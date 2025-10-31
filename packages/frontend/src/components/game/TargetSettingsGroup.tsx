@@ -75,6 +75,15 @@ const TargetSettingsGroup: React.FC<TargetSettingsGroupProps> = ({
   const channelRef = useRef<HTMLDivElement>(null);
   const worldRef = useRef<HTMLDivElement>(null);
 
+  // Debug log
+  useEffect(() => {
+    console.log('[TargetSettingsGroup] received props', {
+      targetPlatforms,
+      targetChannelSubchannels,
+      targetWorlds,
+    });
+  }, [targetPlatforms, targetChannelSubchannels, targetWorlds]);
+
   // Handle outside click to close dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

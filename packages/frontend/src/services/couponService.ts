@@ -23,6 +23,9 @@ export interface CouponSetting {
   expiresAt: string;
   status: CouponStatus;
   codePattern?: CodePattern;
+  targetPlatformsInverted?: boolean;
+  targetChannelsInverted?: boolean;
+  targetWorldsInverted?: boolean;
   createdAt?: string;
   generationStatus?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
   generatedCount?: number;
@@ -55,6 +58,11 @@ export interface CreateCouponSettingInput extends Omit<CouponSetting, 'id'|'stat
   targetPlatforms?: string[] | null;
   targetChannels?: string[] | null;
   targetSubchannels?: string[] | null;
+  targetUsers?: string[] | null;
+  targetPlatformsInverted?: boolean;
+  targetChannelsInverted?: boolean;
+  targetWorldsInverted?: boolean;
+  targetUserIdsInverted?: boolean;
 }
 
 export interface UpdateCouponSettingInput extends Partial<CreateCouponSettingInput> {}

@@ -3220,7 +3220,8 @@
         "error429": "同一用户/代码的请求过多（垃圾邮件限制）",
         "errorCodesDesc": "各种错误情况的响应示例。",
         "apiTest": "API 测试",
-        "copiedToClipboard": "代码已复制到剪贴板。"
+        "copiedToClipboard": "代码已复制到剪贴板。",
+        "allUsed": "全部已使用"
       }
     },
     "issuedCodes": {

@@ -108,7 +108,7 @@ export class CouponRedeemService {
       }
 
       // 6. Check targeting conditions
-      await this.validateTargeting(connection, setting.id, request);
+      await this.validateTargeting(connection, setting.id, request, setting);
 
       // 7. Check per-user/character limit based on usageLimitType
       const usageLimitType = setting.usageLimitType || 'USER';
@@ -237,7 +237,8 @@ export class CouponRedeemService {
   private static async validateTargeting(
     connection: PoolConnection,
     settingId: string,
-    request: RedeemRequest
+    request: RedeemRequest,
+    setting: any
   ): Promise<void> {
     // Check if any targeting conditions are set
     const [worldRows] = await connection.execute<RowDataPacket[]>(
@@ -260,10 +261,16 @@ export class CouponRedeemService {
       [settingId]
     );
 
+    const [userRows] = await connection.execute<RowDataPacket[]>(
+      'SELECT COUNT(*) as count FROM g_coupon_target_users WHERE settingId = ?',
+      [settingId]
+    );
+
     const hasWorldTargeting = (worldRows[0] as any).count > 0;
     const hasPlatformTargeting = (platformRows[0] as any).count > 0;
     const hasChannelTargeting = (channelRows[0] as any).count > 0;
     const hasSubchannelTargeting = (subchannelRows[0] as any).count > 0;
+    const hasUserTargeting = (userRows[0] as any).count > 0;
 
     // Validate world targeting
     if (hasWorldTargeting && request.worldId) {
@@ -295,7 +302,11 @@ export class CouponRedeemService {
         'SELECT COUNT(*) as count FROM g_coupon_target_channels WHERE settingId = ? AND channel = ?',
         [settingId, request.channel]
       );
-      if ((channelMatch[0] as any).count === 0) {
+      const isMatched = (channelMatch[0] as any).count > 0;
+      const isInverted = setting.targetChannelsInverted || false;
+
+      // If inverted: should NOT match. If normal: should match
+      if (isInverted ? isMatched : !isMatched) {
         const error = new CustomError('Coupon is not available for this channel', 422, true, 'UNPROCESSABLE_ENTITY');
         throw error;
       }
@@ -307,8 +318,28 @@ export class CouponRedeemService {
         'SELECT COUNT(*) as count FROM g_coupon_target_subchannels WHERE settingId = ? AND subchannel = ?',
         [settingId, request.subChannel]
       );
-      if ((subchannelMatch[0] as any).count === 0) {
+      const isMatched = (subchannelMatch[0] as any).count > 0;
+      const isInverted = setting.targetChannelsInverted || false;
+
+      // If inverted: should NOT match. If normal: should match
+      if (isInverted ? isMatched : !isMatched) {
         const error = new CustomError('Coupon is not available for this subchannel', 422, true, 'UNPROCESSABLE_ENTITY');
+        throw error;
+      }
+    }
+
+    // Validate user ID targeting
+    if (hasUserTargeting) {
+      const [userMatch] = await connection.execute<RowDataPacket[]>(
+        'SELECT COUNT(*) as count FROM g_coupon_target_users WHERE settingId = ? AND userId = ?',
+        [settingId, request.userId]
+      );
+      const isMatched = (userMatch[0] as any).count > 0;
+      const isInverted = setting.targetUserIdsInverted || false;
+
+      // If inverted: should NOT match. If normal: should match
+      if (isInverted ? isMatched : !isMatched) {
+        const error = new CustomError('Coupon is not available for this user', 422, true, 'UNPROCESSABLE_ENTITY');
         throw error;
       }
     }

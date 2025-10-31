@@ -677,13 +677,43 @@ const CouponSettingsPage: React.FC = () => {
       return;
     }
 
+    // Convert targetChannelSubchannels to targetChannels and targetSubchannels for coupon API
+    const targetChannels: string[] = [];
+    const targetSubchannels: string[] = [];
+    if (form.targetChannelSubchannels && form.targetChannelSubchannels.length > 0) {
+      form.targetChannelSubchannels.forEach((item: any) => {
+        if (!targetChannels.includes(item.channel)) {
+          targetChannels.push(item.channel);
+        }
+        item.subchannels.forEach((subchannel: string) => {
+          if (!targetSubchannels.includes(subchannel)) {
+            targetSubchannels.push(subchannel);
+          }
+        });
+      });
+    }
+
+    // Parse targetUserIds from string to array
+    const targetUsers: string[] = [];
+    if (form.targetUserIds && typeof form.targetUserIds === 'string') {
+      const userIds = form.targetUserIds.split(',').map((id: string) => id.trim()).filter((id: string) => id);
+      targetUsers.push(...userIds);
+    }
+
     const payload: any = {
       ...form,
       startsAt: form.startsAt ? (form.startsAt as Dayjs).toDate().toISOString() : null,
       expiresAt: (form.expiresAt as Dayjs).toDate().toISOString(),
       rewardData: rewardMode === 'direct' ? form.rewardData : null,
       rewardTemplateId: rewardMode === 'template' ? form.rewardTemplateId : null,
+      // Remove targetChannelSubchannels and use targetChannels/targetSubchannels instead
+      targetChannels: targetChannels.length > 0 ? targetChannels : null,
+      targetSubchannels: targetSubchannels.length > 0 ? targetSubchannels : null,
+      targetUsers: targetUsers.length > 0 ? targetUsers : null,
     };
+    delete payload.targetChannelSubchannels;
+    delete payload.targetChannelSubchannelsInverted;
+    delete payload.targetUserIds;
 
     // Debug: log payload to inspect server-side validation issues
     console.log('[CouponSettings] create/update payload', { editing: !!editing, payload });
@@ -705,6 +735,10 @@ const CouponSettingsPage: React.FC = () => {
     // quantity only for create
     if (editing) {
       delete payload.quantity;
+      // For update, don't send startsAt if it's null (it's optional for updates)
+      if (payload.startsAt === null) {
+        delete payload.startsAt;
+      }
     }
 
     try {
@@ -712,6 +746,7 @@ const CouponSettingsPage: React.FC = () => {
         await couponService.updateSetting(editing.id, payload);
         setOpenForm(false);
         resetForm();
+        enqueueSnackbar(t('common.saveSuccess') as string, { variant: 'success' });
         await load();
       } else {
         // For create: close form immediately and load in background
@@ -738,44 +773,81 @@ const CouponSettingsPage: React.FC = () => {
     }
   };
 
-  const handleEdit = (it: CouponSetting) => {
+  const handleEdit = async (it: CouponSetting) => {
     setEditing(it);
 
-    // Set reward mode and data based on rewardTemplateId
-    if (it.rewardTemplateId) {
-      setRewardMode('template');
-    } else {
-      setRewardMode('direct');
-    }
+    try {
+      // Fetch full coupon setting with targeting data
+      const res = await couponService.getSetting(it.id);
+      const fullSetting = res.setting;
 
-    setForm({
-      code: it.code || '',
-      type: it.type,
-      name: (it as any).name,
-      description: (it as any).description || '',
-      quantity: 1,
-      perUserLimit: it.perUserLimit || 1,
-      usageLimitType: it.usageLimitType || 'USER',
-      maxTotalUses: it.maxTotalUses ?? null,
-      startsAt: parseUTCForPicker(it.startsAt),
-      expiresAt: parseUTCForPicker(it.expiresAt),
-      status: it.status,
-      rewardData: it.rewardData || [],
-      rewardTemplateId: it.rewardTemplateId || null,
-      rewardEmailTitle: it.rewardEmailTitle || '',
-      rewardEmailBody: it.rewardEmailBody || '',
-      targetPlatforms: (it as any).targetPlatforms || [],
-      targetPlatformsInverted: (it as any).targetPlatformsInverted || false,
-      targetChannelSubchannels: (it as any).targetChannelSubchannels || [],
-      targetChannelSubchannelsInverted: (it as any).targetChannelSubchannelsInverted || false,
-      targetWorlds: (it as any).targetWorlds || [],
-      targetWorldsInverted: (it as any).targetWorldsInverted || false,
-      targetUserIds: (it as any).targetUserIds || '',
-      targetUserIdsInverted: (it as any).targetUserIdsInverted || false,
-    });
-    // When editing, mark description as manually edited (since it already has a value)
-    setIsDescriptionManuallyEdited(true);
-    setOpenForm(true);
+      console.log('[CouponSettings] handleEdit - fetched full setting', fullSetting);
+
+      // Set reward mode and data based on rewardTemplateId
+      if (fullSetting.rewardTemplateId) {
+        setRewardMode('template');
+      } else {
+        setRewardMode('direct');
+      }
+
+      // Convert targetChannels and targetSubchannels to targetChannelSubchannels format
+      const targetChannelSubchannels: ChannelSubchannelData[] = [];
+      const targetChannels = (fullSetting as any).targetChannels || [];
+      const targetSubchannels = (fullSetting as any).targetSubchannels || [];
+
+      console.log('[CouponSettings] handleEdit - raw data', {
+        targetChannels,
+        targetSubchannels,
+      });
+
+      if (targetChannels.length > 0) {
+        targetChannels.forEach((channel: string) => {
+          targetChannelSubchannels.push({
+            channel,
+            subchannels: targetSubchannels,
+          });
+        });
+      }
+
+      console.log('[CouponSettings] handleEdit - converted targetChannelSubchannels', targetChannelSubchannels);
+
+      const newForm = {
+        code: fullSetting.code || '',
+        type: fullSetting.type,
+        name: (fullSetting as any).name,
+        description: (fullSetting as any).description || '',
+        quantity: 1,
+        perUserLimit: fullSetting.perUserLimit || 1,
+        usageLimitType: fullSetting.usageLimitType || 'USER',
+        maxTotalUses: fullSetting.maxTotalUses ?? null,
+        startsAt: parseUTCForPicker(fullSetting.startsAt),
+        expiresAt: parseUTCForPicker(fullSetting.expiresAt),
+        status: fullSetting.status,
+        rewardData: fullSetting.rewardData || [],
+        rewardTemplateId: fullSetting.rewardTemplateId || null,
+        rewardEmailTitle: fullSetting.rewardEmailTitle || '',
+        rewardEmailBody: fullSetting.rewardEmailBody || '',
+        targetPlatforms: (fullSetting as any).targetPlatforms || [],
+        targetPlatformsInverted: (fullSetting as any).targetPlatformsInverted || false,
+        targetChannelSubchannels,
+        targetChannelSubchannelsInverted: (fullSetting as any).targetChannelsInverted || false,
+        targetWorlds: (fullSetting as any).targetWorlds || [],
+        targetWorldsInverted: (fullSetting as any).targetWorldsInverted || false,
+        targetUserIds: ((fullSetting as any).targetUsers || []).join(', '),
+        targetUserIdsInverted: (fullSetting as any).targetUserIdsInverted || false,
+      };
+
+      console.log('[CouponSettings] handleEdit - final form state', newForm);
+
+      setForm(newForm);
+      // When editing, mark description as manually edited (since it already has a value)
+      setIsDescriptionManuallyEdited(true);
+      // Open form after state is set
+      setOpenForm(true);
+    } catch (error) {
+      console.error('[CouponSettings] handleEdit error:', error);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
+    }
   };
 
   const handleDeleteClick = (setting: CouponSetting) => {
@@ -1066,16 +1138,39 @@ const CouponSettingsPage: React.FC = () => {
                                 </Tooltip>
                               </TableCell>
                             );
-                          case 'status':
+                          case 'status': {
+                            // Check if coupon is fully used
+                            let displayLabel = it.status === 'ACTIVE' ? t('common.active') : it.status === 'DISABLED' ? t('common.disabled') : t('status.deleted');
+                            let displayColor: 'success' | 'default' | 'warning' | 'error' = it.status === 'ACTIVE' ? 'success' : it.status === 'DISABLED' ? 'default' : 'warning';
+
+                            // Check if all coupons are used
+                            if (it.status === 'ACTIVE') {
+                              if (it.type === 'SPECIAL') {
+                                // For SPECIAL: check if maxTotalUses is set and all are used
+                                if (it.maxTotalUses && it.maxTotalUses > 0 && (it.usedCount || 0) >= it.maxTotalUses) {
+                                  displayLabel = t('coupons.couponSettings.allUsed');
+                                  displayColor = 'error';
+                                }
+                              } else {
+                                // For NORMAL: check if all issued codes are used
+                                const totalIssued = it.generatedCount || it.issuedCount || 0;
+                                if (totalIssued > 0 && (it.usedCount || 0) >= totalIssued) {
+                                  displayLabel = t('coupons.couponSettings.allUsed');
+                                  displayColor = 'error';
+                                }
+                              }
+                            }
+
                             return (
                               <TableCell key="status" align="center" sx={{ py: 1, px: 2 }}>
                                 <Chip
                                   size="small"
-                                  color={it.status === 'ACTIVE' ? 'success' : it.status === 'DISABLED' ? 'default' : 'warning'}
-                                  label={it.status === 'ACTIVE' ? t('common.active') : it.status === 'DISABLED' ? t('common.disabled') : t('status.deleted')}
+                                  color={displayColor}
+                                  label={displayLabel}
                                 />
                               </TableCell>
                             );
+                          }
                           case 'usageRate': {
                             let numerator = it.usedCount || 0;
                             let denominator: number | string;

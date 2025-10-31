@@ -31,6 +31,11 @@ const createSchema = Joi.object({
   targetPlatforms: Joi.array().items(Joi.string()).allow(null),
   targetChannels: Joi.array().items(Joi.string()).allow(null),
   targetSubchannels: Joi.array().items(Joi.string()).allow(null),
+  targetUsers: Joi.array().items(Joi.string()).allow(null),
+  targetPlatformsInverted: Joi.boolean().optional().default(false),
+  targetChannelsInverted: Joi.boolean().optional().default(false),
+  targetWorldsInverted: Joi.boolean().optional().default(false),
+  targetUserIdsInverted: Joi.boolean().optional().default(false),
 }).unknown(false);
 
 // Update schema: make most fields optional, but forbid quantity
@@ -59,6 +64,11 @@ const updateSchema = Joi.object({
   targetPlatforms: Joi.array().items(Joi.string()).allow(null).optional(),
   targetChannels: Joi.array().items(Joi.string()).allow(null).optional(),
   targetSubchannels: Joi.array().items(Joi.string()).allow(null).optional(),
+  targetUsers: Joi.array().items(Joi.string()).allow(null).optional(),
+  targetPlatformsInverted: Joi.boolean().optional(),
+  targetChannelsInverted: Joi.boolean().optional(),
+  targetWorldsInverted: Joi.boolean().optional(),
+  targetUserIdsInverted: Joi.boolean().optional(),
 }).unknown(false);
 
 export class CouponSettingsController {

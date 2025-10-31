@@ -3156,6 +3156,7 @@
         "targetUserIdsHelp": "Enter user IDs that can use the coupon (separated by line breaks, all if not entered)",
         "targetUserIdsPlaceholder": "user123\\nuser456\\nuser789"
       },
+      "allUsed": "All Used",
       "deleteConfirmTitle": "Confirm Deletion",
       "deleteConfirmMessage": "Are you sure you want to delete '{{name}}'? This action cannot be undone.",
       "deleteSuccess": "Coupon has been deleted.",

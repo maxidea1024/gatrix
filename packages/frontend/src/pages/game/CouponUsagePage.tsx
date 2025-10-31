@@ -474,7 +474,7 @@ const CouponUsagePage: React.FC = () => {
                             );
                           case 'subChannel':
                             return (
-                              <TableCell key="subChannel"><Typography variant="body2">{r.subChannel || '-'}</Typography></TableCell>
+                              <TableCell key="subChannel"><Typography variant="body2">{r.subchannel || '-'}</Typography></TableCell>
                             );
                           default:
                             return null;

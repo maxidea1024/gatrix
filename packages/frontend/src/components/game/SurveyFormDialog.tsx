@@ -30,8 +30,10 @@ import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
-import surveyService, { Survey, TriggerCondition, ParticipationReward } from '../../services/surveyService';
+import { useGameWorld } from '../../contexts/GameWorldContext';
+import surveyService, { Survey, TriggerCondition, ParticipationReward, ChannelSubchannelData } from '../../services/surveyService';
 import RewardSelector from './RewardSelector';
+import TargetSettingsGroup from './TargetSettingsGroup';
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -48,7 +50,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { platforms } = usePlatformConfig();
+  const { platforms, channels } = usePlatformConfig();
+  const { worlds } = useGameWorld();
 
   // Form state
   const [platformSurveyId, setPlatformSurveyId] = useState('');
@@ -67,10 +70,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
 
   // Targeting state
   const [targetPlatforms, setTargetPlatforms] = useState<string[]>([]);
+  const [targetPlatformsInverted, setTargetPlatformsInverted] = useState(false);
+  const [targetChannelSubchannels, setTargetChannelSubchannels] = useState<ChannelSubchannelData[]>([]);
+  const [targetChannelSubchannelsInverted, setTargetChannelSubchannelsInverted] = useState(false);
   const [targetWorlds, setTargetWorlds] = useState<string[]>([]);
-  const [targetMarkets, setTargetMarkets] = useState<string[]>([]);
-  const [targetClientVersions, setTargetClientVersions] = useState<string[]>([]);
-  const [targetAccountIds, setTargetAccountIds] = useState<string[]>([]);
+  const [targetWorldsInverted, setTargetWorldsInverted] = useState(false);
 
   // Collapse states
   const [triggerConditionsExpanded, setTriggerConditionsExpanded] = useState(true);
@@ -101,10 +105,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setRewardMailContent(survey.rewardMailContent || '');
       setIsActive(Boolean(survey.isActive));
       setTargetPlatforms(Array.isArray(survey.targetPlatforms) ? survey.targetPlatforms : []);
+      setTargetPlatformsInverted(survey.targetPlatformsInverted || false);
+      setTargetChannelSubchannels(Array.isArray(survey.targetChannelSubchannels) ? survey.targetChannelSubchannels : []);
+      setTargetChannelSubchannelsInverted(survey.targetChannelSubchannelsInverted || false);
       setTargetWorlds(Array.isArray(survey.targetWorlds) ? survey.targetWorlds : []);
-      setTargetMarkets(Array.isArray(survey.targetMarkets) ? survey.targetMarkets : []);
-      setTargetClientVersions(Array.isArray(survey.targetClientVersions) ? survey.targetClientVersions : []);
-      setTargetAccountIds(Array.isArray(survey.targetAccountIds) ? survey.targetAccountIds : []);
+      setTargetWorldsInverted(survey.targetWorldsInverted || false);
     } else {
       // Reset form
       setPlatformSurveyId('');
@@ -118,10 +123,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setRewardMailContent('');
       setIsActive(true);
       setTargetPlatforms([]);
+      setTargetPlatformsInverted(false);
+      setTargetChannelSubchannels([]);
+      setTargetChannelSubchannelsInverted(false);
       setTargetWorlds([]);
-      setTargetMarkets([]);
-      setTargetClientVersions([]);
-      setTargetAccountIds([]);
+      setTargetWorldsInverted(false);
     }
   }, [survey, open]);
 
@@ -237,10 +243,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         rewardMailContent: rewardMailContent.trim() || undefined,
         isActive,
         targetPlatforms: targetPlatforms.length > 0 ? targetPlatforms : null,
+        targetPlatformsInverted: targetPlatformsInverted,
+        targetChannelSubchannels: targetChannelSubchannels.length > 0 ? targetChannelSubchannels : null,
+        targetChannelSubchannelsInverted: targetChannelSubchannelsInverted,
         targetWorlds: targetWorlds.length > 0 ? targetWorlds : null,
-        targetMarkets: targetMarkets.length > 0 ? targetMarkets : null,
-        targetClientVersions: targetClientVersions.length > 0 ? targetClientVersions : null,
-        targetAccountIds: targetAccountIds.length > 0 ? targetAccountIds : null,
+        targetWorldsInverted: targetWorldsInverted,
       };
 
       if (survey) {
@@ -347,98 +354,36 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           />
 
           {/* Targeting */}
-          <Paper variant="outlined" sx={{ p: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                mb: targetingExpanded ? 1 : 0,
-                cursor: 'pointer',
+          {/* Target Settings Group */}
+          <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+              🎯 {t('surveys.targeting')}
+            </Typography>
+            <TargetSettingsGroup
+              targetPlatforms={targetPlatforms}
+              targetPlatformsInverted={targetPlatformsInverted}
+              platforms={platforms}
+              onPlatformsChange={(platforms, inverted) => {
+                setTargetPlatforms(platforms);
+                setTargetPlatformsInverted(inverted);
               }}
-              onClick={() => setTargetingExpanded(!targetingExpanded)}
-            >
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                {t('surveys.targeting')}
-              </Typography>
-              <IconButton size="small" sx={{ pointerEvents: 'none' }}>
-                {targetingExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              </IconButton>
-            </Box>
-            <Collapse in={targetingExpanded}>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-                {t('surveys.targetingHelp')}
-              </Typography>
-              <Stack spacing={2}>
-                {/* Target Platforms */}
-                <FormControl fullWidth>
-                  <InputLabel>{t('surveys.targetPlatforms')}</InputLabel>
-                  <Select
-                    multiple
-                    value={targetPlatforms}
-                    onChange={(e) => setTargetPlatforms(typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
-                    input={<OutlinedInput label={t('surveys.targetPlatforms')} />}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {selected.map((value) => (
-                          <Chip key={value} label={value} size="small" />
-                        ))}
-                      </Box>
-                    )}
-                  >
-                    {platforms.map((platform) => (
-                      <MenuItem key={platform.value} value={platform.value}>
-                        {platform.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
-                    {t('surveys.targetPlatformsHelp')}
-                  </Typography>
-                </FormControl>
-
-                {/* Target Worlds */}
-                <TextField
-                  label={t('surveys.targetWorlds')}
-                  value={targetWorlds.join(', ')}
-                  onChange={(e) => setTargetWorlds(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                  fullWidth
-                  placeholder={t('surveys.targetWorldsPlaceholder')}
-                  helperText={t('surveys.targetWorldsHelp')}
-                />
-
-                {/* Target Markets */}
-                <TextField
-                  label={t('surveys.targetMarkets')}
-                  value={targetMarkets.join(', ')}
-                  onChange={(e) => setTargetMarkets(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                  fullWidth
-                  placeholder={t('surveys.targetMarketsPlaceholder')}
-                  helperText={t('surveys.targetMarketsHelp')}
-                />
-
-                {/* Target Client Versions */}
-                <TextField
-                  label={t('surveys.targetClientVersions')}
-                  value={targetClientVersions.join(', ')}
-                  onChange={(e) => setTargetClientVersions(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                  fullWidth
-                  placeholder={t('surveys.targetClientVersionsPlaceholder')}
-                  helperText={t('surveys.targetClientVersionsHelp')}
-                />
-
-                {/* Target Account IDs */}
-                <TextField
-                  label={t('surveys.targetAccountIds')}
-                  value={targetAccountIds.join(', ')}
-                  onChange={(e) => setTargetAccountIds(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                  fullWidth
-                  placeholder={t('surveys.targetAccountIdsPlaceholder')}
-                  helperText={t('surveys.targetAccountIdsHelp')}
-                />
-              </Stack>
-            </Collapse>
-          </Paper>
+              targetChannelSubchannels={targetChannelSubchannels}
+              targetChannelSubchannelsInverted={targetChannelSubchannelsInverted}
+              channels={channels}
+              onChannelsChange={(channels, inverted) => {
+                setTargetChannelSubchannels(channels);
+                setTargetChannelSubchannelsInverted(inverted);
+              }}
+              targetWorlds={targetWorlds}
+              targetWorldsInverted={targetWorldsInverted}
+              worlds={worlds}
+              onWorldsChange={(worlds, inverted) => {
+                setTargetWorlds(worlds);
+                setTargetWorldsInverted(inverted);
+              }}
+              showUserIdFilter={false}
+            />
+          </Box>
 
           {/* Trigger Conditions */}
           <Paper variant="outlined" sx={{ p: 2 }}>

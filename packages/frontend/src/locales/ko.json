@@ -3156,6 +3156,7 @@
         "targetUserIdsHelp": "쿠폰을 사용할 수 있는 유저 ID를 입력합니다 (줄바꿈으로 구분, 미입력 시 전체)",
         "targetUserIdsPlaceholder": "user123\\nuser456\\nuser789"
       },
+      "allUsed": "모두사용",
       "deleteConfirmTitle": "쿠폰 삭제 확인",
       "deleteConfirmMessage": "'{{name}}' 쿠폰을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
       "deleteSuccess": "쿠폰이 삭제되었습니다.",

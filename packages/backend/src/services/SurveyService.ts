@@ -14,6 +14,11 @@ export interface ParticipationReward {
   quantity: number;
 }
 
+export interface ChannelSubchannelData {
+  channel: string;
+  subchannels: string[];
+}
+
 export interface Survey {
   id: string;
   platformSurveyId: string;
@@ -27,10 +32,11 @@ export interface Survey {
   isActive: boolean;
   // Targeting fields
   targetPlatforms?: string[] | null;
+  targetPlatformsInverted?: boolean;
+  targetChannelSubchannels?: ChannelSubchannelData[] | null;
+  targetChannelSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
-  targetMarkets?: string[] | null;
-  targetClientVersions?: string[] | null;
-  targetAccountIds?: string[] | null;
+  targetWorldsInverted?: boolean;
   createdBy?: number;
   updatedBy?: number;
   createdAt: Date;
@@ -56,10 +62,11 @@ export interface CreateSurveyInput {
   isActive?: boolean;
   // Targeting fields
   targetPlatforms?: string[] | null;
+  targetPlatformsInverted?: boolean;
+  targetChannelSubchannels?: ChannelSubchannelData[] | null;
+  targetChannelSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
-  targetMarkets?: string[] | null;
-  targetClientVersions?: string[] | null;
-  targetAccountIds?: string[] | null;
+  targetWorldsInverted?: boolean;
   createdBy?: number;
 }
 
@@ -75,10 +82,11 @@ export interface UpdateSurveyInput {
   isActive?: boolean;
   // Targeting fields
   targetPlatforms?: string[] | null;
+  targetPlatformsInverted?: boolean;
+  targetChannelSubchannels?: ChannelSubchannelData[] | null;
+  targetChannelSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
-  targetMarkets?: string[] | null;
-  targetClientVersions?: string[] | null;
-  targetAccountIds?: string[] | null;
+  targetWorldsInverted?: boolean;
   updatedBy?: number;
 }
 
@@ -136,6 +144,21 @@ export class SurveyService {
           ? JSON.parse(row.participationRewards)
           : row.participationRewards)
         : null,
+      targetPlatforms: row.targetPlatforms
+        ? (typeof row.targetPlatforms === 'string'
+          ? JSON.parse(row.targetPlatforms)
+          : row.targetPlatforms)
+        : null,
+      targetChannelSubchannels: row.targetChannelSubchannels
+        ? (typeof row.targetChannelSubchannels === 'string'
+          ? JSON.parse(row.targetChannelSubchannels)
+          : row.targetChannelSubchannels)
+        : null,
+      targetWorlds: row.targetWorlds
+        ? (typeof row.targetWorlds === 'string'
+          ? JSON.parse(row.targetWorlds)
+          : row.targetWorlds)
+        : null,
     })) as Survey[];
 
     return { surveys, total, page, limit };
@@ -165,6 +188,21 @@ export class SurveyService {
           ? JSON.parse(rows[0].participationRewards)
           : rows[0].participationRewards)
         : null,
+      targetPlatforms: rows[0].targetPlatforms
+        ? (typeof rows[0].targetPlatforms === 'string'
+          ? JSON.parse(rows[0].targetPlatforms)
+          : rows[0].targetPlatforms)
+        : null,
+      targetChannelSubchannels: rows[0].targetChannelSubchannels
+        ? (typeof rows[0].targetChannelSubchannels === 'string'
+          ? JSON.parse(rows[0].targetChannelSubchannels)
+          : rows[0].targetChannelSubchannels)
+        : null,
+      targetWorlds: rows[0].targetWorlds
+        ? (typeof rows[0].targetWorlds === 'string'
+          ? JSON.parse(rows[0].targetWorlds)
+          : rows[0].targetWorlds)
+        : null,
     } as Survey;
 
     return survey;
@@ -193,6 +231,21 @@ export class SurveyService {
         ? (typeof rows[0].participationRewards === 'string'
           ? JSON.parse(rows[0].participationRewards)
           : rows[0].participationRewards)
+        : null,
+      targetPlatforms: rows[0].targetPlatforms
+        ? (typeof rows[0].targetPlatforms === 'string'
+          ? JSON.parse(rows[0].targetPlatforms)
+          : rows[0].targetPlatforms)
+        : null,
+      targetChannelSubchannels: rows[0].targetChannelSubchannels
+        ? (typeof rows[0].targetChannelSubchannels === 'string'
+          ? JSON.parse(rows[0].targetChannelSubchannels)
+          : rows[0].targetChannelSubchannels)
+        : null,
+      targetWorlds: rows[0].targetWorlds
+        ? (typeof rows[0].targetWorlds === 'string'
+          ? JSON.parse(rows[0].targetWorlds)
+          : rows[0].targetWorlds)
         : null,
     } as Survey;
 
@@ -231,9 +284,10 @@ export class SurveyService {
       `INSERT INTO g_surveys
       (id, platformSurveyId, surveyTitle, surveyContent, triggerConditions,
        participationRewards, rewardTemplateId, rewardMailTitle, rewardMailContent, isActive,
-       targetPlatforms, targetWorlds, targetMarkets, targetClientVersions, targetAccountIds,
+       targetPlatforms, targetPlatformsInverted, targetChannelSubchannels, targetChannelSubchannelsInverted,
+       targetWorlds, targetWorldsInverted,
        createdBy)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         input.platformSurveyId,
@@ -246,10 +300,11 @@ export class SurveyService {
         input.rewardMailContent || null,
         isActive,
         input.targetPlatforms ? JSON.stringify(input.targetPlatforms) : null,
+        input.targetPlatformsInverted || false,
+        input.targetChannelSubchannels ? JSON.stringify(input.targetChannelSubchannels) : null,
+        input.targetChannelSubchannelsInverted || false,
         input.targetWorlds ? JSON.stringify(input.targetWorlds) : null,
-        input.targetMarkets ? JSON.stringify(input.targetMarkets) : null,
-        input.targetClientVersions ? JSON.stringify(input.targetClientVersions) : null,
-        input.targetAccountIds ? JSON.stringify(input.targetAccountIds) : null,
+        input.targetWorldsInverted || false,
         input.createdBy || null,
       ]
     );
@@ -332,21 +387,25 @@ export class SurveyService {
       updates.push('targetPlatforms = ?');
       values.push(input.targetPlatforms ? JSON.stringify(input.targetPlatforms) : null);
     }
+    if (input.targetPlatformsInverted !== undefined) {
+      updates.push('targetPlatformsInverted = ?');
+      values.push(input.targetPlatformsInverted);
+    }
+    if (input.targetChannelSubchannels !== undefined) {
+      updates.push('targetChannelSubchannels = ?');
+      values.push(input.targetChannelSubchannels ? JSON.stringify(input.targetChannelSubchannels) : null);
+    }
+    if (input.targetChannelSubchannelsInverted !== undefined) {
+      updates.push('targetChannelSubchannelsInverted = ?');
+      values.push(input.targetChannelSubchannelsInverted);
+    }
     if (input.targetWorlds !== undefined) {
       updates.push('targetWorlds = ?');
       values.push(input.targetWorlds ? JSON.stringify(input.targetWorlds) : null);
     }
-    if (input.targetMarkets !== undefined) {
-      updates.push('targetMarkets = ?');
-      values.push(input.targetMarkets ? JSON.stringify(input.targetMarkets) : null);
-    }
-    if (input.targetClientVersions !== undefined) {
-      updates.push('targetClientVersions = ?');
-      values.push(input.targetClientVersions ? JSON.stringify(input.targetClientVersions) : null);
-    }
-    if (input.targetAccountIds !== undefined) {
-      updates.push('targetAccountIds = ?');
-      values.push(input.targetAccountIds ? JSON.stringify(input.targetAccountIds) : null);
+    if (input.targetWorldsInverted !== undefined) {
+      updates.push('targetWorldsInverted = ?');
+      values.push(input.targetWorldsInverted);
     }
     if (input.updatedBy !== undefined) {
       updates.push('updatedBy = ?');

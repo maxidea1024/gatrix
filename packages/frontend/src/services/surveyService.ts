@@ -11,6 +11,11 @@ export interface ParticipationReward {
   quantity: number;
 }
 
+export interface ChannelSubchannelData {
+  channel: string;
+  subchannels: string[];
+}
+
 export interface Survey {
   id: string;
   platformSurveyId: string;
@@ -24,10 +29,11 @@ export interface Survey {
   isActive: boolean;
   // Targeting fields
   targetPlatforms?: string[] | null;
+  targetPlatformsInverted?: boolean;
+  targetChannelSubchannels?: ChannelSubchannelData[] | null;
+  targetChannelSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
-  targetMarkets?: string[] | null;
-  targetClientVersions?: string[] | null;
-  targetAccountIds?: string[] | null;
+  targetWorldsInverted?: boolean;
   createdBy?: number;
   updatedBy?: number;
   createdAt: string;
@@ -53,10 +59,11 @@ export interface CreateSurveyInput {
   isActive?: boolean;
   // Targeting fields
   targetPlatforms?: string[] | null;
+  targetPlatformsInverted?: boolean;
+  targetChannelSubchannels?: ChannelSubchannelData[] | null;
+  targetChannelSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
-  targetMarkets?: string[] | null;
-  targetClientVersions?: string[] | null;
-  targetAccountIds?: string[] | null;
+  targetWorldsInverted?: boolean;
 }
 
 export interface UpdateSurveyInput {
@@ -71,10 +78,11 @@ export interface UpdateSurveyInput {
   isActive?: boolean;
   // Targeting fields
   targetPlatforms?: string[] | null;
+  targetPlatformsInverted?: boolean;
+  targetChannelSubchannels?: ChannelSubchannelData[] | null;
+  targetChannelSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
-  targetMarkets?: string[] | null;
-  targetClientVersions?: string[] | null;
-  targetAccountIds?: string[] | null;
+  targetWorldsInverted?: boolean;
 }
 
 export interface GetSurveysParams {

@@ -29,6 +29,9 @@ export interface CouponSetting {
   expiresAt: string; // MySQL DATETIME
   status: CouponStatus;
   codePattern?: CodePattern;
+  targetPlatformsInverted?: boolean;
+  targetChannelsInverted?: boolean;
+  targetWorldsInverted?: boolean;
   createdBy?: number | null;
   updatedBy?: number | null;
 }
@@ -55,6 +58,11 @@ export interface CreateCouponSettingInput {
   targetPlatforms?: string[] | null;
   targetChannels?: string[] | null;
   targetSubchannels?: string[] | null;
+  targetUsers?: string[] | null;
+  targetPlatformsInverted?: boolean;
+  targetChannelsInverted?: boolean;
+  targetWorldsInverted?: boolean;
+  targetUserIdsInverted?: boolean;
   createdBy?: number | null;
 }
 
@@ -163,12 +171,18 @@ export class CouponSettingsService {
       [id]
     );
 
+    const [users] = await pool.execute<RowDataPacket[]>(
+      'SELECT userId FROM g_coupon_target_users WHERE settingId = ? ORDER BY userId ASC',
+      [id]
+    );
+
     return {
       ...base,
       targetWorlds: worlds.map(w => w.gameWorldId),
       targetPlatforms: platforms.map(p => p.platform),
       targetChannels: channels.map(c => c.channel),
       targetSubchannels: subchannels.map(s => s.subchannel),
+      targetUsers: users.map(u => u.userId),
     };
   }
 
@@ -213,8 +227,8 @@ export class CouponSettingsService {
     await pool.execute(
       `INSERT INTO g_coupon_settings
        (id, code, type, name, description, tags, maxTotalUses, perUserLimit, usageLimitType, rewardTemplateId, rewardData,
-        rewardEmailTitle, rewardEmailBody, startsAt, expiresAt, status, codePattern, createdBy)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        rewardEmailTitle, rewardEmailBody, startsAt, expiresAt, status, codePattern, targetPlatformsInverted, targetChannelsInverted, targetWorldsInverted, targetUserIdsInverted, createdBy)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         settingCode,
@@ -233,6 +247,10 @@ export class CouponSettingsService {
         expiresAt,
         input.status ?? 'ACTIVE',
         codePattern,
+        input.targetPlatformsInverted ?? false,
+        input.targetChannelsInverted ?? false,
+        input.targetWorldsInverted ?? false,
+        input.targetUserIdsInverted ?? false,
         input.createdBy ?? null,
       ]
     );
@@ -272,6 +290,7 @@ export class CouponSettingsService {
     await insertTargets('g_coupon_target_platforms', 'platform', input.targetPlatforms);
     await insertTargets('g_coupon_target_channels', 'channel', input.targetChannels);
     await insertTargets('g_coupon_target_subchannels', 'subchannel', input.targetSubchannels);
+    await insertTargets('g_coupon_target_users', 'userId', input.targetUsers);
 
     return await this.getSettingById(id);
   }
@@ -306,9 +325,14 @@ export class CouponSettingsService {
     if (input.rewardEmailBody !== undefined) add('rewardEmailBody = ?', input.rewardEmailBody);
 
     if (input.startsAt !== undefined) {
-      const v = convertToMySQLDateTime(input.startsAt);
-      if (!v) throw new CustomError('Invalid startsAt', 400);
-      add('startsAt = ?', v);
+      // startsAt is optional - can be null
+      if (input.startsAt === null) {
+        add('startsAt = ?', null);
+      } else {
+        const v = convertToMySQLDateTime(input.startsAt);
+        if (!v) throw new CustomError('Invalid startsAt', 400);
+        add('startsAt = ?', v);
+      }
     }
     if (input.expiresAt !== undefined) {
       const v = convertToMySQLDateTime(input.expiresAt);
@@ -316,6 +340,9 @@ export class CouponSettingsService {
       add('expiresAt = ?', v);
     }
     if (input.status !== undefined) add('status = ?', input.status);
+    if (input.targetPlatformsInverted !== undefined) add('targetPlatformsInverted = ?', input.targetPlatformsInverted);
+    if (input.targetChannelsInverted !== undefined) add('targetChannelsInverted = ?', input.targetChannelsInverted);
+    if (input.targetWorldsInverted !== undefined) add('targetWorldsInverted = ?', input.targetWorldsInverted);
     if (input.updatedBy !== undefined) add('updatedBy = ?', input.updatedBy);
 
     if (updates.length) {
@@ -343,6 +370,7 @@ export class CouponSettingsService {
     await replaceTargets('g_coupon_target_platforms', 'platform', input.targetPlatforms);
     await replaceTargets('g_coupon_target_channels', 'channel', input.targetChannels);
     await replaceTargets('g_coupon_target_subchannels', 'subchannel', input.targetSubchannels);
+    await replaceTargets('g_coupon_target_users', 'userId', input.targetUsers);
 
     return await this.getSettingById(id);
   }
@@ -473,7 +501,19 @@ export class CouponSettingsService {
 
     const [rows] = await pool.execute<RowDataPacket[]>(
       `SELECT
-        cu.*,
+        cu.id,
+        cu.settingId,
+        cu.issuedCouponId,
+        cu.userId,
+        cu.characterId,
+        cu.userName,
+        cu.sequence,
+        cu.usedAt,
+        cu.userIp,
+        cu.gameWorldId,
+        cu.platform,
+        cu.channel,
+        cu.subchannel,
         cs.name as couponName,
         COALESCE(c.code, cs.code) as couponCode,
         cs.startsAt as couponStartsAt,
@@ -486,6 +526,18 @@ export class CouponSettingsService {
       LIMIT ${limit} OFFSET ${offset}`,
       args
     );
+
+    // Debug logging
+    if (rows.length > 0) {
+      logger.info('[CouponUsage] Sample record:', {
+        id: rows[0].id,
+        userId: rows[0].userId,
+        platform: rows[0].platform,
+        channel: rows[0].channel,
+        subchannel: rows[0].subchannel,
+        couponName: rows[0].couponName,
+      });
+    }
 
     return { records: rows, total, page, limit };
   }
