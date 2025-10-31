@@ -270,8 +270,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 
     // Note: platforms is optional - empty array means "all platforms"
 
-    if (!startDate || !endDate) {
-      enqueueSnackbar(t('serviceNotices.datesRequired'), { variant: 'error' });
+    if (!endDate) {
+      enqueueSnackbar(t('serviceNotices.endDateRequired'), { variant: 'error' });
       return;
     }
 
@@ -295,7 +295,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
         isActive,
         category: category as any,
         platforms,
-        startDate: startDate.toISOString(),
+        startDate: startDate ? startDate.toISOString() : null,
         endDate: endDate.toISOString(),
         tabTitle: trimmedTabTitle ? trimmedTabTitle : null,
         title: title.trim(),
@@ -427,7 +427,10 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
                 slotProps={{
                   textField: {
                     fullWidth: true,
-                    required: true,
+                    required: false,
+                  },
+                  actionBar: {
+                    actions: ['clear', 'cancel', 'accept'],
                   },
                 }}
               />

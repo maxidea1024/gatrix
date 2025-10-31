@@ -591,10 +591,11 @@ const ServiceNoticesPage: React.FC = () => {
                         }
                         if (column.id === 'currentlyVisible') {
                           // Check if notice is currently visible (isActive + within date range)
+                          // startDate is optional - if null, treat as immediately available
                           const now = new Date();
-                          const startDate = new Date(notice.startDate);
+                          const startDate = notice.startDate ? new Date(notice.startDate) : null;
                           const endDate = new Date(notice.endDate);
-                          const isCurrentlyVisible = notice.isActive && now >= startDate && now <= endDate;
+                          const isCurrentlyVisible = notice.isActive && (!startDate || now >= startDate) && now <= endDate;
 
                           // Create tooltip message
                           const tooltipMessage = isCurrentlyVisible
@@ -679,7 +680,7 @@ const ServiceNoticesPage: React.FC = () => {
                           return (
                             <TableCell key={column.id}>
                               <Typography variant="caption" display="block">
-                                {formatDateTime(notice.startDate)}
+                                {notice.startDate ? formatDateTime(notice.startDate) : t('serviceNotices.startImmediately')}
                               </Typography>
                               <Typography variant="caption" display="block" color="text.secondary">
                                 ~ {formatDateTime(notice.endDate)}

@@ -7,7 +7,7 @@ export interface ServiceNotice {
   isActive: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
-  startDate: string;
+  startDate: string | null;
   endDate: string;
   tabTitle?: string;
   title: string;
@@ -21,7 +21,7 @@ export interface CreateServiceNoticeData {
   isActive: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
-  startDate: string;
+  startDate?: string | null;
   endDate: string;
   tabTitle?: string;
   title: string;
@@ -63,10 +63,11 @@ class ServiceNoticeService {
 
       if (filters.currentlyVisible !== undefined) {
         // Filter by currently visible (isActive + within date range)
+        // startDate is optional - if null, treat as immediately available
         if (filters.currentlyVisible) {
-          whereClauses.push('isActive = 1 AND startDate <= NOW() AND endDate >= NOW()');
+          whereClauses.push('isActive = 1 AND (startDate IS NULL OR startDate <= NOW()) AND endDate >= NOW()');
         } else {
-          whereClauses.push('(isActive = 0 OR startDate > NOW() OR endDate < NOW())');
+          whereClauses.push('(isActive = 0 OR (startDate IS NOT NULL AND startDate > NOW()) OR endDate < NOW())');
         }
       }
 
@@ -201,7 +202,7 @@ class ServiceNoticeService {
           data.isActive,
           data.category,
           JSON.stringify(data.platforms),
-          convertToMySQLDateTime(data.startDate),
+          data.startDate ? convertToMySQLDateTime(data.startDate) : null,
           convertToMySQLDateTime(data.endDate),
           data.tabTitle || null,
           data.title,
@@ -245,9 +246,9 @@ class ServiceNoticeService {
         values.push(JSON.stringify(data.platforms));
       }
 
-      if (data.startDate) {
+      if (data.startDate !== undefined) {
         updates.push('startDate = ?');
-        values.push(convertToMySQLDateTime(data.startDate));
+        values.push(data.startDate ? convertToMySQLDateTime(data.startDate) : null);
       }
 
       if (data.endDate) {

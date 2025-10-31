@@ -95,10 +95,10 @@ class ServiceNoticeController {
         });
       }
 
-      if (!data.startDate || !data.endDate) {
+      if (!data.endDate) {
         return res.status(400).json({
           success: false,
-          message: 'Start date and end date are required',
+          message: 'End date is required',
         });
       }
 

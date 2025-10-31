@@ -146,11 +146,12 @@ const ServiceNoticesPreviewPage: React.FC = () => {
 
         if (result && result.notices) {
           // Filter notices that are currently active (within date range)
+          // startDate is optional - if null, treat as immediately available
           const now = new Date();
           const activeNotices = result.notices.filter(notice => {
-            const startDate = new Date(notice.startDate);
+            const startDate = notice.startDate ? new Date(notice.startDate) : null;
             const endDate = new Date(notice.endDate);
-            return now >= startDate && now <= endDate;
+            return (!startDate || now >= startDate) && now <= endDate;
           });
 
           console.log('[ServiceNoticesPreview] Active notices count:', activeNotices.length);

@@ -5,7 +5,7 @@ export interface ServiceNotice {
   isActive: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
-  startDate: string;
+  startDate: string | null;
   endDate: string;
   tabTitle?: string | null;
   title: string;
@@ -19,7 +19,7 @@ export interface CreateServiceNoticeData {
   isActive: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
-  startDate: string;
+  startDate?: string | null;
   endDate: string;
   tabTitle?: string | null;
   title: string;
