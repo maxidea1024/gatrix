@@ -413,6 +413,14 @@ class IngamePopupNoticeService {
    * Format notice from database row
    */
   private formatNotice(row: any): IngamePopupNotice {
+    // Helper function to convert dates safely
+    const convertDate = (date: any): string => {
+      if (date instanceof Date) {
+        return date.toISOString();
+      }
+      return convertFromMySQLDateTime(date) || '';
+    };
+
     return {
       id: row.id,
       isActive: Boolean(row.isActive),
@@ -429,13 +437,13 @@ class IngamePopupNoticeService {
       targetUserIdsInverted: Boolean(row.targetUserIdsInverted),
       displayPriority: row.displayPriority,
       showOnce: Boolean(row.showOnce),
-      startDate: convertFromMySQLDateTime(row.startDate)!,
-      endDate: convertFromMySQLDateTime(row.endDate)!,
+      startDate: convertDate(row.startDate),
+      endDate: convertDate(row.endDate),
       messageTemplateId: row.messageTemplateId,
       useTemplate: Boolean(row.useTemplate),
       description: row.description,
-      createdAt: convertFromMySQLDateTime(row.createdAt)!,
-      updatedAt: convertFromMySQLDateTime(row.updatedAt)!,
+      createdAt: convertDate(row.createdAt),
+      updatedAt: convertDate(row.updatedAt),
       createdBy: row.createdBy,
       updatedBy: row.updatedBy
     };
@@ -444,30 +452,81 @@ class IngamePopupNoticeService {
   /**
    * Format notice for Server SDK response
    * Returns only essential fields for game client
+   * Note: row is already formatted by formatNotice, so dates are already ISO 8601 strings
    */
   formatNoticeForServerSDK(row: any): any {
+    // Helper function to parse array fields
+    const parseArray = (value: any): any[] => {
+      if (Array.isArray(value)) return value;
+      if (typeof value === 'string') {
+        try {
+          return JSON.parse(value);
+        } catch {
+          return [];
+        }
+      }
+      return [];
+    };
+
     // Parse targetUserIds from comma-separated string to array
     const targetUserIds = row.targetUserIds
       ? row.targetUserIds.split(',').map((id: string) => id.trim()).filter((id: string) => id)
       : [];
 
-    return {
+    const targetPlatforms = parseArray(row.targetPlatforms);
+    const targetChannels = parseArray(row.targetChannels);
+    const targetSubchannels = parseArray(row.targetSubchannels);
+    const targetWorlds = parseArray(row.targetWorlds);
+
+    // Filter out "channel:*" subchannels if channel-only targeting is used
+    // If a channel is in targetChannels, remove "channel:*" from targetSubchannels
+    const filteredSubchannels = targetSubchannels.filter(subchannel => {
+      if (typeof subchannel === 'string' && subchannel.includes(':')) {
+        const [channel] = subchannel.split(':');
+        // If this is "channel:*" and the channel is in targetChannels, exclude it
+        if (subchannel.endsWith(':*') && targetChannels.includes(channel)) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    // Build response object, only including non-empty arrays
+    const response: any = {
       content: row.content,
-      targetPlatforms: typeof row.targetPlatforms === 'string' ? JSON.parse(row.targetPlatforms) : row.targetPlatforms,
-      targetPlatformsInverted: Boolean(row.targetPlatformsInverted),
-      targetChannels: typeof row.targetChannels === 'string' ? JSON.parse(row.targetChannels) : row.targetChannels,
-      targetChannelsInverted: Boolean(row.targetChannelsInverted),
-      targetSubchannels: typeof row.targetSubchannels === 'string' ? JSON.parse(row.targetSubchannels) : row.targetSubchannels,
-      targetSubchannelsInverted: Boolean(row.targetSubchannelsInverted),
-      targetWorlds: typeof row.targetWorlds === 'string' ? JSON.parse(row.targetWorlds) : row.targetWorlds,
-      targetWorldsInverted: Boolean(row.targetWorldsInverted),
-      targetUserIds: targetUserIds,
-      targetUserIdsInverted: Boolean(row.targetUserIdsInverted),
       displayPriority: row.displayPriority,
       showOnce: Boolean(row.showOnce),
-      startDate: convertFromMySQLDateTime(row.startDate)!,
-      endDate: convertFromMySQLDateTime(row.endDate)!
+      startDate: row.startDate,
+      endDate: row.endDate
     };
+
+    // Add targeting fields only if they have values
+    if (targetPlatforms.length > 0) {
+      response.targetPlatforms = targetPlatforms;
+      response.targetPlatformsInverted = Boolean(row.targetPlatformsInverted);
+    }
+
+    if (targetChannels.length > 0) {
+      response.targetChannels = targetChannels;
+      response.targetChannelsInverted = Boolean(row.targetChannelsInverted);
+    }
+
+    if (filteredSubchannels.length > 0) {
+      response.targetSubchannels = filteredSubchannels;
+      response.targetSubchannelsInverted = Boolean(row.targetSubchannelsInverted);
+    }
+
+    if (targetWorlds.length > 0) {
+      response.targetWorlds = targetWorlds;
+      response.targetWorldsInverted = Boolean(row.targetWorldsInverted);
+    }
+
+    if (targetUserIds.length > 0) {
+      response.targetUserIds = targetUserIds;
+      response.targetUserIdsInverted = Boolean(row.targetUserIdsInverted);
+    }
+
+    return response;
   }
 }
 

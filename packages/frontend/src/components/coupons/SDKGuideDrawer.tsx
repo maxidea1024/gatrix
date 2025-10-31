@@ -58,8 +58,10 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const [testError, setTestError] = useState<string | null>(null);
   const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
   const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
-  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
+  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(false);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
+  const [expandedRequestHeadersDetail, setExpandedRequestHeadersDetail] = useState(false);
+  const [expandedResponseHeadersDetail, setExpandedResponseHeadersDetail] = useState(false);
   const [testDuration, setTestDuration] = useState<number | null>(null);
   const [testStatus, setTestStatus] = useState<number | null>(null);
 
@@ -544,19 +546,20 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
                 onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
                 sx={{
                   p: 1.5,
-                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                  backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
                   borderRadius: 1,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#3d3d3d' : '#eeeeee' },
+                  border: `2px solid ${theme.palette.primary.main}`,
+                  '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb' },
                 }}
               >
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Request
+                <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
+                  {t('coupons.couponSettings.sdkGuideDrawer.request')}
                 </Typography>
-                <Box sx={{ transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+                <Box sx={{ transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', color: theme.palette.primary.main }}>
                   ▼
                 </Box>
               </Box>
@@ -648,21 +651,40 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
                   {/* Request Headers */}
                   {Object.keys(requestHeaders).length > 0 && (
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                        Headers ({Object.keys(requestHeaders).length})
-                      </Typography>
-                      <Stack spacing={0.5} sx={{ pl: 1 }}>
-                        {Object.entries(requestHeaders).map(([key, value]) => (
-                          <Box key={key} sx={{ display: 'flex', gap: 1 }}>
-                            <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
-                              {key}:
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
-                              {String(value)}
-                            </Typography>
-                          </Box>
-                        ))}
-                      </Stack>
+                      <Box
+                        onClick={() => setExpandedRequestHeadersDetail(!expandedRequestHeadersDetail)}
+                        sx={{
+                          p: 1,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f0f0f0',
+                          borderRadius: 0.5,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#e8e8e8' },
+                        }}
+                      >
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          Headers ({Object.keys(requestHeaders).length})
+                        </Typography>
+                        <Box sx={{ transform: expandedRequestHeadersDetail ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', fontSize: '0.8rem' }}>
+                          ▼
+                        </Box>
+                      </Box>
+                      <Collapse in={expandedRequestHeadersDetail}>
+                        <Stack spacing={0.5} sx={{ pl: 1, pt: 1 }}>
+                          {Object.entries(requestHeaders).map(([key, value]) => (
+                            <Box key={key} sx={{ display: 'flex', gap: 1 }}>
+                              <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
+                                {key}:
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
+                                {String(value)}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Stack>
+                      </Collapse>
                     </Box>
                   )}
 
@@ -687,36 +709,37 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
                   onClick={() => setExpandedResponseHeaders(!expandedResponseHeaders)}
                   sx={{
                     p: 1.5,
-                    backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                    backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
                     borderRadius: 1,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#3d3d3d' : '#eeeeee' },
+                    border: `2px solid ${theme.palette.primary.main}`,
+                    '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb' },
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      Response
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
+                      {t('coupons.couponSettings.sdkGuideDrawer.response')}
                     </Typography>
                     {testStatus && (
                       <Box sx={{ display: 'flex', gap: 2 }}>
                         <Box>
-                          <Typography variant="caption" sx={{ color: 'text.secondary' }}>Status</Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('coupons.couponSettings.sdkGuideDrawer.status')}</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             {testStatus} {testStatus === 200 ? 'OK' : testStatus === 404 ? 'Not Found' : testStatus === 400 ? 'Bad Request' : 'Error'}
                           </Typography>
                         </Box>
                         {testDuration !== null && (
                           <Box>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Time</Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('coupons.couponSettings.sdkGuideDrawer.time')}</Typography>
                             <Typography variant="body2" sx={{ fontWeight: 600 }}>{testDuration}ms</Typography>
                           </Box>
                         )}
                         {Object.keys(responseHeaders).length > 0 && (
                           <Box>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Size</Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('coupons.couponSettings.sdkGuideDrawer.size')}</Typography>
                             <Typography variant="body2" sx={{ fontWeight: 600 }}>
                               {new Blob([JSON.stringify(testResponse)]).size} bytes
                             </Typography>
@@ -725,7 +748,7 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
                       </Box>
                     )}
                   </Box>
-                  <Box sx={{ transform: expandedResponseHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+                  <Box sx={{ transform: expandedResponseHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', color: theme.palette.primary.main }}>
                     ▼
                   </Box>
                 </Box>
@@ -741,21 +764,40 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
                     {/* Response Headers */}
                     {Object.keys(responseHeaders).length > 0 && (
                       <Box sx={{ mb: 2 }}>
-                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                          Headers ({Object.keys(responseHeaders).length})
-                        </Typography>
-                        <Stack spacing={0.5} sx={{ pl: 1 }}>
-                          {Object.entries(responseHeaders).map(([key, value]) => (
-                            <Box key={key} sx={{ display: 'flex', gap: 1 }}>
-                              <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
-                                {key}:
-                              </Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
-                                {String(value)}
-                              </Typography>
-                            </Box>
-                          ))}
-                        </Stack>
+                        <Box
+                          onClick={() => setExpandedResponseHeadersDetail(!expandedResponseHeadersDetail)}
+                          sx={{
+                            p: 1,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f0f0f0',
+                            borderRadius: 0.5,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#e8e8e8' },
+                          }}
+                        >
+                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                            Headers ({Object.keys(responseHeaders).length})
+                          </Typography>
+                          <Box sx={{ transform: expandedResponseHeadersDetail ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', fontSize: '0.8rem' }}>
+                            ▼
+                          </Box>
+                        </Box>
+                        <Collapse in={expandedResponseHeadersDetail}>
+                          <Stack spacing={0.5} sx={{ pl: 1, pt: 1 }}>
+                            {Object.entries(responseHeaders).map(([key, value]) => (
+                              <Box key={key} sx={{ display: 'flex', gap: 1 }}>
+                                <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
+                                  {key}:
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
+                                  {String(value)}
+                                </Typography>
+                              </Box>
+                            ))}
+                          </Stack>
+                        </Collapse>
                       </Box>
                     )}
 
@@ -793,7 +835,7 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
                             </IconButton>
                           </Tooltip>
                         </Box>
-                        <Box sx={{ height: 300, overflow: 'hidden' }}>
+                        <Box sx={{ height: 600, overflow: 'hidden' }}>
                           <Editor
                             height="100%"
                             language="json"

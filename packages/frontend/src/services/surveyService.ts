@@ -60,8 +60,10 @@ export interface CreateSurveyInput {
   // Targeting fields
   targetPlatforms?: string[] | null;
   targetPlatformsInverted?: boolean;
-  targetChannelSubchannels?: ChannelSubchannelData[] | null;
-  targetChannelSubchannelsInverted?: boolean;
+  targetChannels?: string[] | null;
+  targetChannelsInverted?: boolean;
+  targetSubchannels?: string[] | null;
+  targetSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
 }
@@ -79,8 +81,10 @@ export interface UpdateSurveyInput {
   // Targeting fields
   targetPlatforms?: string[] | null;
   targetPlatformsInverted?: boolean;
-  targetChannelSubchannels?: ChannelSubchannelData[] | null;
-  targetChannelSubchannelsInverted?: boolean;
+  targetChannels?: string[] | null;
+  targetChannelsInverted?: boolean;
+  targetSubchannels?: string[] | null;
+  targetSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
 }

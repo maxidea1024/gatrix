@@ -678,6 +678,7 @@ const CouponSettingsPage: React.FC = () => {
     }
 
     // Convert targetChannelSubchannels to targetChannels and targetSubchannels for coupon API
+    // targetSubchannels format: "channel:subchannel" (e.g., "official:global", "official:asia")
     const targetChannels: string[] = [];
     const targetSubchannels: string[] = [];
     if (form.targetChannelSubchannels && form.targetChannelSubchannels.length > 0) {
@@ -686,8 +687,10 @@ const CouponSettingsPage: React.FC = () => {
           targetChannels.push(item.channel);
         }
         item.subchannels.forEach((subchannel: string) => {
-          if (!targetSubchannels.includes(subchannel)) {
-            targetSubchannels.push(subchannel);
+          // Format: "channel:subchannel"
+          const subchannelKey = `${item.channel}:${subchannel}`;
+          if (!targetSubchannels.includes(subchannelKey)) {
+            targetSubchannels.push(subchannelKey);
           }
         });
       });
@@ -791,6 +794,7 @@ const CouponSettingsPage: React.FC = () => {
       }
 
       // Convert targetChannels and targetSubchannels to targetChannelSubchannels format
+      // targetSubchannels format: "channel:subchannel" (e.g., "official:global", "official:asia")
       const targetChannelSubchannels: ChannelSubchannelData[] = [];
       const targetChannels = (fullSetting as any).targetChannels || [];
       const targetSubchannels = (fullSetting as any).targetSubchannels || [];
@@ -800,11 +804,24 @@ const CouponSettingsPage: React.FC = () => {
         targetSubchannels,
       });
 
+      // Parse targetSubchannels from "channel:subchannel" format
+      const subchannelsByChannel: { [key: string]: string[] } = {};
+      targetSubchannels.forEach((subchannelKey: string) => {
+        const [channel, subchannel] = subchannelKey.split(':');
+        if (channel && subchannel) {
+          if (!subchannelsByChannel[channel]) {
+            subchannelsByChannel[channel] = [];
+          }
+          subchannelsByChannel[channel].push(subchannel);
+        }
+      });
+
+      // Build targetChannelSubchannels array
       if (targetChannels.length > 0) {
         targetChannels.forEach((channel: string) => {
           targetChannelSubchannels.push({
             channel,
-            subchannels: targetSubchannels,
+            subchannels: subchannelsByChannel[channel] || [],
           });
         });
       }

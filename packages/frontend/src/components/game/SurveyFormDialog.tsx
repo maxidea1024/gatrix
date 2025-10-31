@@ -106,7 +106,36 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setIsActive(Boolean(survey.isActive));
       setTargetPlatforms(Array.isArray(survey.targetPlatforms) ? survey.targetPlatforms : []);
       setTargetPlatformsInverted(survey.targetPlatformsInverted || false);
-      setTargetChannelSubchannels(Array.isArray(survey.targetChannelSubchannels) ? survey.targetChannelSubchannels : []);
+
+      // Convert targetChannels and targetSubchannels to targetChannelSubchannels format
+      // targetSubchannels format: "channel:subchannel" (e.g., "official:global", "official:asia")
+      const targetChannelSubchannels: ChannelSubchannelData[] = [];
+      const targetChannels = (survey as any).targetChannels || [];
+      const targetSubchannels = (survey as any).targetSubchannels || [];
+
+      // Parse targetSubchannels from "channel:subchannel" format
+      const subchannelsByChannel: { [key: string]: string[] } = {};
+      targetSubchannels.forEach((subchannelKey: string) => {
+        const [channel, subchannel] = subchannelKey.split(':');
+        if (channel && subchannel) {
+          if (!subchannelsByChannel[channel]) {
+            subchannelsByChannel[channel] = [];
+          }
+          subchannelsByChannel[channel].push(subchannel);
+        }
+      });
+
+      // Build targetChannelSubchannels array
+      if (targetChannels.length > 0) {
+        targetChannels.forEach((channel: string) => {
+          targetChannelSubchannels.push({
+            channel,
+            subchannels: subchannelsByChannel[channel] || [],
+          });
+        });
+      }
+
+      setTargetChannelSubchannels(targetChannelSubchannels);
       setTargetChannelSubchannelsInverted(survey.targetChannelSubchannelsInverted || false);
       setTargetWorlds(Array.isArray(survey.targetWorlds) ? survey.targetWorlds : []);
       setTargetWorldsInverted(survey.targetWorldsInverted || false);
@@ -232,6 +261,25 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
 
     try {
       setSubmitting(true);
+
+      // Convert targetChannelSubchannels to targetChannels and targetSubchannels
+      // targetSubchannels format: "channel:subchannel" (e.g., "official:global", "official:asia")
+      const targetChannels: string[] = [];
+      const targetSubchannels: string[] = [];
+      if (targetChannelSubchannels && targetChannelSubchannels.length > 0) {
+        targetChannelSubchannels.forEach((item: any) => {
+          if (!targetChannels.includes(item.channel)) {
+            targetChannels.push(item.channel);
+          }
+          item.subchannels.forEach((subchannel: string) => {
+            const subchannelKey = `${item.channel}:${subchannel}`;
+            if (!targetSubchannels.includes(subchannelKey)) {
+              targetSubchannels.push(subchannelKey);
+            }
+          });
+        });
+      }
+
       const data = {
         platformSurveyId: platformSurveyId.trim(),
         surveyTitle: surveyTitle.trim(),
@@ -244,8 +292,10 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         isActive,
         targetPlatforms: targetPlatforms.length > 0 ? targetPlatforms : null,
         targetPlatformsInverted: targetPlatformsInverted,
-        targetChannelSubchannels: targetChannelSubchannels.length > 0 ? targetChannelSubchannels : null,
-        targetChannelSubchannelsInverted: targetChannelSubchannelsInverted,
+        targetChannels: targetChannels.length > 0 ? targetChannels : null,
+        targetChannelsInverted: targetChannelSubchannelsInverted,
+        targetSubchannels: targetSubchannels.length > 0 ? targetSubchannels : null,
+        targetSubchannelsInverted: targetChannelSubchannelsInverted,
         targetWorlds: targetWorlds.length > 0 ? targetWorlds : null,
         targetWorldsInverted: targetWorldsInverted,
       };

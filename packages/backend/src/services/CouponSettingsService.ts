@@ -167,7 +167,7 @@ export class CouponSettingsService {
       [id]
     );
     const [subchannels] = await pool.execute<RowDataPacket[]>(
-      'SELECT subchannel FROM g_coupon_target_subchannels WHERE settingId = ? ORDER BY subchannel ASC',
+      'SELECT channel, subchannel FROM g_coupon_target_subchannels WHERE settingId = ? ORDER BY channel ASC, subchannel ASC',
       [id]
     );
 
@@ -181,7 +181,8 @@ export class CouponSettingsService {
       targetWorlds: worlds.map(w => w.gameWorldId),
       targetPlatforms: platforms.map(p => p.platform),
       targetChannels: channels.map(c => c.channel),
-      targetSubchannels: subchannels.map(s => s.subchannel),
+      // Format targetSubchannels as "channel:subchannel"
+      targetSubchannels: subchannels.map(s => s.channel ? `${s.channel}:${s.subchannel}` : s.subchannel),
       targetUsers: users.map(u => u.userId),
     };
   }
@@ -270,26 +271,47 @@ export class CouponSettingsService {
       }
     }
 
-    const insertTargets = async (table: string, column: string, values?: string[] | null) => {
+    const insertTargets = async (table: string, column: string, values?: string[] | null, channelData?: { [key: string]: string }) => {
       if (!values || values.length === 0) return;
       const BATCH_SIZE = 1000; // Batch size to avoid MySQL prepared statement placeholder limit
-      const rows = values.map(v => [ulid(), id, v]);
+
+      let rows: any[];
+      if (table === 'g_coupon_target_subchannels' && channelData) {
+        // For subchannels, include channel information
+        rows = values.map(v => {
+          const parts = v.split(':');
+          const channel = parts.length === 2 ? parts[0] : '';
+          const subchannel = parts.length === 2 ? parts[1] : v;
+          return [ulid(), id, subchannel, channel];
+        });
+      } else {
+        rows = values.map(v => [ulid(), id, v]);
+      }
 
       // Insert in batches
       for (let i = 0; i < rows.length; i += BATCH_SIZE) {
         const batch = rows.slice(i, i + BATCH_SIZE);
-        const placeholders = batch.map(() => '(?, ?, ?)').join(',');
-        await pool.execute(
-          `INSERT INTO ${table} (id, settingId, ${column}) VALUES ${placeholders}`,
-          batch.flat()
-        );
+        if (table === 'g_coupon_target_subchannels' && channelData) {
+          const placeholders = batch.map(() => '(?, ?, ?, ?)').join(',');
+          await pool.execute(
+            `INSERT INTO ${table} (id, settingId, ${column}, channel) VALUES ${placeholders}`,
+            batch.flat()
+          );
+        } else {
+          const placeholders = batch.map(() => '(?, ?, ?)').join(',');
+          await pool.execute(
+            `INSERT INTO ${table} (id, settingId, ${column}) VALUES ${placeholders}`,
+            batch.flat()
+          );
+        }
       }
     };
 
     await insertTargets('g_coupon_target_worlds', 'gameWorldId', input.targetWorlds);
     await insertTargets('g_coupon_target_platforms', 'platform', input.targetPlatforms);
     await insertTargets('g_coupon_target_channels', 'channel', input.targetChannels);
-    await insertTargets('g_coupon_target_subchannels', 'subchannel', input.targetSubchannels);
+    // targetSubchannels are in "channel:subchannel" format
+    await insertTargets('g_coupon_target_subchannels', 'subchannel', input.targetSubchannels, {});
     await insertTargets('g_coupon_target_users', 'userId', input.targetUsers);
 
     return await this.getSettingById(id);
@@ -354,22 +376,44 @@ export class CouponSettingsService {
     }
 
     // Replace targeting if provided
-    const replaceTargets = async (table: string, column: string, values?: string[] | null) => {
+    const replaceTargets = async (table: string, column: string, values?: string[] | null, channelData?: { [key: string]: string }) => {
       if (values === undefined) return; // not provided
       await pool.execute(`DELETE FROM ${table} WHERE settingId = ?`, [id]);
       if (!values || values.length === 0) return;
-      const rows = values.map(v => [ulid(), id, v]);
-      const placeholders = rows.map(() => '(?, ?, ?)').join(',');
-      await pool.execute(
-        `INSERT INTO ${table} (id, settingId, ${column}) VALUES ${placeholders}`,
-        rows.flat()
-      );
+
+      let rows: any[];
+      if (table === 'g_coupon_target_subchannels' && channelData) {
+        // For subchannels, include channel information
+        rows = values.map(v => {
+          const parts = v.split(':');
+          const channel = parts.length === 2 ? parts[0] : '';
+          const subchannel = parts.length === 2 ? parts[1] : v;
+          return [ulid(), id, subchannel, channel];
+        });
+      } else {
+        rows = values.map(v => [ulid(), id, v]);
+      }
+
+      if (table === 'g_coupon_target_subchannels' && channelData) {
+        const placeholders = rows.map(() => '(?, ?, ?, ?)').join(',');
+        await pool.execute(
+          `INSERT INTO ${table} (id, settingId, ${column}, channel) VALUES ${placeholders}`,
+          rows.flat()
+        );
+      } else {
+        const placeholders = rows.map(() => '(?, ?, ?)').join(',');
+        await pool.execute(
+          `INSERT INTO ${table} (id, settingId, ${column}) VALUES ${placeholders}`,
+          rows.flat()
+        );
+      }
     };
 
     await replaceTargets('g_coupon_target_worlds', 'gameWorldId', input.targetWorlds);
     await replaceTargets('g_coupon_target_platforms', 'platform', input.targetPlatforms);
     await replaceTargets('g_coupon_target_channels', 'channel', input.targetChannels);
-    await replaceTargets('g_coupon_target_subchannels', 'subchannel', input.targetSubchannels);
+    // targetSubchannels are in "channel:subchannel" format
+    await replaceTargets('g_coupon_target_subchannels', 'subchannel', input.targetSubchannels, {});
     await replaceTargets('g_coupon_target_users', 'userId', input.targetUsers);
 
     return await this.getSettingById(id);

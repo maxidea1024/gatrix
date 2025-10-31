@@ -98,15 +98,29 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       setContent(notice.content);
 
       // Convert targetChannels/targetSubchannels to targetChannelSubchannels format
+      // targetSubchannels format: "channel:subchannel" (e.g., "official:global", "official:asia")
       const targetChannelSubchannels: ChannelSubchannelData[] = [];
       const targetChannels = notice.targetChannels || [];
       const targetSubchannels = notice.targetSubchannels || [];
 
+      // Parse targetSubchannels from "channel:subchannel" format
+      const subchannelsByChannel: { [key: string]: string[] } = {};
+      targetSubchannels.forEach((subchannelKey: string) => {
+        const [channel, subchannel] = subchannelKey.split(':');
+        if (channel && subchannel) {
+          if (!subchannelsByChannel[channel]) {
+            subchannelsByChannel[channel] = [];
+          }
+          subchannelsByChannel[channel].push(subchannel);
+        }
+      });
+
+      // Build targetChannelSubchannels array
       if (targetChannels.length > 0) {
         targetChannels.forEach((channel: string) => {
           targetChannelSubchannels.push({
             channel,
-            subchannels: targetSubchannels,
+            subchannels: subchannelsByChannel[channel] || [],
           });
         });
       }
@@ -186,6 +200,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
 
     try {
       // Convert targetChannelSubchannels to targetChannels and targetSubchannels for API
+      // targetSubchannels format: "channel:subchannel" (e.g., "official:global", "official:asia")
       const targetChannels: string[] = [];
       const targetSubchannels: string[] = [];
       if (targetChannelSubchannels && targetChannelSubchannels.length > 0) {
@@ -194,8 +209,9 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
             targetChannels.push(item.channel);
           }
           item.subchannels.forEach((subchannel: string) => {
-            if (!targetSubchannels.includes(subchannel)) {
-              targetSubchannels.push(subchannel);
+            const subchannelKey = `${item.channel}:${subchannel}`;
+            if (!targetSubchannels.includes(subchannelKey)) {
+              targetSubchannels.push(subchannelKey);
             }
           });
         });

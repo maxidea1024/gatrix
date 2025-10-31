@@ -33,8 +33,10 @@ export interface Survey {
   // Targeting fields
   targetPlatforms?: string[] | null;
   targetPlatformsInverted?: boolean;
-  targetChannelSubchannels?: ChannelSubchannelData[] | null;
-  targetChannelSubchannelsInverted?: boolean;
+  targetChannels?: string[] | null;
+  targetChannelsInverted?: boolean;
+  targetSubchannels?: string[] | null;
+  targetSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
   createdBy?: number;
@@ -63,8 +65,10 @@ export interface CreateSurveyInput {
   // Targeting fields
   targetPlatforms?: string[] | null;
   targetPlatformsInverted?: boolean;
-  targetChannelSubchannels?: ChannelSubchannelData[] | null;
-  targetChannelSubchannelsInverted?: boolean;
+  targetChannels?: string[] | null;
+  targetChannelsInverted?: boolean;
+  targetSubchannels?: string[] | null;
+  targetSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
   createdBy?: number;
@@ -83,8 +87,10 @@ export interface UpdateSurveyInput {
   // Targeting fields
   targetPlatforms?: string[] | null;
   targetPlatformsInverted?: boolean;
-  targetChannelSubchannels?: ChannelSubchannelData[] | null;
-  targetChannelSubchannelsInverted?: boolean;
+  targetChannels?: string[] | null;
+  targetChannelsInverted?: boolean;
+  targetSubchannels?: string[] | null;
+  targetSubchannelsInverted?: boolean;
   targetWorlds?: string[] | null;
   targetWorldsInverted?: boolean;
   updatedBy?: number;
@@ -149,10 +155,15 @@ export class SurveyService {
           ? JSON.parse(row.targetPlatforms)
           : row.targetPlatforms)
         : null,
-      targetChannelSubchannels: row.targetChannelSubchannels
-        ? (typeof row.targetChannelSubchannels === 'string'
-          ? JSON.parse(row.targetChannelSubchannels)
-          : row.targetChannelSubchannels)
+      targetChannels: row.targetChannels
+        ? (typeof row.targetChannels === 'string'
+          ? JSON.parse(row.targetChannels)
+          : row.targetChannels)
+        : null,
+      targetSubchannels: row.targetSubchannels
+        ? (typeof row.targetSubchannels === 'string'
+          ? JSON.parse(row.targetSubchannels)
+          : row.targetSubchannels)
         : null,
       targetWorlds: row.targetWorlds
         ? (typeof row.targetWorlds === 'string'
@@ -193,10 +204,15 @@ export class SurveyService {
           ? JSON.parse(rows[0].targetPlatforms)
           : rows[0].targetPlatforms)
         : null,
-      targetChannelSubchannels: rows[0].targetChannelSubchannels
-        ? (typeof rows[0].targetChannelSubchannels === 'string'
-          ? JSON.parse(rows[0].targetChannelSubchannels)
-          : rows[0].targetChannelSubchannels)
+      targetChannels: rows[0].targetChannels
+        ? (typeof rows[0].targetChannels === 'string'
+          ? JSON.parse(rows[0].targetChannels)
+          : rows[0].targetChannels)
+        : null,
+      targetSubchannels: rows[0].targetSubchannels
+        ? (typeof rows[0].targetSubchannels === 'string'
+          ? JSON.parse(rows[0].targetSubchannels)
+          : rows[0].targetSubchannels)
         : null,
       targetWorlds: rows[0].targetWorlds
         ? (typeof rows[0].targetWorlds === 'string'
@@ -237,10 +253,15 @@ export class SurveyService {
           ? JSON.parse(rows[0].targetPlatforms)
           : rows[0].targetPlatforms)
         : null,
-      targetChannelSubchannels: rows[0].targetChannelSubchannels
-        ? (typeof rows[0].targetChannelSubchannels === 'string'
-          ? JSON.parse(rows[0].targetChannelSubchannels)
-          : rows[0].targetChannelSubchannels)
+      targetChannels: rows[0].targetChannels
+        ? (typeof rows[0].targetChannels === 'string'
+          ? JSON.parse(rows[0].targetChannels)
+          : rows[0].targetChannels)
+        : null,
+      targetSubchannels: rows[0].targetSubchannels
+        ? (typeof rows[0].targetSubchannels === 'string'
+          ? JSON.parse(rows[0].targetSubchannels)
+          : rows[0].targetSubchannels)
         : null,
       targetWorlds: rows[0].targetWorlds
         ? (typeof rows[0].targetWorlds === 'string'
@@ -284,10 +305,10 @@ export class SurveyService {
       `INSERT INTO g_surveys
       (id, platformSurveyId, surveyTitle, surveyContent, triggerConditions,
        participationRewards, rewardTemplateId, rewardMailTitle, rewardMailContent, isActive,
-       targetPlatforms, targetPlatformsInverted, targetChannelSubchannels, targetChannelSubchannelsInverted,
+       targetPlatforms, targetPlatformsInverted, targetChannels, targetChannelsInverted, targetSubchannels, targetSubchannelsInverted,
        targetWorlds, targetWorldsInverted,
        createdBy)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         input.platformSurveyId,
@@ -301,8 +322,10 @@ export class SurveyService {
         isActive,
         input.targetPlatforms ? JSON.stringify(input.targetPlatforms) : null,
         input.targetPlatformsInverted || false,
-        input.targetChannelSubchannels ? JSON.stringify(input.targetChannelSubchannels) : null,
-        input.targetChannelSubchannelsInverted || false,
+        (input as any).targetChannels ? JSON.stringify((input as any).targetChannels) : null,
+        (input as any).targetChannelsInverted || false,
+        (input as any).targetSubchannels ? JSON.stringify((input as any).targetSubchannels) : null,
+        (input as any).targetSubchannelsInverted || false,
         input.targetWorlds ? JSON.stringify(input.targetWorlds) : null,
         input.targetWorldsInverted || false,
         input.createdBy || null,
@@ -391,13 +414,21 @@ export class SurveyService {
       updates.push('targetPlatformsInverted = ?');
       values.push(input.targetPlatformsInverted);
     }
-    if (input.targetChannelSubchannels !== undefined) {
-      updates.push('targetChannelSubchannels = ?');
-      values.push(input.targetChannelSubchannels ? JSON.stringify(input.targetChannelSubchannels) : null);
+    if ((input as any).targetChannels !== undefined) {
+      updates.push('targetChannels = ?');
+      values.push((input as any).targetChannels ? JSON.stringify((input as any).targetChannels) : null);
     }
-    if (input.targetChannelSubchannelsInverted !== undefined) {
-      updates.push('targetChannelSubchannelsInverted = ?');
-      values.push(input.targetChannelSubchannelsInverted);
+    if ((input as any).targetChannelsInverted !== undefined) {
+      updates.push('targetChannelsInverted = ?');
+      values.push((input as any).targetChannelsInverted);
+    }
+    if ((input as any).targetSubchannels !== undefined) {
+      updates.push('targetSubchannels = ?');
+      values.push((input as any).targetSubchannels ? JSON.stringify((input as any).targetSubchannels) : null);
+    }
+    if ((input as any).targetSubchannelsInverted !== undefined) {
+      updates.push('targetSubchannelsInverted = ?');
+      values.push((input as any).targetSubchannelsInverted);
     }
     if (input.targetWorlds !== undefined) {
       updates.push('targetWorlds = ?');
