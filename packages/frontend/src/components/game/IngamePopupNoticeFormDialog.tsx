@@ -191,8 +191,8 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       return;
     }
 
-    if (!startDate || !endDate) {
-      enqueueSnackbar(t('ingamePopupNotices.datesRequired'), { variant: 'error' });
+    if (!endDate) {
+      enqueueSnackbar(t('ingamePopupNotices.endDateRequired'), { variant: 'error' });
       return;
     }
 
@@ -233,7 +233,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
         displayPriority,
         showOnce,
         // Convert local time to UTC (12:00 KST -> 03:00 UTC)
-        startDate: startDate.toISOString(),
+        startDate: startDate ? startDate.toISOString() : null,
         endDate: endDate.toISOString(),
         useTemplate,
         messageTemplateId: useTemplate ? messageTemplateId : null,
@@ -338,8 +338,10 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
               }}
               targetUserIds={targetUserIds}
               targetUserIdsInverted={targetUserIdsInverted}
-              onUserIdsChange={(ids, inverted) => {
+              onUserIdsChange={(ids) => {
                 setTargetUserIds(ids);
+              }}
+              onUserIdsInvertedChange={(inverted) => {
                 setTargetUserIdsInverted(inverted);
               }}
               showUserIdFilter={true}
@@ -358,7 +360,10 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
                 slotProps={{
                   textField: {
                     fullWidth: true,
-                    required: true,
+                    required: false,
+                  },
+                  actionBar: {
+                    actions: ['clear', 'cancel', 'accept'],
                   },
                 }}
               />
@@ -371,6 +376,9 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
                   textField: {
                     fullWidth: true,
                     required: true,
+                  },
+                  actionBar: {
+                    actions: ['clear', 'cancel', 'accept'],
                   },
                 }}
               />

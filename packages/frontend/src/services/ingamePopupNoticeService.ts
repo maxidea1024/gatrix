@@ -16,7 +16,7 @@ export interface IngamePopupNotice {
   targetUserIdsInverted?: boolean;
   displayPriority: number;
   showOnce: boolean;
-  startDate: string;
+  startDate?: string | null;
   endDate: string;
   messageTemplateId: number | null;
   useTemplate: boolean;
@@ -42,7 +42,7 @@ export interface CreateIngamePopupNoticeData {
   targetUserIdsInverted?: boolean;
   displayPriority?: number;
   showOnce?: boolean;
-  startDate: string;
+  startDate?: string | null;
   endDate: string;
   messageTemplateId?: number | null;
   useTemplate?: boolean;

@@ -113,7 +113,7 @@ export class CouponRedeemService {
       // 7. Check per-user/character limit based on usageLimitType
       const usageLimitType = setting.usageLimitType || 'USER';
       let usageQuery = 'SELECT COUNT(*) as count FROM g_coupon_uses WHERE settingId = ? AND ';
-      let usageParams: any[] = [setting.id];
+      const usageParams: any[] = [setting.id];
 
       if (usageLimitType === 'CHARACTER' && request.characterId) {
         usageQuery += 'characterId = ?';

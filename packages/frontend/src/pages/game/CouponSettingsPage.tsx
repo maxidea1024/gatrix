@@ -1613,7 +1613,8 @@ const CouponSettingsPage: React.FC = () => {
                 onWorldsChange={(worlds, inverted) => setForm((s: any) => ({ ...s, targetWorlds: worlds, targetWorldsInverted: inverted }))}
                 targetUserIds={form.targetUserIds || ''}
                 targetUserIdsInverted={form.targetUserIdsInverted || false}
-                onUserIdsChange={(ids, inverted) => setForm((s: any) => ({ ...s, targetUserIds: ids, targetUserIdsInverted: inverted }))}
+                onUserIdsChange={(ids) => setForm((s: any) => ({ ...s, targetUserIds: ids }))}
+                onUserIdsInvertedChange={(inverted) => setForm((s: any) => ({ ...s, targetUserIdsInverted: inverted }))}
                 showUserIdFilter={true}
               />
 

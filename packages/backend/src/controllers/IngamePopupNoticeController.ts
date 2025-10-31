@@ -22,7 +22,7 @@ const createIngamePopupNoticeSchema = Joi.object({
   targetUserIdsInverted: Joi.boolean().optional().default(false),
   displayPriority: Joi.number().integer().min(0).optional(),
   showOnce: Joi.boolean().optional(),
-  startDate: Joi.string().isoDate().required(),
+  startDate: Joi.string().isoDate().optional().allow(null, ''),
   endDate: Joi.string().isoDate().required(),
   messageTemplateId: Joi.number().integer().positive().optional().allow(null),
   useTemplate: Joi.boolean().optional(),
@@ -44,7 +44,7 @@ const updateIngamePopupNoticeSchema = Joi.object({
   targetUserIdsInverted: Joi.boolean().optional(),
   displayPriority: Joi.number().integer().min(0).optional(),
   showOnce: Joi.boolean().optional(),
-  startDate: Joi.string().isoDate().optional(),
+  startDate: Joi.string().isoDate().optional().allow(null, ''),
   endDate: Joi.string().isoDate().optional(),
   messageTemplateId: Joi.number().integer().positive().optional().allow(null),
   useTemplate: Joi.boolean().optional(),
@@ -274,7 +274,7 @@ class IngamePopupNoticeController {
   /**
    * Get active ingame popup notices for Server SDK
    * GET /api/v1/server/ingame-popup-notices
-   * Returns only active notices that are currently visible
+   * Returns only active notices that are currently visible and not expired
    */
   async getServerIngamePopupNotices(req: Request, res: Response, next: NextFunction) {
     try {
@@ -285,8 +285,16 @@ class IngamePopupNoticeController {
 
       const result = await IngamePopupNoticeService.getIngamePopupNotices(1, 1000, filters);
 
+      // Filter out notices where endDate is in the past
+      const now = new Date();
+      const activeNotices = result.notices.filter(notice => {
+        if (!notice.endDate) return true;
+        const endDate = new Date(notice.endDate);
+        return endDate > now;
+      });
+
       // Format notices for Server SDK response
-      const formattedNotices = result.notices.map(notice =>
+      const formattedNotices = activeNotices.map(notice =>
         IngamePopupNoticeService.formatNoticeForServerSDK(notice as any)
       );
 

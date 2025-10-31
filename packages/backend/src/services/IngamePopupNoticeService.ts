@@ -18,7 +18,7 @@ export interface IngamePopupNotice {
   targetUserIdsInverted?: boolean;
   displayPriority: number;
   showOnce: boolean;
-  startDate: string;
+  startDate?: string | null;
   endDate: string;
   messageTemplateId: bigint | null;
   useTemplate: boolean;
@@ -44,7 +44,7 @@ export interface CreateIngamePopupNoticeData {
   targetUserIdsInverted?: boolean;
   displayPriority?: number;
   showOnce?: boolean;
-  startDate: string;
+  startDate?: string | null;
   endDate: string;
   messageTemplateId?: bigint | null;
   useTemplate?: boolean;
@@ -88,10 +88,11 @@ class IngamePopupNoticeService {
 
       if (filters.currentlyVisible !== undefined) {
         // Filter by currently visible (isActive + within date range)
+        // startDate is optional - if null, treat as immediately available
         if (filters.currentlyVisible) {
-          whereClauses.push('isActive = 1 AND startDate <= NOW() AND endDate >= NOW()');
+          whereClauses.push('isActive = 1 AND (startDate IS NULL OR startDate <= NOW()) AND endDate >= NOW()');
         } else {
-          whereClauses.push('(isActive = 0 OR startDate > NOW() OR endDate < NOW())');
+          whereClauses.push('(isActive = 0 OR (startDate IS NOT NULL AND startDate > NOW()) OR endDate < NOW())');
         }
       }
 
@@ -312,9 +313,9 @@ class IngamePopupNoticeService {
         values.push(data.showOnce);
       }
 
-      if (data.startDate) {
+      if (data.startDate !== undefined) {
         updates.push('startDate = ?');
-        values.push(convertToMySQLDateTime(data.startDate));
+        values.push(data.startDate ? convertToMySQLDateTime(data.startDate) : null);
       }
 
       if (data.endDate) {
@@ -413,8 +414,17 @@ class IngamePopupNoticeService {
    * Format notice from database row
    */
   private formatNotice(row: any): IngamePopupNotice {
-    // Helper function to convert dates safely
-    const convertDate = (date: any): string => {
+    // Helper function to convert dates safely (can return null)
+    const convertDate = (date: any): string | null => {
+      if (!date) return null;
+      if (date instanceof Date) {
+        return date.toISOString();
+      }
+      return convertFromMySQLDateTime(date) || null;
+    };
+
+    // Helper function to convert dates safely (must return string)
+    const convertDateRequired = (date: any): string => {
       if (date instanceof Date) {
         return date.toISOString();
       }
@@ -433,17 +443,17 @@ class IngamePopupNoticeService {
       targetChannelsInverted: Boolean(row.targetChannelsInverted),
       targetSubchannels: typeof row.targetSubchannels === 'string' ? JSON.parse(row.targetSubchannels) : row.targetSubchannels,
       targetSubchannelsInverted: Boolean(row.targetSubchannelsInverted),
-      targetUserIds: row.targetUserIds,
+      targetUserIds: row.targetUserIds || null,
       targetUserIdsInverted: Boolean(row.targetUserIdsInverted),
-      displayPriority: row.displayPriority,
+      displayPriority: Number(row.displayPriority) || 100,
       showOnce: Boolean(row.showOnce),
       startDate: convertDate(row.startDate),
-      endDate: convertDate(row.endDate),
+      endDate: convertDateRequired(row.endDate),
       messageTemplateId: row.messageTemplateId,
       useTemplate: Boolean(row.useTemplate),
       description: row.description,
-      createdAt: convertDate(row.createdAt),
-      updatedAt: convertDate(row.updatedAt),
+      createdAt: convertDateRequired(row.createdAt),
+      updatedAt: convertDateRequired(row.updatedAt),
       createdBy: row.createdBy,
       updatedBy: row.updatedBy
     };
@@ -496,9 +506,13 @@ class IngamePopupNoticeService {
       content: row.content,
       displayPriority: row.displayPriority,
       showOnce: Boolean(row.showOnce),
-      startDate: row.startDate,
       endDate: row.endDate
     };
+
+    // Only include startDate if it's not null
+    if (row.startDate) {
+      response.startDate = row.startDate;
+    }
 
     // Add targeting fields only if they have values
     if (targetPlatforms.length > 0) {

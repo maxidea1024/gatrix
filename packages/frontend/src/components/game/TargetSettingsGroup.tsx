@@ -44,7 +44,8 @@ export interface TargetSettingsGroupProps {
   // User IDs (optional)
   targetUserIds?: string;
   targetUserIdsInverted?: boolean;
-  onUserIdsChange?: (ids: string, inverted: boolean) => void;
+  onUserIdsChange?: (ids: string) => void;
+  onUserIdsInvertedChange?: (inverted: boolean) => void;
   showUserIdFilter?: boolean;
 }
 
@@ -64,6 +65,7 @@ const TargetSettingsGroup: React.FC<TargetSettingsGroupProps> = ({
   targetUserIds = '',
   targetUserIdsInverted = false,
   onUserIdsChange,
+  onUserIdsInvertedChange,
   showUserIdFilter = false,
 }) => {
   const { t } = useTranslation();

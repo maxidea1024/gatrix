@@ -619,19 +619,20 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
                 onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
                 sx={{
                   p: 1.5,
-                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                  backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#e3f2fd',
                   borderRadius: 1,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#3d3d3d' : '#eeeeee' },
+                  border: `2px solid ${theme.palette.primary.main}`,
+                  '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#252525' : '#bbdefb' },
                 }}
               >
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
                   {t('clientVersions.sdkGuideDrawer.request')}
                 </Typography>
-                <Box sx={{ transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+                <Box sx={{ transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', color: theme.palette.primary.main }}>
                   ▼
                 </Box>
               </Box>

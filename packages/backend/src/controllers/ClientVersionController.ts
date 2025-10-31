@@ -273,7 +273,7 @@ export class ClientVersionController {
       const value = filterParams[key];
       // guestModeAllowed는 boolean이므로 false도 유효한 값
       if (value !== undefined && (value !== '' || key === 'guestModeAllowed' || key === 'tags' || key === 'tagsOperator')) {
-        let processedValue: any = value;
+        const processedValue: any = value;
 
         // guestModeAllowed는 이미 Joi에서 boolean 또는 boolean[]로 변환됨
         // 다른 필드는 그대로 사용

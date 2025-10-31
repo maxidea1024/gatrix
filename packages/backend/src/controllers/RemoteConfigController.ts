@@ -431,7 +431,7 @@ export class RemoteConfigController {
       const userId = (req as any).user?.id;
 
       // Get existing template
-      let template = await db('g_remote_config_templates')
+      const template = await db('g_remote_config_templates')
         .where('environmentId', 1)
         .where('templateName', 'default_template')
         .first();
@@ -440,7 +440,7 @@ export class RemoteConfigController {
         throw new CustomError('Template not found', 404);
       }
 
-      let templateData = typeof template.templateData === 'string'
+      const templateData = typeof template.templateData === 'string'
         ? JSON.parse(template.templateData)
         : template.templateData;
 

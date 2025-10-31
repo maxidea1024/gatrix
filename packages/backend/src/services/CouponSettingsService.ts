@@ -167,7 +167,7 @@ export class CouponSettingsService {
       [id]
     );
     const [subchannels] = await pool.execute<RowDataPacket[]>(
-      'SELECT channel, subchannel FROM g_coupon_target_subchannels WHERE settingId = ? ORDER BY channel ASC, subchannel ASC',
+      'SELECT subchannel FROM g_coupon_target_subchannels WHERE settingId = ? ORDER BY subchannel ASC',
       [id]
     );
 
@@ -182,7 +182,7 @@ export class CouponSettingsService {
       targetPlatforms: platforms.map(p => p.platform),
       targetChannels: channels.map(c => c.channel),
       // Format targetSubchannels as "channel:subchannel"
-      targetSubchannels: subchannels.map(s => s.channel ? `${s.channel}:${s.subchannel}` : s.subchannel),
+      targetSubchannels: subchannels.map(s => s.subchannel),
       targetUsers: users.map(u => u.userId),
     };
   }

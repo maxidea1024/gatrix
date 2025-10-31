@@ -35,7 +35,7 @@ export class CampaignEvaluationEngine {
       const now = new Date();
       
       // Get all active campaigns that are currently running
-      let campaignQuery = db('g_remote_config_campaigns as c')
+      const campaignQuery = db('g_remote_config_campaigns as c')
         .where('c.isActive', true)
         .where('c.status', 'running')
         .where(function() {

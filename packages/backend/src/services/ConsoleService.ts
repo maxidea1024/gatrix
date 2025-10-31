@@ -681,7 +681,7 @@ class ConsoleService {
     try {
       let key: Buffer;
       let keyHex: string;
-      let keySize = 32; // Default for AES-256 and ChaCha20
+      const keySize = 32; // Default for AES-256 and ChaCha20
 
       if (opts?.key) {
         keyHex = opts.key;
@@ -1234,7 +1234,7 @@ class ConsoleService {
       const remaining = length - 1;
 
       // Ensure at least one digit and one symbol in the remaining part
-      let chars: string[] = new Array(remaining).fill('');
+      const chars: string[] = new Array(remaining).fill('');
       if (remaining >= 1) chars[0] = randFrom(digits);
       if (remaining >= 2) chars[1] = randFrom(symbols);
       for (let i = 0; i < remaining; i++) {
