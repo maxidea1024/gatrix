@@ -15,6 +15,241 @@ const router = Router();
 // Apply auth rate limiting to all auth routes
 router.use(authLimiter as any);
 
+/**
+ * @openapi
+ * tags:
+ *   - name: Authentication
+ *     description: Endpoints for user authentication and profile management
+ * paths:
+ *   /auth/login:
+ *     post:
+ *       summary: 사용자 로그인
+ *       description: 이메일과 비밀번호로 로그인합니다. 성공 시 본문에 accessToken을 반환하고, refreshToken은 HttpOnly 쿠키로 설정됩니다.
+ *       tags: [Authentication]
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LoginRequest'
+ *             examples:
+ *               valid:
+ *                 summary: 로그인 요청 예시
+ *                 value:
+ *                   email: user@example.com
+ *                   password: "P@ssw0rd!"
+ *       responses:
+ *         '200':
+ *           description: 로그인에 성공합니다. 액세스 토큰이 발급됩니다.
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/AuthResponse'
+ *               examples:
+ *                 success:
+ *                   summary: 성공 응답 예시
+ *                   value:
+ *                     success: true
+ *                     message: login.success
+ *                     data:
+ *                       accessToken: "eyJhbGciOi..."
+ *         '400':
+ *           description: 요청 형식이 올바르지 않습니다.
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/ErrorResponse'
+ *         '401':
+ *           description: 이메일 또는 비밀번호가 올바르지 않습니다.
+ *         '429':
+ *           description: 너무 많은 요청입니다. 잠시 후 다시 시도해 주세요.
+ *   /auth/register:
+ *     post:
+ *       summary: 사용자 회원가입
+ *       description: 이메일과 비밀번호로 신규 사용자를 생성합니다.
+ *       tags: [Authentication]
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RegisterRequest'
+ *             examples:
+ *               valid:
+ *                 summary: 회원가입 요청 예시
+ *                 value:
+ *                   email: newuser@example.com
+ *                   password: "P@ssw0rd!"
+ *                   name: "홍길동"
+ *       responses:
+ *         '201':
+ *           description: 회원가입에 성공했습니다.
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/AuthResponse'
+ *         '400':
+ *           description: 요청 유효성 검사 실패
+ *         '409':
+ *           description: 이미 존재하는 이메일입니다.
+ *   /auth/refresh:
+ *     post:
+ *       summary: 액세스 토큰 갱신
+ *       description: refreshToken 쿠키로부터 새로운 accessToken을 발급합니다.
+ *       tags: [Authentication]
+ *       security:
+ *         - cookieAuth: []
+ *       responses:
+ *         '200':
+ *           description: 토큰 갱신 성공
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/AuthResponse'
+ *         '401':
+ *           description: 유효하지 않은 리프레시 토큰
+ *   /auth/logout:
+ *     post:
+ *       summary: 로그아웃
+ *       description: 리프레시 토큰 쿠키를 제거합니다.
+ *       tags: [Authentication]
+ *       responses:
+ *         '200':
+ *           description: 로그아웃 성공
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/SuccessResponse'
+ *   /auth/profile:
+ *     get:
+ *       summary: 내 프로필 조회
+ *       description: 현재 로그인한 사용자의 프로필을 조회합니다.
+ *       tags: [Authentication]
+ *       security:
+ *         - bearerAuth: []
+ *       responses:
+ *         '200':
+ *           description: 프로필 정보
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                   data:
+ *                     type: object
+ *                     properties:
+ *                       user:
+ *                         $ref: '#/components/schemas/User'
+ *         '401':
+ *           description: 인증 필요
+ *   /auth/change-password:
+ *     post:
+ *       summary: 비밀번호 변경
+ *       description: 현재 비밀번호 확인 후 새 비밀번호로 변경합니다.
+ *       tags: [Authentication]
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required: [currentPassword, newPassword]
+ *               properties:
+ *                 currentPassword:
+ *                   type: string
+ *                 newPassword:
+ *                   type: string
+ *             examples:
+ *               valid:
+ *                 value:
+ *                   currentPassword: "OldP@ssw0rd!"
+ *                   newPassword: "NewP@ssw0rd!"
+ *       responses:
+ *         '200':
+ *           description: 비밀번호 변경 성공
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/SuccessResponse'
+ *         '400':
+ *           description: 유효성 검사 실패
+ *         '401':
+ *           description: 인증 필요
+ *   /auth/forgot-password:
+ *     post:
+ *       summary: 비밀번호 재설정 메일 요청
+ *       description: 입력한 이메일로 재설정 링크를 전송합니다.
+ *       tags: [Authentication]
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required: [email]
+ *               properties:
+ *                 email:
+ *                   type: string
+ *             examples:
+ *               sample:
+ *                 value:
+ *                   email: user@example.com
+ *       responses:
+ *         '200':
+ *           description: 이메일 발송 성공 (존재 여부와 무관하게 동일한 응답)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/SuccessResponse'
+ *   /auth/validate-reset-token/{token}:
+ *     get:
+ *       summary: 비밀번호 재설정 토큰 검증
+ *       tags: [Authentication]
+ *       parameters:
+ *         - in: path
+ *           name: token
+ *           schema:
+ *             type: string
+ *           required: true
+ *           description: 비밀번호 재설정 토큰
+ *       responses:
+ *         '200':
+ *           description: 토큰이 유효합니다.
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/SuccessResponse'
+ *         '400':
+ *           description: 토큰이 유효하지 않거나 만료됨
+ *   /auth/reset-password:
+ *     post:
+ *       summary: 비밀번호 재설정
+ *       tags: [Authentication]
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required: [token, password]
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 password:
+ *                   type: string
+ *       responses:
+ *         '200':
+ *           description: 비밀번호가 성공적으로 재설정되었습니다.
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/SuccessResponse'
+ */
+
 // Local authentication routes
 router.post('/login', auditUserLogin as any, AuthController.login);
 router.post('/register', auditUserRegister as any, AuthController.register);

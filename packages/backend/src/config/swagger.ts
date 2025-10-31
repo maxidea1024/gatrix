@@ -191,6 +191,118 @@ const options: swaggerJSDoc.Options = {
             },
           },
         },
+        Tag: {
+          type: 'object',
+          description: 'Tag object used to categorize resources',
+          properties: {
+            id: { type: 'integer', description: 'Tag ID' },
+            name: { type: 'string', description: 'Tag name' },
+          },
+        },
+        GameWorld: {
+          type: 'object',
+          description: 'Game world entity',
+          properties: {
+            id: { type: 'integer', description: 'Internal numeric ID' },
+            worldId: { type: 'string', description: 'Stable world identifier (unique)' },
+            name: { type: 'string', description: 'Display name' },
+            isVisible: { type: 'boolean', description: 'Visibility flag' },
+            isMaintenance: { type: 'boolean', description: 'Maintenance mode flag' },
+            displayOrder: { type: 'integer', description: 'Ordering value (lower first or as defined)' },
+            description: { type: 'string', description: 'Optional description', nullable: true },
+            maintenanceStartDate: { type: 'string', format: 'date-time', nullable: true, description: 'Maintenance start (MySQL DATETIME formatted string)' },
+            maintenanceEndDate: { type: 'string', format: 'date-time', nullable: true, description: 'Maintenance end (MySQL DATETIME formatted string)' },
+            maintenanceMessage: { type: 'string', nullable: true, description: 'Maintenance message (default locale)' },
+            supportsMultiLanguage: { type: 'boolean', description: 'Whether maintenance message supports multiple languages' },
+            maintenanceLocales: {
+              type: 'array',
+              description: 'Per-language maintenance messages',
+              items: {
+                type: 'object',
+                properties: {
+                  lang: { type: 'string', enum: ['ko', 'en', 'zh'], description: 'Language code' },
+                  message: { type: 'string', description: 'Localized maintenance message' },
+                },
+              },
+            },
+            customPayload: { type: 'object', description: 'Custom JSON payload', additionalProperties: true, nullable: true },
+            createdBy: { type: 'integer', description: 'Creator user ID' },
+            updatedBy: { type: 'integer', description: 'Last updater user ID', nullable: true },
+            createdAt: { type: 'string', format: 'date-time', description: 'Creation timestamp' },
+            updatedAt: { type: 'string', format: 'date-time', description: 'Last update timestamp' },
+            tags: { type: 'array', description: 'Associated tags', items: { $ref: '#/components/schemas/Tag' } },
+          },
+        },
+      },
+      responses: {
+        UnauthorizedError: {
+          description: 'Unauthorized - missing or invalid authentication',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' },
+              examples: {
+                missingToken: {
+                  summary: 'Missing bearer token',
+                  value: { success: false, message: 'Authentication required: missing token', error: 'UNAUTHORIZED' },
+                },
+                invalidToken: {
+                  summary: 'Invalid/expired token',
+                  value: { success: false, message: 'Invalid or expired token', error: 'TOKEN_INVALID' },
+                },
+              },
+            },
+          },
+        },
+        ForbiddenError: {
+          description: 'Forbidden - insufficient privileges',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' },
+              example: { success: false, message: 'You do not have permission to perform this action', error: 'FORBIDDEN' },
+            },
+          },
+        },
+        NotFoundError: {
+          description: 'Resource not found',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' },
+              example: { success: false, message: 'Resource not found', error: 'NOT_FOUND' },
+            },
+          },
+        },
+        BadRequestError: {
+          description: 'Bad request - validation or input error',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' },
+              examples: {
+                validation: {
+                  summary: 'Validation failed',
+                  value: { success: false, message: 'Validation failed: field is required', error: 'VALIDATION_ERROR', details: { field: 'email' } },
+                },
+              },
+            },
+          },
+        },
+        TooManyRequestsError: {
+          description: 'Too many requests - rate limit exceeded',
+          headers: {
+            'Retry-After': { description: 'Time in seconds to wait before retrying', schema: { type: 'integer', example: 60 } },
+          },
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' },
+              example: { success: false, message: 'Too many requests', error: 'RATE_LIMITED' },
+            },
+          },
+        },
+      },
+      parameters: {
+        PageParam: { in: 'query', name: 'page', schema: { type: 'integer', minimum: 1, default: 1 }, description: 'Page number (1-based)' },
+        LimitParam: { in: 'query', name: 'limit', schema: { type: 'integer', minimum: 1, maximum: 100, default: 20 }, description: 'Items per page' },
+        SearchParam: { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Free-text search keyword' },
+        LangParam: { in: 'query', name: 'lang', schema: { type: 'string', enum: ['ko', 'en', 'zh'] }, description: 'Preferred language for localized messages' },
       },
     },
     tags: [
@@ -211,7 +323,7 @@ const options: swaggerJSDoc.Options = {
         description: 'Public client endpoints (no authentication required, cached)',
       },
       {
-        name: 'Game Worlds',
+        name: 'GameWorlds',
         description: 'Game world management endpoints',
       },
       {
@@ -226,6 +338,18 @@ const options: swaggerJSDoc.Options = {
         name: 'Audit Logs',
         description: 'System audit log endpoints',
       },
+      {
+        name: 'ClientSDK',
+        description: 'Client SDK endpoints (require API token and application name headers)',
+      },
+      {
+        name: 'RemoteConfig',
+        description: 'Remote configuration evaluation and template endpoints',
+      },
+      {
+        name: 'Monitoring',
+        description: 'Operational monitoring endpoints (crash, stats)',
+      },
     ],
     security: [
       {
@@ -237,9 +361,9 @@ const options: swaggerJSDoc.Options = {
     ],
   },
   apis: [
-    './src/routes/*.ts',
-    './src/controllers/*.ts',
-    './src/models/*.ts',
+    './src/routes/**/*.ts',
+    './src/controllers/**/*.ts',
+    './src/models/**/*.ts',
   ],
 };
 
