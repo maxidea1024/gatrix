@@ -17,6 +17,7 @@ import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSe
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import SDKGuideDrawer from '@/components/coupons/SDKGuideDrawer';
 import RewardSelector from '@/components/game/RewardSelector';
+import TargetSettingsGroup, { ChannelSubchannelData } from '@/components/game/TargetSettingsGroup';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Dayjs } from 'dayjs';
 
@@ -302,6 +303,7 @@ const CouponSettingsPage: React.FC = () => {
     targetWorlds: [] as string[],
     targetWorldsInverted: false,
     targetUserIds: '' as string,
+    targetUserIdsInverted: false,
   });
   const [rewardMode, setRewardMode] = useState<'direct' | 'template'>('direct');
   // Track if description was manually edited by user
@@ -762,6 +764,14 @@ const CouponSettingsPage: React.FC = () => {
       rewardTemplateId: it.rewardTemplateId || null,
       rewardEmailTitle: it.rewardEmailTitle || '',
       rewardEmailBody: it.rewardEmailBody || '',
+      targetPlatforms: (it as any).targetPlatforms || [],
+      targetPlatformsInverted: (it as any).targetPlatformsInverted || false,
+      targetChannelSubchannels: (it as any).targetChannelSubchannels || [],
+      targetChannelSubchannelsInverted: (it as any).targetChannelSubchannelsInverted || false,
+      targetWorlds: (it as any).targetWorlds || [],
+      targetWorldsInverted: (it as any).targetWorldsInverted || false,
+      targetUserIds: (it as any).targetUserIds || '',
+      targetUserIdsInverted: (it as any).targetUserIdsInverted || false,
     });
     // When editing, mark description as manually edited (since it already has a value)
     setIsDescriptionManuallyEdited(true);
@@ -1476,157 +1486,24 @@ const CouponSettingsPage: React.FC = () => {
               <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
                 🎯 {t('coupons.couponSettings.form.targetSettings')}
               </Typography>
-              <Stack spacing={2}>
-                {/* Platform */}
-                <Box ref={platformTableRef}>
-                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 500 }}>
-                    {t('coupons.couponSettings.form.targetPlatforms')}
-                  </Typography>
-
-                  {/* Selected Chips Display */}
-                  <Box
-                    sx={{
-                      border: '1px solid',
-                      borderColor: 'action.disabled',
-                      borderRadius: 1,
-                      p: 1.5,
-                      minHeight: 56,
-                      display: 'flex',
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
-                      gap: 1,
-                      bgcolor: 'background.paper',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        borderColor: 'action.active',
-                        bgcolor: 'action.hover',
-                      }
-                    }}
-                    onClick={() => {
-                      setForm((s: any) => ({
-                        ...s,
-                        _showPlatformTable: !s._showPlatformTable
-                      }));
-                    }}
-                  >
-                    {form.targetPlatforms && form.targetPlatforms.length > 0 && (
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setForm((s: any) => ({
-                            ...s,
-                            targetPlatformsInverted: !s.targetPlatformsInverted
-                          }));
-                        }}
-                        sx={{
-                          minWidth: 'auto',
-                          px: 1.5,
-                          py: 0.5,
-                          borderRadius: 0,
-                          fontWeight: 700,
-                          textTransform: 'none',
-                          fontSize: '0.85rem',
-                          ...(form.targetPlatformsInverted ? {
-                            bgcolor: 'error.main',
-                            color: 'white',
-                            '&:hover': {
-                              bgcolor: 'error.dark',
-                            }
-                          } : {
-                            bgcolor: 'action.disabled',
-                            color: 'text.secondary',
-                            '&:hover': {
-                              bgcolor: 'action.disabled',
-                              opacity: 0.8,
-                            }
-                          })
-                        }}
-                      >
-                        NOT
-                      </Button>
-                    )}
-                    {form.targetPlatforms && form.targetPlatforms.length > 0 ? (
-                      form.targetPlatforms.map((platformValue: string) => {
-                        const platformObj = platforms.find((p) => p.value === platformValue);
-                        return (
-                          <Chip
-                            key={platformValue}
-                            label={platformObj?.label || platformValue}
-                            onDelete={(e) => {
-                              e.stopPropagation();
-                              setForm((s: any) => ({
-                                ...s,
-                                targetPlatforms: (s.targetPlatforms || []).filter((p: string) => p !== platformValue)
-                              }));
-                            }}
-                            size="small"
-                            variant="outlined"
-                            sx={{ borderRadius: 0.5 }}
-                          />
-                        );
-                      })
-                    ) : !form.targetPlatformsInverted && (
-                      <Typography variant="body2" color="text.secondary">
-                        {t('coupons.couponSettings.form.targetChannelsNone')}
-                      </Typography>
-                    )}
-                  </Box>
-
-                  {/* Platform Dropdown Table */}
-                  <Box
-                    sx={{
-                      border: '1px solid',
-                      borderColor: 'action.disabled',
-                      borderRadius: 1,
-                      overflow: form._showPlatformTable ? 'auto' : 'hidden',
-                      mt: 0,
-                      bgcolor: 'background.paper',
-                      position: 'relative',
-                      top: -1,
-                      maxHeight: form._showPlatformTable ? 300 : 0,
-                      opacity: form._showPlatformTable ? 1 : 0,
-                      transition: 'all 0.3s ease-in-out',
-                      visibility: form._showPlatformTable ? 'visible' : 'hidden',
-                    }}
-                  >
-                    <Box sx={{ p: 1 }}>
-                      {platforms.map((platform) => {
-                        const isSelected = form.targetPlatforms?.includes(platform.value);
-                        return (
-                          <FormControlLabel
-                            key={platform.value}
-                            control={
-                              <Checkbox
-                                checked={isSelected || false}
-                                onChange={(e) => {
-                                  if (e.target.checked) {
-                                    setForm((s: any) => ({
-                                      ...s,
-                                      targetPlatforms: [...(s.targetPlatforms || []), platform.value]
-                                    }));
-                                  } else {
-                                    setForm((s: any) => ({
-                                      ...s,
-                                      targetPlatforms: (s.targetPlatforms || []).filter((p: string) => p !== platform.value)
-                                    }));
-                                  }
-                                }}
-                                size="small"
-                              />
-                            }
-                            label={platform.label}
-                            sx={{ display: 'block', mb: 1 }}
-                          />
-                        );
-                      })}
-                    </Box>
-                  </Box>
-
-                  <FormHelperText sx={{ mt: 1 }}>{t('coupons.couponSettings.form.targetPlatformsHelp')}</FormHelperText>
-                </Box>
+              <TargetSettingsGroup
+                targetPlatforms={form.targetPlatforms || []}
+                targetPlatformsInverted={form.targetPlatformsInverted || false}
+                platforms={platforms}
+                onPlatformsChange={(platforms, inverted) => setForm((s: any) => ({ ...s, targetPlatforms: platforms, targetPlatformsInverted: inverted }))}
+                targetChannelSubchannels={form.targetChannelSubchannels || []}
+                targetChannelSubchannelsInverted={form.targetChannelSubchannelsInverted || false}
+                channels={channels}
+                onChannelsChange={(channels, inverted) => setForm((s: any) => ({ ...s, targetChannelSubchannels: channels, targetChannelSubchannelsInverted: inverted }))}
+                targetWorlds={form.targetWorlds || []}
+                targetWorldsInverted={form.targetWorldsInverted || false}
+                worlds={worlds}
+                onWorldsChange={(worlds, inverted) => setForm((s: any) => ({ ...s, targetWorlds: worlds, targetWorldsInverted: inverted }))}
+                targetUserIds={form.targetUserIds || ''}
+                targetUserIdsInverted={form.targetUserIdsInverted || false}
+                onUserIdsChange={(ids, inverted) => setForm((s: any) => ({ ...s, targetUserIds: ids, targetUserIdsInverted: inverted }))}
+                showUserIdFilter={true}
+              />
 
                 {/* Channel-Subchannel Combinations - Dropdown with Table */}
                 <Box ref={channelTableRef}>
@@ -1675,10 +1552,9 @@ const CouponSettingsPage: React.FC = () => {
                         }}
                         sx={{
                           minWidth: 'auto',
-                          px: 1.5,
+                          px: 1,
                           py: 0.5,
-                          borderRadius: 0,
-                          fontWeight: 700,
+                          fontWeight: 600,
                           textTransform: 'none',
                           fontSize: '0.85rem',
                           ...(form.targetChannelSubchannelsInverted ? {
@@ -1896,166 +1772,144 @@ const CouponSettingsPage: React.FC = () => {
                 </Box>
 
                 {/* Game World */}
+                <TargetSelector
+                  title={t('coupons.couponSettings.form.targetWorlds')}
+                  helperText={t('coupons.couponSettings.form.targetWorldsHelp')}
+                  options={worlds.map((w) => ({ ...w, label: `${w.value} - ${w.label}` }))}
+                  selectedValues={form.targetWorlds || []}
+                  isInverted={form.targetWorldsInverted || false}
+                  onSelectionChange={(values) => setForm((s: any) => ({ ...s, targetWorlds: values }))}
+                  onInvertedChange={(inverted) => setForm((s: any) => ({ ...s, targetWorldsInverted: inverted }))}
+                  type="simple"
+                />
+
+                {/* User ID List */}
                 <Box>
                   <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 500 }}>
-                    {t('coupons.couponSettings.form.targetWorlds')}
+                    {t('coupons.couponSettings.form.targetUserIds')}
                   </Typography>
 
-                  <Box ref={worldTableRef}>
-                    {/* Selected Chips Display */}
-                    <Box
-                      sx={{
-                        border: '1px solid',
-                        borderColor: 'action.disabled',
-                        borderRadius: 1,
-                        p: 1.5,
-                        minHeight: 56,
-                        display: 'flex',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                        gap: 1,
-                        bgcolor: 'background.paper',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        '&:hover': {
-                          borderColor: 'action.active',
-                          bgcolor: 'action.hover',
-                        }
-                      }}
-                      onClick={() => {
-                        setForm((s: any) => ({
-                          ...s,
-                          _showWorldTable: !s._showWorldTable
-                        }));
-                      }}
-                    >
-                      {form.targetWorlds && form.targetWorlds.length > 0 && (
-                        <Button
-                          variant="contained"
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setForm((s: any) => ({
-                              ...s,
-                              targetWorldsInverted: !s.targetWorldsInverted
-                            }));
-                          }}
-                          sx={{
-                            minWidth: 'auto',
-                            px: 1.5,
-                            py: 0.5,
-                            borderRadius: 0,
-                            fontWeight: 700,
-                            textTransform: 'none',
-                            fontSize: '0.85rem',
-                            ...(form.targetWorldsInverted ? {
-                              bgcolor: 'error.main',
-                              color: 'white',
-                              '&:hover': {
-                                bgcolor: 'error.dark',
-                              }
-                            } : {
+                  {/* User ID Input Container */}
+                  <Box
+                    sx={{
+                      border: '1px solid',
+                      borderColor: 'action.disabled',
+                      borderRadius: 1,
+                      p: 1.5,
+                      minHeight: 56,
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      flexWrap: 'wrap',
+                      gap: 1,
+                      bgcolor: 'background.paper',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        borderColor: 'action.active',
+                        bgcolor: 'action.hover',
+                      },
+                      '&:focus-within': {
+                        borderColor: 'primary.main',
+                        boxShadow: '0 0 0 2px rgba(25, 103, 210, 0.1)',
+                      }
+                    }}
+                  >
+                    {/* NOT Button */}
+                    {form.targetUserIds && form.targetUserIds.trim() && (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setForm((s: any) => ({
+                            ...s,
+                            targetUserIdsInverted: !s.targetUserIdsInverted
+                          }));
+                        }}
+                        sx={{
+                          minWidth: 'auto',
+                          px: 1,
+                          py: 0.5,
+                          fontWeight: 600,
+                          textTransform: 'none',
+                          fontSize: '0.85rem',
+                          ...(form.targetUserIdsInverted ? {
+                            bgcolor: 'error.main',
+                            color: 'white',
+                            '&:hover': {
+                              bgcolor: 'error.dark',
+                            }
+                          } : {
+                            bgcolor: 'action.disabled',
+                            color: 'text.secondary',
+                            '&:hover': {
                               bgcolor: 'action.disabled',
-                              color: 'text.secondary',
-                              '&:hover': {
-                                bgcolor: 'action.disabled',
-                                opacity: 0.8,
-                              }
-                            })
-                          }}
-                        >
-                          NOT
-                        </Button>
-                      )}
-                      {form.targetWorlds && form.targetWorlds.length > 0 ? (
-                        form.targetWorlds.map((worldValue: string) => (
+                              opacity: 0.8,
+                            }
+                          })
+                        }}
+                      >
+                        NOT
+                      </Button>
+                    )}
+
+                    {/* User ID Chips Display */}
+                    {form.targetUserIds && form.targetUserIds.trim() && (
+                      form.targetUserIds.split(',').map((userId: string, index: number) => {
+                        const trimmedId = userId.trim();
+                        if (!trimmedId) return null;
+                        return (
                           <Chip
-                            key={worldValue}
-                            label={worldValue}
-                            onDelete={(e) => {
-                              e.stopPropagation();
+                            key={index}
+                            label={trimmedId}
+                            onDelete={() => {
+                              const ids = form.targetUserIds.split(',').map((id: string) => id.trim()).filter((id: string) => id);
+                              const filtered = ids.filter((_: string, i: number) => i !== index);
                               setForm((s: any) => ({
                                 ...s,
-                                targetWorlds: (s.targetWorlds || []).filter((w: string) => w !== worldValue)
+                                targetUserIds: filtered.length > 0 ? filtered.join(', ') : ''
                               }));
                             }}
                             size="small"
-                            variant="outlined"
-                            sx={{ borderRadius: 0.5 }}
                           />
-                        ))
-                      ) : !form.targetWorldsInverted && (
-                        <Typography variant="body2" color="text.secondary">
-                          {t('coupons.couponSettings.form.targetChannelsNone')}
-                        </Typography>
-                      )}
-                    </Box>
+                        );
+                      })
+                    )}
 
-                    {/* World Dropdown Table */}
-                    <Box
-                      sx={{
-                        border: '1px solid',
-                        borderColor: 'action.disabled',
-                        borderRadius: 1,
-                        overflow: form._showWorldTable ? 'auto' : 'hidden',
-                        mt: 0,
-                        bgcolor: 'background.paper',
-                        position: 'relative',
-                        top: -1,
-                        maxHeight: form._showWorldTable ? 300 : 0,
-                        opacity: form._showWorldTable ? 1 : 0,
-                        transition: 'all 0.3s ease-in-out',
-                        visibility: form._showWorldTable ? 'visible' : 'hidden',
+                    {/* User ID Input Field */}
+                    <input
+                      type="text"
+                      placeholder={form.targetUserIds && form.targetUserIds.trim() ? '' : 'user1, user2, user3...'}
+                      onKeyDown={(e) => {
+                        const input = (e.currentTarget as HTMLInputElement).value.trim();
+                        if ((e.key === 'Enter' || e.key === ',') && input) {
+                          e.preventDefault();
+                          // Split by comma and filter empty values
+                          const newIds = input.split(',').map((id: string) => id.trim()).filter((id: string) => id);
+                          const existingIds = form.targetUserIds ? form.targetUserIds.split(',').map((id: string) => id.trim()).filter((id: string) => id) : [];
+                          const uniqueIds = Array.from(new Set([...existingIds, ...newIds]));
+                          setForm((s: any) => ({
+                            ...s,
+                            targetUserIds: uniqueIds.join(', ')
+                          }));
+                          (e.currentTarget as HTMLInputElement).value = '';
+                        }
                       }}
-                    >
-                      <Box sx={{ p: 1 }}>
-                        {worlds.map((world) => {
-                          const isSelected = form.targetWorlds?.includes(world.value);
-                          return (
-                            <FormControlLabel
-                              key={world.value}
-                              control={
-                                <Checkbox
-                                  checked={isSelected || false}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      setForm((s: any) => ({
-                                        ...s,
-                                        targetWorlds: [...(s.targetWorlds || []), world.value]
-                                      }));
-                                    } else {
-                                      setForm((s: any) => ({
-                                        ...s,
-                                        targetWorlds: (s.targetWorlds || []).filter((w: string) => w !== world.value)
-                                      }));
-                                    }
-                                  }}
-                                  size="small"
-                                />
-                              }
-                              label={`${world.value} - ${world.label}`}
-                              sx={{ display: 'block', mb: 1 }}
-                            />
-                          );
-                        })}
-                      </Box>
-                    </Box>
+                      style={{
+                        flex: 1,
+                        minWidth: 150,
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: '0.875rem',
+                        fontFamily: 'inherit',
+                        backgroundColor: 'transparent',
+                        color: 'inherit',
+                        caretColor: 'inherit',
+                      }}
+                    />
                   </Box>
 
-                  <FormHelperText sx={{ mt: 1 }}>{t('coupons.couponSettings.form.targetWorldsHelp')}</FormHelperText>
+                  <FormHelperText sx={{ mt: 1 }}>{t('coupons.couponSettings.form.targetUserIdsHelp')}</FormHelperText>
                 </Box>
-
-                {/* User ID List */}
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={3}
-                  label={t('coupons.couponSettings.form.targetUserIds')}
-                  value={form.targetUserIds || ''}
-                  onChange={(e) => setForm((s: any) => ({ ...s, targetUserIds: e.target.value }))}
-                  placeholder={t('coupons.couponSettings.form.targetUserIdsPlaceholder')}
-                  helperText={t('coupons.couponSettings.form.targetUserIdsHelp')}
-                />
               </Stack>
             </Box>
 
