@@ -1848,6 +1848,7 @@
     "demoteUser": "사용자 강등",
     "promoteUserConfirm": "{{name}} 사용자를 관리자로 승격하시겠습니까?",
     "demoteUserConfirm": "{{name}} 사용자를 일반 사용자로 강등하시겠습니까?",
+    "targetSettings": "대상 지정",
     "userPromoted": "사용자가 관리자로 승격되었습니다",
     "userDemoted": "사용자가 일반 사용자로 강등되었습니다",
     "userPromoteFailed": "사용자 승격에 실패했습니다",

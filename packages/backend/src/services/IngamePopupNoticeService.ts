@@ -7,10 +7,15 @@ export interface IngamePopupNotice {
   isActive: boolean;
   content: string;
   targetWorlds: string[] | null;
-  targetMarkets: string[] | null;
+  targetWorldsInverted?: boolean;
   targetPlatforms: string[] | null;
-  targetClientVersions: string[] | null;
-  targetAccountIds: string[] | null;
+  targetPlatformsInverted?: boolean;
+  targetChannels: string[] | null;
+  targetChannelsInverted?: boolean;
+  targetSubchannels: string[] | null;
+  targetSubchannelsInverted?: boolean;
+  targetUserIds: string | null;
+  targetUserIdsInverted?: boolean;
   displayPriority: number;
   showOnce: boolean;
   startDate: string;
@@ -28,10 +33,15 @@ export interface CreateIngamePopupNoticeData {
   isActive: boolean;
   content: string;
   targetWorlds?: string[] | null;
-  targetMarkets?: string[] | null;
+  targetWorldsInverted?: boolean;
   targetPlatforms?: string[] | null;
-  targetClientVersions?: string[] | null;
-  targetAccountIds?: string[] | null;
+  targetPlatformsInverted?: boolean;
+  targetChannels?: string[] | null;
+  targetChannelsInverted?: boolean;
+  targetSubchannels?: string[] | null;
+  targetSubchannelsInverted?: boolean;
+  targetUserIds?: string | null;
+  targetUserIdsInverted?: boolean;
   displayPriority?: number;
   showOnce?: boolean;
   startDate: string;
@@ -182,19 +192,25 @@ class IngamePopupNoticeService {
 
       const [result] = await pool.execute<ResultSetHeader>(
         `INSERT INTO g_ingame_popup_notices (
-          isActive, content, targetWorlds, targetMarkets, targetPlatforms,
-          targetClientVersions, targetAccountIds,
+          isActive, content, targetWorlds, targetWorldsInverted, targetPlatforms, targetPlatformsInverted,
+          targetChannels, targetChannelsInverted, targetSubchannels, targetSubchannelsInverted,
+          targetUserIds, targetUserIdsInverted,
           displayPriority, showOnce, startDate, endDate,
           messageTemplateId, useTemplate, description, createdBy
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           data.isActive,
           data.content,
           data.targetWorlds ? JSON.stringify(data.targetWorlds) : null,
-          data.targetMarkets ? JSON.stringify(data.targetMarkets) : null,
+          data.targetWorldsInverted ?? false,
           data.targetPlatforms ? JSON.stringify(data.targetPlatforms) : null,
-          data.targetClientVersions ? JSON.stringify(data.targetClientVersions) : null,
-          data.targetAccountIds ? JSON.stringify(data.targetAccountIds) : null,
+          data.targetPlatformsInverted ?? false,
+          data.targetChannels ? JSON.stringify(data.targetChannels) : null,
+          data.targetChannelsInverted ?? false,
+          data.targetSubchannels ? JSON.stringify(data.targetSubchannels) : null,
+          data.targetSubchannelsInverted ?? false,
+          data.targetUserIds ?? null,
+          data.targetUserIdsInverted ?? false,
           data.displayPriority ?? 100,
           data.showOnce ?? false,
           convertToMySQLDateTime(data.startDate),
@@ -241,9 +257,9 @@ class IngamePopupNoticeService {
         values.push(data.targetWorlds ? JSON.stringify(data.targetWorlds) : null);
       }
 
-      if (data.targetMarkets !== undefined) {
-        updates.push('targetMarkets = ?');
-        values.push(data.targetMarkets ? JSON.stringify(data.targetMarkets) : null);
+      if (data.targetWorldsInverted !== undefined) {
+        updates.push('targetWorldsInverted = ?');
+        values.push(data.targetWorldsInverted);
       }
 
       if (data.targetPlatforms !== undefined) {
@@ -251,14 +267,39 @@ class IngamePopupNoticeService {
         values.push(data.targetPlatforms ? JSON.stringify(data.targetPlatforms) : null);
       }
 
-      if (data.targetClientVersions !== undefined) {
-        updates.push('targetClientVersions = ?');
-        values.push(data.targetClientVersions ? JSON.stringify(data.targetClientVersions) : null);
+      if (data.targetPlatformsInverted !== undefined) {
+        updates.push('targetPlatformsInverted = ?');
+        values.push(data.targetPlatformsInverted);
       }
 
-      if (data.targetAccountIds !== undefined) {
-        updates.push('targetAccountIds = ?');
-        values.push(data.targetAccountIds ? JSON.stringify(data.targetAccountIds) : null);
+      if (data.targetChannels !== undefined) {
+        updates.push('targetChannels = ?');
+        values.push(data.targetChannels ? JSON.stringify(data.targetChannels) : null);
+      }
+
+      if (data.targetChannelsInverted !== undefined) {
+        updates.push('targetChannelsInverted = ?');
+        values.push(data.targetChannelsInverted);
+      }
+
+      if (data.targetSubchannels !== undefined) {
+        updates.push('targetSubchannels = ?');
+        values.push(data.targetSubchannels ? JSON.stringify(data.targetSubchannels) : null);
+      }
+
+      if (data.targetSubchannelsInverted !== undefined) {
+        updates.push('targetSubchannelsInverted = ?');
+        values.push(data.targetSubchannelsInverted);
+      }
+
+      if (data.targetUserIds !== undefined) {
+        updates.push('targetUserIds = ?');
+        values.push(data.targetUserIds ?? null);
+      }
+
+      if (data.targetUserIdsInverted !== undefined) {
+        updates.push('targetUserIdsInverted = ?');
+        values.push(data.targetUserIdsInverted);
       }
 
       if (data.displayPriority !== undefined) {
@@ -377,10 +418,15 @@ class IngamePopupNoticeService {
       isActive: Boolean(row.isActive),
       content: row.content,
       targetWorlds: typeof row.targetWorlds === 'string' ? JSON.parse(row.targetWorlds) : row.targetWorlds,
-      targetMarkets: typeof row.targetMarkets === 'string' ? JSON.parse(row.targetMarkets) : row.targetMarkets,
+      targetWorldsInverted: Boolean(row.targetWorldsInverted),
       targetPlatforms: typeof row.targetPlatforms === 'string' ? JSON.parse(row.targetPlatforms) : row.targetPlatforms,
-      targetClientVersions: typeof row.targetClientVersions === 'string' ? JSON.parse(row.targetClientVersions) : row.targetClientVersions,
-      targetAccountIds: typeof row.targetAccountIds === 'string' ? JSON.parse(row.targetAccountIds) : row.targetAccountIds,
+      targetPlatformsInverted: Boolean(row.targetPlatformsInverted),
+      targetChannels: typeof row.targetChannels === 'string' ? JSON.parse(row.targetChannels) : row.targetChannels,
+      targetChannelsInverted: Boolean(row.targetChannelsInverted),
+      targetSubchannels: typeof row.targetSubchannels === 'string' ? JSON.parse(row.targetSubchannels) : row.targetSubchannels,
+      targetSubchannelsInverted: Boolean(row.targetSubchannelsInverted),
+      targetUserIds: row.targetUserIds,
+      targetUserIdsInverted: Boolean(row.targetUserIdsInverted),
       displayPriority: row.displayPriority,
       showOnce: Boolean(row.showOnce),
       startDate: convertFromMySQLDateTime(row.startDate)!,
@@ -392,6 +438,35 @@ class IngamePopupNoticeService {
       updatedAt: convertFromMySQLDateTime(row.updatedAt)!,
       createdBy: row.createdBy,
       updatedBy: row.updatedBy
+    };
+  }
+
+  /**
+   * Format notice for Server SDK response
+   * Returns only essential fields for game client
+   */
+  formatNoticeForServerSDK(row: any): any {
+    // Parse targetUserIds from comma-separated string to array
+    const targetUserIds = row.targetUserIds
+      ? row.targetUserIds.split(',').map((id: string) => id.trim()).filter((id: string) => id)
+      : [];
+
+    return {
+      content: row.content,
+      targetPlatforms: typeof row.targetPlatforms === 'string' ? JSON.parse(row.targetPlatforms) : row.targetPlatforms,
+      targetPlatformsInverted: Boolean(row.targetPlatformsInverted),
+      targetChannels: typeof row.targetChannels === 'string' ? JSON.parse(row.targetChannels) : row.targetChannels,
+      targetChannelsInverted: Boolean(row.targetChannelsInverted),
+      targetSubchannels: typeof row.targetSubchannels === 'string' ? JSON.parse(row.targetSubchannels) : row.targetSubchannels,
+      targetSubchannelsInverted: Boolean(row.targetSubchannelsInverted),
+      targetWorlds: typeof row.targetWorlds === 'string' ? JSON.parse(row.targetWorlds) : row.targetWorlds,
+      targetWorldsInverted: Boolean(row.targetWorldsInverted),
+      targetUserIds: targetUserIds,
+      targetUserIdsInverted: Boolean(row.targetUserIdsInverted),
+      displayPriority: row.displayPriority,
+      showOnce: Boolean(row.showOnce),
+      startDate: convertFromMySQLDateTime(row.startDate)!,
+      endDate: convertFromMySQLDateTime(row.endDate)!
     };
   }
 }

@@ -1848,6 +1848,7 @@
     "demoteUser": "Demote User",
     "promoteUserConfirm": "Are you sure you want to promote {{name}} to admin?",
     "demoteUserConfirm": "Are you sure you want to demote {{name}} from admin?",
+    "targetSettings": "Target Settings",
     "userPromoted": "User has been promoted to admin",
     "userDemoted": "User has been demoted from admin",
     "userPromoteFailed": "Failed to promote user",

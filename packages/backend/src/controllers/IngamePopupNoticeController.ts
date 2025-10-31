@@ -11,11 +11,15 @@ const createIngamePopupNoticeSchema = Joi.object({
   isActive: Joi.boolean().required(),
   content: Joi.string().min(1).required(),
   targetWorlds: Joi.array().items(Joi.string()).optional().allow(null),
-  targetMarkets: Joi.array().items(Joi.string()).optional().allow(null),
+  targetWorldsInverted: Joi.boolean().optional().default(false),
   targetPlatforms: Joi.array().items(Joi.string()).optional().allow(null),
-  targetClientVersions: Joi.array().items(Joi.string()).optional().allow(null),
-  targetGameVersions: Joi.array().items(Joi.string()).optional().allow(null),
-  targetAccountIds: Joi.array().items(Joi.string()).optional().allow(null),
+  targetPlatformsInverted: Joi.boolean().optional().default(false),
+  targetChannels: Joi.array().items(Joi.string()).optional().allow(null),
+  targetChannelsInverted: Joi.boolean().optional().default(false),
+  targetSubchannels: Joi.array().items(Joi.string()).optional().allow(null),
+  targetSubchannelsInverted: Joi.boolean().optional().default(false),
+  targetUserIds: Joi.string().optional().allow(null, ''),
+  targetUserIdsInverted: Joi.boolean().optional().default(false),
   displayPriority: Joi.number().integer().min(0).optional(),
   showOnce: Joi.boolean().optional(),
   startDate: Joi.string().isoDate().required(),
@@ -29,11 +33,15 @@ const updateIngamePopupNoticeSchema = Joi.object({
   isActive: Joi.boolean().optional(),
   content: Joi.string().min(1).optional(),
   targetWorlds: Joi.array().items(Joi.string()).optional().allow(null),
-  targetMarkets: Joi.array().items(Joi.string()).optional().allow(null),
+  targetWorldsInverted: Joi.boolean().optional(),
   targetPlatforms: Joi.array().items(Joi.string()).optional().allow(null),
-  targetClientVersions: Joi.array().items(Joi.string()).optional().allow(null),
-  targetGameVersions: Joi.array().items(Joi.string()).optional().allow(null),
-  targetAccountIds: Joi.array().items(Joi.string()).optional().allow(null),
+  targetPlatformsInverted: Joi.boolean().optional(),
+  targetChannels: Joi.array().items(Joi.string()).optional().allow(null),
+  targetChannelsInverted: Joi.boolean().optional(),
+  targetSubchannels: Joi.array().items(Joi.string()).optional().allow(null),
+  targetSubchannelsInverted: Joi.boolean().optional(),
+  targetUserIds: Joi.string().optional().allow(null, ''),
+  targetUserIdsInverted: Joi.boolean().optional(),
   displayPriority: Joi.number().integer().min(0).optional(),
   showOnce: Joi.boolean().optional(),
   startDate: Joi.string().isoDate().optional(),
@@ -277,9 +285,14 @@ class IngamePopupNoticeController {
 
       const result = await IngamePopupNoticeService.getIngamePopupNotices(1, 1000, filters);
 
+      // Format notices for Server SDK response
+      const formattedNotices = result.notices.map(notice =>
+        IngamePopupNoticeService.formatNoticeForServerSDK(notice as any)
+      );
+
       res.json({
         success: true,
-        data: result.notices
+        data: formattedNotices
       });
     } catch (error) {
       next(error);

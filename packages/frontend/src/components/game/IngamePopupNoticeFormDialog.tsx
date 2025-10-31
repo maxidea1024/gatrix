@@ -10,13 +10,7 @@ import {
   Toolbar,
   IconButton,
   Stack,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
-  OutlinedInput,
-  SelectChangeEvent,
+  Paper,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import ResizableDrawer from '../common/ResizableDrawer';
@@ -25,6 +19,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
+import { useGameWorld } from '../../contexts/GameWorldContext';
 import {
   IngamePopupNotice,
   CreateIngamePopupNoticeData,
@@ -34,6 +29,7 @@ import ingamePopupNoticeService from '../../services/ingamePopupNoticeService';
 import { messageTemplateService, MessageTemplate } from '../../services/messageTemplateService';
 import MultiLanguageMessageInput from '../common/MultiLanguageMessageInput';
 import { parseUTCForPicker } from '../../utils/dateFormat';
+import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGroup';
 
 interface IngamePopupNoticeFormDialogProps {
   open: boolean;
@@ -50,17 +46,26 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { platforms } = usePlatformConfig();
+  const { platforms, channels } = usePlatformConfig();
+  const { worlds } = useGameWorld();
   const [submitting, setSubmitting] = useState(false);
 
   // Form state
   const [isActive, setIsActive] = useState(true);
   const [content, setContent] = useState('');
-  const [targetWorlds, setTargetWorlds] = useState<string[]>([]);
-  const [targetMarkets, setTargetMarkets] = useState<string[]>([]);
+
+  // Target settings
   const [targetPlatforms, setTargetPlatforms] = useState<string[]>([]);
-  const [targetClientVersions, setTargetClientVersions] = useState<string[]>([]);
-  const [targetAccountIds, setTargetAccountIds] = useState<string[]>([]);
+  const [targetPlatformsInverted, setTargetPlatformsInverted] = useState(false);
+  const [targetChannelSubchannels, setTargetChannelSubchannels] = useState<ChannelSubchannelData[]>([]);
+  const [targetChannelSubchannelsInverted, setTargetChannelSubchannelsInverted] = useState(false);
+  const [targetWorlds, setTargetWorlds] = useState<string[]>([]);
+  const [targetWorldsInverted, setTargetWorldsInverted] = useState(false);
+
+  // User ID targeting
+  const [targetUserIds, setTargetUserIds] = useState<string>('');
+  const [targetUserIdsInverted, setTargetUserIdsInverted] = useState(false);
+
   const [displayPriority, setDisplayPriority] = useState(100);
   const [showOnce, setShowOnce] = useState(false);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
@@ -91,11 +96,30 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
     if (notice) {
       setIsActive(notice.isActive);
       setContent(notice.content);
-      setTargetWorlds(notice.targetWorlds || []);
-      setTargetMarkets(notice.targetMarkets || []);
+
+      // Convert targetChannels/targetSubchannels to targetChannelSubchannels format
+      const targetChannelSubchannels: ChannelSubchannelData[] = [];
+      const targetChannels = notice.targetChannels || [];
+      const targetSubchannels = notice.targetSubchannels || [];
+
+      if (targetChannels.length > 0) {
+        targetChannels.forEach((channel: string) => {
+          targetChannelSubchannels.push({
+            channel,
+            subchannels: targetSubchannels,
+          });
+        });
+      }
+
       setTargetPlatforms(notice.targetPlatforms || []);
-      setTargetClientVersions(notice.targetClientVersions || []);
-      setTargetAccountIds(notice.targetAccountIds || []);
+      setTargetPlatformsInverted(notice.targetPlatformsInverted || false);
+      setTargetChannelSubchannels(targetChannelSubchannels);
+      setTargetChannelSubchannelsInverted(notice.targetChannelSubchannelsInverted || false);
+      setTargetWorlds(notice.targetWorlds || []);
+      setTargetWorldsInverted(notice.targetWorldsInverted || false);
+      setTargetUserIds((notice as any).targetUserIds || '');
+      setTargetUserIdsInverted((notice as any).targetUserIdsInverted || false);
+
       setDisplayPriority(notice.displayPriority);
       setShowOnce(notice.showOnce);
       // Parse UTC time and convert to user's timezone for display
@@ -114,11 +138,14 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       // Reset form
       setIsActive(true);
       setContent('');
-      setTargetWorlds([]);
-      setTargetMarkets([]);
       setTargetPlatforms([]);
-      setTargetClientVersions([]);
-      setTargetAccountIds([]);
+      setTargetPlatformsInverted(false);
+      setTargetChannelSubchannels([]);
+      setTargetChannelSubchannelsInverted(false);
+      setTargetWorlds([]);
+      setTargetWorldsInverted(false);
+      setTargetUserIds('');
+      setTargetUserIdsInverted(false);
       setDisplayPriority(100);
       setShowOnce(false);
       setStartDate(null);
@@ -158,14 +185,35 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
     setSubmitting(true);
 
     try {
+      // Convert targetChannelSubchannels to targetChannels and targetSubchannels for API
+      const targetChannels: string[] = [];
+      const targetSubchannels: string[] = [];
+      if (targetChannelSubchannels && targetChannelSubchannels.length > 0) {
+        targetChannelSubchannels.forEach((item: any) => {
+          if (!targetChannels.includes(item.channel)) {
+            targetChannels.push(item.channel);
+          }
+          item.subchannels.forEach((subchannel: string) => {
+            if (!targetSubchannels.includes(subchannel)) {
+              targetSubchannels.push(subchannel);
+            }
+          });
+        });
+      }
+
       const data: CreateIngamePopupNoticeData | UpdateIngamePopupNoticeData = {
         isActive,
         content: content.trim(),
-        targetWorlds: targetWorlds.length > 0 ? targetWorlds : null,
-        targetMarkets: targetMarkets.length > 0 ? targetMarkets : null,
         targetPlatforms: targetPlatforms.length > 0 ? targetPlatforms : null,
-        targetClientVersions: targetClientVersions.length > 0 ? targetClientVersions : null,
-        targetAccountIds: targetAccountIds.length > 0 ? targetAccountIds : null,
+        targetPlatformsInverted: targetPlatformsInverted,
+        targetChannels: targetChannels.length > 0 ? targetChannels : null,
+        targetChannelsInverted: targetChannelSubchannelsInverted,
+        targetSubchannels: targetSubchannels.length > 0 ? targetSubchannels : null,
+        targetSubchannelsInverted: targetChannelSubchannelsInverted,
+        targetWorlds: targetWorlds.length > 0 ? targetWorlds : null,
+        targetWorldsInverted: targetWorldsInverted,
+        targetUserIds: targetUserIds.trim() || null,
+        targetUserIdsInverted: targetUserIdsInverted,
         displayPriority,
         showOnce,
         // Convert local time to UTC (12:00 KST -> 03:00 UTC)
@@ -194,23 +242,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
     }
   };
 
-  const handleMultiSelectChange = (
-    event: SelectChangeEvent<string[]>,
-    setter: React.Dispatch<React.SetStateAction<string[]>>
-  ) => {
-    const value = event.target.value;
-    setter(typeof value === 'string' ? value.split(',') : value);
-  };
 
-  const handleVersionAdd = (version: string, setter: React.Dispatch<React.SetStateAction<string[]>>) => {
-    if (version.trim()) {
-      setter(prev => [...prev, version.trim()]);
-    }
-  };
-
-  const handleVersionRemove = (version: string, setter: React.Dispatch<React.SetStateAction<string[]>>) => {
-    setter(prev => prev.filter(v => v !== version));
-  };
 
   return (
     <ResizableDrawer
@@ -261,72 +293,44 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
             </Typography>
           </Box>
 
-          {/* Target Platforms */}
-          <FormControl fullWidth>
-            <InputLabel>{t('ingamePopupNotices.targetPlatforms')}</InputLabel>
-            <Select
-              multiple
-              value={targetPlatforms}
-              onChange={(e) => handleMultiSelectChange(e, setTargetPlatforms)}
-              input={<OutlinedInput label={t('ingamePopupNotices.targetPlatforms')} />}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={value} size="small" />
-                  ))}
-                </Box>
-              )}
-            >
-              {platforms.map((platform) => (
-                <MenuItem key={platform.value} value={platform.value}>
-                  {platform.label}
-                </MenuItem>
-              ))}
-            </Select>
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
-              {t('ingamePopupNotices.targetPlatformsHelp')}
+          {/* Target Settings Group */}
+          <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+              {t('common.targetSettings')}
             </Typography>
-          </FormControl>
+            <TargetSettingsGroup
+              targetPlatforms={targetPlatforms}
+              targetPlatformsInverted={targetPlatformsInverted}
+              platforms={platforms}
+              onPlatformsChange={(platforms, inverted) => {
+                setTargetPlatforms(platforms);
+                setTargetPlatformsInverted(inverted);
+              }}
+              targetChannelSubchannels={targetChannelSubchannels}
+              targetChannelSubchannelsInverted={targetChannelSubchannelsInverted}
+              channels={channels}
+              onChannelsChange={(channels, inverted) => {
+                setTargetChannelSubchannels(channels);
+                setTargetChannelSubchannelsInverted(inverted);
+              }}
+              targetWorlds={targetWorlds}
+              targetWorldsInverted={targetWorldsInverted}
+              worlds={worlds}
+              onWorldsChange={(worlds, inverted) => {
+                setTargetWorlds(worlds);
+                setTargetWorldsInverted(inverted);
+              }}
+              targetUserIds={targetUserIds}
+              targetUserIdsInverted={targetUserIdsInverted}
+              onUserIdsChange={(ids, inverted) => {
+                setTargetUserIds(ids);
+                setTargetUserIdsInverted(inverted);
+              }}
+              showUserIdFilter={true}
+            />
+          </Paper>
 
-          {/* Target Worlds */}
-          <TextField
-            label={t('ingamePopupNotices.targetWorlds')}
-            value={targetWorlds.join(', ')}
-            onChange={(e) => setTargetWorlds(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-            fullWidth
-            placeholder={t('ingamePopupNotices.targetWorldsPlaceholder')}
-            helperText={t('ingamePopupNotices.targetWorldsHelp')}
-          />
 
-          {/* Target Markets */}
-          <TextField
-            label={t('ingamePopupNotices.targetMarkets')}
-            value={targetMarkets.join(', ')}
-            onChange={(e) => setTargetMarkets(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-            fullWidth
-            placeholder={t('ingamePopupNotices.targetMarketsPlaceholder')}
-            helperText={t('ingamePopupNotices.targetMarketsHelp')}
-          />
-
-          {/* Target Client Versions */}
-          <TextField
-            label={t('ingamePopupNotices.targetClientVersions')}
-            value={targetClientVersions.join(', ')}
-            onChange={(e) => setTargetClientVersions(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-            fullWidth
-            placeholder={t('ingamePopupNotices.targetClientVersionsPlaceholder')}
-            helperText={t('ingamePopupNotices.targetClientVersionsHelp')}
-          />
-
-          {/* Target Account IDs */}
-          <TextField
-            label={t('ingamePopupNotices.targetAccountIds')}
-            value={targetAccountIds.join(', ')}
-            onChange={(e) => setTargetAccountIds(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-            fullWidth
-            placeholder={t('ingamePopupNotices.targetAccountIdsPlaceholder')}
-            helperText={t('ingamePopupNotices.targetAccountIdsHelp')}
-          />
 
           {/* Date Range */}
           <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>

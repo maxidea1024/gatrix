@@ -1903,6 +1903,7 @@
     "demoteUser": "降级用户",
     "promoteUserConfirm": "确定要将 {{name}} 提升为管理员吗？",
     "demoteUserConfirm": "确定要将 {{name}} 从管理员降级吗？",
+    "targetSettings": "目标设置",
     "userPromoted": "用户已提升为管理员",
     "userDemoted": "用户已从管理员降级",
     "userPromoteFailed": "提升用户失败",
