@@ -17,6 +17,7 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import { WhitelistService } from '../../services/whitelistService';
 
 interface WhitelistTestResult {
@@ -29,6 +30,7 @@ interface WhitelistTestResult {
 }
 
 const WhitelistOverview: React.FC = () => {
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
   // Test state
@@ -39,7 +41,7 @@ const WhitelistOverview: React.FC = () => {
 
   const handleTest = async () => {
     if (!testAccountId && !testIpAddress) {
-      enqueueSnackbar('계정 ID 또는 IP 주소 중 하나는 입력해야 합니다.', { variant: 'warning' });
+      enqueueSnackbar(t('whitelist.overview.testWarning'), { variant: 'warning' });
       return;
     }
 
@@ -52,7 +54,7 @@ const WhitelistOverview: React.FC = () => {
       setTestResult(result);
     } catch (error) {
       console.error('Failed to test whitelist:', error);
-      enqueueSnackbar('화이트리스트 테스트에 실패했습니다.', { variant: 'error' });
+      enqueueSnackbar(t('whitelist.overview.testFailed'), { variant: 'error' });
     } finally {
       setTesting(false);
     }
@@ -67,21 +69,21 @@ const WhitelistOverview: React.FC = () => {
 
   return (
     <Box>
-      {/* 화이트리스트 테스트 */}
+      {/* Whitelist Test */}
       <Card>
         <CardContent>
           <Typography variant="h6" sx={{ mb: 3 }}>
-            화이트리스트 테스트
+            {t('whitelist.overview.testTitle')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            계정 ID나 IP 주소를 입력하여 화이트리스트 접근 권한을 테스트할 수 있습니다.
+            {t('whitelist.overview.testDescription')}
           </Typography>
 
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid size={{ xs: 12 , md: 3 }}>
               <TextField
                 fullWidth
-                label="테스트 계정 ID"
+                label={t('whitelist.overview.testAccountId')}
                 value={testAccountId}
                 onChange={(e) => setTestAccountId(e.target.value)}
                 placeholder="예: 28004430"
@@ -90,7 +92,7 @@ const WhitelistOverview: React.FC = () => {
             <Grid size={{ xs: 12 , md: 3 }}>
               <TextField
                 fullWidth
-                label="테스트 IP 주소"
+                label={t('whitelist.overview.testIpAddress')}
                 value={testIpAddress}
                 onChange={(e) => setTestIpAddress(e.target.value)}
                 placeholder="예: 127.0.0.1"
@@ -105,7 +107,7 @@ const WhitelistOverview: React.FC = () => {
                 startIcon={testing ? <CircularProgress size={20} /> : <SearchIcon />}
                 sx={{ height: '56px' }}
               >
-                {testing ? '테스트 중...' : '테스트 실행'}
+                {testing ? t('common.testing') : t('whitelist.overview.testButton')}
               </Button>
             </Grid>
             <Grid size={{ xs: 12 , md: 3 }}>
@@ -116,7 +118,7 @@ const WhitelistOverview: React.FC = () => {
                 disabled={testing}
                 sx={{ height: '56px' }}
               >
-                초기화
+                {t('common.reset')}
               </Button>
             </Grid>
           </Grid>
@@ -129,8 +131,8 @@ const WhitelistOverview: React.FC = () => {
             >
               <Typography variant="subtitle2">
                 {testResult.isAllowed
-                  ? '접근이 허용됩니다'
-                  : '접근이 거부됩니다'
+                  ? t('whitelist.overview.testAllowed')
+                  : t('whitelist.overview.testDenied')
                 }
               </Typography>
             </Alert>
@@ -139,12 +141,12 @@ const WhitelistOverview: React.FC = () => {
           {testResult && testResult.matchedRules.length > 0 && (
             <Box>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                일치하는 규칙:
+                {t('whitelist.overview.matchedRules')}:
               </Typography>
               {testResult.matchedRules.map((rule, index) => (
                 <Chip
                   key={index}
-                  label={`${rule.type === 'account' ? '계정 규칙' : 'IP 규칙'}: ${rule.rule}`}
+                  label={`${rule.type === 'account' ? t('whitelist.overview.accountRule') : t('whitelist.overview.ipRule')}: ${rule.rule}`}
                   color={rule.type === 'account' ? 'primary' : 'secondary'}
                   size="small"
                   sx={{ mr: 1, mb: 1 }}

@@ -98,6 +98,12 @@ export default defineConfig({
           });
         },
       },
+      '/bull-board': {
+        target: backendUrl,
+        changeOrigin: true,
+        secure: false,
+        agent: httpAgent,
+      },
     },
   },
   build: {

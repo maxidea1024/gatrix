@@ -161,8 +161,8 @@ app.use('/api/v1', routes);
 
 // Bull Board (Admin only)
 const bullBoardAdapter = BullBoardConfig.initialize();
-app.use('/admin/queues', bullBoardAdapter.getRouter());
-app.use('/api/v1/admin/queues', (authenticate as any), (requireAdmin as any), bullBoardAdapter.getRouter());
+app.use('/bull-board', bullBoardAdapter.getRouter());
+app.use('/api/v1/bull-board', (authenticate as any), (requireAdmin as any), bullBoardAdapter.getRouter());
 
 // app.use('/api/v1/advanced-settings', advancedSettingsRoutes);
 

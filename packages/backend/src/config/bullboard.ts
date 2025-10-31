@@ -13,7 +13,7 @@ export class BullBoardConfig {
     try {
       // Express adapter 생성
       this.serverAdapter = new ExpressAdapter();
-      this.serverAdapter.setBasePath('/admin/queues');
+      this.serverAdapter.setBasePath('/bull-board');
 
       // Bull Board 생성
       createBullBoard({

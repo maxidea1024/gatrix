@@ -973,7 +973,7 @@
     }
   },
   "whitelist": {
-    "title": "Account Whitelist Management",
+    "title": "Whitelist",
     "subtitle": "Manage account and IP-based access control with whitelist entries, permissions, and security policies",
     "addEntry": "Add Entry",
     "allowedPeriod": "Allowed Period",
@@ -985,7 +985,8 @@
     "tabs": {
       "overview": "Overview",
       "account": "Account Whitelist",
-      "ip": "IP Whitelist"
+      "ip": "IP Whitelist",
+      "playground": "Playground"
     },
     "overview": {
       "title": "Whitelist Overview",
@@ -1006,7 +1007,11 @@
       "testButton": "Run Test",
       "testAllowed": "Access is allowed",
       "testDenied": "Access is denied",
-      "matchedRules": "Matched Rules"
+      "matchedRules": "Matched Rules",
+      "testWarning": "Please enter either an account ID or IP address.",
+      "testFailed": "Failed to test whitelist.",
+      "accountRule": "Account Rule",
+      "ipRule": "IP Rule"
     },
     "columns": {
       "actions": "Actions",
@@ -1746,6 +1751,7 @@
     "required": "Required",
     "optional": "Optional",
     "reset": "Reset",
+    "testing": "Testing...",
     "selectedItems": "{{count}} items selected",
     "selectedCount": "{{count}} selected",
     "deleteSelected": "Delete Selected",
@@ -2161,10 +2167,13 @@
     "maintenanceTemplates": "Message Templates",
     "scheduleManagement": "Schedule Management",
     "scheduler": "Schedule",
-    "whitelist": "Account Whitelist",
     "auditLogs": "Audit Logs",
-    "apiTokens": "API Tokens",
+    "security": "Security",
+    "apiAccessTokens": "API Access Tokens",
+    "whitelist": "Account Whitelist",
     "remoteConfig": "Remote Config",
+    "eventLens": "Event Lens",
+    "projects": "Projects",
     "collapse": "Collapse",
     "expand": "Expand",
     "jobs": "Job Management",
@@ -3538,6 +3547,13 @@
   "REWARD_TYPE_REWARD_SEASON_ITEMS": "Season Reward Items",
   "REWARD_TYPE_CAPTURED_SHIP": "Captured Ship",
   "REWARD_TYPE_SOUND_PACK": "Sound Pack",
+  "eventLens": {
+    "projects": {
+      "title": "Projects",
+      "subtitle": "Displays all projects in this workspace",
+      "comingSoonSubtitle": "New features will be added soon"
+    }
+  },
   "openApi": {
     "description": "Select and view the API documentation. Each API is used for different purposes.",
     "info": "Admin API is used in the admin panel, while Server SDK API and Client SDK API are used in game servers and clients respectively.",

@@ -439,7 +439,7 @@ const WhitelistPage: React.FC = () => {
           <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 3 }}>
             <Tab label={t('whitelist.tabs.account')} />
             <Tab label={t('whitelist.tabs.ip')} />
-            <Tab label="Playground" />
+            <Tab label={t('whitelist.tabs.playground')} />
           </Tabs>
 
           {/* Tab Content */}

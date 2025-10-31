@@ -35,6 +35,8 @@ import {
   AdminPanelSettings,
   Storage as ServerIcon,
   Api as ApiIcon,
+  Insights as InsightsIcon,
+  Folder as FolderIcon,
 } from '@mui/icons-material';
 
 export interface MenuItem {
@@ -71,16 +73,18 @@ export const adminPanelMenuItems: MenuItem[] = [
     { text: 'sidebar.jobs', icon: <JobIcon />, path: '/admin/jobs', adminOnly: true },
     { text: 'sidebar.queueMonitor', icon: <MonitorIcon />, path: '/admin/queue-monitor', adminOnly: true },
   ] },
-  { text: 'sidebar.whitelist', icon: <SecurityIcon />, path: '/admin/whitelist', adminOnly: true },
   { text: 'sidebar.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs', adminOnly: true },
   { text: 'sidebar.realtimeEvents', icon: <TimelineIcon />, path: '/admin/realtime-events', adminOnly: true },
   { text: 'sidebar.crashEvents', icon: <BugReportIcon />, path: '/admin/crash-events', adminOnly: true },
   { text: 'sidebar.remoteConfig', icon: <CloudSyncIcon />, path: '/admin/remote-config', adminOnly: true },
-  { text: 'sidebar.apiTokens', icon: <VpnKeyIcon />, path: '/admin/api-tokens', adminOnly: true },
-  { text: 'sidebar.console', icon: <TerminalIcon />, path: '/admin/console', adminOnly: true },
+  { text: 'sidebar.security', icon: <SecurityIcon />, adminOnly: true, children: [
+    { text: 'sidebar.apiAccessTokens', icon: <VpnKeyIcon />, path: '/admin/api-tokens', adminOnly: true },
+    { text: 'sidebar.whitelist', icon: <SecurityIcon />, path: '/admin/whitelist', adminOnly: true },
+  ] },
   { text: 'sidebar.serverManagement', icon: <DnsIcon />, adminOnly: true, children: [
     { text: 'sidebar.serverList', icon: <ServerIcon />, path: '/admin/server-list', adminOnly: true },
   ] },
+  { text: 'sidebar.console', icon: <TerminalIcon />, path: '/admin/console', adminOnly: true },
   { text: 'sidebar.openApi', icon: <ApiIcon />, path: '/admin/open-api', adminOnly: true },
 ];
 
@@ -104,6 +108,11 @@ export const gameMenuItems: MenuItem[] = [
   },
   { text: 'sidebar.rewardTemplates', icon: <CardGiftcardIcon />, path: '/game/reward-templates', adminOnly: true },
   { text: 'sidebar.planningData', icon: <StorageIcon />, path: '/game/planning-data', adminOnly: true },
+];
+
+// 이벤트 렌즈 메뉴
+export const eventLensMenuItems: MenuItem[] = [
+  { text: 'sidebar.projects', icon: <FolderIcon />, path: '/admin/event-lens/projects', adminOnly: true },
 ];
 
 // 설정 메뉴
@@ -138,6 +147,13 @@ export const getMenuCategories = (isAdmin: boolean): MenuCategory[] => {
         icon: <SportsEsportsIcon />,
         adminOnly: true,
         children: gameMenuItems,
+      },
+      {
+        id: 'event-lens',
+        text: 'sidebar.eventLens',
+        icon: <InsightsIcon />,
+        adminOnly: true,
+        children: eventLensMenuItems,
       },
       {
         id: 'settings',

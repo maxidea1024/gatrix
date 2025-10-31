@@ -1028,7 +1028,7 @@
     }
   },
   "whitelist": {
-    "title": "白名单管理",
+    "title": "白名单",
     "subtitle": "管理账户白名单条目",
     "addEntry": "添加条目",
     "allowedPeriod": "允许期间",
@@ -1040,7 +1040,8 @@
     "tabs": {
       "overview": "概览",
       "account": "账户白名单",
-      "ip": "IP白名单"
+      "ip": "IP白名单",
+      "playground": "Playground"
     },
     "overview": {
       "title": "白名单概览",
@@ -1061,7 +1062,11 @@
       "testButton": "运行测试",
       "testAllowed": "允许访问",
       "testDenied": "拒绝访问",
-      "matchedRules": "匹配规则"
+      "matchedRules": "匹配规则",
+      "testWarning": "请输入账户ID或IP地址中的至少一个。",
+      "testFailed": "白名单测试失败。",
+      "accountRule": "账户规则",
+      "ipRule": "IP规则"
     },
     "columns": {
       "actions": "操作",
@@ -1801,6 +1806,7 @@
     "required": "必填",
     "optional": "可选",
     "reset": "重置",
+    "testing": "测试中...",
     "selectedItems": "已选择 {{count}} 项",
     "selectedCount": "已选择{{count}}个",
     "deleteSelected": "删除选中项",
@@ -2216,10 +2222,13 @@
     "maintenanceTemplates": "消息模板",
     "scheduleManagement": "计划管理",
     "scheduler": "计划",
-    "whitelist": "账户白名单",
     "auditLogs": "审计日志",
-    "apiTokens": "API令牌",
+    "security": "安全",
+    "apiAccessTokens": "API 访问令牌",
+    "whitelist": "账户白名单",
     "remoteConfig": "远程配置",
+    "eventLens": "事件透镜",
+    "projects": "项目",
     "collapse": "折叠",
     "expand": "展开",
     "jobs": "作业管理",
@@ -3582,6 +3591,13 @@
   "REWARD_TYPE_REWARD_SEASON_ITEMS": "赛季奖励道具",
   "REWARD_TYPE_CAPTURED_SHIP": "俘获船舶",
   "REWARD_TYPE_SOUND_PACK": "音效包",
+  "eventLens": {
+    "projects": {
+      "title": "项目",
+      "subtitle": "显示此工作区中的所有项目",
+      "comingSoonSubtitle": "新功能即将推出"
+    }
+  },
   "openApi": {
     "description": "选择并查看 API 文档。每个 API 用于不同的目的。",
     "info": "Admin API 用于管理员面板，Server SDK API 和 Client SDK API 分别用于游戏服务器和客户端。",

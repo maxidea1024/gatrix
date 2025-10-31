@@ -29,7 +29,8 @@ const QueueMonitorPage: React.FC = () => {
     );
   }
 
-  const bullboardUrl = `${window.location.protocol}//${window.location.host}/admin/queues`;
+  // BullMQ Dashboard 경로
+  const bullboardUrl = `${window.location.protocol}//${window.location.host}/bull-board`;
 
   return (
     <Box sx={{ p: 3 }}>
@@ -62,7 +63,7 @@ const QueueMonitorPage: React.FC = () => {
               <CircularProgress />
             </Box>
           )}
-          
+
           {error && (
             <Box sx={{ p: 3 }}>
               <Alert severity="error">

@@ -973,7 +973,7 @@
     }
   },
   "whitelist": {
-    "title": "계정 화이트리스트 관리",
+    "title": "화이트리스트",
     "subtitle": "화이트리스트 항목, 권한 및 보안 정책을 통해 계정 및 IP 기반 접근 제어를 관리합니다",
     "addEntry": "항목 추가",
     "allowedPeriod": "허용 기간",
@@ -985,7 +985,8 @@
     "tabs": {
       "overview": "개요",
       "account": "계정 화이트리스트",
-      "ip": "IP 화이트리스트"
+      "ip": "IP 화이트리스트",
+      "playground": "Playground"
     },
     "overview": {
       "title": "화이트리스트 개요",
@@ -1006,7 +1007,11 @@
       "testButton": "테스트 실행",
       "testAllowed": "접근이 허용됩니다",
       "testDenied": "접근이 거부됩니다",
-      "matchedRules": "일치하는 규칙"
+      "matchedRules": "일치하는 규칙",
+      "testWarning": "계정 ID 또는 IP 주소 중 하나는 입력해야 합니다.",
+      "testFailed": "화이트리스트 테스트에 실패했습니다.",
+      "accountRule": "계정 규칙",
+      "ipRule": "IP 규칙"
     },
     "columns": {
       "actions": "작업",
@@ -1746,6 +1751,7 @@
     "required": "필수",
     "optional": "선택사항",
     "reset": "재설정",
+    "testing": "테스트 중...",
     "selectedItems": "{{count}}개 항목 선택됨",
     "selectedCount": "{{count}}개 선택됨",
     "deleteSelected": "선택 항목 삭제",
@@ -2161,10 +2167,13 @@
     "maintenanceTemplates": "메시지 템플릿",
     "scheduleManagement": "스케줄 관리",
     "scheduler": "스케줄",
-    "whitelist": "화이트리스트",
     "auditLogs": "감사 로그",
-    "apiTokens": "API 토큰",
+    "security": "보안",
+    "apiAccessTokens": "API 액세스 토큰",
+    "whitelist": "화이트리스트",
     "remoteConfig": "리모트 설정",
+    "eventLens": "이벤트 렌즈",
+    "projects": "프로젝트",
     "collapse": "접기",
     "expand": "펼치기",
     "jobs": "작업 관리",
@@ -3539,6 +3548,13 @@
   "REWARD_TYPE_REWARD_SEASON_ITEMS": "시즌 보상 아이템",
   "REWARD_TYPE_CAPTURED_SHIP": "나포 선박",
   "REWARD_TYPE_SOUND_PACK": "사운드 팩",
+  "eventLens": {
+    "projects": {
+      "title": "프로젝트",
+      "subtitle": "이 워크스페이스의 모든 프로젝트를 보여줍니다",
+      "comingSoonSubtitle": "새로운 기능이 곧 추가될 예정입니다"
+    }
+  },
   "openApi": {
     "description": "API 문서를 선택하여 확인하세요. 각 API는 다른 목적으로 사용됩니다.",
     "info": "Admin API는 관리자 패널에서 사용되며, Server SDK API와 Client SDK API는 게임 서버와 클라이언트에서 사용됩니다.",
