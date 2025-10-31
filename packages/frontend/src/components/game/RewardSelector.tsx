@@ -15,6 +15,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Tooltip,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -165,21 +166,11 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
       {/* Direct Mode */}
       {mode === 'direct' && (
         <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="subtitle2">{t('rewardSelector.rewards')}</Typography>
-            <Button
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={handleAddReward}
-              disabled={disabled}
-            >
-              {t('rewardSelector.addReward')}
-            </Button>
-          </Box>
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+          <Typography variant="subtitle2" sx={{ mb: 2 }}>{t('rewardSelector.rewards')}</Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
             {t('rewardSelector.directModeHelp')}
           </Typography>
-          <Stack spacing={1}>
+          <Stack spacing={2}>
             {value.map((reward, index) => (
               <Box key={index} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
                 <Box sx={{ flex: 1 }}>
@@ -194,20 +185,44 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
                     minQuantity={minQuantity}
                   />
                 </Box>
-                <IconButton
-                  onClick={() => handleRemoveReward(index)}
-                  disabled={disabled}
-                  size="small"
-                  sx={{ mt: 0.5 }}
-                >
-                  <DeleteIcon />
-                </IconButton>
+                <Tooltip title={t('rewardSelector.deleteReward')}>
+                  <IconButton
+                    onClick={() => handleRemoveReward(index)}
+                    disabled={disabled}
+                    size="small"
+                    sx={{ mt: 0.5 }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
               </Box>
             ))}
             {value.length === 0 && (
-              <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
-                {t('rewardSelector.noRewards')}
-              </Typography>
+              <Box sx={{ py: 3, px: 2, textAlign: 'center', bgcolor: 'warning.lighter', border: '2px dashed', borderColor: 'warning.main', borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: 'warning.dark', mb: 2 }}>
+                  ⚠️ {t('rewardSelector.noRewards')}
+                </Typography>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddReward}
+                  disabled={disabled}
+                >
+                  {t('rewardSelector.addReward')}
+                </Button>
+              </Box>
+            )}
+            {value.length > 0 && (
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<AddIcon />}
+                onClick={handleAddReward}
+                disabled={disabled}
+              >
+                {t('rewardSelector.addReward')}
+              </Button>
             )}
           </Stack>
         </Box>

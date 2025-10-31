@@ -16,6 +16,7 @@ import { MuiColorInput } from 'mui-color-input';
 import JsonEditor from '@/components/common/JsonEditor';
 import ArrayEditor from '@/components/common/ArrayEditor';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
+import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
 
 interface KeyValueFormDrawerProps {
   open: boolean;
@@ -42,6 +43,7 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { refresh: refreshPlatformConfig } = usePlatformConfig();
   const [submitting, setSubmitting] = useState(false);
   const [previousArrayElementType, setPreviousArrayElementType] = useState<VarValueType | undefined>(undefined);
 
@@ -93,9 +95,10 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
   }, [item, open]);
 
   // Validate C identifier for key name
+  // Allow $ prefix for system KV items (e.g., $platforms, $channels)
   const isValidCIdentifier = (key: string): boolean => {
-    // C identifier: starts with letter or underscore, followed by letters, digits, or underscores
-    const cIdentifierRegex = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+    // C identifier: starts with letter, underscore, or $ (for system KV), followed by letters, digits, or underscores
+    const cIdentifierRegex = /^[$a-zA-Z_][a-zA-Z0-9_]*$/;
     return cIdentifierRegex.test(key);
   };
 
@@ -163,6 +166,12 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
           ? t('settings.kv.duplicateSuccess')
           : t('settings.kv.createSuccess');
         enqueueSnackbar(successMessage, { variant: 'success' });
+      }
+
+      // Refresh platform config if $platforms or $channels was modified
+      const keyName = formData.varKey.trim();
+      if (keyName === '$platforms' || keyName === '$channels') {
+        await refreshPlatformConfig();
       }
 
       onSuccess();

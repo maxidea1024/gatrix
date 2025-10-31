@@ -26,6 +26,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { I18nProvider, useI18n } from './contexts/I18nContext';
 import { PlatformConfigProvider } from './contexts/PlatformConfigContext';
+import { GameWorldProvider } from './contexts/GameWorldContext';
 
 // Components
 import { LoadingIndicator } from './components/LoadingIndicator';
@@ -243,8 +244,9 @@ const AppContent: React.FC = () => {
     <ThemeProvider>
       <AuthProvider>
         <PlatformConfigProvider>
-          <AuthInitializer>
-            <LocalizedDatePickers>
+          <GameWorldProvider>
+            <AuthInitializer>
+              <LocalizedDatePickers>
               <CssBaseline />
             {/* Global scrollbar styles */}
             <GlobalStyles
@@ -416,8 +418,9 @@ const AppContent: React.FC = () => {
               </Routes>
             </Router>
             </SnackbarProvider>
-          </LocalizedDatePickers>
-          </AuthInitializer>
+              </LocalizedDatePickers>
+            </AuthInitializer>
+          </GameWorldProvider>
         </PlatformConfigProvider>
       </AuthProvider>
     </ThemeProvider>

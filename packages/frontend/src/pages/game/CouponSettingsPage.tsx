@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
-import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, Menu, Divider } from '@mui/material';
+import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, Menu, Divider, FormHelperText } from '@mui/material';
 import { Settings as SettingsIcon, Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, List as ListIcon, ContentCopy as ContentCopyIcon, Code as CodeIcon, CardGiftcard as CardGiftcardIcon, HourglassEmpty as HourglassEmptyIcon, Download as DownloadIcon, ArrowDropDown as ArrowDropDownIcon, CheckCircle as CheckCircleIcon, TableChart as TableChartIcon, Description as ExcelIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -7,6 +7,8 @@ import { useDebounce } from '@/hooks/useDebounce';
 import SimplePagination from '@/components/common/SimplePagination';
 import { couponService, CouponSetting, CouponStatus, CouponType, IssuedCouponCode } from '@/services/couponService';
 import { generateExampleCouponCode, CodePattern } from '@/utils/couponCodeGenerator';
+import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
+import { useGameWorld } from '@/contexts/GameWorldContext';
 
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
@@ -22,6 +24,8 @@ import { Dayjs } from 'dayjs';
 const CouponSettingsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { platforms, channels } = usePlatformConfig();
+  const { worlds } = useGameWorld();
 
   // list state
   const [items, setItems] = useState<CouponSetting[]>([]);
@@ -291,14 +295,61 @@ const CouponSettingsPage: React.FC = () => {
     rewardTemplateId: null as string | null,
     rewardEmailTitle: '',
     rewardEmailBody: '',
+    targetPlatforms: [] as string[],
+    targetPlatformsInverted: false,
+    targetChannelSubchannels: [] as Array<{ channel: string; subchannels: string[] }>,
+    targetChannelSubchannelsInverted: false,
+    targetWorlds: [] as string[],
+    targetWorldsInverted: false,
+    targetUserIds: '' as string,
   });
   const [rewardMode, setRewardMode] = useState<'direct' | 'template'>('direct');
   // Track if description was manually edited by user
   const [isDescriptionManuallyEdited, setIsDescriptionManuallyEdited] = useState(false);
+  // Ref for channel table container
+  const channelTableRef = useRef<HTMLDivElement>(null);
+  const platformTableRef = useRef<HTMLDivElement>(null);
+  const worldTableRef = useRef<HTMLDivElement>(null);
+
+  // Memoize code pattern example to prevent unnecessary re-generation
+  const codePatternExample = useMemo(() => {
+    return generateExampleCouponCode((form.codePattern || 'ALPHANUMERIC_8') as CodePattern);
+  }, [form.codePattern]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (channelTableRef.current && !channelTableRef.current.contains(event.target as Node)) {
+        setForm((s: any) => ({
+          ...s,
+          _showChannelTable: false
+        }));
+      }
+      if (platformTableRef.current && !platformTableRef.current.contains(event.target as Node)) {
+        setForm((s: any) => ({
+          ...s,
+          _showPlatformTable: false
+        }));
+      }
+      if (worldTableRef.current && !worldTableRef.current.contains(event.target as Node)) {
+        setForm((s: any) => ({
+          ...s,
+          _showWorldTable: false
+        }));
+      }
+    };
+
+    if (form._showChannelTable || form._showPlatformTable || form._showWorldTable) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [form._showChannelTable, form._showPlatformTable, form._showWorldTable]);
 
   const resetForm = () => {
     setEditing(null);
-    setForm({ code: '', type: 'NORMAL', name: '', description: '', quantity: 1, perUserLimit: 1, usageLimitType: 'USER', maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE', rewardData: [], rewardTemplateId: null, rewardEmailTitle: '', rewardEmailBody: '' });
+    setForm({ code: '', type: 'NORMAL', name: '', description: '', quantity: 1, perUserLimit: 1, usageLimitType: 'USER', maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE', rewardData: [], rewardTemplateId: null, rewardEmailTitle: '', rewardEmailBody: '', targetPlatforms: [], targetChannelSubchannels: [], targetWorlds: [], targetUserIds: '' });
     setRewardMode('direct');
     setIsDescriptionManuallyEdited(false);
   };
@@ -318,7 +369,7 @@ const CouponSettingsPage: React.FC = () => {
       label: t('common.status'),
       type: 'select',
       options: [
-        { value: 'ACTIVE', label: t('common.enabled') },
+        { value: 'ACTIVE', label: t('common.active') },
         { value: 'DISABLED', label: t('common.disabled') },
         { value: 'DELETED', label: t('status.deleted') },
       ],
@@ -1011,7 +1062,7 @@ const CouponSettingsPage: React.FC = () => {
                                 <Chip
                                   size="small"
                                   color={it.status === 'ACTIVE' ? 'success' : it.status === 'DISABLED' ? 'default' : 'warning'}
-                                  label={it.status === 'ACTIVE' ? t('common.enabled') : it.status === 'DISABLED' ? t('common.disabled') : t('status.deleted')}
+                                  label={it.status === 'ACTIVE' ? t('common.active') : it.status === 'DISABLED' ? t('common.disabled') : t('status.deleted')}
                                 />
                               </TableCell>
                             );
@@ -1174,275 +1225,896 @@ const CouponSettingsPage: React.FC = () => {
       >
         {/* Body */}
         <Box sx={{ p: 3, overflowY: 'auto', flex: 1 }}>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            {/* 1. Name */}
-            <TextField
-              required
-              autoFocus
-              label={t('coupons.couponSettings.form.name')}
-              value={form.name}
-              onChange={(e) => {
-                const newName = e.target.value;
-                setForm((s: any) => ({
-                  ...s,
-                  name: newName,
-                  // Auto-fill description if it hasn't been manually edited
-                  description: !isDescriptionManuallyEdited ? newName : s.description,
-                }));
-              }}
-              helperText={t('coupons.couponSettings.form.nameHelp')}
-              fullWidth
-            />
-            {/* 2. Description */}
-            <TextField
-              label={t('coupons.couponSettings.form.description')}
-              value={form.description}
-              onChange={(e) => {
-                setForm((s: any) => ({ ...s, description: e.target.value }));
-                // Mark description as manually edited when user types
-                setIsDescriptionManuallyEdited(true);
-              }}
-              helperText={t('coupons.couponSettings.form.descriptionHelp')}
-              fullWidth
-            />
-            {/* 3. Type */}
-            <TextField
-              select
-              required
-              fullWidth
-              label={t('coupons.couponSettings.form.type')}
-              value={form.type}
-              disabled={!!editing}
-              onChange={(e) => setForm((s: any) => ({
-                ...s,
-                type: e.target.value,
-                perUserLimit: e.target.value === 'SPECIAL' ? 1 : s.perUserLimit,
-                maxTotalUses: e.target.value === 'NORMAL' ? null : s.maxTotalUses,
-                code: e.target.value === 'NORMAL' ? '' : s.code,
-                quantity: e.target.value === 'NORMAL' ? (s.quantity || 1) : 1,
-              }))}
-              helperText={!!editing ? t('coupons.couponSettings.form.typeCannotBeChanged') : undefined}
-            >
-              <MenuItem value="SPECIAL">SPECIAL</MenuItem>
-              <MenuItem value="NORMAL">NORMAL</MenuItem>
-            </TextField>
-            {/* 3-1. Code Pattern (NORMAL only) */}
-            {form.type === 'NORMAL' && (
-              <TextField
-                select
-                fullWidth
-                label={t('coupons.couponSettings.form.codePattern')}
-                value={form.codePattern || 'ALPHANUMERIC_8'}
-                onChange={(e) => setForm((s: any) => ({ ...s, codePattern: e.target.value }))}
-                disabled={!!editing}
-                helperText={!!editing ? t('coupons.couponSettings.form.codePatternCannotBeChanged') : t('coupons.couponSettings.form.codePatternExample', { code: generateExampleCouponCode((form.codePattern || 'ALPHANUMERIC_8') as CodePattern) })}
-              >
-                <MenuItem value="ALPHANUMERIC_8">{t('coupons.couponSettings.form.codePattern8')}</MenuItem>
-                <MenuItem value="ALPHANUMERIC_16">{t('coupons.couponSettings.form.codePattern16')}</MenuItem>
-                <MenuItem value="ALPHANUMERIC_16_HYPHEN">{t('coupons.couponSettings.form.codePattern16Hyphen')}</MenuItem>
-              </TextField>
-            )}
-            {/* 4. Code (SPECIAL only) */}
-            {form.type === 'SPECIAL' && (
-              <TextField
-                required
-                fullWidth
-                label={t('coupons.couponSettings.form.code')}
-                value={form.code}
-                onChange={(e) => {
-                  const value = e.target.value.toUpperCase();
-                  setForm((s: any) => ({ ...s, code: value }));
-                }}
-                error={codeError}
-                helperText={codeError ? getCodeErrorMessage() : t('coupons.couponSettings.form.codeHelp')}
-                inputProps={{
-                  style: { textTransform: 'uppercase' }
-                }}
+          <Stack spacing={3} sx={{ mt: 1 }}>
+            {/* Status Checkbox */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Checkbox
+                checked={form.status === 'ACTIVE'}
+                onChange={(e) => setForm((s: any) => ({ ...s, status: e.target.checked ? 'ACTIVE' : 'DISABLED' }))}
               />
-            )}
-            {/* 5. Quantity (NORMAL only) */}
-            {form.type === 'NORMAL' && !editing && (
-              <TextField
-                type="number"
-                fullWidth
-                label={t('coupons.couponSettings.form.quantity')}
-                value={form.quantity}
-                onChange={(e) => setForm((s: any) => ({ ...s, quantity: Number(e.target.value) }))}
-                error={quantityError}
-                helperText={quantityError ? t('coupons.couponSettings.form.quantityMinError') : t('coupons.couponSettings.form.quantityHelp')}
-                sx={{
-                  '& input[type=number]': { MozAppearance: 'textfield' },
-                  '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
-                }}
-              />
-            )}
-            {/* 6 & 7. Usage Limit Type + PerUserLimit (NORMAL only) */}
-            {form.type === 'NORMAL' && (
-              <Box sx={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 2 }}>
+              <Typography variant="body2">
+                {t('common.enabled')}
+              </Typography>
+            </Box>
+
+            {/* Basic Information Group */}
+            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                📋 {t('common.basicInformation')}
+              </Typography>
+              <Stack spacing={2}>
+                {/* Name */}
                 <TextField
-                  select
-                  label={t('coupons.couponSettings.form.usageLimitType')}
-                  value={form.usageLimitType}
-                  onChange={(e) => setForm((s: any) => ({ ...s, usageLimitType: e.target.value }))}
-                  helperText={t('coupons.couponSettings.form.usageLimitTypeHelp')}
-                >
-                  <MenuItem value="USER">{t('coupons.couponSettings.form.usageLimitTypeUser')}</MenuItem>
-                  <MenuItem value="CHARACTER">{t('coupons.couponSettings.form.usageLimitTypeCharacter')}</MenuItem>
-                </TextField>
-                <TextField
-                  type="number"
-                  label={form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimit') : t('coupons.couponSettings.form.perUserLimit')}
-                  value={form.perUserLimit}
-                  onChange={(e) => setForm((s: any) => ({ ...s, perUserLimit: Number(e.target.value) }))}
-                  error={perUserLimitError}
-                  helperText={perUserLimitError ? t('coupons.couponSettings.form.perUserLimitMinError') : (form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimitHelp') : t('coupons.couponSettings.form.perUserLimitHelp'))}
-                  sx={{
-                    '& input[type=number]': { MozAppearance: 'textfield' },
-                    '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                  required
+                  autoFocus
+                  label={t('coupons.couponSettings.form.name')}
+                  value={form.name}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    setForm((s: any) => ({
+                      ...s,
+                      name: newName,
+                      description: !isDescriptionManuallyEdited ? newName : s.description,
+                    }));
                   }}
-                />
-              </Box>
-            )}
-            {/* 7. MaxTotalUses + Unlimited (SPECIAL only) */}
-            {form.type === 'SPECIAL' && (
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                <TextField
-                  type="number"
+                  helperText={t('coupons.couponSettings.form.nameHelp')}
                   fullWidth
-                  label={t('coupons.couponSettings.form.maxTotalUses')}
-                  value={form.maxTotalUses ?? ''}
-                  onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.value === '' ? null : Number(e.target.value) }))}
-                  error={maxTotalUsesError}
-                  helperText={maxTotalUsesError ? t('coupons.couponSettings.form.maxTotalUsesMinError') : t('coupons.couponSettings.form.maxTotalUsesHelp')}
-                  disabled={form.maxTotalUses === null}
-                  sx={{
-                    '& input[type=number]': { MozAppearance: 'textfield' },
-                    '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
-                  }}
                 />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={form.maxTotalUses === null}
-                      onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.checked ? null : (s.maxTotalUses ?? 0) }))}
+                {/* Description */}
+                <TextField
+                  label={t('coupons.couponSettings.form.description')}
+                  value={form.description}
+                  onChange={(e) => {
+                    setForm((s: any) => ({ ...s, description: e.target.value }));
+                    setIsDescriptionManuallyEdited(true);
+                  }}
+                  helperText={t('coupons.couponSettings.form.descriptionHelp')}
+                  fullWidth
+                />
+              </Stack>
+            </Box>
+            {/* Code & Quantity Group */}
+            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                🔐 {t('coupons.couponSettings.form.codeAndQuantity')}
+              </Typography>
+              <Stack spacing={2}>
+                {/* Type and Code Pattern/Code in one row */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 2 }}>
+                  {/* Type */}
+                  <TextField
+                    select
+                    required
+                    label={t('coupons.couponSettings.form.type')}
+                    value={form.type}
+                    disabled={!!editing}
+                    onChange={(e) => setForm((s: any) => ({
+                      ...s,
+                      type: e.target.value,
+                      perUserLimit: e.target.value === 'SPECIAL' ? 1 : s.perUserLimit,
+                      maxTotalUses: e.target.value === 'NORMAL' ? null : s.maxTotalUses,
+                      code: e.target.value === 'NORMAL' ? '' : s.code,
+                      quantity: e.target.value === 'NORMAL' ? (s.quantity || 1) : 1,
+                    }))}
+                    helperText={!!editing ? t('coupons.couponSettings.form.typeCannotBeChanged') : undefined}
+                  >
+                    <MenuItem value="SPECIAL">SPECIAL</MenuItem>
+                    <MenuItem value="NORMAL">NORMAL</MenuItem>
+                  </TextField>
+
+                  {/* Code Pattern (NORMAL only) */}
+                  {form.type === 'NORMAL' && (
+                    <TextField
+                      select
+                      label={t('coupons.couponSettings.form.codePattern')}
+                      value={form.codePattern || 'ALPHANUMERIC_8'}
+                      onChange={(e) => setForm((s: any) => ({ ...s, codePattern: e.target.value }))}
+                      disabled={!!editing}
+                      helperText={!!editing ? t('coupons.couponSettings.form.codePatternCannotBeChanged') : `예시: ${codePatternExample}`}
+                    >
+                      <MenuItem value="ALPHANUMERIC_8">{t('coupons.couponSettings.form.codePattern8')}</MenuItem>
+                      <MenuItem value="ALPHANUMERIC_16">{t('coupons.couponSettings.form.codePattern16')}</MenuItem>
+                      <MenuItem value="ALPHANUMERIC_16_HYPHEN">{t('coupons.couponSettings.form.codePattern16Hyphen')}</MenuItem>
+                    </TextField>
+                  )}
+
+                  {/* Code (SPECIAL only) */}
+                  {form.type === 'SPECIAL' && (
+                    <TextField
+                      required
+                      label={t('coupons.couponSettings.form.code')}
+                      value={form.code}
+                      onChange={(e) => {
+                        const value = e.target.value.toUpperCase();
+                        setForm((s: any) => ({ ...s, code: value }));
+                      }}
+                      error={codeError}
+                      helperText={codeError ? getCodeErrorMessage() : t('coupons.couponSettings.form.codeHelp')}
+                      inputProps={{
+                        style: { textTransform: 'uppercase' }
+                      }}
                     />
-                  }
-                  label={t('coupons.couponSettings.form.unlimited')}
-                />
-              </Box>
-            )}
-            {/* 8-10. Date Range + Applicable Period */}
-            <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <DateTimePicker
-                  label={t('coupons.couponSettings.form.startsAt')}
-                  value={form.startsAt}
-                  onChange={(date) => setForm((s: any) => ({ ...s, startsAt: date }))}
-                  slotProps={{
-                    textField: { fullWidth: true },
-                    actionBar: {
-                      actions: ['clear', 'cancel', 'accept'],
-                    },
-                  }}
-                />
-                <DateTimePicker
-                  label={t('coupons.couponSettings.form.expiresAt')}
-                  value={form.expiresAt}
-                  onChange={(date) => setForm((s: any) => ({ ...s, expiresAt: date }))}
-                  minDateTime={form.startsAt || undefined}
-                  slotProps={{
-                    textField: { fullWidth: true, required: true },
-                    actionBar: {
-                      actions: ['clear', 'cancel', 'accept'],
-                    },
-                  }}
-                />
-              </Box>
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
-                {t('coupons.couponSettings.form.startsAtHelp')} / {t('coupons.couponSettings.form.expiresAtHelp')}
+                  )}
+                </Box>
+
+                {/* Quantity (NORMAL only) */}
+                {form.type === 'NORMAL' && !editing && (
+                  <TextField
+                    type="number"
+                    fullWidth
+                    label={t('coupons.couponSettings.form.quantity')}
+                    value={form.quantity}
+                    onChange={(e) => setForm((s: any) => ({ ...s, quantity: Number(e.target.value) }))}
+                    error={quantityError}
+                    helperText={quantityError ? t('coupons.couponSettings.form.quantityMinError') : t('coupons.couponSettings.form.quantityHelp')}
+                    sx={{
+                      '& input[type=number]': { MozAppearance: 'textfield' },
+                      '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                    }}
+                  />
+                )}
+              </Stack>
+            </Box>
+            {/* Usage Limit Group */}
+            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                ⏱️ {t('coupons.couponSettings.form.usageLimit')}
               </Typography>
-              {form.expiresAt && (
-                <Typography variant="body2" color="text.secondary" sx={{ ml: 1.75 }}>
-                  {(() => {
-                    const e = form.expiresAt as Dayjs;
-                    const endStr = e.format('YYYY-MM-DD HH:mm');
-                    if (form.startsAt) {
-                      const s = form.startsAt as Dayjs;
-                      const startStr = s.format('YYYY-MM-DD HH:mm');
-                      const days = Math.max(0, Math.ceil(e.diff(s, 'hour') / 24));
-                      return `${t('coupons.couponSettings.form.applicablePeriod')}: ${startStr} ~ ${endStr} (${days}${t('common.day')})`;
-                    } else {
-                      return `${t('coupons.couponSettings.form.applicablePeriod')}: ${t('coupons.couponSettings.form.immediatelyAvailable')} ~ ${endStr}`;
-                    }
-                  })()}
+              <Stack spacing={2}>
+                {/* Usage Limit Type + PerUserLimit (NORMAL only) */}
+                {form.type === 'NORMAL' && (
+                  <Box sx={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 2 }}>
+                    <TextField
+                      select
+                      label={t('coupons.couponSettings.form.usageLimitType')}
+                      value={form.usageLimitType}
+                      onChange={(e) => setForm((s: any) => ({ ...s, usageLimitType: e.target.value }))}
+                      helperText={t('coupons.couponSettings.form.usageLimitTypeHelp')}
+                    >
+                      <MenuItem value="USER">{t('coupons.couponSettings.form.usageLimitTypeUser')}</MenuItem>
+                      <MenuItem value="CHARACTER">{t('coupons.couponSettings.form.usageLimitTypeCharacter')}</MenuItem>
+                    </TextField>
+                    <TextField
+                      type="number"
+                      label={form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimit') : t('coupons.couponSettings.form.perUserLimit')}
+                      value={form.perUserLimit}
+                      onChange={(e) => setForm((s: any) => ({ ...s, perUserLimit: Number(e.target.value) }))}
+                      error={perUserLimitError}
+                      helperText={perUserLimitError ? t('coupons.couponSettings.form.perUserLimitMinError') : (form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimitHelp') : t('coupons.couponSettings.form.perUserLimitHelp'))}
+                      sx={{
+                        '& input[type=number]': { MozAppearance: 'textfield' },
+                        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                      }}
+                    />
+                  </Box>
+                )}
+                {/* MaxTotalUses + Unlimited (SPECIAL only) */}
+                {form.type === 'SPECIAL' && (
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    <TextField
+                      type="number"
+                      fullWidth
+                      label={t('coupons.couponSettings.form.maxTotalUses')}
+                      value={form.maxTotalUses ?? ''}
+                      onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.value === '' ? null : Number(e.target.value) }))}
+                      error={maxTotalUsesError}
+                      helperText={maxTotalUsesError ? t('coupons.couponSettings.form.maxTotalUsesMinError') : t('coupons.couponSettings.form.maxTotalUsesHelp')}
+                      disabled={form.maxTotalUses === null}
+                      sx={{
+                        '& input[type=number]': { MozAppearance: 'textfield' },
+                        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                      }}
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={form.maxTotalUses === null}
+                          onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.checked ? null : (s.maxTotalUses ?? 0) }))}
+                        />
+                      }
+                      label={t('coupons.couponSettings.form.unlimited')}
+                    />
+                  </Box>
+                )}
+              </Stack>
+            </Box>
+            {/* Date Range Group */}
+            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                📅 {t('coupons.couponSettings.form.dateRange')}
+              </Typography>
+              <Stack spacing={2}>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <DateTimePicker
+                    label={t('coupons.couponSettings.form.startsAt')}
+                    value={form.startsAt}
+                    onChange={(date) => setForm((s: any) => ({ ...s, startsAt: date }))}
+                    slotProps={{
+                      textField: { fullWidth: true },
+                      actionBar: {
+                        actions: ['clear', 'cancel', 'accept'],
+                      },
+                    }}
+                  />
+                  <DateTimePicker
+                    label={t('coupons.couponSettings.form.expiresAt')}
+                    value={form.expiresAt}
+                    onChange={(date) => setForm((s: any) => ({ ...s, expiresAt: date }))}
+                    minDateTime={form.startsAt || undefined}
+                    slotProps={{
+                      textField: { fullWidth: true, required: true },
+                      actionBar: {
+                        actions: ['clear', 'cancel', 'accept'],
+                      },
+                    }}
+                  />
+                </Box>
+                <Typography variant="caption" color="text.secondary">
+                  {t('coupons.couponSettings.form.startsAtHelp')} / {t('coupons.couponSettings.form.expiresAtHelp')}
                 </Typography>
-              )}
-            </Box>
-            {/* 11. Status */}
-            <TextField
-              select
-              fullWidth
-              label={t('common.status')}
-              value={form.status}
-              onChange={(e) => setForm((s: any) => ({ ...s, status: e.target.value }))}
-            >
-              <MenuItem value="ACTIVE">{t('common.enabled')}</MenuItem>
-              <MenuItem value="DISABLED">{t('common.disabled')}</MenuItem>
-            </TextField>
-
-            {/* 12. Rewards */}
-            <Box sx={{ pt: 1 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                {t('surveys.participationRewards')}
-                <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-                {t('surveys.participationRewardsHelp')}
-              </Typography>
-              <RewardSelector
-                value={form.rewardData || []}
-                onChange={(rewards) => setForm((s: any) => ({ ...s, rewardData: rewards }))}
-                onModeChange={(mode, templateId) => {
-                  setRewardMode(mode);
-                  if (mode === 'template') {
-                    setForm((s: any) => ({ ...s, rewardTemplateId: templateId || null }));
-                  } else {
-                    setForm((s: any) => ({ ...s, rewardTemplateId: null }));
-                  }
-                }}
-                minQuantity={1}
-                initialMode={rewardMode}
-                initialTemplateId={form.rewardTemplateId || ''}
-              />
+                {form.expiresAt && (
+                  <Typography variant="body2" color="text.secondary">
+                    {(() => {
+                      const e = form.expiresAt as Dayjs;
+                      const endStr = e.format('YYYY-MM-DD HH:mm');
+                      if (form.startsAt) {
+                        const s = form.startsAt as Dayjs;
+                        const startStr = s.format('YYYY-MM-DD HH:mm');
+                        const days = Math.max(0, Math.ceil(e.diff(s, 'hour') / 24));
+                        return `${t('coupons.couponSettings.form.applicablePeriod')}: ${startStr} ~ ${endStr} (${days}${t('common.day')})`;
+                      } else {
+                        return `${t('coupons.couponSettings.form.applicablePeriod')}: ${t('coupons.couponSettings.form.immediatelyAvailable')} ~ ${endStr}`;
+                      }
+                    })()}
+                  </Typography>
+                )}
+              </Stack>
             </Box>
 
-            {/* 13. Reward Email */}
-            <Box sx={{ pt: 2, borderTop: 1, borderColor: 'divider' }}>
-              <Typography variant="subtitle2" sx={{ mb: 2 }}>
-                {t('coupons.couponSettings.form.rewardEmail')}
-                <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>
+            {/* Target Settings Group */}
+            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                🎯 {t('coupons.couponSettings.form.targetSettings')}
               </Typography>
-              <TextField
-                required
-                fullWidth
-                label={t('coupons.couponSettings.form.rewardEmailTitle')}
-                value={form.rewardEmailTitle || ''}
-                onChange={(e) => setForm((s: any) => ({ ...s, rewardEmailTitle: e.target.value }))}
-                placeholder={t('coupons.couponSettings.form.rewardEmailTitlePlaceholder')}
-                helperText={t('coupons.couponSettings.form.rewardEmailTitleHelp')}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                required
-                fullWidth
-                multiline
-                rows={4}
-                label={t('coupons.couponSettings.form.rewardEmailBody')}
-                value={form.rewardEmailBody || ''}
-                onChange={(e) => setForm((s: any) => ({ ...s, rewardEmailBody: e.target.value }))}
-                placeholder={t('coupons.couponSettings.form.rewardEmailBodyPlaceholder')}
-                helperText={t('coupons.couponSettings.form.rewardEmailBodyHelp')}
-              />
+              <Stack spacing={2}>
+                {/* Platform */}
+                <Box ref={platformTableRef}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 500 }}>
+                    {t('coupons.couponSettings.form.targetPlatforms')}
+                  </Typography>
+
+                  {/* Selected Chips Display */}
+                  <Box
+                    sx={{
+                      border: '1px solid',
+                      borderColor: 'action.disabled',
+                      borderRadius: 1,
+                      p: 1.5,
+                      minHeight: 56,
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: 1,
+                      bgcolor: 'background.paper',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        borderColor: 'action.active',
+                        bgcolor: 'action.hover',
+                      }
+                    }}
+                    onClick={() => {
+                      setForm((s: any) => ({
+                        ...s,
+                        _showPlatformTable: !s._showPlatformTable
+                      }));
+                    }}
+                  >
+                    {form.targetPlatforms && form.targetPlatforms.length > 0 && (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setForm((s: any) => ({
+                            ...s,
+                            targetPlatformsInverted: !s.targetPlatformsInverted
+                          }));
+                        }}
+                        sx={{
+                          minWidth: 'auto',
+                          px: 1.5,
+                          py: 0.5,
+                          borderRadius: 0,
+                          fontWeight: 700,
+                          textTransform: 'none',
+                          fontSize: '0.85rem',
+                          ...(form.targetPlatformsInverted ? {
+                            bgcolor: 'error.main',
+                            color: 'white',
+                            '&:hover': {
+                              bgcolor: 'error.dark',
+                            }
+                          } : {
+                            bgcolor: 'action.disabled',
+                            color: 'text.secondary',
+                            '&:hover': {
+                              bgcolor: 'action.disabled',
+                              opacity: 0.8,
+                            }
+                          })
+                        }}
+                      >
+                        NOT
+                      </Button>
+                    )}
+                    {form.targetPlatforms && form.targetPlatforms.length > 0 ? (
+                      form.targetPlatforms.map((platformValue: string) => {
+                        const platformObj = platforms.find((p) => p.value === platformValue);
+                        return (
+                          <Chip
+                            key={platformValue}
+                            label={platformObj?.label || platformValue}
+                            onDelete={(e) => {
+                              e.stopPropagation();
+                              setForm((s: any) => ({
+                                ...s,
+                                targetPlatforms: (s.targetPlatforms || []).filter((p: string) => p !== platformValue)
+                              }));
+                            }}
+                            size="small"
+                            variant="outlined"
+                            sx={{ borderRadius: 0.5 }}
+                          />
+                        );
+                      })
+                    ) : !form.targetPlatformsInverted && (
+                      <Typography variant="body2" color="text.secondary">
+                        {t('coupons.couponSettings.form.targetChannelsNone')}
+                      </Typography>
+                    )}
+                  </Box>
+
+                  {/* Platform Dropdown Table */}
+                  <Box
+                    sx={{
+                      border: '1px solid',
+                      borderColor: 'action.disabled',
+                      borderRadius: 1,
+                      overflow: form._showPlatformTable ? 'auto' : 'hidden',
+                      mt: 0,
+                      bgcolor: 'background.paper',
+                      position: 'relative',
+                      top: -1,
+                      maxHeight: form._showPlatformTable ? 300 : 0,
+                      opacity: form._showPlatformTable ? 1 : 0,
+                      transition: 'all 0.3s ease-in-out',
+                      visibility: form._showPlatformTable ? 'visible' : 'hidden',
+                    }}
+                  >
+                    <Box sx={{ p: 1 }}>
+                      {platforms.map((platform) => {
+                        const isSelected = form.targetPlatforms?.includes(platform.value);
+                        return (
+                          <FormControlLabel
+                            key={platform.value}
+                            control={
+                              <Checkbox
+                                checked={isSelected || false}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setForm((s: any) => ({
+                                      ...s,
+                                      targetPlatforms: [...(s.targetPlatforms || []), platform.value]
+                                    }));
+                                  } else {
+                                    setForm((s: any) => ({
+                                      ...s,
+                                      targetPlatforms: (s.targetPlatforms || []).filter((p: string) => p !== platform.value)
+                                    }));
+                                  }
+                                }}
+                                size="small"
+                              />
+                            }
+                            label={platform.label}
+                            sx={{ display: 'block', mb: 1 }}
+                          />
+                        );
+                      })}
+                    </Box>
+                  </Box>
+
+                  <FormHelperText sx={{ mt: 1 }}>{t('coupons.couponSettings.form.targetPlatformsHelp')}</FormHelperText>
+                </Box>
+
+                {/* Channel-Subchannel Combinations - Dropdown with Table */}
+                <Box ref={channelTableRef}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 500 }}>
+                    {t('coupons.couponSettings.form.targetChannels')}
+                  </Typography>
+
+                  {/* Selected Chips Display */}
+                  <Box
+                    sx={{
+                      border: '1px solid',
+                      borderColor: 'action.disabled',
+                      borderRadius: 1,
+                      p: 1.5,
+                      minHeight: 56,
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: 1,
+                      bgcolor: 'background.paper',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        borderColor: 'action.active',
+                        bgcolor: 'action.hover',
+                      }
+                    }}
+                    onClick={() => {
+                      // Toggle table visibility
+                      setForm((s: any) => ({
+                        ...s,
+                        _showChannelTable: !s._showChannelTable
+                      }));
+                    }}
+                  >
+                    {form.targetChannelSubchannels && form.targetChannelSubchannels.length > 0 && (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setForm((s: any) => ({
+                            ...s,
+                            targetChannelSubchannelsInverted: !s.targetChannelSubchannelsInverted
+                          }));
+                        }}
+                        sx={{
+                          minWidth: 'auto',
+                          px: 1.5,
+                          py: 0.5,
+                          borderRadius: 0,
+                          fontWeight: 700,
+                          textTransform: 'none',
+                          fontSize: '0.85rem',
+                          ...(form.targetChannelSubchannelsInverted ? {
+                            bgcolor: 'error.main',
+                            color: 'white',
+                            '&:hover': {
+                              bgcolor: 'error.dark',
+                            }
+                          } : {
+                            bgcolor: 'action.disabled',
+                            color: 'text.secondary',
+                            '&:hover': {
+                              bgcolor: 'action.disabled',
+                              opacity: 0.8,
+                            }
+                          })
+                        }}
+                      >
+                        NOT
+                      </Button>
+                    )}
+                    {form.targetChannelSubchannels && form.targetChannelSubchannels.length > 0 ? (
+                      form.targetChannelSubchannels.map((c: any) =>
+                        c.subchannels.map((sc: string) => {
+                          const channelObj = channels.find((ch) => ch.value === c.channel);
+                          const label = sc === '*'
+                            ? `${channelObj?.label}`
+                            : `${channelObj?.label}:${channelObj?.subChannels.find((s) => s.value === sc)?.label}`;
+                          return (
+                            <Chip
+                              key={`${c.channel}:${sc}`}
+                              label={label}
+                              onDelete={(e) => {
+                                e.stopPropagation();
+                                setForm((s: any) => ({
+                                  ...s,
+                                  targetChannelSubchannels: (s.targetChannelSubchannels || [])
+                                    .map((ch: any) =>
+                                      ch.channel === c.channel
+                                        ? { ...ch, subchannels: ch.subchannels.filter((s: string) => s !== sc) }
+                                        : ch
+                                    )
+                                    .filter((ch: any) => (ch.subchannels || []).length > 0)
+                                }));
+                              }}
+                              size="small"
+                              variant="outlined"
+                              sx={{ borderRadius: 0.5 }}
+                            />
+                          );
+                        })
+                      )
+                    ) : !form.targetChannelSubchannelsInverted && (
+                      <Typography variant="body2" color="text.secondary">
+                        {t('coupons.couponSettings.form.targetChannelsNone')}
+                      </Typography>
+                    )}
+                  </Box>
+
+                  {/* Table Dropdown */}
+                  <Box
+                    sx={{
+                      border: '1px solid',
+                      borderColor: 'action.disabled',
+                      borderRadius: 1,
+                      overflow: form._showChannelTable ? 'auto' : 'hidden',
+                      mt: 0,
+                      bgcolor: 'background.paper',
+                      position: 'relative',
+                      top: -1,
+                      maxHeight: form._showChannelTable ? 500 : 0,
+                      opacity: form._showChannelTable ? 1 : 0,
+                      transition: 'all 0.3s ease-in-out',
+                      visibility: form._showChannelTable ? 'visible' : 'hidden',
+                    }}
+                  >
+                      <TableContainer sx={{ maxHeight: 400 }}>
+                        <Table size="small" stickyHeader>
+                          <TableBody>
+                            {channels.map((channel) => {
+                              // Check if any subchannel is selected for this channel
+                              const anySubchannelSelected = form.targetChannelSubchannels?.some((c: any) =>
+                                c.channel === channel.value && c.subchannels?.some((sc: string) => sc !== '*')
+                              );
+                              // Check if channel-wide selection exists
+                              const isChannelWideSelected = form.targetChannelSubchannels?.some((c: any) =>
+                                c.channel === channel.value && c.subchannels?.includes('*')
+                              );
+
+                              return (
+                              <TableRow key={channel.value} sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
+                                <TableCell sx={{ p: 1 }}>
+                                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 600, mb: 0.5 }}>
+                                      {channel.label}
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+                                      {/* All checkbox */}
+                                      <FormControlLabel
+                                        control={
+                                          <Checkbox
+                                            checked={isChannelWideSelected || false}
+                                            indeterminate={!isChannelWideSelected && anySubchannelSelected}
+                                            onChange={(e) => {
+                                              if (e.target.checked) {
+                                                // Select all subchannels for this channel
+                                                setForm((s: any) => {
+                                                  const existing = (s.targetChannelSubchannels || []).find((c: any) => c.channel === channel.value);
+                                                  if (existing) {
+                                                    return {
+                                                      ...s,
+                                                      targetChannelSubchannels: (s.targetChannelSubchannels || []).map((c: any) =>
+                                                        c.channel === channel.value
+                                                          ? { ...c, subchannels: ['*'] }
+                                                          : c
+                                                      )
+                                                    };
+                                                  } else {
+                                                    return {
+                                                      ...s,
+                                                      targetChannelSubchannels: [
+                                                        ...(s.targetChannelSubchannels || []),
+                                                        { channel: channel.value, subchannels: ['*'] }
+                                                      ]
+                                                    };
+                                                  }
+                                                });
+                                              } else {
+                                                // Deselect all subchannels for this channel
+                                                setForm((s: any) => ({
+                                                  ...s,
+                                                  targetChannelSubchannels: (s.targetChannelSubchannels || [])
+                                                    .filter((c: any) => c.channel !== channel.value)
+                                                }));
+                                              }
+                                            }}
+                                            size="small"
+                                          />
+                                        }
+                                        label="전체"
+                                        sx={{ m: 0, mr: 1 }}
+                                      />
+                                      {/* Divider */}
+                                      <Box sx={{ width: '1px', height: '24px', bgcolor: 'divider', mx: 0.5 }} />
+                                      {/* Individual subchannels */}
+                                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                      {channel.subChannels.map((subchannel) => {
+                                      const combinationKey = `${channel.value}:${subchannel.value}`;
+                                      const isSelected = form.targetChannelSubchannels?.some((c: any) =>
+                                        c.channel === channel.value && c.subchannels?.includes(subchannel.value)
+                                      );
+                                      return (
+                                        <FormControlLabel
+                                          key={combinationKey}
+                                          control={
+                                            <Checkbox
+                                              checked={isSelected || false}
+                                              onChange={(e) => {
+                                                if (e.target.checked) {
+                                                  setForm((s: any) => {
+                                                    const existing = (s.targetChannelSubchannels || []).find((c: any) => c.channel === channel.value);
+                                                    if (existing) {
+                                                      // Remove '*' if it exists and add the specific subchannel
+                                                      const filteredSubchannels = (existing.subchannels || []).filter((sc: string) => sc !== '*');
+                                                      return {
+                                                        ...s,
+                                                        targetChannelSubchannels: (s.targetChannelSubchannels || []).map((c: any) =>
+                                                          c.channel === channel.value
+                                                            ? { ...c, subchannels: [...filteredSubchannels, subchannel.value] }
+                                                            : c
+                                                        )
+                                                      };
+                                                    } else {
+                                                      return {
+                                                        ...s,
+                                                        targetChannelSubchannels: [
+                                                          ...(s.targetChannelSubchannels || []),
+                                                          { channel: channel.value, subchannels: [subchannel.value] }
+                                                        ]
+                                                      };
+                                                    }
+                                                  });
+                                                } else {
+                                                  setForm((s: any) => ({
+                                                    ...s,
+                                                    targetChannelSubchannels: (s.targetChannelSubchannels || [])
+                                                      .map((c: any) =>
+                                                        c.channel === channel.value
+                                                          ? { ...c, subchannels: (c.subchannels || []).filter((sc: string) => sc !== subchannel.value) }
+                                                          : c
+                                                      )
+                                                      .filter((c: any) => (c.subchannels || []).length > 0)
+                                                  }));
+                                                }
+                                              }}
+                                              size="small"
+                                            />
+                                          }
+                                          label={subchannel.label}
+                                          sx={{ m: 0 }}
+                                        />
+                                      );
+                                    })}
+                                      </Box>
+                                    </Box>
+                                  </Box>
+                                </TableCell>
+                              </TableRow>
+                            );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Box>
+                </Box>
+
+                {/* Game World */}
+                <Box>
+                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 500 }}>
+                    {t('coupons.couponSettings.form.targetWorlds')}
+                  </Typography>
+
+                  <Box ref={worldTableRef}>
+                    {/* Selected Chips Display */}
+                    <Box
+                      sx={{
+                        border: '1px solid',
+                        borderColor: 'action.disabled',
+                        borderRadius: 1,
+                        p: 1.5,
+                        minHeight: 56,
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: 1,
+                        bgcolor: 'background.paper',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          borderColor: 'action.active',
+                          bgcolor: 'action.hover',
+                        }
+                      }}
+                      onClick={() => {
+                        setForm((s: any) => ({
+                          ...s,
+                          _showWorldTable: !s._showWorldTable
+                        }));
+                      }}
+                    >
+                      {form.targetWorlds && form.targetWorlds.length > 0 && (
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setForm((s: any) => ({
+                              ...s,
+                              targetWorldsInverted: !s.targetWorldsInverted
+                            }));
+                          }}
+                          sx={{
+                            minWidth: 'auto',
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: 0,
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            fontSize: '0.85rem',
+                            ...(form.targetWorldsInverted ? {
+                              bgcolor: 'error.main',
+                              color: 'white',
+                              '&:hover': {
+                                bgcolor: 'error.dark',
+                              }
+                            } : {
+                              bgcolor: 'action.disabled',
+                              color: 'text.secondary',
+                              '&:hover': {
+                                bgcolor: 'action.disabled',
+                                opacity: 0.8,
+                              }
+                            })
+                          }}
+                        >
+                          NOT
+                        </Button>
+                      )}
+                      {form.targetWorlds && form.targetWorlds.length > 0 ? (
+                        form.targetWorlds.map((worldValue: string) => (
+                          <Chip
+                            key={worldValue}
+                            label={worldValue}
+                            onDelete={(e) => {
+                              e.stopPropagation();
+                              setForm((s: any) => ({
+                                ...s,
+                                targetWorlds: (s.targetWorlds || []).filter((w: string) => w !== worldValue)
+                              }));
+                            }}
+                            size="small"
+                            variant="outlined"
+                            sx={{ borderRadius: 0.5 }}
+                          />
+                        ))
+                      ) : !form.targetWorldsInverted && (
+                        <Typography variant="body2" color="text.secondary">
+                          {t('coupons.couponSettings.form.targetChannelsNone')}
+                        </Typography>
+                      )}
+                    </Box>
+
+                    {/* World Dropdown Table */}
+                    <Box
+                      sx={{
+                        border: '1px solid',
+                        borderColor: 'action.disabled',
+                        borderRadius: 1,
+                        overflow: form._showWorldTable ? 'auto' : 'hidden',
+                        mt: 0,
+                        bgcolor: 'background.paper',
+                        position: 'relative',
+                        top: -1,
+                        maxHeight: form._showWorldTable ? 300 : 0,
+                        opacity: form._showWorldTable ? 1 : 0,
+                        transition: 'all 0.3s ease-in-out',
+                        visibility: form._showWorldTable ? 'visible' : 'hidden',
+                      }}
+                    >
+                      <Box sx={{ p: 1 }}>
+                        {worlds.map((world) => {
+                          const isSelected = form.targetWorlds?.includes(world.value);
+                          return (
+                            <FormControlLabel
+                              key={world.value}
+                              control={
+                                <Checkbox
+                                  checked={isSelected || false}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setForm((s: any) => ({
+                                        ...s,
+                                        targetWorlds: [...(s.targetWorlds || []), world.value]
+                                      }));
+                                    } else {
+                                      setForm((s: any) => ({
+                                        ...s,
+                                        targetWorlds: (s.targetWorlds || []).filter((w: string) => w !== world.value)
+                                      }));
+                                    }
+                                  }}
+                                  size="small"
+                                />
+                              }
+                              label={`${world.value} - ${world.label}`}
+                              sx={{ display: 'block', mb: 1 }}
+                            />
+                          );
+                        })}
+                      </Box>
+                    </Box>
+                  </Box>
+
+                  <FormHelperText sx={{ mt: 1 }}>{t('coupons.couponSettings.form.targetWorldsHelp')}</FormHelperText>
+                </Box>
+
+                {/* User ID List */}
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={3}
+                  label={t('coupons.couponSettings.form.targetUserIds')}
+                  value={form.targetUserIds || ''}
+                  onChange={(e) => setForm((s: any) => ({ ...s, targetUserIds: e.target.value }))}
+                  placeholder={t('coupons.couponSettings.form.targetUserIdsPlaceholder')}
+                  helperText={t('coupons.couponSettings.form.targetUserIdsHelp')}
+                />
+              </Stack>
+            </Box>
+
+            {/* Rewards Group */}
+            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                🎁 {t('surveys.participationRewards')}
+              </Typography>
+              <Stack spacing={2}>
+                <Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                    {t('surveys.participationRewardsHelp')}
+                  </Typography>
+                  <RewardSelector
+                    value={form.rewardData || []}
+                    onChange={(rewards) => setForm((s: any) => ({ ...s, rewardData: rewards }))}
+                    onModeChange={(mode, templateId) => {
+                      setRewardMode(mode);
+                      if (mode === 'template') {
+                        setForm((s: any) => ({ ...s, rewardTemplateId: templateId || null }));
+                      } else {
+                        setForm((s: any) => ({ ...s, rewardTemplateId: null }));
+                      }
+                    }}
+                    minQuantity={1}
+                    initialMode={rewardMode}
+                    initialTemplateId={form.rewardTemplateId || ''}
+                  />
+                </Box>
+              </Stack>
+            </Box>
+
+            {/* Reward Email Group */}
+            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                ✉️ {t('coupons.couponSettings.form.rewardEmail')}
+              </Typography>
+              <Stack spacing={2}>
+                <TextField
+                  required
+                  fullWidth
+                  label={t('coupons.couponSettings.form.rewardEmailTitle')}
+                  value={form.rewardEmailTitle || ''}
+                  onChange={(e) => setForm((s: any) => ({ ...s, rewardEmailTitle: e.target.value }))}
+                  placeholder={t('coupons.couponSettings.form.rewardEmailTitlePlaceholder')}
+                  helperText={t('coupons.couponSettings.form.rewardEmailTitleHelp')}
+                />
+                <TextField
+                  required
+                  fullWidth
+                  multiline
+                  rows={4}
+                  label={t('coupons.couponSettings.form.rewardEmailBody')}
+                  value={form.rewardEmailBody || ''}
+                  onChange={(e) => setForm((s: any) => ({ ...s, rewardEmailBody: e.target.value }))}
+                  placeholder={t('coupons.couponSettings.form.rewardEmailBodyPlaceholder')}
+                  helperText={t('coupons.couponSettings.form.rewardEmailBodyHelp')}
+                />
+              </Stack>
             </Box>
           </Stack>
         </Box>
