@@ -310,6 +310,25 @@ const PlanningDataPage: React.FC = () => {
     setShowUploadDialog(true);
   };
 
+  const handleUploadSuccess = async () => {
+    // Close upload dialog
+    setShowUploadDialog(false);
+
+    // Refresh all data after successful upload
+    // Reset all cached data to force reload
+    setStats(null);
+    setHotTimeBuffData(null);
+    setEventPageData(null);
+    setLiveEventData(null);
+    setMateRecruitingGroupData(null);
+    setOceanNpcAreaSpawnerData(null);
+    setCategoryItems({});
+    setRewardTypeItems({});
+
+    // Reload stats which will trigger other data loads
+    await loadStats();
+  };
+
 
 
   // Copy to clipboard on Ctrl+Click
@@ -664,10 +683,7 @@ const PlanningDataPage: React.FC = () => {
                 </Button>
               </Box>
               <PlanningDataUpload
-                onUploadSuccess={() => {
-                  setShowUploadDialog(false);
-                  loadStats();
-                }}
+                onUploadSuccess={handleUploadSuccess}
               />
             </CardContent>
           </Card>
