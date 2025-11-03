@@ -164,7 +164,7 @@ services:
       dockerfile: packages/event-lens/Dockerfile
     container_name: gatrix-event-lens-worker
     restart: unless-stopped
-    command: ["node", "dist/worker.js"]
+    command: ["node", "packages/event-lens/dist/worker.js"]
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       CLICKHOUSE_HOST: clickhouse

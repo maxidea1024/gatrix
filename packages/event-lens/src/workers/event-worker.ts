@@ -13,7 +13,7 @@ export class EventWorker {
 
   constructor() {
     this.worker = new Worker(
-      'event-lens:events',
+      'event-lens-events',
       this.processJob.bind(this),
       {
         connection: redis,

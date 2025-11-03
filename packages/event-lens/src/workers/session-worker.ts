@@ -8,7 +8,7 @@ export class SessionWorker {
 
   constructor() {
     this.worker = new Worker(
-      'event-lens:sessions',
+      'event-lens-sessions',
       this.processJob.bind(this),
       {
         connection: redis,
