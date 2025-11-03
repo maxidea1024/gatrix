@@ -1,0 +1,41 @@
+{
+  ":DefaultShipBlueprint": {
+    ":type": {
+      "id": "key",
+      "shipBlueprintId": "number"
+    },
+    ":required": {
+      "shipBlueprintId": 1
+    },
+    ":min": {
+      "shipBlueprintId": 70200000
+    },
+    ":max": {
+      "shipBlueprintId": 70289999
+    },
+    ":enum": {},
+    ":links": {
+      "shipBlueprintId": [
+        "ShipBlueprint"
+      ]
+    }
+  },
+  "DefaultShipBlueprint": {
+    "1": {
+      "id": 1,
+      "shipBlueprintId": 70200001
+    },
+    "2": {
+      "id": 2,
+      "shipBlueprintId": 70200002
+    },
+    "3": {
+      "id": 3,
+      "shipBlueprintId": 70200003
+    },
+    "4": {
+      "id": 4,
+      "shipBlueprintId": 70200005
+    }
+  }
+}

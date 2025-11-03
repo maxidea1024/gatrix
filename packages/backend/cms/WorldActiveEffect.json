@@ -1,0 +1,618 @@
+{
+  ":WorldActiveEffect": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "uiText": "text",
+      "useTriggerFleetTiming": [
+        "number"
+      ],
+      "useTriggerShipTiming": [
+        "number"
+      ],
+      "isPercent": "bool",
+      "isPlusNeeded": "bool",
+      "worldActiveEffectTarget": "number"
+    },
+    ":required": {
+      "name": 1,
+      "isPercent": 1,
+      "isPlusNeeded": 1,
+      "worldActiveEffectTarget": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "WorldActiveEffect": {
+    "75110002": {
+      "id": 75110002,
+      "name": "물 보유량 변화",
+      "uiText": "물 보유량",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110003": {
+      "id": 75110003,
+      "name": "(사용x)물 보유량% 변화",
+      "uiText": "물 보유량",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110004": {
+      "id": 75110004,
+      "name": "식량 보유량 변화",
+      "uiText": "식량 보유량",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110005": {
+      "id": 75110005,
+      "name": "(사용x)식량 보유량% 변화",
+      "uiText": "식량 보유량",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110006": {
+      "id": 75110006,
+      "name": "내구도 변화",
+      "uiText": "선박 내구도",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110007": {
+      "id": 75110007,
+      "name": "내구도 % 변화",
+      "uiText": "선박 내구도",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110008": {
+      "id": 75110008,
+      "name": "입항 거리 변화",
+      "uiText": "입항 거리",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110009": {
+      "id": 75110009,
+      "name": "선원 수 변화",
+      "uiText": "선원 수",
+      "useTriggerFleetTiming": [
+        1
+      ],
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110010": {
+      "id": 75110010,
+      "name": "선원 수% 변화",
+      "uiText": "선원 수",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110011": {
+      "id": 75110011,
+      "name": "교전 확률 변화",
+      "uiText": "교전 확률",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110012": {
+      "id": 75110012,
+      "name": "충성도 변화",
+      "uiText": "충성도",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75110013": {
+      "id": 75110013,
+      "name": "충성도% 변화",
+      "uiText": "충성도",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75110014": {
+      "id": 75110014,
+      "name": "교역품 수량 변화",
+      "uiText": "교역품 수량",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75110015": {
+      "id": 75110015,
+      "name": "교역품 수량% 변화",
+      "uiText": "교역품 수량",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75110016": {
+      "id": 75110016,
+      "name": "항해사 부상 확률 변화",
+      "uiText": "항해사 부상 확률",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75110017": {
+      "id": 75110017,
+      "name": "항해사 부상 시간% 변화",
+      "uiText": "항해사 부상 시간",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75110018": {
+      "id": 75110018,
+      "name": "국가 우호도 변화",
+      "uiText": "우호도",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 1
+    },
+    "75110019": {
+      "id": 75110019,
+      "name": "우호도 감소",
+      "uiText": "우호도 감소",
+      "isPercent": false,
+      "isPlusNeeded": false,
+      "worldActiveEffectTarget": 1
+    },
+    "75110022": {
+      "id": 75110022,
+      "name": "보유 재화 % 변화",
+      "uiText": "보유 재화",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 1
+    },
+    "75110023": {
+      "id": 75110023,
+      "name": "보유 교역품 변화",
+      "uiText": "보유 교역품",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75110024": {
+      "id": 75110024,
+      "name": "보유 교역품 % 변화",
+      "uiText": "보유 교역품",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75110025": {
+      "id": 75110025,
+      "name": "선원 수 모두 회복",
+      "uiText": "선원 수 모두 회복",
+      "isPercent": false,
+      "isPlusNeeded": false,
+      "worldActiveEffectTarget": 2
+    },
+    "75110026": {
+      "id": 75110026,
+      "name": "내구도 모두 회복",
+      "uiText": "내구도 모두 회복",
+      "isPercent": false,
+      "isPlusNeeded": false,
+      "worldActiveEffectTarget": 2
+    },
+    "75110102": {
+      "id": 75110102,
+      "name": "물 보유량 변화 (일괄)",
+      "uiText": "물 보유량",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110103": {
+      "id": 75110103,
+      "name": "(사용x)물 보유량% 변화 (일괄)",
+      "uiText": "물 보유량",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110104": {
+      "id": 75110104,
+      "name": "식량 보유량 변화 (일괄)",
+      "uiText": "식량 보유량",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110105": {
+      "id": 75110105,
+      "name": "(사용x)식량 보유량% 변화 (일괄)",
+      "uiText": "식량 보유량",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110106": {
+      "id": 75110106,
+      "name": "내구도 변화 (일괄)",
+      "uiText": "선박 내구도",
+      "useTriggerFleetTiming": [
+        1
+      ],
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110107": {
+      "id": 75110107,
+      "name": "내구도 % 변화 (일괄)",
+      "uiText": "선박 내구도",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110109": {
+      "id": 75110109,
+      "name": "선원 수 변화 (일괄)",
+      "uiText": "선원 수",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75110110": {
+      "id": 75110110,
+      "name": "선원 수% 변화 (일괄)",
+      "uiText": "선원 수",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75111000": {
+      "id": 75111000,
+      "name": "재해 예측 변화율",
+      "uiText": "재해 예측",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75111001": {
+      "id": 75111001,
+      "name": "선박 물 보유량 변화",
+      "uiText": "물 보유량",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111002": {
+      "id": 75111002,
+      "name": "(사용x)선박 물 보유량% 변화",
+      "uiText": "물 보유량",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111003": {
+      "id": 75111003,
+      "name": "선박 식량 보유량 변화",
+      "uiText": "식량 보유량",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111004": {
+      "id": 75111004,
+      "name": "(사용x)선박 식량 보유량% 변화",
+      "uiText": "식량 보유량",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111005": {
+      "id": 75111005,
+      "name": "선박 내구도 변화",
+      "uiText": "선박 내구도",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111006": {
+      "id": 75111006,
+      "name": "선박 내구도 % 변화",
+      "uiText": "선박 내구도",
+      "useTriggerShipTiming": [
+        1
+      ],
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111007": {
+      "id": 75111007,
+      "name": "선박 입항 거리 변화",
+      "uiText": "입항 거리",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111008": {
+      "id": 75111008,
+      "name": "선박 선원 수 변화",
+      "uiText": "선원 수",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111009": {
+      "id": 75111009,
+      "name": "선박 선원 수% 변화",
+      "uiText": "선원 수",
+      "useTriggerShipTiming": [
+        1
+      ],
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111010": {
+      "id": 75111010,
+      "name": "선박 교전 확률 변화",
+      "uiText": "교전 확률",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111011": {
+      "id": 75111011,
+      "name": "모든 선원 회복",
+      "uiText": "모든 선원 회복",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111012": {
+      "id": 75111012,
+      "name": "선박 내구도 모두 회복",
+      "uiText": "내구도 모두 회복",
+      "isPercent": false,
+      "isPlusNeeded": false,
+      "worldActiveEffectTarget": 3
+    },
+    "75111013": {
+      "id": 75111013,
+      "name": "낚시 성공률 변화",
+      "uiText": "낚시 성공",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75111014": {
+      "id": 75111014,
+      "name": "낚시 성공률% 변화",
+      "uiText": "낚시 성공",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75111015": {
+      "id": 75111015,
+      "name": "상태 이상 해제",
+      "uiText": "상태 이상 해제",
+      "isPercent": false,
+      "isPlusNeeded": false,
+      "worldActiveEffectTarget": 2
+    },
+    "75111016": {
+      "id": 75111016,
+      "name": "가연성 교역품 수량 변화",
+      "uiText": "가연성 교역품",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111017": {
+      "id": 75111017,
+      "name": "가연성 교역품 수량 % 변화",
+      "uiText": "가연성 교역품",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111018": {
+      "id": 75111018,
+      "name": "귀금속 교역품 수량 변화",
+      "uiText": "고가 교역품",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111019": {
+      "id": 75111019,
+      "name": "귀금속 교역품 수량 % 변화",
+      "uiText": "고가 교역품",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111020": {
+      "id": 75111020,
+      "name": "부패 교역품 수량 변화",
+      "uiText": "부패성 교역품",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111021": {
+      "id": 75111021,
+      "name": "부패 교역품 수량 % 변화",
+      "uiText": "부패성 교역품",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111022": {
+      "id": 75111022,
+      "name": "폐사 교역품 수량 변화",
+      "uiText": "생물 교역품",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111023": {
+      "id": 75111023,
+      "name": "폐사 교역품 수량 % 변화",
+      "uiText": "생물 교역품",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111024": {
+      "id": 75111024,
+      "name": "번식 교역품 수량 변화",
+      "uiText": "생물 교역품",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111025": {
+      "id": 75111025,
+      "name": "번식 교역품 수량 % 변화",
+      "uiText": "생물 교역품",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111026": {
+      "id": 75111026,
+      "name": "함대 충성도 변화",
+      "uiText": "충성도",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75111027": {
+      "id": 75111027,
+      "name": "함대 충성도% 변화",
+      "uiText": "충성도",
+      "isPercent": true,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75111028": {
+      "id": 75111028,
+      "name": "모든 재해 해소",
+      "uiText": "모든 재해 해소",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75111029": {
+      "id": 75111029,
+      "name": "선박 수명 변화",
+      "uiText": "선박 수명",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111030": {
+      "id": 75111030,
+      "name": "선박 수명% 변화",
+      "uiText": "선박 수명",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 3
+    },
+    "75111031": {
+      "id": 75111031,
+      "name": "함대 전체 수명 변화",
+      "uiText": "모든 선박 수명",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75111032": {
+      "id": 75111032,
+      "name": "함대 전체 수명% 변화",
+      "uiText": "모든 선박 수명",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75111033": {
+      "id": 75111033,
+      "name": "침몰 선박 회복",
+      "uiText": "침몰 선박 복구",
+      "isPercent": false,
+      "isPlusNeeded": false,
+      "worldActiveEffectTarget": 2
+    },
+    "75111034": {
+      "id": 75111034,
+      "name": "날씨 변경 (랜덤)",
+      "uiText": "날씨 변경",
+      "isPercent": false,
+      "isPlusNeeded": false,
+      "worldActiveEffectTarget": 2
+    },
+    "75111035": {
+      "id": 75111035,
+      "name": "교염품 변경",
+      "uiText": "교역품 변경",
+      "isPercent": false,
+      "isPlusNeeded": false,
+      "worldActiveEffectTarget": 2
+    },
+    "75111036": {
+      "id": 75111036,
+      "name": "기함 외형 변경",
+      "uiText": "외형 변경",
+      "isPercent": false,
+      "isPlusNeeded": false,
+      "worldActiveEffectTarget": 2
+    },
+    "75111037": {
+      "id": 75111037,
+      "name": "본거지로 귀환",
+      "uiText": "본거지로 회항",
+      "isPercent": false,
+      "isPlusNeeded": false,
+      "worldActiveEffectTarget": 2
+    },
+    "75111038": {
+      "id": 75111038,
+      "name": "모든 항해사 부상 회복",
+      "uiText": "부상 회복",
+      "isPercent": false,
+      "isPlusNeeded": false,
+      "worldActiveEffectTarget": 2
+    },
+    "75111039": {
+      "id": 75111039,
+      "name": "선박 물 보유량 변화(순차)",
+      "uiText": "물 보유량",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    },
+    "75111040": {
+      "id": 75111040,
+      "name": "선박 식량 보유량 변화(순차)",
+      "uiText": "식량 보유량",
+      "isPercent": false,
+      "isPlusNeeded": true,
+      "worldActiveEffectTarget": 2
+    }
+  }
+}

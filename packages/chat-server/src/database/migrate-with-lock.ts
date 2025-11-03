@@ -4,7 +4,9 @@ import knex from 'knex';
 import path from 'path';
 import logger from '../config/logger';
 
-const knexConfig = require('../../knexfile');
+// Load knexfile from the correct location
+const knexConfigPath = path.join(__dirname, '../../knexfile');
+const knexConfig = require(knexConfigPath);
 
 const LOCK_NAME = 'gatrix_chat_migration_lock';
 const LOCK_TIMEOUT = 300; // 5 minutes in seconds
@@ -112,5 +114,8 @@ async function runMigrations() {
 }
 
 // Run migrations
-runMigrations();
+runMigrations().catch((error) => {
+  console.error('Fatal error:', error);
+  process.exit(1);
+});
 

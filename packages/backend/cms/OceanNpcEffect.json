@@ -1,0 +1,33 @@
+{
+  ":OceanNpcEffect": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "uiText": "text"
+    },
+    ":required": {
+      "name": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "OceanNpcEffect": {
+    "16200000": {
+      "id": 16200000,
+      "name": "함대 속도 변화",
+      "uiText": "함대 속도 변화"
+    },
+    "16200001": {
+      "id": 16200001,
+      "name": "함대 속도 변화%",
+      "uiText": "함대 속도 변화"
+    },
+    "16200002": {
+      "id": 16200002,
+      "name": "입항 거리 변화",
+      "uiText": "입항 거리 변화"
+    }
+  }
+}

@@ -1,0 +1,643 @@
+{
+  ":HotTimeBonus": {
+    ":type": {
+      "id": "key",
+      "group": "number",
+      "eventStartDate": "string",
+      "eventEndDate": "string",
+      "startHour": "number",
+      "endHour": "number",
+      "mailId": "number",
+      "levels": [
+        "number"
+      ],
+      "rewardFixeds": [
+        "number",
+        "number"
+      ]
+    },
+    ":required": {
+      "startHour": 1,
+      "endHour": 1,
+      "levels": [
+        1
+      ],
+      "rewardFixeds": [
+        1,
+        1
+      ]
+    },
+    ":requiredInObject": {
+      "startHour": 1,
+      "endHour": 1,
+      "levels": [
+        1
+      ],
+      "rewardFixeds": [
+        1,
+        1
+      ]
+    },
+    ":min": {
+      "startHour": 1,
+      "endHour": 1,
+      "mailId": 92000000,
+      "levels": [
+        1
+      ],
+      "rewardFixeds": [
+        94000000,
+        94000000
+      ]
+    },
+    ":max": {
+      "startHour": 24,
+      "endHour": 24,
+      "mailId": 92999999,
+      "levels": [
+        102
+      ],
+      "rewardFixeds": [
+        95999999,
+        95999999
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "mailId": [
+        "Mail"
+      ],
+      "rewardFixeds": [
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ]
+      ]
+    },
+    ":asset": {}
+  },
+  "HotTimeBonus": {
+    "1": {
+      "id": 1,
+      "group": 2001,
+      "eventStartDate": "2025/09/24/00:00:00",
+      "eventEndDate": "2025/09/24/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110000,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "2": {
+      "id": 2,
+      "group": 2002,
+      "eventStartDate": "2025/09/25/00:00:00",
+      "eventEndDate": "2025/09/25/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110001,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "3": {
+      "id": 3,
+      "group": 2003,
+      "eventStartDate": "2025/09/26/00:00:00",
+      "eventEndDate": "2025/09/26/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110002,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "4": {
+      "id": 4,
+      "group": 2004,
+      "eventStartDate": "2025/09/27/00:00:00",
+      "eventEndDate": "2025/09/27/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110003,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "5": {
+      "id": 5,
+      "group": 2005,
+      "eventStartDate": "2025/09/28/00:00:00",
+      "eventEndDate": "2025/09/28/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110004,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "6": {
+      "id": 6,
+      "group": 2006,
+      "eventStartDate": "2025/09/29/00:00:00",
+      "eventEndDate": "2025/09/29/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110005,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "7": {
+      "id": 7,
+      "group": 2007,
+      "eventStartDate": "2025/09/30/00:00:00",
+      "eventEndDate": "2025/09/30/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110006,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "8": {
+      "id": 8,
+      "group": 2008,
+      "eventStartDate": "2025/10/01/00:00:00",
+      "eventEndDate": "2025/10/01/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110007,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "9": {
+      "id": 9,
+      "group": 2009,
+      "eventStartDate": "2025/10/02/00:00:00",
+      "eventEndDate": "2025/10/02/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110008,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "10": {
+      "id": 10,
+      "group": 2010,
+      "eventStartDate": "2025/10/03/00:00:00",
+      "eventEndDate": "2025/10/03/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110009,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "11": {
+      "id": 11,
+      "group": 2011,
+      "eventStartDate": "2025/10/04/00:00:00",
+      "eventEndDate": "2025/10/04/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110010,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "12": {
+      "id": 12,
+      "group": 2012,
+      "eventStartDate": "2025/10/05/00:00:00",
+      "eventEndDate": "2025/10/05/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110011,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "13": {
+      "id": 13,
+      "group": 2013,
+      "eventStartDate": "2025/10/06/00:00:00",
+      "eventEndDate": "2025/10/06/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110012,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "14": {
+      "id": 14,
+      "group": 2014,
+      "eventStartDate": "2025/10/07/00:00:00",
+      "eventEndDate": "2025/10/07/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110013,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "15": {
+      "id": 15,
+      "group": 2015,
+      "eventStartDate": "2025/10/08/00:00:00",
+      "eventEndDate": "2025/10/08/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110014,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "16": {
+      "id": 16,
+      "group": 2016,
+      "eventStartDate": "2025/10/09/00:00:00",
+      "eventEndDate": "2025/10/09/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110015,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "17": {
+      "id": 17,
+      "group": 2017,
+      "eventStartDate": "2025/10/10/00:00:00",
+      "eventEndDate": "2025/10/10/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110016,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "18": {
+      "id": 18,
+      "group": 2018,
+      "eventStartDate": "2025/10/11/00:00:00",
+      "eventEndDate": "2025/10/11/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110017,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "19": {
+      "id": 19,
+      "group": 2019,
+      "eventStartDate": "2025/10/12/00:00:00",
+      "eventEndDate": "2025/10/12/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110018,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "20": {
+      "id": 20,
+      "group": 2020,
+      "eventStartDate": "2025/10/13/00:00:00",
+      "eventEndDate": "2025/10/13/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110019,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "21": {
+      "id": 21,
+      "group": 2021,
+      "eventStartDate": "2025/10/14/00:00:00",
+      "eventEndDate": "2025/10/14/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110020,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "22": {
+      "id": 22,
+      "group": 2022,
+      "eventStartDate": "2025/10/15/00:00:00",
+      "eventEndDate": "2025/10/15/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110021,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "23": {
+      "id": 23,
+      "group": 2023,
+      "eventStartDate": "2025/10/16/00:00:00",
+      "eventEndDate": "2025/10/16/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110022,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "24": {
+      "id": 24,
+      "group": 2024,
+      "eventStartDate": "2025/10/17/00:00:00",
+      "eventEndDate": "2025/10/17/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110023,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "25": {
+      "id": 25,
+      "group": 2025,
+      "eventStartDate": "2025/10/18/00:00:00",
+      "eventEndDate": "2025/10/18/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110024,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "26": {
+      "id": 26,
+      "group": 2026,
+      "eventStartDate": "2025/10/19/00:00:00",
+      "eventEndDate": "2025/10/19/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110025,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "27": {
+      "id": 27,
+      "group": 2027,
+      "eventStartDate": "2025/10/20/00:00:00",
+      "eventEndDate": "2025/10/20/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110026,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "28": {
+      "id": 28,
+      "group": 2028,
+      "eventStartDate": "2025/10/21/00:00:00",
+      "eventEndDate": "2025/10/21/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110027,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "29": {
+      "id": 29,
+      "group": 2029,
+      "eventStartDate": "2025/10/22/00:00:00",
+      "eventEndDate": "2025/10/22/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110028,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "30": {
+      "id": 30,
+      "group": 2030,
+      "eventStartDate": "2025/10/23/00:00:00",
+      "eventEndDate": "2025/10/23/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110029,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "31": {
+      "id": 31,
+      "group": 2031,
+      "eventStartDate": "2025/10/24/00:00:00",
+      "eventEndDate": "2025/10/24/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110030,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    },
+    "32": {
+      "id": 32,
+      "group": 2032,
+      "eventStartDate": "2025/10/25/00:00:00",
+      "eventEndDate": "2025/10/25/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110031,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910866,
+        95910866
+      ]
+    },
+    "33": {
+      "id": 33,
+      "group": 2033,
+      "eventStartDate": "2025/10/26/00:00:00",
+      "eventEndDate": "2025/10/26/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110032,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910864,
+        95910864
+      ]
+    },
+    "34": {
+      "id": 34,
+      "group": 2034,
+      "eventStartDate": "2025/10/27/00:00:00",
+      "eventEndDate": "2025/10/27/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110033,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910866,
+        95910866
+      ]
+    },
+    "35": {
+      "id": 35,
+      "group": 2035,
+      "eventStartDate": "2025/10/28/00:00:00",
+      "eventEndDate": "2025/10/28/23:59:59",
+      "startHour": 17,
+      "endHour": 19,
+      "mailId": 92110034,
+      "levels": [
+        101
+      ],
+      "rewardFixeds": [
+        95910865,
+        95910865
+      ]
+    }
+  }
+}

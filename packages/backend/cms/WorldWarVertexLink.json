@@ -1,0 +1,392 @@
+{
+  ":WorldWarVertexLink": {
+    ":type": {
+      "id": "key",
+      "worldWarVertexId": "number",
+      "linking": [
+        {
+          "WWVertexId": "number",
+          "Distance": "number",
+          "EdgeType": "number"
+        },
+        {
+          "WWVertexId": "number",
+          "Distance": "number",
+          "EdgeType": "number"
+        },
+        {
+          "WWVertexId": "number",
+          "Distance": "number",
+          "EdgeType": "number"
+        },
+        {
+          "WWVertexId": "number",
+          "Distance": "number",
+          "EdgeType": "number"
+        }
+      ]
+    },
+    ":required": {},
+    ":requiredInObject": {},
+    ":min": {
+      "worldWarVertexId": 0,
+      "linking": [
+        {
+          "WWVertexId": 0,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 0,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 0,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 0,
+          "EdgeType": 0
+        }
+      ]
+    },
+    ":max": {
+      "worldWarVertexId": 10000,
+      "linking": [
+        {
+          "WWVertexId": 10000,
+          "EdgeType": 1
+        },
+        {
+          "WWVertexId": 10000,
+          "EdgeType": 1
+        },
+        {
+          "WWVertexId": 10000,
+          "EdgeType": 1
+        },
+        {
+          "WWVertexId": 10000,
+          "EdgeType": 1
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "worldWarVertexId": [
+        "WorldWarVertex"
+      ],
+      "linking": [
+        {
+          "WWVertexId": [
+            "WorldWarVertex"
+          ]
+        },
+        {
+          "WWVertexId": [
+            "WorldWarVertex"
+          ]
+        },
+        {
+          "WWVertexId": [
+            "WorldWarVertex"
+          ]
+        },
+        {
+          "WWVertexId": [
+            "WorldWarVertex"
+          ]
+        }
+      ]
+    }
+  },
+  "WorldWarVertexLink": {
+    "0": {
+      "id": 0,
+      "worldWarVertexId": 0,
+      "linking": [
+        {
+          "WWVertexId": 3,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        }
+      ]
+    },
+    "1": {
+      "id": 1,
+      "worldWarVertexId": 1,
+      "linking": [
+        {
+          "WWVertexId": 5,
+          "Distance": 180,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 2,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 3,
+          "Distance": 200,
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        }
+      ]
+    },
+    "2": {
+      "id": 2,
+      "worldWarVertexId": 2,
+      "linking": [
+        {
+          "WWVertexId": 1,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 3,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 6,
+          "Distance": 200,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 10,
+          "Distance": 200,
+          "EdgeType": 0
+        }
+      ]
+    },
+    "3": {
+      "id": 3,
+      "worldWarVertexId": 3,
+      "linking": [
+        {
+          "WWVertexId": 0,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 1,
+          "Distance": 180,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 2,
+          "Distance": 180,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 9,
+          "Distance": 200,
+          "EdgeType": 0
+        }
+      ]
+    },
+    "4": {
+      "id": 4,
+      "worldWarVertexId": 4,
+      "linking": [
+        {
+          "WWVertexId": 5,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        }
+      ]
+    },
+    "5": {
+      "id": 5,
+      "worldWarVertexId": 5,
+      "linking": [
+        {
+          "WWVertexId": 4,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 6,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 7,
+          "Distance": 180,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 1,
+          "Distance": 200,
+          "EdgeType": 0
+        }
+      ]
+    },
+    "6": {
+      "id": 6,
+      "worldWarVertexId": 6,
+      "linking": [
+        {
+          "WWVertexId": 5,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 7,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 2,
+          "Distance": 200,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 10,
+          "Distance": 200,
+          "EdgeType": 0
+        }
+      ]
+    },
+    "7": {
+      "id": 7,
+      "worldWarVertexId": 7,
+      "linking": [
+        {
+          "WWVertexId": 5,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 6,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 11,
+          "Distance": 200,
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        }
+      ]
+    },
+    "8": {
+      "id": 8,
+      "worldWarVertexId": 8,
+      "linking": [
+        {
+          "WWVertexId": 11,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        }
+      ]
+    },
+    "9": {
+      "id": 9,
+      "worldWarVertexId": 9,
+      "linking": [
+        {
+          "WWVertexId": 10,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 11,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 3,
+          "Distance": 200,
+          "EdgeType": 0
+        },
+        {
+          "EdgeType": 0
+        }
+      ]
+    },
+    "10": {
+      "id": 10,
+      "worldWarVertexId": 10,
+      "linking": [
+        {
+          "WWVertexId": 9,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 11,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 2,
+          "Distance": 200,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 6,
+          "Distance": 200,
+          "EdgeType": 0
+        }
+      ]
+    },
+    "11": {
+      "id": 11,
+      "worldWarVertexId": 11,
+      "linking": [
+        {
+          "WWVertexId": 8,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 9,
+          "Distance": 180,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 10,
+          "Distance": 100,
+          "EdgeType": 0
+        },
+        {
+          "WWVertexId": 7,
+          "Distance": 200,
+          "EdgeType": 0
+        }
+      ]
+    }
+  }
+}

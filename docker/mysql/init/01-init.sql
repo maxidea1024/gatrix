@@ -19,6 +19,10 @@ GRANT ALL PRIVILEGES ON gatrix.* TO 'gatrix_user'@'%';
 CREATE DATABASE IF NOT EXISTS gatrix_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON gatrix_test.* TO 'gatrix_user'@'%';
 
+-- Create chat database for chat server
+CREATE DATABASE IF NOT EXISTS gatrix_chat CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON gatrix_chat.* TO 'gatrix_user'@'%';
+
 -- Flush privileges
 FLUSH PRIVILEGES;
 

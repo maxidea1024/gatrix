@@ -1,0 +1,61 @@
+{
+  ":WindRate": {
+    ":type": {
+      "id": "key",
+      "windRate": "number"
+    },
+    ":required": {
+      "windRate": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "WindRate": {
+    "0": {
+      "id": 0,
+      "windRate": 0
+    },
+    "1": {
+      "id": 1,
+      "windRate": 2.51
+    },
+    "2": {
+      "id": 2,
+      "windRate": 5.02
+    },
+    "3": {
+      "id": 3,
+      "windRate": 7.53
+    },
+    "4": {
+      "id": 4,
+      "windRate": 10.04
+    },
+    "5": {
+      "id": 5,
+      "windRate": 12.55
+    },
+    "6": {
+      "id": 6,
+      "windRate": 15.06
+    },
+    "7": {
+      "id": 7,
+      "windRate": 17.57
+    },
+    "8": {
+      "id": 8,
+      "windRate": 20.08
+    },
+    "9": {
+      "id": 9,
+      "windRate": 22.59
+    },
+    "10": {
+      "id": 10,
+      "windRate": 25.09
+    }
+  }
+}

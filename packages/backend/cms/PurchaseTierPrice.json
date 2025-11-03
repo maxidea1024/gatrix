@@ -1,0 +1,1251 @@
+{
+  ":PurchaseTierPrice": {
+    ":type": {
+      "id": "key",
+      "tierGroup": "number",
+      "priceKR": "number",
+      "priceCN": "number"
+    },
+    ":required": {
+      "tierGroup": 1,
+      "priceKR": 1,
+      "priceCN": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "PurchaseTierPrice": {
+    "100120001": {
+      "id": 100120001,
+      "tierGroup": 1,
+      "priceKR": 1000,
+      "priceCN": 6
+    },
+    "100120002": {
+      "id": 100120002,
+      "tierGroup": 2,
+      "priceKR": 3000,
+      "priceCN": 18
+    },
+    "100120003": {
+      "id": 100120003,
+      "tierGroup": 3,
+      "priceKR": 5000,
+      "priceCN": 30
+    },
+    "100120004": {
+      "id": 100120004,
+      "tierGroup": 4,
+      "priceKR": 10000,
+      "priceCN": 68
+    },
+    "100120005": {
+      "id": 100120005,
+      "tierGroup": 5,
+      "priceKR": 30000,
+      "priceCN": 198
+    },
+    "100120006": {
+      "id": 100120006,
+      "tierGroup": 6,
+      "priceKR": 50000,
+      "priceCN": 328
+    },
+    "100120007": {
+      "id": 100120007,
+      "tierGroup": 7,
+      "priceKR": 100000,
+      "priceCN": 648
+    },
+    "100120008": {
+      "id": 100120008,
+      "tierGroup": 8,
+      "priceKR": 150000,
+      "priceCN": 900
+    },
+    "100120009": {
+      "id": 100120009,
+      "tierGroup": 9,
+      "priceKR": 200000,
+      "priceCN": 1150
+    },
+    "100120010": {
+      "id": 100120010,
+      "tierGroup": 10,
+      "priceKR": 250000,
+      "priceCN": 1400
+    },
+    "100120011": {
+      "id": 100120011,
+      "tierGroup": 11,
+      "priceKR": 300000,
+      "priceCN": 1650
+    },
+    "100120012": {
+      "id": 100120012,
+      "tierGroup": 12,
+      "priceKR": 350000,
+      "priceCN": 1900
+    },
+    "100120013": {
+      "id": 100120013,
+      "tierGroup": 13,
+      "priceKR": 400000,
+      "priceCN": 2150
+    },
+    "100120014": {
+      "id": 100120014,
+      "tierGroup": 14,
+      "priceKR": 450000,
+      "priceCN": 2400
+    },
+    "100120015": {
+      "id": 100120015,
+      "tierGroup": 15,
+      "priceKR": 500000,
+      "priceCN": 2650
+    },
+    "100120016": {
+      "id": 100120016,
+      "tierGroup": 16,
+      "priceKR": 550000,
+      "priceCN": 2900
+    },
+    "100120017": {
+      "id": 100120017,
+      "tierGroup": 17,
+      "priceKR": 600000,
+      "priceCN": 3150
+    },
+    "100120018": {
+      "id": 100120018,
+      "tierGroup": 18,
+      "priceKR": 650000,
+      "priceCN": 3400
+    },
+    "100120019": {
+      "id": 100120019,
+      "tierGroup": 19,
+      "priceKR": 700000,
+      "priceCN": 3650
+    },
+    "100120020": {
+      "id": 100120020,
+      "tierGroup": 20,
+      "priceKR": 750000,
+      "priceCN": 3900
+    },
+    "100120021": {
+      "id": 100120021,
+      "tierGroup": 21,
+      "priceKR": 800000,
+      "priceCN": 4150
+    },
+    "100120022": {
+      "id": 100120022,
+      "tierGroup": 22,
+      "priceKR": 850000,
+      "priceCN": 4400
+    },
+    "100120023": {
+      "id": 100120023,
+      "tierGroup": 23,
+      "priceKR": 900000,
+      "priceCN": 4650
+    },
+    "100120024": {
+      "id": 100120024,
+      "tierGroup": 24,
+      "priceKR": 950000,
+      "priceCN": 4900
+    },
+    "100120025": {
+      "id": 100120025,
+      "tierGroup": 25,
+      "priceKR": 1000000,
+      "priceCN": 5150
+    },
+    "100120026": {
+      "id": 100120026,
+      "tierGroup": 26,
+      "priceKR": 1050000,
+      "priceCN": 5400
+    },
+    "100120027": {
+      "id": 100120027,
+      "tierGroup": 27,
+      "priceKR": 1100000,
+      "priceCN": 5650
+    },
+    "100120028": {
+      "id": 100120028,
+      "tierGroup": 28,
+      "priceKR": 1150000,
+      "priceCN": 5900
+    },
+    "100120029": {
+      "id": 100120029,
+      "tierGroup": 29,
+      "priceKR": 1200000,
+      "priceCN": 6150
+    },
+    "100120030": {
+      "id": 100120030,
+      "tierGroup": 30,
+      "priceKR": 1250000,
+      "priceCN": 6400
+    },
+    "100120031": {
+      "id": 100120031,
+      "tierGroup": 31,
+      "priceKR": 1300000,
+      "priceCN": 6650
+    },
+    "100120032": {
+      "id": 100120032,
+      "tierGroup": 32,
+      "priceKR": 1350000,
+      "priceCN": 6900
+    },
+    "100120033": {
+      "id": 100120033,
+      "tierGroup": 33,
+      "priceKR": 1400000,
+      "priceCN": 7150
+    },
+    "100120034": {
+      "id": 100120034,
+      "tierGroup": 34,
+      "priceKR": 1450000,
+      "priceCN": 7400
+    },
+    "100120035": {
+      "id": 100120035,
+      "tierGroup": 35,
+      "priceKR": 1500000,
+      "priceCN": 7650
+    },
+    "100120036": {
+      "id": 100120036,
+      "tierGroup": 36,
+      "priceKR": 1550000,
+      "priceCN": 7900
+    },
+    "100120037": {
+      "id": 100120037,
+      "tierGroup": 37,
+      "priceKR": 1600000,
+      "priceCN": 8150
+    },
+    "100120038": {
+      "id": 100120038,
+      "tierGroup": 38,
+      "priceKR": 1650000,
+      "priceCN": 8400
+    },
+    "100120039": {
+      "id": 100120039,
+      "tierGroup": 39,
+      "priceKR": 1700000,
+      "priceCN": 8650
+    },
+    "100120040": {
+      "id": 100120040,
+      "tierGroup": 40,
+      "priceKR": 1750000,
+      "priceCN": 8900
+    },
+    "100120041": {
+      "id": 100120041,
+      "tierGroup": 41,
+      "priceKR": 1800000,
+      "priceCN": 9150
+    },
+    "100120042": {
+      "id": 100120042,
+      "tierGroup": 42,
+      "priceKR": 1850000,
+      "priceCN": 9400
+    },
+    "100120043": {
+      "id": 100120043,
+      "tierGroup": 43,
+      "priceKR": 1900000,
+      "priceCN": 9650
+    },
+    "100120044": {
+      "id": 100120044,
+      "tierGroup": 44,
+      "priceKR": 1950000,
+      "priceCN": 9900
+    },
+    "100120045": {
+      "id": 100120045,
+      "tierGroup": 45,
+      "priceKR": 2000000,
+      "priceCN": 10150
+    },
+    "100120046": {
+      "id": 100120046,
+      "tierGroup": 46,
+      "priceKR": 2050000,
+      "priceCN": 10400
+    },
+    "100120047": {
+      "id": 100120047,
+      "tierGroup": 47,
+      "priceKR": 2100000,
+      "priceCN": 10650
+    },
+    "100120048": {
+      "id": 100120048,
+      "tierGroup": 48,
+      "priceKR": 2150000,
+      "priceCN": 10900
+    },
+    "100120049": {
+      "id": 100120049,
+      "tierGroup": 49,
+      "priceKR": 2200000,
+      "priceCN": 11150
+    },
+    "100120050": {
+      "id": 100120050,
+      "tierGroup": 50,
+      "priceKR": 2250000,
+      "priceCN": 11400
+    },
+    "100120051": {
+      "id": 100120051,
+      "tierGroup": 51,
+      "priceKR": 2300000,
+      "priceCN": 11650
+    },
+    "100120052": {
+      "id": 100120052,
+      "tierGroup": 52,
+      "priceKR": 2350000,
+      "priceCN": 11900
+    },
+    "100120053": {
+      "id": 100120053,
+      "tierGroup": 53,
+      "priceKR": 2400000,
+      "priceCN": 12150
+    },
+    "100120054": {
+      "id": 100120054,
+      "tierGroup": 54,
+      "priceKR": 2450000,
+      "priceCN": 12400
+    },
+    "100120055": {
+      "id": 100120055,
+      "tierGroup": 55,
+      "priceKR": 2500000,
+      "priceCN": 12650
+    },
+    "100120056": {
+      "id": 100120056,
+      "tierGroup": 56,
+      "priceKR": 2550000,
+      "priceCN": 12900
+    },
+    "100120057": {
+      "id": 100120057,
+      "tierGroup": 57,
+      "priceKR": 2600000,
+      "priceCN": 13150
+    },
+    "100120058": {
+      "id": 100120058,
+      "tierGroup": 58,
+      "priceKR": 2650000,
+      "priceCN": 13400
+    },
+    "100120059": {
+      "id": 100120059,
+      "tierGroup": 59,
+      "priceKR": 2700000,
+      "priceCN": 13650
+    },
+    "100120060": {
+      "id": 100120060,
+      "tierGroup": 60,
+      "priceKR": 2750000,
+      "priceCN": 13900
+    },
+    "100120061": {
+      "id": 100120061,
+      "tierGroup": 61,
+      "priceKR": 2800000,
+      "priceCN": 14150
+    },
+    "100120062": {
+      "id": 100120062,
+      "tierGroup": 62,
+      "priceKR": 2850000,
+      "priceCN": 14400
+    },
+    "100120063": {
+      "id": 100120063,
+      "tierGroup": 63,
+      "priceKR": 2900000,
+      "priceCN": 14650
+    },
+    "100120064": {
+      "id": 100120064,
+      "tierGroup": 64,
+      "priceKR": 2950000,
+      "priceCN": 14900
+    },
+    "100120065": {
+      "id": 100120065,
+      "tierGroup": 65,
+      "priceKR": 3000000,
+      "priceCN": 15150
+    },
+    "100120066": {
+      "id": 100120066,
+      "tierGroup": 66,
+      "priceKR": 3050000,
+      "priceCN": 15400
+    },
+    "100120067": {
+      "id": 100120067,
+      "tierGroup": 67,
+      "priceKR": 3100000,
+      "priceCN": 15650
+    },
+    "100120068": {
+      "id": 100120068,
+      "tierGroup": 68,
+      "priceKR": 3150000,
+      "priceCN": 15900
+    },
+    "100120069": {
+      "id": 100120069,
+      "tierGroup": 69,
+      "priceKR": 3200000,
+      "priceCN": 16150
+    },
+    "100120070": {
+      "id": 100120070,
+      "tierGroup": 70,
+      "priceKR": 3250000,
+      "priceCN": 16400
+    },
+    "100120071": {
+      "id": 100120071,
+      "tierGroup": 71,
+      "priceKR": 3300000,
+      "priceCN": 16650
+    },
+    "100120072": {
+      "id": 100120072,
+      "tierGroup": 72,
+      "priceKR": 3350000,
+      "priceCN": 16900
+    },
+    "100120073": {
+      "id": 100120073,
+      "tierGroup": 73,
+      "priceKR": 3400000,
+      "priceCN": 17150
+    },
+    "100120074": {
+      "id": 100120074,
+      "tierGroup": 74,
+      "priceKR": 3450000,
+      "priceCN": 17400
+    },
+    "100120075": {
+      "id": 100120075,
+      "tierGroup": 75,
+      "priceKR": 3500000,
+      "priceCN": 17650
+    },
+    "100120076": {
+      "id": 100120076,
+      "tierGroup": 76,
+      "priceKR": 3550000,
+      "priceCN": 17900
+    },
+    "100120077": {
+      "id": 100120077,
+      "tierGroup": 77,
+      "priceKR": 3600000,
+      "priceCN": 18150
+    },
+    "100120078": {
+      "id": 100120078,
+      "tierGroup": 78,
+      "priceKR": 3650000,
+      "priceCN": 18400
+    },
+    "100120079": {
+      "id": 100120079,
+      "tierGroup": 79,
+      "priceKR": 3700000,
+      "priceCN": 18650
+    },
+    "100120080": {
+      "id": 100120080,
+      "tierGroup": 80,
+      "priceKR": 3750000,
+      "priceCN": 18900
+    },
+    "100120081": {
+      "id": 100120081,
+      "tierGroup": 81,
+      "priceKR": 3800000,
+      "priceCN": 19150
+    },
+    "100120082": {
+      "id": 100120082,
+      "tierGroup": 82,
+      "priceKR": 3850000,
+      "priceCN": 19400
+    },
+    "100120083": {
+      "id": 100120083,
+      "tierGroup": 83,
+      "priceKR": 3900000,
+      "priceCN": 19650
+    },
+    "100120084": {
+      "id": 100120084,
+      "tierGroup": 84,
+      "priceKR": 3950000,
+      "priceCN": 19900
+    },
+    "100120085": {
+      "id": 100120085,
+      "tierGroup": 85,
+      "priceKR": 4000000,
+      "priceCN": 20150
+    },
+    "100120086": {
+      "id": 100120086,
+      "tierGroup": 86,
+      "priceKR": 4050000,
+      "priceCN": 20400
+    },
+    "100120087": {
+      "id": 100120087,
+      "tierGroup": 87,
+      "priceKR": 4100000,
+      "priceCN": 20650
+    },
+    "100120088": {
+      "id": 100120088,
+      "tierGroup": 88,
+      "priceKR": 4150000,
+      "priceCN": 20900
+    },
+    "100120089": {
+      "id": 100120089,
+      "tierGroup": 89,
+      "priceKR": 4200000,
+      "priceCN": 21150
+    },
+    "100120090": {
+      "id": 100120090,
+      "tierGroup": 90,
+      "priceKR": 4250000,
+      "priceCN": 21400
+    },
+    "100120091": {
+      "id": 100120091,
+      "tierGroup": 91,
+      "priceKR": 4300000,
+      "priceCN": 21650
+    },
+    "100120092": {
+      "id": 100120092,
+      "tierGroup": 92,
+      "priceKR": 4350000,
+      "priceCN": 21900
+    },
+    "100120093": {
+      "id": 100120093,
+      "tierGroup": 93,
+      "priceKR": 4400000,
+      "priceCN": 22150
+    },
+    "100120094": {
+      "id": 100120094,
+      "tierGroup": 94,
+      "priceKR": 4450000,
+      "priceCN": 22400
+    },
+    "100120095": {
+      "id": 100120095,
+      "tierGroup": 95,
+      "priceKR": 4500000,
+      "priceCN": 22650
+    },
+    "100120096": {
+      "id": 100120096,
+      "tierGroup": 96,
+      "priceKR": 4550000,
+      "priceCN": 22900
+    },
+    "100120097": {
+      "id": 100120097,
+      "tierGroup": 97,
+      "priceKR": 4600000,
+      "priceCN": 23150
+    },
+    "100120098": {
+      "id": 100120098,
+      "tierGroup": 98,
+      "priceKR": 4650000,
+      "priceCN": 23400
+    },
+    "100120099": {
+      "id": 100120099,
+      "tierGroup": 99,
+      "priceKR": 4700000,
+      "priceCN": 23650
+    },
+    "100120100": {
+      "id": 100120100,
+      "tierGroup": 100,
+      "priceKR": 4750000,
+      "priceCN": 23900
+    },
+    "100120101": {
+      "id": 100120101,
+      "tierGroup": 101,
+      "priceKR": 4800000,
+      "priceCN": 24150
+    },
+    "100120102": {
+      "id": 100120102,
+      "tierGroup": 102,
+      "priceKR": 4850000,
+      "priceCN": 24400
+    },
+    "100120103": {
+      "id": 100120103,
+      "tierGroup": 103,
+      "priceKR": 4900000,
+      "priceCN": 24650
+    },
+    "100120104": {
+      "id": 100120104,
+      "tierGroup": 104,
+      "priceKR": 4950000,
+      "priceCN": 24900
+    },
+    "100120105": {
+      "id": 100120105,
+      "tierGroup": 105,
+      "priceKR": 5000000,
+      "priceCN": 25150
+    },
+    "100120106": {
+      "id": 100120106,
+      "tierGroup": 106,
+      "priceKR": 5050000,
+      "priceCN": 25400
+    },
+    "100120107": {
+      "id": 100120107,
+      "tierGroup": 107,
+      "priceKR": 5100000,
+      "priceCN": 25650
+    },
+    "100120108": {
+      "id": 100120108,
+      "tierGroup": 108,
+      "priceKR": 5150000,
+      "priceCN": 25900
+    },
+    "100120109": {
+      "id": 100120109,
+      "tierGroup": 109,
+      "priceKR": 5200000,
+      "priceCN": 26150
+    },
+    "100120110": {
+      "id": 100120110,
+      "tierGroup": 110,
+      "priceKR": 5250000,
+      "priceCN": 26400
+    },
+    "100120111": {
+      "id": 100120111,
+      "tierGroup": 111,
+      "priceKR": 5300000,
+      "priceCN": 26650
+    },
+    "100120112": {
+      "id": 100120112,
+      "tierGroup": 112,
+      "priceKR": 5350000,
+      "priceCN": 26900
+    },
+    "100120113": {
+      "id": 100120113,
+      "tierGroup": 113,
+      "priceKR": 5400000,
+      "priceCN": 27150
+    },
+    "100120114": {
+      "id": 100120114,
+      "tierGroup": 114,
+      "priceKR": 5450000,
+      "priceCN": 27400
+    },
+    "100120115": {
+      "id": 100120115,
+      "tierGroup": 115,
+      "priceKR": 5500000,
+      "priceCN": 27650
+    },
+    "100120116": {
+      "id": 100120116,
+      "tierGroup": 116,
+      "priceKR": 5550000,
+      "priceCN": 27900
+    },
+    "100120117": {
+      "id": 100120117,
+      "tierGroup": 117,
+      "priceKR": 5600000,
+      "priceCN": 28150
+    },
+    "100120118": {
+      "id": 100120118,
+      "tierGroup": 118,
+      "priceKR": 5650000,
+      "priceCN": 28400
+    },
+    "100120119": {
+      "id": 100120119,
+      "tierGroup": 119,
+      "priceKR": 5700000,
+      "priceCN": 28650
+    },
+    "100120120": {
+      "id": 100120120,
+      "tierGroup": 120,
+      "priceKR": 5750000,
+      "priceCN": 28900
+    },
+    "100120121": {
+      "id": 100120121,
+      "tierGroup": 121,
+      "priceKR": 5800000,
+      "priceCN": 29150
+    },
+    "100120122": {
+      "id": 100120122,
+      "tierGroup": 122,
+      "priceKR": 5850000,
+      "priceCN": 29400
+    },
+    "100120123": {
+      "id": 100120123,
+      "tierGroup": 123,
+      "priceKR": 5900000,
+      "priceCN": 29650
+    },
+    "100120124": {
+      "id": 100120124,
+      "tierGroup": 124,
+      "priceKR": 5950000,
+      "priceCN": 29900
+    },
+    "100120125": {
+      "id": 100120125,
+      "tierGroup": 125,
+      "priceKR": 6000000,
+      "priceCN": 30150
+    },
+    "100120126": {
+      "id": 100120126,
+      "tierGroup": 126,
+      "priceKR": 6050000,
+      "priceCN": 30400
+    },
+    "100120127": {
+      "id": 100120127,
+      "tierGroup": 127,
+      "priceKR": 6100000,
+      "priceCN": 30650
+    },
+    "100120128": {
+      "id": 100120128,
+      "tierGroup": 128,
+      "priceKR": 6150000,
+      "priceCN": 30900
+    },
+    "100120129": {
+      "id": 100120129,
+      "tierGroup": 129,
+      "priceKR": 6200000,
+      "priceCN": 31150
+    },
+    "100120130": {
+      "id": 100120130,
+      "tierGroup": 130,
+      "priceKR": 6250000,
+      "priceCN": 31400
+    },
+    "100120131": {
+      "id": 100120131,
+      "tierGroup": 131,
+      "priceKR": 6300000,
+      "priceCN": 31650
+    },
+    "100120132": {
+      "id": 100120132,
+      "tierGroup": 132,
+      "priceKR": 6350000,
+      "priceCN": 31900
+    },
+    "100120133": {
+      "id": 100120133,
+      "tierGroup": 133,
+      "priceKR": 6400000,
+      "priceCN": 32150
+    },
+    "100120134": {
+      "id": 100120134,
+      "tierGroup": 134,
+      "priceKR": 6450000,
+      "priceCN": 32400
+    },
+    "100120135": {
+      "id": 100120135,
+      "tierGroup": 135,
+      "priceKR": 6500000,
+      "priceCN": 32650
+    },
+    "100120136": {
+      "id": 100120136,
+      "tierGroup": 136,
+      "priceKR": 6550000,
+      "priceCN": 32900
+    },
+    "100120137": {
+      "id": 100120137,
+      "tierGroup": 137,
+      "priceKR": 6600000,
+      "priceCN": 33150
+    },
+    "100120138": {
+      "id": 100120138,
+      "tierGroup": 138,
+      "priceKR": 6650000,
+      "priceCN": 33400
+    },
+    "100120139": {
+      "id": 100120139,
+      "tierGroup": 139,
+      "priceKR": 6700000,
+      "priceCN": 33650
+    },
+    "100120140": {
+      "id": 100120140,
+      "tierGroup": 140,
+      "priceKR": 6750000,
+      "priceCN": 33900
+    },
+    "100120141": {
+      "id": 100120141,
+      "tierGroup": 141,
+      "priceKR": 6800000,
+      "priceCN": 34150
+    },
+    "100120142": {
+      "id": 100120142,
+      "tierGroup": 142,
+      "priceKR": 6850000,
+      "priceCN": 34400
+    },
+    "100120143": {
+      "id": 100120143,
+      "tierGroup": 143,
+      "priceKR": 6900000,
+      "priceCN": 34650
+    },
+    "100120144": {
+      "id": 100120144,
+      "tierGroup": 144,
+      "priceKR": 6950000,
+      "priceCN": 34900
+    },
+    "100120145": {
+      "id": 100120145,
+      "tierGroup": 145,
+      "priceKR": 7000000,
+      "priceCN": 35150
+    },
+    "100120146": {
+      "id": 100120146,
+      "tierGroup": 146,
+      "priceKR": 7050000,
+      "priceCN": 35400
+    },
+    "100120147": {
+      "id": 100120147,
+      "tierGroup": 147,
+      "priceKR": 7100000,
+      "priceCN": 35650
+    },
+    "100120148": {
+      "id": 100120148,
+      "tierGroup": 148,
+      "priceKR": 7150000,
+      "priceCN": 35900
+    },
+    "100120149": {
+      "id": 100120149,
+      "tierGroup": 149,
+      "priceKR": 7200000,
+      "priceCN": 36150
+    },
+    "100120150": {
+      "id": 100120150,
+      "tierGroup": 150,
+      "priceKR": 7250000,
+      "priceCN": 36400
+    },
+    "100120151": {
+      "id": 100120151,
+      "tierGroup": 151,
+      "priceKR": 7300000,
+      "priceCN": 36650
+    },
+    "100120152": {
+      "id": 100120152,
+      "tierGroup": 152,
+      "priceKR": 7350000,
+      "priceCN": 36900
+    },
+    "100120153": {
+      "id": 100120153,
+      "tierGroup": 153,
+      "priceKR": 7400000,
+      "priceCN": 37150
+    },
+    "100120154": {
+      "id": 100120154,
+      "tierGroup": 154,
+      "priceKR": 7450000,
+      "priceCN": 37400
+    },
+    "100120155": {
+      "id": 100120155,
+      "tierGroup": 155,
+      "priceKR": 7500000,
+      "priceCN": 37650
+    },
+    "100120156": {
+      "id": 100120156,
+      "tierGroup": 156,
+      "priceKR": 7550000,
+      "priceCN": 37900
+    },
+    "100120157": {
+      "id": 100120157,
+      "tierGroup": 157,
+      "priceKR": 7600000,
+      "priceCN": 38150
+    },
+    "100120158": {
+      "id": 100120158,
+      "tierGroup": 158,
+      "priceKR": 7650000,
+      "priceCN": 38400
+    },
+    "100120159": {
+      "id": 100120159,
+      "tierGroup": 159,
+      "priceKR": 7700000,
+      "priceCN": 38650
+    },
+    "100120160": {
+      "id": 100120160,
+      "tierGroup": 160,
+      "priceKR": 7750000,
+      "priceCN": 38900
+    },
+    "100120161": {
+      "id": 100120161,
+      "tierGroup": 161,
+      "priceKR": 7800000,
+      "priceCN": 39150
+    },
+    "100120162": {
+      "id": 100120162,
+      "tierGroup": 162,
+      "priceKR": 7850000,
+      "priceCN": 39400
+    },
+    "100120163": {
+      "id": 100120163,
+      "tierGroup": 163,
+      "priceKR": 7900000,
+      "priceCN": 39650
+    },
+    "100120164": {
+      "id": 100120164,
+      "tierGroup": 164,
+      "priceKR": 7950000,
+      "priceCN": 39900
+    },
+    "100120165": {
+      "id": 100120165,
+      "tierGroup": 165,
+      "priceKR": 8000000,
+      "priceCN": 40150
+    },
+    "100120166": {
+      "id": 100120166,
+      "tierGroup": 166,
+      "priceKR": 8050000,
+      "priceCN": 40400
+    },
+    "100120167": {
+      "id": 100120167,
+      "tierGroup": 167,
+      "priceKR": 8100000,
+      "priceCN": 40650
+    },
+    "100120168": {
+      "id": 100120168,
+      "tierGroup": 168,
+      "priceKR": 8150000,
+      "priceCN": 40900
+    },
+    "100120169": {
+      "id": 100120169,
+      "tierGroup": 169,
+      "priceKR": 8200000,
+      "priceCN": 41150
+    },
+    "100120170": {
+      "id": 100120170,
+      "tierGroup": 170,
+      "priceKR": 8250000,
+      "priceCN": 41400
+    },
+    "100120171": {
+      "id": 100120171,
+      "tierGroup": 171,
+      "priceKR": 8300000,
+      "priceCN": 41650
+    },
+    "100120172": {
+      "id": 100120172,
+      "tierGroup": 172,
+      "priceKR": 8350000,
+      "priceCN": 41900
+    },
+    "100120173": {
+      "id": 100120173,
+      "tierGroup": 173,
+      "priceKR": 8400000,
+      "priceCN": 42150
+    },
+    "100120174": {
+      "id": 100120174,
+      "tierGroup": 174,
+      "priceKR": 8450000,
+      "priceCN": 42400
+    },
+    "100120175": {
+      "id": 100120175,
+      "tierGroup": 175,
+      "priceKR": 8500000,
+      "priceCN": 42650
+    },
+    "100120176": {
+      "id": 100120176,
+      "tierGroup": 176,
+      "priceKR": 8550000,
+      "priceCN": 42900
+    },
+    "100120177": {
+      "id": 100120177,
+      "tierGroup": 177,
+      "priceKR": 8600000,
+      "priceCN": 43150
+    },
+    "100120178": {
+      "id": 100120178,
+      "tierGroup": 178,
+      "priceKR": 8650000,
+      "priceCN": 43400
+    },
+    "100120179": {
+      "id": 100120179,
+      "tierGroup": 179,
+      "priceKR": 8700000,
+      "priceCN": 43650
+    },
+    "100120180": {
+      "id": 100120180,
+      "tierGroup": 180,
+      "priceKR": 8750000,
+      "priceCN": 43900
+    },
+    "100120181": {
+      "id": 100120181,
+      "tierGroup": 181,
+      "priceKR": 8800000,
+      "priceCN": 44150
+    },
+    "100120182": {
+      "id": 100120182,
+      "tierGroup": 182,
+      "priceKR": 8850000,
+      "priceCN": 44400
+    },
+    "100120183": {
+      "id": 100120183,
+      "tierGroup": 183,
+      "priceKR": 8900000,
+      "priceCN": 44650
+    },
+    "100120184": {
+      "id": 100120184,
+      "tierGroup": 184,
+      "priceKR": 8950000,
+      "priceCN": 44900
+    },
+    "100120185": {
+      "id": 100120185,
+      "tierGroup": 185,
+      "priceKR": 9000000,
+      "priceCN": 45150
+    },
+    "100120186": {
+      "id": 100120186,
+      "tierGroup": 186,
+      "priceKR": 9050000,
+      "priceCN": 45400
+    },
+    "100120187": {
+      "id": 100120187,
+      "tierGroup": 187,
+      "priceKR": 9100000,
+      "priceCN": 45650
+    },
+    "100120188": {
+      "id": 100120188,
+      "tierGroup": 188,
+      "priceKR": 9150000,
+      "priceCN": 45900
+    },
+    "100120189": {
+      "id": 100120189,
+      "tierGroup": 189,
+      "priceKR": 9200000,
+      "priceCN": 46150
+    },
+    "100120190": {
+      "id": 100120190,
+      "tierGroup": 190,
+      "priceKR": 9250000,
+      "priceCN": 46400
+    },
+    "100120191": {
+      "id": 100120191,
+      "tierGroup": 191,
+      "priceKR": 9300000,
+      "priceCN": 46650
+    },
+    "100120192": {
+      "id": 100120192,
+      "tierGroup": 192,
+      "priceKR": 9350000,
+      "priceCN": 46900
+    },
+    "100120193": {
+      "id": 100120193,
+      "tierGroup": 193,
+      "priceKR": 9400000,
+      "priceCN": 47150
+    },
+    "100120194": {
+      "id": 100120194,
+      "tierGroup": 194,
+      "priceKR": 9450000,
+      "priceCN": 47400
+    },
+    "100120195": {
+      "id": 100120195,
+      "tierGroup": 195,
+      "priceKR": 9500000,
+      "priceCN": 47650
+    },
+    "100120196": {
+      "id": 100120196,
+      "tierGroup": 196,
+      "priceKR": 9550000,
+      "priceCN": 47900
+    },
+    "100120197": {
+      "id": 100120197,
+      "tierGroup": 197,
+      "priceKR": 9600000,
+      "priceCN": 48150
+    },
+    "100120198": {
+      "id": 100120198,
+      "tierGroup": 198,
+      "priceKR": 9650000,
+      "priceCN": 48400
+    },
+    "100120199": {
+      "id": 100120199,
+      "tierGroup": 199,
+      "priceKR": 9700000,
+      "priceCN": 48650
+    },
+    "100120200": {
+      "id": 100120200,
+      "tierGroup": 200,
+      "priceKR": 9750000,
+      "priceCN": 48900
+    },
+    "100120201": {
+      "id": 100120201,
+      "tierGroup": 201,
+      "priceKR": 9800000,
+      "priceCN": 49150
+    },
+    "100120202": {
+      "id": 100120202,
+      "tierGroup": 202,
+      "priceKR": 9850000,
+      "priceCN": 49400
+    },
+    "100120203": {
+      "id": 100120203,
+      "tierGroup": 203,
+      "priceKR": 9900000,
+      "priceCN": 49650
+    },
+    "100120204": {
+      "id": 100120204,
+      "tierGroup": 204,
+      "priceKR": 9950000,
+      "priceCN": 49900
+    },
+    "100120205": {
+      "id": 100120205,
+      "tierGroup": 205,
+      "priceKR": 10000000,
+      "priceCN": 50150
+    }
+  }
+}

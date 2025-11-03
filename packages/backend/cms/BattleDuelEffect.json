@@ -1,0 +1,102 @@
+{
+  ":BattleDuelEffect": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "useEffectType": "number",
+      "timingType": "number",
+      "globalEffectPriority": "number"
+    },
+    ":required": {
+      "name": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "BattleDuelEffect": {
+    "67700000": {
+      "id": 67700000,
+      "name": "필사 공격",
+      "useEffectType": 0,
+      "timingType": 0,
+      "globalEffectPriority": 4
+    },
+    "67700001": {
+      "id": 67700001,
+      "name": "절대 반격",
+      "useEffectType": 0,
+      "timingType": 0,
+      "globalEffectPriority": 2
+    },
+    "67700002": {
+      "id": 67700002,
+      "name": "공격 흡수",
+      "useEffectType": 2,
+      "timingType": 1
+    },
+    "67700003": {
+      "id": 67700003,
+      "name": "카운터",
+      "useEffectType": 0,
+      "timingType": 0,
+      "globalEffectPriority": 3
+    },
+    "67700004": {
+      "id": 67700004,
+      "name": "체력 교환",
+      "useEffectType": 2,
+      "timingType": 1
+    },
+    "67700005": {
+      "id": 67700005,
+      "name": "매 페이즈 피해",
+      "useEffectType": 3,
+      "timingType": 1
+    },
+    "67700006": {
+      "id": 67700006,
+      "name": "매 페이즈 회복",
+      "useEffectType": 3,
+      "timingType": 1
+    },
+    "67700007": {
+      "id": 67700007,
+      "name": "즉시 피해",
+      "useEffectType": 3,
+      "timingType": 1
+    },
+    "67700008": {
+      "id": 67700008,
+      "name": "즉시 회복",
+      "useEffectType": 3,
+      "timingType": 1
+    },
+    "67700009": {
+      "id": 67700009,
+      "name": "적 행동 무효",
+      "useEffectType": 2,
+      "timingType": 0
+    },
+    "67700010": {
+      "id": 67700010,
+      "name": "강제 무승부",
+      "useEffectType": 0,
+      "timingType": 0
+    },
+    "67700011": {
+      "id": 67700011,
+      "name": "턴 무효화",
+      "useEffectType": 0,
+      "timingType": 1,
+      "globalEffectPriority": 1
+    },
+    "67700012": {
+      "id": 67700012,
+      "name": "선공 잡기",
+      "useEffectType": 3,
+      "timingType": 1
+    }
+  }
+}

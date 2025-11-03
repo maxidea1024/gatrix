@@ -1,0 +1,22 @@
+{
+  ":Reminisce": {
+    ":type": {
+      "id": "key",
+      "questTarget": "number",
+      "questNodeIdx": "number",
+      "bubbleChatScript": "string",
+      "ImageScript": "string",
+      "videoScript": "string"
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "questTarget": [
+        "Quest"
+      ]
+    }
+  },
+  "Reminisce": {}
+}

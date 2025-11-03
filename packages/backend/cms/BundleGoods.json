@@ -1,0 +1,30 @@
+{
+  ":BundleGoods": {
+    ":type": {
+      "id": "key",
+      "group": "number",
+      "color": "string"
+    },
+    ":required": {
+      "group": 1,
+      "color": 1
+    },
+    ":requiredInObject": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "BundleGoods": {
+    "100041003": {
+      "id": 100041003,
+      "group": 1000,
+      "color": "00F6ADFF"
+    },
+    "100041004": {
+      "id": 100041004,
+      "group": 1001,
+      "color": "0081F6FF"
+    }
+  }
+}

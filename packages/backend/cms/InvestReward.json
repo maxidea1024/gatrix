@@ -1,0 +1,63 @@
+{
+  ":InvestReward": {
+    ":type": {
+      "id": "key",
+      "seasonId": "number",
+      "seasonRewardContents": "number",
+      "targetTileId": "number",
+      "limitGroupId": "number",
+      "rewardItemId": "number",
+      "rewardItemValue": "number",
+      "ratio": "number"
+    },
+    ":required": {
+      "seasonId": 1,
+      "limitGroupId": 1,
+      "rewardItemId": 1,
+      "rewardItemValue": 1,
+      "ratio": 1
+    },
+    ":requiredInObject": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":asset": {},
+    ":links": {
+      "rewardItemId": [
+        "Item"
+      ]
+    }
+  },
+  "InvestReward": {
+    "100060001": {
+      "id": 100060001,
+      "seasonId": 1,
+      "seasonRewardContents": 1,
+      "targetTileId": 71400000,
+      "limitGroupId": 1030101,
+      "rewardItemId": 23401003,
+      "rewardItemValue": 1,
+      "ratio": 1000000
+    },
+    "100060002": {
+      "id": 100060002,
+      "seasonId": 2,
+      "seasonRewardContents": 2,
+      "targetTileId": 30000,
+      "limitGroupId": 1030202,
+      "rewardItemId": 23401004,
+      "rewardItemValue": 1,
+      "ratio": 10000
+    },
+    "100060003": {
+      "id": 100060003,
+      "seasonId": 3,
+      "seasonRewardContents": 3,
+      "targetTileId": 12300002,
+      "limitGroupId": 1030303,
+      "rewardItemId": 23401005,
+      "rewardItemValue": 1,
+      "ratio": 1000
+    }
+  }
+}

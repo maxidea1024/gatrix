@@ -1,0 +1,93 @@
+{
+  ":EventGameList": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "type": "number",
+      "groupId": "number",
+      "costItem": "number",
+      "costCount": "number",
+      "costUseRewardId": "number",
+      "rewardRepresentativeItem": "number",
+      "dailyLimit": "number",
+      "referPage": [
+        "number",
+        "number"
+      ]
+    },
+    ":required": {
+      "name": 1,
+      "type": 1,
+      "groupId": 1,
+      "costItem": 1,
+      "costCount": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "costItem": [
+        "Item"
+      ],
+      "costUseRewardId": [
+        "RewardFixed"
+      ],
+      "referPage": [
+        [
+          "EventPage"
+        ],
+        [
+          "EventPage"
+        ]
+      ]
+    }
+  },
+  "EventGameList": {
+    "10001": {
+      "id": 10001,
+      "name": "설날 놀이판",
+      "type": 0,
+      "groupId": 10001,
+      "costItem": 23340003,
+      "costCount": 1,
+      "referPage": [
+        99320024,
+        99320026
+      ]
+    },
+    "10002": {
+      "id": 10002,
+      "name": "가을 놀이판_KR",
+      "type": 0,
+      "groupId": 10002,
+      "costItem": 23340011,
+      "costCount": 1,
+      "referPage": [
+        99320080
+      ]
+    },
+    "10003": {
+      "id": 10003,
+      "name": "가을 놀이판_GL",
+      "type": 0,
+      "groupId": 10003,
+      "costItem": 23340011,
+      "costCount": 1,
+      "referPage": [
+        99320081
+      ]
+    },
+    "10004": {
+      "id": 10004,
+      "name": "산타의 놀이판",
+      "type": 0,
+      "groupId": 10004,
+      "costItem": 23340048,
+      "costCount": 1,
+      "referPage": [
+        99320176,
+        99320178
+      ]
+    }
+  }
+}

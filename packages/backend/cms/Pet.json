@@ -1,0 +1,195 @@
+{
+  ":Pet": {
+    ":type": {
+      "id": "key",
+      "icon": "string",
+      "characterId": "number",
+      "hintText": "text",
+      "desc": "text",
+      "worldBuffId": "number"
+    },
+    ":required": {
+      "characterId": 1,
+      "hintText": 1,
+      "desc": 1,
+      "worldBuffId": 1
+    },
+    ":min": {
+      "characterId": 21000000
+    },
+    ":max": {
+      "characterId": 21199999
+    },
+    ":enum": {},
+    ":links": {
+      "characterId": [
+        "Character"
+      ],
+      "worldBuffId": [
+        "WorldBuff"
+      ]
+    }
+  },
+  "Pet": {
+    "1500000": {
+      "id": 1500000,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21155100,
+      "hintText": "'펫 : 맥스' 상품",
+      "desc": "듬직한 개 맥스는 오늘도 뼈다귀를 찾는 긴 여정을 떠납니다.",
+      "worldBuffId": 38099052
+    },
+    "1500001": {
+      "id": 1500001,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21155101,
+      "hintText": "'펫 : 루나' 상품",
+      "desc": "날렵한 고양이 루나는 오늘도 생선을 찾는 짧은 여정을 떠납니다.",
+      "worldBuffId": 38099053
+    },
+    "1500002": {
+      "id": 1500002,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160001,
+      "hintText": "'펫 : 페더' 상품",
+      "desc": "화려한 날개의 페더입니다.",
+      "worldBuffId": 38099060
+    },
+    "1500003": {
+      "id": 1500003,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160002,
+      "hintText": "'펫 : 실버' 상품",
+      "desc": "반짝이는 실버입니다.",
+      "worldBuffId": 38099061
+    },
+    "1500004": {
+      "id": 1500004,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160003,
+      "hintText": "업적 단계 보상 70단계",
+      "desc": "누가 이런 위험한 토끼를 찾게 될까요?",
+      "worldBuffId": 38099062
+    },
+    "1500005": {
+      "id": 1500005,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160004,
+      "hintText": "'펫 : 베일리' 상품",
+      "desc": "똑똑한 베일리입니다.",
+      "worldBuffId": 38099063
+    },
+    "1500006": {
+      "id": 1500006,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160005,
+      "hintText": "'펫 : 코튼' 상품",
+      "desc": "성격이 나쁜 코튼입니다.",
+      "worldBuffId": 38099064
+    },
+    "1500007": {
+      "id": 1500007,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160006,
+      "hintText": "'펫 : 스텔라' 상품",
+      "desc": "우아한 스텔라입니다.",
+      "worldBuffId": 38099065
+    },
+    "1500008": {
+      "id": 1500008,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160007,
+      "hintText": "'펫 : 듀크' 상품",
+      "desc": "가장 빠른 듀크입니다.",
+      "worldBuffId": 38099066
+    },
+    "1500009": {
+      "id": 1500009,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160008,
+      "hintText": "'펫 : 럭키' 상품",
+      "desc": "행운을 부르는 럭키입니다.",
+      "worldBuffId": 38099067
+    },
+    "1500010": {
+      "id": 1500010,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160009,
+      "hintText": "'펫 : 레오' 상품",
+      "desc": "명랑한 레오입니다.",
+      "worldBuffId": 38099068
+    },
+    "1500011": {
+      "id": 1500011,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160010,
+      "hintText": "'펫 : 찰리' 상품",
+      "desc": "도도한 찰리입니다.",
+      "worldBuffId": 38099069
+    },
+    "1500012": {
+      "id": 1500012,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160011,
+      "hintText": "'펫 : 데이지' 상품",
+      "desc": "포근한 데이지입니다.",
+      "worldBuffId": 38099070
+    },
+    "1500013": {
+      "id": 1500013,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160012,
+      "hintText": "'펫 : 스노우' 상품",
+      "desc": "따뜻한 스노우입니다.",
+      "worldBuffId": 38099071
+    },
+    "1500014": {
+      "id": 1500014,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160013,
+      "hintText": "'펫 : 폴' 상품",
+      "desc": "용맹한 폴입니다.",
+      "worldBuffId": 38099072
+    },
+    "1500015": {
+      "id": 1500015,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160014,
+      "hintText": "'펫 : 루돌프' 상품",
+      "desc": "매우 반짝이는 코 장식을 단 사슴입니다.",
+      "worldBuffId": 38099073
+    },
+    "1500016": {
+      "id": 1500016,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160015,
+      "hintText": "'펫 : 제스퍼' 상품",
+      "desc": "씩씩한 제스퍼입니다.",
+      "worldBuffId": 38099090
+    },
+    "1500017": {
+      "id": 1500017,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160016,
+      "hintText": "'펫 : 록키' 상품",
+      "desc": "재빠른 록키입니다.",
+      "worldBuffId": 38099089
+    },
+    "1500018": {
+      "id": 1500018,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160017,
+      "hintText": "'펫 : 벨라' 상품",
+      "desc": "온순한 성격을 가진 벨라입니다.",
+      "worldBuffId": 38099091
+    },
+    "1500019": {
+      "id": 1500019,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160018,
+      "hintText": "'펫 : 버디' 상품",
+      "desc": "성격이 사나운 버디입니다.",
+      "worldBuffId": 38099092
+    }
+  }
+}

@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="Gatrix - Online Game Platform Management System" />
-    
+    <!-- Emotion insertion point for predictable style injection order -->
+    <meta name="emotion-insertion-point" content="" />
+
+
     <!-- Roboto font for Material-UI -->
     <link
       rel="stylesheet"
@@ -17,12 +20,15 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
     />
-    
+
     <title>Gatrix Dashboard</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <!-- Optional runtime config (no-op in dev); safe if missing -->
+    <script>window.ENV = window.ENV || {};</script>
+    <script src="/config.js"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

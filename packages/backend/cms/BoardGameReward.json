@@ -1,0 +1,1163 @@
+{
+  ":BoardGameReward": {
+    ":type": {
+      "id": "key",
+      "groupId": "number",
+      "tileOrder": "number",
+      "tileType": "number",
+      "rewardId": [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number"
+      ]
+    },
+    ":required": {
+      "groupId": 1,
+      "tileOrder": 1,
+      "tileType": 1,
+      "rewardId": [
+        1
+      ]
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "rewardId": [
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ],
+        [
+          "RewardFixed"
+        ]
+      ]
+    }
+  },
+  "BoardGameReward": {
+    "1": {
+      "id": 1,
+      "groupId": 10001,
+      "tileOrder": 1,
+      "tileType": 0,
+      "rewardId": [
+        95991749,
+        95991750,
+        95991751,
+        95991752,
+        95991753,
+        95991754,
+        95991755,
+        95991756,
+        95991757,
+        95991758,
+        95991759,
+        95991760
+      ]
+    },
+    "2": {
+      "id": 2,
+      "groupId": 10001,
+      "tileOrder": 2,
+      "tileType": 2,
+      "rewardId": [
+        95991700,
+        95991701,
+        95991702,
+        95991702,
+        95991702,
+        95991702,
+        95991702,
+        95991702,
+        95991702,
+        95991702,
+        95991702,
+        95991702
+      ]
+    },
+    "3": {
+      "id": 3,
+      "groupId": 10001,
+      "tileOrder": 3,
+      "tileType": 2,
+      "rewardId": [
+        95991703,
+        95991704,
+        95991705,
+        95991705,
+        95991705,
+        95991705,
+        95991705,
+        95991705,
+        95991705,
+        95991705,
+        95991705,
+        95991705
+      ]
+    },
+    "4": {
+      "id": 4,
+      "groupId": 10001,
+      "tileOrder": 4,
+      "tileType": 2,
+      "rewardId": [
+        95991706,
+        95991707,
+        95991708,
+        95991708,
+        95991708,
+        95991708,
+        95991708,
+        95991708,
+        95991708,
+        95991708,
+        95991708,
+        95991708
+      ]
+    },
+    "5": {
+      "id": 5,
+      "groupId": 10001,
+      "tileOrder": 5,
+      "tileType": 2,
+      "rewardId": [
+        95991709,
+        95991710,
+        95991711,
+        95991711,
+        95991711,
+        95991711,
+        95991711,
+        95991711,
+        95991711,
+        95991711,
+        95991711,
+        95991711
+      ]
+    },
+    "6": {
+      "id": 6,
+      "groupId": 10001,
+      "tileOrder": 6,
+      "tileType": 1,
+      "rewardId": [
+        95991712,
+        95991712,
+        95991712,
+        95991712,
+        95991712,
+        95991712,
+        95991712,
+        95991712,
+        95991712,
+        95991712,
+        95991712,
+        95991712
+      ]
+    },
+    "7": {
+      "id": 7,
+      "groupId": 10001,
+      "tileOrder": 7,
+      "tileType": 2,
+      "rewardId": [
+        95991713,
+        95991714,
+        95991715,
+        95991715,
+        95991715,
+        95991715,
+        95991715,
+        95991715,
+        95991715,
+        95991715,
+        95991715,
+        95991715
+      ]
+    },
+    "8": {
+      "id": 8,
+      "groupId": 10001,
+      "tileOrder": 8,
+      "tileType": 2,
+      "rewardId": [
+        95991716,
+        95991717,
+        95991718,
+        95991718,
+        95991718,
+        95991718,
+        95991718,
+        95991718,
+        95991718,
+        95991718,
+        95991718,
+        95991718
+      ]
+    },
+    "9": {
+      "id": 9,
+      "groupId": 10001,
+      "tileOrder": 9,
+      "tileType": 2,
+      "rewardId": [
+        95991719,
+        95991720,
+        95991721,
+        95991721,
+        95991721,
+        95991721,
+        95991721,
+        95991721,
+        95991721,
+        95991721,
+        95991721,
+        95991721
+      ]
+    },
+    "10": {
+      "id": 10,
+      "groupId": 10001,
+      "tileOrder": 10,
+      "tileType": 2,
+      "rewardId": [
+        95991722,
+        95991723,
+        95991724,
+        95991724,
+        95991724,
+        95991724,
+        95991724,
+        95991724,
+        95991724,
+        95991724,
+        95991724,
+        95991724
+      ]
+    },
+    "11": {
+      "id": 11,
+      "groupId": 10001,
+      "tileOrder": 11,
+      "tileType": 1,
+      "rewardId": [
+        95991725,
+        95991725,
+        95991725,
+        95991725,
+        95991725,
+        95991725,
+        95991725,
+        95991725,
+        95991725,
+        95991725,
+        95991725,
+        95991725
+      ]
+    },
+    "12": {
+      "id": 12,
+      "groupId": 10001,
+      "tileOrder": 12,
+      "tileType": 2,
+      "rewardId": [
+        95991726,
+        95991727,
+        95991728,
+        95991728,
+        95991728,
+        95991728,
+        95991728,
+        95991728,
+        95991728,
+        95991728,
+        95991728,
+        95991728
+      ]
+    },
+    "13": {
+      "id": 13,
+      "groupId": 10001,
+      "tileOrder": 13,
+      "tileType": 2,
+      "rewardId": [
+        95991729,
+        95991730,
+        95991731,
+        95991731,
+        95991731,
+        95991731,
+        95991731,
+        95991731,
+        95991731,
+        95991731,
+        95991731,
+        95991731
+      ]
+    },
+    "14": {
+      "id": 14,
+      "groupId": 10001,
+      "tileOrder": 14,
+      "tileType": 2,
+      "rewardId": [
+        95991732,
+        95991733,
+        95991734,
+        95991734,
+        95991734,
+        95991734,
+        95991734,
+        95991734,
+        95991734,
+        95991734,
+        95991734,
+        95991734
+      ]
+    },
+    "15": {
+      "id": 15,
+      "groupId": 10001,
+      "tileOrder": 15,
+      "tileType": 2,
+      "rewardId": [
+        95991735,
+        95991736,
+        95991737,
+        95991737,
+        95991737,
+        95991737,
+        95991737,
+        95991737,
+        95991737,
+        95991737,
+        95991737,
+        95991737
+      ]
+    },
+    "16": {
+      "id": 16,
+      "groupId": 10001,
+      "tileOrder": 16,
+      "tileType": 1,
+      "rewardId": [
+        95991738,
+        95991738,
+        95991738,
+        95991738,
+        95991738,
+        95991738,
+        95991738,
+        95991738,
+        95991738,
+        95991738,
+        95991738,
+        95991738
+      ]
+    },
+    "17": {
+      "id": 17,
+      "groupId": 10001,
+      "tileOrder": 17,
+      "tileType": 2,
+      "rewardId": [
+        95991739,
+        95991740,
+        95991741,
+        95991741,
+        95991741,
+        95991741,
+        95991741,
+        95991741,
+        95991741,
+        95991741,
+        95991741,
+        95991741
+      ]
+    },
+    "18": {
+      "id": 18,
+      "groupId": 10001,
+      "tileOrder": 18,
+      "tileType": 2,
+      "rewardId": [
+        95991742,
+        95991743,
+        95991744,
+        95991744,
+        95991744,
+        95991744,
+        95991744,
+        95991744,
+        95991744,
+        95991744,
+        95991744,
+        95991744
+      ]
+    },
+    "19": {
+      "id": 19,
+      "groupId": 10001,
+      "tileOrder": 19,
+      "tileType": 2,
+      "rewardId": [
+        95991745,
+        95991746,
+        95991747,
+        95991747,
+        95991747,
+        95991747,
+        95991747,
+        95991747,
+        95991747,
+        95991747,
+        95991747,
+        95991747
+      ]
+    },
+    "20": {
+      "id": 20,
+      "groupId": 10001,
+      "tileOrder": 20,
+      "tileType": 1,
+      "rewardId": [
+        95991748,
+        95991748,
+        95991748,
+        95991748,
+        95991748,
+        95991748,
+        95991748,
+        95991748,
+        95991748,
+        95991748,
+        95991748,
+        95991748
+      ]
+    },
+    "21": {
+      "id": 21,
+      "groupId": 10002,
+      "tileOrder": 1,
+      "tileType": 0,
+      "rewardId": [
+        95960225,
+        95960226,
+        95960227,
+        95960228,
+        95960229,
+        95960230,
+        95960231,
+        95960232,
+        95960233,
+        95960234,
+        95960235,
+        95960236,
+        95960237,
+        95960238,
+        95960239,
+        95960240,
+        95960241,
+        95960242,
+        95960243,
+        95960244,
+        95960245,
+        95960246,
+        95960247,
+        95960248,
+        95960249,
+        95960250
+      ]
+    },
+    "22": {
+      "id": 22,
+      "groupId": 10002,
+      "tileOrder": 2,
+      "tileType": 2,
+      "rewardId": [
+        95960206
+      ]
+    },
+    "23": {
+      "id": 23,
+      "groupId": 10002,
+      "tileOrder": 3,
+      "tileType": 2,
+      "rewardId": [
+        95960207
+      ]
+    },
+    "24": {
+      "id": 24,
+      "groupId": 10002,
+      "tileOrder": 4,
+      "tileType": 2,
+      "rewardId": [
+        95960208
+      ]
+    },
+    "25": {
+      "id": 25,
+      "groupId": 10002,
+      "tileOrder": 5,
+      "tileType": 2,
+      "rewardId": [
+        95960209
+      ]
+    },
+    "26": {
+      "id": 26,
+      "groupId": 10002,
+      "tileOrder": 6,
+      "tileType": 1,
+      "rewardId": [
+        95960210
+      ]
+    },
+    "27": {
+      "id": 27,
+      "groupId": 10002,
+      "tileOrder": 7,
+      "tileType": 2,
+      "rewardId": [
+        95960211
+      ]
+    },
+    "28": {
+      "id": 28,
+      "groupId": 10002,
+      "tileOrder": 8,
+      "tileType": 2,
+      "rewardId": [
+        95960212
+      ]
+    },
+    "29": {
+      "id": 29,
+      "groupId": 10002,
+      "tileOrder": 9,
+      "tileType": 2,
+      "rewardId": [
+        95960213
+      ]
+    },
+    "30": {
+      "id": 30,
+      "groupId": 10002,
+      "tileOrder": 10,
+      "tileType": 2,
+      "rewardId": [
+        95960214
+      ]
+    },
+    "31": {
+      "id": 31,
+      "groupId": 10002,
+      "tileOrder": 11,
+      "tileType": 1,
+      "rewardId": [
+        95960215
+      ]
+    },
+    "32": {
+      "id": 32,
+      "groupId": 10002,
+      "tileOrder": 12,
+      "tileType": 2,
+      "rewardId": [
+        95960216
+      ]
+    },
+    "33": {
+      "id": 33,
+      "groupId": 10002,
+      "tileOrder": 13,
+      "tileType": 2,
+      "rewardId": [
+        95960217
+      ]
+    },
+    "34": {
+      "id": 34,
+      "groupId": 10002,
+      "tileOrder": 14,
+      "tileType": 2,
+      "rewardId": [
+        95960218
+      ]
+    },
+    "35": {
+      "id": 35,
+      "groupId": 10002,
+      "tileOrder": 15,
+      "tileType": 2,
+      "rewardId": [
+        95960219
+      ]
+    },
+    "36": {
+      "id": 36,
+      "groupId": 10002,
+      "tileOrder": 16,
+      "tileType": 1,
+      "rewardId": [
+        95960220
+      ]
+    },
+    "37": {
+      "id": 37,
+      "groupId": 10002,
+      "tileOrder": 17,
+      "tileType": 2,
+      "rewardId": [
+        95960221
+      ]
+    },
+    "38": {
+      "id": 38,
+      "groupId": 10002,
+      "tileOrder": 18,
+      "tileType": 2,
+      "rewardId": [
+        95960222
+      ]
+    },
+    "39": {
+      "id": 39,
+      "groupId": 10002,
+      "tileOrder": 19,
+      "tileType": 2,
+      "rewardId": [
+        95960223
+      ]
+    },
+    "40": {
+      "id": 40,
+      "groupId": 10002,
+      "tileOrder": 20,
+      "tileType": 2,
+      "rewardId": [
+        95960224
+      ]
+    },
+    "41": {
+      "id": 41,
+      "groupId": 10003,
+      "tileOrder": 1,
+      "tileType": 0,
+      "rewardId": [
+        95960225,
+        95960226,
+        95960227,
+        95960228,
+        95960229,
+        95960230,
+        95960231,
+        95960232,
+        95960233,
+        95960234,
+        95960235,
+        95960236,
+        95960237,
+        95960238,
+        95960239,
+        95960240,
+        95960241,
+        95960242,
+        95960243,
+        95960244,
+        95960245,
+        95960246,
+        95960247,
+        95960248,
+        95960249,
+        95960250
+      ]
+    },
+    "42": {
+      "id": 42,
+      "groupId": 10003,
+      "tileOrder": 2,
+      "tileType": 2,
+      "rewardId": [
+        95960206
+      ]
+    },
+    "43": {
+      "id": 43,
+      "groupId": 10003,
+      "tileOrder": 3,
+      "tileType": 2,
+      "rewardId": [
+        95960207
+      ]
+    },
+    "44": {
+      "id": 44,
+      "groupId": 10003,
+      "tileOrder": 4,
+      "tileType": 2,
+      "rewardId": [
+        95960208
+      ]
+    },
+    "45": {
+      "id": 45,
+      "groupId": 10003,
+      "tileOrder": 5,
+      "tileType": 2,
+      "rewardId": [
+        95960209
+      ]
+    },
+    "46": {
+      "id": 46,
+      "groupId": 10003,
+      "tileOrder": 6,
+      "tileType": 1,
+      "rewardId": [
+        95960210
+      ]
+    },
+    "47": {
+      "id": 47,
+      "groupId": 10003,
+      "tileOrder": 7,
+      "tileType": 2,
+      "rewardId": [
+        95960211
+      ]
+    },
+    "48": {
+      "id": 48,
+      "groupId": 10003,
+      "tileOrder": 8,
+      "tileType": 2,
+      "rewardId": [
+        95960212
+      ]
+    },
+    "49": {
+      "id": 49,
+      "groupId": 10003,
+      "tileOrder": 9,
+      "tileType": 2,
+      "rewardId": [
+        95960213
+      ]
+    },
+    "50": {
+      "id": 50,
+      "groupId": 10003,
+      "tileOrder": 10,
+      "tileType": 2,
+      "rewardId": [
+        95960214
+      ]
+    },
+    "51": {
+      "id": 51,
+      "groupId": 10003,
+      "tileOrder": 11,
+      "tileType": 1,
+      "rewardId": [
+        95960215
+      ]
+    },
+    "52": {
+      "id": 52,
+      "groupId": 10003,
+      "tileOrder": 12,
+      "tileType": 2,
+      "rewardId": [
+        95960216
+      ]
+    },
+    "53": {
+      "id": 53,
+      "groupId": 10003,
+      "tileOrder": 13,
+      "tileType": 2,
+      "rewardId": [
+        95960217
+      ]
+    },
+    "54": {
+      "id": 54,
+      "groupId": 10003,
+      "tileOrder": 14,
+      "tileType": 2,
+      "rewardId": [
+        95960218
+      ]
+    },
+    "55": {
+      "id": 55,
+      "groupId": 10003,
+      "tileOrder": 15,
+      "tileType": 2,
+      "rewardId": [
+        95960219
+      ]
+    },
+    "56": {
+      "id": 56,
+      "groupId": 10003,
+      "tileOrder": 16,
+      "tileType": 1,
+      "rewardId": [
+        95960220
+      ]
+    },
+    "57": {
+      "id": 57,
+      "groupId": 10003,
+      "tileOrder": 17,
+      "tileType": 2,
+      "rewardId": [
+        95960221
+      ]
+    },
+    "58": {
+      "id": 58,
+      "groupId": 10003,
+      "tileOrder": 18,
+      "tileType": 2,
+      "rewardId": [
+        95960222
+      ]
+    },
+    "59": {
+      "id": 59,
+      "groupId": 10003,
+      "tileOrder": 19,
+      "tileType": 2,
+      "rewardId": [
+        95960223
+      ]
+    },
+    "60": {
+      "id": 60,
+      "groupId": 10003,
+      "tileOrder": 20,
+      "tileType": 2,
+      "rewardId": [
+        95960224
+      ]
+    },
+    "61": {
+      "id": 61,
+      "groupId": 10004,
+      "tileOrder": 1,
+      "tileType": 0,
+      "rewardId": [
+        95961065
+      ]
+    },
+    "62": {
+      "id": 62,
+      "groupId": 10004,
+      "tileOrder": 2,
+      "tileType": 1,
+      "rewardId": [
+        95961066
+      ]
+    },
+    "63": {
+      "id": 63,
+      "groupId": 10004,
+      "tileOrder": 3,
+      "tileType": 1,
+      "rewardId": [
+        95961067
+      ]
+    },
+    "64": {
+      "id": 64,
+      "groupId": 10004,
+      "tileOrder": 4,
+      "tileType": 1,
+      "rewardId": [
+        95961068
+      ]
+    },
+    "65": {
+      "id": 65,
+      "groupId": 10004,
+      "tileOrder": 5,
+      "tileType": 1,
+      "rewardId": [
+        95961069
+      ]
+    },
+    "66": {
+      "id": 66,
+      "groupId": 10004,
+      "tileOrder": 6,
+      "tileType": 1,
+      "rewardId": [
+        95961070
+      ]
+    },
+    "67": {
+      "id": 67,
+      "groupId": 10004,
+      "tileOrder": 7,
+      "tileType": 1,
+      "rewardId": [
+        95961071
+      ]
+    },
+    "68": {
+      "id": 68,
+      "groupId": 10004,
+      "tileOrder": 8,
+      "tileType": 1,
+      "rewardId": [
+        95961072
+      ]
+    },
+    "69": {
+      "id": 69,
+      "groupId": 10004,
+      "tileOrder": 9,
+      "tileType": 1,
+      "rewardId": [
+        95961073
+      ]
+    },
+    "70": {
+      "id": 70,
+      "groupId": 10004,
+      "tileOrder": 10,
+      "tileType": 1,
+      "rewardId": [
+        95961074
+      ]
+    },
+    "71": {
+      "id": 71,
+      "groupId": 10004,
+      "tileOrder": 11,
+      "tileType": 1,
+      "rewardId": [
+        95961075
+      ]
+    },
+    "72": {
+      "id": 72,
+      "groupId": 10004,
+      "tileOrder": 12,
+      "tileType": 1,
+      "rewardId": [
+        95961076
+      ]
+    },
+    "73": {
+      "id": 73,
+      "groupId": 10004,
+      "tileOrder": 13,
+      "tileType": 1,
+      "rewardId": [
+        95961077
+      ]
+    },
+    "74": {
+      "id": 74,
+      "groupId": 10004,
+      "tileOrder": 14,
+      "tileType": 1,
+      "rewardId": [
+        95961078
+      ]
+    },
+    "75": {
+      "id": 75,
+      "groupId": 10004,
+      "tileOrder": 15,
+      "tileType": 1,
+      "rewardId": [
+        95961079
+      ]
+    },
+    "76": {
+      "id": 76,
+      "groupId": 10004,
+      "tileOrder": 16,
+      "tileType": 1,
+      "rewardId": [
+        95961080
+      ]
+    },
+    "77": {
+      "id": 77,
+      "groupId": 10004,
+      "tileOrder": 17,
+      "tileType": 1,
+      "rewardId": [
+        95961081
+      ]
+    },
+    "78": {
+      "id": 78,
+      "groupId": 10004,
+      "tileOrder": 18,
+      "tileType": 1,
+      "rewardId": [
+        95961082
+      ]
+    },
+    "79": {
+      "id": 79,
+      "groupId": 10004,
+      "tileOrder": 19,
+      "tileType": 1,
+      "rewardId": [
+        95961083
+      ]
+    },
+    "80": {
+      "id": 80,
+      "groupId": 10004,
+      "tileOrder": 20,
+      "tileType": 1,
+      "rewardId": [
+        95961084
+      ]
+    }
+  }
+}

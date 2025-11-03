@@ -1,0 +1,107 @@
+{
+  ":TownDevelopExp": {
+    ":type": {
+      "id": "key",
+      "exp": "number",
+      "accumulateExp": "number",
+      "priceVector": "number",
+      "smuggleGoodsWeight": "number"
+    },
+    ":required": {
+      "exp": 1,
+      "accumulateExp": 1,
+      "priceVector": 1,
+      "smuggleGoodsWeight": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "TownDevelopExp": {
+    "0": {
+      "id": 0,
+      "exp": 0,
+      "accumulateExp": 0,
+      "priceVector": 12,
+      "smuggleGoodsWeight": 0
+    },
+    "1": {
+      "id": 1,
+      "exp": 10000,
+      "accumulateExp": 10000,
+      "priceVector": 11,
+      "smuggleGoodsWeight": 100
+    },
+    "2": {
+      "id": 2,
+      "exp": 60000,
+      "accumulateExp": 70000,
+      "priceVector": 11,
+      "smuggleGoodsWeight": 200
+    },
+    "3": {
+      "id": 3,
+      "exp": 140000,
+      "accumulateExp": 210000,
+      "priceVector": 11,
+      "smuggleGoodsWeight": 300
+    },
+    "4": {
+      "id": 4,
+      "exp": 260000,
+      "accumulateExp": 470000,
+      "priceVector": 10,
+      "smuggleGoodsWeight": 400
+    },
+    "5": {
+      "id": 5,
+      "exp": 420000,
+      "accumulateExp": 890000,
+      "priceVector": 10,
+      "smuggleGoodsWeight": 500
+    },
+    "6": {
+      "id": 6,
+      "exp": 610000,
+      "accumulateExp": 1500000,
+      "priceVector": 10,
+      "smuggleGoodsWeight": 600
+    },
+    "7": {
+      "id": 7,
+      "exp": 840000,
+      "accumulateExp": 2340000,
+      "priceVector": 9,
+      "smuggleGoodsWeight": 700
+    },
+    "8": {
+      "id": 8,
+      "exp": 1100000,
+      "accumulateExp": 3440000,
+      "priceVector": 9,
+      "smuggleGoodsWeight": 800
+    },
+    "9": {
+      "id": 9,
+      "exp": 1400000,
+      "accumulateExp": 4840000,
+      "priceVector": 9,
+      "smuggleGoodsWeight": 900
+    },
+    "10": {
+      "id": 10,
+      "exp": 1740000,
+      "accumulateExp": 6580000,
+      "priceVector": 8,
+      "smuggleGoodsWeight": 1000
+    },
+    "11": {
+      "id": 11,
+      "exp": 2110000,
+      "accumulateExp": 8690000,
+      "priceVector": 8,
+      "smuggleGoodsWeight": 1100
+    }
+  }
+}

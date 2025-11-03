@@ -95,7 +95,7 @@ COPY --from=builder --chown=gatrix:nodejs /app/package*.json ./
 
 USER gatrix
 
-EXPOSE 3000 5001 3001
+EXPOSE 3000 5000 3001
 
 CMD ["node", "dist/index.js"]
 ```

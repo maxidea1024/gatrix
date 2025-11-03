@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { gameWorldService } from '../services/gameWorldService';
+import { useAuth } from './AuthContext';
 
 export interface GameWorldOption {
   label: string;
@@ -20,6 +21,7 @@ interface GameWorldProviderProps {
 }
 
 export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
   const [worlds, setWorlds] = useState<GameWorldOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,21 +45,29 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }
     }
   };
 
+  // Fetch only when authenticated
   useEffect(() => {
-    loadGameWorlds();
-  }, []);
+    if (isAuthenticated) {
+      loadGameWorlds();
+    } else {
+      // Reset and stop loading when unauthenticated
+      setWorlds([]);
+      setError(null);
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
 
-  // Listen for game world updates from backend
+  // Listen for game world updates from backend (only when authenticated)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'gameWorldsUpdated') {
+      if (e.key === 'gameWorldsUpdated' && isAuthenticated) {
         loadGameWorlds();
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [isAuthenticated]);
 
   const value: GameWorldContextType = {
     worlds,

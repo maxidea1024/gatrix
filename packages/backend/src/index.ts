@@ -134,6 +134,17 @@ const startServer = async () => {
     }
     logger.info('Database connection established successfully');
 
+    // Run database migrations
+    try {
+      logger.info('Running database migrations...');
+      const { runMigrations } = await import('./database/migrate');
+      await runMigrations();
+      logger.info('Database migrations completed successfully');
+    } catch (error) {
+      logger.error('Database migrations failed:', error);
+      throw error;
+    }
+
     // Check and configure database timezone
     try {
       await setDatabaseTimezoneToUTC();
@@ -219,9 +230,9 @@ const startServer = async () => {
 
     server.listen(config.port, () => {
       logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`, appInstance.getLogInfo());
-      logger.info(`Health check available at http://localhost:${config.port}/health`);
-      logger.info(`API available at http://localhost:${config.port}/api/v1`);
-      logger.info(`Chat API proxy available at http://localhost:${config.port}/api/v1/chat`);
+      logger.info(`Health check available at http://127.0.0.1:${config.port}/health`);
+      logger.info(`API available at http://127.0.0.1:${config.port}/api/v1`);
+      logger.info(`Chat API proxy available at http://127.0.0.1:${config.port}/api/v1/chat`);
       logger.info(`Queue service ready: ${queueService.isReady()}`);
       logger.info(`PubSub service ready: ${pubSubService.isReady()}`);
     });

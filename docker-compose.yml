@@ -68,9 +68,10 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@gatrix.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       ADMIN_NAME: ${ADMIN_NAME:-Administrator}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      CORS_ORIGIN: "*"
       DISABLE_X_POWERED_BY: true
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
+      DISABLE_RATE_LIMIT: true
       # Chat Server Integration
       CHAT_SERVER_URL: http://chat-server:3001
       # Service Discovery
@@ -87,8 +88,9 @@ services:
       - gatrix-network
     volumes:
       - backend_logs:/app/logs
+      - backend_data:/app/data
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       timeout: 10s
       retries: 5
       interval: 30s
@@ -149,7 +151,7 @@ services:
     volumes:
       - event_lens_logs:/app/logs
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3002/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3002/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       timeout: 10s
       retries: 5
       interval: 30s
@@ -219,7 +221,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
       JWT_EXPIRES_IN: 24h
       # CORS
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      CORS_ORIGIN: "*"
       # Clustering
       CLUSTER_ENABLED: ${CHAT_CLUSTER_ENABLED:-true}
       CLUSTER_WORKERS: ${CHAT_CLUSTER_WORKERS:-0}
@@ -253,7 +255,7 @@ services:
       - chat_server_uploads:/app/uploads
       - chat_server_logs:/app/logs
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       timeout: 10s
       retries: 5
       interval: 30s
@@ -267,7 +269,7 @@ services:
     container_name: gatrix-frontend
     restart: unless-stopped
     environment:
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:5000/api/v1}
+      VITE_API_URL: /api/v1
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
     ports:
@@ -281,7 +283,7 @@ services:
     volumes:
       - ./docker/nginx/ssl:/etc/nginx/ssl:ro
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:80/health"]
       timeout: 10s
       retries: 5
       interval: 30s
@@ -326,6 +328,8 @@ volumes:
   clickhouse_data:
     driver: local
   backend_logs:
+    driver: local
+  backend_data:
     driver: local
   event_lens_logs:
     driver: local

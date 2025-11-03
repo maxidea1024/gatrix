@@ -3447,6 +3447,7 @@
     "title": "Planning Data",
     "subtitle": "Manage game planning data",
     "rebuildData": "Reload Data",
+    "uploadData": "Upload Planning Data",
     "rebuildSuccess": "Planning data has been successfully reloaded",
     "showingFirst100": "Showing first 100 items (Total: {{total}})",
     "search": "Search",
@@ -3468,6 +3469,20 @@
     "errors": {
       "loadStatsFailed": "Failed to load planning data statistics",
       "rebuildFailed": "Failed to rebuild data"
+    },
+    "upload": {
+      "title": "Upload Planning Data",
+      "dragDrop": "Drag and drop files here to upload",
+      "or": "or",
+      "selectFiles": "Select Files",
+      "selectedFiles": "Selected Files",
+      "missingFiles": "Unselected Files",
+      "upload": "Upload",
+      "uploading": "Uploading...",
+      "uploadSuccess": "Planning data has been successfully uploaded",
+      "uploadFailed": "Failed to upload planning data",
+      "selectFilesToUpload": "Please select files to upload",
+      "filesUploadedAndCached": "{{count}} planning data files uploaded and cached successfully"
     },
     "tabs": {
       "rewardTypes": "Reward Types",

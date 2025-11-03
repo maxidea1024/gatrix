@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const API_TOKEN = 'f183e6b8ba6e724cc2093910342857e6aa720f82d4f6154aaaedd669c8d0741a';
-const BASE_URL = 'http://localhost:5001';
+const BASE_URL = 'http://localhost:5000';
 
 async function debugSingleCall() {
   console.log('🔍 Debug single API call...');

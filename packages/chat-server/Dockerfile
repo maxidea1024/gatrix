@@ -48,8 +48,14 @@ RUN yarn install --frozen-lockfile --production=true && \
 # Copy built application
 COPY --from=builder /app/packages/chat-server/dist ./packages/chat-server/dist
 
-# Create uploads directory
-RUN mkdir -p uploads && chown -R chatserver:nodejs uploads
+# Copy migration files
+COPY packages/chat-server/src/database/migrations ./packages/chat-server/dist/database/migrations
+
+# Copy knexfile
+COPY packages/chat-server/knexfile.js ./packages/chat-server/
+
+# Create logs and uploads directories with proper permissions
+RUN mkdir -p logs uploads && chown -R chatserver:nodejs logs uploads
 
 # Switch to non-root user
 USER chatserver

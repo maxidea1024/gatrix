@@ -16,7 +16,7 @@
  *   --rewards          Build reward lookup tables only
  *   --ui-lists         Build UI list data only
  *   --localization     Build localization table only
- *   --cms-dir <path>   CMS directory path (default: ../../../cms/server)
+ *   --cms-dir <path>   CMS directory path (default: ../../../cms)
  *   --output-dir <path> Output directory path (default: current directory)
  *   --help             Show this help message
  * 
@@ -34,9 +34,9 @@ const JSON5 = require('json5');
 // Configuration
 // ============================================================================
 
-const DEFAULT_CMS_DIR = path.join(__dirname, '../../../cms/server');
+const DEFAULT_CMS_DIR = path.join(__dirname, '../../../cms');
 const DEFAULT_OUTPUT_DIR = __dirname;
-const DEFAULT_LOCTAB_SOURCE = path.join(__dirname, 'loctab-source');
+const DEFAULT_LOCTAB_SOURCE = path.join(DEFAULT_CMS_DIR, 'locdata', 'locdata');
 
 // ============================================================================
 // REWARD_TYPE Definitions (from game server rewardDesc.ts)
@@ -1873,14 +1873,14 @@ Options:
   --rewards          Build reward lookup tables only
   --ui-lists         Build UI list data only
   --localization     Build localization table only
-  --cms-dir <path>   CMS directory path (default: ../../../cms/server)
+  --cms-dir <path>   CMS directory path (default: ../../../cms)
   --output-dir <path> Output directory path (default: current directory)
   --help, -h         Show this help message
 
 Examples:
   node adminToolDataBuilder.js
   node adminToolDataBuilder.js --rewards
-  node adminToolDataBuilder.js --cms-dir /path/to/cms/server
+  node adminToolDataBuilder.js --cms-dir /path/to/cms
       `);
       process.exit(0);
     } else if (arg === '--all') {
@@ -1917,7 +1917,7 @@ Examples:
   // Build localization table FIRST (needed for reward lookup)
   let loctab = {};
   if (buildLocalization || buildRewards) {
-    const loctabSource = path.join(outputDir, 'loctab-source');
+    const loctabSource = path.join(cmsDir, 'locdata', 'locdata');
     const loctabOutput = path.join(outputDir, 'loctab.json');
 
     loctab = convertLocalizationTable(loctabSource, loctabOutput);

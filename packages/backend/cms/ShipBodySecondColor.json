@@ -1,0 +1,759 @@
+{
+  ":ShipBodySecondColor": {
+    ":type": {
+      "id": "key",
+      "color": "number",
+      "applypointId": "number",
+      "applypointval": "number",
+      "unlockpointId": "number",
+      "unlockpointval": "number",
+      "unlockitemId": "number",
+      "unlockitemval": "number",
+      "unlockitemsId": [
+        "number",
+        "number",
+        "number"
+      ],
+      "unlockitemsval": [
+        "number",
+        "number",
+        "number"
+      ]
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "ShipBodySecondColor": {
+    "47500000": {
+      "id": 47500000,
+      "color": 6226688,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500001": {
+      "id": 47500001,
+      "color": 9307904,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500002": {
+      "id": 47500002,
+      "color": 12258304,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 1300000
+    },
+    "47500003": {
+      "id": 47500003,
+      "color": 14958395,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500004": {
+      "id": 47500004,
+      "color": 16082532,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500005": {
+      "id": 47500005,
+      "color": 16486029,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500006": {
+      "id": 47500006,
+      "color": 6242304,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500007": {
+      "id": 47500007,
+      "color": 9331200,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500008": {
+      "id": 47500008,
+      "color": 11631360,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500009": {
+      "id": 47500009,
+      "color": 13471488,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500010": {
+      "id": 47500010,
+      "color": 15904840,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500011": {
+      "id": 47500011,
+      "color": 16302202,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500012": {
+      "id": 47500012,
+      "color": 6244864,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500013": {
+      "id": 47500013,
+      "color": 8808960,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500014": {
+      "id": 47500014,
+      "color": 12424704,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500015": {
+      "id": 47500015,
+      "color": 14857216,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500016": {
+      "id": 47500016,
+      "color": 15977061,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500017": {
+      "id": 47500017,
+      "color": 16636297,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500018": {
+      "id": 47500018,
+      "color": 6248960,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500019": {
+      "id": 47500019,
+      "color": 9801472,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500020": {
+      "id": 47500020,
+      "color": 12761600,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500021": {
+      "id": 47500021,
+      "color": 14800934,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500022": {
+      "id": 47500022,
+      "color": 15788130,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500023": {
+      "id": 47500023,
+      "color": 16512122,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500024": {
+      "id": 47500024,
+      "color": 5398272,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500025": {
+      "id": 47500025,
+      "color": 8821248,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500026": {
+      "id": 47500026,
+      "color": 10993664,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500027": {
+      "id": 47500027,
+      "color": 13034496,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500028": {
+      "id": 47500028,
+      "color": 13888871,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500029": {
+      "id": 47500029,
+      "color": 14809734,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500030": {
+      "id": 47500030,
+      "color": 3429376,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500031": {
+      "id": 47500031,
+      "color": 6065920,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500032": {
+      "id": 47500032,
+      "color": 8109312,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500033": {
+      "id": 47500033,
+      "color": 9361664,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500034": {
+      "id": 47500034,
+      "color": 11268697,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500035": {
+      "id": 47500035,
+      "color": 12581510,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500036": {
+      "id": 47500036,
+      "color": 1134391,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500037": {
+      "id": 47500037,
+      "color": 35416,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500038": {
+      "id": 47500038,
+      "color": 44399,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500039": {
+      "id": 47500039,
+      "color": 53126,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500040": {
+      "id": 47500040,
+      "color": 4320673,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500041": {
+      "id": 47500041,
+      "color": 8125114,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500042": {
+      "id": 47500042,
+      "color": 1004367,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500043": {
+      "id": 47500043,
+      "color": 2198405,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500044": {
+      "id": 47500044,
+      "color": 3063222,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500045": {
+      "id": 47500045,
+      "color": 3727833,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 1300000
+    },
+    "47500046": {
+      "id": 47500046,
+      "color": 7139046,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500047": {
+      "id": 47500047,
+      "color": 9435890,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500048": {
+      "id": 47500048,
+      "color": 1065295,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500049": {
+      "id": 47500049,
+      "color": 30873,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500050": {
+      "id": 47500050,
+      "color": 40648,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500051": {
+      "id": 47500051,
+      "color": 3718893,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500052": {
+      "id": 47500052,
+      "color": 8507123,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500053": {
+      "id": 47500053,
+      "color": 10804989,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500054": {
+      "id": 47500054,
+      "color": 1185874,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500055": {
+      "id": 47500055,
+      "color": 1648024,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500056": {
+      "id": 47500056,
+      "color": 2372552,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500057": {
+      "id": 47500057,
+      "color": 5265898,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500058": {
+      "id": 47500058,
+      "color": 8028152,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500059": {
+      "id": 47500059,
+      "color": 10593535,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 1300000
+    },
+    "47500060": {
+      "id": 47500060,
+      "color": 2688851,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500061": {
+      "id": 47500061,
+      "color": 5117077,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500062": {
+      "id": 47500062,
+      "color": 7151564,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500063": {
+      "id": 47500063,
+      "color": 8464112,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500064": {
+      "id": 47500064,
+      "color": 10582005,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500065": {
+      "id": 47500065,
+      "color": 12428286,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500066": {
+      "id": 47500066,
+      "color": 4397651,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500067": {
+      "id": 47500067,
+      "color": 8009109,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500068": {
+      "id": 47500068,
+      "color": 10438594,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500069": {
+      "id": 47500069,
+      "color": 12276964,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500070": {
+      "id": 47500070,
+      "color": 13398004,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500071": {
+      "id": 47500071,
+      "color": 14191612,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500072": {
+      "id": 47500072,
+      "color": 5313107,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500073": {
+      "id": 47500073,
+      "color": 9709720,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500074": {
+      "id": 47500074,
+      "color": 12531396,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500075": {
+      "id": 47500075,
+      "color": 14893544,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500076": {
+      "id": 47500076,
+      "color": 15954680,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500077": {
+      "id": 47500077,
+      "color": 16161786,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500078": {
+      "id": 47500078,
+      "color": 5510444,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500079": {
+      "id": 47500079,
+      "color": 9907283,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 250000
+    },
+    "47500080": {
+      "id": 47500080,
+      "color": 12926062,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500081": {
+      "id": 47500081,
+      "color": 15226761,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 1300000
+    },
+    "47500082": {
+      "id": 47500082,
+      "color": 16284321,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500083": {
+      "id": 47500083,
+      "color": 16687290,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500084": {
+      "id": 47500084,
+      "color": 2894892,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 6950000
+    },
+    "47500085": {
+      "id": 47500085,
+      "color": 5789784,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500086": {
+      "id": 47500086,
+      "color": 8553090,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500087": {
+      "id": 47500087,
+      "color": 10724259,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500088": {
+      "id": 47500088,
+      "color": 13092807,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500089": {
+      "id": 47500089,
+      "color": 15000804,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 50000
+    },
+    "47500090": {
+      "id": 47500090,
+      "color": 16777215,
+      "applypointId": 100001,
+      "applypointval": 10000,
+      "unlockpointId": 100001,
+      "unlockpointval": 1300000
+    }
+  }
+}

@@ -1,0 +1,301 @@
+{
+  ":TownNpcOnePick": {
+    ":type": {
+      "id": "key",
+      "location": "string",
+      "npcNationType": "number",
+      "npcJobType": "number",
+      "genderType": "number",
+      "actionRadius": "number",
+      "appearTownTime": "number",
+      "outTownTime": "number",
+      "patrolBuilding": [
+        "number",
+        "number",
+        "number"
+      ]
+    },
+    ":required": {
+      "location": 1,
+      "actionRadius": 1,
+      "appearTownTime": 1,
+      "outTownTime": 1
+    },
+    ":min": {
+      "npcNationType": 1,
+      "npcJobType": 1,
+      "genderType": 0,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 0,
+      "patrolBuilding": [
+        0,
+        0,
+        0
+      ]
+    },
+    ":max": {
+      "npcNationType": 4,
+      "npcJobType": 6,
+      "genderType": 1,
+      "actionRadius": 5,
+      "appearTownTime": 24,
+      "outTownTime": 24,
+      "patrolBuilding": [
+        54,
+        54,
+        54
+      ]
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "TownNpcOnePick": {
+    "55000001": {
+      "id": 55000001,
+      "location": "Own_Citizen_Day",
+      "npcNationType": 1,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 8,
+      "outTownTime": 20
+    },
+    "55000002": {
+      "id": 55000002,
+      "location": "Own_Citizen_Night",
+      "npcNationType": 1,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 22,
+      "outTownTime": 6
+    },
+    "55000003": {
+      "id": 55000003,
+      "location": "Own_Citizen_All",
+      "npcNationType": 1,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "55000004": {
+      "id": 55000004,
+      "location": "Own_Soldier_Day",
+      "npcNationType": 1,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 8,
+      "outTownTime": 20
+    },
+    "55000005": {
+      "id": 55000005,
+      "location": "Own_Soldier_Night",
+      "npcNationType": 1,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 22,
+      "outTownTime": 6
+    },
+    "55000006": {
+      "id": 55000006,
+      "location": "Own_Soldier_All",
+      "npcNationType": 1,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "55000007": {
+      "id": 55000007,
+      "location": "Own_Animal_Day",
+      "npcNationType": 1,
+      "npcJobType": 3,
+      "genderType": 0,
+      "actionRadius": 5,
+      "appearTownTime": 8,
+      "outTownTime": 20
+    },
+    "55000008": {
+      "id": 55000008,
+      "location": "Own_Animal_Night",
+      "npcNationType": 1,
+      "npcJobType": 3,
+      "genderType": 0,
+      "actionRadius": 5,
+      "appearTownTime": 22,
+      "outTownTime": 6
+    },
+    "55000009": {
+      "id": 55000009,
+      "location": "Own_Animal_All",
+      "npcNationType": 1,
+      "npcJobType": 3,
+      "genderType": 0,
+      "actionRadius": 5,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "55000010": {
+      "id": 55000010,
+      "location": "Ally_Citizen_Day",
+      "npcNationType": 2,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 8,
+      "outTownTime": 20
+    },
+    "55000011": {
+      "id": 55000011,
+      "location": "Ally_Citizen_Night",
+      "npcNationType": 2,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 22,
+      "outTownTime": 6
+    },
+    "55000012": {
+      "id": 55000012,
+      "location": "Ally_Citizen_All",
+      "npcNationType": 2,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "55000013": {
+      "id": 55000013,
+      "location": "Ally_Soldier_Day",
+      "npcNationType": 2,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 8,
+      "outTownTime": 20
+    },
+    "55000014": {
+      "id": 55000014,
+      "location": "Ally_Soldier_Night",
+      "npcNationType": 2,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 22,
+      "outTownTime": 6
+    },
+    "55000015": {
+      "id": 55000015,
+      "location": "Ally_Soldier_All",
+      "npcNationType": 2,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "55000016": {
+      "id": 55000016,
+      "location": "Occupy_Citizen_Day",
+      "npcNationType": 3,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 8,
+      "outTownTime": 20
+    },
+    "55000017": {
+      "id": 55000017,
+      "location": "Occupy_Citizen_Night",
+      "npcNationType": 3,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 22,
+      "outTownTime": 6
+    },
+    "55000018": {
+      "id": 55000018,
+      "location": "Occupy_Citizen_All",
+      "npcNationType": 3,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "55000019": {
+      "id": 55000019,
+      "location": "Occupy_Soldier_Day",
+      "npcNationType": 3,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 8,
+      "outTownTime": 20
+    },
+    "55000020": {
+      "id": 55000020,
+      "location": "Occupy_Soldier_Night",
+      "npcNationType": 3,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 22,
+      "outTownTime": 6
+    },
+    "55000021": {
+      "id": 55000021,
+      "location": "Occupy_Soldier_All",
+      "npcNationType": 3,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "55000022": {
+      "id": 55000022,
+      "location": "Occupied_Citizen_Day",
+      "npcNationType": 4,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 8,
+      "outTownTime": 20
+    },
+    "55000023": {
+      "id": 55000023,
+      "location": "Occupied_Citizen_Night",
+      "npcNationType": 4,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 22,
+      "outTownTime": 6
+    },
+    "55000024": {
+      "id": 55000024,
+      "location": "Occupied_Citizen_All",
+      "npcNationType": 4,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "55000025": {
+      "id": 55000025,
+      "location": "Occupied_Soldier_Day",
+      "npcNationType": 4,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 8,
+      "outTownTime": 20
+    },
+    "55000026": {
+      "id": 55000026,
+      "location": "Occupied_Soldier_Night",
+      "npcNationType": 4,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 22,
+      "outTownTime": 6
+    },
+    "55000027": {
+      "id": 55000027,
+      "location": "Occupied_Soldier_All",
+      "npcNationType": 4,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    }
+  }
+}

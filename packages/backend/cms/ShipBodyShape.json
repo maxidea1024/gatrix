@@ -1,0 +1,5911 @@
+{
+  ":ShipBodyShape": {
+    ":type": {
+      "id": "key",
+      "meshName": "string",
+      "meshDensity": "number",
+      "buoyancyRadius": "number",
+      "buoyancyOffsetZ": {
+        "sail": "number",
+        "display": "number"
+      },
+      "parts": {
+        "0": "number",
+        "1": "number",
+        "2": "number",
+        "3": "number",
+        "4": "number",
+        "5": "number",
+        "6": "number",
+        "7": "number",
+        "8": "number",
+        "9": "number",
+        "10": "number",
+        "11": "number",
+        "12": "number",
+        "13": "number"
+      },
+      "colorTint": "number",
+      "color1": "number",
+      "color2": "number",
+      "materials": [
+        {
+          "index": "number",
+          "name": "string"
+        },
+        {
+          "index": "number",
+          "name": "string"
+        },
+        {
+          "index": "number",
+          "name": "string"
+        },
+        {
+          "index": "number",
+          "name": "string"
+        }
+      ],
+      "wakePlayer": "number",
+      "wakeNPC": "number",
+      "wakeCutscene": "number",
+      "overrideMeshScale": "number"
+    },
+    ":required": {
+      "meshName": 1
+    },
+    ":requireedInObject": {
+      "parts": {
+        "0": 1,
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1
+      },
+      "materials": [
+        {
+          "index": 1,
+          "name": 1
+        },
+        {
+          "index": 1,
+          "name": 1
+        },
+        {
+          "index": 1,
+          "name": 1
+        },
+        {
+          "index": 1,
+          "name": 1
+        }
+      ]
+    },
+    ":min": {
+      "meshDensity": 10,
+      "buoyancyRadius": 10
+    },
+    ":max": {
+      "meshDensity": 1000,
+      "buoyancyRadius": 1000
+    },
+    ":enum": {},
+    ":links": {
+      "parts": {
+        "0": [
+          "ShipPartShape"
+        ],
+        "1": [
+          "ShipPartShape"
+        ],
+        "2": [
+          "ShipPartShape"
+        ],
+        "3": [
+          "ShipPartShape"
+        ],
+        "4": [
+          "ShipPartShape"
+        ],
+        "5": [
+          "ShipPartShape"
+        ],
+        "6": [
+          "ShipPartShape"
+        ],
+        "7": [
+          "ShipPartShape"
+        ],
+        "8": [
+          "ShipPartShape"
+        ],
+        "9": [
+          "ShipPartShape"
+        ],
+        "10": [
+          "ShipPartShape"
+        ],
+        "11": [
+          "ShipPartShape"
+        ],
+        "12": [
+          "ShipPartShape"
+        ],
+        "13": [
+          "ShipPartShape"
+        ]
+      },
+      "wakePlayer": [
+        "ShipWakeFX"
+      ],
+      "wakeNPC": [
+        "ShipWakeFX"
+      ],
+      "wakeCutscene": [
+        "ShipWakeFX"
+      ]
+    },
+    ":asset": {
+      "meshName": 1,
+      "materials": [
+        {
+          "name": 1
+        },
+        {
+          "name": 1
+        },
+        {
+          "name": 1
+        },
+        {
+          "name": 1
+        }
+      ]
+    }
+  },
+  "ShipBodyShape": {
+    "45000000": {
+      "id": 45000000,
+      "meshName": "SK_Ship_Caravel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000001,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600003,
+        "7": 46600004,
+        "8": 46600005,
+        "9": 46600007
+      },
+      "wakePlayer": 47600016
+    },
+    "45000001": {
+      "id": 45000001,
+      "meshName": "SK_Ship_Caravel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000002,
+        "1": 46300001,
+        "2": 46700001
+      },
+      "wakePlayer": 47600016
+    },
+    "45000002": {
+      "id": 45000002,
+      "meshName": "SK_Ship_Caravel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000003,
+        "1": 46100002,
+        "2": 46200001,
+        "3": 46300001
+      },
+      "wakePlayer": 47600016
+    },
+    "45000003": {
+      "id": 45000003,
+      "meshName": "SK_Ship_Caravel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000004,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600016
+    },
+    "45000004": {
+      "id": 45000004,
+      "meshName": "SK_Ship_Caravel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000005,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600016
+    },
+    "45000005": {
+      "id": 45000005,
+      "meshName": "SK_Ship_Caravel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000006,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600016
+    },
+    "45000006": {
+      "id": 45000006,
+      "meshName": "SK_Ship_Caravel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000007,
+        "1": 46100002,
+        "2": 46200001,
+        "3": 46300001,
+        "4": 46700001
+      },
+      "wakePlayer": 47600016
+    },
+    "45000007": {
+      "id": 45000007,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000008,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600007,
+        "9": 46600005
+      },
+      "wakePlayer": 47600014
+    },
+    "45000008": {
+      "id": 45000008,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000009,
+        "1": 46300001,
+        "2": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000009": {
+      "id": 45000009,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000010,
+        "1": 46100002,
+        "2": 46200001,
+        "3": 46300001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000010": {
+      "id": 45000010,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000011,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001,
+        "4": 46400001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000011": {
+      "id": 45000011,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000012,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000012": {
+      "id": 45000012,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000013,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000013": {
+      "id": 45000013,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000014,
+        "1": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000014": {
+      "id": 45000014,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000015,
+        "1": 46300001,
+        "2": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000015": {
+      "id": 45000015,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000016,
+        "1": 46100002,
+        "2": 46200001,
+        "3": 46300001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000016": {
+      "id": 45000016,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000017,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000017": {
+      "id": 45000017,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000018,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000018": {
+      "id": 45000018,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000019,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000019": {
+      "id": 45000019,
+      "meshName": "SK_Ship_HansaCog_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000020,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600005,
+        "9": 46600008
+      },
+      "wakePlayer": 47600014
+    },
+    "45000020": {
+      "id": 45000020,
+      "meshName": "SK_Ship_HansaCog_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000021,
+        "1": 46300001,
+        "2": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000021": {
+      "id": 45000021,
+      "meshName": "SK_Ship_HansaCog_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000022,
+        "1": 46100002,
+        "2": 46200001,
+        "3": 46300001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000022": {
+      "id": 45000022,
+      "meshName": "SK_Ship_HansaCog_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000023,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000023": {
+      "id": 45000023,
+      "meshName": "SK_Ship_HansaCog_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000024,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000024": {
+      "id": 45000024,
+      "meshName": "SK_Ship_HansaCog_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000025,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000025": {
+      "id": 45000025,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -30
+      },
+      "parts": {
+        "0": 46000026,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600004,
+        "8": 46600009,
+        "9": 46600007
+      },
+      "wakePlayer": 47600015
+    },
+    "45000026": {
+      "id": 45000026,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000027,
+        "1": 46300001,
+        "2": 46700001
+      },
+      "wakePlayer": 47600015
+    },
+    "45000027": {
+      "id": 45000027,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000028,
+        "1": 46100002,
+        "2": 46200001,
+        "3": 46300001
+      },
+      "wakePlayer": 47600015
+    },
+    "45000028": {
+      "id": 45000028,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000029,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600015
+    },
+    "45000029": {
+      "id": 45000029,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000030,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600015
+    },
+    "45000030": {
+      "id": 45000030,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000031,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600015
+    },
+    "45000031": {
+      "id": 45000031,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -30
+      },
+      "parts": {
+        "0": 46000032,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600004,
+        "8": 46600009,
+        "9": 46600007
+      },
+      "wakePlayer": 47600015
+    },
+    "45000032": {
+      "id": 45000032,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000033,
+        "1": 46300001,
+        "2": 46700001
+      },
+      "wakePlayer": 47600015
+    },
+    "45000033": {
+      "id": 45000033,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000034,
+        "1": 46100002,
+        "2": 46200001,
+        "3": 46300001
+      },
+      "wakePlayer": 47600015
+    },
+    "45000034": {
+      "id": 45000034,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000035,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600015
+    },
+    "45000035": {
+      "id": 45000035,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000036,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600015
+    },
+    "45000036": {
+      "id": 45000036,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000037,
+        "1": 46200001,
+        "2": 46300001,
+        "3": 46700001
+      },
+      "wakePlayer": 47600015
+    },
+    "45000037": {
+      "id": 45000037,
+      "meshName": "SK_Ship_LargeGalleon_Body",
+      "meshDensity": 500,
+      "buoyancyRadius": 200,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000038,
+        "1": 46700002,
+        "2": 46550001,
+        "3": 46300001
+      },
+      "wakePlayer": 47600017
+    },
+    "45000038": {
+      "id": 45000038,
+      "meshName": "SK_Ship_Galleon_Body",
+      "meshDensity": 500,
+      "buoyancyRadius": 200,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000038,
+        "1": 46700002,
+        "2": 46550001,
+        "3": 46300001
+      },
+      "wakePlayer": 47600017
+    },
+    "45000039": {
+      "id": 45000039,
+      "meshName": "SK_Ship_Talette_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000008,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600009,
+        "8": 46600003,
+        "9": 46600007
+      },
+      "wakePlayer": 47600014
+    },
+    "45000040": {
+      "id": 45000040,
+      "meshName": "SK_Ship_Talette_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000008,
+        "1": 46700001,
+        "2": 46300001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000041": {
+      "id": 45000041,
+      "meshName": "SK_Ship_Talette_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000014,
+        "1": 46700001,
+        "2": 46300001
+      },
+      "wakePlayer": 47600014
+    },
+    "45000042": {
+      "id": 45000042,
+      "meshName": "SK_Ship_CaravelSmall_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -30
+      },
+      "parts": {
+        "0": 46000039,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600005,
+        "9": 46600011
+      },
+      "wakePlayer": 47600015
+    },
+    "45000043": {
+      "id": 45000043,
+      "meshName": "SK_Ship_CaravelSmall_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -30
+      },
+      "parts": {
+        "0": 46000040,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600005,
+        "9": 46600011
+      },
+      "wakePlayer": 47600015
+    },
+    "45000044": {
+      "id": 45000044,
+      "meshName": "SK_Ship_Sloop_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000041,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600004,
+        "7": 46600007,
+        "8": 46600010
+      },
+      "wakePlayer": 47600015
+    },
+    "45000045": {
+      "id": 45000045,
+      "meshName": "SK_Ship_Cutter_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000042,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600005,
+        "9": 46600011
+      },
+      "wakePlayer": 47600015
+    },
+    "45000046": {
+      "id": 45000046,
+      "meshName": "SK_Ship_Bergantin_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000043,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600006,
+        "9": 46600007
+      },
+      "wakePlayer": 47600015
+    },
+    "45000047": {
+      "id": 45000047,
+      "meshName": "SK_Ship_Nao_body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000044,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600005,
+        "8": 46600004,
+        "9": 46600009,
+        "10": 46600006
+      },
+      "wakePlayer": 47600016
+    },
+    "45000048": {
+      "id": 45000048,
+      "meshName": "SK_Ship_Buss_body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000045,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600004,
+        "8": 46600010,
+        "9": 46600009
+      },
+      "wakePlayer": 47600016
+    },
+    "45000049": {
+      "id": 45000049,
+      "meshName": "SK_Ship_Osmangalley_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000046,
+        "1": 46700017,
+        "2": 46500001,
+        "6": 46600001,
+        "7": 46600004,
+        "8": 46600011
+      },
+      "wakePlayer": 47600016
+    },
+    "45000050": {
+      "id": 45000050,
+      "meshName": "SK_Ship_PanOkSeon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000047,
+        "1": 46700004,
+        "2": 46500002,
+        "3": 46300001
+      },
+      "wakePlayer": 47600018
+    },
+    "45000051": {
+      "id": 45000051,
+      "meshName": "SK_Ship_TurtleShip_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000048,
+        "1": 46700005,
+        "2": 46500003
+      },
+      "wakePlayer": 47600017
+    },
+    "45000052": {
+      "id": 45000052,
+      "meshName": "SK_Ship_Vaisseau_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000049,
+        "1": 46700012,
+        "6": 46600005,
+        "7": 46600010
+      },
+      "wakePlayer": 47600018
+    },
+    "45000053": {
+      "id": 45000053,
+      "meshName": "SK_Ship_Corvette_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000050,
+        "1": 46700013,
+        "6": 46600005,
+        "7": 46600007,
+        "8": 46600011,
+        "9": 46600009
+      },
+      "wakePlayer": 47600016
+    },
+    "45000054": {
+      "id": 45000054,
+      "meshName": "Sk_Ship_Frigate_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000051,
+        "1": 46700013,
+        "6": 46600001,
+        "7": 46600007,
+        "8": 46600011,
+        "9": 46600010,
+        "10": 46600009
+      },
+      "wakePlayer": 47600016
+    },
+    "45000055": {
+      "id": 45000055,
+      "meshName": "Sk_Ship_LargeFrigate_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000052,
+        "1": 46700012,
+        "6": 46600001
+      },
+      "wakePlayer": 47600017
+    },
+    "45000056": {
+      "id": 45000056,
+      "meshName": "SK_Ship_Galley_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000053,
+        "1": 46700016,
+        "2": 46500004,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600009,
+        "9": 46600010
+      },
+      "wakePlayer": 47600016
+    },
+    "45000057": {
+      "id": 45000057,
+      "meshName": "SK_Ship_LightGalley_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000054,
+        "1": 46700016,
+        "2": 46500005,
+        "6": 46600004,
+        "7": 46600006,
+        "8": 46600009,
+        "9": 46600010
+      },
+      "wakePlayer": 47600015
+    },
+    "45000058": {
+      "id": 45000058,
+      "meshName": "SK_Ship_HeavyGalley_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000055,
+        "1": 46700016,
+        "2": 46500006,
+        "6": 46600002,
+        "7": 46600004,
+        "8": 46600005,
+        "9": 46600007
+      },
+      "wakePlayer": 47600016
+    },
+    "45000059": {
+      "id": 45000059,
+      "meshName": "SK_Ship_Treasure_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000056,
+        "1": 46700004,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018
+    },
+    "45000060": {
+      "id": 45000060,
+      "meshName": "SK_Ship_LargeGalleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000038,
+        "1": 46700002,
+        "2": 46550001,
+        "3": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000061": {
+      "id": 45000061,
+      "meshName": "SK_Ship_Galleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000057,
+        "1": 46700003,
+        "2": 46550001,
+        "3": 46300001,
+        "5": 46100003
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000062": {
+      "id": 45000062,
+      "meshName": "SK_Ship_Sloop_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000058,
+        "1": 46700001,
+        "2": 46200005,
+        "3": 46100005
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000063": {
+      "id": 45000063,
+      "meshName": "SK_Ship_Bergantin_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000059,
+        "1": 46700001,
+        "2": 46300001,
+        "3": 46200003
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000064": {
+      "id": 45000064,
+      "meshName": "SK_Ship_Osmangalley_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000060,
+        "1": 46700001,
+        "2": 46500001,
+        "3": 46200007
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000065": {
+      "id": 45000065,
+      "meshName": "SK_Ship_Osmangalley_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000061,
+        "1": 46700001,
+        "2": 46500001,
+        "3": 46200007
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000066": {
+      "id": 45000066,
+      "meshName": "SK_Ship_VaisseauBoss_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000062,
+        "1": 46700001,
+        "2": 46200010,
+        "3": 46100004,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000067": {
+      "id": 45000067,
+      "meshName": "SK_Ship_Nao_body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000044,
+        "1": 46700001,
+        "3": 46200003,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000068": {
+      "id": 45000068,
+      "meshName": "SK_Ship_Nao_body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000063,
+        "1": 46700001,
+        "3": 46200004,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000069": {
+      "id": 45000069,
+      "meshName": "SK_Ship_Buss_body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000045,
+        "1": 46700001,
+        "3": 46200005,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000070": {
+      "id": 45000070,
+      "meshName": "SK_Ship_Buss_body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000064,
+        "1": 46700001,
+        "3": 46200006,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000071": {
+      "id": 45000071,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000008,
+        "1": 46700001,
+        "3": 46200007,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000072": {
+      "id": 45000072,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000065,
+        "1": 46700001,
+        "3": 46200008,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000073": {
+      "id": 45000073,
+      "meshName": "SK_Ship_Talette_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000014,
+        "1": 46700001,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000074": {
+      "id": 45000074,
+      "meshName": "SK_Ship_Talette_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000066,
+        "1": 46700001,
+        "3": 46200010,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000075": {
+      "id": 45000075,
+      "meshName": "SK_Ship_Galleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000038,
+        "1": 46700001,
+        "3": 46200017,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000076": {
+      "id": 45000076,
+      "meshName": "SK_Ship_Galleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000067,
+        "1": 46700001,
+        "3": 46200012,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000077": {
+      "id": 45000077,
+      "meshName": "SK_Ship_Bergantin_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000043,
+        "1": 46700001,
+        "3": 46200013,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000078": {
+      "id": 45000078,
+      "meshName": "SK_Ship_Bergantin_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000068,
+        "1": 46700001,
+        "3": 46200014,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000079": {
+      "id": 45000079,
+      "meshName": "Sk_Ship_LargeFrigate_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000052,
+        "1": 46700001,
+        "3": 46200020,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000080": {
+      "id": 45000080,
+      "meshName": "Sk_Ship_Frigate_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000051,
+        "1": 46700001,
+        "3": 46200021,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000081": {
+      "id": 45000081,
+      "meshName": "Sk_Ship_Frigate_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000069,
+        "1": 46700001,
+        "3": 46200028,
+        "4": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000082": {
+      "id": 45000082,
+      "meshName": "SK_Ship_Kobaya_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000070,
+        "1": 46700009,
+        "2": 46500007,
+        "3": 46300001,
+        "6": 46600001,
+        "7": 46600006
+      },
+      "wakePlayer": 47600015
+    },
+    "45000083": {
+      "id": 45000083,
+      "meshName": "SK_Ship_Dhow_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000071,
+        "1": 46700009,
+        "2": 46300001,
+        "6": 46600004,
+        "7": 46600005,
+        "8": 46600007,
+        "9": 46600009,
+        "10": 46600010
+      },
+      "wakePlayer": 47600015
+    },
+    "45000084": {
+      "id": 45000084,
+      "meshName": "SK_Ship_LargeJunk_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000072,
+        "1": 46700010,
+        "2": 46300001,
+        "3": 46550001
+      },
+      "wakePlayer": 47600018
+    },
+    "45000085": {
+      "id": 45000085,
+      "meshName": "SK_Ship_Carrack_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000073,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600005
+      },
+      "wakePlayer": 47600016
+    },
+    "45000086": {
+      "id": 45000086,
+      "meshName": "SK_Ship_LargeSha_Chuan_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000074,
+        "1": 46700004,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600004,
+        "9": 46600007
+      },
+      "wakePlayer": 47600017
+    },
+    "45000087": {
+      "id": 45000087,
+      "meshName": "SK_Ship_Schooner_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000075,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600004,
+        "7": 46600006,
+        "8": 46600007
+      },
+      "wakePlayer": 47600016
+    },
+    "45000088": {
+      "id": 45000088,
+      "meshName": "SK_Ship_Sambuk_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 30,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000076,
+        "1": 46700016,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600003,
+        "8": 46600005,
+        "9": 46600006,
+        "10": 46600008
+      },
+      "wakePlayer": 47600016
+    },
+    "45000089": {
+      "id": 45000089,
+      "meshName": "SK_Ship_Felucca_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000077,
+        "1": 46700001,
+        "6": 46600003,
+        "7": 46600004,
+        "8": 46600007,
+        "9": 46600010
+      },
+      "wakePlayer": 47600015
+    },
+    "45000090": {
+      "id": 45000090,
+      "meshName": "SK_Ship_Pinnace_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000078,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600005,
+        "8": 46600007
+      },
+      "wakePlayer": 47600016
+    },
+    "45000091": {
+      "id": 45000091,
+      "meshName": "SK_Ship_Fluyt_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "display": -40
+      },
+      "parts": {
+        "0": 46000079,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600005,
+        "8": 46600007
+      },
+      "wakePlayer": 47600016
+    },
+    "45000092": {
+      "id": 45000092,
+      "meshName": "SK_Ship_Xebec_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": -10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000080,
+        "1": 46700016,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600006,
+        "8": 46600010
+      },
+      "wakePlayer": 47600016
+    },
+    "45000093": {
+      "id": 45000093,
+      "meshName": "SK_Ship_MediumGalleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000081,
+        "1": 46700003,
+        "2": 46300001,
+        "6": 46600009,
+        "7": 46600010
+      },
+      "wakePlayer": 47600016
+    },
+    "45000094": {
+      "id": 45000094,
+      "meshName": "SK_Ship_HeavyCarrack_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000082,
+        "1": 46700013,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600004,
+        "9": 46600011
+      },
+      "wakePlayer": 47600017
+    },
+    "45000095": {
+      "id": 45000095,
+      "meshName": "SK_Ship_Chebec_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": -10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000083,
+        "1": 46700017,
+        "2": 46300001,
+        "6": 46600005,
+        "7": 46600007
+      },
+      "wakePlayer": 47600017
+    },
+    "45000096": {
+      "id": 45000096,
+      "meshName": "SK_Ship_LargeSchooner_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000084,
+        "1": 46700017,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600010
+      },
+      "wakePlayer": 47600017
+    },
+    "45000097": {
+      "id": 45000097,
+      "meshName": "SK_Ship_LaMort_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000085,
+        "1": 46700012,
+        "2": 46300001,
+        "3": 46500008,
+        "6": 46600002,
+        "7": 46600005,
+        "8": 46600010,
+        "9": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000098": {
+      "id": 45000098,
+      "meshName": "SK_Ship_Galleass_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000086,
+        "1": 46700015,
+        "2": 46300001,
+        "3": 46500009,
+        "7": 46600001,
+        "8": 46600004,
+        "9": 46600005,
+        "10": 46600006,
+        "11": 46600009
+      },
+      "wakePlayer": 47600017
+    },
+    "45000099": {
+      "id": 45000099,
+      "meshName": "SK_Ship_LaReale_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000087,
+        "1": 46700013,
+        "2": 46300001,
+        "3": 46500010,
+        "7": 46600001,
+        "8": 46600003,
+        "9": 46600005,
+        "10": 46600007,
+        "11": 46600008,
+        "12": 46600011
+      },
+      "wakePlayer": 47600017
+    },
+    "45000100": {
+      "id": 45000100,
+      "meshName": "SK_Ship_OsmanGalleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000088,
+        "1": 46700015,
+        "2": 46500011,
+        "7": 46600001,
+        "8": 46600005,
+        "9": 46600006
+      },
+      "wakePlayer": 47600017
+    },
+    "45000101": {
+      "id": 45000101,
+      "meshName": "SK_Ship_LaRoyale_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000089,
+        "1": 46700013,
+        "2": 46500012,
+        "3": 46300001,
+        "7": 46600002,
+        "8": 46600004,
+        "9": 46600011
+      },
+      "wakePlayer": 47600017
+    },
+    "45000102": {
+      "id": 45000102,
+      "meshName": "SK_Ship_Ocean_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000090,
+        "1": 46700012,
+        "6": 46600004,
+        "7": 46600005,
+        "8": 46600007,
+        "9": 46600008,
+        "10": 46600002
+      },
+      "wakePlayer": 47600018
+    },
+    "45000103": {
+      "id": 45000103,
+      "meshName": "SK_Ship_FlandersGalley_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000091,
+        "1": 46700017,
+        "2": 46500013,
+        "3": 46300001,
+        "7": 46600001,
+        "8": 46600009
+      },
+      "wakePlayer": 47600016
+    },
+    "45000104": {
+      "id": 45000104,
+      "meshName": "SK_Ship_LongSchooner_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000092,
+        "1": 46700012,
+        "2": 46300001,
+        "7": 46600003,
+        "8": 46600007,
+        "9": 46600010
+      },
+      "wakePlayer": 47600018
+    },
+    "45000105": {
+      "id": 45000105,
+      "meshName": "SK_Ship_CogBig_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000093,
+        "1": 46700001,
+        "6": 46600002,
+        "7": 46600004,
+        "8": 46600009,
+        "9": 46600007
+      },
+      "wakePlayer": 47600015
+    },
+    "45000106": {
+      "id": 45000106,
+      "meshName": "SK_Ship_Barca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000094,
+        "1": 46700001,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600007,
+        "9": 46600005
+      },
+      "wakePlayer": 47600014
+    },
+    "45000107": {
+      "id": 45000107,
+      "meshName": "SK_Ship_PrinsWillem_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000095,
+        "1": 46700013,
+        "2": 46300001,
+        "7": 46600002,
+        "8": 46600003,
+        "9": 46600007
+      },
+      "wakePlayer": 47600017
+    },
+    "45000108": {
+      "id": 45000108,
+      "meshName": "SK_Ship_HalveMaen_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000096,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600003,
+        "7": 46600011,
+        "8": 46600004,
+        "9": 46600009,
+        "10": 46600002
+      },
+      "wakePlayer": 47600017
+    },
+    "45000109": {
+      "id": 45000109,
+      "meshName": "SK_Ship_Budgerow_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000097,
+        "1": 46700008,
+        "2": 46300001,
+        "3": 46500014
+      },
+      "wakePlayer": 47600014
+    },
+    "45000110": {
+      "id": 45000110,
+      "meshName": "SK_Ship_Temeraire_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000098,
+        "1": 46700012,
+        "2": 46300001,
+        "6": 46600008,
+        "7": 46600005
+      },
+      "wakePlayer": 47600017
+    },
+    "45000111": {
+      "id": 45000111,
+      "meshName": "SK_Ship_Sampan_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": -10,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000099,
+        "1": 46700007,
+        "2": 46300002
+      },
+      "wakePlayer": 47600014
+    },
+    "45000112": {
+      "id": 45000112,
+      "meshName": "SK_Ship_Proa_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "display": -20
+      },
+      "parts": {
+        "0": 46000100,
+        "1": 46700009,
+        "2": 46300001,
+        "7": 46600001,
+        "8": 46600009
+      },
+      "wakePlayer": 47600015
+    },
+    "45000113": {
+      "id": 45000113,
+      "meshName": "SK_Ship_LightProa_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000101,
+        "1": 46700008,
+        "2": 46300001,
+        "7": 46600001,
+        "8": 46600009
+      },
+      "wakePlayer": 47600014
+    },
+    "45000114": {
+      "id": 45000114,
+      "meshName": "SK_Ship_VenetianGalleass_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000102,
+        "1": 46700013,
+        "2": 46300002,
+        "3": 46500015,
+        "7": 46600003,
+        "8": 46600007
+      },
+      "wakePlayer": 47600018
+    },
+    "45000115": {
+      "id": 45000115,
+      "meshName": "SK_Ship_Sekibune_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000103,
+        "1": 46700007,
+        "2": 46300001,
+        "3": 46500016,
+        "7": 46600001,
+        "8": 46600002,
+        "9": 46600007
+      },
+      "wakePlayer": 47600016
+    },
+    "45000116": {
+      "id": 45000116,
+      "meshName": "SK_Ship_LargeSekibune_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000104,
+        "1": 46700007,
+        "2": 46300001,
+        "3": 46500017,
+        "7": 46600001,
+        "8": 46600002
+      },
+      "wakePlayer": 47600017
+    },
+    "45000117": {
+      "id": 45000117,
+      "meshName": "SK_Ship_GoldBarca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000105,
+        "1": 46700013,
+        "2": 46300003,
+        "7": 46600002,
+        "8": 46600005,
+        "9": 46600007,
+        "10": 46600010
+      },
+      "wakePlayer": 47600014
+    },
+    "45000118": {
+      "id": 45000118,
+      "meshName": "SK_Ship_Nobunagas_Tekkosen_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000106,
+        "1": 46700010,
+        "3": 46500018
+      },
+      "wakePlayer": 47600018
+    },
+    "45000119": {
+      "id": 45000119,
+      "meshName": "SK_Ship_Lorcha_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000107,
+        "1": 46700009,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600005,
+        "9": 46600010,
+        "10": 46600009,
+        "11": 46600007
+      },
+      "wakePlayer": 47600016
+    },
+    "45000120": {
+      "id": 45000120,
+      "meshName": "SK_Ship_Sha_Chuan_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000108,
+        "1": 46700010,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600003,
+        "9": 46600004,
+        "10": 46600007
+      },
+      "wakePlayer": 47600016
+    },
+    "45000121": {
+      "id": 45000121,
+      "meshName": "SK_Ship_RedSealShip_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000109,
+        "1": 46700008,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600005
+      },
+      "wakePlayer": 47600016
+    },
+    "45000122": {
+      "id": 45000122,
+      "meshName": "SK_Ship_Junk_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000110,
+        "1": 46700010,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600005,
+        "8": 46600004,
+        "9": 46600010
+      },
+      "wakePlayer": 47600017
+    },
+    "45000123": {
+      "id": 45000123,
+      "meshName": "SK_Ship_LightSha_Chuan_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000111,
+        "1": 46700010,
+        "2": 46300001,
+        "6": 46600007,
+        "7": 46600005,
+        "8": 46600004
+      },
+      "wakePlayer": 47600015
+    },
+    "45000124": {
+      "id": 45000124,
+      "meshName": "SK_Ship_JoUnSeon_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000112,
+        "1": 46700005,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600003,
+        "8": 46600005
+      },
+      "wakePlayer": 47600016
+    },
+    "45000125": {
+      "id": 45000125,
+      "meshName": "SK_Ship_RoyalSorvereign_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000113,
+        "1": 46700012,
+        "2": 46300003,
+        "6": 46600002,
+        "7": 46600010,
+        "8": 46600011,
+        "9": 46600003
+      },
+      "wakePlayer": 47600018
+    },
+    "45000126": {
+      "id": 45000126,
+      "meshName": "SK_Ship_MaengSeon_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000114,
+        "1": 46700005,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600003,
+        "8": 46600005,
+        "9": 46600009
+      },
+      "wakePlayer": 47600015
+    },
+    "45000127": {
+      "id": 45000127,
+      "meshName": "SK_Ship_Atakebune_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000115,
+        "1": 46700007,
+        "2": 46300001,
+        "3": 46500019
+      },
+      "wakePlayer": 47600017
+    },
+    "45000128": {
+      "id": 45000128,
+      "meshName": "SK_Ship_Tekkosen_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000116,
+        "1": 46700007,
+        "2": 46300001,
+        "3": 46500020
+      },
+      "wakePlayer": 47600018
+    },
+    "45000129": {
+      "id": 45000129,
+      "meshName": "SK_Ship_SanFelipe_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000117,
+        "1": 46700012,
+        "7": 46600002,
+        "8": 46600007
+      },
+      "wakePlayer": 47600018
+    },
+    "45000130": {
+      "id": 45000130,
+      "meshName": "SK_Ship_Mayflower_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000118,
+        "1": 46700013,
+        "6": 46600002,
+        "7": 46600007,
+        "8": 46600003
+      },
+      "wakePlayer": 47600016
+    },
+    "45000131": {
+      "id": 45000131,
+      "meshName": "SK_Ship_FuShip_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000119,
+        "1": 46700010,
+        "2": 46300001,
+        "7": 46600001,
+        "8": 46600002,
+        "9": 46600004,
+        "10": 46600007,
+        "11": 46600010
+      },
+      "wakePlayer": 47600016
+    },
+    "45000132": {
+      "id": 45000132,
+      "meshName": "SK_Ship_Santa_Catarina_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000120,
+        "1": 46700012,
+        "2": 46300001,
+        "6": 46600007,
+        "7": 46600010,
+        "8": 46600009,
+        "9": 46600003,
+        "10": 46600001
+      },
+      "wakePlayer": 47600017
+    },
+    "45000133": {
+      "id": 45000133,
+      "meshName": "SK_Ship_LaPinta_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000121,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600004,
+        "8": 46600009
+      },
+      "wakePlayer": 47600015
+    },
+    "45000134": {
+      "id": 45000134,
+      "meshName": "SK_Ship_LargeJoUnSeon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000122,
+        "1": 46700005,
+        "2": 46300001,
+        "3": 46500021
+      },
+      "wakePlayer": 47600017
+    },
+    "45000135": {
+      "id": 45000135,
+      "meshName": "SK_Ship_Vasa_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000123,
+        "1": 46700013,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600010,
+        "9": 46600011
+      },
+      "wakePlayer": 47600017
+    },
+    "45000136": {
+      "id": 45000136,
+      "meshName": "SK_Ship_HigakiKaisen_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000124,
+        "1": 46700010,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600004
+      },
+      "wakePlayer": 47600017
+    },
+    "45000137": {
+      "id": 45000137,
+      "meshName": "SK_Ship_SantaMaria_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000125,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600007,
+        "7": 46600002,
+        "8": 46600005
+      },
+      "wakePlayer": 47600016
+    },
+    "45000138": {
+      "id": 45000138,
+      "meshName": "SK_Ship_Flemish_Galleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000126,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600007
+      },
+      "wakePlayer": 47600017
+    },
+    "45000139": {
+      "id": 45000139,
+      "meshName": "SK_Ship_Victoria_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000127,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600003,
+        "7": 46600010
+      },
+      "wakePlayer": 47600016
+    },
+    "45000140": {
+      "id": 45000140,
+      "meshName": "SK_Ship_DragonHeadShip_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000128,
+        "1": 46700010,
+        "2": 46300001
+      },
+      "wakePlayer": 47600017
+    },
+    "45000141": {
+      "id": 45000141,
+      "meshName": "SK_Ship_AdlervonLubeck_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000129,
+        "1": 46700012,
+        "6": 46600002,
+        "7": 46600007,
+        "8": 46600003,
+        "9": 46600005
+      },
+      "wakePlayer": 47600018
+    },
+    "45000142": {
+      "id": 45000142,
+      "meshName": "SK_Ship_NorskeLove_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000130,
+        "1": 46700013,
+        "6": 46600007,
+        "7": 46600010,
+        "8": 46600001,
+        "9": 46600011
+      },
+      "wakePlayer": 47600017
+    },
+    "45000143": {
+      "id": 45000143,
+      "meshName": "SK_Ship_Ironsides_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000131,
+        "1": 46700012,
+        "6": 46600007,
+        "7": 46600003,
+        "8": 46600009,
+        "9": 46600002
+      },
+      "wakePlayer": 47600018
+    },
+    "45000144": {
+      "id": 45000144,
+      "meshName": "SK_Ship_FlyingCloud_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000132,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600009,
+        "7": 46600010,
+        "8": 46600003,
+        "9": 46600007
+      },
+      "wakePlayer": 47600017
+    },
+    "45000145": {
+      "id": 45000145,
+      "meshName": "SK_Ship_Sagyeonseon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000133,
+        "1": 46700005,
+        "2": 46300001,
+        "3": 46500022
+      },
+      "wakePlayer": 47600017
+    },
+    "45000146": {
+      "id": 45000146,
+      "meshName": "SK_Ship_Karakoa_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": -10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000134,
+        "1": 46700017,
+        "3": 46500023,
+        "6": 46600001
+      },
+      "wakePlayer": 47600016
+    },
+    "45000147": {
+      "id": 45000147,
+      "meshName": "SK_Ship_Tanjaq_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000135,
+        "1": 46700008,
+        "2": 46300001,
+        "6": 46600010,
+        "7": 46600004,
+        "8": 46600007,
+        "9": 46600002
+      },
+      "wakePlayer": 47600015
+    },
+    "45000148": {
+      "id": 45000148,
+      "meshName": "SK_Ship_NordicGalleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000136,
+        "1": 46700012,
+        "6": 46600007,
+        "7": 46600001,
+        "8": 46600010,
+        "9": 46600003
+      },
+      "wakePlayer": 47600017
+    },
+    "45000149": {
+      "id": 45000149,
+      "meshName": "SK_Ship_GoldenHind_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000137,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600007,
+        "8": 46600008
+      },
+      "wakePlayer": 47600017
+    },
+    "45000150": {
+      "id": 45000150,
+      "meshName": "SK_Ship_DeSperwer_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000138,
+        "1": 46700013,
+        "6": 46600001,
+        "7": 46600010,
+        "8": 46600011,
+        "9": 46600003
+      },
+      "wakePlayer": 47600016
+    },
+    "45000151": {
+      "id": 45000151,
+      "meshName": "SK_Ship_Endeavour_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000139,
+        "1": 46700012,
+        "6": 46600010,
+        "7": 46600009,
+        "8": 46600007
+      },
+      "wakePlayer": 47600017
+    },
+    "45000152": {
+      "id": 45000152,
+      "meshName": "SK_Ship_Sao_Gabriel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000140,
+        "1": 46700012,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600008
+      },
+      "wakePlayer": 47600017
+    },
+    "45000153": {
+      "id": 45000153,
+      "meshName": "SK_Ship_JungjosTurtleShip_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000141,
+        "1": 46700004,
+        "2": 46800006,
+        "3": 46500024
+      },
+      "wakePlayer": 47600018
+    },
+    "45000154": {
+      "id": 45000154,
+      "meshName": "SK_Ship_GoldenSampan_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000142,
+        "1": 46700008,
+        "2": 46300002
+      },
+      "wakePlayer": 47600015
+    },
+    "45000155": {
+      "id": 45000155,
+      "meshName": "SK_Ship_SanJuan_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 40,
+        "display": 0
+      },
+      "parts": {
+        "0": 46000143,
+        "1": 46700013,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600011
+      },
+      "wakePlayer": 47600017
+    },
+    "45000156": {
+      "id": 45000156,
+      "meshName": "SK_Ship_GranFluyt_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000144,
+        "1": 46700012,
+        "6": 46600005,
+        "7": 46600010,
+        "8": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000157": {
+      "id": 45000157,
+      "meshName": "SK_Ship_NapolitanGalleass_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000145,
+        "1": 46700017,
+        "2": 46300002,
+        "3": 46500025,
+        "6": 46600001,
+        "7": 46600005,
+        "8": 46600009
+      },
+      "wakePlayer": 47600017
+    },
+    "45000158": {
+      "id": 45000158,
+      "meshName": "SK_Ship_RomanGalley_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000146,
+        "1": 46700016,
+        "2": 46300003,
+        "3": 46500026,
+        "6": 46600005,
+        "7": 46600007
+      },
+      "wakePlayer": 47600016
+    },
+    "45000159": {
+      "id": 45000159,
+      "meshName": "SK_Ship_RazeedFrigate_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000147,
+        "1": 46700012,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600011
+      },
+      "wakePlayer": 47600017
+    },
+    "45000160": {
+      "id": 45000160,
+      "meshName": "SK_Ship_Thermopylae_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 30,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000148,
+        "1": 46700015,
+        "6": 46600011,
+        "7": 46600010,
+        "8": 46600003,
+        "9": 46600001
+      },
+      "wakePlayer": 47600018
+    },
+    "45000161": {
+      "id": 45000161,
+      "meshName": "SK_Ship_LaCouronne_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000149,
+        "1": 46700012,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600005,
+        "8": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000162": {
+      "id": 45000162,
+      "meshName": "SK_Ship_Bermuda_Sloop_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000150,
+        "1": 46700013,
+        "2": 46300002,
+        "6": 46600001,
+        "7": 46600003,
+        "8": 46600010
+      },
+      "wakePlayer": 47600017
+    },
+    "45000163": {
+      "id": 45000163,
+      "meshName": "SK_Ship_DeZeven_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000151,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600004,
+        "7": 46600005,
+        "8": 46600011,
+        "9": 46600005
+      },
+      "wakePlayer": 47600018
+    },
+    "45000164": {
+      "id": 45000164,
+      "meshName": "SK_Ship_Clipper_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000152,
+        "1": 46700013,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600011,
+        "9": 46600001
+      },
+      "wakePlayer": 47600017
+    },
+    "45000165": {
+      "id": 45000165,
+      "meshName": "SK_Ship_Surprise_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000153,
+        "1": 46700012,
+        "6": 46600005,
+        "7": 46600009,
+        "8": 46600011
+      },
+      "wakePlayer": 47600017
+    },
+    "45000166": {
+      "id": 45000166,
+      "meshName": "SK_Ship_Zouge_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": -10,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000154,
+        "1": 46700009,
+        "2": 46500027,
+        "3": 46300001,
+        "7": 46600001,
+        "8": 46600007,
+        "9": 46600009,
+        "10": 46600011
+      },
+      "wakePlayer": 47600015
+    },
+    "45000167": {
+      "id": 45000167,
+      "meshName": "SK_Ship_MengChong_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000155,
+        "1": 46700010,
+        "2": 46500028,
+        "6": 46600001,
+        "7": 46600004
+      },
+      "wakePlayer": 47600015
+    },
+    "45000168": {
+      "id": 45000168,
+      "meshName": "SK_Ship_ManilaGalleon_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000156,
+        "1": 46700013
+      },
+      "wakePlayer": 47600018
+    },
+    "45000169": {
+      "id": 45000169,
+      "meshName": "SK_Ship_SantisimaTrinidad_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000157,
+        "1": 46700012,
+        "6": 46600003,
+        "7": 46600007
+      },
+      "wakePlayer": 47600017
+    },
+    "45000170": {
+      "id": 45000170,
+      "meshName": "SK_Ship_Beagle_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000158,
+        "1": 46700012,
+        "2": 46300001,
+        "6": 46600007,
+        "7": 46600009
+      },
+      "wakePlayer": 47600017
+    },
+    "45000171": {
+      "id": 45000171,
+      "meshName": "SK_Ship_GhanjahDhow_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000159,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600003,
+        "8": 46600010
+      },
+      "wakePlayer": 47600017
+    },
+    "45000172": {
+      "id": 45000172,
+      "meshName": "SK_Ship_Esmeralda_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000160,
+        "1": 46700013,
+        "2": 46300001,
+        "7": 46600004,
+        "8": 46600007,
+        "9": 46600009
+      },
+      "wakePlayer": 47600016
+    },
+    "45000173": {
+      "id": 45000173,
+      "meshName": "SK_Ship_StLawrence_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000161,
+        "1": 46700012,
+        "2": 46300003,
+        "6": 46600002,
+        "7": 46600005
+      },
+      "wakePlayer": 47600018
+    },
+    "45000174": {
+      "id": 45000174,
+      "meshName": "SK_Ship_Hainan_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000162,
+        "1": 46700009,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600003,
+        "8": 46600004
+      },
+      "wakePlayer": 47600016
+    },
+    "45000175": {
+      "id": 45000175,
+      "meshName": "SK_Ship_Adventure_Galley_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000163,
+        "1": 46700013,
+        "3": 46500029,
+        "6": 46600003,
+        "7": 46600005,
+        "8": 46600009,
+        "9": 46600010
+      },
+      "wakePlayer": 47600017
+    },
+    "45000176": {
+      "id": 45000176,
+      "meshName": "SK_Ship_Bounty_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000164,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600007,
+        "9": 46600011
+      },
+      "wakePlayer": 47600017
+    },
+    "45000177": {
+      "id": 45000177,
+      "meshName": "SK_Ship_SanFelipe_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000165,
+        "1": 46700012,
+        "7": 46600002,
+        "8": 46600007
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000178": {
+      "id": 45000178,
+      "meshName": "SK_Ship_GranFluyt_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000166,
+        "1": 46700012
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000179": {
+      "id": 45000179,
+      "meshName": "SK_Ship_DeZeven_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000167,
+        "1": 46700013,
+        "2": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000180": {
+      "id": 45000180,
+      "meshName": "SK_Ship_VenetianGalleass_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000168,
+        "1": 46700013,
+        "2": 46300002,
+        "3": 46500015
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000181": {
+      "id": 45000181,
+      "meshName": "SK_Ship_Pinnace_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000169,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600005,
+        "8": 46600007
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000182": {
+      "id": 45000182,
+      "meshName": "SK_Ship_Corvette_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000170,
+        "1": 46700013,
+        "6": 46600005,
+        "7": 46600007,
+        "8": 46600011,
+        "9": 46600009
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000183": {
+      "id": 45000183,
+      "meshName": "SK_Ship_Vaisseau_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000171,
+        "1": 46700012,
+        "6": 46600005,
+        "7": 46600010
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000184": {
+      "id": 45000184,
+      "meshName": "SK_Ship_OsmanGalleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000172,
+        "1": 46700015,
+        "2": 46500011,
+        "7": 46600001,
+        "8": 46600005,
+        "9": 46600006
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000185": {
+      "id": 45000185,
+      "meshName": "SK_Ship_RomanGalley_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000173,
+        "1": 46700016,
+        "2": 46300003,
+        "3": 46500026
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000186": {
+      "id": 45000186,
+      "meshName": "SK_Ship_Galleon_Body",
+      "meshDensity": 500,
+      "buoyancyRadius": 200,
+      "parts": {
+        "0": 46000174,
+        "1": 46700002,
+        "2": 46550001,
+        "3": 46300001
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000187": {
+      "id": 45000187,
+      "meshName": "SK_Ship_Ingermanland_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000175,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600006,
+        "8": 46600010,
+        "9": 46600011,
+        "10": 46600005
+      },
+      "wakePlayer": 47600018
+    },
+    "45000188": {
+      "id": 45000188,
+      "meshName": "SK_Ship_Chenggong_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000176,
+        "1": 46700010,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600005,
+        "9": 46600007,
+        "10": 46600010
+      },
+      "wakePlayer": 47600018
+    },
+    "45000189": {
+      "id": 45000189,
+      "meshName": "Sk_Ship_SoleilRoyal_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000177,
+        "1": 46700012,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600004,
+        "9": 46600007,
+        "10": 46600003,
+        "11": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000190": {
+      "id": 45000190,
+      "meshName": "SK_Ship_Kronan_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000178,
+        "1": 46700013,
+        "6": 46600001,
+        "7": 46600005,
+        "8": 46600007
+      },
+      "wakePlayer": 47600018
+    },
+    "45000191": {
+      "id": 45000191,
+      "meshName": "SK_Ship_Bucentaur_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000179,
+        "1": 46700015,
+        "3": 46500030
+      },
+      "wakePlayer": 47600018
+    },
+    "45000192": {
+      "id": 45000192,
+      "meshName": "SK_Ship_Victory_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000180,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600004,
+        "7": 46600005,
+        "8": 46600008,
+        "9": 46600010,
+        "10": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000193": {
+      "id": 45000193,
+      "meshName": "SK_Ship_DauphinRoyal_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000181,
+        "1": 46700012,
+        "6": 46600002,
+        "7": 46600005,
+        "8": 46600010
+      },
+      "wakePlayer": 47600018
+    },
+    "45000194": {
+      "id": 45000194,
+      "meshName": "SK_Ship_Louchuan_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000182,
+        "1": 46700009,
+        "2": 46300001,
+        "3": 46500031,
+        "7": 46600002,
+        "8": 46600003,
+        "9": 46600005,
+        "10": 46600007
+      },
+      "wakePlayer": 47600018
+    },
+    "45000195": {
+      "id": 45000195,
+      "meshName": "SK_Ship_ManSeon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000183,
+        "1": 46700009,
+        "2": 46300001,
+        "6": 46600003,
+        "7": 46600004,
+        "8": 46600009
+      },
+      "wakePlayer": 47600017
+    },
+    "45000196": {
+      "id": 45000196,
+      "meshName": "SK_Ship_Ryukyuship_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000184,
+        "1": 46700010,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018
+    },
+    "45000197": {
+      "id": 45000197,
+      "meshName": "SK_Ship_Bellona_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000185,
+        "1": 46700013,
+        "6": 46600001,
+        "7": 46600005,
+        "8": 46600009,
+        "9": 46600010
+      },
+      "wakePlayer": 47600018
+    },
+    "45000198": {
+      "id": 45000198,
+      "meshName": "SK_Ship_Whydah_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000186,
+        "1": 46700013,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600003,
+        "9": 46600007,
+        "10": 46600009
+      },
+      "wakePlayer": 47600018
+    },
+    "45000199": {
+      "id": 45000199,
+      "meshName": "SK_Ship_Tenchimaru_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000187,
+        "1": 46700004,
+        "2": 46300001,
+        "3": 46500055
+      },
+      "wakePlayer": 47600018
+    },
+    "45000200": {
+      "id": 45000200,
+      "meshName": "SK_Ship_ManilaGalleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000188,
+        "1": 46700013,
+        "2": 46300003,
+        "3": 46100094,
+        "4": 46200032,
+        "5": 46400005,
+        "6": 46600001,
+        "7": 46600004,
+        "8": 46600005,
+        "9": 46600006,
+        "10": 46600009
+      },
+      "wakePlayer": 47600017
+    },
+    "45000201": {
+      "id": 45000201,
+      "meshName": "SK_Ship_Victoria_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000189,
+        "1": 46700001,
+        "2": 46200005,
+        "3": 46100005
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000202": {
+      "id": 45000202,
+      "meshName": "SK_Ship_Cutter_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000190,
+        "1": 46700001,
+        "2": 46300001,
+        "3": 46200003
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000203": {
+      "id": 45000203,
+      "meshName": "SK_Ship_Fluyt_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000191,
+        "1": 46700001,
+        "2": 46300001,
+        "3": 46200003
+      },
+      "wakeCutscene": 47600005
+    },
+    "45000204": {
+      "id": 45000204,
+      "meshName": "SK_Ship_GhostShipWest_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000192,
+        "1": 46800002
+      }
+    },
+    "45000205": {
+      "id": 45000205,
+      "meshName": "SK_Ship_Mongdong_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000193,
+        "1": 46700009,
+        "2": 46300003,
+        "3": 46500032
+      }
+    },
+    "45000206": {
+      "id": 45000206,
+      "meshName": "SK_Ship_GhostShipEast_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000194,
+        "1": 46800002
+      }
+    },
+    "45000207": {
+      "id": 45000207,
+      "meshName": "SK_Ship_GoldenHansaCog_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000195,
+        "1": 46700014,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600005,
+        "9": 46600008
+      },
+      "wakePlayer": 47600015
+    },
+    "45000208": {
+      "id": 45000208,
+      "meshName": "SK_Ship_Araki_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000196,
+        "1": 46700007,
+        "6": 46600001,
+        "7": 46600004,
+        "8": 46600009
+      },
+      "wakePlayer": 47600018
+    },
+    "45000209": {
+      "id": 45000209,
+      "meshName": "SK_Ship_Baochuan_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000197,
+        "1": 46700009,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600004,
+        "8": 46600007
+      },
+      "wakePlayer": 47600018
+    },
+    "45000210": {
+      "id": 45000210,
+      "meshName": "SK_Ship_YangSeon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000198,
+        "1": 46700005,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018
+    },
+    "45000211": {
+      "id": 45000211,
+      "meshName": "SK_Ship_DaePanOkSeon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000199,
+        "1": 46700005,
+        "3": 46500033
+      },
+      "wakePlayer": 47600018
+    },
+    "45000212": {
+      "id": 45000212,
+      "meshName": "SK_Ship_Byeongseon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000200,
+        "1": 46700005,
+        "2": 46300001,
+        "3": 46500034,
+        "7": 46600001,
+        "8": 46600002,
+        "9": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000213": {
+      "id": 45000213,
+      "meshName": "SK_Ship_Daihieu_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000201,
+        "1": 46700007,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018
+    },
+    "45000214": {
+      "id": 45000214,
+      "meshName": "SK_Ship_Djong_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000202,
+        "1": 46700008,
+        "6": 46600001,
+        "7": 46600002
+      },
+      "wakePlayer": 47600018
+    },
+    "45000215": {
+      "id": 45000215,
+      "meshName": "SK_Ship_Doujian_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000203,
+        "1": 46700005,
+        "2": 46300001,
+        "3": 46500035,
+        "7": 46600002,
+        "8": 46600005,
+        "9": 46600010
+      },
+      "wakePlayer": 47600018
+    },
+    "45000216": {
+      "id": 45000216,
+      "meshName": "SK_Ship_NooJeonSeon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000204,
+        "1": 46700005,
+        "2": 46300001,
+        "3": 46500036,
+        "6": 46600002,
+        "7": 46600004
+      },
+      "wakePlayer": 47600018
+    },
+    "45000217": {
+      "id": 45000217,
+      "meshName": "SK_Ship_PyeongJeonSeon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000205,
+        "1": 46700005,
+        "2": 46300001,
+        "3": 46500037,
+        "7": 46600005,
+        "8": 46600007
+      },
+      "wakePlayer": 47600018
+    },
+    "45000218": {
+      "id": 45000218,
+      "meshName": "SK_Ship_Junk_Schooner_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000206,
+        "1": 46700010,
+        "2": 46300001,
+        "6": 46600003,
+        "7": 46600007,
+        "8": 46600010
+      },
+      "wakePlayer": 47600018
+    },
+    "45000219": {
+      "id": 45000219,
+      "meshName": "SK_Ship_SuiYangDragonBoat_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000207,
+        "1": 46700009,
+        "2": 46300001,
+        "3": 46500038
+      },
+      "wakePlayer": 47600018
+    },
+    "45000220": {
+      "id": 45000220,
+      "meshName": "SK_Ship_GoldenTalette_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000008,
+        "1": 46700001,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600009,
+        "8": 46600003,
+        "9": 46600007
+      },
+      "wakePlayer": 47600014
+    },
+    "45000221": {
+      "id": 45000221,
+      "meshName": "SK_Ship_DanChuan_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000208,
+        "1": 46700009,
+        "2": 46300001,
+        "6": 46600011,
+        "7": 46600007
+      },
+      "wakePlayer": 47600018
+    },
+    "45000222": {
+      "id": 45000222,
+      "meshName": "SK_Ship_Neptune_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000209,
+        "1": 46700012,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600005,
+        "8": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000223": {
+      "id": 45000223,
+      "meshName": "SK_Ship_GoldBarca_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000105,
+        "1": 46700013,
+        "2": 46300003,
+        "3": 46800001,
+        "7": 46600002,
+        "8": 46600005,
+        "9": 46600007,
+        "10": 46600010
+      },
+      "wakePlayer": 47600014
+    },
+    "45000224": {
+      "id": 45000224,
+      "meshName": "SK_Ship_GoldenTalette_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000008,
+        "1": 46700001,
+        "2": 46300001,
+        "3": 46800001,
+        "6": 46600002,
+        "7": 46600009,
+        "8": 46600003,
+        "9": 46600007
+      },
+      "wakePlayer": 47600014
+    },
+    "45000225": {
+      "id": 45000225,
+      "meshName": "SK_Ship_GoldenHansaCog_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -20
+      },
+      "parts": {
+        "0": 46000195,
+        "1": 46700014,
+        "3": 46800001,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600005,
+        "9": 46600008
+      },
+      "wakePlayer": 47600015
+    },
+    "45000226": {
+      "id": 45000226,
+      "meshName": "SK_Ship_GoldenSampan_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000142,
+        "1": 46700008,
+        "2": 46300002,
+        "3": 46800001
+      },
+      "wakePlayer": 47600015
+    },
+    "45000227": {
+      "id": 45000227,
+      "meshName": "SK_Ship_SpecialLorcha_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000210,
+        "1": 46700009,
+        "6": 46600009,
+        "7": 46600007
+      },
+      "wakePlayer": 47600016
+    },
+    "45000228": {
+      "id": 45000228,
+      "meshName": "SK_Ship_QueenAnneRevenge_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000211
+      },
+      "wakePlayer": 47600018
+    },
+    "45000229": {
+      "id": 45000229,
+      "meshName": "Sk_Ship_QueenAnneRevenge_Reward_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000212,
+        "1": 46700014
+      },
+      "wakePlayer": 47600018
+    },
+    "45000230": {
+      "id": 45000230,
+      "meshName": "SK_Ship_SpecialGoldenHind_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000213,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600007,
+        "8": 46600008
+      },
+      "wakePlayer": 47600017
+    },
+    "45000231": {
+      "id": 45000231,
+      "meshName": "SK_Ship_LeNeptune_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000214,
+        "1": 46700012,
+        "6": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000232": {
+      "id": 45000232,
+      "meshName": "Sk_Ship_Neptuno_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000215,
+        "1": 46700013,
+        "6": 46600001,
+        "7": 46600003,
+        "8": 46600007,
+        "9": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000233": {
+      "id": 45000233,
+      "meshName": "SK_Ship_BraveEagle_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000216,
+        "1": 46700014,
+        "2": 46300001,
+        "3": 46500039
+      },
+      "wakePlayer": 47600018
+    },
+    "45000234": {
+      "id": 45000234,
+      "meshName": "SK_Ship_BraveEagle_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000217,
+        "1": 46700014,
+        "2": 46300001,
+        "3": 46500040
+      },
+      "wakePlayer": 47600018
+    },
+    "45000235": {
+      "id": 45000235,
+      "meshName": "SK_Ship_SuiYangPheonixBoat_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000218,
+        "1": 46700009,
+        "2": 46300001,
+        "3": 46500041,
+        "7": 46600009,
+        "8": 46600010
+      },
+      "wakePlayer": 47600018
+    },
+    "45000236": {
+      "id": 45000236,
+      "meshName": "SK_Ship_Gozabune_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000219,
+        "1": 46700006,
+        "2": 46300001,
+        "3": 46500042,
+        "7": 46600001,
+        "8": 46600002
+      },
+      "wakePlayer": 47600018
+    },
+    "45000237": {
+      "id": 45000237,
+      "meshName": "SK_Ship_LeBucentaur_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000220,
+        "1": 46700013,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600007,
+        "9": 46600010,
+        "10": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000238": {
+      "id": 45000238,
+      "meshName": "SK_Ship_Redoubtable_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000221,
+        "1": 46700012,
+        "6": 46600007
+      },
+      "wakePlayer": 47600018
+    },
+    "45000239": {
+      "id": 45000239,
+      "meshName": "SK_Ship_Amity_Boss_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000222
+      },
+      "wakePlayer": 47600018
+    },
+    "45000240": {
+      "id": 45000240,
+      "meshName": "SK_Ship_Amity_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000223,
+        "1": 46700012,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018
+    },
+    "45000241": {
+      "id": 45000241,
+      "meshName": "SK_Ship_GhostShipEastElite_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "parts": {
+        "0": 46000224,
+        "1": 46800003
+      }
+    },
+    "45000242": {
+      "id": 45000242,
+      "meshName": "SK_Ship_DateMaru_Body",
+      "meshDensity": 500,
+      "buoyancyRadius": 200,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000225,
+        "1": 46300001
+      },
+      "wakePlayer": 47600017
+    },
+    "45000243": {
+      "id": 45000243,
+      "meshName": "SK_Ship_Sambaek_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000226,
+        "1": 46700013,
+        "6": 46600005,
+        "7": 46600007,
+        "8": 46600011,
+        "9": 46600009
+      },
+      "wakePlayer": 47600017
+    },
+    "45000244": {
+      "id": 45000244,
+      "meshName": "SK_Ship_AvatarGoblin_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000227,
+        "1": 46500043
+      },
+      "wakePlayer": 47600018
+    },
+    "45000245": {
+      "id": 45000245,
+      "meshName": "SK_Ship_Avatar_HermitCrab_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000228,
+        "1": 46700018
+      },
+      "wakePlayer": 47600018
+    },
+    "45000246": {
+      "id": 45000246,
+      "meshName": "SK_Ship_1stTurtleShip_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000229,
+        "1": 46500044,
+        "2": 46800004,
+        "3": 46700005
+      },
+      "wakePlayer": 47600017
+    },
+    "45000247": {
+      "id": 45000247,
+      "meshName": "SK_Ship_Avatar_OakCask_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000230,
+        "1": 46700014
+      },
+      "wakePlayer": 47600015
+    },
+    "45000248": {
+      "id": 45000248,
+      "meshName": "SK_Ship_Avatar_Log_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000231,
+        "1": 46700014
+      },
+      "wakePlayer": 47600015
+    },
+    "45000249": {
+      "id": 45000249,
+      "meshName": "SK_Ship_Avatar_Sphinxs_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000232,
+        "1": 46700013,
+        "2": 46500045
+      },
+      "wakePlayer": 47600018
+    },
+    "45000250": {
+      "id": 45000250,
+      "meshName": "SK_Ship_Avatar_Paper1_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000233,
+        "1": 46700014
+      },
+      "wakePlayer": 47600015
+    },
+    "45000251": {
+      "id": 45000251,
+      "meshName": "SK_Ship_Avatar_Paper2_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000234,
+        "1": 46700014
+      },
+      "wakePlayer": 47600015
+    },
+    "45000252": {
+      "id": 45000252,
+      "meshName": "SK_Ship_Avatar_Paper3_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000235,
+        "1": 46700014
+      },
+      "wakePlayer": 47600015
+    },
+    "45000253": {
+      "id": 45000253,
+      "meshName": "SK_Ship_Avatar_LifeBoat_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000236,
+        "1": 46700014
+      },
+      "wakePlayer": 47600015
+    },
+    "45000254": {
+      "id": 45000254,
+      "meshName": "SK_Ship_Avatar_Leaf_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000237,
+        "1": 46700014
+      },
+      "wakePlayer": 47600015
+    },
+    "45000255": {
+      "id": 45000255,
+      "meshName": "SK_Ship_Avatar_FullMoonFestival_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -10
+      },
+      "parts": {
+        "0": 46000238,
+        "1": 46700014
+      },
+      "wakePlayer": 47600016
+    },
+    "45000256": {
+      "id": 45000256,
+      "meshName": "SK_Ship_Avatar_Colosseum_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000239,
+        "1": 46700013,
+        "2": 46500046
+      },
+      "wakePlayer": 47600018
+    },
+    "45000257": {
+      "id": 45000257,
+      "meshName": "SK_Ship_Avatar_Toy_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000240,
+        "1": 46700014
+      },
+      "wakePlayer": 47600016
+    },
+    "45000258": {
+      "id": 45000258,
+      "meshName": "SK_Ship_SpecialBounty_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000241,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600003,
+        "8": 46600007,
+        "9": 46600011
+      },
+      "wakePlayer": 47600017
+    },
+    "45000259": {
+      "id": 45000259,
+      "meshName": "SK_Ship_Avatar_Tenshu_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000242,
+        "1": 46700014,
+        "2": 46500047
+      },
+      "wakePlayer": 47600018
+    },
+    "45000260": {
+      "id": 45000260,
+      "meshName": "SK_Ship_Avatar_FlyingFish_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000243,
+        "1": 46700014
+      },
+      "wakePlayer": 47600018
+    },
+    "45000261": {
+      "id": 45000261,
+      "meshName": "SK_Ship_SpecialJunkSchooner_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000244,
+        "1": 46700014
+      },
+      "wakePlayer": 47600018
+    },
+    "45000262": {
+      "id": 45000262,
+      "meshName": "SK_Boss_Mobydick",
+      "wakePlayer": 47600018
+    },
+    "45000263": {
+      "id": 45000263,
+      "meshName": "SK_Ship_Yisunsin_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000245,
+        "1": 46700004,
+        "2": 46500048,
+        "3": 46300001
+      },
+      "wakePlayer": 47600017
+    },
+    "45000264": {
+      "id": 45000264,
+      "meshName": "SK_Ship_SpecialDjong_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000246,
+        "1": 46700008,
+        "6": 46600001,
+        "7": 46600002
+      },
+      "wakePlayer": 47600018
+    },
+    "45000265": {
+      "id": 45000265,
+      "meshName": "SK_Ship_SpecialTurtleShip_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000247,
+        "1": 46700005,
+        "2": 46500049,
+        "3": 46300001,
+        "4": 46800005
+      },
+      "wakePlayer": 47600017
+    },
+    "45000266": {
+      "id": 45000266,
+      "meshName": "SK_Ship_Avatar_Yak_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000248,
+        "1": 46700014
+      },
+      "wakePlayer": 47600018
+    },
+    "45000267": {
+      "id": 45000267,
+      "meshName": "SK_Ship_Avatar_Octopus_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000249,
+        "1": 46700014
+      },
+      "wakePlayer": 47600018
+    },
+    "45000268": {
+      "id": 45000268,
+      "meshName": "SK_Ship_SpecialFlyingCloud_body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000250,
+        "1": 46700013
+      },
+      "wakePlayer": 47600017
+    },
+    "45000269": {
+      "id": 45000269,
+      "meshName": "SK_Ship_Avatar_Angel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000251,
+        "1": 46700013
+      },
+      "wakePlayer": 47600018
+    },
+    "45000270": {
+      "id": 45000270,
+      "meshName": "SK_Battle_Ra",
+      "wakePlayer": 47600018
+    },
+    "45000271": {
+      "id": 45000271,
+      "meshName": "SK_Ship_Avatar_Blowfish_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000252,
+        "1": 46700013
+      },
+      "wakePlayer": 47600018
+    },
+    "45000272": {
+      "id": 45000272,
+      "meshName": "SK_Ship_Avatar_Vacation_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000253,
+        "1": 46700013
+      },
+      "wakePlayer": 47600018
+    },
+    "45000273": {
+      "id": 45000273,
+      "meshName": "SK_Ship_Illyeon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000115,
+        "1": 46700007,
+        "2": 46300001,
+        "3": 46500019
+      },
+      "wakePlayer": 47600017
+    },
+    "45000274": {
+      "id": 45000274,
+      "meshName": "SK_Ship_Riberia_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000254
+      },
+      "wakePlayer": 47600017
+    },
+    "45000275": {
+      "id": 45000275,
+      "meshName": "SK_Ship_RinAmadio_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000255
+      },
+      "wakePlayer": 47600017
+    },
+    "45000276": {
+      "id": 45000276,
+      "meshName": "SK_Ship_KelberosA_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000256
+      },
+      "wakePlayer": 47600017
+    },
+    "45000277": {
+      "id": 45000277,
+      "meshName": "SK_Ship_Avatar_ClockworkDoll_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000257,
+        "1": 46700013
+      },
+      "wakePlayer": 47600017
+    },
+    "45000278": {
+      "id": 45000278,
+      "meshName": "SK_Ship_Avatar_Icecream_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000258,
+        "1": 46700013
+      },
+      "wakePlayer": 47600017
+    },
+    "45000279": {
+      "id": 45000279,
+      "meshName": "SK_Ship_Avatar_RubberDuck_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000259,
+        "1": 46700013
+      },
+      "wakePlayer": 47600018
+    },
+    "45000280": {
+      "id": 45000280,
+      "meshName": "SK_Ship_Avatar_Macaron_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000260,
+        "1": 46700014,
+        "2": 46500050
+      },
+      "wakePlayer": 47600018
+    },
+    "45000281": {
+      "id": 45000281,
+      "meshName": "SK_Boss_Battle_Scylla",
+      "wakePlayer": 47600018
+    },
+    "45000282": {
+      "id": 45000282,
+      "meshName": "SK_Boss_Battle_Scylla_DragonHead",
+      "wakePlayer": 47600018
+    },
+    "45000283": {
+      "id": 45000283,
+      "meshName": "SK_Boss_Stingray1",
+      "wakePlayer": 47600018
+    },
+    "45000284": {
+      "id": 45000284,
+      "meshName": "SK_Boss_Stingray2",
+      "wakePlayer": 47600018
+    },
+    "45000285": {
+      "id": 45000285,
+      "meshName": "SK_Ship_GoldenDragonHeadShip_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000261,
+        "1": 46700010,
+        "2": 46300001
+      },
+      "wakePlayer": 47600017
+    },
+    "45000286": {
+      "id": 45000286,
+      "meshName": "SK_Ship_GoldenTurtleShip_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000262,
+        "1": 46700004,
+        "2": 46500051,
+        "3": 46800006
+      },
+      "wakePlayer": 47600018
+    },
+    "45000287": {
+      "id": 45000287,
+      "meshName": "SK_Ship_GoldenBaochuan_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000263,
+        "1": 46700009,
+        "2": 46300001,
+        "6": 46600002,
+        "7": 46600004,
+        "8": 46600007
+      },
+      "wakePlayer": 47600018
+    },
+    "45000288": {
+      "id": 45000288,
+      "meshName": "SK_Ship_GoldOsmanGalleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000264,
+        "1": 46700015,
+        "2": 46500052,
+        "7": 46600001,
+        "8": 46600005,
+        "9": 46600006
+      },
+      "wakePlayer": 47600017
+    },
+    "45000289": {
+      "id": 45000289,
+      "meshName": "Sk_Ship_GoldenNeptuno_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000265,
+        "1": 46700013,
+        "6": 46600001,
+        "7": 46600003,
+        "8": 46600007,
+        "9": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000290": {
+      "id": 45000290,
+      "meshName": "SK_Ship_GoldenSurprise_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000266,
+        "1": 46700012,
+        "6": 46600005,
+        "7": 46600009,
+        "8": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000291": {
+      "id": 45000291,
+      "meshName": "SK_Ship_GoldenLouchuan_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000267,
+        "1": 46700009,
+        "2": 46300001,
+        "3": 46500053,
+        "7": 46600002,
+        "8": 46600003,
+        "9": 46600005,
+        "10": 46600007
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000292": {
+      "id": 45000292,
+      "meshName": "SK_Ship_GoldenTekkosen_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000268,
+        "1": 46700007,
+        "2": 46300001,
+        "3": 46500054
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000293": {
+      "id": 45000293,
+      "meshName": "Sk_Ship_GoldenTemeraire_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000269,
+        "1": 46700012,
+        "2": 46300001,
+        "6": 46600008,
+        "7": 46600005
+      },
+      "wakePlayer": 47600017,
+      "overrideMeshScale": 1.5
+    },
+    "45000294": {
+      "id": 45000294,
+      "meshName": "SK_Ship_GoldenRyukyuship_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000270,
+        "1": 46700010,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018
+    },
+    "45000295": {
+      "id": 45000295,
+      "meshName": "SK_Ship_GoldenTenchimaru_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000271,
+        "1": 46700004,
+        "2": 46300001,
+        "3": 46500056
+      },
+      "wakePlayer": 47600018
+    },
+    "45000296": {
+      "id": 45000296,
+      "meshName": "SK_Ship_GoldenEndeavour_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000272,
+        "1": 46700012,
+        "6": 46600010,
+        "7": 46600009,
+        "8": 46600007
+      },
+      "wakePlayer": 47600017,
+      "overrideMeshScale": 1.5
+    },
+    "45000297": {
+      "id": 45000297,
+      "meshName": "SK_Ship_GoldenFlyingCloud_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000273,
+        "1": 46700013,
+        "2": 46300001,
+        "6": 46600009,
+        "7": 46600010,
+        "8": 46600003,
+        "9": 46600007
+      },
+      "wakePlayer": 47600017,
+      "overrideMeshScale": 1.5
+    },
+    "45000298": {
+      "id": 45000298,
+      "meshName": "SK_Ship_GoldenKronan_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000274,
+        "1": 46700013,
+        "6": 46600001,
+        "7": 46600005,
+        "8": 46600007
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000299": {
+      "id": 45000299,
+      "meshName": "SK_Ship_MediumGalleon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 10,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000081,
+        "1": 46700003,
+        "2": 46300001,
+        "3": 46800007,
+        "6": 46600009,
+        "7": 46600010
+      },
+      "wakePlayer": 47600016
+    },
+    "45000300": {
+      "id": 45000300,
+      "meshName": "SK_Ship_GoldenJunkSchooner_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000275,
+        "1": 46700014
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000301": {
+      "id": 45000301,
+      "meshName": "SK_Ship_GoldenPanOkSeon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000276,
+        "1": 46700005,
+        "3": 46500057
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000302": {
+      "id": 45000302,
+      "meshName": "SK_Ship_RageOfAlgiers_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000277,
+        "1": 46700017,
+        "2": 46300002,
+        "3": 46500058
+      },
+      "wakePlayer": 47600018
+    },
+    "45000303": {
+      "id": 45000303,
+      "meshName": "SK_Ship_GoldenNobunagas_Tekkosen_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000278,
+        "1": 46700010,
+        "3": 46500059
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000304": {
+      "id": 45000304,
+      "meshName": "SK_Ship_GoldenGozabune_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000279,
+        "1": 46700006,
+        "2": 46300001,
+        "3": 46500060,
+        "7": 46600001,
+        "8": 46600002
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000305": {
+      "id": 45000305,
+      "meshName": "SK_Ship_Skeid_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000280,
+        "1": 46700012,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000306": {
+      "id": 45000306,
+      "meshName": "SK_Ship_Skeid_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000281,
+        "1": 46700012,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000307": {
+      "id": 45000307,
+      "meshName": "SK_Ship_Skeid_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000282,
+        "1": 46700012,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000308": {
+      "id": 45000308,
+      "meshName": "SK_Ship_Avater_Skeid_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000283,
+        "1": 46700012
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000309": {
+      "id": 45000309,
+      "meshName": "SK_Ship_Avater_Skeid_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000284,
+        "1": 46700012
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000310": {
+      "id": 45000310,
+      "meshName": "SK_Ship_Avater_Skeid_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000285,
+        "1": 46700012
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000311": {
+      "id": 45000311,
+      "meshName": "SK_Ship_GoldenThermopylae_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 30,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000286,
+        "1": 46700015,
+        "6": 46600011,
+        "7": 46600010,
+        "8": 46600003,
+        "9": 46600001
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000312": {
+      "id": 45000312,
+      "meshName": "SK_Ship_GoldenLaMort_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000287,
+        "1": 46700012,
+        "2": 46300001,
+        "3": 46500061,
+        "6": 46600002,
+        "7": 46600005,
+        "8": 46600010,
+        "9": 46600011
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000313": {
+      "id": 45000313,
+      "meshName": "Sk_Ship_GoldenIronsides_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000288,
+        "1": 46700012,
+        "6": 46600007,
+        "7": 46600003,
+        "8": 46600009,
+        "9": 46600002
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000314": {
+      "id": 45000314,
+      "meshName": "SK_Ship_EnchantedAmity_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000289,
+        "1": 46700012,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018
+    },
+    "45000315": {
+      "id": 45000315,
+      "meshName": "SK_Ship_GoldenEnchantedAmity_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000290,
+        "1": 46700013,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000316": {
+      "id": 45000316,
+      "meshName": "SK_Ship_EnchantedAmityBoss_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000291
+      },
+      "wakePlayer": 47600018
+    },
+    "45000317": {
+      "id": 45000317,
+      "meshName": "SK_Ship_Avatar_GMRubberDuck_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000292,
+        "1": 46700013
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000318": {
+      "id": 45000318,
+      "meshName": "SK_Ship_GoldenYangSeon_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000293,
+        "1": 46700005,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000319": {
+      "id": 45000319,
+      "meshName": "SK_Ship_GoldenVenetianGalleass_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000294,
+        "1": 46700013,
+        "2": 46300002,
+        "3": 46500062,
+        "7": 46600003,
+        "8": 46600007
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000320": {
+      "id": 45000320,
+      "meshName": "SK_Ship_RewardSaintGarbriel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000295,
+        "1": 46700012
+      },
+      "wakePlayer": 47600018
+    },
+    "45000321": {
+      "id": 45000321,
+      "meshName": "SK_Ship_RewardSaintGarbriel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000296,
+        "1": 46700012
+      },
+      "wakePlayer": 47600018
+    },
+    "45000322": {
+      "id": 45000322,
+      "meshName": "SK_Ship_RewardSaintGarbriel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000297,
+        "1": 46700012
+      },
+      "wakePlayer": 47600018
+    },
+    "45000323": {
+      "id": 45000323,
+      "meshName": "SK_Ship_GoldenAdlervonLubeck_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000298,
+        "1": 46700012,
+        "6": 46600002,
+        "7": 46600007,
+        "8": 46600003,
+        "9": 46600005
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000324": {
+      "id": 45000324,
+      "meshName": "SK_Ship_GoldenManilaGalleon_Body",
+      "meshDensity": 600,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000299,
+        "1": 46700013
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000325": {
+      "id": 45000325,
+      "meshName": "SK_Ship_GoldenDjong_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000300,
+        "1": 46700008,
+        "6": 46600001,
+        "7": 46600002
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000326": {
+      "id": 45000326,
+      "meshName": "SK_Ship_GoldenLargeJunk_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000301,
+        "1": 46700010,
+        "2": 46300001,
+        "3": 46550001
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000327": {
+      "id": 45000327,
+      "meshName": "SK_Ship_RewardSantaMaria_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000302,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600007,
+        "7": 46600002,
+        "8": 46600005
+      },
+      "wakePlayer": 47600018
+    },
+    "45000328": {
+      "id": 45000328,
+      "meshName": "SK_Ship_RewardSantaMaria_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000303,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600007,
+        "7": 46600002,
+        "8": 46600005
+      },
+      "wakePlayer": 47600018
+    },
+    "45000329": {
+      "id": 45000329,
+      "meshName": "SK_Ship_RewardSantaMaria_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000304,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600007,
+        "7": 46600002,
+        "8": 46600005
+      },
+      "wakePlayer": 47600018
+    },
+    "45000330": {
+      "id": 45000330,
+      "meshName": "SK_Ship_Avatar_RewardSantaMaria_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000302,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600007,
+        "7": 46600002,
+        "8": 46600005
+      },
+      "wakePlayer": 47600018
+    },
+    "45000331": {
+      "id": 45000331,
+      "meshName": "SK_Ship_Avatar_RewardSantaMaria_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000303,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600007,
+        "7": 46600002,
+        "8": 46600005
+      },
+      "wakePlayer": 47600018
+    },
+    "45000332": {
+      "id": 45000332,
+      "meshName": "SK_Ship_Avatar_RewardSantaMaria_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000304,
+        "1": 46700014,
+        "2": 46300001,
+        "6": 46600007,
+        "7": 46600002,
+        "8": 46600005
+      },
+      "wakePlayer": 47600018
+    },
+    "45000333": {
+      "id": 45000333,
+      "meshName": "SK_Ship_GoldenSoleilRoyal_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000305,
+        "1": 46700012,
+        "2": 46300001,
+        "6": 46600001,
+        "7": 46600002,
+        "8": 46600004,
+        "9": 46600007,
+        "10": 46600003,
+        "11": 46600011
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000334": {
+      "id": 45000334,
+      "meshName": "SK_Ship_GoldenWave_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000306
+      },
+      "wakePlayer": 47600018
+    },
+    "45000335": {
+      "id": 45000335,
+      "meshName": "SK_Ship_GoldenWaveReward_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000307,
+        "1": 46700012,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018
+    },
+    "45000336": {
+      "id": 45000336,
+      "meshName": "SK_Ship_GoldenGoldenWave_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000308,
+        "1": 46700012,
+        "2": 46300001
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000337": {
+      "id": 45000337,
+      "meshName": "SK_Ship_Avatar_R_Angel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000309,
+        "1": 46700012
+      },
+      "wakePlayer": 47600018
+    },
+    "45000338": {
+      "id": 45000338,
+      "meshName": "SK_Ship_R_Angel_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 100,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000310,
+        "1": 46700013
+      },
+      "wakePlayer": 47600018
+    },
+    "45000339": {
+      "id": 45000339,
+      "meshName": "SK_Ship_GoldenBucentaur_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000311,
+        "1": 46700015,
+        "3": 46500063
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000340": {
+      "id": 45000340,
+      "meshName": "Sk_Ship_GoldenSanFelipe_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000312,
+        "1": 46700012,
+        "7": 46600002,
+        "8": 46600007
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    },
+    "45000341": {
+      "id": 45000341,
+      "meshName": "SK_Ship_RetroFuturismCorvette_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000313,
+        "1": 46700013,
+        "8": 46600011
+      },
+      "wakePlayer": 47600018
+    },
+    "45000342": {
+      "id": 45000342,
+      "meshName": "SK_Ship_GoldenRetroFuturismCorvette_Body",
+      "meshDensity": 700,
+      "buoyancyRadius": 150,
+      "buoyancyOffsetZ": {
+        "sail": 20,
+        "display": -40
+      },
+      "parts": {
+        "0": 46000314,
+        "1": 46700013,
+        "8": 46600011
+      },
+      "wakePlayer": 47600018,
+      "overrideMeshScale": 1.5
+    }
+  }
+}

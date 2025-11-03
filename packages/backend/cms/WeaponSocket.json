@@ -1,0 +1,1609 @@
+{
+  ":WeaponSocket": {
+    ":type": {
+      "id": "strkey",
+      "axe": "string",
+      "blade": "string",
+      "bow": "string",
+      "crossbow": "string",
+      "pistol": "string",
+      "rifle": "string",
+      "spear": "string",
+      "sword": "string",
+      "thSword": "string",
+      "twinBlade": [
+        "string",
+        "string"
+      ],
+      "tool": [
+        "string",
+        "string"
+      ]
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "WeaponSocket": {
+    "Combat_Run_01": {
+      "id": "Combat_Run_01",
+      "axe": "socket_hand_r",
+      "blade": "socket_hand_r",
+      "bow": "socket_hand_r",
+      "crossbow": "socket_hand_r",
+      "pistol": "socket_hand_r",
+      "rifle": "socket_hand_r",
+      "spear": "socket_hand_r",
+      "sword": "socket_hand_r",
+      "thSword": "socket_hand_r",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Duel_Groggy_01": {
+      "id": "Duel_Groggy_01",
+      "axe": "socket_hand_r",
+      "blade": "socket_hand_r",
+      "bow": "socket_hand_r",
+      "crossbow": "socket_hand_l",
+      "pistol": "socket_hand_l",
+      "rifle": "socket_hand_r",
+      "spear": "socket_hand_r",
+      "sword": "socket_hand_r",
+      "thSword": "socket_hand_r",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Duel_Attack01_Rifle": {
+      "id": "Duel_Attack01_Rifle",
+      "rifle": "socket_hand_l"
+    },
+    "Duel_Attack02_Rifle": {
+      "id": "Duel_Attack02_Rifle",
+      "rifle": "socket_hand_l"
+    },
+    "Duel_Attack03_Rifle": {
+      "id": "Duel_Attack03_Rifle",
+      "rifle": "socket_hand_l"
+    },
+    "Duel_Damage_Rifle": {
+      "id": "Duel_Damage_Rifle",
+      "rifle": "socket_hand_l"
+    },
+    "Duel_Guard01_Rifle": {
+      "id": "Duel_Guard01_Rifle",
+      "rifle": "socket_hand_l"
+    },
+    "Duel_Guard02_Rifle": {
+      "id": "Duel_Guard02_Rifle",
+      "rifle": "socket_hand_l"
+    },
+    "Duel_Guard03_Rifle": {
+      "id": "Duel_Guard03_Rifle",
+      "rifle": "socket_hand_l"
+    },
+    "Duel_Stand_Rifle": {
+      "id": "Duel_Stand_Rifle",
+      "rifle": "socket_hand_l"
+    },
+    "Duel_Attack01_Spear": {
+      "id": "Duel_Attack01_Spear",
+      "spear": "socket_hand_l"
+    },
+    "Duel_Attack02_Spear": {
+      "id": "Duel_Attack02_Spear",
+      "spear": "socket_hand_l"
+    },
+    "Duel_Attack03_Spear": {
+      "id": "Duel_Attack03_Spear",
+      "spear": "socket_hand_l"
+    },
+    "Duel_Damage_Spear": {
+      "id": "Duel_Damage_Spear",
+      "spear": "socket_hand_l"
+    },
+    "Duel_Guard01_Spear": {
+      "id": "Duel_Guard01_Spear",
+      "spear": "socket_hand_l"
+    },
+    "Duel_Guard02_Spear": {
+      "id": "Duel_Guard02_Spear",
+      "spear": "socket_hand_l"
+    },
+    "Duel_Guard03_Spear": {
+      "id": "Duel_Guard03_Spear",
+      "spear": "socket_hand_l"
+    },
+    "Duel_Stand_Spear": {
+      "id": "Duel_Stand_Spear",
+      "spear": "socket_hand_l"
+    },
+    "Town_Run_01": {
+      "id": "Town_Run_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Run_02": {
+      "id": "Town_Run_02",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Stand_01": {
+      "id": "Town_Stand_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Walk_01": {
+      "id": "Town_Walk_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Duel_Attack01_Bow": {
+      "id": "Duel_Attack01_Bow",
+      "bow": "socket_hand_r"
+    },
+    "Duel_Attack02_Bow": {
+      "id": "Duel_Attack02_Bow",
+      "bow": "socket_hand_r"
+    },
+    "Duel_Attack03_Bow": {
+      "id": "Duel_Attack03_Bow",
+      "bow": "socket_hand_r"
+    },
+    "Duel_Damage_Bow": {
+      "id": "Duel_Damage_Bow",
+      "bow": "socket_hand_r"
+    },
+    "Duel_Dodge01_Bow": {
+      "id": "Duel_Dodge01_Bow",
+      "bow": "socket_hand_r"
+    },
+    "Duel_Dodge02_Bow": {
+      "id": "Duel_Dodge02_Bow",
+      "bow": "socket_hand_r"
+    },
+    "Duel_Dodge03_Bow": {
+      "id": "Duel_Dodge03_Bow",
+      "bow": "socket_hand_r"
+    },
+    "Duel_Stand_Bow": {
+      "id": "Duel_Stand_Bow",
+      "bow": "socket_hand_r"
+    },
+    "Duel_Attack01_Crossbow": {
+      "id": "Duel_Attack01_Crossbow",
+      "crossbow": "socket_hand_r"
+    },
+    "Duel_Attack02_Crossbow": {
+      "id": "Duel_Attack02_Crossbow",
+      "crossbow": "socket_hand_r"
+    },
+    "Duel_Attack03_Crossbow": {
+      "id": "Duel_Attack03_Crossbow",
+      "crossbow": "socket_hand_r"
+    },
+    "Duel_Damage_Crossbow": {
+      "id": "Duel_Damage_Crossbow",
+      "crossbow": "socket_hand_r"
+    },
+    "Duel_Dodge01_Crossbow": {
+      "id": "Duel_Dodge01_Crossbow",
+      "crossbow": "socket_hand_r"
+    },
+    "Duel_Dodge02_Crossbow": {
+      "id": "Duel_Dodge02_Crossbow",
+      "crossbow": "socket_hand_r"
+    },
+    "Duel_Dodge03_Crossbow": {
+      "id": "Duel_Dodge03_Crossbow",
+      "crossbow": "socket_hand_r"
+    },
+    "Duel_Stand_Crossbow": {
+      "id": "Duel_Stand_Crossbow",
+      "crossbow": "socket_hand_r"
+    },
+    "Duel_Attack01_Pistol": {
+      "id": "Duel_Attack01_Pistol",
+      "pistol": "socket_hand_r"
+    },
+    "Duel_Attack02_Pistol": {
+      "id": "Duel_Attack02_Pistol",
+      "pistol": "socket_hand_r"
+    },
+    "Duel_Attack03_Pistol": {
+      "id": "Duel_Attack03_Pistol",
+      "pistol": "socket_hand_r"
+    },
+    "Duel_Damage_Pistol": {
+      "id": "Duel_Damage_Pistol",
+      "pistol": "socket_hand_r"
+    },
+    "Duel_Dodge01_Pistol": {
+      "id": "Duel_Dodge01_Pistol",
+      "pistol": "socket_hand_r"
+    },
+    "Duel_Dodge02_Pistol": {
+      "id": "Duel_Dodge02_Pistol",
+      "pistol": "socket_hand_r"
+    },
+    "Duel_Dodge03_Pistol": {
+      "id": "Duel_Dodge03_Pistol",
+      "pistol": "socket_hand_r"
+    },
+    "Duel_Stand_Pistol": {
+      "id": "Duel_Stand_Pistol",
+      "pistol": "socket_hand_r"
+    },
+    "Duel_Attack01_Blade": {
+      "id": "Duel_Attack01_Blade",
+      "blade": "socket_hand_r"
+    },
+    "Duel_Attack02_Blade": {
+      "id": "Duel_Attack02_Blade",
+      "blade": "socket_hand_r"
+    },
+    "Duel_Attack03_Blade": {
+      "id": "Duel_Attack03_Blade",
+      "blade": "socket_hand_r"
+    },
+    "Duel_Damage_Blade": {
+      "id": "Duel_Damage_Blade",
+      "blade": "socket_hand_r"
+    },
+    "Duel_Guard01_Blade": {
+      "id": "Duel_Guard01_Blade",
+      "blade": "socket_hand_r"
+    },
+    "Duel_Guard02_Blade": {
+      "id": "Duel_Guard02_Blade",
+      "blade": "socket_hand_r"
+    },
+    "Duel_Guard03_Blade": {
+      "id": "Duel_Guard03_Blade",
+      "blade": "socket_hand_r"
+    },
+    "Duel_Stand_Blade": {
+      "id": "Duel_Stand_Blade",
+      "blade": "socket_hand_r"
+    },
+    "Duel_Attack01_Sword": {
+      "id": "Duel_Attack01_Sword",
+      "sword": "socket_hand_r"
+    },
+    "Duel_Attack02_Sword": {
+      "id": "Duel_Attack02_Sword",
+      "sword": "socket_hand_r"
+    },
+    "Duel_Attack03_Sword": {
+      "id": "Duel_Attack03_Sword",
+      "sword": "socket_hand_r"
+    },
+    "Duel_Damage_Sword": {
+      "id": "Duel_Damage_Sword",
+      "sword": "socket_hand_r"
+    },
+    "Duel_Guard01_Sword": {
+      "id": "Duel_Guard01_Sword",
+      "sword": "socket_hand_r"
+    },
+    "Duel_Guard02_Sword": {
+      "id": "Duel_Guard02_Sword",
+      "sword": "socket_hand_r"
+    },
+    "Duel_Guard03_Sword": {
+      "id": "Duel_Guard03_Sword",
+      "sword": "socket_hand_r"
+    },
+    "Duel_Stand_Sword": {
+      "id": "Duel_Stand_Sword",
+      "sword": "socket_hand_r"
+    },
+    "Duel_Attack01_THSword": {
+      "id": "Duel_Attack01_THSword",
+      "axe": "socket_hand_r",
+      "thSword": "socket_hand_r"
+    },
+    "Duel_Attack02_THSword": {
+      "id": "Duel_Attack02_THSword",
+      "axe": "socket_hand_r",
+      "thSword": "socket_hand_r"
+    },
+    "Duel_Attack03_THSword": {
+      "id": "Duel_Attack03_THSword",
+      "axe": "socket_hand_r",
+      "thSword": "socket_hand_r"
+    },
+    "Duel_Damage_THSword": {
+      "id": "Duel_Damage_THSword",
+      "axe": "socket_hand_r",
+      "thSword": "socket_hand_r"
+    },
+    "Duel_Guard01_THSword": {
+      "id": "Duel_Guard01_THSword",
+      "axe": "socket_hand_r",
+      "thSword": "socket_hand_r"
+    },
+    "Duel_Guard02_THSword": {
+      "id": "Duel_Guard02_THSword",
+      "axe": "socket_hand_r",
+      "thSword": "socket_hand_r"
+    },
+    "Duel_Guard03_THSword": {
+      "id": "Duel_Guard03_THSword",
+      "axe": "socket_hand_r",
+      "thSword": "socket_hand_r"
+    },
+    "Duel_Stand_THSword": {
+      "id": "Duel_Stand_THSword",
+      "axe": "socket_hand_r",
+      "thSword": "socket_hand_r"
+    },
+    "Duel_Attack01_TwinBlade": {
+      "id": "Duel_Attack01_TwinBlade",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Duel_Attack02_TwinBlade": {
+      "id": "Duel_Attack02_TwinBlade",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Duel_Attack03_TwinBlade": {
+      "id": "Duel_Attack03_TwinBlade",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Duel_Damage_TwinBlade": {
+      "id": "Duel_Damage_TwinBlade",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Duel_Guard01_TwinBlade": {
+      "id": "Duel_Guard01_TwinBlade",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Duel_Guard02_TwinBlade": {
+      "id": "Duel_Guard02_TwinBlade",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Duel_Guard03_TwinBlade": {
+      "id": "Duel_Guard03_TwinBlade",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Duel_Stand_TwinBlade": {
+      "id": "Duel_Stand_TwinBlade",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Ship_CaptainNPC_01": {
+      "id": "Ship_CaptainNPC_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Ship_inJuredLeg_01": {
+      "id": "Ship_inJuredLeg_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Ship_injuredArm_01": {
+      "id": "Ship_injuredArm_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Duel_Win_01": {
+      "id": "Duel_Win_01",
+      "axe": "socket_hand_r",
+      "blade": "socket_hand_r",
+      "bow": "socket_hand_r",
+      "crossbow": "socket_hand_r",
+      "pistol": "socket_hand_r",
+      "rifle": "socket_hand_r",
+      "spear": "socket_hand_r",
+      "sword": "socket_hand_r",
+      "thSword": "socket_hand_r",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Ship_CaptainNPC_02": {
+      "id": "Ship_CaptainNPC_02",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Ship_CaptainNPC_03": {
+      "id": "Ship_CaptainNPC_03",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Ship_Damaged_01": {
+      "id": "Ship_Damaged_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Ship_Damaged_02": {
+      "id": "Ship_Damaged_02",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Ship_DeckOutskirtsNPC_01": {
+      "id": "Ship_DeckOutskirtsNPC_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Ship_DeckOutskirtsNPC_02": {
+      "id": "Ship_DeckOutskirtsNPC_02",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Ship_DeckOutskirtsNPC_03": {
+      "id": "Ship_DeckOutskirtsNPC_03",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Ship_DeckinteriorNPC_02": {
+      "id": "Ship_DeckinteriorNPC_02",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Ship_DeckinteriorNPC_03": {
+      "id": "Ship_DeckinteriorNPC_03",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Ship_DeckinteriorNPC_04": {
+      "id": "Ship_DeckinteriorNPC_04",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Ship_Success_01": {
+      "id": "Ship_Success_01"
+    },
+    "Town_Watchman01_Idle": {
+      "id": "Town_Watchman01_Idle",
+      "sword": "socket_hand_l"
+    },
+    "Town_Watchman01_Run": {
+      "id": "Town_Watchman01_Run",
+      "sword": "socket_hand_l"
+    },
+    "Town_Watchman01_Walk": {
+      "id": "Town_Watchman01_Walk",
+      "sword": "socket_hand_l"
+    },
+    "Town_Watchman01_Walk_02": {
+      "id": "Town_Watchman01_Walk_02",
+      "sword": "socket_hand_l"
+    },
+    "Town_Watchman02_Idle": {
+      "id": "Town_Watchman02_Idle",
+      "sword": "socket_hand_l"
+    },
+    "Town_Watchman02_Run": {
+      "id": "Town_Watchman02_Run",
+      "sword": "socket_hand_l"
+    },
+    "Town_Watchman02_Walk": {
+      "id": "Town_Watchman02_Walk",
+      "sword": "socket_hand_l"
+    },
+    "Town_Watchman02_Walk_02": {
+      "id": "Town_Watchman02_Walk_02",
+      "sword": "socket_hand_l"
+    },
+    "Town_Watchman03_Idle": {
+      "id": "Town_Watchman03_Idle",
+      "sword": "socket_hand_r"
+    },
+    "Town_Watchman03_Run": {
+      "id": "Town_Watchman03_Run",
+      "sword": "socket_hand_r"
+    },
+    "Town_Watchman03_Walk": {
+      "id": "Town_Watchman03_Walk",
+      "sword": "socket_hand_r"
+    },
+    "Town_Watchman03_Walk_02": {
+      "id": "Town_Watchman03_Walk_02",
+      "sword": "socket_hand_r"
+    },
+    "Town_Lute_01": {
+      "id": "Town_Lute_01",
+      "sword": "socket_waist_r"
+    },
+    "Ship_Command_01": {
+      "id": "Ship_Command_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Salute_Start_01": {
+      "id": "Town_Salute_Start_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Salute_Doing_01": {
+      "id": "Town_Salute_Doing_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Salute_End_01": {
+      "id": "Town_Salute_End_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Duel_SAttack01_Sword": {
+      "id": "Duel_SAttack01_Sword",
+      "sword": "socket_hand_r"
+    },
+    "Duel_SAttack01_Rifle": {
+      "id": "Duel_SAttack01_Rifle",
+      "rifle": "socket_hand_l"
+    },
+    "Duel_SAttack01_Spear": {
+      "id": "Duel_SAttack01_Spear",
+      "spear": "socket_hand_l"
+    },
+    "Duel_SAttack01_Bow": {
+      "id": "Duel_SAttack01_Bow",
+      "bow": "socket_hand_r"
+    },
+    "Duel_SAttack01_Crossbow": {
+      "id": "Duel_SAttack01_Crossbow",
+      "crossbow": "socket_hand_r"
+    },
+    "Duel_SAttack01_Pistol": {
+      "id": "Duel_SAttack01_Pistol",
+      "pistol": "socket_hand_r"
+    },
+    "Duel_SAttack01_Blade": {
+      "id": "Duel_SAttack01_Blade",
+      "blade": "socket_hand_r"
+    },
+    "Duel_SAttack01_TwinBlade": {
+      "id": "Duel_SAttack01_TwinBlade",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Duel_SAttack01_THSword": {
+      "id": "Duel_SAttack01_THSword",
+      "axe": "socket_hand_r",
+      "thSword": "socket_hand_r"
+    },
+    "Town_Whisk_Idle_01": {
+      "id": "Town_Whisk_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Think_Idle_01": {
+      "id": "Town_Think_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Stretching_Idle_01": {
+      "id": "Town_Stretching_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Map_Idle_01": {
+      "id": "Town_Map_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Town_LookAround_Idle_01": {
+      "id": "Town_LookAround_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_FoldArm_Idle_01": {
+      "id": "Town_FoldArm_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Calculation_Idle_01": {
+      "id": "Town_Calculation_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Town_Threat_Idle_01": {
+      "id": "Town_Threat_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Massage_Idle_01": {
+      "id": "Town_Massage_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Walk_02": {
+      "id": "Town_Walk_02",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Ship_FishingIde_01": {
+      "id": "Ship_FishingIde_01",
+      "sword": "socket_hand_r"
+    },
+    "Ship_FishingRodAngling_01": {
+      "id": "Ship_FishingRodAngling_01",
+      "sword": "socket_hand_r"
+    },
+    "Ship_FishingRodDraw_01": {
+      "id": "Ship_FishingRodDraw_01",
+      "sword": "socket_hand_r"
+    },
+    "Ship_FishingRodThrow_01": {
+      "id": "Ship_FishingRodThrow_01",
+      "sword": "socket_hand_r"
+    },
+    "Ship_FishingRodThrow_02": {
+      "id": "Ship_FishingRodThrow_02",
+      "sword": "socket_hand_r"
+    },
+    "Town_Read_Start_01": {
+      "id": "Town_Read_Start_01",
+      "sword": "socket_hand_l"
+    },
+    "Town_Read_Doing_01": {
+      "id": "Town_Read_Doing_01",
+      "sword": "socket_hand_l"
+    },
+    "Town_Read_End_01": {
+      "id": "Town_Read_End_01",
+      "sword": "socket_hand_l"
+    },
+    "Town_Workman_Walk_01": {
+      "id": "Town_Workman_Walk_01",
+      "sword": "socket_hand_r"
+    },
+    "Adventure_Gathering_Pick_01": {
+      "id": "Adventure_Gathering_Pick_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Adventure_Gathering_Note_01": {
+      "id": "Adventure_Gathering_Note_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ],
+      "tool": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Town_Hello_Idle_01": {
+      "id": "Town_Hello_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Clap_Idle_01": {
+      "id": "Town_Clap_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_CheerUp_Idle_01": {
+      "id": "Town_CheerUp_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Order_Idle_01": {
+      "id": "Town_Order_Idle_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Cheers_01": {
+      "id": "Town_Cheers_01",
+      "sword": "socket_hand_r"
+    },
+    "Town_Cheers_02": {
+      "id": "Town_Cheers_02",
+      "sword": "socket_hand_r"
+    },
+    "Town_Cheers_Idle_01": {
+      "id": "Town_Cheers_Idle_01",
+      "sword": "socket_hand_r"
+    },
+    "Town_Binding_Idle_01": {
+      "id": "Town_Binding_Idle_01",
+      "sword": "socket_hand_l"
+    },
+    "Town_Binding_Walk_01": {
+      "id": "Town_Binding_Walk_01",
+      "sword": "socket_hand_l"
+    },
+    "Town_Binding_Harass_01": {
+      "id": "Town_Binding_Harass_01",
+      "sword": "socket_hand_l"
+    },
+    "Town_Pistol_Threat_Idle_01": {
+      "id": "Town_Pistol_Threat_Idle_01",
+      "pistol": "socket_hand_r"
+    },
+    "Town_Fado_Stand_01": {
+      "id": "Town_Fado_Stand_01",
+      "tool": [
+        "socket_waist_r"
+      ]
+    },
+    "Town_Dance_Indian_01": {
+      "id": "Town_Dance_Indian_01"
+    },
+    "Town_Sitar_Sit_01": {
+      "id": "Town_Sitar_Sit_01",
+      "tool": [
+        "socket_waist_l"
+      ]
+    },
+    "Town_Sitar_Stand_01": {
+      "id": "Town_Sitar_Stand_01",
+      "tool": [
+        "socket_waist_l"
+      ]
+    },
+    "Town_Drop_01": {
+      "id": "Town_Drop_01"
+    },
+    "Town_Ocarina_01": {
+      "id": "Town_Ocarina_01",
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Town_Swordetiquette_01": {
+      "id": "Town_Swordetiquette_01",
+      "blade": "socket_hand_r",
+      "sword": "socket_hand_r"
+    },
+    "Town_Swordetiquette_02": {
+      "id": "Town_Swordetiquette_02",
+      "blade": "socket_hand_r",
+      "sword": "socket_hand_r"
+    },
+    "Town_Binding_Harass_02": {
+      "id": "Town_Binding_Harass_02",
+      "sword": "socket_hand_l"
+    },
+    "Sea_Sinking_01": {
+      "id": "Sea_Sinking_01"
+    },
+    "Duel_Knockback_03": {
+      "id": "Duel_Knockback_03"
+    },
+    "Town_Drop_idle_01": {
+      "id": "Town_Drop_idle_01"
+    },
+    "Town_Warkman_Walk_01": {
+      "id": "Town_Warkman_Walk_01"
+    },
+    "Town_BackWalk_01": {
+      "id": "Town_BackWalk_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Surprise_01": {
+      "id": "Town_Surprise_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Stand_02": {
+      "id": "Town_Stand_02",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Duel_Walk_Blade": {
+      "id": "Duel_Walk_Blade",
+      "blade": "socket_hand_r"
+    },
+    "Duel_Walk_Bow": {
+      "id": "Duel_Walk_Bow",
+      "bow": "socket_hand_r"
+    },
+    "Duel_Walk_Crossbow": {
+      "id": "Duel_Walk_Crossbow",
+      "crossbow": "socket_hand_r"
+    },
+    "Duel_Walk_Pistol": {
+      "id": "Duel_Walk_Pistol",
+      "pistol": "socket_hand_r"
+    },
+    "Duel_Walk_Rifle": {
+      "id": "Duel_Walk_Rifle",
+      "rifle": "socket_hand_l"
+    },
+    "Duel_Walk_Spear": {
+      "id": "Duel_Walk_Spear",
+      "spear": "socket_hand_l"
+    },
+    "Duel_Walk_Sword": {
+      "id": "Duel_Walk_Sword",
+      "sword": "socket_hand_r"
+    },
+    "Duel_Walk_THSword": {
+      "id": "Duel_Walk_THSword",
+      "axe": "socket_hand_r",
+      "thSword": "socket_hand_r"
+    },
+    "Duel_Walk_TwinBlade": {
+      "id": "Duel_Walk_TwinBlade",
+      "twinBlade": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Town_Jump_Start_01": {
+      "id": "Town_Jump_Start_01"
+    },
+    "Inn_Sit_08": {
+      "id": "Inn_Sit_08"
+    },
+    "Town_Kick_01": {
+      "id": "Town_Kick_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Wakeup_01": {
+      "id": "Town_Wakeup_01"
+    },
+    "Town_Laugh_01": {
+      "id": "Town_Laugh_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Walk_03": {
+      "id": "Town_Walk_03",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Give_01": {
+      "id": "Town_Give_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Receive_01": {
+      "id": "Town_Receive_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Cheers_Idle_02": {
+      "id": "Town_Cheers_Idle_02",
+      "sword": "socket_hand_r"
+    },
+    "Town_Cheers_03": {
+      "id": "Town_Cheers_03",
+      "sword": "socket_hand_r"
+    },
+    "Town_Cheers_04": {
+      "id": "Town_Cheers_04",
+      "sword": "socket_hand_r"
+    },
+    "Town_Nod_01": {
+      "id": "Town_Nod_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Inn_Eat_01": {
+      "id": "Inn_Eat_01",
+      "sword": "socket_hand_r"
+    },
+    "Inn_Eat_Idle_01": {
+      "id": "Inn_Eat_Idle_01",
+      "sword": "socket_hand_r"
+    },
+    "Inn_Eat_02": {
+      "id": "Inn_Eat_02",
+      "sword": "socket_hand_l"
+    },
+    "Inn_Eat_Idle_02": {
+      "id": "Inn_Eat_Idle_02",
+      "sword": "socket_hand_l"
+    },
+    "Ship_FishingRodAngling_02": {
+      "id": "Ship_FishingRodAngling_02",
+      "sword": "socket_hand_r"
+    },
+    "Ship_FishingRodAngling_03": {
+      "id": "Ship_FishingRodAngling_03",
+      "sword": "socket_hand_r"
+    },
+    "Town_Swordetiquette_03": {
+      "id": "Town_Swordetiquette_03",
+      "blade": "socket_hand_r",
+      "sword": "socket_hand_r"
+    },
+    "Town_Swordetiquette_04": {
+      "id": "Town_Swordetiquette_04",
+      "blade": "socket_hand_r",
+      "sword": "socket_hand_r"
+    },
+    "Town_Swordetiquette_05": {
+      "id": "Town_Swordetiquette_05",
+      "blade": "socket_hand_r",
+      "sword": "socket_hand_r"
+    },
+    "Town_Swordetiquette_06": {
+      "id": "Town_Swordetiquette_06",
+      "blade": "socket_hand_r",
+      "sword": "socket_hand_r"
+    },
+    "Town_Kneel_01": {
+      "id": "Town_Kneel_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Kneeling_01": {
+      "id": "Town_Kneeling_01",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Cheers_Idle_03": {
+      "id": "Town_Cheers_Idle_03",
+      "sword": "socket_hand_r"
+    },
+    "Town_Cheers_Idle_04": {
+      "id": "Town_Cheers_Idle_04",
+      "sword": "socket_hand_r"
+    },
+    "Town_Cheers_Idle_05": {
+      "id": "Town_Cheers_Idle_05",
+      "sword": "socket_hand_r"
+    },
+    "Town_Cheers_05": {
+      "id": "Town_Cheers_05",
+      "sword": "socket_hand_r"
+    },
+    "Town_Cheers_06": {
+      "id": "Town_Cheers_06",
+      "sword": "socket_hand_r"
+    },
+    "Town_Cheers_07": {
+      "id": "Town_Cheers_07",
+      "sword": "socket_hand_r"
+    },
+    "Ship_FishingRodAngling_04": {
+      "id": "Ship_FishingRodAngling_04",
+      "sword": "socket_hand_r"
+    },
+    "Ship_FishingRodAngling_05": {
+      "id": "Ship_FishingRodAngling_05",
+      "sword": "socket_hand_r"
+    },
+    "Manufacture_Blacksmith_01": {
+      "id": "Manufacture_Blacksmith_01",
+      "tool": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Manufacture_Blacksmith_02": {
+      "id": "Manufacture_Blacksmith_02",
+      "tool": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Manufacture_Cooking_01": {
+      "id": "Manufacture_Cooking_01",
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Manufacture_Cooking_02": {
+      "id": "Manufacture_Cooking_02",
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Manufacture_Walk_01": {
+      "id": "Manufacture_Walk_01",
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Manufacture_Bellow_01": {
+      "id": "Manufacture_Bellow_01",
+      "tool": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    }
+  }
+}

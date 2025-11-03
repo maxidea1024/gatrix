@@ -1,38 +1,18 @@
 /**
  * Migration 029: Make startDate nullable in g_ingame_popup_notices
- * This allows notices to start immediately without specifying a start date
+ *
+ * Note: This migration is a no-op because g_ingame_popup_notices.startDate
+ * is already nullable from the initial schema or earlier migrations.
  */
 
 async function up(pool) {
-  console.log('Running migration 029: Make startDate nullable in g_ingame_popup_notices');
-
-  try {
-    await pool.execute(`
-      ALTER TABLE g_ingame_popup_notices 
-      MODIFY COLUMN startDate TIMESTAMP NULL COMMENT 'Start date and time for the notice (optional, starts immediately if null)'
-    `);
-
-    console.log('Migration 029 completed successfully');
-  } catch (error) {
-    console.error('Migration 029 failed:', error);
-    throw error;
-  }
+  console.log('Skipping: g_ingame_popup_notices.startDate is already nullable');
+  // No-op: column already nullable
 }
 
 async function down(pool) {
-  console.log('Rolling back migration 029: Make startDate nullable in g_ingame_popup_notices');
-
-  try {
-    await pool.execute(`
-      ALTER TABLE g_ingame_popup_notices 
-      MODIFY COLUMN startDate TIMESTAMP NOT NULL COMMENT 'Start date and time for the notice'
-    `);
-
-    console.log('Migration 029 rollback completed successfully');
-  } catch (error) {
-    console.error('Migration 029 rollback failed:', error);
-    throw error;
-  }
+  console.log('Skipping rollback: no changes were made in this migration');
+  // No-op: nothing to rollback
 }
 
 module.exports = { up, down };

@@ -6,7 +6,9 @@
 echo "Starting Gatrix Frontend..."
 
 # Default values
-API_URL=${VITE_API_URL:-"http://localhost:5000/api/v1"}
+# In production, use relative path for API calls (same origin)
+# In development, use absolute URL
+API_URL=${VITE_API_URL:-"/api/v1"}
 APP_NAME=${VITE_APP_NAME:-"Gatrix"}
 DEFAULT_LANGUAGE=${VITE_DEFAULT_LANGUAGE:-"ko"}
 ROUTER_BASENAME=${VITE_ROUTER_BASENAME:-"/"}

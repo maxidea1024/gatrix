@@ -1,0 +1,392 @@
+{
+  ":SalvageRewardGroup": {
+    ":type": {
+      "id": "key",
+      "needSpecialStat": "number",
+      "rewardGroup": [
+        {
+          "Val": "number",
+          "Reward": "number",
+          "Exp": "number",
+          "RareRate": "number",
+          "RareReward": "number",
+          "RareExp": "number",
+          "NoticeRewardElem": "number",
+          "NoticeRewardId": "number"
+        },
+        {
+          "Val": "number",
+          "Reward": "number",
+          "Exp": "number",
+          "RareRate": "number",
+          "RareReward": "number",
+          "RareExp": "number",
+          "NoticeRewardElem": "number",
+          "NoticeRewardId": "number"
+        },
+        {
+          "Val": "number",
+          "Reward": "number",
+          "Exp": "number",
+          "RareRate": "number",
+          "RareReward": "number",
+          "RareExp": "number",
+          "NoticeRewardElem": "number",
+          "NoticeRewardId": "number"
+        },
+        {
+          "Val": "number",
+          "Reward": "number",
+          "Exp": "number",
+          "RareRate": "number",
+          "RareReward": "number",
+          "RareExp": "number",
+          "NoticeRewardElem": "number",
+          "NoticeRewardId": "number"
+        },
+        {
+          "Val": "number",
+          "Reward": "number",
+          "Exp": "number",
+          "RareRate": "number",
+          "RareReward": "number",
+          "RareExp": "number",
+          "NoticeRewardElem": "number",
+          "NoticeRewardId": "number"
+        },
+        {
+          "Val": "number",
+          "Reward": "number",
+          "Exp": "number",
+          "RareRate": "number",
+          "RareReward": "number",
+          "RareExp": "number",
+          "NoticeRewardElem": "number",
+          "NoticeRewardId": "number"
+        }
+      ]
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "rewardGroup": [
+        {
+          "NoticeRewardId": [
+            "Point",
+            "Item",
+            "DepartSupply",
+            "TradeGoods",
+            "CEquip",
+            "Ship",
+            "Mate",
+            "ShipBlueprint",
+            "ShipSlot",
+            "Shield",
+            "TaxFreePermit",
+            "IllustSkin",
+            "ShipCamouflage",
+            "UserTitle",
+            "Pet"
+          ]
+        },
+        {
+          "NoticeRewardId": [
+            "Point",
+            "Item",
+            "DepartSupply",
+            "TradeGoods",
+            "CEquip",
+            "Ship",
+            "Mate",
+            "ShipBlueprint",
+            "ShipSlot",
+            "Shield",
+            "TaxFreePermit",
+            "IllustSkin",
+            "ShipCamouflage",
+            "UserTitle",
+            "Pet"
+          ]
+        },
+        {
+          "NoticeRewardId": [
+            "Point",
+            "Item",
+            "DepartSupply",
+            "TradeGoods",
+            "CEquip",
+            "Ship",
+            "Mate",
+            "ShipBlueprint",
+            "ShipSlot",
+            "Shield",
+            "TaxFreePermit",
+            "IllustSkin",
+            "ShipCamouflage",
+            "UserTitle",
+            "Pet"
+          ]
+        },
+        {
+          "NoticeRewardId": [
+            "Point",
+            "Item",
+            "DepartSupply",
+            "TradeGoods",
+            "CEquip",
+            "Ship",
+            "Mate",
+            "ShipBlueprint",
+            "ShipSlot",
+            "Shield",
+            "TaxFreePermit",
+            "IllustSkin",
+            "ShipCamouflage",
+            "UserTitle",
+            "Pet"
+          ]
+        },
+        {
+          "NoticeRewardId": [
+            "Point",
+            "Item",
+            "DepartSupply",
+            "TradeGoods",
+            "CEquip",
+            "Ship",
+            "Mate",
+            "ShipBlueprint",
+            "ShipSlot",
+            "Shield",
+            "TaxFreePermit",
+            "IllustSkin",
+            "ShipCamouflage",
+            "UserTitle",
+            "Pet"
+          ]
+        },
+        {
+          "NoticeRewardId": [
+            "Point",
+            "Item",
+            "DepartSupply",
+            "TradeGoods",
+            "CEquip",
+            "Ship",
+            "Mate",
+            "ShipBlueprint",
+            "ShipSlot",
+            "Shield",
+            "TaxFreePermit",
+            "IllustSkin",
+            "ShipCamouflage",
+            "UserTitle",
+            "Pet"
+          ]
+        }
+      ]
+    }
+  },
+  "SalvageRewardGroup": {
+    "99960000": {
+      "id": 99960000,
+      "needSpecialStat": 10,
+      "rewardGroup": [
+        {
+          "Val": 1,
+          "Reward": 90121078,
+          "Exp": 12,
+          "RareRate": 21,
+          "RareReward": 90121084,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900109
+        },
+        {
+          "Val": 5,
+          "Reward": 90121079,
+          "Exp": 13,
+          "RareRate": 28,
+          "RareReward": 90121084,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900109
+        },
+        {
+          "Val": 10,
+          "Reward": 90121080,
+          "Exp": 14,
+          "RareRate": 39,
+          "RareReward": 90121084,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900109
+        },
+        {
+          "Val": 15,
+          "Reward": 90121085,
+          "Exp": 15,
+          "RareRate": 53,
+          "RareReward": 90121084,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900109
+        },
+        {
+          "Val": 20,
+          "Reward": 90121081,
+          "Exp": 16,
+          "RareRate": 73,
+          "RareReward": 90121084,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900109
+        },
+        {
+          "Val": 25,
+          "Reward": 90121082,
+          "Exp": 17,
+          "RareRate": 100,
+          "RareReward": 90121084,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900109
+        }
+      ]
+    },
+    "99960001": {
+      "id": 99960001,
+      "needSpecialStat": 10,
+      "rewardGroup": [
+        {
+          "Val": 1,
+          "Reward": 90121078,
+          "Exp": 12,
+          "RareRate": 21,
+          "RareReward": 90121181,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900111
+        },
+        {
+          "Val": 5,
+          "Reward": 90121079,
+          "Exp": 13,
+          "RareRate": 28,
+          "RareReward": 90121181,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900111
+        },
+        {
+          "Val": 10,
+          "Reward": 90121080,
+          "Exp": 14,
+          "RareRate": 39,
+          "RareReward": 90121181,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900111
+        },
+        {
+          "Val": 15,
+          "Reward": 90121085,
+          "Exp": 15,
+          "RareRate": 53,
+          "RareReward": 90121181,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900111
+        },
+        {
+          "Val": 20,
+          "Reward": 90121081,
+          "Exp": 16,
+          "RareRate": 73,
+          "RareReward": 90121181,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900111
+        },
+        {
+          "Val": 25,
+          "Reward": 90121082,
+          "Exp": 17,
+          "RareRate": 100,
+          "RareReward": 90121181,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900111
+        }
+      ]
+    },
+    "99960002": {
+      "id": 99960002,
+      "needSpecialStat": 10,
+      "rewardGroup": [
+        {
+          "Val": 1,
+          "Reward": 90121078,
+          "Exp": 12,
+          "RareRate": 21,
+          "RareReward": 90121323,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900112
+        },
+        {
+          "Val": 5,
+          "Reward": 90121079,
+          "Exp": 13,
+          "RareRate": 28,
+          "RareReward": 90121323,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900112
+        },
+        {
+          "Val": 10,
+          "Reward": 90121080,
+          "Exp": 14,
+          "RareRate": 39,
+          "RareReward": 90121323,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900112
+        },
+        {
+          "Val": 15,
+          "Reward": 90121085,
+          "Exp": 15,
+          "RareRate": 53,
+          "RareReward": 90121323,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900112
+        },
+        {
+          "Val": 20,
+          "Reward": 90121081,
+          "Exp": 16,
+          "RareRate": 73,
+          "RareReward": 90121323,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900112
+        },
+        {
+          "Val": 25,
+          "Reward": 90121082,
+          "Exp": 17,
+          "RareRate": 100,
+          "RareReward": 90121323,
+          "RareExp": 2500,
+          "NoticeRewardElem": 2,
+          "NoticeRewardId": 23900112
+        }
+      ]
+    }
+  }
+}

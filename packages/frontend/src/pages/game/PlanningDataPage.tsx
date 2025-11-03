@@ -36,6 +36,7 @@ import {
   CardGiftcard as GiftIcon,
   Category as CategoryIcon,
   Schedule as ScheduleIcon,
+  CloudUpload as CloudUploadIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -43,6 +44,7 @@ import planningDataService, { PlanningDataStats, HotTimeBuffLookup, HotTimeBuffI
 import SimplePagination from '../../components/common/SimplePagination';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import PlanningDataUpload from '../../components/planning-data/PlanningDataUpload';
 
 const PlanningDataPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -65,6 +67,7 @@ const PlanningDataPage: React.FC = () => {
   const [stats, setStats] = useState<PlanningDataStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const saved = sessionStorage.getItem('planningDataActiveTab');
     return saved ? parseInt(saved) : 0;
@@ -303,54 +306,8 @@ const PlanningDataPage: React.FC = () => {
   };
 
   const handleRebuild = async () => {
-    try {
-      setRebuilding(true);
-      // Rebuild all planning data
-      await Promise.all([
-        planningDataService.rebuildRewardLookup(),
-        planningDataService.buildHotTimeBuffLookup(),
-        planningDataService.buildEventPageLookup(),
-        planningDataService.buildLiveEventLookup(),
-        planningDataService.buildMateRecruitingGroupLookup(),
-        planningDataService.buildOceanNpcAreaSpawnerLookup(),
-      ]);
-      enqueueSnackbar(t('planningData.rebuildSuccess'), { variant: 'success' });
-
-      // Clear all cached data to force reload
-      setHotTimeBuffData(null);
-      setEventPageData(null);
-      setLiveEventData(null);
-      setMateRecruitingGroupData(null);
-      setOceanNpcAreaSpawnerData(null);
-
-      // Reload stats
-      await loadStats();
-
-      // Reload data for current tab
-      if (activeTab === 2) {
-        await loadHotTimeBuff();
-      } else if (activeTab === 3) {
-        await loadEventPage();
-      } else if (activeTab === 4) {
-        await loadLiveEvent();
-      } else if (activeTab === 5) {
-        await loadMateRecruitingGroup();
-      } else if (activeTab === 6) {
-        await loadOceanNpcAreaSpawner();
-      }
-    } catch (error: any) {
-      // Extract user-friendly error message
-      let errorMessage = t('planningData.errors.rebuildFailed');
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message && !error.message.includes('function')) {
-        errorMessage = error.message;
-      }
-      console.error('Rebuild error details:', error);
-      enqueueSnackbar(errorMessage, { variant: 'error' });
-    } finally {
-      setRebuilding(false);
-    }
+    // Open upload dialog
+    setShowUploadDialog(true);
   };
 
 
@@ -659,14 +616,63 @@ const PlanningDataPage: React.FC = () => {
           </Button>
           <Button
             variant="contained"
-            startIcon={rebuilding ? <CircularProgress size={20} /> : <RefreshIcon />}
+            startIcon={<CloudUploadIcon />}
             onClick={handleRebuild}
-            disabled={loading || rebuilding}
+            disabled={loading}
           >
-            {t('planningData.rebuildData')}
+            {t('planningData.uploadData')}
           </Button>
         </Box>
       </Box>
+
+      {/* Upload Dialog Modal */}
+      {showUploadDialog && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1300,
+          }}
+          onClick={() => setShowUploadDialog(false)}
+        >
+          <Card
+            sx={{
+              maxWidth: 600,
+              width: '90%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardContent>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6">{t('planningData.upload.title')}</Typography>
+                <Button
+                  size="small"
+                  onClick={() => setShowUploadDialog(false)}
+                  sx={{ minWidth: 'auto' }}
+                >
+                  ✕
+                </Button>
+              </Box>
+              <PlanningDataUpload
+                onUploadSuccess={() => {
+                  setShowUploadDialog(false);
+                  loadStats();
+                }}
+              />
+            </CardContent>
+          </Card>
+        </Box>
+      )}
 
       {/* Content */}
       {loading ? (

@@ -12,11 +12,11 @@ export const config = {
 
   // Database
   database: {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306', 10),
-    name: process.env.DB_NAME || 'gatrix_chat',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'password',
+    host: process.env.CHAT_DB_HOST || process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.CHAT_DB_PORT || process.env.DB_PORT || '3306', 10),
+    name: process.env.CHAT_DB_NAME || 'gatrix_chat',
+    user: process.env.CHAT_DB_USER || process.env.DB_USER || 'root',
+    password: process.env.CHAT_DB_PASSWORD || process.env.DB_PASSWORD || 'password',
     debug: process.env.DB_DEBUG === 'true',
   },
 
@@ -70,7 +70,10 @@ export const config = {
   cors: {
     // Allow wildcard "*" in dev by converting ["*"] to "*" for Socket.IO
     get origin() {
-      const corsEnv = process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:3000,http://localhost:3002';
+      const defaultOrigins = process.env.NODE_ENV === 'production'
+        ? 'http://frontend:80'
+        : 'http://localhost:5173,http://localhost:3000,http://localhost:3002';
+      const corsEnv = process.env.CORS_ORIGIN || defaultOrigins;
       const list = corsEnv.split(',');
       return list.includes('*') ? '*' : list;
     },

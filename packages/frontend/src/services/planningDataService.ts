@@ -241,6 +241,26 @@ class PlanningDataService {
     const response = await api.post('/admin/planning-data/oceannpcarea/build');
     return response.data;
   }
+
+  /**
+   * Upload planning data files (drag & drop)
+   */
+  async uploadPlanningData(files: File[]): Promise<{ success: boolean; message: string; filesUploaded: string[]; stats: any }> {
+    const formData = new FormData();
+
+    // Add each file to FormData
+    files.forEach((file) => {
+      formData.append('files', file, file.name);
+    });
+
+    const response = await api.post('/admin/planning-data/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  }
 }
 
 export default new PlanningDataService();

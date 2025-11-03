@@ -12,7 +12,7 @@ exports.up = async function(connection) {
       isActive BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'Active status',
       category ENUM('maintenance', 'event', 'notice', 'promotion', 'other') NOT NULL COMMENT 'Notice category',
       platforms JSON NOT NULL COMMENT 'Target platforms (pc, pc-wegame, ios, android, harmonyos)',
-      startDate DATETIME NOT NULL COMMENT 'Start date/time (UTC)',
+      startDate DATETIME NULL COMMENT 'Start date/time (UTC)',
       endDate DATETIME NOT NULL COMMENT 'End date/time (UTC)',
       tabTitle VARCHAR(200) NULL COMMENT 'Optional tab title (used in list views)',
       title VARCHAR(500) NOT NULL COMMENT 'Notice title',

@@ -1,0 +1,62 @@
+{
+  ":ArenaUseMap": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "bannerList": "string",
+      "bannerImage": "string",
+      "markerType": "number",
+      "stageId": "number",
+      "desc": "text"
+    },
+    ":required": {
+      "name": 1,
+      "bannerImage": 1,
+      "markerType": 1,
+      "stageId": 1,
+      "desc": 1
+    },
+    ":min": {
+      "markerType": 0
+    },
+    ":max": {
+      "markerType": 4
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "ArenaUseMap": {
+    "101": {
+      "id": 101,
+      "name": "해안가의 전투",
+      "bannerImage": "WT_ArenaMap01_Sprite",
+      "markerType": 0,
+      "stageId": 15620001,
+      "desc": "해안가 인근에서 벌어지는 전투.\n순수하게 함대의 전투력으로 맞붙는 전장이다."
+    },
+    "102": {
+      "id": 102,
+      "name": "만의 전투",
+      "bannerImage": "WT_ArenaMap02_Sprite",
+      "markerType": 1,
+      "stageId": 15620002,
+      "desc": "커다란 만 깊숙이서 벌어지는 전투.\n추가 백병 공격력 10% 증가하며 백병 기술 사용 시 기동력 소모량이 10% 감소하고, 직접적으로 받는 포격 피해가 20% 감소한다."
+    },
+    "103": {
+      "id": 103,
+      "name": "유빙 지역의 전투",
+      "bannerImage": "WT_ArenaMap03_Sprite",
+      "markerType": 3,
+      "stageId": 15620003,
+      "desc": "4개의 작은 섬들 사이에서 벌어지는 전투.\n추가 충파 공격력 10% 증가하며 충파 기술 사용 시 기동력 소모량이 10% 감소하고, 직접적으로 받는 백병 피해가 20% 감소한다."
+    },
+    "104": {
+      "id": 104,
+      "name": "4개의 섬 사이의 전투",
+      "bannerImage": "WT_ArenaMap04_Sprite",
+      "markerType": 2,
+      "stageId": 15620004,
+      "desc": "크고 작은 유빙들 사이에서 벌어지는 전투.\n추가 포격 공격력 10% 증가하며 포격 기술 사용 시 기동력 소모량이 10% 감소하고, 직접적으로 받는 충파 피해가 20% 감소한다."
+    }
+  }
+}

@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 async function testServerAPI() {
-  const baseURL = 'http://localhost:5001';
+  const baseURL = 'http://localhost:5000';
   const token = '8b89ad53927a29ab6dbfb0569af5020d4dc81ecef08ec1d70439cd80fda465c9';
 
   const headers = {

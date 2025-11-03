@@ -1,0 +1,98 @@
+{
+  ":SpecialShipBlueprint": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "localBitflag": "bit",
+      "order": "number"
+    },
+    ":required": {
+      "name": 1,
+      "order": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "SpecialShipBlueprint": {
+    "70290000": {
+      "id": 70290000,
+      "name": "0",
+      "localBitflag": 127,
+      "order": 1
+    },
+    "70290001": {
+      "id": 70290001,
+      "name": "100",
+      "localBitflag": 127,
+      "order": 2
+    },
+    "70290002": {
+      "id": 70290002,
+      "name": "1",
+      "localBitflag": 127,
+      "order": 3
+    },
+    "70290003": {
+      "id": 70290003,
+      "name": "2",
+      "localBitflag": 127,
+      "order": 4
+    },
+    "70290004": {
+      "id": 70290004,
+      "name": "3",
+      "localBitflag": 127,
+      "order": 5
+    },
+    "70290005": {
+      "id": 70290005,
+      "name": "4",
+      "localBitflag": 127,
+      "order": 6
+    },
+    "70290006": {
+      "id": 70290006,
+      "name": "5",
+      "localBitflag": 127,
+      "order": 7
+    },
+    "70290007": {
+      "id": 70290007,
+      "name": "6",
+      "localBitflag": 127,
+      "order": 8
+    },
+    "70290008": {
+      "id": 70290008,
+      "name": "7",
+      "localBitflag": 127,
+      "order": 9
+    },
+    "70290009": {
+      "id": 70290009,
+      "name": "8",
+      "localBitflag": 127,
+      "order": 10
+    },
+    "70290010": {
+      "id": 70290010,
+      "name": "9",
+      "localBitflag": 127,
+      "order": 11
+    },
+    "70290011": {
+      "id": 70290011,
+      "name": "10",
+      "localBitflag": 127,
+      "order": 12
+    },
+    "70290012": {
+      "id": 70290012,
+      "name": "11",
+      "localBitflag": 127,
+      "order": 13
+    }
+  }
+}

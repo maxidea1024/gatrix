@@ -1,0 +1,345 @@
+{
+  ":OceanNpcLocalSpawner": {
+    ":type": {
+      "id": "key",
+      "order": "number",
+      "tileColor": "string",
+      "name": "text",
+      "minLv": "number",
+      "maxLv": "number",
+      "baseWorldmapTileInfoTexture": "string",
+      "worldmapTileInfoTexture": "string"
+    },
+    ":required": {
+      "order": 1,
+      "name": 1,
+      "minLv": 1,
+      "maxLv": 1,
+      "baseWorldmapTileInfoTexture": 1,
+      "worldmapTileInfoTexture": 1
+    },
+    ":min": {
+      "order": 1,
+      "minLv": 1,
+      "maxLv": 1
+    },
+    ":max": {
+      "minLv": 120,
+      "maxLv": 120
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "OceanNpcLocalSpawner": {
+    "30000": {
+      "id": 30000,
+      "order": 1,
+      "tileColor": "ffe9a7",
+      "name": "LV 1",
+      "minLv": 1,
+      "maxLv": 20,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_1"
+    },
+    "30001": {
+      "id": 30001,
+      "order": 2,
+      "tileColor": "ccff96",
+      "name": "LV 15",
+      "minLv": 20,
+      "maxLv": 30,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_2"
+    },
+    "30002": {
+      "id": 30002,
+      "order": 3,
+      "tileColor": "a0f7ff",
+      "name": "LV 20",
+      "minLv": 25,
+      "maxLv": 35,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_3"
+    },
+    "30011": {
+      "id": 30011,
+      "order": 4,
+      "tileColor": "a28cff",
+      "name": "LV 20",
+      "minLv": 25,
+      "maxLv": 35,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_4"
+    },
+    "30010": {
+      "id": 30010,
+      "order": 5,
+      "tileColor": "ff81ce",
+      "name": "LV 25",
+      "minLv": 30,
+      "maxLv": 40,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_5"
+    },
+    "30020": {
+      "id": 30020,
+      "order": 6,
+      "tileColor": "ff856d",
+      "name": "LV 30",
+      "minLv": 35,
+      "maxLv": 45,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_6"
+    },
+    "30021": {
+      "id": 30021,
+      "order": 7,
+      "tileColor": "ffda47",
+      "name": "LV 35",
+      "minLv": 40,
+      "maxLv": 50,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_7"
+    },
+    "30030": {
+      "id": 30030,
+      "order": 8,
+      "tileColor": "75ff4b",
+      "name": "LV 40",
+      "minLv": 45,
+      "maxLv": 55,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_8"
+    },
+    "30040": {
+      "id": 30040,
+      "order": 9,
+      "tileColor": "4fe4ff",
+      "name": "LV 45",
+      "minLv": 50,
+      "maxLv": 60,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_9"
+    },
+    "30050": {
+      "id": 30050,
+      "order": 10,
+      "tileColor": "4537ff",
+      "name": "LV 50",
+      "minLv": 55,
+      "maxLv": 65,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_10"
+    },
+    "30060": {
+      "id": 30060,
+      "order": 11,
+      "tileColor": "ba36ff",
+      "name": "LV 55",
+      "minLv": 60,
+      "maxLv": 70,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_11"
+    },
+    "30070": {
+      "id": 30070,
+      "order": 12,
+      "tileColor": "ff4d24",
+      "name": "LV 60",
+      "minLv": 65,
+      "maxLv": 75,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_12"
+    },
+    "30071": {
+      "id": 30071,
+      "order": 14,
+      "tileColor": "c69a11",
+      "name": "LV 65",
+      "minLv": 70,
+      "maxLv": 80,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_14"
+    },
+    "30072": {
+      "id": 30072,
+      "order": 13,
+      "tileColor": "4dd622",
+      "name": "LV 63",
+      "minLv": 68,
+      "maxLv": 78,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_13"
+    },
+    "30073": {
+      "id": 30073,
+      "order": 15,
+      "tileColor": "16b5d1",
+      "name": "LV 68",
+      "minLv": 73,
+      "maxLv": 83,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_15"
+    },
+    "30080": {
+      "id": 30080,
+      "order": 16,
+      "tileColor": "2518d9",
+      "name": "LV 70",
+      "minLv": 75,
+      "maxLv": 85,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_16"
+    },
+    "30081": {
+      "id": 30081,
+      "order": 17,
+      "tileColor": "8f21c9",
+      "name": "LV 75",
+      "minLv": 80,
+      "maxLv": 88,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_17"
+    },
+    "30082": {
+      "id": 30082,
+      "order": 18,
+      "tileColor": "c83b1b",
+      "name": "LV 77",
+      "minLv": 82,
+      "maxLv": 93,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_18"
+    },
+    "30083": {
+      "id": 30083,
+      "order": 19,
+      "tileColor": "8d6b00",
+      "name": "LV 79",
+      "minLv": 84,
+      "maxLv": 93,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_19"
+    },
+    "30084": {
+      "id": 30084,
+      "order": 20,
+      "tileColor": "218900",
+      "name": "LV 81",
+      "minLv": 86,
+      "maxLv": 93,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_20"
+    },
+    "30085": {
+      "id": 30085,
+      "order": 21,
+      "tileColor": "007286",
+      "name": "LV 83",
+      "minLv": 88,
+      "maxLv": 93,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_21"
+    },
+    "30086": {
+      "id": 30086,
+      "order": 22,
+      "tileColor": "08007e",
+      "name": "LV 85",
+      "minLv": 90,
+      "maxLv": 93,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_22"
+    },
+    "30087": {
+      "id": 30087,
+      "order": 23,
+      "tileColor": "7f0060",
+      "name": "LV 85",
+      "minLv": 90,
+      "maxLv": 93,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_23"
+    },
+    "30088": {
+      "id": 30088,
+      "order": 24,
+      "tileColor": "831800",
+      "name": "LV 88",
+      "minLv": 93,
+      "maxLv": 93,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_24"
+    },
+    "30089": {
+      "id": 30089,
+      "order": 25,
+      "tileColor": "ffe9a7",
+      "name": "LV 94",
+      "minLv": 94,
+      "maxLv": 94,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_25"
+    },
+    "30090": {
+      "id": 30090,
+      "order": 100,
+      "tileColor": "2518d9",
+      "name": "LV 120",
+      "minLv": 120,
+      "maxLv": 120,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_100"
+    },
+    "30091": {
+      "id": 30091,
+      "order": 101,
+      "tileColor": "c69a11",
+      "name": "LV 120",
+      "minLv": 120,
+      "maxLv": 120,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_101"
+    },
+    "30092": {
+      "id": 30092,
+      "order": 26,
+      "tileColor": "ccff96",
+      "name": "LV 95",
+      "minLv": 95,
+      "maxLv": 95,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_26"
+    },
+    "30093": {
+      "id": 30093,
+      "order": 27,
+      "tileColor": "a0f7ff",
+      "name": "LV 96",
+      "minLv": 96,
+      "maxLv": 96,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_27"
+    },
+    "30094": {
+      "id": 30094,
+      "order": 28,
+      "tileColor": "ccff96",
+      "name": "LV 97",
+      "minLv": 97,
+      "maxLv": 97,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_28"
+    },
+    "30095": {
+      "id": 30095,
+      "order": 29,
+      "tileColor": "8f21c9",
+      "name": "LV 98",
+      "minLv": 98,
+      "maxLv": 100,
+      "baseWorldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile",
+      "worldmapTileInfoTexture": "T_GEN_Worldmap_NpcLocalSpawnerOceanTile_29"
+    }
+  }
+}

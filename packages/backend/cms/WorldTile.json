@@ -1,0 +1,1608 @@
+{
+  ":WorldTile": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "tileColor": "string",
+      "tileUseType": "number",
+      "moveLockVal": "number",
+      "moveBuffVal": "number",
+      "baseWorldmapMoveLockTexture": "string",
+      "worldmapMoveLockTexture": "string",
+      "moveLockText": "text",
+      "moveBuffText": "text",
+      "worldBuffId": "number",
+      "worldBuff": [
+        {
+          "WorldBuffId": "number",
+          "Pct": "number"
+        },
+        {
+          "WorldBuffId": "number",
+          "Pct": "number"
+        },
+        {
+          "WorldBuffId": "number",
+          "Pct": "number"
+        },
+        {
+          "WorldBuffId": "number",
+          "Pct": "number"
+        },
+        {
+          "WorldBuffId": "number",
+          "Pct": "number"
+        },
+        {
+          "WorldBuffId": "number",
+          "Pct": "number"
+        },
+        {
+          "WorldBuffId": "number",
+          "Pct": "number"
+        },
+        {
+          "WorldBuffId": "number",
+          "Pct": "number"
+        }
+      ],
+      "oceanNpcBuff": "number"
+    },
+    ":required": {
+      "name": 1
+    },
+    ":min": {
+      "worldBuffId": 38000000,
+      "worldBuff": [
+        {
+          "WorldBuffId": 38000000,
+          "Pct": 0
+        },
+        {
+          "WorldBuffId": 38000000,
+          "Pct": 0
+        },
+        {
+          "WorldBuffId": 38000000,
+          "Pct": 0
+        },
+        {
+          "WorldBuffId": 38000000,
+          "Pct": 0
+        },
+        {
+          "WorldBuffId": 38000000,
+          "Pct": 0
+        },
+        {
+          "WorldBuffId": 38000000,
+          "Pct": 0
+        },
+        {
+          "WorldBuffId": 38000000,
+          "Pct": 0
+        },
+        {
+          "WorldBuffId": 38000000,
+          "Pct": 0
+        }
+      ],
+      "oceanNpcBuff": 16300000
+    },
+    ":max": {
+      "worldBuffId": 38099999,
+      "worldBuff": [
+        {
+          "WorldBuffId": 38099999,
+          "Pct": 100
+        },
+        {
+          "WorldBuffId": 38099999,
+          "Pct": 100
+        },
+        {
+          "WorldBuffId": 38099999,
+          "Pct": 100
+        },
+        {
+          "WorldBuffId": 38099999,
+          "Pct": 100
+        },
+        {
+          "WorldBuffId": 38099999,
+          "Pct": 100
+        },
+        {
+          "WorldBuffId": 38099999,
+          "Pct": 100
+        },
+        {
+          "WorldBuffId": 38099999,
+          "Pct": 100
+        },
+        {
+          "WorldBuffId": 38099999,
+          "Pct": 100
+        }
+      ],
+      "oceanNpcBuff": 16399999
+    },
+    ":enum": {},
+    ":asset": {},
+    ":links": {
+      "worldBuffId": [
+        "WorldBuff"
+      ],
+      "worldBuff": [
+        {
+          "WorldBuffId": [
+            "WorldBuff"
+          ]
+        },
+        {
+          "WorldBuffId": [
+            "WorldBuff"
+          ]
+        },
+        {
+          "WorldBuffId": [
+            "WorldBuff"
+          ]
+        },
+        {
+          "WorldBuffId": [
+            "WorldBuff"
+          ]
+        },
+        {
+          "WorldBuffId": [
+            "WorldBuff"
+          ]
+        },
+        {
+          "WorldBuffId": [
+            "WorldBuff"
+          ]
+        },
+        {
+          "WorldBuffId": [
+            "WorldBuff"
+          ]
+        },
+        {
+          "WorldBuffId": [
+            "WorldBuff"
+          ]
+        }
+      ],
+      "oceanNpcBuff": [
+        "OceanNpcBuff"
+      ]
+    }
+  },
+  "WorldTile": {
+    "14000100": {
+      "id": 14000100,
+      "name": "얼음 지형",
+      "tileUseType": 2,
+      "moveLockVal": 0,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_0"
+    },
+    "14000101": {
+      "id": 14000101,
+      "name": "얼음 지형",
+      "tileColor": "ffe9a7",
+      "tileUseType": 2,
+      "moveLockVal": 1,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_1",
+      "moveLockText": "쇄빙 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "쇄빙 {0} 이상 필요"
+    },
+    "14000102": {
+      "id": 14000102,
+      "name": "얼음 지형",
+      "tileColor": "ccff96",
+      "tileUseType": 2,
+      "moveLockVal": 40,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_40",
+      "moveLockText": "쇄빙 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "쇄빙 {0} 이상 필요"
+    },
+    "14000103": {
+      "id": 14000103,
+      "name": "얼음 지형",
+      "tileColor": "a0f7ff",
+      "tileUseType": 2,
+      "moveLockVal": 60,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_60",
+      "moveLockText": "쇄빙 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "쇄빙 {0} 이상 필요"
+    },
+    "14000104": {
+      "id": 14000104,
+      "name": "얼음 지형",
+      "tileColor": "a28cff",
+      "tileUseType": 2,
+      "moveLockVal": 75,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_75",
+      "moveLockText": "쇄빙 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "쇄빙 {0} 이상 필요"
+    },
+    "14000107": {
+      "id": 14000107,
+      "name": "얼음 지형",
+      "tileColor": "ff81ce",
+      "tileUseType": 2,
+      "moveLockVal": 80,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_80",
+      "moveLockText": "쇄빙 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "쇄빙 {0} 이상 필요"
+    },
+    "14000105": {
+      "id": 14000105,
+      "name": "얼음 지형",
+      "tileColor": "ff856d",
+      "tileUseType": 2,
+      "moveLockVal": 120,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_120",
+      "moveLockText": "쇄빙 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "쇄빙 {0} 이상 필요"
+    },
+    "14000108": {
+      "id": 14000108,
+      "name": "얼음 지형",
+      "tileColor": "75ff4b",
+      "tileUseType": 2,
+      "moveLockVal": 130,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_130",
+      "moveLockText": "쇄빙 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "쇄빙 {0} 이상 필요"
+    },
+    "14000109": {
+      "id": 14000109,
+      "name": "얼음 지형",
+      "tileColor": "4fe4ff",
+      "tileUseType": 2,
+      "moveLockVal": 140,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_140",
+      "moveLockText": "쇄빙 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "쇄빙 {0} 이상 필요"
+    },
+    "14000110": {
+      "id": 14000110,
+      "name": "얼음 지형",
+      "tileColor": "4537ff",
+      "tileUseType": 2,
+      "moveLockVal": 150,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_150",
+      "moveLockText": "쇄빙 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "쇄빙 {0} 이상 필요"
+    },
+    "14000111": {
+      "id": 14000111,
+      "name": "얼음 지형",
+      "tileColor": "ba36ff",
+      "tileUseType": 2,
+      "moveLockVal": 160,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_160",
+      "moveLockText": "쇄빙 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "쇄빙 {0} 이상 필요"
+    },
+    "14000106": {
+      "id": 14000106,
+      "name": "얼음 지형",
+      "tileColor": "ffda47",
+      "tileUseType": 2,
+      "moveLockVal": 200,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_IceBreakingOceanTile_200",
+      "moveLockText": "쇄빙 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "쇄빙 {0} 이상 필요"
+    },
+    "14000200": {
+      "id": 14000200,
+      "name": "선박 크기",
+      "tileUseType": 3,
+      "moveLockVal": 5,
+      "moveBuffVal": 5,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ShipSizeOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ShipSizeOceanTile_5"
+    },
+    "14000201": {
+      "id": 14000201,
+      "name": "선박 크기",
+      "tileUseType": 3,
+      "moveLockVal": 5,
+      "moveBuffVal": 5,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ShipSizeOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ShipSizeOceanTile_5",
+      "moveBuffText": "{0} 이하의 선박 필요"
+    },
+    "14000202": {
+      "id": 14000202,
+      "name": "선박 크기",
+      "tileUseType": 3,
+      "moveLockVal": 5,
+      "moveBuffVal": 5,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ShipSizeOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ShipSizeOceanTile_5",
+      "moveBuffText": "{0} 이하의 선박 필요"
+    },
+    "14000300": {
+      "id": 14000300,
+      "name": "내파 지형",
+      "tileUseType": 4,
+      "moveLockVal": 0,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_0"
+    },
+    "14000301": {
+      "id": 14000301,
+      "name": "내파 지형",
+      "tileColor": "ffe9a7",
+      "tileUseType": 4,
+      "moveLockVal": 2,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_2",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000302": {
+      "id": 14000302,
+      "name": "내파 지형",
+      "tileColor": "ccff96",
+      "tileUseType": 4,
+      "moveLockVal": 4,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_4",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000303": {
+      "id": 14000303,
+      "name": "내파 지형",
+      "tileColor": "a0f7ff",
+      "tileUseType": 4,
+      "moveLockVal": 7,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_7",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000304": {
+      "id": 14000304,
+      "name": "내파 지형",
+      "tileColor": "a28cff",
+      "tileUseType": 4,
+      "moveLockVal": 10,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_10",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000305": {
+      "id": 14000305,
+      "name": "내파 지형",
+      "tileColor": "ff81ce",
+      "tileUseType": 4,
+      "moveLockVal": 15,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_15",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000306": {
+      "id": 14000306,
+      "name": "내파 지형",
+      "tileColor": "ff856d",
+      "tileUseType": 4,
+      "moveLockVal": 20,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_20",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000307": {
+      "id": 14000307,
+      "name": "내파 지형",
+      "tileColor": "ffda47",
+      "tileUseType": 4,
+      "moveLockVal": 35,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_35",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000308": {
+      "id": 14000308,
+      "name": "내파 지형",
+      "tileColor": "75ff4b",
+      "tileUseType": 4,
+      "moveLockVal": 45,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_45",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000309": {
+      "id": 14000309,
+      "name": "내파 지형",
+      "tileColor": "4fe4ff",
+      "tileUseType": 4,
+      "moveLockVal": 55,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_55",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000310": {
+      "id": 14000310,
+      "name": "내파 지형",
+      "tileColor": "4537ff",
+      "tileUseType": 4,
+      "moveLockVal": 65,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_65",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000311": {
+      "id": 14000311,
+      "name": "내파 지형",
+      "tileColor": "ba36ff",
+      "tileUseType": 4,
+      "moveLockVal": 75,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_75",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000312": {
+      "id": 14000312,
+      "name": "내파 지형",
+      "tileColor": "ff4d24",
+      "tileUseType": 4,
+      "moveLockVal": 85,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_85",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000313": {
+      "id": 14000313,
+      "name": "내파 지형",
+      "tileColor": "c69a11",
+      "tileUseType": 4,
+      "moveLockVal": 95,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_95",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000314": {
+      "id": 14000314,
+      "name": "내파 지형",
+      "tileColor": "4dd622",
+      "tileUseType": 4,
+      "moveLockVal": 100,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_100",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000315": {
+      "id": 14000315,
+      "name": "내파 지형",
+      "tileColor": "16b5d1",
+      "tileUseType": 4,
+      "moveLockVal": 110,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_110",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000316": {
+      "id": 14000316,
+      "name": "내파 지형",
+      "tileColor": "2518d9",
+      "tileUseType": 4,
+      "moveLockVal": 120,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_120",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000317": {
+      "id": 14000317,
+      "name": "내파 지형",
+      "tileColor": "8f21c9",
+      "tileUseType": 4,
+      "moveLockVal": 130,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_130",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000318": {
+      "id": 14000318,
+      "name": "내파 지형",
+      "tileColor": "c83b1b",
+      "tileUseType": 4,
+      "moveLockVal": 140,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_140",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000319": {
+      "id": 14000319,
+      "name": "내파 지형",
+      "tileColor": "8d6b00",
+      "tileUseType": 4,
+      "moveLockVal": 150,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_150",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000320": {
+      "id": 14000320,
+      "name": "내파 지형",
+      "tileColor": "218900",
+      "tileUseType": 4,
+      "moveLockVal": 160,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_160",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000321": {
+      "id": 14000321,
+      "name": "내파 지형",
+      "tileColor": "007286",
+      "tileUseType": 4,
+      "moveLockVal": 155,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_155",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000323": {
+      "id": 14000323,
+      "name": "내파 지형",
+      "tileColor": "08007e",
+      "tileUseType": 4,
+      "moveLockVal": 165,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_165",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000324": {
+      "id": 14000324,
+      "name": "내파 지형",
+      "tileColor": "7f0060",
+      "tileUseType": 4,
+      "moveLockVal": 170,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_170",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000325": {
+      "id": 14000325,
+      "name": "내파 지형",
+      "tileColor": "831800",
+      "tileUseType": 4,
+      "moveLockVal": 175,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_175",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000328": {
+      "id": 14000328,
+      "name": "내파 지형",
+      "tileColor": "a0f7ff",
+      "tileUseType": 4,
+      "moveLockVal": 200,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_200",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000329": {
+      "id": 14000329,
+      "name": "내파 지형",
+      "tileColor": "a28cff",
+      "tileUseType": 4,
+      "moveLockVal": 210,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_210",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000322": {
+      "id": 14000322,
+      "name": "내파 지형",
+      "tileColor": "3E4242",
+      "tileUseType": 4,
+      "moveLockVal": 250,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_WaveResistanceOceanTile_250",
+      "moveLockText": "내파 {0} 이상이 필요합니다.\n더 좋은 장갑이나 닻을 장착하세요.",
+      "moveBuffText": "내파 {0} 이상 필요"
+    },
+    "14000400": {
+      "id": 14000400,
+      "name": "해초 지형",
+      "tileUseType": 6,
+      "moveLockVal": 0,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_0"
+    },
+    "14000401": {
+      "id": 14000401,
+      "name": "해초 지형",
+      "tileColor": "ffe9a7",
+      "tileUseType": 6,
+      "moveLockVal": 3,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_3",
+      "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "돌파 {0} 이상 필요"
+    },
+    "14000402": {
+      "id": 14000402,
+      "name": "해초 지형",
+      "tileColor": "ccff96",
+      "tileUseType": 6,
+      "moveLockVal": 10,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_10",
+      "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "돌파 {0} 이상 필요"
+    },
+    "14000403": {
+      "id": 14000403,
+      "name": "해초 지형",
+      "tileColor": "a0f7ff",
+      "tileUseType": 6,
+      "moveLockVal": 20,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_20",
+      "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "돌파 {0} 이상 필요"
+    },
+    "14000404": {
+      "id": 14000404,
+      "name": "해초 지형",
+      "tileColor": "a28cff",
+      "tileUseType": 6,
+      "moveLockVal": 30,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_30",
+      "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "돌파 {0} 이상 필요"
+    },
+    "14000405": {
+      "id": 14000405,
+      "name": "해초 지형",
+      "tileColor": "ff81ce",
+      "tileUseType": 6,
+      "moveLockVal": 40,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_40",
+      "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "돌파 {0} 이상 필요"
+    },
+    "14000406": {
+      "id": 14000406,
+      "name": "해초 지형",
+      "tileColor": "ff856d",
+      "tileUseType": 6,
+      "moveLockVal": 50,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_50",
+      "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "돌파 {0} 이상 필요"
+    },
+    "14000407": {
+      "id": 14000407,
+      "name": "해초 지형",
+      "tileColor": "ffda47",
+      "tileUseType": 6,
+      "moveLockVal": 60,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_60",
+      "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "돌파 {0} 이상 필요"
+    },
+    "14000408": {
+      "id": 14000408,
+      "name": "해초 지형",
+      "tileColor": "75ff4b",
+      "tileUseType": 6,
+      "moveLockVal": 80,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_80",
+      "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "돌파 {0} 이상 필요"
+    },
+    "14000409": {
+      "id": 14000409,
+      "name": "해초 지형",
+      "tileColor": "4fe4ff",
+      "tileUseType": 6,
+      "moveLockVal": 100,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_100",
+      "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "돌파 {0} 이상 필요"
+    },
+    "14000410": {
+      "id": 14000410,
+      "name": "해초 지형",
+      "tileColor": "4537ff",
+      "tileUseType": 6,
+      "moveLockVal": 120,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_120",
+      "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "돌파 {0} 이상 필요"
+    },
+    "14000411": {
+      "id": 14000411,
+      "name": "해초 지형",
+      "tileColor": "ba36ff",
+      "tileUseType": 6,
+      "moveLockVal": 125,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_125",
+      "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
+      "moveBuffText": "돌파 {0} 이상 필요"
+    },
+    "14000500": {
+      "id": 14000500,
+      "name": "암초 지형",
+      "tileUseType": 5,
+      "moveLockVal": 0,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile_0"
+    },
+    "14000501": {
+      "id": 14000501,
+      "name": "암초 지형",
+      "tileColor": "ffe9a7",
+      "tileUseType": 5,
+      "moveLockVal": 0,
+      "moveBuffVal": 10,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile_10",
+      "moveLockText": "조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "moveBuffText": "정상 속도를 위해서는 조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "worldBuffId": 38015500
+    },
+    "14000502": {
+      "id": 14000502,
+      "name": "암초 지형",
+      "tileColor": "ccff96",
+      "tileUseType": 5,
+      "moveLockVal": 0,
+      "moveBuffVal": 15,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile_15",
+      "moveLockText": "조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "moveBuffText": "정상 속도를 위해서는 조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "worldBuffId": 38015500
+    },
+    "14000503": {
+      "id": 14000503,
+      "name": "암초 지형",
+      "tileColor": "a0f7ff",
+      "tileUseType": 5,
+      "moveLockVal": 0,
+      "moveBuffVal": 20,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile_20",
+      "moveLockText": "조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "moveBuffText": "정상 속도를 위해서는 조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "worldBuffId": 38015500
+    },
+    "14000504": {
+      "id": 14000504,
+      "name": "암초 지형",
+      "tileColor": "a28cff",
+      "tileUseType": 5,
+      "moveLockVal": 0,
+      "moveBuffVal": 25,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile_25",
+      "moveLockText": "조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "moveBuffText": "정상 속도를 위해서는 조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "worldBuffId": 38015500
+    },
+    "14000505": {
+      "id": 14000505,
+      "name": "암초 지형",
+      "tileColor": "ff81ce",
+      "tileUseType": 5,
+      "moveLockVal": 0,
+      "moveBuffVal": 30,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile_30",
+      "moveLockText": "조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "moveBuffText": "정상 속도를 위해서는 조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "worldBuffId": 38015500
+    },
+    "14000506": {
+      "id": 14000506,
+      "name": "암초 지형",
+      "tileColor": "ff856d",
+      "tileUseType": 5,
+      "moveLockVal": 0,
+      "moveBuffVal": 35,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile_35",
+      "moveLockText": "조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "moveBuffText": "정상 속도를 위해서는 조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "worldBuffId": 38015500
+    },
+    "14000507": {
+      "id": 14000507,
+      "name": "암초 지형",
+      "tileColor": "ffda47",
+      "tileUseType": 5,
+      "moveLockVal": 0,
+      "moveBuffVal": 100,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanRockTile_35",
+      "moveLockText": "조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "moveBuffText": "정상 속도를 위해서는 조력 {0} 이상이 필요합니다.\n조력이 있는 선박을 준비하세요.",
+      "worldBuffId": 38015501
+    },
+    "14000600": {
+      "id": 14000600,
+      "name": "선단 레벨",
+      "tileUseType": 1,
+      "moveLockVal": 0,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile_0"
+    },
+    "14000601": {
+      "id": 14000601,
+      "name": "선단 레벨",
+      "tileColor": "ffe9a7",
+      "tileUseType": 1,
+      "moveLockVal": 15,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile_15",
+      "moveLockText": "선단 LV {0} 이상이 필요합니다.\n선단 LV을 더 높이고 오세요.",
+      "moveBuffText": "선단 LV {0} 이상 필요"
+    },
+    "14000602": {
+      "id": 14000602,
+      "name": "선단 레벨",
+      "tileColor": "ccff96",
+      "tileUseType": 1,
+      "moveLockVal": 18,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile_18",
+      "moveLockText": "선단 LV {0} 이상이 필요합니다.\n선단 LV을 더 높이고 오세요.",
+      "moveBuffText": "선단 LV {0} 이상 필요"
+    },
+    "14000603": {
+      "id": 14000603,
+      "name": "선단 레벨",
+      "tileColor": "a0f7ff",
+      "tileUseType": 1,
+      "moveLockVal": 20,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile_20",
+      "moveLockText": "선단 LV {0} 이상이 필요합니다.\n선단 LV을 더 높이고 오세요.",
+      "moveBuffText": "선단 LV {0} 이상 필요"
+    },
+    "14000619": {
+      "id": 14000619,
+      "name": "선단 레벨",
+      "tileColor": "a28cff",
+      "tileUseType": 1,
+      "moveLockVal": 27,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile_27",
+      "moveLockText": "선단 LV {0} 이상이 필요합니다.\n선단 LV을 더 높이고 오세요.",
+      "moveBuffText": "선단 LV {0} 이상 필요"
+    },
+    "14000604": {
+      "id": 14000604,
+      "name": "선단 레벨",
+      "tileColor": "ff81ce",
+      "tileUseType": 1,
+      "moveLockVal": 24,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile_24",
+      "moveLockText": "선단 LV {0} 이상이 필요합니다.\n선단 LV을 더 높이고 오세요.",
+      "moveBuffText": "선단 LV {0} 이상 필요"
+    },
+    "14000605": {
+      "id": 14000605,
+      "name": "선단 레벨",
+      "tileColor": "ff856d",
+      "tileUseType": 1,
+      "moveLockVal": 30,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile_30",
+      "moveLockText": "선단 LV {0} 이상이 필요합니다.\n선단 LV을 더 높이고 오세요.",
+      "moveBuffText": "선단 LV {0} 이상 필요"
+    },
+    "14000606": {
+      "id": 14000606,
+      "name": "선단 레벨",
+      "tileColor": "ffda47",
+      "tileUseType": 1,
+      "moveLockVal": 34,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile_34",
+      "moveLockText": "선단 LV {0} 이상이 필요합니다.\n선단 LV을 더 높이고 오세요.",
+      "moveBuffText": "선단 LV {0} 이상 필요"
+    },
+    "14000607": {
+      "id": 14000607,
+      "name": "선단 레벨",
+      "tileColor": "75ff4b",
+      "tileUseType": 1,
+      "moveLockVal": 37,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile_37",
+      "moveLockText": "선단 LV {0} 이상이 필요합니다.\n선단 LV을 더 높이고 오세요.",
+      "moveBuffText": "선단 LV {0} 이상 필요"
+    },
+    "14000608": {
+      "id": 14000608,
+      "name": "선단 레벨",
+      "tileColor": "4fe4ff",
+      "tileUseType": 1,
+      "moveLockVal": 40,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile_40",
+      "moveLockText": "선단 LV {0} 이상이 필요합니다.\n선단 LV을 더 높이고 오세요.",
+      "moveBuffText": "선단 LV {0} 이상 필요"
+    },
+    "14000618": {
+      "id": 14000618,
+      "name": "선단 레벨",
+      "tileColor": "08007e",
+      "tileUseType": 1,
+      "moveLockVal": 120,
+      "moveBuffVal": 0,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_CompanyLvOceanTile_120",
+      "moveLockText": "선단 LV {0} 이상이 필요합니다.\n선단 LV을 더 높이고 오세요.",
+      "moveBuffText": "선단 LV {0} 이상 필요"
+    },
+    "14010001": {
+      "id": 14010001,
+      "name": "#한기",
+      "tileColor": "ffe9a7",
+      "tileUseType": 8,
+      "moveLockVal": 0,
+      "moveBuffVal": 10,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile_10",
+      "moveLockText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "moveBuffText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "worldBuff": [
+        {
+          "WorldBuffId": 38016007,
+          "Pct": 90
+        },
+        {
+          "WorldBuffId": 38016006,
+          "Pct": 80
+        },
+        {
+          "WorldBuffId": 38016005,
+          "Pct": 70
+        },
+        {
+          "WorldBuffId": 38016004,
+          "Pct": 60
+        },
+        {
+          "WorldBuffId": 38016003,
+          "Pct": 50
+        },
+        {
+          "WorldBuffId": 38016002,
+          "Pct": 40
+        },
+        {
+          "WorldBuffId": 38016001,
+          "Pct": 30
+        },
+        {
+          "WorldBuffId": 38016000,
+          "Pct": 20
+        }
+      ]
+    },
+    "14010002": {
+      "id": 14010002,
+      "name": "#한기",
+      "tileColor": "ccff96",
+      "tileUseType": 8,
+      "moveLockVal": 0,
+      "moveBuffVal": 20,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile_20",
+      "moveLockText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "moveBuffText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "worldBuff": [
+        {
+          "WorldBuffId": 38016007,
+          "Pct": 90
+        },
+        {
+          "WorldBuffId": 38016006,
+          "Pct": 80
+        },
+        {
+          "WorldBuffId": 38016005,
+          "Pct": 70
+        },
+        {
+          "WorldBuffId": 38016004,
+          "Pct": 60
+        },
+        {
+          "WorldBuffId": 38016003,
+          "Pct": 50
+        },
+        {
+          "WorldBuffId": 38016002,
+          "Pct": 40
+        },
+        {
+          "WorldBuffId": 38016001,
+          "Pct": 30
+        },
+        {
+          "WorldBuffId": 38016000,
+          "Pct": 20
+        }
+      ]
+    },
+    "14010003": {
+      "id": 14010003,
+      "name": "#한기",
+      "tileColor": "a0f7ff",
+      "tileUseType": 8,
+      "moveLockVal": 0,
+      "moveBuffVal": 30,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile_30",
+      "moveLockText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "moveBuffText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "worldBuff": [
+        {
+          "WorldBuffId": 38016007,
+          "Pct": 90
+        },
+        {
+          "WorldBuffId": 38016006,
+          "Pct": 80
+        },
+        {
+          "WorldBuffId": 38016005,
+          "Pct": 70
+        },
+        {
+          "WorldBuffId": 38016004,
+          "Pct": 60
+        },
+        {
+          "WorldBuffId": 38016003,
+          "Pct": 50
+        },
+        {
+          "WorldBuffId": 38016002,
+          "Pct": 40
+        },
+        {
+          "WorldBuffId": 38016001,
+          "Pct": 30
+        },
+        {
+          "WorldBuffId": 38016000,
+          "Pct": 20
+        }
+      ]
+    },
+    "14010004": {
+      "id": 14010004,
+      "name": "#한기",
+      "tileColor": "a28cff",
+      "tileUseType": 8,
+      "moveLockVal": 0,
+      "moveBuffVal": 40,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile_40",
+      "moveLockText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "moveBuffText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "worldBuff": [
+        {
+          "WorldBuffId": 38016007,
+          "Pct": 90
+        },
+        {
+          "WorldBuffId": 38016006,
+          "Pct": 80
+        },
+        {
+          "WorldBuffId": 38016005,
+          "Pct": 70
+        },
+        {
+          "WorldBuffId": 38016004,
+          "Pct": 60
+        },
+        {
+          "WorldBuffId": 38016003,
+          "Pct": 50
+        },
+        {
+          "WorldBuffId": 38016002,
+          "Pct": 40
+        },
+        {
+          "WorldBuffId": 38016001,
+          "Pct": 30
+        },
+        {
+          "WorldBuffId": 38016000,
+          "Pct": 20
+        }
+      ]
+    },
+    "14010005": {
+      "id": 14010005,
+      "name": "#한기",
+      "tileColor": "ff81ce",
+      "tileUseType": 8,
+      "moveLockVal": 0,
+      "moveBuffVal": 50,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile_50",
+      "moveLockText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "moveBuffText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "worldBuff": [
+        {
+          "WorldBuffId": 38016007,
+          "Pct": 90
+        },
+        {
+          "WorldBuffId": 38016006,
+          "Pct": 80
+        },
+        {
+          "WorldBuffId": 38016005,
+          "Pct": 70
+        },
+        {
+          "WorldBuffId": 38016004,
+          "Pct": 60
+        },
+        {
+          "WorldBuffId": 38016003,
+          "Pct": 50
+        },
+        {
+          "WorldBuffId": 38016002,
+          "Pct": 40
+        },
+        {
+          "WorldBuffId": 38016001,
+          "Pct": 30
+        },
+        {
+          "WorldBuffId": 38016000,
+          "Pct": 20
+        }
+      ]
+    },
+    "14010006": {
+      "id": 14010006,
+      "name": "#한기",
+      "tileColor": "ff856d",
+      "tileUseType": 8,
+      "moveLockVal": 0,
+      "moveBuffVal": 60,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile_60",
+      "moveLockText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "moveBuffText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "worldBuff": [
+        {
+          "WorldBuffId": 38016007,
+          "Pct": 90
+        },
+        {
+          "WorldBuffId": 38016006,
+          "Pct": 80
+        },
+        {
+          "WorldBuffId": 38016005,
+          "Pct": 70
+        },
+        {
+          "WorldBuffId": 38016004,
+          "Pct": 60
+        },
+        {
+          "WorldBuffId": 38016003,
+          "Pct": 50
+        },
+        {
+          "WorldBuffId": 38016002,
+          "Pct": 40
+        },
+        {
+          "WorldBuffId": 38016001,
+          "Pct": 30
+        },
+        {
+          "WorldBuffId": 38016000,
+          "Pct": 20
+        }
+      ]
+    },
+    "14010007": {
+      "id": 14010007,
+      "name": "#한기",
+      "tileColor": "ffda47",
+      "tileUseType": 8,
+      "moveLockVal": 0,
+      "moveBuffVal": 70,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile_70",
+      "moveLockText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "moveBuffText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "worldBuff": [
+        {
+          "WorldBuffId": 38016007,
+          "Pct": 90
+        },
+        {
+          "WorldBuffId": 38016006,
+          "Pct": 80
+        },
+        {
+          "WorldBuffId": 38016005,
+          "Pct": 70
+        },
+        {
+          "WorldBuffId": 38016004,
+          "Pct": 60
+        },
+        {
+          "WorldBuffId": 38016003,
+          "Pct": 50
+        },
+        {
+          "WorldBuffId": 38016002,
+          "Pct": 40
+        },
+        {
+          "WorldBuffId": 38016001,
+          "Pct": 30
+        },
+        {
+          "WorldBuffId": 38016000,
+          "Pct": 20
+        }
+      ]
+    },
+    "14010008": {
+      "id": 14010008,
+      "name": "#한기",
+      "tileColor": "75ff4b",
+      "tileUseType": 8,
+      "moveLockVal": 0,
+      "moveBuffVal": 80,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile_80",
+      "moveLockText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "moveBuffText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "worldBuff": [
+        {
+          "WorldBuffId": 38016007,
+          "Pct": 90
+        },
+        {
+          "WorldBuffId": 38016006,
+          "Pct": 80
+        },
+        {
+          "WorldBuffId": 38016005,
+          "Pct": 70
+        },
+        {
+          "WorldBuffId": 38016004,
+          "Pct": 60
+        },
+        {
+          "WorldBuffId": 38016003,
+          "Pct": 50
+        },
+        {
+          "WorldBuffId": 38016002,
+          "Pct": 40
+        },
+        {
+          "WorldBuffId": 38016001,
+          "Pct": 30
+        },
+        {
+          "WorldBuffId": 38016000,
+          "Pct": 20
+        }
+      ]
+    },
+    "14010009": {
+      "id": 14010009,
+      "name": "#한기",
+      "tileColor": "4fe4ff",
+      "tileUseType": 8,
+      "moveLockVal": 0,
+      "moveBuffVal": 90,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile_90",
+      "moveLockText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "moveBuffText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "worldBuff": [
+        {
+          "WorldBuffId": 38016007,
+          "Pct": 90
+        },
+        {
+          "WorldBuffId": 38016006,
+          "Pct": 80
+        },
+        {
+          "WorldBuffId": 38016005,
+          "Pct": 70
+        },
+        {
+          "WorldBuffId": 38016004,
+          "Pct": 60
+        },
+        {
+          "WorldBuffId": 38016003,
+          "Pct": 50
+        },
+        {
+          "WorldBuffId": 38016002,
+          "Pct": 40
+        },
+        {
+          "WorldBuffId": 38016001,
+          "Pct": 30
+        },
+        {
+          "WorldBuffId": 38016000,
+          "Pct": 20
+        }
+      ]
+    },
+    "14010010": {
+      "id": 14010010,
+      "name": "#한기",
+      "tileColor": "4537ff",
+      "tileUseType": 8,
+      "moveLockVal": 0,
+      "moveBuffVal": 100,
+      "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_ChillOceanTile_100",
+      "moveLockText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "moveBuffText": "한기 {0} 이상이 필요합니다.\n한기 부족에 따라 선원 수 감소와 선박 속도 저하가 발생할 수 있습니다.",
+      "worldBuff": [
+        {
+          "WorldBuffId": 38016007,
+          "Pct": 90
+        },
+        {
+          "WorldBuffId": 38016006,
+          "Pct": 80
+        },
+        {
+          "WorldBuffId": 38016005,
+          "Pct": 70
+        },
+        {
+          "WorldBuffId": 38016004,
+          "Pct": 60
+        },
+        {
+          "WorldBuffId": 38016003,
+          "Pct": 50
+        },
+        {
+          "WorldBuffId": 38016002,
+          "Pct": 40
+        },
+        {
+          "WorldBuffId": 38016001,
+          "Pct": 30
+        },
+        {
+          "WorldBuffId": 38016000,
+          "Pct": 20
+        }
+      ]
+    },
+    "14050001": {
+      "id": 14050001,
+      "name": "근해",
+      "tileUseType": 1,
+      "moveLockVal": 0,
+      "moveBuffVal": 999,
+      "moveLockText": "근해에 진입했습니다.",
+      "moveBuffText": "근해"
+    },
+    "14050002": {
+      "id": 14050002,
+      "name": "강",
+      "tileUseType": 1,
+      "moveLockVal": 0,
+      "moveBuffVal": 999,
+      "moveLockText": "강에 진입했습니다.",
+      "moveBuffText": "강"
+    },
+    "14050003": {
+      "id": 14050003,
+      "name": "산호",
+      "tileUseType": 1,
+      "moveLockVal": 0,
+      "moveBuffVal": 999,
+      "moveLockText": "산호 해역에 진입했습니다.",
+      "moveBuffText": "산호 해역"
+    },
+    "14050004": {
+      "id": 14050004,
+      "name": "산호",
+      "tileUseType": 1,
+      "moveLockVal": 0,
+      "moveBuffVal": 999,
+      "moveLockText": "산호 해역에 진입했습니다.",
+      "moveBuffText": "산호 해역"
+    },
+    "14050005": {
+      "id": 14050005,
+      "name": "산호",
+      "tileUseType": 1,
+      "moveLockVal": 0,
+      "moveBuffVal": 999,
+      "moveLockText": "산호 해역에 진입했습니다.",
+      "moveBuffText": "산호 해역"
+    },
+    "14050006": {
+      "id": 14050006,
+      "name": "산호",
+      "tileUseType": 1,
+      "moveLockVal": 0,
+      "moveBuffVal": 999,
+      "moveLockText": "산호 해역에 진입했습니다.",
+      "moveBuffText": "산호 해역"
+    },
+    "14050007": {
+      "id": 14050007,
+      "name": "흑해",
+      "tileUseType": 1,
+      "moveLockVal": 0,
+      "moveBuffVal": 999,
+      "moveLockText": "흑해 해역에 진입했습니다.",
+      "moveBuffText": "흑해 해역"
+    },
+    "14050008": {
+      "id": 14050008,
+      "name": "황해",
+      "tileUseType": 1,
+      "moveLockVal": 0,
+      "moveBuffVal": 999,
+      "moveLockText": "황해 해역에 진입했습니다.",
+      "moveBuffText": "황해 해역"
+    },
+    "14050009": {
+      "id": 14050009,
+      "name": "백해",
+      "tileUseType": 1,
+      "moveLockVal": 0,
+      "moveBuffVal": 999,
+      "moveLockText": "백해 해역에 진입했습니다.",
+      "moveBuffText": "백해 해역"
+    },
+    "14050010": {
+      "id": 14050010,
+      "name": "극지",
+      "tileUseType": 1,
+      "moveLockVal": 0,
+      "moveBuffVal": 999,
+      "moveLockText": "극지 해역에 진입했습니다.",
+      "moveBuffText": "극지 해역"
+    }
+  }
+}

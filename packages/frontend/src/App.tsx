@@ -247,177 +247,177 @@ const AppContent: React.FC = () => {
           <GameWorldProvider>
             <AuthInitializer>
               <LocalizedDatePickers>
-              <CssBaseline />
-            {/* Global scrollbar styles */}
-            <GlobalStyles
-              styles={(theme) => ({
-                // Firefox - thin scrollbar for all elements
-                'html, body, *, div, main, section, article, aside, nav': {
-                  scrollbarWidth: 'thin',
-                },
-                // WebKit/Blink (Chrome, Edge, Safari)
-                'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar': {
-                  width: '8px',
-                  height: '8px',
-                },
-                'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track': {
-                  background: 'transparent',
-                },
-                'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb': {
-                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-                  borderRadius: '4px',
-                },
-                'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover, div::-webkit-scrollbar-thumb:hover': {
-                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-                },
-                'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, *::-webkit-scrollbar-thumb:active, div::-webkit-scrollbar-thumb:active': {
-                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-                },
-              })}
-            />
-            <SnackbarProvider
-              maxSnack={3}
-              autoHideDuration={3000}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'center',
-              }}
-              classes={{
-                containerRoot: 'snackbar-container-root',
-              }}
-              style={{ zIndex: 9999 }}
-            >
-              <Router basename={import.meta.env.VITE_ROUTER_BASENAME || '/'}>
-                <Routes>
-                {/* Public Routes */}
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/logout" element={<LogoutPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/signup" element={<RegisterPage />} />
-                <Route path="/invalid-invite" element={<InvalidInvitePage />} />
-                <Route path="/pending-approval" element={<PendingApprovalPage />} />
-                <Route path="/auth/pending" element={<PendingApprovalPage />} />
-                <Route path="/auth/callback" element={<OAuthCallbackPage />} />
-                <Route path="/account-suspended" element={<AccountSuspendedPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-                <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                <CssBaseline />
+                {/* Global scrollbar styles */}
+                <GlobalStyles
+                  styles={(theme) => ({
+                    // Firefox - thin scrollbar for all elements
+                    'html, body, *, div, main, section, article, aside, nav': {
+                      scrollbarWidth: 'thin',
+                    },
+                    // WebKit/Blink (Chrome, Edge, Safari)
+                    'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar': {
+                      width: '8px',
+                      height: '8px',
+                    },
+                    'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track': {
+                      background: 'transparent',
+                    },
+                    'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb': {
+                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+                      borderRadius: '4px',
+                    },
+                    'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover, div::-webkit-scrollbar-thumb:hover': {
+                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                    },
+                    'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, *::-webkit-scrollbar-thumb:active, div::-webkit-scrollbar-thumb:active': {
+                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+                    },
+                  })}
+                />
+                <SnackbarProvider
+                  maxSnack={3}
+                  autoHideDuration={3000}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                  }}
+                  classes={{
+                    containerRoot: 'snackbar-container-root',
+                  }}
+                  style={{ zIndex: 9999 }}
+                >
+                  <Router basename={import.meta.env.VITE_ROUTER_BASENAME || '/'}>
+                    <Routes>
+                      {/* Public Routes */}
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/logout" element={<LogoutPage />} />
+                      <Route path="/register" element={<RegisterPage />} />
+                      <Route path="/signup" element={<RegisterPage />} />
+                      <Route path="/invalid-invite" element={<InvalidInvitePage />} />
+                      <Route path="/pending-approval" element={<PendingApprovalPage />} />
+                      <Route path="/auth/pending" element={<PendingApprovalPage />} />
+                      <Route path="/auth/callback" element={<OAuthCallbackPage />} />
+                      <Route path="/account-suspended" element={<AccountSuspendedPage />} />
+                      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                      <Route path="/reset-password" element={<ResetPasswordPage />} />
+                      <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-                {/* Service Notices Preview - Public Route */}
-                <Route path="/service-notices-preview" element={<ServiceNoticesPreviewPage />} />
+                      {/* Service Notices Preview - Public Route */}
+                      <Route path="/service-notices-preview" element={<ServiceNoticesPreviewPage />} />
 
-                {/* Landing Page - only for first-time visitors */}
-                <Route path="/" element={<ConditionalLandingPage />} />
+                      {/* Landing Page - only for first-time visitors */}
+                      <Route path="/" element={<ConditionalLandingPage />} />
 
-                {/* Protected Routes */}
+                      {/* Protected Routes */}
 
-                <Route path="/dashboard" element={
-                  <ProtectedRoute>
-                    <MainLayout>
-                      <DashboardPage />
-                    </MainLayout>
-                  </ProtectedRoute>
-                } />
+                      <Route path="/dashboard" element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <DashboardPage />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      } />
 
-                <Route path="/chat" element={
-                  <ProtectedRoute>
-                    <MainLayout>
-                      <ChatPage />
-                    </MainLayout>
-                  </ProtectedRoute>
-                } />
+                      <Route path="/chat" element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <ChatPage />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      } />
 
-                <Route path="/mailbox" element={
-                  <ProtectedRoute>
-                    <MainLayout>
-                      <MailboxPage />
-                    </MainLayout>
-                  </ProtectedRoute>
-                } />
+                      <Route path="/mailbox" element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <MailboxPage />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      } />
 
-                <Route path="/profile" element={
-                  <ProtectedRoute>
-                    <MainLayout>
-                      <ProfilePage />
-                    </MainLayout>
-                  </ProtectedRoute>
-                } />
+                      <Route path="/profile" element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <ProfilePage />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      } />
 
-                {/* Settings Routes */}
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <MainLayout>
-                      <SettingsPage />
-                    </MainLayout>
-                  </ProtectedRoute>
-                } />
-                <Route path="/settings/tags" element={
-                  <ProtectedRoute>
-                    <MainLayout>
-                      <TagsPage />
-                    </MainLayout>
-                  </ProtectedRoute>
-                } />
+                      {/* Settings Routes */}
+                      <Route path="/settings" element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <SettingsPage />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/settings/tags" element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <TagsPage />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      } />
 
-                {/* Advanced Settings Route - Removed */}
+                      {/* Advanced Settings Route - Removed */}
 
-                {/* Admin Routes */}
-                <Route path="/admin/*" element={
-                  <ProtectedRoute requiredRoles={['admin']}>
-                    <MainLayout>
-                      <Routes>
-                        <Route index element={<Navigate to="/admin/users" replace />} />
-                        <Route path="users" element={<UsersManagementPage />} />
-                        <Route path="client-versions" element={<ClientVersionsPage />} />
-                        <Route path="game-worlds" element={<GameWorldsPage />} />
-                        <Route path="maintenance" element={<MaintenancePage />} />
-                        <Route path="maintenance-templates" element={<MessageTemplatesPage />} />
-                        <Route path="scheduler" element={<SchedulerPage />} />
-                        <Route path="whitelist" element={<WhitelistPage />} />
+                      {/* Admin Routes */}
+                      <Route path="/admin/*" element={
+                        <ProtectedRoute requiredRoles={['admin']}>
+                          <MainLayout>
+                            <Routes>
+                              <Route index element={<Navigate to="/admin/users" replace />} />
+                              <Route path="users" element={<UsersManagementPage />} />
+                              <Route path="client-versions" element={<ClientVersionsPage />} />
+                              <Route path="game-worlds" element={<GameWorldsPage />} />
+                              <Route path="maintenance" element={<MaintenancePage />} />
+                              <Route path="maintenance-templates" element={<MessageTemplatesPage />} />
+                              <Route path="scheduler" element={<SchedulerPage />} />
+                              <Route path="whitelist" element={<WhitelistPage />} />
 
-                        <Route path="jobs" element={<JobsPage />} />
-                        <Route path="queue-monitor" element={<QueueMonitorPage />} />
-                        <Route path="audit-logs" element={<AuditLogsPage />} />
-                        <Route path="realtime-events" element={<RealtimeEventsPage />} />
-                        <Route path="crash-events" element={<CrashEventsPage />} />
-                        <Route path="remote-config" element={<RemoteConfigDashboard />} />
-                        <Route path="remote-config-old" element={<RemoteConfigPage />} />
-                        <Route path="remote-config/history" element={<RemoteConfigHistoryPage />} />
-                        <Route path="api-tokens" element={<ApiTokensPage />} />
-                        <Route path="console" element={<SystemConsolePage />} />
-                        <Route path="server-list" element={<ServerListPage />} />
-                        <Route path="open-api" element={<OpenApiPage />} />
-                        <Route path="event-lens/projects" element={<EventLensProjectsPage />} />
-                      </Routes>
-                    </MainLayout>
-                  </ProtectedRoute>
-                } />
+                              <Route path="jobs" element={<JobsPage />} />
+                              <Route path="queue-monitor" element={<QueueMonitorPage />} />
+                              <Route path="audit-logs" element={<AuditLogsPage />} />
+                              <Route path="realtime-events" element={<RealtimeEventsPage />} />
+                              <Route path="crash-events" element={<CrashEventsPage />} />
+                              <Route path="remote-config" element={<RemoteConfigDashboard />} />
+                              <Route path="remote-config-old" element={<RemoteConfigPage />} />
+                              <Route path="remote-config/history" element={<RemoteConfigHistoryPage />} />
+                              <Route path="api-tokens" element={<ApiTokensPage />} />
+                              <Route path="console" element={<SystemConsolePage />} />
+                              <Route path="server-list" element={<ServerListPage />} />
+                              <Route path="open-api" element={<OpenApiPage />} />
+                              <Route path="event-lens/projects" element={<EventLensProjectsPage />} />
+                            </Routes>
+                          </MainLayout>
+                        </ProtectedRoute>
+                      } />
 
-                {/* Game Routes */}
-                <Route path="/game/*" element={
-                  <ProtectedRoute requiredRoles={['admin']}>
-                    <MainLayout>
-                      <Routes>
-                        <Route path="service-notices" element={<ServiceNoticesPage />} />
-                        <Route path="ingame-popup-notices" element={<IngamePopupNoticesPage />} />
-                        <Route path="coupons" element={<CouponsPage />} />
-                        <Route path="surveys" element={<SurveysPage />} />
-                        <Route path="reward-templates" element={<RewardTemplatesPage />} />
-                        <Route path="hot-time-button-event" element={<HotTimeButtonEventPage />} />
-                        <Route path="coupon-settings" element={<CouponSettingsPage />} />
-                        <Route path="coupon-usage" element={<CouponUsagePage />} />
-                        <Route path="live-event" element={<LiveEventPage />} />
-                        <Route path="planning-data" element={<PlanningDataPage />} />
-                      </Routes>
-                    </MainLayout>
-                  </ProtectedRoute>
-                } />
+                      {/* Game Routes */}
+                      <Route path="/game/*" element={
+                        <ProtectedRoute requiredRoles={['admin']}>
+                          <MainLayout>
+                            <Routes>
+                              <Route path="service-notices" element={<ServiceNoticesPage />} />
+                              <Route path="ingame-popup-notices" element={<IngamePopupNoticesPage />} />
+                              <Route path="coupons" element={<CouponsPage />} />
+                              <Route path="surveys" element={<SurveysPage />} />
+                              <Route path="reward-templates" element={<RewardTemplatesPage />} />
+                              <Route path="hot-time-button-event" element={<HotTimeButtonEventPage />} />
+                              <Route path="coupon-settings" element={<CouponSettingsPage />} />
+                              <Route path="coupon-usage" element={<CouponUsagePage />} />
+                              <Route path="live-event" element={<LiveEventPage />} />
+                              <Route path="planning-data" element={<PlanningDataPage />} />
+                            </Routes>
+                          </MainLayout>
+                        </ProtectedRoute>
+                      } />
 
-                {/* 404 Route */}
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </Router>
-            </SnackbarProvider>
+                      {/* 404 Route */}
+                      <Route path="*" element={<NotFoundPage />} />
+                    </Routes>
+                  </Router>
+                </SnackbarProvider>
               </LocalizedDatePickers>
             </AuthInitializer>
           </GameWorldProvider>

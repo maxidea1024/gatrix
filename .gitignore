@@ -100,3 +100,6 @@ Thumbs.db
 tmp/
 temp/
 /packages/backend/public/crashes
+
+# Runtime generated planning data (dynamically generated at runtime)
+/packages/backend/data/planning/

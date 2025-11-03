@@ -87,13 +87,11 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       // Get token from apiService (uses the latest token with auto-refresh)
       const token = apiService.getAccessToken();
 
-      // Build absolute URL to bypass dev proxy for SSE (more reliable)
-      const defaultBackendBase = 'http://localhost:5000';
-      const apiBase = (import.meta as any).env?.VITE_API_URL || `${defaultBackendBase}/api/v1`;
-      let backendBase = apiBase.replace(/\/api\/v1\/?$/, '');
+      // Use relative URL for SSE - Vite proxy will handle routing to backend
+      // This ensures SSE works correctly in both dev and production
       const url = token
-        ? `${backendBase}/api/v1/admin/notifications/sse?token=${encodeURIComponent(token)}`
-        : `${backendBase}/api/v1/admin/notifications/sse`;
+        ? `/api/v1/admin/notifications/sse?token=${encodeURIComponent(token)}`
+        : `/api/v1/admin/notifications/sse`;
 
 
 

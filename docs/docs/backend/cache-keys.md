@@ -215,11 +215,11 @@ Verify cache key constants work properly:
 
 ```bash
 # Test visibility toggle (check cache invalidation)
-curl -X PATCH http://localhost:5001/api/v1/game-worlds/12/toggle-visibility \
+curl -X PATCH http://localhost:5000/api/v1/game-worlds/12/toggle-visibility \
   -H "Authorization: Bearer $TOKEN"
 
 # Test client API cache
-curl http://localhost:5001/api/v1/client/game-worlds
+curl http://localhost:5000/api/v1/client/game-worlds
 ```
 
 Check server logs for `Cache delete attempted but key not found: game_worlds:public` message

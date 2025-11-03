@@ -116,68 +116,9 @@ export default defineConfig({
     target: 'es2020',
     rollupOptions: {
       output: {
-        // 더 세분화된 청크 분할
-        manualChunks: (id) => {
-          // node_modules의 패키지들을 vendor 청크로 분리
-          if (id.includes('node_modules')) {
-            // React 관련
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'react-vendor';
-            }
-            // MUI 관련
-            if (id.includes('@mui') || id.includes('@emotion')) {
-              return 'mui-vendor';
-            }
-            // 라우터 관련
-            if (id.includes('react-router')) {
-              return 'router-vendor';
-            }
-            // 폼 관련
-            if (id.includes('react-hook-form') || id.includes('yup') || id.includes('@hookform')) {
-              return 'forms-vendor';
-            }
-            // i18n 관련
-            if (id.includes('i18next') || id.includes('react-i18next')) {
-              return 'i18n-vendor';
-            }
-            // 차트/그래프 라이브러리
-            if (id.includes('chart') || id.includes('recharts') || id.includes('d3')) {
-              return 'charts-vendor';
-            }
-            // 유틸리티 라이브러리들
-            if (id.includes('lodash') || id.includes('date-fns') || id.includes('moment')) {
-              return 'utils-vendor';
-            }
-            // 나머지 vendor 라이브러리들
-            return 'vendor';
-          }
-
-          // 애플리케이션 코드 분할
-          // 관리자 페이지들
-          if (id.includes('/pages/admin/')) {
-            return 'admin-pages';
-          }
-          // 사용자 페이지들
-          if (id.includes('/pages/user/')) {
-            return 'user-pages';
-          }
-          // 인증 페이지들
-          if (id.includes('/pages/auth/')) {
-            return 'auth-pages';
-          }
-          // 채팅 관련
-          if (id.includes('/chat/') || id.includes('ChatContext') || id.includes('chatService')) {
-            return 'chat';
-          }
-          // 서비스들
-          if (id.includes('/services/')) {
-            return 'services';
-          }
-          // 컴포넌트들
-          if (id.includes('/components/')) {
-            return 'components';
-          }
-        },
+        // Hardening: eliminate dynamic code-splitting to avoid runtime init-order issues across chunks
+        inlineDynamicImports: true,
+        manualChunks: undefined,
       },
     },
   },

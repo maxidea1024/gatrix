@@ -1,0 +1,16 @@
+{
+  ":SalvageMinigameCombo": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "comboCount": "number",
+      "scoreMultifly": "number"
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "SalvageMinigameCombo": {}
+}

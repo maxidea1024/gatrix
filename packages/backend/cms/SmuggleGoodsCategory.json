@@ -1,0 +1,39 @@
+{
+  ":SmuggleGoodsCategory": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "margin": "number"
+    },
+    ":required": {
+      "name": 1,
+      "margin": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "SmuggleGoodsCategory": {
+    "0": {
+      "id": 0,
+      "name": "불법",
+      "margin": 300
+    },
+    "1": {
+      "id": 1,
+      "name": "만용",
+      "margin": 350
+    },
+    "2": {
+      "id": 2,
+      "name": "탐욕",
+      "margin": 370
+    },
+    "3": {
+      "id": 3,
+      "name": "사치",
+      "margin": 400
+    }
+  }
+}

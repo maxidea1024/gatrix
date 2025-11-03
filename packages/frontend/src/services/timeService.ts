@@ -29,7 +29,9 @@ class TimeService {
     const clientLocalTime = new Date().getTime();
 
     try {
-      const baseURL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001/api/v1';
+      const runtimeEnv = (typeof window !== 'undefined' && (window as any)?.ENV?.VITE_API_URL) as string | undefined;
+      let baseURL = runtimeEnv || (import.meta as any).env?.VITE_API_URL || '/api/v1';
+      if (/^https?:\/\/localhost:5001\b/.test(baseURL)) baseURL = baseURL.replace('localhost:5001', 'localhost:5000');
       const response = await axios.get<ServerTimeResponse>(`${baseURL}/time?clientLocalTime=${clientLocalTime}`);
       const currentLocalTime = new Date().getTime();
 

@@ -1,0 +1,73 @@
+{
+  ":InfiniteLighthouseSchedule": {
+    ":type": {
+      "id": "key",
+      "SeasonNum": "number",
+      "stageGroup": "number",
+      "startDate": "string",
+      "endDate": "string",
+      "sweepStage": "number"
+    },
+    ":required": {
+      "SeasonNum": 1,
+      "stageGroup": 1
+    },
+    ":requiredInObject": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "InfiniteLighthouseSchedule": {
+    "1000001": {
+      "id": 1000001,
+      "SeasonNum": 1,
+      "stageGroup": 1
+    },
+    "1000002": {
+      "id": 1000002,
+      "SeasonNum": 2,
+      "stageGroup": 2
+    },
+    "1000003": {
+      "id": 1000003,
+      "SeasonNum": 3,
+      "stageGroup": 3
+    },
+    "1000004": {
+      "id": 1000004,
+      "SeasonNum": 4,
+      "stageGroup": 4
+    },
+    "1000005": {
+      "id": 1000005,
+      "SeasonNum": 5,
+      "stageGroup": 5
+    },
+    "1000006": {
+      "id": 1000006,
+      "SeasonNum": 6,
+      "stageGroup": 6
+    },
+    "1000007": {
+      "id": 1000007,
+      "SeasonNum": 7,
+      "stageGroup": 7
+    },
+    "1000008": {
+      "id": 1000008,
+      "SeasonNum": 8,
+      "stageGroup": 8
+    },
+    "1000009": {
+      "id": 1000009,
+      "SeasonNum": 9,
+      "stageGroup": 9
+    },
+    "1000010": {
+      "id": 1000010,
+      "SeasonNum": 10,
+      "stageGroup": 10
+    }
+  }
+}

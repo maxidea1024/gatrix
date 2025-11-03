@@ -1,0 +1,2050 @@
+{
+  ":NationPolicy": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "nameFormatText": [
+        "text"
+      ],
+      "desc": "text",
+      "descFormatText": [
+        "text",
+        "text",
+        "text"
+      ],
+      "group": "number",
+      "step": "number",
+      "fleetSpecialStatExpModifier": {
+        "jobType": "number",
+        "modifierType": "number",
+        "value": "number"
+      },
+      "shipSpecialStatExpModifier": {
+        "jobType": "number",
+        "modifierType": "number",
+        "value": "number"
+      },
+      "fleetStatEffect": [
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        }
+      ],
+      "fleetBattleBuffId": "number"
+    },
+    ":required": {
+      "name": 1,
+      "desc": 1,
+      "group": 1,
+      "step": 1
+    },
+    ":requiredInObject": {},
+    ":min": {
+      "fleetSpecialStatExpModifier": {
+        "jobType": 0,
+        "modifierType": 1
+      },
+      "shipSpecialStatExpModifier": {
+        "jobType": 0,
+        "modifierType": 1
+      }
+    },
+    ":max": {
+      "fleetSpecialStatExpModifier": {
+        "jobType": 4,
+        "modifierType": 4
+      },
+      "shipSpecialStatExpModifier": {
+        "jobType": 4,
+        "modifierType": 4
+      },
+      "fleetStatEffect": [
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    ":enum": {},
+    ":asset": {},
+    ":links": {
+      "fleetStatEffect": [
+        {
+          "Id": [
+            "WorldPassiveEffect",
+            "StatOperator"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect",
+            "StatOperator"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect",
+            "StatOperator"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect",
+            "StatOperator"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect",
+            "StatOperator"
+          ]
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Id": [
+            "WorldPassiveEffect",
+            "StatOperator"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect",
+            "StatOperator"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect",
+            "StatOperator"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect",
+            "StatOperator"
+          ]
+        }
+      ],
+      "fleetBattleBuffId": [
+        "BattleBuff"
+      ]
+    }
+  },
+  "NationPolicy": {
+    "10130001": {
+      "id": 10130001,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "1"
+      ],
+      "desc": "쥐, 비위생, 괴혈병, 전염병, 부패 예방 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 1,
+      "step": 1,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311001,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311002,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311003,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311004,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311005,
+          "Value": 50
+        }
+      ]
+    },
+    "10130002": {
+      "id": 10130002,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "2"
+      ],
+      "desc": "항해사 부상 회복 시간이 {0}% 감소합니다.",
+      "descFormatText": [
+        "3.0"
+      ],
+      "group": 1,
+      "step": 2,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310011,
+          "Value": -30
+        }
+      ]
+    },
+    "10130003": {
+      "id": 10130003,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "3"
+      ],
+      "desc": "추가 경험치를 {0}% 획득합니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 1,
+      "step": 3,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312120,
+          "Value": 10
+        }
+      ]
+    },
+    "10130004": {
+      "id": 10130004,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "4"
+      ],
+      "desc": "보급 비용이 {0}% 감소합니다.",
+      "descFormatText": [
+        "3.0"
+      ],
+      "group": 1,
+      "step": 4,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312212,
+          "Value": -30
+        }
+      ]
+    },
+    "10130005": {
+      "id": 10130005,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "5"
+      ],
+      "desc": "보험 비용이 {0}% 감소합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 1,
+      "step": 5,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312010,
+          "Value": -50
+        }
+      ]
+    },
+    "10130006": {
+      "id": 10130006,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "6"
+      ],
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatText": [
+        "전투 전문 지식",
+        "300"
+      ],
+      "group": 1,
+      "step": 6,
+      "shipSpecialStatExpModifier": {
+        "jobType": 3,
+        "modifierType": 1,
+        "value": 300
+      },
+      "fleetStatEffect": [
+        {
+          "Type": 0,
+          "Id": 304,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 301,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 322,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 323,
+          "Value": 300
+        }
+      ]
+    },
+    "10130007": {
+      "id": 10130007,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "7"
+      ],
+      "desc": "화재, 해초, 암초, 침수, 대화재 예방 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 1,
+      "step": 7,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311007,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311008,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311009,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311010,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311011,
+          "Value": 50
+        }
+      ]
+    },
+    "10130008": {
+      "id": 10130008,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "8"
+      ],
+      "desc": "싸움, 반란, 화물 붕괴, 화물 도난 예방 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 1,
+      "step": 8,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311013,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311012,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311015,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311014,
+          "Value": 50
+        }
+      ]
+    },
+    "10130009": {
+      "id": 10130009,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "9"
+      ],
+      "desc": "명성을 추가로 {0}% 획득합니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 1,
+      "step": 9,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312112,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75312110,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75312108,
+          "Value": 10
+        }
+      ]
+    },
+    "10130010": {
+      "id": 10130010,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "10"
+      ],
+      "desc": "모험, 교역, 전투 추가 경험치를 {0}% 획득합니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 1,
+      "step": 10,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312118,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75312116,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75312114,
+          "Value": 10
+        }
+      ]
+    },
+    "10130011": {
+      "id": 10130011,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "11"
+      ],
+      "desc": "욕구불만, 향수병, 정서불안, 불면증, 저체온증 예방 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 1,
+      "step": 11,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311016,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311018,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311017,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311019,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311029,
+          "Value": 50
+        }
+      ]
+    },
+    "10130012": {
+      "id": 10130012,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "12"
+      ],
+      "desc": "항해사 부상 확률이 {0}% 감소합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 1,
+      "step": 12,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310010,
+          "Value": -50
+        }
+      ]
+    },
+    "10130013": {
+      "id": 10130013,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "13"
+      ],
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatText": [
+        "교역 전문 지식",
+        "505"
+      ],
+      "group": 1,
+      "step": 13,
+      "fleetSpecialStatExpModifier": {
+        "jobType": 2,
+        "modifierType": 1,
+        "value": 505
+      },
+      "fleetStatEffect": [
+        {
+          "Type": 0,
+          "Id": 305,
+          "Value": 505
+        },
+        {
+          "Type": 0,
+          "Id": 306,
+          "Value": 505
+        },
+        {
+          "Type": 0,
+          "Id": 307,
+          "Value": 505
+        },
+        {
+          "Type": 0,
+          "Id": 315,
+          "Value": 505
+        }
+      ]
+    },
+    "10130014": {
+      "id": 10130014,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "14"
+      ],
+      "desc": "항해사 충성 감소에 필요한 시간이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 1,
+      "step": 14,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312011,
+          "Value": -50
+        }
+      ]
+    },
+    "10130015": {
+      "id": 10130015,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "15"
+      ],
+      "desc": "추가 경험치를 {0}% 획득합니다.",
+      "descFormatText": [
+        "3.0"
+      ],
+      "group": 1,
+      "step": 15,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312120,
+          "Value": 30
+        }
+      ]
+    },
+    "10130016": {
+      "id": 10130016,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "16"
+      ],
+      "desc": "폭풍, 눈보라, 돌풍, 무풍, 동상 예방 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 1,
+      "step": 16,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311020,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311022,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311023,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311024,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311030,
+          "Value": 50
+        }
+      ]
+    },
+    "10130017": {
+      "id": 10130017,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "17"
+      ],
+      "desc": "격랑, 세이렌, 식인상어, 고래 충돌 예방 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 1,
+      "step": 17,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311021,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311026,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311027,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75311028,
+          "Value": 50
+        }
+      ]
+    },
+    "10130018": {
+      "id": 10130018,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "18"
+      ],
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatText": [
+        "탐험 전문 지식",
+        "505"
+      ],
+      "group": 1,
+      "step": 18,
+      "fleetSpecialStatExpModifier": {
+        "jobType": 1,
+        "modifierType": 1,
+        "value": 505
+      },
+      "fleetStatEffect": [
+        {
+          "Type": 0,
+          "Id": 324,
+          "Value": 505
+        },
+        {
+          "Type": 0,
+          "Id": 325,
+          "Value": 505
+        },
+        {
+          "Type": 0,
+          "Id": 309,
+          "Value": 505
+        },
+        {
+          "Type": 0,
+          "Id": 326,
+          "Value": 505
+        }
+      ]
+    },
+    "10130019": {
+      "id": 10130019,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "19"
+      ],
+      "desc": "항해 시 소모하는 식량과 물이 {0}% 감소합니다.",
+      "descFormatText": [
+        "3.0"
+      ],
+      "group": 1,
+      "step": 19,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310003,
+          "Value": -30
+        },
+        {
+          "Type": 1,
+          "Id": 75310005,
+          "Value": -30
+        }
+      ]
+    },
+    "10130020": {
+      "id": 10130020,
+      "name": "항해 및 성장 {0}",
+      "nameFormatText": [
+        "20"
+      ],
+      "desc": "항해 속도가 {0}% 증가합니다.",
+      "descFormatText": [
+        "3.0"
+      ],
+      "group": 1,
+      "step": 20,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310014,
+          "Value": 30
+        }
+      ]
+    },
+    "10131001": {
+      "id": 10131001,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "1"
+      ],
+      "desc": "환대 시 우호도 증가량이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 2,
+      "step": 1,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Value": 50
+        }
+      ]
+    },
+    "10131002": {
+      "id": 10131002,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "2"
+      ],
+      "desc": "저택 발견물 보고 시 획득 명성 수치가 {0}% 증가합니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 2,
+      "step": 2,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312055,
+          "Value": 10
+        }
+      ]
+    },
+    "10131003": {
+      "id": 10131003,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "3"
+      ],
+      "desc": "육지 탐험 시 소모하는 물과 식량이 {0}% 감소합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 2,
+      "step": 3,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312067,
+          "Value": 50
+        }
+      ]
+    },
+    "10131004": {
+      "id": 10131004,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "4"
+      ],
+      "desc": "상급 어종 발견 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 2,
+      "step": 4,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312051,
+          "Value": 50
+        }
+      ]
+    },
+    "10131005": {
+      "id": 10131005,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "5"
+      ],
+      "desc": "저택 자원 보고 시 획득 재화 수량이 {0}% 증가합니다.",
+      "descFormatText": [
+        "0.5"
+      ],
+      "group": 2,
+      "step": 5,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312060,
+          "Value": 5
+        }
+      ]
+    },
+    "10131006": {
+      "id": 10131006,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "6"
+      ],
+      "desc": "육지 탐험 전투력이 {0} 증가합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "group": 2,
+      "step": 6,
+      "fleetStatEffect": [
+        {
+          "Type": 0,
+          "Id": 3148,
+          "Value": 3
+        }
+      ]
+    },
+    "10131007": {
+      "id": 10131007,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "7"
+      ],
+      "desc": "육지 탐험 관찰력이 {0} 증가합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "group": 2,
+      "step": 7,
+      "fleetStatEffect": [
+        {
+          "Type": 0,
+          "Id": 3150,
+          "Value": 3
+        }
+      ]
+    },
+    "10131008": {
+      "id": 10131008,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "8"
+      ],
+      "desc": "저택 자원 보고 시 획득 명성 수치가 {0}% 증가합니다.",
+      "descFormatText": [
+        "0.5"
+      ],
+      "group": 2,
+      "step": 8,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312061,
+          "Value": 5
+        }
+      ]
+    },
+    "10131009": {
+      "id": 10131009,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "9"
+      ],
+      "desc": "육지 탐험 채집력이 {0} 증가합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "group": 2,
+      "step": 9,
+      "fleetStatEffect": [
+        {
+          "Type": 0,
+          "Id": 3149,
+          "Value": 3
+        }
+      ]
+    },
+    "10131010": {
+      "id": 10131010,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "10"
+      ],
+      "desc": "탐험 시 높은 등급 탐험 발생 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "0.5"
+      ],
+      "group": 2,
+      "step": 10,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312068,
+          "Value": 5
+        }
+      ]
+    },
+    "10131011": {
+      "id": 10131011,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "11"
+      ],
+      "desc": "약탈 시 우호도 감소량이 {0}% 감소합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 2,
+      "step": 11,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312076,
+          "Value": 50
+        }
+      ]
+    },
+    "10131012": {
+      "id": 10131012,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "12"
+      ],
+      "desc": "모험 도구의 구매 비용이 {0}% 감소합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 2,
+      "step": 12,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312069,
+          "Value": -50
+        }
+      ]
+    },
+    "10131013": {
+      "id": 10131013,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "13"
+      ],
+      "desc": "육지 탐험 및 마을 탐험 시 선원 사망 확률이 {0}% 감소합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 2,
+      "step": 13,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312063,
+          "Value": 50
+        }
+      ]
+    },
+    "10131014": {
+      "id": 10131014,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "14"
+      ],
+      "desc": "저택 발견물 보고 시 획득 재화 수량이 {0}% 증가합니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 2,
+      "step": 14,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312054,
+          "Value": 10
+        }
+      ]
+    },
+    "10131015": {
+      "id": 10131015,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "15"
+      ],
+      "desc": "낚시 기술이 {0} 증가합니다.",
+      "descFormatText": [
+        "5"
+      ],
+      "group": 2,
+      "step": 15,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312050,
+          "Value": 5
+        }
+      ]
+    },
+    "10131016": {
+      "id": 10131016,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "16"
+      ],
+      "desc": "모험 경험치를 {0}% 추가 획득합니다.",
+      "descFormatText": [
+        "2.0"
+      ],
+      "group": 2,
+      "step": 16,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312017,
+          "Value": 20
+        }
+      ]
+    },
+    "10131017": {
+      "id": 10131017,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "17"
+      ],
+      "desc": "탐험 시 높은 등급 탐험 발생 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 2,
+      "step": 17,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312068,
+          "Value": 10
+        }
+      ]
+    },
+    "10131018": {
+      "id": 10131018,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "18"
+      ],
+      "desc": "육지 탐험 시 획득하는 자원 수량이 {0}% 증가합니다.",
+      "descFormatText": [
+        "0.5"
+      ],
+      "group": 2,
+      "step": 18,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312073,
+          "Value": 5
+        }
+      ]
+    },
+    "10131019": {
+      "id": 10131019,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "19"
+      ],
+      "desc": "육지 탐험 수련 입장 가능 횟수가 {0}회 증가합니다.",
+      "descFormatText": [
+        "1"
+      ],
+      "group": 2,
+      "step": 19,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312074,
+          "Value": 1
+        }
+      ]
+    },
+    "10131020": {
+      "id": 10131020,
+      "name": "모험 {0}",
+      "nameFormatText": [
+        "20"
+      ],
+      "desc": "탐험, 낚시에서 자원 획득 시 {0}% 확률로 자원을 추가 획득합니다.",
+      "descFormatText": [
+        "20.0"
+      ],
+      "group": 2,
+      "step": 20,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312201,
+          "Value": 200
+        }
+      ]
+    },
+    "10132001": {
+      "id": 10132001,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "1"
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품, 잡화의 구매 가격이 {0}% 할인됩니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 3,
+      "step": 1,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300340,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300350,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300360,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300370,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300380,
+          "Value": 10
+        }
+      ]
+    },
+    "10132002": {
+      "id": 10132002,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "2"
+      ],
+      "desc": "판매 조합 배율 최대치 제한이 {0}% 증가합니다.",
+      "descFormatText": [
+        "2.0"
+      ],
+      "group": 3,
+      "step": 2,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312121,
+          "Value": 20
+        }
+      ]
+    },
+    "10132003": {
+      "id": 10132003,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "3"
+      ],
+      "desc": "협상 발생 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "3.0"
+      ],
+      "group": 3,
+      "step": 3,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312096,
+          "Value": 30
+        }
+      ]
+    },
+    "10132004": {
+      "id": 10132004,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "4"
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품, 잡화의 판매 가격이 {0}% 할증됩니다.",
+      "descFormatText": [
+        "0.5"
+      ],
+      "group": 3,
+      "step": 4,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300540,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300550,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300570,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300580,
+          "Value": 5
+        }
+      ]
+    },
+    "10132005": {
+      "id": 10132005,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "5"
+      ],
+      "desc": "모든 교역품의 판매 가격이 {0}% 할증됩니다.",
+      "descFormatText": [
+        "0.5"
+      ],
+      "group": 3,
+      "step": 5,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312094,
+          "Value": 5
+        }
+      ]
+    },
+    "10132006": {
+      "id": 10132006,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "6"
+      ],
+      "desc": "염료, 광석, 공업품, 기호품, 섬유의 구매 가격이 {0}% 할인됩니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 3,
+      "step": 6,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300400,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300410,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300420,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300430,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300440,
+          "Value": 10
+        }
+      ]
+    },
+    "10132007": {
+      "id": 10132007,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "7"
+      ],
+      "desc": "판매 조합 배율 최대치 제한이 {0}% 증가합니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 3,
+      "step": 7,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312121,
+          "Value": 10
+        }
+      ]
+    },
+    "10132008": {
+      "id": 10132008,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "8"
+      ],
+      "desc": "주류, 직물, 공예품, 무기류, 총포류의 판매 가격이 {0}% 할증됩니다.",
+      "descFormatText": [
+        "0.5"
+      ],
+      "group": 3,
+      "step": 8,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300590,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300650,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300680,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300660,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300670,
+          "Value": 5
+        }
+      ]
+    },
+    "10132009": {
+      "id": 10132009,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "9"
+      ],
+      "desc": "물물 교환 대상 교역품 획득량이 {0}% 증가합니다.",
+      "descFormatText": [
+        "3.0"
+      ],
+      "group": 3,
+      "step": 9,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312152,
+          "Value": 30
+        }
+      ]
+    },
+    "10132010": {
+      "id": 10132010,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "10"
+      ],
+      "desc": "거래 점수 발생 순이익 기준이 {0}% 감소합니다.",
+      "descFormatText": [
+        "2.0"
+      ],
+      "group": 3,
+      "step": 10,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312119,
+          "Value": -20
+        }
+      ]
+    },
+    "10132011": {
+      "id": 10132011,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "11"
+      ],
+      "desc": "주류, 직물, 공예품, 무기류, 총포류의 구매 가격이 {0}% 할인됩니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 3,
+      "step": 11,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300390,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300450,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300480,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300460,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300470,
+          "Value": 10
+        }
+      ]
+    },
+    "10132012": {
+      "id": 10132012,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "12"
+      ],
+      "desc": "물물 교환 가격 협상과 수량 협상의 필요 우호도 비용이 {0}% 감소합니다.",
+      "descFormatText": [
+        "3.0"
+      ],
+      "group": 3,
+      "step": 12,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312197,
+          "Value": -30
+        },
+        {
+          "Type": 1,
+          "Id": 75312195,
+          "Value": -30
+        }
+      ]
+    },
+    "10132013": {
+      "id": 10132013,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "13"
+      ],
+      "desc": "협상 성공 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 3,
+      "step": 13,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312104,
+          "Value": 10
+        }
+      ]
+    },
+    "10132014": {
+      "id": 10132014,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "14"
+      ],
+      "desc": "염료, 광석, 공업품, 기호품, 섬유의 판매 가격이 {0}% 할증됩니다.",
+      "descFormatText": [
+        "0.5"
+      ],
+      "group": 3,
+      "step": 14,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300600,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300610,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300620,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300630,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300640,
+          "Value": 5
+        }
+      ]
+    },
+    "10132015": {
+      "id": 10132015,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "15"
+      ],
+      "desc": "모든 교역품의 판매 가격이 {0}% 할증됩니다.",
+      "descFormatText": [
+        "0.5"
+      ],
+      "group": 3,
+      "step": 15,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312094,
+          "Value": 5
+        }
+      ]
+    },
+    "10132016": {
+      "id": 10132016,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "16"
+      ],
+      "desc": "귀금속, 향료, 보석, 미술품, 향신료의 구매 가격이 {0}% 할인됩니다.",
+      "descFormatText": [
+        "1.0"
+      ],
+      "group": 3,
+      "step": 16,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300510,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300520,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300530,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300490,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300500,
+          "Value": 10
+        }
+      ]
+    },
+    "10132017": {
+      "id": 10132017,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "17"
+      ],
+      "desc": "교역 경험치를 {0}% 추가 획득합니다.",
+      "descFormatText": [
+        "2.0"
+      ],
+      "group": 3,
+      "step": 17,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312015,
+          "Value": 20
+        }
+      ]
+    },
+    "10132018": {
+      "id": 10132018,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "18"
+      ],
+      "desc": "귀금속, 향료, 보석, 미술품, 향신료의 판매 가격이 {0}% 할증됩니다.",
+      "descFormatText": [
+        "0.5"
+      ],
+      "group": 3,
+      "step": 18,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300710,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300720,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300730,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300690,
+          "Value": 5
+        },
+        {
+          "Type": 1,
+          "Id": 75300700,
+          "Value": 5
+        }
+      ]
+    },
+    "10132019": {
+      "id": 10132019,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "19"
+      ],
+      "desc": "거래 점수 발생 순이익 기준이 {0}% 감소합니다.",
+      "descFormatText": [
+        "3.0"
+      ],
+      "group": 3,
+      "step": 19,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312119,
+          "Value": -30
+        }
+      ]
+    },
+    "10132020": {
+      "id": 10132020,
+      "name": "교역 {0}",
+      "nameFormatText": [
+        "20"
+      ],
+      "desc": "물물 교환 가능 횟수가 {0} 증가합니다.",
+      "descFormatText": [
+        "1"
+      ],
+      "group": 3,
+      "step": 20,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312151,
+          "Value": 1
+        }
+      ]
+    },
+    "10133001": {
+      "id": 10133001,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "1"
+      ],
+      "desc": "추가 포격 명중이 {0}% 증가합니다.",
+      "descFormatText": [
+        "15.0"
+      ],
+      "group": 4,
+      "step": 1,
+      "fleetBattleBuffId": 65610000
+    },
+    "10133002": {
+      "id": 10133002,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "2"
+      ],
+      "desc": "추가 백병 명중이 {0}% 증가합니다.",
+      "descFormatText": [
+        "15.0"
+      ],
+      "group": 4,
+      "step": 2,
+      "fleetBattleBuffId": 65610001
+    },
+    "10133003": {
+      "id": 10133003,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "3"
+      ],
+      "desc": "추가 백병 방어력이 {0}% 증가합니다.",
+      "descFormatText": [
+        "13.5"
+      ],
+      "group": 4,
+      "step": 3,
+      "fleetBattleBuffId": 65610002
+    },
+    "10133004": {
+      "id": 10133004,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "4"
+      ],
+      "desc": "추가 포격 방어력이 {0}% 증가합니다.",
+      "descFormatText": [
+        "13.5"
+      ],
+      "group": 4,
+      "step": 4,
+      "fleetBattleBuffId": 65610003
+    },
+    "10133005": {
+      "id": 10133005,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "5"
+      ],
+      "desc": "모든 받은 치명타 피해가 {0}% 감소합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 4,
+      "step": 5,
+      "fleetBattleBuffId": 65610004
+    },
+    "10133006": {
+      "id": 10133006,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "6"
+      ],
+      "desc": "추가 충파 방어력이 {0}% 증가합니다.",
+      "descFormatText": [
+        "13.5"
+      ],
+      "group": 4,
+      "step": 6,
+      "fleetBattleBuffId": 65610005
+    },
+    "10133007": {
+      "id": 10133007,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "7"
+      ],
+      "desc": "행동 불가 효과 면역 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 4,
+      "step": 7,
+      "fleetBattleBuffId": 65610006
+    },
+    "10133008": {
+      "id": 10133008,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "8"
+      ],
+      "desc": "추가 포격 공격력이 {0}% 증가합니다.",
+      "descFormatText": [
+        "15.0"
+      ],
+      "group": 4,
+      "step": 8,
+      "fleetBattleBuffId": 65610007
+    },
+    "10133009": {
+      "id": 10133009,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "9"
+      ],
+      "desc": "직접적으로 받는 충파 피해가 {0}% 감소합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 4,
+      "step": 9,
+      "fleetBattleBuffId": 65610008
+    },
+    "10133010": {
+      "id": 10133010,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "10"
+      ],
+      "desc": "기동력 소모량이 {0}% 감소합니다.",
+      "descFormatText": [
+        "10.0"
+      ],
+      "group": 4,
+      "step": 10,
+      "fleetBattleBuffId": 65610009
+    },
+    "10133011": {
+      "id": 10133011,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "11"
+      ],
+      "desc": "추가 포격 회피가 {0}% 증가합니다.",
+      "descFormatText": [
+        "12.0"
+      ],
+      "group": 4,
+      "step": 11,
+      "fleetBattleBuffId": 65610010
+    },
+    "10133012": {
+      "id": 10133012,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "12"
+      ],
+      "desc": "모든 피격 면역 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 4,
+      "step": 12,
+      "fleetBattleBuffId": 65610011
+    },
+    "10133013": {
+      "id": 10133013,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "13"
+      ],
+      "desc": "추가 충파 공격력이 {0}% 증가합니다.",
+      "descFormatText": [
+        "15.0"
+      ],
+      "group": 4,
+      "step": 13,
+      "fleetBattleBuffId": 65610012
+    },
+    "10133014": {
+      "id": 10133014,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "14"
+      ],
+      "desc": "추가 백병 회피가 {0}% 증가합니다.",
+      "descFormatText": [
+        "12.0"
+      ],
+      "group": 4,
+      "step": 14,
+      "fleetBattleBuffId": 65610013
+    },
+    "10133015": {
+      "id": 10133015,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "15"
+      ],
+      "desc": "전투 경험치를 {0}% 추가획득합니다.",
+      "descFormatText": [
+        "2.0"
+      ],
+      "group": 4,
+      "step": 15,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312013,
+          "Value": 20
+        }
+      ]
+    },
+    "10133016": {
+      "id": 10133016,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "16"
+      ],
+      "desc": "직접적으로 받는 포격 피해가 {0}% 감소합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 4,
+      "step": 16,
+      "fleetBattleBuffId": 65610014
+    },
+    "10133017": {
+      "id": 10133017,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "17"
+      ],
+      "desc": "직접적으로 받는 백병 피해가 {0}% 감소합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "group": 4,
+      "step": 17,
+      "fleetBattleBuffId": 65610015
+    },
+    "10133018": {
+      "id": 10133018,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "18"
+      ],
+      "desc": "추가 백병 공격력이 {0}% 증가합니다.",
+      "descFormatText": [
+        "15.0"
+      ],
+      "group": 4,
+      "step": 18,
+      "fleetBattleBuffId": 65610016
+    },
+    "10133019": {
+      "id": 10133019,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "19"
+      ],
+      "desc": "모든 치명타 저항이 {0}% 증가합니다.",
+      "descFormatText": [
+        "10.0"
+      ],
+      "group": 4,
+      "step": 19,
+      "fleetBattleBuffId": 65610017
+    },
+    "10133020": {
+      "id": 10133020,
+      "name": "전투 {0}",
+      "nameFormatText": [
+        "20"
+      ],
+      "desc": "전투 후 배를 나포할 확률이 {0}배로 증가합니다.",
+      "descFormatText": [
+        "2"
+      ],
+      "group": 4,
+      "step": 20,
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312124,
+          "Value": 1000
+        }
+      ]
+    }
+  }
+}

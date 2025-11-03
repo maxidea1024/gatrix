@@ -1,8 +1,23 @@
 import knex, { Knex } from 'knex';
+import path from 'path';
+import fs from 'fs';
 import { config } from './index';
 import { createLogger } from './logger';
 
 const logger = createLogger('DatabaseManager');
+
+// Determine migration directory based on environment
+const getMigrationDir = (): string => {
+  // In production Docker, migrations are in dist/database/migrations
+  // In development, they are in src/database/migrations
+  const distPath = path.join(__dirname, '..', 'database', 'migrations');
+  const srcPath = path.join(__dirname, '..', 'database', 'migrations');
+
+  if (fs.existsSync(distPath)) {
+    return distPath;
+  }
+  return srcPath;
+};
 
 class DatabaseManager {
   private static instance: DatabaseManager;
@@ -42,7 +57,7 @@ class DatabaseManager {
           propagateCreateError: false,
         },
         migrations: {
-          directory: './migrations',
+          directory: getMigrationDir(),
           tableName: 'chat_migrations',
         },
         seeds: {
@@ -57,6 +72,20 @@ class DatabaseManager {
       // Test connection
       await this.testConnection();
       logger.info('Database connection established successfully');
+
+      // Run migrations automatically
+      try {
+        logger.info('Running database migrations...');
+        const [executed] = await this.knexInstance.migrate.latest();
+        if (executed.length > 0) {
+          logger.info(`Executed ${executed.length} migrations:`, executed);
+        } else {
+          logger.info('No pending migrations');
+        }
+      } catch (error) {
+        logger.error('Migration failed:', error);
+        throw error;
+      }
     } catch (error) {
       logger.error('Failed to initialize database:', error);
       throw error;

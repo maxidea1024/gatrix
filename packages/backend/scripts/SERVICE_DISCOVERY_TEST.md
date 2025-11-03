@@ -23,8 +23,8 @@ export API_TOKEN="your-server-sdk-token-here"
 # Required for listing servers
 export ADMIN_TOKEN="your-admin-jwt-token-here"
 
-# Optional: Backend API URL (default: http://localhost:5001)
-export API_URL="http://localhost:5001"
+# Optional: Backend API URL (default: http://localhost:5000)
+export API_URL="http://localhost:5000"
 ```
 
 ## Usage

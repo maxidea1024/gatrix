@@ -209,7 +209,7 @@ The job system uses BullMQ with the following configuration:
 
 Access the Bull Board dashboard at:
 ```
-http://localhost:5001/admin/queues
+http://localhost:5000/admin/queues
 ```
 
 Monitor:

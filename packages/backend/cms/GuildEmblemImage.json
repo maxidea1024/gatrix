@@ -1,0 +1,171 @@
+{
+  ":GuildEmblemImage": {
+    ":type": {
+      "id": "key",
+      "guildEmblem": "string",
+      "guildEmblemIcon": "string",
+      "guildLevel": "number",
+      "isExposure": "bool"
+    },
+    ":required": {
+      "guildEmblem": 1,
+      "guildEmblemIcon": 1,
+      "guildLevel": 1,
+      "isExposure": 1
+    },
+    ":min": {
+      "guildLevel": 1
+    },
+    ":max": {
+      "guildLevel": 100
+    },
+    ":enum": {},
+    ":links": {
+      "guildLevel": [
+        "Guild"
+      ]
+    }
+  },
+  "GuildEmblemImage": {
+    "401": {
+      "id": 401,
+      "guildEmblem": "WT_Guild_Emblem_01_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_01_Sprite",
+      "guildLevel": 1,
+      "isExposure": true
+    },
+    "402": {
+      "id": 402,
+      "guildEmblem": "WT_Guild_Emblem_02_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_02_Sprite",
+      "guildLevel": 1,
+      "isExposure": true
+    },
+    "403": {
+      "id": 403,
+      "guildEmblem": "WT_Guild_Emblem_03_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_03_Sprite",
+      "guildLevel": 1,
+      "isExposure": true
+    },
+    "404": {
+      "id": 404,
+      "guildEmblem": "WT_Guild_Emblem_04_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_04_Sprite",
+      "guildLevel": 1,
+      "isExposure": true
+    },
+    "405": {
+      "id": 405,
+      "guildEmblem": "WT_Guild_Emblem_06_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_06_Sprite",
+      "guildLevel": 2,
+      "isExposure": true
+    },
+    "406": {
+      "id": 406,
+      "guildEmblem": "WT_Guild_Emblem_08_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_08_Sprite",
+      "guildLevel": 2,
+      "isExposure": true
+    },
+    "407": {
+      "id": 407,
+      "guildEmblem": "WT_Guild_Emblem_12_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_12_Sprite",
+      "guildLevel": 2,
+      "isExposure": true
+    },
+    "408": {
+      "id": 408,
+      "guildEmblem": "WT_Guild_Emblem_13_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_13_Sprite",
+      "guildLevel": 2,
+      "isExposure": true
+    },
+    "409": {
+      "id": 409,
+      "guildEmblem": "WT_Guild_Emblem_15_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_15_Sprite",
+      "guildLevel": 3,
+      "isExposure": true
+    },
+    "410": {
+      "id": 410,
+      "guildEmblem": "WT_Guild_Emblem_16_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_16_Sprite",
+      "guildLevel": 3,
+      "isExposure": true
+    },
+    "411": {
+      "id": 411,
+      "guildEmblem": "WT_Guild_Emblem_19_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_19_Sprite",
+      "guildLevel": 3,
+      "isExposure": true
+    },
+    "412": {
+      "id": 412,
+      "guildEmblem": "WT_Guild_Emblem_20_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_20_Sprite",
+      "guildLevel": 3,
+      "isExposure": true
+    },
+    "413": {
+      "id": 413,
+      "guildEmblem": "WT_Guild_Emblem_14_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_14_Sprite",
+      "guildLevel": 4,
+      "isExposure": true
+    },
+    "414": {
+      "id": 414,
+      "guildEmblem": "WT_Guild_Emblem_17_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_17_Sprite",
+      "guildLevel": 4,
+      "isExposure": true
+    },
+    "415": {
+      "id": 415,
+      "guildEmblem": "WT_Guild_Emblem_18_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_18_Sprite",
+      "guildLevel": 4,
+      "isExposure": true
+    },
+    "416": {
+      "id": 416,
+      "guildEmblem": "WT_Guild_Emblem_09_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_09_Sprite",
+      "guildLevel": 4,
+      "isExposure": true
+    },
+    "417": {
+      "id": 417,
+      "guildEmblem": "WT_Guild_Emblem_10_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_10_Sprite",
+      "guildLevel": 5,
+      "isExposure": true
+    },
+    "418": {
+      "id": 418,
+      "guildEmblem": "WT_Guild_Emblem_11_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_11_Sprite",
+      "guildLevel": 5,
+      "isExposure": true
+    },
+    "419": {
+      "id": 419,
+      "guildEmblem": "WT_Guild_Emblem_07_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_07_Sprite",
+      "guildLevel": 5,
+      "isExposure": true
+    },
+    "420": {
+      "id": 420,
+      "guildEmblem": "WT_Guild_Emblem_05_Sprite",
+      "guildEmblemIcon": "WT_Guild_Emblem_05_Sprite",
+      "guildLevel": 5,
+      "isExposure": true
+    }
+  }
+}

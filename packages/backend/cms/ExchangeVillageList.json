@@ -1,0 +1,9075 @@
+{
+  ":ExchangeVillageList": {
+    ":type": {
+      "id": "key",
+      "group": "number",
+      "sortOrder": "number",
+      "maxExchangeCount": "number",
+      "hideContentsTermsExchangeList": "bool",
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ],
+      "getTradeGoodsId": "number",
+      "getTradeGoodsDefault": "number",
+      "getTradeGoods": [
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Id": "number",
+          "Value": "number"
+        }
+      ]
+    },
+    ":required": {
+      "group": 1,
+      "sortOrder": 1,
+      "maxExchangeCount": 1,
+      "hideContentsTermsExchangeList": 1,
+      "getTradeGoodsId": 1,
+      "getTradeGoodsDefault": 1,
+      "getTradeGoods": [
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 1,
+          "Value": 1
+        }
+      ]
+    },
+    ":requiredInObject": {
+      "materialTradeGoods": [
+        {
+          "Id": 1,
+          "Value": 1
+        },
+        {
+          "Id": 1,
+          "Value": 1
+        },
+        {
+          "Id": 1,
+          "Value": 1
+        },
+        {
+          "Id": 1,
+          "Value": 1
+        },
+        {
+          "Id": 1,
+          "Value": 1
+        }
+      ]
+    },
+    ":min": {
+      "contentsTerms": [
+        {
+          "Id": 81000000
+        }
+      ],
+      "getTradeGoodsId": 24000000,
+      "materialTradeGoods": [
+        {
+          "Id": 24000000
+        },
+        {
+          "Id": 24000000
+        },
+        {
+          "Id": 24000000
+        },
+        {
+          "Id": 24000000
+        },
+        {
+          "Id": 24000000
+        }
+      ]
+    },
+    ":max": {
+      "contentsTerms": [
+        {
+          "Id": 81999999
+        }
+      ],
+      "getTradeGoodsId": 24499999,
+      "materialTradeGoods": [
+        {
+          "Id": 24499999
+        },
+        {
+          "Id": 24499999
+        },
+        {
+          "Id": 24499999
+        },
+        {
+          "Id": 24499999
+        },
+        {
+          "Id": 24499999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "contentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ],
+      "getTradeGoodsId": [
+        "TradeGoods"
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": [
+            "TradeGoods"
+          ]
+        },
+        {
+          "Id": [
+            "TradeGoods"
+          ]
+        },
+        {
+          "Id": [
+            "TradeGoods"
+          ]
+        },
+        {
+          "Id": [
+            "TradeGoods"
+          ]
+        },
+        {
+          "Id": [
+            "TradeGoods"
+          ]
+        }
+      ]
+    }
+  },
+  "ExchangeVillageList": {
+    "12600001": {
+      "id": 12600001,
+      "group": 10000,
+      "sortOrder": 1,
+      "maxExchangeCount": 70,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000532,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000181,
+          "Value": 2
+        },
+        {
+          "Id": 24000375,
+          "Value": 1
+        },
+        {
+          "Id": 24000435,
+          "Value": 2
+        }
+      ]
+    },
+    "12600002": {
+      "id": 12600002,
+      "group": 10000,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000533,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000532,
+          "Value": 4
+        },
+        {
+          "Id": 24000181,
+          "Value": 2
+        }
+      ]
+    },
+    "12600003": {
+      "id": 12600003,
+      "group": 10000,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500000,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000510,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000489,
+          "Value": 1
+        },
+        {
+          "Id": 24000130,
+          "Value": 2
+        }
+      ]
+    },
+    "12600004": {
+      "id": 12600004,
+      "group": 10000,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223002,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000550,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000436,
+          "Value": 2
+        },
+        {
+          "Id": 24000125,
+          "Value": 2
+        },
+        {
+          "Id": 24000072,
+          "Value": 2
+        }
+      ]
+    },
+    "12606401": {
+      "id": 12606401,
+      "group": 10100,
+      "sortOrder": 1,
+      "maxExchangeCount": 70,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000532,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000181,
+          "Value": 2
+        },
+        {
+          "Id": 24000375,
+          "Value": 1
+        },
+        {
+          "Id": 24000435,
+          "Value": 2
+        }
+      ]
+    },
+    "12606402": {
+      "id": 12606402,
+      "group": 10100,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000533,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000532,
+          "Value": 4
+        },
+        {
+          "Id": 24000181,
+          "Value": 2
+        }
+      ]
+    },
+    "12606403": {
+      "id": 12606403,
+      "group": 10100,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500064,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000542,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000159,
+          "Value": 1
+        },
+        {
+          "Id": 24000167,
+          "Value": 1
+        },
+        {
+          "Id": 24000235,
+          "Value": 1
+        },
+        {
+          "Id": 24000358,
+          "Value": 1
+        }
+      ]
+    },
+    "12606404": {
+      "id": 12606404,
+      "group": 10100,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223002,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000550,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000436,
+          "Value": 2
+        },
+        {
+          "Id": 24000125,
+          "Value": 2
+        },
+        {
+          "Id": 24000072,
+          "Value": 2
+        }
+      ]
+    },
+    "12600101": {
+      "id": 12600101,
+      "group": 10200,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000534,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000269,
+          "Value": 2
+        },
+        {
+          "Id": 24000213,
+          "Value": 2
+        },
+        {
+          "Id": 24000140,
+          "Value": 2
+        }
+      ]
+    },
+    "12600102": {
+      "id": 12600102,
+      "group": 10200,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000535,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000319,
+          "Value": 2
+        },
+        {
+          "Id": 24000156,
+          "Value": 2
+        },
+        {
+          "Id": 24000446,
+          "Value": 2
+        }
+      ]
+    },
+    "12600201": {
+      "id": 12600201,
+      "group": 10300,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000534,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000269,
+          "Value": 2
+        },
+        {
+          "Id": 24000213,
+          "Value": 2
+        },
+        {
+          "Id": 24000140,
+          "Value": 2
+        }
+      ]
+    },
+    "12600202": {
+      "id": 12600202,
+      "group": 10300,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000535,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000319,
+          "Value": 2
+        },
+        {
+          "Id": 24000156,
+          "Value": 2
+        },
+        {
+          "Id": 24000446,
+          "Value": 2
+        }
+      ]
+    },
+    "12600203": {
+      "id": 12600203,
+      "group": 10300,
+      "sortOrder": 3,
+      "maxExchangeCount": 20,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500002,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000502,
+      "getTradeGoodsDefault": 30,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000158,
+          "Value": 10
+        },
+        {
+          "Id": 24000171,
+          "Value": 5
+        },
+        {
+          "Id": 24000167,
+          "Value": 10
+        }
+      ]
+    },
+    "12600601": {
+      "id": 12600601,
+      "group": 10400,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000534,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000269,
+          "Value": 2
+        },
+        {
+          "Id": 24000213,
+          "Value": 2
+        },
+        {
+          "Id": 24000140,
+          "Value": 2
+        }
+      ]
+    },
+    "12600602": {
+      "id": 12600602,
+      "group": 10400,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000535,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000319,
+          "Value": 2
+        },
+        {
+          "Id": 24000156,
+          "Value": 2
+        },
+        {
+          "Id": 24000446,
+          "Value": 2
+        }
+      ]
+    },
+    "12600604": {
+      "id": 12600604,
+      "group": 10400,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223005,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000551,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000240,
+          "Value": 1
+        },
+        {
+          "Id": 24000255,
+          "Value": 1
+        },
+        {
+          "Id": 24000297,
+          "Value": 1
+        },
+        {
+          "Id": 24000331,
+          "Value": 1
+        }
+      ]
+    },
+    "12600701": {
+      "id": 12600701,
+      "group": 10500,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000534,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000269,
+          "Value": 2
+        },
+        {
+          "Id": 24000213,
+          "Value": 2
+        },
+        {
+          "Id": 24000140,
+          "Value": 2
+        }
+      ]
+    },
+    "12600702": {
+      "id": 12600702,
+      "group": 10500,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000535,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000319,
+          "Value": 2
+        },
+        {
+          "Id": 24000156,
+          "Value": 2
+        },
+        {
+          "Id": 24000446,
+          "Value": 2
+        }
+      ]
+    },
+    "12600703": {
+      "id": 12600703,
+      "group": 10500,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000052,
+          "Target": 70409064,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000543,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000008,
+          "Value": 2
+        },
+        {
+          "Id": 24000239,
+          "Value": 1
+        },
+        {
+          "Id": 24000417,
+          "Value": 1
+        }
+      ]
+    },
+    "12600704": {
+      "id": 12600704,
+      "group": 10500,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223005,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000551,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000240,
+          "Value": 1
+        },
+        {
+          "Id": 24000255,
+          "Value": 1
+        },
+        {
+          "Id": 24000297,
+          "Value": 1
+        },
+        {
+          "Id": 24000331,
+          "Value": 1
+        }
+      ]
+    },
+    "12600801": {
+      "id": 12600801,
+      "group": 10600,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000534,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000269,
+          "Value": 2
+        },
+        {
+          "Id": 24000213,
+          "Value": 2
+        },
+        {
+          "Id": 24000140,
+          "Value": 2
+        }
+      ]
+    },
+    "12600802": {
+      "id": 12600802,
+      "group": 10600,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000535,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000319,
+          "Value": 2
+        },
+        {
+          "Id": 24000156,
+          "Value": 2
+        },
+        {
+          "Id": 24000446,
+          "Value": 2
+        }
+      ]
+    },
+    "12600803": {
+      "id": 12600803,
+      "group": 10600,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500008,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000544,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000319,
+          "Value": 1
+        },
+        {
+          "Id": 24000406,
+          "Value": 1
+        },
+        {
+          "Id": 24000057,
+          "Value": 1
+        },
+        {
+          "Id": 24000066,
+          "Value": 1
+        }
+      ]
+    },
+    "12600804": {
+      "id": 12600804,
+      "group": 10600,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223005,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000551,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000240,
+          "Value": 1
+        },
+        {
+          "Id": 24000255,
+          "Value": 1
+        },
+        {
+          "Id": 24000297,
+          "Value": 1
+        },
+        {
+          "Id": 24000331,
+          "Value": 1
+        }
+      ]
+    },
+    "12600501": {
+      "id": 12600501,
+      "group": 10700,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000536,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000100,
+          "Value": 1
+        },
+        {
+          "Id": 24000033,
+          "Value": 2
+        },
+        {
+          "Id": 24000205,
+          "Value": 2
+        }
+      ]
+    },
+    "12600502": {
+      "id": 12600502,
+      "group": 10700,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000537,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000190,
+          "Value": 2
+        },
+        {
+          "Id": 24000192,
+          "Value": 1
+        },
+        {
+          "Id": 24000209,
+          "Value": 2
+        }
+      ]
+    },
+    "12600901": {
+      "id": 12600901,
+      "group": 10800,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000536,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000100,
+          "Value": 1
+        },
+        {
+          "Id": 24000033,
+          "Value": 2
+        },
+        {
+          "Id": 24000205,
+          "Value": 2
+        }
+      ]
+    },
+    "12600902": {
+      "id": 12600902,
+      "group": 10800,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000537,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000190,
+          "Value": 2
+        },
+        {
+          "Id": 24000192,
+          "Value": 1
+        },
+        {
+          "Id": 24000209,
+          "Value": 2
+        }
+      ]
+    },
+    "12600903": {
+      "id": 12600903,
+      "group": 10800,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500009,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000545,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000230,
+          "Value": 3
+        },
+        {
+          "Id": 24000381,
+          "Value": 3
+        }
+      ]
+    },
+    "12601001": {
+      "id": 12601001,
+      "group": 10900,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000536,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000100,
+          "Value": 1
+        },
+        {
+          "Id": 24000033,
+          "Value": 2
+        },
+        {
+          "Id": 24000205,
+          "Value": 2
+        }
+      ]
+    },
+    "12601002": {
+      "id": 12601002,
+      "group": 10900,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000537,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000190,
+          "Value": 2
+        },
+        {
+          "Id": 24000192,
+          "Value": 1
+        },
+        {
+          "Id": 24000209,
+          "Value": 2
+        }
+      ]
+    },
+    "12601003": {
+      "id": 12601003,
+      "group": 10900,
+      "sortOrder": 3,
+      "maxExchangeCount": 40,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500010,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000349,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000252,
+          "Value": 1
+        },
+        {
+          "Id": 24000245,
+          "Value": 1
+        },
+        {
+          "Id": 24000165,
+          "Value": 2
+        }
+      ]
+    },
+    "12601101": {
+      "id": 12601101,
+      "group": 11000,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000536,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000100,
+          "Value": 1
+        },
+        {
+          "Id": 24000033,
+          "Value": 2
+        },
+        {
+          "Id": 24000205,
+          "Value": 2
+        }
+      ]
+    },
+    "12601102": {
+      "id": 12601102,
+      "group": 11000,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000537,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000190,
+          "Value": 2
+        },
+        {
+          "Id": 24000192,
+          "Value": 1
+        },
+        {
+          "Id": 24000209,
+          "Value": 2
+        }
+      ]
+    },
+    "12601103": {
+      "id": 12601103,
+      "group": 11000,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500011,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000546,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000267,
+          "Value": 1
+        },
+        {
+          "Id": 24000347,
+          "Value": 1
+        },
+        {
+          "Id": 24000351,
+          "Value": 1
+        },
+        {
+          "Id": 24000233,
+          "Value": 1
+        }
+      ]
+    },
+    "12601201": {
+      "id": 12601201,
+      "group": 11100,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000538,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000189,
+          "Value": 3
+        },
+        {
+          "Id": 24000085,
+          "Value": 3
+        }
+      ]
+    },
+    "12601202": {
+      "id": 12601202,
+      "group": 11100,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000539,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000107,
+          "Value": 2
+        },
+        {
+          "Id": 24000109,
+          "Value": 2
+        },
+        {
+          "Id": 24000110,
+          "Value": 2
+        }
+      ]
+    },
+    "12601203": {
+      "id": 12601203,
+      "group": 11100,
+      "sortOrder": 3,
+      "maxExchangeCount": 15,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500012,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000340,
+      "getTradeGoodsDefault": 20,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000297,
+          "Value": 1
+        },
+        {
+          "Id": 24000189,
+          "Value": 5
+        }
+      ]
+    },
+    "12601301": {
+      "id": 12601301,
+      "group": 11200,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000538,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000189,
+          "Value": 3
+        },
+        {
+          "Id": 24000085,
+          "Value": 3
+        }
+      ]
+    },
+    "12601302": {
+      "id": 12601302,
+      "group": 11200,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000539,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000107,
+          "Value": 2
+        },
+        {
+          "Id": 24000109,
+          "Value": 2
+        },
+        {
+          "Id": 24000110,
+          "Value": 2
+        }
+      ]
+    },
+    "12601401": {
+      "id": 12601401,
+      "group": 11300,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000538,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000189,
+          "Value": 3
+        },
+        {
+          "Id": 24000085,
+          "Value": 3
+        }
+      ]
+    },
+    "12601402": {
+      "id": 12601402,
+      "group": 11300,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000539,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000107,
+          "Value": 2
+        },
+        {
+          "Id": 24000109,
+          "Value": 2
+        },
+        {
+          "Id": 24000110,
+          "Value": 2
+        }
+      ]
+    },
+    "12601403": {
+      "id": 12601403,
+      "group": 11300,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500014,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000547,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000538,
+          "Value": 2
+        },
+        {
+          "Id": 24000072,
+          "Value": 1
+        },
+        {
+          "Id": 24000268,
+          "Value": 1
+        }
+      ]
+    },
+    "12601404": {
+      "id": 12601404,
+      "group": 11300,
+      "sortOrder": 5,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223001,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000549,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000170,
+          "Value": 2
+        },
+        {
+          "Id": 24000167,
+          "Value": 2
+        },
+        {
+          "Id": 24000181,
+          "Value": 2
+        }
+      ]
+    },
+    "12601501": {
+      "id": 12601501,
+      "group": 11400,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000538,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000189,
+          "Value": 3
+        },
+        {
+          "Id": 24000085,
+          "Value": 3
+        }
+      ]
+    },
+    "12601502": {
+      "id": 12601502,
+      "group": 11400,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000539,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000107,
+          "Value": 2
+        },
+        {
+          "Id": 24000109,
+          "Value": 2
+        },
+        {
+          "Id": 24000110,
+          "Value": 2
+        }
+      ]
+    },
+    "12601504": {
+      "id": 12601504,
+      "group": 11400,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223001,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000549,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000170,
+          "Value": 2
+        },
+        {
+          "Id": 24000167,
+          "Value": 2
+        },
+        {
+          "Id": 24000181,
+          "Value": 2
+        }
+      ]
+    },
+    "12601601": {
+      "id": 12601601,
+      "group": 11500,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000538,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000189,
+          "Value": 3
+        },
+        {
+          "Id": 24000085,
+          "Value": 3
+        }
+      ]
+    },
+    "12601602": {
+      "id": 12601602,
+      "group": 11500,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000539,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000107,
+          "Value": 2
+        },
+        {
+          "Id": 24000109,
+          "Value": 2
+        },
+        {
+          "Id": 24000110,
+          "Value": 2
+        }
+      ]
+    },
+    "12601604": {
+      "id": 12601604,
+      "group": 11500,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223001,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000549,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000170,
+          "Value": 2
+        },
+        {
+          "Id": 24000167,
+          "Value": 2
+        },
+        {
+          "Id": 24000181,
+          "Value": 2
+        }
+      ]
+    },
+    "12600301": {
+      "id": 12600301,
+      "group": 11600,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000540,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000333,
+          "Value": 2
+        },
+        {
+          "Id": 24000097,
+          "Value": 4
+        }
+      ]
+    },
+    "12600302": {
+      "id": 12600302,
+      "group": 11600,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000541,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000441,
+          "Value": 2
+        },
+        {
+          "Id": 24000146,
+          "Value": 2
+        },
+        {
+          "Id": 24000141,
+          "Value": 2
+        }
+      ]
+    },
+    "12600303": {
+      "id": 12600303,
+      "group": 11600,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500003,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000548,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000440,
+          "Value": 2
+        },
+        {
+          "Id": 24000230,
+          "Value": 1
+        },
+        {
+          "Id": 24000361,
+          "Value": 1
+        }
+      ]
+    },
+    "12600401": {
+      "id": 12600401,
+      "group": 11700,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000540,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000333,
+          "Value": 2
+        },
+        {
+          "Id": 24000097,
+          "Value": 4
+        }
+      ]
+    },
+    "12600402": {
+      "id": 12600402,
+      "group": 11700,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000541,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000441,
+          "Value": 2
+        },
+        {
+          "Id": 24000146,
+          "Value": 2
+        },
+        {
+          "Id": 24000141,
+          "Value": 2
+        }
+      ]
+    },
+    "12603401": {
+      "id": 12603401,
+      "group": 11800,
+      "sortOrder": 1,
+      "maxExchangeCount": 250,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000577,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000209,
+          "Value": 1
+        },
+        {
+          "Id": 24000038,
+          "Value": 1
+        },
+        {
+          "Id": 24000319,
+          "Value": 1
+        }
+      ]
+    },
+    "12603402": {
+      "id": 12603402,
+      "group": 11800,
+      "sortOrder": 2,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000586,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000406,
+          "Value": 1
+        },
+        {
+          "Id": 24000428,
+          "Value": 1
+        },
+        {
+          "Id": 24000430,
+          "Value": 1
+        }
+      ]
+    },
+    "12603403": {
+      "id": 12603403,
+      "group": 11800,
+      "sortOrder": 3,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500034,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000589,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000586,
+          "Value": 2
+        },
+        {
+          "Id": 24000235,
+          "Value": 2
+        }
+      ]
+    },
+    "12603404": {
+      "id": 12603404,
+      "group": 11800,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223007,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000596,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000590,
+          "Value": 1
+        },
+        {
+          "Id": 24000591,
+          "Value": 1
+        }
+      ]
+    },
+    "12603201": {
+      "id": 12603201,
+      "group": 11900,
+      "sortOrder": 1,
+      "maxExchangeCount": 250,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000577,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000209,
+          "Value": 1
+        },
+        {
+          "Id": 24000038,
+          "Value": 1
+        },
+        {
+          "Id": 24000319,
+          "Value": 1
+        }
+      ]
+    },
+    "12603202": {
+      "id": 12603202,
+      "group": 11900,
+      "sortOrder": 2,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000586,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000406,
+          "Value": 1
+        },
+        {
+          "Id": 24000428,
+          "Value": 1
+        },
+        {
+          "Id": 24000430,
+          "Value": 1
+        }
+      ]
+    },
+    "12603203": {
+      "id": 12603203,
+      "group": 11900,
+      "sortOrder": 3,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500032,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000589,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000586,
+          "Value": 2
+        },
+        {
+          "Id": 24000235,
+          "Value": 2
+        }
+      ]
+    },
+    "12603204": {
+      "id": 12603204,
+      "group": 11900,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223007,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000596,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000590,
+          "Value": 1
+        },
+        {
+          "Id": 24000591,
+          "Value": 1
+        }
+      ]
+    },
+    "12603301": {
+      "id": 12603301,
+      "group": 12000,
+      "sortOrder": 1,
+      "maxExchangeCount": 250,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000577,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000209,
+          "Value": 1
+        },
+        {
+          "Id": 24000038,
+          "Value": 1
+        },
+        {
+          "Id": 24000319,
+          "Value": 1
+        }
+      ]
+    },
+    "12603302": {
+      "id": 12603302,
+      "group": 12000,
+      "sortOrder": 2,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000586,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000406,
+          "Value": 1
+        },
+        {
+          "Id": 24000428,
+          "Value": 1
+        },
+        {
+          "Id": 24000430,
+          "Value": 1
+        }
+      ]
+    },
+    "12602901": {
+      "id": 12602901,
+      "group": 12100,
+      "sortOrder": 1,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000575,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000234,
+          "Value": 1
+        },
+        {
+          "Id": 24000170,
+          "Value": 1
+        },
+        {
+          "Id": 24000183,
+          "Value": 1
+        }
+      ]
+    },
+    "12602902": {
+      "id": 12602902,
+      "group": 12100,
+      "sortOrder": 2,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000576,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000035,
+          "Value": 1
+        },
+        {
+          "Id": 24000009,
+          "Value": 1
+        },
+        {
+          "Id": 24000291,
+          "Value": 1
+        },
+        {
+          "Id": 24000072,
+          "Value": 1
+        }
+      ]
+    },
+    "12602903": {
+      "id": 12602903,
+      "group": 12100,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500029,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000584,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000210,
+          "Value": 1
+        },
+        {
+          "Id": 24000284,
+          "Value": 1
+        },
+        {
+          "Id": 24000410,
+          "Value": 1
+        },
+        {
+          "Id": 24000447,
+          "Value": 1
+        }
+      ]
+    },
+    "12602801": {
+      "id": 12602801,
+      "group": 12200,
+      "sortOrder": 1,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000575,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000234,
+          "Value": 1
+        },
+        {
+          "Id": 24000170,
+          "Value": 1
+        },
+        {
+          "Id": 24000183,
+          "Value": 1
+        }
+      ]
+    },
+    "12602802": {
+      "id": 12602802,
+      "group": 12200,
+      "sortOrder": 2,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000576,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000035,
+          "Value": 1
+        },
+        {
+          "Id": 24000009,
+          "Value": 1
+        },
+        {
+          "Id": 24000291,
+          "Value": 1
+        },
+        {
+          "Id": 24000072,
+          "Value": 1
+        }
+      ]
+    },
+    "12602803": {
+      "id": 12602803,
+      "group": 12200,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500028,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000584,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000210,
+          "Value": 1
+        },
+        {
+          "Id": 24000284,
+          "Value": 1
+        },
+        {
+          "Id": 24000410,
+          "Value": 1
+        },
+        {
+          "Id": 24000447,
+          "Value": 1
+        }
+      ]
+    },
+    "12606001": {
+      "id": 12606001,
+      "group": 12300,
+      "sortOrder": 1,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000575,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000234,
+          "Value": 1
+        },
+        {
+          "Id": 24000170,
+          "Value": 1
+        },
+        {
+          "Id": 24000183,
+          "Value": 1
+        }
+      ]
+    },
+    "12606002": {
+      "id": 12606002,
+      "group": 12300,
+      "sortOrder": 2,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000576,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000035,
+          "Value": 1
+        },
+        {
+          "Id": 24000009,
+          "Value": 1
+        },
+        {
+          "Id": 24000291,
+          "Value": 1
+        },
+        {
+          "Id": 24000072,
+          "Value": 1
+        }
+      ]
+    },
+    "12606003": {
+      "id": 12606003,
+      "group": 12300,
+      "sortOrder": 3,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500060,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000593,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000393,
+          "Value": 1
+        },
+        {
+          "Id": 24000292,
+          "Value": 1
+        },
+        {
+          "Id": 24000283,
+          "Value": 1
+        }
+      ]
+    },
+    "12603101": {
+      "id": 12603101,
+      "group": 12400,
+      "sortOrder": 1,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000587,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000439,
+          "Value": 1
+        },
+        {
+          "Id": 24000044,
+          "Value": 1
+        }
+      ]
+    },
+    "12603102": {
+      "id": 12603102,
+      "group": 12400,
+      "sortOrder": 2,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000590,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000355,
+          "Value": 1
+        },
+        {
+          "Id": 24000320,
+          "Value": 1
+        }
+      ]
+    },
+    "12603001": {
+      "id": 12603001,
+      "group": 12500,
+      "sortOrder": 1,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000587,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000439,
+          "Value": 1
+        },
+        {
+          "Id": 24000044,
+          "Value": 1
+        }
+      ]
+    },
+    "12603002": {
+      "id": 12603002,
+      "group": 12500,
+      "sortOrder": 2,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000590,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000355,
+          "Value": 1
+        },
+        {
+          "Id": 24000320,
+          "Value": 1
+        }
+      ]
+    },
+    "12603003": {
+      "id": 12603003,
+      "group": 12500,
+      "sortOrder": 3,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500030,
+          "Count": 6
+        }
+      ],
+      "getTradeGoodsId": 24000588,
+      "getTradeGoodsDefault": 2,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000318,
+          "Value": 1
+        },
+        {
+          "Id": 24000332,
+          "Value": 1
+        }
+      ]
+    },
+    "12602101": {
+      "id": 12602101,
+      "group": 12600,
+      "sortOrder": 2,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000582,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000320,
+          "Value": 1
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        },
+        {
+          "Id": 24000171,
+          "Value": 1
+        }
+      ]
+    },
+    "12602102": {
+      "id": 12602102,
+      "group": 12600,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000583,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000373,
+          "Value": 2
+        },
+        {
+          "Id": 24000265,
+          "Value": 2
+        },
+        {
+          "Id": 24000066,
+          "Value": 2
+        }
+      ]
+    },
+    "12602601": {
+      "id": 12602601,
+      "group": 12700,
+      "sortOrder": 1,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000582,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000320,
+          "Value": 1
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        },
+        {
+          "Id": 24000171,
+          "Value": 1
+        }
+      ]
+    },
+    "12602602": {
+      "id": 12602602,
+      "group": 12700,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000583,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000373,
+          "Value": 2
+        },
+        {
+          "Id": 24000265,
+          "Value": 2
+        },
+        {
+          "Id": 24000066,
+          "Value": 2
+        }
+      ]
+    },
+    "12602301": {
+      "id": 12602301,
+      "group": 12800,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000578,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000146,
+          "Value": 2
+        },
+        {
+          "Id": 24000038,
+          "Value": 2
+        },
+        {
+          "Id": 24000127,
+          "Value": 1
+        }
+      ]
+    },
+    "12602302": {
+      "id": 12602302,
+      "group": 12800,
+      "sortOrder": 2,
+      "maxExchangeCount": 110,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000579,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000183,
+          "Value": 2
+        },
+        {
+          "Id": 24000414,
+          "Value": 2
+        },
+        {
+          "Id": 24000139,
+          "Value": 1
+        }
+      ]
+    },
+    "12602303": {
+      "id": 12602303,
+      "group": 12800,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500023,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000591,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000091,
+          "Value": 2
+        },
+        {
+          "Id": 24000329,
+          "Value": 2
+        },
+        {
+          "Id": 24000143,
+          "Value": 1
+        }
+      ]
+    },
+    "12602304": {
+      "id": 12602304,
+      "group": 12800,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223003,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000594,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000116,
+          "Value": 1
+        },
+        {
+          "Id": 24000208,
+          "Value": 3
+        },
+        {
+          "Id": 24000271,
+          "Value": 1
+        }
+      ]
+    },
+    "12602201": {
+      "id": 12602201,
+      "group": 12900,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000578,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000146,
+          "Value": 2
+        },
+        {
+          "Id": 24000038,
+          "Value": 2
+        },
+        {
+          "Id": 24000127,
+          "Value": 1
+        }
+      ]
+    },
+    "12602202": {
+      "id": 12602202,
+      "group": 12900,
+      "sortOrder": 2,
+      "maxExchangeCount": 110,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000579,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000183,
+          "Value": 2
+        },
+        {
+          "Id": 24000414,
+          "Value": 2
+        },
+        {
+          "Id": 24000139,
+          "Value": 1
+        }
+      ]
+    },
+    "12602203": {
+      "id": 12602203,
+      "group": 12900,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500022,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000591,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000091,
+          "Value": 2
+        },
+        {
+          "Id": 24000329,
+          "Value": 2
+        },
+        {
+          "Id": 24000143,
+          "Value": 1
+        }
+      ]
+    },
+    "12602204": {
+      "id": 12602204,
+      "group": 12900,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223003,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000594,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000116,
+          "Value": 1
+        },
+        {
+          "Id": 24000208,
+          "Value": 3
+        },
+        {
+          "Id": 24000271,
+          "Value": 1
+        }
+      ]
+    },
+    "12602401": {
+      "id": 12602401,
+      "group": 13000,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000578,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000146,
+          "Value": 2
+        },
+        {
+          "Id": 24000038,
+          "Value": 2
+        },
+        {
+          "Id": 24000127,
+          "Value": 1
+        }
+      ]
+    },
+    "12602402": {
+      "id": 12602402,
+      "group": 13000,
+      "sortOrder": 2,
+      "maxExchangeCount": 110,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000579,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000183,
+          "Value": 2
+        },
+        {
+          "Id": 24000414,
+          "Value": 2
+        },
+        {
+          "Id": 24000139,
+          "Value": 1
+        }
+      ]
+    },
+    "12602501": {
+      "id": 12602501,
+      "group": 13100,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000578,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000146,
+          "Value": 2
+        },
+        {
+          "Id": 24000038,
+          "Value": 2
+        },
+        {
+          "Id": 24000127,
+          "Value": 1
+        }
+      ]
+    },
+    "12602502": {
+      "id": 12602502,
+      "group": 13100,
+      "sortOrder": 2,
+      "maxExchangeCount": 110,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000579,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000183,
+          "Value": 2
+        },
+        {
+          "Id": 24000414,
+          "Value": 2
+        },
+        {
+          "Id": 24000139,
+          "Value": 1
+        }
+      ]
+    },
+    "12602001": {
+      "id": 12602001,
+      "group": 13200,
+      "sortOrder": 1,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000580,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000576,
+          "Value": 1
+        },
+        {
+          "Id": 24000000,
+          "Value": 2
+        }
+      ]
+    },
+    "12602002": {
+      "id": 12602002,
+      "group": 13200,
+      "sortOrder": 2,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000581,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000159,
+          "Value": 1
+        },
+        {
+          "Id": 24000234,
+          "Value": 1
+        },
+        {
+          "Id": 24000383,
+          "Value": 2
+        }
+      ]
+    },
+    "12602003": {
+      "id": 12602003,
+      "group": 13200,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500020,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000592,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000054,
+          "Value": 1
+        },
+        {
+          "Id": 24000407,
+          "Value": 2
+        },
+        {
+          "Id": 24000196,
+          "Value": 1
+        }
+      ]
+    },
+    "12602004": {
+      "id": 12602004,
+      "group": 13200,
+      "sortOrder": 4,
+      "maxExchangeCount": 160,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223004,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000595,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000367,
+          "Value": 2
+        },
+        {
+          "Id": 24000360,
+          "Value": 1
+        },
+        {
+          "Id": 24000351,
+          "Value": 1
+        }
+      ]
+    },
+    "12601901": {
+      "id": 12601901,
+      "group": 13300,
+      "sortOrder": 1,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000580,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000576,
+          "Value": 1
+        },
+        {
+          "Id": 24000000,
+          "Value": 2
+        }
+      ]
+    },
+    "12601902": {
+      "id": 12601902,
+      "group": 13300,
+      "sortOrder": 2,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000581,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000159,
+          "Value": 1
+        },
+        {
+          "Id": 24000234,
+          "Value": 1
+        },
+        {
+          "Id": 24000383,
+          "Value": 2
+        }
+      ]
+    },
+    "12601903": {
+      "id": 12601903,
+      "group": 13300,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500019,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000592,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000054,
+          "Value": 1
+        },
+        {
+          "Id": 24000407,
+          "Value": 2
+        },
+        {
+          "Id": 24000196,
+          "Value": 1
+        }
+      ]
+    },
+    "12601904": {
+      "id": 12601904,
+      "group": 13300,
+      "sortOrder": 4,
+      "maxExchangeCount": 160,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223004,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000595,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000367,
+          "Value": 2
+        },
+        {
+          "Id": 24000360,
+          "Value": 1
+        },
+        {
+          "Id": 24000351,
+          "Value": 1
+        }
+      ]
+    },
+    "12601801": {
+      "id": 12601801,
+      "group": 13400,
+      "sortOrder": 1,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000580,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000576,
+          "Value": 1
+        },
+        {
+          "Id": 24000000,
+          "Value": 2
+        }
+      ]
+    },
+    "12601802": {
+      "id": 12601802,
+      "group": 13400,
+      "sortOrder": 2,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000581,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000159,
+          "Value": 1
+        },
+        {
+          "Id": 24000234,
+          "Value": 1
+        },
+        {
+          "Id": 24000383,
+          "Value": 2
+        }
+      ]
+    },
+    "12604201": {
+      "id": 12604201,
+      "group": 13500,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000603,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000286,
+          "Value": 3
+        },
+        {
+          "Id": 24000058,
+          "Value": 2
+        },
+        {
+          "Id": 24000163,
+          "Value": 1
+        }
+      ]
+    },
+    "12604202": {
+      "id": 12604202,
+      "group": 13500,
+      "sortOrder": 2,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000572,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000352,
+          "Value": 1
+        },
+        {
+          "Id": 24000230,
+          "Value": 2
+        },
+        {
+          "Id": 24000364,
+          "Value": 1
+        }
+      ]
+    },
+    "12604204": {
+      "id": 12604204,
+      "group": 13500,
+      "sortOrder": 4,
+      "maxExchangeCount": 50,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223005,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000628,
+      "getTradeGoodsDefault": 8,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000116,
+          "Value": 10
+        },
+        {
+          "Id": 24000320,
+          "Value": 2
+        }
+      ]
+    },
+    "12604301": {
+      "id": 12604301,
+      "group": 13600,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000603,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000286,
+          "Value": 3
+        },
+        {
+          "Id": 24000058,
+          "Value": 2
+        },
+        {
+          "Id": 24000163,
+          "Value": 1
+        }
+      ]
+    },
+    "12604302": {
+      "id": 12604302,
+      "group": 13600,
+      "sortOrder": 2,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000572,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000352,
+          "Value": 1
+        },
+        {
+          "Id": 24000230,
+          "Value": 2
+        },
+        {
+          "Id": 24000364,
+          "Value": 1
+        }
+      ]
+    },
+    "12604303": {
+      "id": 12604303,
+      "group": 13600,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500043,
+          "Count": 6
+        }
+      ],
+      "getTradeGoodsId": 24000623,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000300,
+          "Value": 2
+        },
+        {
+          "Id": 24000151,
+          "Value": 3
+        }
+      ]
+    },
+    "12604304": {
+      "id": 12604304,
+      "group": 13600,
+      "sortOrder": 4,
+      "maxExchangeCount": 50,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223005,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000628,
+      "getTradeGoodsDefault": 8,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000116,
+          "Value": 10
+        },
+        {
+          "Id": 24000320,
+          "Value": 2
+        }
+      ]
+    },
+    "12604401": {
+      "id": 12604401,
+      "group": 13700,
+      "sortOrder": 1,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000604,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000036,
+          "Value": 2
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        }
+      ]
+    },
+    "12604402": {
+      "id": 12604402,
+      "group": 13700,
+      "sortOrder": 2,
+      "maxExchangeCount": 80,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000605,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000151,
+          "Value": 5
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        }
+      ]
+    },
+    "12604404": {
+      "id": 12604404,
+      "group": 13700,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223007,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000626,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000358,
+          "Value": 2
+        },
+        {
+          "Id": 24000320,
+          "Value": 1
+        },
+        {
+          "Id": 24000318,
+          "Value": 1
+        }
+      ]
+    },
+    "12604501": {
+      "id": 12604501,
+      "group": 13800,
+      "sortOrder": 1,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000604,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000036,
+          "Value": 2
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        }
+      ]
+    },
+    "12604502": {
+      "id": 12604502,
+      "group": 13800,
+      "sortOrder": 2,
+      "maxExchangeCount": 80,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000605,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000151,
+          "Value": 5
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        }
+      ]
+    },
+    "12604504": {
+      "id": 12604504,
+      "group": 13800,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223007,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000626,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000358,
+          "Value": 2
+        },
+        {
+          "Id": 24000320,
+          "Value": 1
+        },
+        {
+          "Id": 24000318,
+          "Value": 1
+        }
+      ]
+    },
+    "12604601": {
+      "id": 12604601,
+      "group": 13900,
+      "sortOrder": 1,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000604,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000036,
+          "Value": 2
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        }
+      ]
+    },
+    "12604602": {
+      "id": 12604602,
+      "group": 13900,
+      "sortOrder": 2,
+      "maxExchangeCount": 80,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000605,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000151,
+          "Value": 5
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        }
+      ]
+    },
+    "12604701": {
+      "id": 12604701,
+      "group": 14000,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000606,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000434,
+          "Value": 4
+        },
+        {
+          "Id": 24000229,
+          "Value": 4
+        }
+      ]
+    },
+    "12604702": {
+      "id": 12604702,
+      "group": 14000,
+      "sortOrder": 3,
+      "maxExchangeCount": 80,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000607,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000056,
+          "Value": 2
+        },
+        {
+          "Id": 24000307,
+          "Value": 1
+        },
+        {
+          "Id": 24000311,
+          "Value": 1
+        },
+        {
+          "Id": 24000316,
+          "Value": 1
+        }
+      ]
+    },
+    "12604703": {
+      "id": 12604703,
+      "group": 14000,
+      "sortOrder": 4,
+      "maxExchangeCount": 50,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000052,
+          "Target": 70401185,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000566,
+      "getTradeGoodsDefault": 8,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000185,
+          "Value": 4
+        },
+        {
+          "Id": 24000123,
+          "Value": 3
+        },
+        {
+          "Id": 24000272,
+          "Value": 2
+        }
+      ]
+    },
+    "12604801": {
+      "id": 12604801,
+      "group": 14100,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000606,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000434,
+          "Value": 4
+        },
+        {
+          "Id": 24000229,
+          "Value": 4
+        }
+      ]
+    },
+    "12604802": {
+      "id": 12604802,
+      "group": 14100,
+      "sortOrder": 3,
+      "maxExchangeCount": 80,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000607,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000056,
+          "Value": 2
+        },
+        {
+          "Id": 24000307,
+          "Value": 1
+        },
+        {
+          "Id": 24000311,
+          "Value": 1
+        },
+        {
+          "Id": 24000316,
+          "Value": 1
+        }
+      ]
+    },
+    "12604901": {
+      "id": 12604901,
+      "group": 14200,
+      "sortOrder": 1,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000608,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000199,
+          "Value": 1
+        },
+        {
+          "Id": 24000395,
+          "Value": 1
+        },
+        {
+          "Id": 24000201,
+          "Value": 1
+        },
+        {
+          "Id": 24000447,
+          "Value": 1
+        }
+      ]
+    },
+    "12604902": {
+      "id": 12604902,
+      "group": 14200,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000609,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000085,
+          "Value": 1
+        },
+        {
+          "Id": 24000409,
+          "Value": 2
+        },
+        {
+          "Id": 24000084,
+          "Value": 2
+        }
+      ]
+    },
+    "12605001": {
+      "id": 12605001,
+      "group": 14300,
+      "sortOrder": 3,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000612,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000347,
+          "Value": 1
+        },
+        {
+          "Id": 24000353,
+          "Value": 1
+        },
+        {
+          "Id": 24000352,
+          "Value": 1
+        }
+      ]
+    },
+    "12605002": {
+      "id": 12605002,
+      "group": 14300,
+      "sortOrder": 4,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000613,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000502,
+          "Value": 2
+        },
+        {
+          "Id": 24000549,
+          "Value": 2
+        }
+      ]
+    },
+    "12605003": {
+      "id": 12605003,
+      "group": 14300,
+      "sortOrder": 5,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500050,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000622,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000317,
+          "Value": 1
+        },
+        {
+          "Id": 24000320,
+          "Value": 1
+        },
+        {
+          "Id": 24000151,
+          "Value": 1
+        },
+        {
+          "Id": 24000397,
+          "Value": 1
+        }
+      ]
+    },
+    "12605101": {
+      "id": 12605101,
+      "group": 14400,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000610,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000421,
+          "Value": 2
+        },
+        {
+          "Id": 24000331,
+          "Value": 1
+        },
+        {
+          "Id": 24000500,
+          "Value": 1
+        }
+      ]
+    },
+    "12605102": {
+      "id": 12605102,
+      "group": 14400,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000611,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000049,
+          "Value": 2
+        },
+        {
+          "Id": 24000071,
+          "Value": 1
+        },
+        {
+          "Id": 24000320,
+          "Value": 1
+        }
+      ]
+    },
+    "12605103": {
+      "id": 12605103,
+      "group": 14400,
+      "sortOrder": 4,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000052,
+          "Target": 70402056,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000569,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000252,
+          "Value": 1
+        },
+        {
+          "Id": 24000272,
+          "Value": 1
+        },
+        {
+          "Id": 24000319,
+          "Value": 1
+        }
+      ]
+    },
+    "12605201": {
+      "id": 12605201,
+      "group": 14500,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000610,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000421,
+          "Value": 2
+        },
+        {
+          "Id": 24000331,
+          "Value": 1
+        },
+        {
+          "Id": 24000500,
+          "Value": 1
+        }
+      ]
+    },
+    "12605202": {
+      "id": 12605202,
+      "group": 14500,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000611,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000049,
+          "Value": 2
+        },
+        {
+          "Id": 24000071,
+          "Value": 1
+        },
+        {
+          "Id": 24000320,
+          "Value": 1
+        }
+      ]
+    },
+    "12605204": {
+      "id": 12605204,
+      "group": 14500,
+      "sortOrder": 4,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223005,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000624,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000230,
+          "Value": 1
+        },
+        {
+          "Id": 24000578,
+          "Value": 1
+        },
+        {
+          "Id": 24000544,
+          "Value": 1
+        }
+      ]
+    },
+    "12605301": {
+      "id": 12605301,
+      "group": 14600,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000610,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000421,
+          "Value": 2
+        },
+        {
+          "Id": 24000331,
+          "Value": 1
+        },
+        {
+          "Id": 24000500,
+          "Value": 1
+        }
+      ]
+    },
+    "12605302": {
+      "id": 12605302,
+      "group": 14600,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000611,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000049,
+          "Value": 2
+        },
+        {
+          "Id": 24000071,
+          "Value": 1
+        },
+        {
+          "Id": 24000320,
+          "Value": 1
+        }
+      ]
+    },
+    "12605303": {
+      "id": 12605303,
+      "group": 14600,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500053,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000620,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000225,
+          "Value": 2
+        },
+        {
+          "Id": 24000143,
+          "Value": 1
+        },
+        {
+          "Id": 24000142,
+          "Value": 1
+        },
+        {
+          "Id": 24000148,
+          "Value": 1
+        }
+      ]
+    },
+    "12605401": {
+      "id": 12605401,
+      "group": 14700,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000618,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000453,
+          "Value": 1
+        },
+        {
+          "Id": 24000412,
+          "Value": 1
+        }
+      ]
+    },
+    "12605402": {
+      "id": 12605402,
+      "group": 14700,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000619,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000267,
+          "Value": 1
+        },
+        {
+          "Id": 24000435,
+          "Value": 1
+        }
+      ]
+    },
+    "12605403": {
+      "id": 12605403,
+      "group": 14700,
+      "sortOrder": 3,
+      "maxExchangeCount": 20,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500054,
+          "Count": 6
+        }
+      ],
+      "getTradeGoodsId": 24000442,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000480,
+          "Value": 2
+        },
+        {
+          "Id": 24000174,
+          "Value": 2
+        },
+        {
+          "Id": 24000364,
+          "Value": 2
+        }
+      ]
+    },
+    "12605501": {
+      "id": 12605501,
+      "group": 14800,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000614,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000002,
+          "Value": 1
+        },
+        {
+          "Id": 24000410,
+          "Value": 1
+        },
+        {
+          "Id": 24000215,
+          "Value": 1
+        }
+      ]
+    },
+    "12605503": {
+      "id": 12605503,
+      "group": 14800,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500055,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000615,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000167,
+          "Value": 1
+        },
+        {
+          "Id": 24000484,
+          "Value": 1
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        }
+      ]
+    },
+    "12605504": {
+      "id": 12605504,
+      "group": 14800,
+      "sortOrder": 4,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223003,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000627,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000483,
+          "Value": 1
+        },
+        {
+          "Id": 24000406,
+          "Value": 1
+        },
+        {
+          "Id": 24000375,
+          "Value": 1
+        }
+      ]
+    },
+    "12605601": {
+      "id": 12605601,
+      "group": 14900,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000614,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000002,
+          "Value": 1
+        },
+        {
+          "Id": 24000410,
+          "Value": 1
+        },
+        {
+          "Id": 24000215,
+          "Value": 1
+        }
+      ]
+    },
+    "12605603": {
+      "id": 12605603,
+      "group": 14900,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500056,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000615,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000167,
+          "Value": 1
+        },
+        {
+          "Id": 24000484,
+          "Value": 1
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        }
+      ]
+    },
+    "12605604": {
+      "id": 12605604,
+      "group": 14900,
+      "sortOrder": 4,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223003,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000627,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000483,
+          "Value": 1
+        },
+        {
+          "Id": 24000406,
+          "Value": 1
+        },
+        {
+          "Id": 24000375,
+          "Value": 1
+        }
+      ]
+    },
+    "12605701": {
+      "id": 12605701,
+      "group": 15000,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000614,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000002,
+          "Value": 1
+        },
+        {
+          "Id": 24000410,
+          "Value": 1
+        },
+        {
+          "Id": 24000215,
+          "Value": 1
+        }
+      ]
+    },
+    "12605703": {
+      "id": 12605703,
+      "group": 15000,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500057,
+          "Count": 5
+        }
+      ],
+      "getTradeGoodsId": 24000615,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000167,
+          "Value": 1
+        },
+        {
+          "Id": 24000484,
+          "Value": 1
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        }
+      ]
+    },
+    "12605801": {
+      "id": 12605801,
+      "group": 15100,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000616,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000542,
+          "Value": 1
+        },
+        {
+          "Id": 24000384,
+          "Value": 1
+        }
+      ]
+    },
+    "12605802": {
+      "id": 12605802,
+      "group": 15100,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000617,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000616,
+          "Value": 1
+        },
+        {
+          "Id": 24000163,
+          "Value": 1
+        }
+      ]
+    },
+    "12605803": {
+      "id": 12605803,
+      "group": 15100,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500058,
+          "Count": 6
+        }
+      ],
+      "getTradeGoodsId": 24000621,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000346,
+          "Value": 1
+        },
+        {
+          "Id": 24000442,
+          "Value": 1
+        },
+        {
+          "Id": 24000317,
+          "Value": 1
+        }
+      ]
+    },
+    "12605804": {
+      "id": 12605804,
+      "group": 15100,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223006,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000625,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000424,
+          "Value": 1
+        },
+        {
+          "Id": 24000420,
+          "Value": 1
+        },
+        {
+          "Id": 24000418,
+          "Value": 1
+        }
+      ]
+    },
+    "12606601": {
+      "id": 12606601,
+      "group": 15200,
+      "sortOrder": 1,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000575,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000234,
+          "Value": 1
+        },
+        {
+          "Id": 24000170,
+          "Value": 1
+        },
+        {
+          "Id": 24000183,
+          "Value": 1
+        }
+      ]
+    },
+    "12606602": {
+      "id": 12606602,
+      "group": 15200,
+      "sortOrder": 2,
+      "maxExchangeCount": 150,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000576,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000035,
+          "Value": 1
+        },
+        {
+          "Id": 24000009,
+          "Value": 1
+        },
+        {
+          "Id": 24000291,
+          "Value": 1
+        },
+        {
+          "Id": 24000072,
+          "Value": 1
+        }
+      ]
+    },
+    "12606603": {
+      "id": 12606603,
+      "group": 15200,
+      "sortOrder": 3,
+      "maxExchangeCount": 200,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500066,
+          "Count": 6
+        }
+      ],
+      "getTradeGoodsId": 24000463,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000166,
+          "Value": 1
+        },
+        {
+          "Id": 24000389,
+          "Value": 1
+        }
+      ]
+    },
+    "12606604": {
+      "id": 12606604,
+      "group": 15200,
+      "sortOrder": 4,
+      "maxExchangeCount": 15,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223001,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000523,
+      "getTradeGoodsDefault": 20,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000355,
+          "Value": 5
+        },
+        {
+          "Id": 24000232,
+          "Value": 5
+        },
+        {
+          "Id": 24000320,
+          "Value": 5
+        },
+        {
+          "Id": 24000351,
+          "Value": 5
+        }
+      ]
+    },
+    "12606701": {
+      "id": 12606701,
+      "group": 15300,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000618,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000453,
+          "Value": 1
+        },
+        {
+          "Id": 24000412,
+          "Value": 1
+        }
+      ]
+    },
+    "12606702": {
+      "id": 12606702,
+      "group": 15300,
+      "sortOrder": 2,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000619,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000267,
+          "Value": 1
+        },
+        {
+          "Id": 24000435,
+          "Value": 1
+        }
+      ]
+    },
+    "12606703": {
+      "id": 12606703,
+      "group": 15300,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500067,
+          "Count": 6
+        }
+      ],
+      "getTradeGoodsId": 24000620,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000225,
+          "Value": 2
+        },
+        {
+          "Id": 24000143,
+          "Value": 1
+        },
+        {
+          "Id": 24000142,
+          "Value": 1
+        },
+        {
+          "Id": 24000148,
+          "Value": 1
+        }
+      ]
+    },
+    "12606704": {
+      "id": 12606704,
+      "group": 15300,
+      "sortOrder": 4,
+      "maxExchangeCount": 20,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223000,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000370,
+      "getTradeGoodsDefault": 20,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000349,
+          "Value": 8
+        },
+        {
+          "Id": 24000424,
+          "Value": 4
+        },
+        {
+          "Id": 24000317,
+          "Value": 8
+        }
+      ]
+    },
+    "12606501": {
+      "id": 12606501,
+      "group": 15400,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000629,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000036,
+          "Value": 3
+        },
+        {
+          "Id": 24000067,
+          "Value": 2
+        },
+        {
+          "Id": 24000418,
+          "Value": 2
+        }
+      ]
+    },
+    "12606503": {
+      "id": 12606503,
+      "group": 15400,
+      "sortOrder": 3,
+      "maxExchangeCount": 80,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500065,
+          "Count": 6
+        }
+      ],
+      "getTradeGoodsId": 24000631,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000056,
+          "Value": 1
+        },
+        {
+          "Id": 24000130,
+          "Value": 3
+        },
+        {
+          "Id": 24000294,
+          "Value": 2
+        }
+      ]
+    },
+    "12606504": {
+      "id": 12606504,
+      "group": 15400,
+      "sortOrder": 4,
+      "maxExchangeCount": 50,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223004,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000632,
+      "getTradeGoodsDefault": 7,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000227,
+          "Value": 2
+        },
+        {
+          "Id": 24000241,
+          "Value": 2
+        },
+        {
+          "Id": 24000239,
+          "Value": 2
+        },
+        {
+          "Id": 24000170,
+          "Value": 2
+        }
+      ]
+    },
+    "12604001": {
+      "id": 12604001,
+      "group": 15500,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000629,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000036,
+          "Value": 3
+        },
+        {
+          "Id": 24000067,
+          "Value": 2
+        },
+        {
+          "Id": 24000418,
+          "Value": 2
+        }
+      ]
+    },
+    "12604002": {
+      "id": 12604002,
+      "group": 15500,
+      "sortOrder": 2,
+      "maxExchangeCount": 50,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500040,
+          "Count": 6
+        }
+      ],
+      "getTradeGoodsId": 24000630,
+      "getTradeGoodsDefault": 8,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000616,
+          "Value": 3
+        },
+        {
+          "Id": 24000583,
+          "Value": 3
+        }
+      ]
+    },
+    "12604003": {
+      "id": 12604003,
+      "group": 15500,
+      "sortOrder": 3,
+      "maxExchangeCount": 80,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500040,
+          "Count": 6
+        }
+      ],
+      "getTradeGoodsId": 24000631,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000056,
+          "Value": 1
+        },
+        {
+          "Id": 24000130,
+          "Value": 3
+        },
+        {
+          "Id": 24000294,
+          "Value": 2
+        }
+      ]
+    },
+    "12604004": {
+      "id": 12604004,
+      "group": 15500,
+      "sortOrder": 4,
+      "maxExchangeCount": 50,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223004,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000632,
+      "getTradeGoodsDefault": 7,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000227,
+          "Value": 2
+        },
+        {
+          "Id": 24000241,
+          "Value": 2
+        },
+        {
+          "Id": 24000239,
+          "Value": 2
+        },
+        {
+          "Id": 24000170,
+          "Value": 2
+        }
+      ]
+    },
+    "12606801": {
+      "id": 12606801,
+      "group": 15600,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000598,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000413,
+          "Value": 1
+        },
+        {
+          "Id": 24000305,
+          "Value": 2
+        },
+        {
+          "Id": 24000223,
+          "Value": 2
+        }
+      ]
+    },
+    "12606803": {
+      "id": 12606803,
+      "group": 15600,
+      "sortOrder": 3,
+      "maxExchangeCount": 50,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500068,
+          "Count": 6
+        }
+      ],
+      "getTradeGoodsId": 24000599,
+      "getTradeGoodsDefault": 6,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000186,
+          "Value": 1
+        },
+        {
+          "Id": 24000609,
+          "Value": 1
+        },
+        {
+          "Id": 24000592,
+          "Value": 1
+        }
+      ]
+    },
+    "12606804": {
+      "id": 12606804,
+      "group": 15600,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223002,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000597,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000171,
+          "Value": 1
+        },
+        {
+          "Id": 24000399,
+          "Value": 1
+        },
+        {
+          "Id": 24000157,
+          "Value": 1
+        },
+        {
+          "Id": 24000319,
+          "Value": 1
+        }
+      ]
+    },
+    "12606901": {
+      "id": 12606901,
+      "group": 15700,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000598,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000413,
+          "Value": 1
+        },
+        {
+          "Id": 24000305,
+          "Value": 2
+        },
+        {
+          "Id": 24000223,
+          "Value": 2
+        }
+      ]
+    },
+    "12606904": {
+      "id": 12606904,
+      "group": 15700,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223002,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000597,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000171,
+          "Value": 1
+        },
+        {
+          "Id": 24000399,
+          "Value": 1
+        },
+        {
+          "Id": 24000157,
+          "Value": 1
+        },
+        {
+          "Id": 24000319,
+          "Value": 1
+        }
+      ]
+    },
+    "12607001": {
+      "id": 12607001,
+      "group": 15800,
+      "sortOrder": 1,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000633,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000372,
+          "Value": 3
+        },
+        {
+          "Id": 24000292,
+          "Value": 3
+        }
+      ]
+    },
+    "12607003": {
+      "id": 12607003,
+      "group": 15800,
+      "sortOrder": 3,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000064,
+          "Target": 70500070,
+          "Count": 6
+        }
+      ],
+      "getTradeGoodsId": 24000635,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000634,
+          "Value": 3
+        },
+        {
+          "Id": 24000340,
+          "Value": 1
+        },
+        {
+          "Id": 24000167,
+          "Value": 2
+        }
+      ]
+    },
+    "12607004": {
+      "id": 12607004,
+      "group": 15800,
+      "sortOrder": 4,
+      "maxExchangeCount": 100,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000065,
+          "Target": 99223007,
+          "Count": 1
+        }
+      ],
+      "getTradeGoodsId": 24000636,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000183,
+          "Value": 2
+        },
+        {
+          "Id": 24000635,
+          "Value": 3
+        }
+      ]
+    },
+    "12601405": {
+      "id": 12601405,
+      "group": 11300,
+      "sortOrder": 1,
+      "maxExchangeCount": 50,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000687,
+      "getTradeGoodsDefault": 5,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000688,
+          "Value": 3
+        },
+        {
+          "Id": 24000689,
+          "Value": 1
+        }
+      ]
+    },
+    "12601505": {
+      "id": 12601505,
+      "group": 11400,
+      "sortOrder": 1,
+      "maxExchangeCount": 50,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000076,
+          "Target": 5,
+          "Count": 23
+        }
+      ],
+      "getTradeGoodsId": 24000687,
+      "getTradeGoodsDefault": 7,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000688,
+          "Value": 3
+        },
+        {
+          "Id": 24000689,
+          "Value": 1
+        }
+      ]
+    },
+    "12602105": {
+      "id": 12602105,
+      "group": 12600,
+      "sortOrder": 1,
+      "maxExchangeCount": 30,
+      "hideContentsTermsExchangeList": false,
+      "contentsTerms": [
+        {
+          "Id": 81000076,
+          "Target": 8,
+          "Count": 21
+        }
+      ],
+      "getTradeGoodsId": 24000690,
+      "getTradeGoodsDefault": 10,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000476,
+          "Value": 1
+        },
+        {
+          "Id": 24000691,
+          "Value": 5
+        },
+        {
+          "Id": 24000621,
+          "Value": 3
+        }
+      ]
+    },
+    "12604805": {
+      "id": 12604805,
+      "group": 14100,
+      "sortOrder": 1,
+      "maxExchangeCount": 60,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000688,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000320,
+          "Value": 1
+        }
+      ]
+    },
+    "12605005": {
+      "id": 12605005,
+      "group": 14300,
+      "sortOrder": 1,
+      "maxExchangeCount": 50,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000689,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000272,
+          "Value": 2
+        }
+      ]
+    },
+    "12605006": {
+      "id": 12605006,
+      "group": 14300,
+      "sortOrder": 2,
+      "maxExchangeCount": 30,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000691,
+      "getTradeGoodsDefault": 10,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000535,
+          "Value": 13
+        },
+        {
+          "Id": 24000365,
+          "Value": 1
+        }
+      ]
+    },
+    "12604705": {
+      "id": 12604705,
+      "group": 14000,
+      "sortOrder": 1,
+      "maxExchangeCount": 60,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000688,
+      "getTradeGoodsDefault": 4,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000320,
+          "Value": 1
+        }
+      ]
+    },
+    "12605105": {
+      "id": 12605105,
+      "group": 14400,
+      "sortOrder": 1,
+      "maxExchangeCount": 50,
+      "hideContentsTermsExchangeList": false,
+      "getTradeGoodsId": 24000689,
+      "getTradeGoodsDefault": 3,
+      "getTradeGoods": [
+        {
+          "Value": 700
+        },
+        {
+          "Value": 800
+        },
+        {
+          "Value": 900
+        },
+        {
+          "Value": 1000
+        },
+        {
+          "Value": 1050
+        },
+        {
+          "Value": 1100
+        },
+        {
+          "Value": 1150
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 24000272,
+          "Value": 2
+        }
+      ]
+    }
+  }
+}

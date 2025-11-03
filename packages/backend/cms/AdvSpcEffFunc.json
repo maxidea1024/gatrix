@@ -1,0 +1,232 @@
+{
+  ":AdvSpcEffFunc": {
+    ":type": {
+      "id": "key",
+      "funcType": "number",
+      "funcTypeTag": [
+        "number",
+        "number",
+        "number"
+      ],
+      "funcSpotType": "number",
+      "funcSpotTag": [
+        "number",
+        "number"
+      ],
+      "funcValueOpt": {
+        "MathSign": "number",
+        "Value": "number"
+      },
+      "funcValue": {
+        "MathSign": "number",
+        "Value": "number"
+      }
+    },
+    ":required": {
+      "funcType": 1
+    },
+    ":requiredInObject": {
+      "funcType": 1,
+      "funcValueOpt": {
+        "Value": 1
+      },
+      "funcValue": {
+        "MathSign": 1,
+        "Value": 1
+      }
+    },
+    ":min": {
+      "funcType": 1,
+      "funcSpotType": 1,
+      "funcValueOpt": {
+        "MathSign": 0
+      },
+      "funcValue": {
+        "MathSign": 0
+      }
+    },
+    ":max": {
+      "funcType": 23,
+      "funcSpotType": 2,
+      "funcValueOpt": {
+        "MathSign": 3
+      },
+      "funcValue": {
+        "MathSign": 3
+      }
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "AdvSpcEffFunc": {
+    "77490000": {
+      "id": 77490000,
+      "funcType": 1
+    },
+    "77490001": {
+      "id": 77490001,
+      "funcType": 1,
+      "funcTypeTag": [
+        20001
+      ]
+    },
+    "77490002": {
+      "id": 77490002,
+      "funcType": 2
+    },
+    "77490003": {
+      "id": 77490003,
+      "funcType": 3
+    },
+    "77490004": {
+      "id": 77490004,
+      "funcType": 4,
+      "funcValueOpt": {
+        "MathSign": 1,
+        "Value": 2
+      },
+      "funcValue": {
+        "MathSign": 1,
+        "Value": 2
+      }
+    },
+    "77490005": {
+      "id": 77490005,
+      "funcType": 5
+    },
+    "77490006": {
+      "id": 77490006,
+      "funcType": 6,
+      "funcSpotTag": [
+        10003,
+        10004
+      ]
+    },
+    "77490007": {
+      "id": 77490007,
+      "funcType": 7
+    },
+    "77490008": {
+      "id": 77490008,
+      "funcType": 8
+    },
+    "77490009": {
+      "id": 77490009,
+      "funcType": 9
+    },
+    "77490010": {
+      "id": 77490010,
+      "funcType": 10
+    },
+    "77490011": {
+      "id": 77490011,
+      "funcType": 11
+    },
+    "77490012": {
+      "id": 77490012,
+      "funcType": 12
+    },
+    "77490013": {
+      "id": 77490013,
+      "funcType": 13
+    },
+    "77490014": {
+      "id": 77490014,
+      "funcType": 14
+    },
+    "77490015": {
+      "id": 77490015,
+      "funcType": 15
+    },
+    "77490016": {
+      "id": 77490016,
+      "funcType": 16
+    },
+    "77490017": {
+      "id": 77490017,
+      "funcType": 17
+    },
+    "77490018": {
+      "id": 77490018,
+      "funcType": 18
+    },
+    "77490019": {
+      "id": 77490019,
+      "funcType": 19
+    },
+    "77490020": {
+      "id": 77490020,
+      "funcType": 20
+    },
+    "77490021": {
+      "id": 77490021,
+      "funcType": 21
+    },
+    "77490022": {
+      "id": 77490022,
+      "funcType": 22,
+      "funcTypeTag": [
+        1041,
+        1042
+      ],
+      "funcValue": {
+        "MathSign": 1,
+        "Value": 10
+      }
+    },
+    "77490023": {
+      "id": 77490023,
+      "funcType": 23,
+      "funcTypeTag": [
+        1046
+      ],
+      "funcValue": {
+        "MathSign": 1,
+        "Value": 10
+      }
+    },
+    "77490024": {
+      "id": 77490024,
+      "funcType": 22,
+      "funcTypeTag": [
+        1041
+      ],
+      "funcValue": {
+        "MathSign": 2,
+        "Value": 10
+      }
+    },
+    "77490025": {
+      "id": 77490025,
+      "funcType": 23,
+      "funcTypeTag": [
+        1046,
+        1045
+      ],
+      "funcValue": {
+        "MathSign": 1,
+        "Value": 10
+      }
+    },
+    "77491000": {
+      "id": 77491000,
+      "funcType": 15,
+      "funcTypeTag": [
+        1021
+      ],
+      "funcSpotTag": [
+        10014
+      ]
+    },
+    "77491001": {
+      "id": 77491001,
+      "funcType": 15,
+      "funcTypeTag": [
+        1021
+      ],
+      "funcSpotTag": [
+        10015
+      ]
+    }
+  }
+}

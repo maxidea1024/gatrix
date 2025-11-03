@@ -1,0 +1,600 @@
+{
+  ":InvestSeasonRankingReward": {
+    ":type": {
+      "id": "key",
+      "rankingGroup": "number",
+      "nationId": "number",
+      "rankingGrade": "number",
+      "rankingRange": "number",
+      "rewardFixedId": "number"
+    },
+    ":required": {
+      "rankingGroup": 1,
+      "rankingGrade": 1,
+      "rankingRange": 1
+    },
+    ":requiredInObject": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":asset": {},
+    ":links": {
+      "nationId": [
+        "Nation"
+      ],
+      "rewardFixedId": [
+        "RewardFixed"
+      ]
+    }
+  },
+  "InvestSeasonRankingReward": {
+    "100080001": {
+      "id": 100080001,
+      "rankingGroup": 1000,
+      "rankingGrade": 1,
+      "rankingRange": 1,
+      "rewardFixedId": 95600355
+    },
+    "100080002": {
+      "id": 100080002,
+      "rankingGroup": 1000,
+      "rankingGrade": 2,
+      "rankingRange": 2,
+      "rewardFixedId": 95600356
+    },
+    "100080003": {
+      "id": 100080003,
+      "rankingGroup": 1000,
+      "rankingGrade": 3,
+      "rankingRange": 3,
+      "rewardFixedId": 95600357
+    },
+    "100080004": {
+      "id": 100080004,
+      "rankingGroup": 1000,
+      "rankingGrade": 4,
+      "rankingRange": 5,
+      "rewardFixedId": 95600358
+    },
+    "100080005": {
+      "id": 100080005,
+      "rankingGroup": 1000,
+      "rankingGrade": 5,
+      "rankingRange": 10,
+      "rewardFixedId": 95600359
+    },
+    "100080006": {
+      "id": 100080006,
+      "rankingGroup": 1000,
+      "rankingGrade": 6,
+      "rankingRange": 20,
+      "rewardFixedId": 95600360
+    },
+    "100080007": {
+      "id": 100080007,
+      "rankingGroup": 1000,
+      "rankingGrade": 7,
+      "rankingRange": 30,
+      "rewardFixedId": 95600361
+    },
+    "100080008": {
+      "id": 100080008,
+      "rankingGroup": 1000,
+      "rankingGrade": 8,
+      "rankingRange": 50,
+      "rewardFixedId": 95600362
+    },
+    "100080009": {
+      "id": 100080009,
+      "rankingGroup": 1001,
+      "nationId": 10000000,
+      "rankingGrade": 1,
+      "rankingRange": 1,
+      "rewardFixedId": 95600363
+    },
+    "100080010": {
+      "id": 100080010,
+      "rankingGroup": 1001,
+      "nationId": 10000000,
+      "rankingGrade": 2,
+      "rankingRange": 2,
+      "rewardFixedId": 95600364
+    },
+    "100080011": {
+      "id": 100080011,
+      "rankingGroup": 1001,
+      "nationId": 10000000,
+      "rankingGrade": 3,
+      "rankingRange": 3,
+      "rewardFixedId": 95600365
+    },
+    "100080012": {
+      "id": 100080012,
+      "rankingGroup": 1001,
+      "nationId": 10000000,
+      "rankingGrade": 4,
+      "rankingRange": 5,
+      "rewardFixedId": 95600366
+    },
+    "100080013": {
+      "id": 100080013,
+      "rankingGroup": 1001,
+      "nationId": 10000000,
+      "rankingGrade": 5,
+      "rankingRange": 10,
+      "rewardFixedId": 95600367
+    },
+    "100080014": {
+      "id": 100080014,
+      "rankingGroup": 1001,
+      "nationId": 10000000,
+      "rankingGrade": 6,
+      "rankingRange": 20,
+      "rewardFixedId": 95600368
+    },
+    "100080015": {
+      "id": 100080015,
+      "rankingGroup": 1001,
+      "nationId": 10000000,
+      "rankingGrade": 7,
+      "rankingRange": 30,
+      "rewardFixedId": 95600369
+    },
+    "100080016": {
+      "id": 100080016,
+      "rankingGroup": 1001,
+      "nationId": 10000000,
+      "rankingGrade": 8,
+      "rankingRange": 50,
+      "rewardFixedId": 95600370
+    },
+    "100080017": {
+      "id": 100080017,
+      "rankingGroup": 1002,
+      "nationId": 10000001,
+      "rankingGrade": 1,
+      "rankingRange": 1,
+      "rewardFixedId": 95600371
+    },
+    "100080018": {
+      "id": 100080018,
+      "rankingGroup": 1002,
+      "nationId": 10000001,
+      "rankingGrade": 2,
+      "rankingRange": 2,
+      "rewardFixedId": 95600372
+    },
+    "100080019": {
+      "id": 100080019,
+      "rankingGroup": 1002,
+      "nationId": 10000001,
+      "rankingGrade": 3,
+      "rankingRange": 3,
+      "rewardFixedId": 95600373
+    },
+    "100080020": {
+      "id": 100080020,
+      "rankingGroup": 1002,
+      "nationId": 10000001,
+      "rankingGrade": 4,
+      "rankingRange": 5,
+      "rewardFixedId": 95600366
+    },
+    "100080021": {
+      "id": 100080021,
+      "rankingGroup": 1002,
+      "nationId": 10000001,
+      "rankingGrade": 5,
+      "rankingRange": 10,
+      "rewardFixedId": 95600367
+    },
+    "100080022": {
+      "id": 100080022,
+      "rankingGroup": 1002,
+      "nationId": 10000001,
+      "rankingGrade": 6,
+      "rankingRange": 20,
+      "rewardFixedId": 95600368
+    },
+    "100080023": {
+      "id": 100080023,
+      "rankingGroup": 1002,
+      "nationId": 10000001,
+      "rankingGrade": 7,
+      "rankingRange": 30,
+      "rewardFixedId": 95600369
+    },
+    "100080024": {
+      "id": 100080024,
+      "rankingGroup": 1002,
+      "nationId": 10000001,
+      "rankingGrade": 8,
+      "rankingRange": 50,
+      "rewardFixedId": 95600370
+    },
+    "100080025": {
+      "id": 100080025,
+      "rankingGroup": 1003,
+      "nationId": 10000002,
+      "rankingGrade": 1,
+      "rankingRange": 1,
+      "rewardFixedId": 95600374
+    },
+    "100080026": {
+      "id": 100080026,
+      "rankingGroup": 1003,
+      "nationId": 10000002,
+      "rankingGrade": 2,
+      "rankingRange": 2,
+      "rewardFixedId": 95600375
+    },
+    "100080027": {
+      "id": 100080027,
+      "rankingGroup": 1003,
+      "nationId": 10000002,
+      "rankingGrade": 3,
+      "rankingRange": 3,
+      "rewardFixedId": 95600376
+    },
+    "100080028": {
+      "id": 100080028,
+      "rankingGroup": 1003,
+      "nationId": 10000002,
+      "rankingGrade": 4,
+      "rankingRange": 5,
+      "rewardFixedId": 95600366
+    },
+    "100080029": {
+      "id": 100080029,
+      "rankingGroup": 1003,
+      "nationId": 10000002,
+      "rankingGrade": 5,
+      "rankingRange": 10,
+      "rewardFixedId": 95600367
+    },
+    "100080030": {
+      "id": 100080030,
+      "rankingGroup": 1003,
+      "nationId": 10000002,
+      "rankingGrade": 6,
+      "rankingRange": 20,
+      "rewardFixedId": 95600368
+    },
+    "100080031": {
+      "id": 100080031,
+      "rankingGroup": 1003,
+      "nationId": 10000002,
+      "rankingGrade": 7,
+      "rankingRange": 30,
+      "rewardFixedId": 95600369
+    },
+    "100080032": {
+      "id": 100080032,
+      "rankingGroup": 1003,
+      "nationId": 10000002,
+      "rankingGrade": 8,
+      "rankingRange": 50,
+      "rewardFixedId": 95600370
+    },
+    "100080033": {
+      "id": 100080033,
+      "rankingGroup": 1004,
+      "nationId": 10000003,
+      "rankingGrade": 1,
+      "rankingRange": 1,
+      "rewardFixedId": 95600377
+    },
+    "100080034": {
+      "id": 100080034,
+      "rankingGroup": 1004,
+      "nationId": 10000003,
+      "rankingGrade": 2,
+      "rankingRange": 2,
+      "rewardFixedId": 95600378
+    },
+    "100080035": {
+      "id": 100080035,
+      "rankingGroup": 1004,
+      "nationId": 10000003,
+      "rankingGrade": 3,
+      "rankingRange": 3,
+      "rewardFixedId": 95600379
+    },
+    "100080036": {
+      "id": 100080036,
+      "rankingGroup": 1004,
+      "nationId": 10000003,
+      "rankingGrade": 4,
+      "rankingRange": 5,
+      "rewardFixedId": 95600366
+    },
+    "100080037": {
+      "id": 100080037,
+      "rankingGroup": 1004,
+      "nationId": 10000003,
+      "rankingGrade": 5,
+      "rankingRange": 10,
+      "rewardFixedId": 95600367
+    },
+    "100080038": {
+      "id": 100080038,
+      "rankingGroup": 1004,
+      "nationId": 10000003,
+      "rankingGrade": 6,
+      "rankingRange": 20,
+      "rewardFixedId": 95600368
+    },
+    "100080039": {
+      "id": 100080039,
+      "rankingGroup": 1004,
+      "nationId": 10000003,
+      "rankingGrade": 7,
+      "rankingRange": 30,
+      "rewardFixedId": 95600369
+    },
+    "100080040": {
+      "id": 100080040,
+      "rankingGroup": 1004,
+      "nationId": 10000003,
+      "rankingGrade": 8,
+      "rankingRange": 50,
+      "rewardFixedId": 95600370
+    },
+    "100080041": {
+      "id": 100080041,
+      "rankingGroup": 1005,
+      "nationId": 10000005,
+      "rankingGrade": 1,
+      "rankingRange": 1,
+      "rewardFixedId": 95600380
+    },
+    "100080042": {
+      "id": 100080042,
+      "rankingGroup": 1005,
+      "nationId": 10000005,
+      "rankingGrade": 2,
+      "rankingRange": 2,
+      "rewardFixedId": 95600381
+    },
+    "100080043": {
+      "id": 100080043,
+      "rankingGroup": 1005,
+      "nationId": 10000005,
+      "rankingGrade": 3,
+      "rankingRange": 3,
+      "rewardFixedId": 95600382
+    },
+    "100080044": {
+      "id": 100080044,
+      "rankingGroup": 1005,
+      "nationId": 10000005,
+      "rankingGrade": 4,
+      "rankingRange": 5,
+      "rewardFixedId": 95600366
+    },
+    "100080045": {
+      "id": 100080045,
+      "rankingGroup": 1005,
+      "nationId": 10000005,
+      "rankingGrade": 5,
+      "rankingRange": 10,
+      "rewardFixedId": 95600367
+    },
+    "100080046": {
+      "id": 100080046,
+      "rankingGroup": 1005,
+      "nationId": 10000005,
+      "rankingGrade": 6,
+      "rankingRange": 20,
+      "rewardFixedId": 95600368
+    },
+    "100080047": {
+      "id": 100080047,
+      "rankingGroup": 1005,
+      "nationId": 10000005,
+      "rankingGrade": 7,
+      "rankingRange": 30,
+      "rewardFixedId": 95600369
+    },
+    "100080048": {
+      "id": 100080048,
+      "rankingGroup": 1005,
+      "nationId": 10000005,
+      "rankingGrade": 8,
+      "rankingRange": 50,
+      "rewardFixedId": 95600370
+    },
+    "100080049": {
+      "id": 100080049,
+      "rankingGroup": 1006,
+      "nationId": 10001031,
+      "rankingGrade": 1,
+      "rankingRange": 1,
+      "rewardFixedId": 95600383
+    },
+    "100080050": {
+      "id": 100080050,
+      "rankingGroup": 1006,
+      "nationId": 10001031,
+      "rankingGrade": 2,
+      "rankingRange": 2,
+      "rewardFixedId": 95600384
+    },
+    "100080051": {
+      "id": 100080051,
+      "rankingGroup": 1006,
+      "nationId": 10001031,
+      "rankingGrade": 3,
+      "rankingRange": 3,
+      "rewardFixedId": 95600385
+    },
+    "100080052": {
+      "id": 100080052,
+      "rankingGroup": 1006,
+      "nationId": 10001031,
+      "rankingGrade": 4,
+      "rankingRange": 5,
+      "rewardFixedId": 95600366
+    },
+    "100080053": {
+      "id": 100080053,
+      "rankingGroup": 1006,
+      "nationId": 10001031,
+      "rankingGrade": 5,
+      "rankingRange": 10,
+      "rewardFixedId": 95600367
+    },
+    "100080054": {
+      "id": 100080054,
+      "rankingGroup": 1006,
+      "nationId": 10001031,
+      "rankingGrade": 6,
+      "rankingRange": 20,
+      "rewardFixedId": 95600368
+    },
+    "100080055": {
+      "id": 100080055,
+      "rankingGroup": 1006,
+      "nationId": 10001031,
+      "rankingGrade": 7,
+      "rankingRange": 30,
+      "rewardFixedId": 95600369
+    },
+    "100080056": {
+      "id": 100080056,
+      "rankingGroup": 1006,
+      "nationId": 10001031,
+      "rankingGrade": 8,
+      "rankingRange": 50,
+      "rewardFixedId": 95600370
+    },
+    "100080057": {
+      "id": 100080057,
+      "rankingGroup": 1007,
+      "nationId": 10001071,
+      "rankingGrade": 1,
+      "rankingRange": 1,
+      "rewardFixedId": 95600386
+    },
+    "100080058": {
+      "id": 100080058,
+      "rankingGroup": 1007,
+      "nationId": 10001071,
+      "rankingGrade": 2,
+      "rankingRange": 2,
+      "rewardFixedId": 95600387
+    },
+    "100080059": {
+      "id": 100080059,
+      "rankingGroup": 1007,
+      "nationId": 10001071,
+      "rankingGrade": 3,
+      "rankingRange": 3,
+      "rewardFixedId": 95600388
+    },
+    "100080060": {
+      "id": 100080060,
+      "rankingGroup": 1007,
+      "nationId": 10001071,
+      "rankingGrade": 4,
+      "rankingRange": 5,
+      "rewardFixedId": 95600366
+    },
+    "100080061": {
+      "id": 100080061,
+      "rankingGroup": 1007,
+      "nationId": 10001071,
+      "rankingGrade": 5,
+      "rankingRange": 10,
+      "rewardFixedId": 95600367
+    },
+    "100080062": {
+      "id": 100080062,
+      "rankingGroup": 1007,
+      "nationId": 10001071,
+      "rankingGrade": 6,
+      "rankingRange": 20,
+      "rewardFixedId": 95600368
+    },
+    "100080063": {
+      "id": 100080063,
+      "rankingGroup": 1007,
+      "nationId": 10001071,
+      "rankingGrade": 7,
+      "rankingRange": 30,
+      "rewardFixedId": 95600369
+    },
+    "100080064": {
+      "id": 100080064,
+      "rankingGroup": 1007,
+      "nationId": 10001071,
+      "rankingGrade": 8,
+      "rankingRange": 50,
+      "rewardFixedId": 95600370
+    },
+    "100080065": {
+      "id": 100080065,
+      "rankingGroup": 1008,
+      "nationId": 10001033,
+      "rankingGrade": 1,
+      "rankingRange": 1,
+      "rewardFixedId": 95600389
+    },
+    "100080066": {
+      "id": 100080066,
+      "rankingGroup": 1008,
+      "nationId": 10001033,
+      "rankingGrade": 2,
+      "rankingRange": 2,
+      "rewardFixedId": 95600390
+    },
+    "100080067": {
+      "id": 100080067,
+      "rankingGroup": 1008,
+      "nationId": 10001033,
+      "rankingGrade": 3,
+      "rankingRange": 3,
+      "rewardFixedId": 95600391
+    },
+    "100080068": {
+      "id": 100080068,
+      "rankingGroup": 1008,
+      "nationId": 10001033,
+      "rankingGrade": 4,
+      "rankingRange": 5,
+      "rewardFixedId": 95600366
+    },
+    "100080069": {
+      "id": 100080069,
+      "rankingGroup": 1008,
+      "nationId": 10001033,
+      "rankingGrade": 5,
+      "rankingRange": 10,
+      "rewardFixedId": 95600367
+    },
+    "100080070": {
+      "id": 100080070,
+      "rankingGroup": 1008,
+      "nationId": 10001033,
+      "rankingGrade": 6,
+      "rankingRange": 20,
+      "rewardFixedId": 95600368
+    },
+    "100080071": {
+      "id": 100080071,
+      "rankingGroup": 1008,
+      "nationId": 10001033,
+      "rankingGrade": 7,
+      "rankingRange": 30,
+      "rewardFixedId": 95600369
+    },
+    "100080072": {
+      "id": 100080072,
+      "rankingGroup": 1008,
+      "nationId": 10001033,
+      "rankingGrade": 8,
+      "rankingRange": 50,
+      "rewardFixedId": 95600370
+    }
+  }
+}

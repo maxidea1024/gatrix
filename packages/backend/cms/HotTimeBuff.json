@@ -1,0 +1,3096 @@
+{
+  ":HotTimeBuff": {
+    ":type": {
+      "id": "key",
+      "icon": "string",
+      "startDate": "string",
+      "endDate": "string",
+      "localBitflag": "bit",
+      "startHour": "number",
+      "endHour": "number",
+      "minLv": "number",
+      "maxLv": "number",
+      "bitFlagDayOfWeek": "bit",
+      "worldBuffId": [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number"
+      ]
+    },
+    ":required": {
+      "icon": 1,
+      "startDate": 1,
+      "endDate": 1,
+      "localBitflag": 1,
+      "startHour": 1,
+      "endHour": 1,
+      "minLv": 1,
+      "maxLv": 1,
+      "bitFlagDayOfWeek": 1
+    },
+    ":min": {
+      "startHour": 0,
+      "endHour": 0
+    },
+    ":max": {
+      "startHour": 24,
+      "endHour": 24
+    },
+    ":enum": {},
+    ":links": {
+      "worldBuffId": [
+        [
+          "WorldBuff"
+        ],
+        [
+          "WorldBuff"
+        ],
+        [
+          "WorldBuff"
+        ],
+        [
+          "WorldBuff"
+        ],
+        [
+          "WorldBuff"
+        ]
+      ]
+    }
+  },
+  "HotTimeBuff": {
+    "58001001": {
+      "id": 58001001,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ]
+    },
+    "58001002": {
+      "id": 58001002,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001003": {
+      "id": 58001003,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ]
+    },
+    "58001004": {
+      "id": 58001004,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001005": {
+      "id": 58001005,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001006": {
+      "id": 58001006,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001007": {
+      "id": 58001007,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001008": {
+      "id": 58001008,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001009": {
+      "id": 58001009,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001010": {
+      "id": 58001010,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001011": {
+      "id": 58001011,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ]
+    },
+    "58001012": {
+      "id": 58001012,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ]
+    },
+    "58001013": {
+      "id": 58001013,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/14/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ]
+    },
+    "58001014": {
+      "id": 58001014,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/14/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001015": {
+      "id": 58001015,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/15/00:00:00",
+      "endDate": "2023/08/15/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099000,
+        38099002,
+        38099003
+      ]
+    },
+    "58001046": {
+      "id": 58001046,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/16/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ]
+    },
+    "58001047": {
+      "id": 58001047,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/16/00:00:00",
+      "endDate": "2023/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001016": {
+      "id": 58001016,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/23/00:00:00",
+      "endDate": "2023/08/29/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38099006,
+        38099002,
+        38099003
+      ]
+    },
+    "58001017": {
+      "id": 58001017,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ]
+    },
+    "58001018": {
+      "id": 58001018,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001019": {
+      "id": 58001019,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ]
+    },
+    "58001020": {
+      "id": 58001020,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001021": {
+      "id": 58001021,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001022": {
+      "id": 58001022,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001023": {
+      "id": 58001023,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001024": {
+      "id": 58001024,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001025": {
+      "id": 58001025,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001026": {
+      "id": 58001026,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001027": {
+      "id": 58001027,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ]
+    },
+    "58001028": {
+      "id": 58001028,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ]
+    },
+    "58001029": {
+      "id": 58001029,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ]
+    },
+    "58001030": {
+      "id": 58001030,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/08/30/00:00:00",
+      "endDate": "2023/09/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001031": {
+      "id": 58001031,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/09/28/00:00:00",
+      "endDate": "2023/10/03/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 119,
+      "worldBuffId": [
+        38099002,
+        38099008,
+        38099005
+      ]
+    },
+    "58001032": {
+      "id": 58001032,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ]
+    },
+    "58001033": {
+      "id": 58001033,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001034": {
+      "id": 58001034,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ]
+    },
+    "58001035": {
+      "id": 58001035,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001036": {
+      "id": 58001036,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001037": {
+      "id": 58001037,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001038": {
+      "id": 58001038,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001039": {
+      "id": 58001039,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001040": {
+      "id": 58001040,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001041": {
+      "id": 58001041,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001042": {
+      "id": 58001042,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ]
+    },
+    "58001043": {
+      "id": 58001043,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ]
+    },
+    "58001044": {
+      "id": 58001044,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ]
+    },
+    "58001045": {
+      "id": 58001045,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/10/04/00:00:00",
+      "endDate": "2023/12/19/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001050": {
+      "id": 58001050,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/12/20/00:00:00",
+      "endDate": "2024/01/01/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099002,
+        38099007,
+        38099005
+      ]
+    },
+    "58001051": {
+      "id": 58001051,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/12/20/00:00:00",
+      "endDate": "2024/01/01/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099003,
+        38099007,
+        38099005
+      ]
+    },
+    "58001052": {
+      "id": 58001052,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/12/20/00:00:00",
+      "endDate": "2024/01/01/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099002,
+        38099007,
+        38099005
+      ]
+    },
+    "58001053": {
+      "id": 58001053,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/12/20/00:00:00",
+      "endDate": "2024/01/01/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ]
+    },
+    "58001054": {
+      "id": 58001054,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/12/20/00:00:00",
+      "endDate": "2024/01/01/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ]
+    },
+    "58001055": {
+      "id": 58001055,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/12/20/00:00:00",
+      "endDate": "2024/01/01/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ]
+    },
+    "58001056": {
+      "id": 58001056,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2023/12/20/00:00:00",
+      "endDate": "2024/01/01/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099003,
+        38099007,
+        38099005
+      ]
+    },
+    "58001057": {
+      "id": 58001057,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ]
+    },
+    "58001058": {
+      "id": 58001058,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001059": {
+      "id": 58001059,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ]
+    },
+    "58001060": {
+      "id": 58001060,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001061": {
+      "id": 58001061,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001062": {
+      "id": 58001062,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001063": {
+      "id": 58001063,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ]
+    },
+    "58001064": {
+      "id": 58001064,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ]
+    },
+    "58001065": {
+      "id": 58001065,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ]
+    },
+    "58001066": {
+      "id": 58001066,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ]
+    },
+    "58001067": {
+      "id": 58001067,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ]
+    },
+    "58001068": {
+      "id": 58001068,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/02/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001069": {
+      "id": 58001069,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ]
+    },
+    "58001070": {
+      "id": 58001070,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001071": {
+      "id": 58001071,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ]
+    },
+    "58001072": {
+      "id": 58001072,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001073": {
+      "id": 58001073,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001074": {
+      "id": 58001074,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001075": {
+      "id": 58001075,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001076": {
+      "id": 58001076,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001077": {
+      "id": 58001077,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001078": {
+      "id": 58001078,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001079": {
+      "id": 58001079,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ]
+    },
+    "58001080": {
+      "id": 58001080,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ]
+    },
+    "58001081": {
+      "id": 58001081,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ]
+    },
+    "58001082": {
+      "id": 58001082,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/01/17/00:00:00",
+      "endDate": "2024/07/30/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001083": {
+      "id": 58001083,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/07/31/00:00:00",
+      "endDate": "2024/08/06/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099004,
+        38099054,
+        38099055,
+        38099007
+      ]
+    },
+    "58001084": {
+      "id": 58001084,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/07/31/00:00:00",
+      "endDate": "2024/08/06/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099004,
+        38099059,
+        38099012,
+        38099000
+      ]
+    },
+    "58001085": {
+      "id": 58001085,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/07/31/00:00:00",
+      "endDate": "2024/08/06/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099004,
+        38099054,
+        38099055,
+        38099007
+      ]
+    },
+    "58001086": {
+      "id": 58001086,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/07/31/00:00:00",
+      "endDate": "2024/08/06/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099057,
+        38099058
+      ]
+    },
+    "58001087": {
+      "id": 58001087,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/07/31/00:00:00",
+      "endDate": "2024/08/06/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099057,
+        38099058
+      ]
+    },
+    "58001088": {
+      "id": 58001088,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/07/31/00:00:00",
+      "endDate": "2024/08/06/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099004,
+        38099059,
+        38099012,
+        38099000
+      ]
+    },
+    "58001089": {
+      "id": 58001089,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/07/31/00:00:00",
+      "endDate": "2024/08/06/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099004,
+        38099054,
+        38099055,
+        38099007
+      ]
+    },
+    "58001090": {
+      "id": 58001090,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/07/00:00:00",
+      "endDate": "2024/08/11/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099004,
+        38099059,
+        38099012,
+        38099000
+      ]
+    },
+    "58001091": {
+      "id": 58001091,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/07/00:00:00",
+      "endDate": "2024/08/11/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099004,
+        38099054,
+        38099055,
+        38099007
+      ]
+    },
+    "58001092": {
+      "id": 58001092,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/07/00:00:00",
+      "endDate": "2024/08/11/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099004,
+        38099059,
+        38099012,
+        38099000
+      ]
+    },
+    "58001093": {
+      "id": 58001093,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/07/00:00:00",
+      "endDate": "2024/08/11/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099057,
+        38099058
+      ]
+    },
+    "58001094": {
+      "id": 58001094,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/07/00:00:00",
+      "endDate": "2024/08/11/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099057,
+        38099058
+      ]
+    },
+    "58001095": {
+      "id": 58001095,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ]
+    },
+    "58001096": {
+      "id": 58001096,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001097": {
+      "id": 58001097,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ]
+    },
+    "58001098": {
+      "id": 58001098,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001099": {
+      "id": 58001099,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001100": {
+      "id": 58001100,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001101": {
+      "id": 58001101,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001102": {
+      "id": 58001102,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001103": {
+      "id": 58001103,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001104": {
+      "id": 58001104,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001105": {
+      "id": 58001105,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ]
+    },
+    "58001106": {
+      "id": 58001106,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099009
+      ]
+    },
+    "58001107": {
+      "id": 58001107,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099013
+      ]
+    },
+    "58001108": {
+      "id": 58001108,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/12/00:00:00",
+      "endDate": "2024/08/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001109": {
+      "id": 58001109,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/23/00:00:00",
+      "endDate": "2024/08/25/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099058,
+        38099055
+      ]
+    },
+    "58001110": {
+      "id": 58001110,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/23/00:00:00",
+      "endDate": "2024/08/25/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099058,
+        38099054
+      ]
+    },
+    "58001111": {
+      "id": 58001111,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/23/00:00:00",
+      "endDate": "2024/08/25/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099055
+      ]
+    },
+    "58001112": {
+      "id": 58001112,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/26/00:00:00",
+      "endDate": "2024/09/13/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099001,
+        38099007,
+        38099005
+      ]
+    },
+    "58001113": {
+      "id": 58001113,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/26/00:00:00",
+      "endDate": "2024/09/13/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099001,
+        38099007,
+        38099005
+      ]
+    },
+    "58001114": {
+      "id": 58001114,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/26/00:00:00",
+      "endDate": "2024/09/13/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099001,
+        38099007,
+        38099005
+      ]
+    },
+    "58001115": {
+      "id": 58001115,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/26/00:00:00",
+      "endDate": "2024/09/13/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099001,
+        38099007,
+        38099005
+      ]
+    },
+    "58001116": {
+      "id": 58001116,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/26/00:00:00",
+      "endDate": "2024/09/13/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099001,
+        38099007,
+        38099005
+      ]
+    },
+    "58001117": {
+      "id": 58001117,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/26/00:00:00",
+      "endDate": "2024/09/13/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099007,
+        38099005
+      ]
+    },
+    "58001118": {
+      "id": 58001118,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/08/26/00:00:00",
+      "endDate": "2024/09/13/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099008,
+        38099006
+      ]
+    },
+    "58001119": {
+      "id": 58001119,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/14/00:00:00",
+      "endDate": "2024/09/18/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099055
+      ]
+    },
+    "58001120": {
+      "id": 58001120,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/14/00:00:00",
+      "endDate": "2024/09/18/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099058,
+        38099054
+      ]
+    },
+    "58001121": {
+      "id": 58001121,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/14/00:00:00",
+      "endDate": "2024/09/18/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099055
+      ]
+    },
+    "58001122": {
+      "id": 58001122,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/14/00:00:00",
+      "endDate": "2024/09/18/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099058,
+        38099054
+      ]
+    },
+    "58001123": {
+      "id": 58001123,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/14/00:00:00",
+      "endDate": "2024/09/18/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099004,
+        38099002,
+        38099057,
+        38099055
+      ]
+    },
+    "58001124": {
+      "id": 58001124,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ]
+    },
+    "58001125": {
+      "id": 58001125,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001126": {
+      "id": 58001126,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001127": {
+      "id": 58001127,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001128": {
+      "id": 58001128,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ]
+    },
+    "58001129": {
+      "id": 58001129,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001130": {
+      "id": 58001130,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ]
+    },
+    "58001131": {
+      "id": 58001131,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001132": {
+      "id": 58001132,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099013
+      ]
+    },
+    "58001133": {
+      "id": 58001133,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099009
+      ]
+    },
+    "58001134": {
+      "id": 58001134,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001135": {
+      "id": 58001135,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099055
+      ]
+    },
+    "58001136": {
+      "id": 58001136,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001137": {
+      "id": 58001137,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/09/19/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099054
+      ]
+    },
+    "58001138": {
+      "id": 58001138,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/23/00:00:00",
+      "endDate": "2024/10/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003,
+        38099000,
+        38099012
+      ]
+    },
+    "58001139": {
+      "id": 58001139,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/23/00:00:00",
+      "endDate": "2024/10/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001140": {
+      "id": 58001140,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/23/00:00:00",
+      "endDate": "2024/10/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014,
+        38099000,
+        38099012
+      ]
+    },
+    "58001141": {
+      "id": 58001141,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/23/00:00:00",
+      "endDate": "2024/10/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001142": {
+      "id": 58001142,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/23/00:00:00",
+      "endDate": "2024/10/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099013,
+        38099000,
+        38099012
+      ]
+    },
+    "58001143": {
+      "id": 58001143,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/23/00:00:00",
+      "endDate": "2024/10/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099005
+      ]
+    },
+    "58001144": {
+      "id": 58001144,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/23/00:00:00",
+      "endDate": "2024/10/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001,
+        38099000,
+        38099012
+      ]
+    },
+    "58001145": {
+      "id": 58001145,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/23/00:00:00",
+      "endDate": "2024/10/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099055
+      ]
+    },
+    "58001146": {
+      "id": 58001146,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/23/00:00:00",
+      "endDate": "2024/10/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001,
+        38099000,
+        38099012
+      ]
+    },
+    "58001147": {
+      "id": 58001147,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/23/00:00:00",
+      "endDate": "2024/10/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099054
+      ]
+    },
+    "58001148": {
+      "id": 58001148,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007,
+        38090015,
+        38090016,
+        38090017
+      ]
+    },
+    "58001149": {
+      "id": 58001149,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001150": {
+      "id": 58001150,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010,
+        38090015,
+        38090016,
+        38090017
+      ]
+    },
+    "58001151": {
+      "id": 58001151,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001152": {
+      "id": 58001152,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003,
+        38090015,
+        38090016,
+        38090017
+      ]
+    },
+    "58001153": {
+      "id": 58001153,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001154": {
+      "id": 58001154,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014,
+        38090015,
+        38090016,
+        38090017
+      ]
+    },
+    "58001155": {
+      "id": 58001155,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001156": {
+      "id": 58001156,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099013,
+        38090015,
+        38090016,
+        38090017
+      ]
+    },
+    "58001157": {
+      "id": 58001157,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099005
+      ]
+    },
+    "58001158": {
+      "id": 58001158,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001,
+        38090015,
+        38090016,
+        38090017
+      ]
+    },
+    "58001159": {
+      "id": 58001159,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099055
+      ]
+    },
+    "58001160": {
+      "id": 58001160,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001,
+        38090015,
+        38090016,
+        38090017
+      ]
+    },
+    "58001161": {
+      "id": 58001161,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2024/10/28/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099054
+      ]
+    },
+    "58001162": {
+      "id": 58001162,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099007
+      ]
+    },
+    "58001163": {
+      "id": 58001163,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099079
+      ]
+    },
+    "58001164": {
+      "id": 58001164,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099080
+      ]
+    },
+    "58001165": {
+      "id": 58001165,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 2,
+      "worldBuffId": [
+        38099000
+      ]
+    },
+    "58001166": {
+      "id": 58001166,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099010
+      ]
+    },
+    "58001167": {
+      "id": 58001167,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099081
+      ]
+    },
+    "58001168": {
+      "id": 58001168,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099082
+      ]
+    },
+    "58001169": {
+      "id": 58001169,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 4,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001170": {
+      "id": 58001170,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099003
+      ]
+    },
+    "58001171": {
+      "id": 58001171,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099083
+      ]
+    },
+    "58001172": {
+      "id": 58001172,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099084
+      ]
+    },
+    "58001173": {
+      "id": 58001173,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 8,
+      "worldBuffId": [
+        38099085
+      ]
+    },
+    "58001174": {
+      "id": 58001174,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099014
+      ]
+    },
+    "58001175": {
+      "id": 58001175,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099081
+      ]
+    },
+    "58001176": {
+      "id": 58001176,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099082
+      ]
+    },
+    "58001177": {
+      "id": 58001177,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 16,
+      "worldBuffId": [
+        38099012
+      ]
+    },
+    "58001178": {
+      "id": 58001178,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099013
+      ]
+    },
+    "58001179": {
+      "id": 58001179,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099086
+      ]
+    },
+    "58001180": {
+      "id": 58001180,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099087
+      ]
+    },
+    "58001181": {
+      "id": 58001181,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 32,
+      "worldBuffId": [
+        38099088
+      ]
+    },
+    "58001182": {
+      "id": 58001182,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001183": {
+      "id": 58001183,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099077
+      ]
+    },
+    "58001184": {
+      "id": 58001184,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099078
+      ]
+    },
+    "58001185": {
+      "id": 58001185,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 64,
+      "worldBuffId": [
+        38099055
+      ]
+    },
+    "58001186": {
+      "id": 58001186,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099003,
+        38099001
+      ]
+    },
+    "58001187": {
+      "id": 58001187,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 18,
+      "endHour": 20,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099075
+      ]
+    },
+    "58001188": {
+      "id": 58001188,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 20,
+      "endHour": 22,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099076
+      ]
+    },
+    "58001189": {
+      "id": 58001189,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2030/12/31/23:59:59",
+      "localBitflag": 27,
+      "startHour": 22,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 1,
+      "worldBuffId": [
+        38099054
+      ]
+    },
+    "58001190": {
+      "id": 58001190,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/03/28/00:00:00",
+      "endDate": "2025/04/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38090018
+      ]
+    },
+    "58001191": {
+      "id": 58001191,
+      "icon": "Icon_HotTimeBuff_03_Sprite",
+      "startDate": "2025/04/23/00:00:00",
+      "endDate": "2025/04/27/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38095410
+      ]
+    },
+    "58001192": {
+      "id": 58001192,
+      "icon": "icon_effect_3rd_HotTime_Sprite",
+      "startDate": "2025/08/20/00:00:00",
+      "endDate": "2025/09/23/23:59:59",
+      "localBitflag": 27,
+      "startHour": 12,
+      "endHour": 14,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38099093
+      ]
+    },
+    "58001193": {
+      "id": 58001193,
+      "icon": "icon_effect_3rd_HotTime_Sprite",
+      "startDate": "2025/08/20/00:00:00",
+      "endDate": "2025/09/23/23:59:59",
+      "localBitflag": 27,
+      "startHour": 19,
+      "endHour": 24,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38099093
+      ]
+    },
+    "58001194": {
+      "id": 58001194,
+      "icon": "icon_effect_3rd_HotTime_Sprite",
+      "startDate": "2025/08/20/00:00:00",
+      "endDate": "2025/09/23/23:59:59",
+      "localBitflag": 27,
+      "startHour": 0,
+      "endHour": 1,
+      "minLv": 1,
+      "maxLv": 200,
+      "bitFlagDayOfWeek": 127,
+      "worldBuffId": [
+        38099093
+      ]
+    }
+  }
+}

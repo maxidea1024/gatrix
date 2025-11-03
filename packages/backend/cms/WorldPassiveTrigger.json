@@ -1,0 +1,260 @@
+{
+  ":WorldPassiveTrigger": {
+    ":type": {
+      "id": "key",
+      "targetType": "number",
+      "triggerType": "number",
+      "triggerValue": "number",
+      "activeEffect": [
+        {
+          "Rate": "number",
+          "Id": "number",
+          "Val": "number"
+        }
+      ]
+    },
+    ":required": {
+      "targetType": 1,
+      "triggerType": 1,
+      "triggerValue": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "activeEffect": [
+        {
+          "Id": [
+            "WorldActiveEffect"
+          ]
+        }
+      ]
+    }
+  },
+  "WorldPassiveTrigger": {
+    "75400000": {
+      "id": 75400000,
+      "targetType": 2,
+      "triggerType": 1,
+      "triggerValue": 16099900
+    },
+    "75400001": {
+      "id": 75400001,
+      "targetType": 2,
+      "triggerType": 1,
+      "triggerValue": 16099900,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75110009,
+          "Val": -10
+        }
+      ]
+    },
+    "75400002": {
+      "id": 75400002,
+      "targetType": 2,
+      "triggerType": 1,
+      "triggerValue": 16099900,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75110106,
+          "Val": -50
+        }
+      ]
+    },
+    "75400003": {
+      "id": 75400003,
+      "targetType": 2,
+      "triggerType": 1,
+      "triggerValue": 16099901
+    },
+    "75400004": {
+      "id": 75400004,
+      "targetType": 2,
+      "triggerType": 1,
+      "triggerValue": 16099901,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75110009,
+          "Val": -10
+        }
+      ]
+    },
+    "75400005": {
+      "id": 75400005,
+      "targetType": 2,
+      "triggerType": 1,
+      "triggerValue": 16099901,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75110106,
+          "Val": -50
+        }
+      ]
+    },
+    "75400006": {
+      "id": 75400006,
+      "targetType": 2,
+      "triggerType": 1,
+      "triggerValue": 16099902
+    },
+    "75400007": {
+      "id": 75400007,
+      "targetType": 2,
+      "triggerType": 1,
+      "triggerValue": 16099902,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75110009,
+          "Val": -10
+        }
+      ]
+    },
+    "75400008": {
+      "id": 75400008,
+      "targetType": 2,
+      "triggerType": 1,
+      "triggerValue": 16099902,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75110106,
+          "Val": -50
+        }
+      ]
+    },
+    "75400009": {
+      "id": 75400009,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100006
+    },
+    "75400010": {
+      "id": 75400010,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100006,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75111009,
+          "Val": -100
+        }
+      ]
+    },
+    "75400011": {
+      "id": 75400011,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100006,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75111006,
+          "Val": -100
+        }
+      ]
+    },
+    "75400012": {
+      "id": 75400012,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100003
+    },
+    "75400013": {
+      "id": 75400013,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100003,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75111009,
+          "Val": -100
+        }
+      ]
+    },
+    "75400014": {
+      "id": 75400014,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100003,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75111006,
+          "Val": -100
+        }
+      ]
+    },
+    "75400015": {
+      "id": 75400015,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100004
+    },
+    "75400016": {
+      "id": 75400016,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100004,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75111009,
+          "Val": -100
+        }
+      ]
+    },
+    "75400017": {
+      "id": 75400017,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100004,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75111006,
+          "Val": -100
+        }
+      ]
+    },
+    "75400018": {
+      "id": 75400018,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100009
+    },
+    "75400019": {
+      "id": 75400019,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100009,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75111009,
+          "Val": -100
+        }
+      ]
+    },
+    "75400020": {
+      "id": 75400020,
+      "targetType": 3,
+      "triggerType": 1,
+      "triggerValue": 16100009,
+      "activeEffect": [
+        {
+          "Rate": 100,
+          "Id": 75111006,
+          "Val": -100
+        }
+      ]
+    }
+  }
+}

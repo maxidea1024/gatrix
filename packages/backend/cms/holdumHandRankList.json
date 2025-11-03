@@ -1,0 +1,505 @@
+{
+  ":holdumHandRankList": {
+    ":type": {
+      "id": "key",
+      "rank": "number",
+      "type": "number",
+      "cardNum1": "number",
+      "cardNum2": "number"
+    },
+    ":required": {
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "holdumHandRankList": {
+    "101": {
+      "id": 101,
+      "rank": 1,
+      "type": 0,
+      "cardNum1": 1,
+      "cardNum2": 1
+    },
+    "102": {
+      "id": 102,
+      "rank": 1,
+      "type": 0,
+      "cardNum1": 13,
+      "cardNum2": 13
+    },
+    "103": {
+      "id": 103,
+      "rank": 1,
+      "type": 0,
+      "cardNum1": 12,
+      "cardNum2": 12
+    },
+    "104": {
+      "id": 104,
+      "rank": 1,
+      "type": 0,
+      "cardNum1": 11,
+      "cardNum2": 11
+    },
+    "105": {
+      "id": 105,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 13
+    },
+    "106": {
+      "id": 106,
+      "rank": 1,
+      "type": 0,
+      "cardNum1": 10,
+      "cardNum2": 10
+    },
+    "107": {
+      "id": 107,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 12
+    },
+    "108": {
+      "id": 108,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 11
+    },
+    "109": {
+      "id": 109,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 12,
+      "cardNum2": 13
+    },
+    "110": {
+      "id": 110,
+      "rank": 1,
+      "type": 5,
+      "cardNum1": 1,
+      "cardNum2": 13
+    },
+    "111": {
+      "id": 111,
+      "rank": 1,
+      "type": 0,
+      "cardNum1": 9,
+      "cardNum2": 9
+    },
+    "112": {
+      "id": 112,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 10
+    },
+    "113": {
+      "id": 113,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 13,
+      "cardNum2": 11
+    },
+    "114": {
+      "id": 114,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 12,
+      "cardNum2": 11
+    },
+    "115": {
+      "id": 115,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 11,
+      "cardNum2": 10
+    },
+    "116": {
+      "id": 116,
+      "rank": 1,
+      "type": 5,
+      "cardNum1": 1,
+      "cardNum2": 12
+    },
+    "117": {
+      "id": 117,
+      "rank": 1,
+      "type": 0,
+      "cardNum1": 8,
+      "cardNum2": 8
+    },
+    "118": {
+      "id": 118,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 13,
+      "cardNum2": 10
+    },
+    "119": {
+      "id": 119,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 12,
+      "cardNum2": 10
+    },
+    "120": {
+      "id": 120,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 11,
+      "cardNum2": 9
+    },
+    "121": {
+      "id": 121,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 10,
+      "cardNum2": 9
+    },
+    "122": {
+      "id": 122,
+      "rank": 1,
+      "type": 1,
+      "cardNum1": 9,
+      "cardNum2": 8
+    },
+    "123": {
+      "id": 123,
+      "rank": 1,
+      "type": 5,
+      "cardNum1": 1,
+      "cardNum2": 11
+    },
+    "124": {
+      "id": 124,
+      "rank": 1,
+      "type": 5,
+      "cardNum1": 13,
+      "cardNum2": 12
+    },
+    "125": {
+      "id": 125,
+      "rank": 2,
+      "type": 0,
+      "cardNum1": 7,
+      "cardNum2": 7
+    },
+    "126": {
+      "id": 126,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 9
+    },
+    "127": {
+      "id": 127,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 8
+    },
+    "128": {
+      "id": 128,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 7
+    },
+    "129": {
+      "id": 129,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 6
+    },
+    "130": {
+      "id": 130,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 5
+    },
+    "131": {
+      "id": 131,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 4
+    },
+    "132": {
+      "id": 132,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 3
+    },
+    "133": {
+      "id": 133,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 1,
+      "cardNum2": 2
+    },
+    "134": {
+      "id": 134,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 12,
+      "cardNum2": 9
+    },
+    "135": {
+      "id": 135,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 10,
+      "cardNum2": 8
+    },
+    "136": {
+      "id": 136,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 9,
+      "cardNum2": 7
+    },
+    "137": {
+      "id": 137,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 8,
+      "cardNum2": 7
+    },
+    "138": {
+      "id": 138,
+      "rank": 2,
+      "type": 1,
+      "cardNum1": 7,
+      "cardNum2": 6
+    },
+    "139": {
+      "id": 139,
+      "rank": 2,
+      "type": 5,
+      "cardNum1": 13,
+      "cardNum2": 11
+    },
+    "140": {
+      "id": 140,
+      "rank": 2,
+      "type": 5,
+      "cardNum1": 12,
+      "cardNum2": 11
+    },
+    "141": {
+      "id": 141,
+      "rank": 2,
+      "type": 5,
+      "cardNum1": 11,
+      "cardNum2": 10
+    },
+    "142": {
+      "id": 142,
+      "rank": 3,
+      "type": 0,
+      "cardNum1": 6,
+      "cardNum2": 6
+    },
+    "143": {
+      "id": 143,
+      "rank": 3,
+      "type": 0,
+      "cardNum1": 5,
+      "cardNum2": 5
+    },
+    "144": {
+      "id": 144,
+      "rank": 3,
+      "type": 1,
+      "cardNum1": 13,
+      "cardNum2": 9
+    },
+    "145": {
+      "id": 145,
+      "rank": 3,
+      "type": 1,
+      "cardNum1": 11,
+      "cardNum2": 8
+    },
+    "146": {
+      "id": 146,
+      "rank": 3,
+      "type": 1,
+      "cardNum1": 8,
+      "cardNum2": 6
+    },
+    "147": {
+      "id": 147,
+      "rank": 3,
+      "type": 1,
+      "cardNum1": 7,
+      "cardNum2": 5
+    },
+    "148": {
+      "id": 148,
+      "rank": 3,
+      "type": 1,
+      "cardNum1": 5,
+      "cardNum2": 4
+    },
+    "149": {
+      "id": 149,
+      "rank": 3,
+      "type": 5,
+      "cardNum1": 1,
+      "cardNum2": 10
+    },
+    "150": {
+      "id": 150,
+      "rank": 3,
+      "type": 5,
+      "cardNum1": 13,
+      "cardNum2": 10
+    },
+    "151": {
+      "id": 151,
+      "rank": 3,
+      "type": 5,
+      "cardNum1": 11,
+      "cardNum2": 10
+    },
+    "152": {
+      "id": 152,
+      "rank": 4,
+      "type": 0,
+      "cardNum1": 4,
+      "cardNum2": 4
+    },
+    "153": {
+      "id": 153,
+      "rank": 4,
+      "type": 0,
+      "cardNum1": 3,
+      "cardNum2": 3
+    },
+    "154": {
+      "id": 154,
+      "rank": 4,
+      "type": 0,
+      "cardNum1": 2,
+      "cardNum2": 2
+    },
+    "155": {
+      "id": 155,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 13,
+      "cardNum2": 8
+    },
+    "156": {
+      "id": 156,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 13,
+      "cardNum2": 7
+    },
+    "157": {
+      "id": 157,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 13,
+      "cardNum2": 6
+    },
+    "158": {
+      "id": 158,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 13,
+      "cardNum2": 5
+    },
+    "159": {
+      "id": 159,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 13,
+      "cardNum2": 4
+    },
+    "160": {
+      "id": 160,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 13,
+      "cardNum2": 3
+    },
+    "161": {
+      "id": 161,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 13,
+      "cardNum2": 2
+    },
+    "162": {
+      "id": 162,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 12,
+      "cardNum2": 8
+    },
+    "163": {
+      "id": 163,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 10,
+      "cardNum2": 7
+    },
+    "164": {
+      "id": 164,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 6,
+      "cardNum2": 4
+    },
+    "165": {
+      "id": 165,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 5,
+      "cardNum2": 3
+    },
+    "166": {
+      "id": 166,
+      "rank": 4,
+      "type": 1,
+      "cardNum1": 4,
+      "cardNum2": 3
+    },
+    "167": {
+      "id": 167,
+      "rank": 4,
+      "type": 5,
+      "cardNum1": 11,
+      "cardNum2": 9
+    },
+    "168": {
+      "id": 168,
+      "rank": 4,
+      "type": 5,
+      "cardNum1": 10,
+      "cardNum2": 9
+    },
+    "169": {
+      "id": 169,
+      "rank": 4,
+      "type": 5,
+      "cardNum1": 9,
+      "cardNum2": 8
+    }
+  }
+}

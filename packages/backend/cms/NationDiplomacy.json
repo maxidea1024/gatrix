@@ -1,0 +1,91 @@
+{
+  ":NationDiplomacy": {
+    ":type": {
+      "id": "key",
+      "relatedNationIntimacy": "number",
+      "foreignReputation": "number",
+      "companyNationReputation": "number",
+      "worldIntimacyMultiplier": "number"
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "NationDiplomacy": {
+    "10200000": {
+      "id": 10200000,
+      "companyNationReputation": -100
+    },
+    "10200001": {
+      "id": 10200001,
+      "relatedNationIntimacy": -5,
+      "foreignReputation": -50
+    },
+    "10200002": {
+      "id": 10200002,
+      "companyNationReputation": -100
+    },
+    "10200003": {
+      "id": 10200003,
+      "relatedNationIntimacy": -5,
+      "foreignReputation": -50
+    },
+    "10200004": {
+      "id": 10200004,
+      "companyNationReputation": 10
+    },
+    "10200005": {
+      "id": 10200005,
+      "relatedNationIntimacy": -2,
+      "foreignReputation": -20,
+      "companyNationReputation": 10
+    },
+    "10200006": {
+      "id": 10200006,
+      "relatedNationIntimacy": 20,
+      "foreignReputation": 10
+    },
+    "10200007": {
+      "id": 10200007,
+      "relatedNationIntimacy": 5,
+      "foreignReputation": 10
+    },
+    "10200008": {
+      "id": 10200008,
+      "relatedNationIntimacy": -100,
+      "foreignReputation": 100,
+      "companyNationReputation": -1000
+    },
+    "10200009": {
+      "id": 10200009,
+      "worldIntimacyMultiplier": -10
+    },
+    "10200010": {
+      "id": 10200010,
+      "worldIntimacyMultiplier": -50
+    },
+    "10200015": {
+      "id": 10200015,
+      "companyNationReputation": -200
+    },
+    "10200016": {
+      "id": 10200016,
+      "relatedNationIntimacy": -10,
+      "foreignReputation": -100
+    },
+    "10200017": {
+      "id": 10200017,
+      "companyNationReputation": -50
+    },
+    "10200018": {
+      "id": 10200018,
+      "foreignReputation": -50
+    },
+    "10200019": {
+      "id": 10200019,
+      "companyNationReputation": 10
+    }
+  }
+}

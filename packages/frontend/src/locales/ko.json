@@ -3448,6 +3448,7 @@
     "title": "기획데이터",
     "subtitle": "게임 기획 데이터를 관리합니다",
     "rebuildData": "데이터 다시 불러오기",
+    "uploadData": "기획데이터 업로드",
     "rebuildSuccess": "기획데이터가 성공적으로 다시 불러와졌습니다",
     "showingFirst100": "처음 100개 항목만 표시 중 (전체: {{total}}개)",
     "search": "검색",
@@ -3469,6 +3470,20 @@
     "errors": {
       "loadStatsFailed": "기획데이터 통계를 불러오는데 실패했습니다",
       "rebuildFailed": "데이터 다시 불러오기에 실패했습니다"
+    },
+    "upload": {
+      "title": "기획데이터 업로드",
+      "dragDrop": "파일을 여기에 드래그하여 업로드하세요",
+      "or": "또는",
+      "selectFiles": "파일 선택",
+      "selectedFiles": "선택된 파일",
+      "missingFiles": "선택되지 않은 파일",
+      "upload": "업로드",
+      "uploading": "업로드 중...",
+      "uploadSuccess": "기획데이터가 성공적으로 업로드되었습니다",
+      "uploadFailed": "기획데이터 업로드에 실패했습니다",
+      "selectFilesToUpload": "업로드할 파일을 선택해주세요",
+      "filesUploadedAndCached": "{{count}}개의 기획데이터 파일이 업로드되고 캐싱되었습니다"
     },
     "tabs": {
       "rewardTypes": "보상 타입 목록",

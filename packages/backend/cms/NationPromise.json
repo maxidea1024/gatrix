@@ -1,0 +1,513 @@
+{
+  ":NationPromise": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "nameFormatText": [
+        "text"
+      ],
+      "desc": "text",
+      "descFormatText": [
+        "text",
+        "text"
+      ],
+      "icon": "string",
+      "type": "number",
+      "group": "number",
+      "groupOrder": "number",
+      "pointId": "number",
+      "pointVal": "number",
+      "conditionId": "number",
+      "conditionCount": "number",
+      "buffId": "number",
+      "rewardId": "number"
+    },
+    ":required": {
+      "name": 1,
+      "desc": 1,
+      "type": 1,
+      "group": 1,
+      "groupOrder": 1
+    },
+    ":requiredInObject": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":asset": {},
+    ":links": {
+      "pointId": [
+        "Point"
+      ],
+      "conditionId": [
+        "NationPromiseCondition"
+      ],
+      "buffId": [
+        "WorldBuff"
+      ],
+      "rewardId": [
+        "RewardFixed"
+      ]
+    }
+  },
+  "NationPromise": {
+    "10120001": {
+      "id": 10120001,
+      "name": "{0} 권역 매수",
+      "nameFormatText": [
+        "지정"
+      ],
+      "desc": "{0} 권역에 {1}두카트를 투자합니다.",
+      "descFormatText": [
+        "지정한",
+        "5,000,000,000"
+      ],
+      "icon": "icon_NationPromise_01_Sprite",
+      "type": 0,
+      "group": 1100,
+      "groupOrder": 1,
+      "conditionId": 10160001,
+      "conditionCount": 5000000000,
+      "rewardId": 94110001
+    },
+    "10120002": {
+      "id": 10120002,
+      "name": "{0} 매수",
+      "nameFormatText": [
+        "지정 도시"
+      ],
+      "desc": "{0} 도시에 {1}두카트를 투자합니다.",
+      "descFormatText": [
+        "지정한",
+        "10,000,000,000"
+      ],
+      "icon": "icon_NationPromise_02_Sprite",
+      "type": 0,
+      "group": 1100,
+      "groupOrder": 2,
+      "conditionId": 10160002,
+      "conditionCount": 10000000000,
+      "rewardId": 94110002
+    },
+    "10120003": {
+      "id": 10120003,
+      "name": "{0} 회유",
+      "nameFormatText": [
+        "지정 도시"
+      ],
+      "desc": "{0} 도시를 동맹항으로 만듭니다.",
+      "descFormatText": [
+        "지정한"
+      ],
+      "icon": "icon_NationPromise_03_Sprite",
+      "type": 0,
+      "group": 1100,
+      "groupOrder": 3,
+      "conditionId": 10160003,
+      "conditionCount": 1,
+      "rewardId": 94110003
+    },
+    "10120101": {
+      "id": 10120101,
+      "name": "{0} 권역 점유",
+      "nameFormatText": [
+        "지정"
+      ],
+      "desc": "{0} 권역을 점유합니다.",
+      "descFormatText": [
+        "지정한"
+      ],
+      "icon": "icon_NationPromise_04_Sprite",
+      "type": 0,
+      "group": 1200,
+      "groupOrder": 1,
+      "conditionId": 10160004,
+      "conditionCount": 1,
+      "rewardId": 94110004
+    },
+    "10120102": {
+      "id": 10120102,
+      "name": "{0} 권역 봉쇄",
+      "nameFormatText": [
+        "지정"
+      ],
+      "desc": "{0} 권역을 독점합니다.",
+      "descFormatText": [
+        "지정한"
+      ],
+      "icon": "icon_NationPromise_05_Sprite",
+      "type": 0,
+      "group": 1200,
+      "groupOrder": 2,
+      "conditionId": 10160005,
+      "conditionCount": 1,
+      "rewardId": 94110005
+    },
+    "10120103": {
+      "id": 10120103,
+      "name": "{0} 회유",
+      "nameFormatText": [
+        "지정 도시"
+      ],
+      "desc": "{0} 도시를 동맹항으로 만듭니다.",
+      "descFormatText": [
+        "지정한"
+      ],
+      "icon": "icon_NationPromise_06_Sprite",
+      "type": 0,
+      "group": 1200,
+      "groupOrder": 3,
+      "conditionId": 10160003,
+      "conditionCount": 1,
+      "rewardId": 94110006
+    },
+    "10120201": {
+      "id": 10120201,
+      "name": "최고의 국가",
+      "desc": "국력 순위 1위를 달성합니다.",
+      "icon": "icon_NationPromise_07_Sprite",
+      "type": 0,
+      "group": 1300,
+      "groupOrder": 1,
+      "conditionId": 10160006,
+      "conditionCount": 1,
+      "rewardId": 94110007
+    },
+    "10120202": {
+      "id": 10120202,
+      "name": "강력한 국가",
+      "desc": "국력 순위를 2위 이상 달성합니다.",
+      "icon": "icon_NationPromise_08_Sprite",
+      "type": 0,
+      "group": 1300,
+      "groupOrder": 2,
+      "conditionId": 10160006,
+      "conditionCount": 2,
+      "rewardId": 94110008
+    },
+    "10120203": {
+      "id": 10120203,
+      "name": "발전하는 국가",
+      "desc": "국력 순위를 3위 이상 달성합니다.",
+      "icon": "icon_NationPromise_09_Sprite",
+      "type": 0,
+      "group": 1300,
+      "groupOrder": 3,
+      "conditionId": 10160006,
+      "conditionCount": 3,
+      "rewardId": 94110009
+    },
+    "10120301": {
+      "id": 10120301,
+      "name": "부유한 국가",
+      "desc": "임기 중 국가 기금을 {0} 이상 누적 획득합니다.",
+      "descFormatText": [
+        "10,000,000,000"
+      ],
+      "icon": "icon_NationPromise_10_Sprite",
+      "type": 0,
+      "group": 1400,
+      "groupOrder": 1,
+      "conditionId": 10160007,
+      "conditionCount": 10000000000,
+      "rewardId": 94110010
+    },
+    "10120302": {
+      "id": 10120302,
+      "name": "아주 부유한 국가",
+      "desc": "임기 중 국가 기금을 {0} 이상 누적 획득합니다.",
+      "descFormatText": [
+        "30,000,000,000"
+      ],
+      "icon": "icon_NationPromise_11_Sprite",
+      "type": 0,
+      "group": 1400,
+      "groupOrder": 2,
+      "conditionId": 10160007,
+      "conditionCount": 30000000000,
+      "rewardId": 94110011
+    },
+    "10121001": {
+      "id": 10121001,
+      "name": "왕실의 항해 기술",
+      "desc": "1함대의 속도가 {0}% 증가합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "type": 1,
+      "group": 2100,
+      "groupOrder": 1,
+      "pointId": 100003,
+      "pointVal": 10000,
+      "buffId": 38099021
+    },
+    "10121002": {
+      "id": 10121002,
+      "name": "왕실의 비밀스러운 지식",
+      "desc": "1함대의 경험치 획득량이 {0}% 증가합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "type": 1,
+      "group": 2100,
+      "groupOrder": 2,
+      "pointId": 100003,
+      "pointVal": 10000,
+      "buffId": 38099022
+    },
+    "10121003": {
+      "id": 10121003,
+      "name": "전투의 비법",
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatText": [
+        "전투 전문 지식",
+        "300"
+      ],
+      "type": 1,
+      "group": 2100,
+      "groupOrder": 3,
+      "pointId": 100001,
+      "pointVal": 1000000000,
+      "buffId": 38099023
+    },
+    "10121004": {
+      "id": 10121004,
+      "name": "교역의 비법",
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatText": [
+        "교역 전문 지식",
+        "505"
+      ],
+      "type": 1,
+      "group": 2100,
+      "groupOrder": 4,
+      "pointId": 100001,
+      "pointVal": 1000000000,
+      "buffId": 38099024
+    },
+    "10121005": {
+      "id": 10121005,
+      "name": "탐험의 비법",
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatText": [
+        "탐험 전문 지식",
+        "505"
+      ],
+      "type": 1,
+      "group": 2100,
+      "groupOrder": 5,
+      "pointId": 100001,
+      "pointVal": 1000000000,
+      "buffId": 38099025
+    },
+    "10121101": {
+      "id": 10121101,
+      "name": "신속한 탐험",
+      "desc": "육지 탐험 쾌속 횟수가 {0}회 증가합니다.",
+      "descFormatText": [
+        "20"
+      ],
+      "type": 1,
+      "group": 2200,
+      "groupOrder": 1,
+      "pointId": 100003,
+      "pointVal": 10000,
+      "buffId": 38099026
+    },
+    "10121102": {
+      "id": 10121102,
+      "name": "풍족한 탐험",
+      "desc": "자원 추가 획득량이 {0}% 증가합니다.",
+      "descFormatText": [
+        "2"
+      ],
+      "type": 1,
+      "group": 2200,
+      "groupOrder": 2,
+      "pointId": 100003,
+      "pointVal": 10000,
+      "buffId": 38099027
+    },
+    "10121103": {
+      "id": 10121103,
+      "name": "근위대 파견",
+      "desc": "탐험 전투력이 {0} 증가합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "type": 1,
+      "group": 2200,
+      "groupOrder": 3,
+      "pointId": 100001,
+      "pointVal": 1000000000,
+      "buffId": 38099028
+    },
+    "10121104": {
+      "id": 10121104,
+      "name": "왕실 학자 파견",
+      "desc": "탐험 관찰력이 {0} 증가합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "type": 1,
+      "group": 2200,
+      "groupOrder": 4,
+      "pointId": 100001,
+      "pointVal": 1000000000,
+      "buffId": 38099029
+    },
+    "10121105": {
+      "id": 10121105,
+      "name": "장인 파견",
+      "desc": "탐험 채집력이 {0} 증가합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "type": 1,
+      "group": 2200,
+      "groupOrder": 5,
+      "pointId": 100001,
+      "pointVal": 1000000000,
+      "buffId": 38099030
+    },
+    "10121201": {
+      "id": 10121201,
+      "name": "두카트 순도 증가",
+      "desc": "교역품 판매 가격이 {0}% 증가합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "type": 1,
+      "group": 2300,
+      "groupOrder": 1,
+      "pointId": 100003,
+      "pointVal": 10000,
+      "buffId": 38099031
+    },
+    "10121202": {
+      "id": 10121202,
+      "name": "위협적인 깃발",
+      "desc": "협상 성공 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "type": 1,
+      "group": 2300,
+      "groupOrder": 2,
+      "pointId": 100003,
+      "pointVal": 10000,
+      "buffId": 38099032
+    },
+    "10121203": {
+      "id": 10121203,
+      "name": "신뢰가는 깃발",
+      "desc": "거래 점수 기준이 {0}% 감소합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "type": 1,
+      "group": 2300,
+      "groupOrder": 3,
+      "pointId": 100001,
+      "pointVal": 1000000000,
+      "buffId": 38099033
+    },
+    "10121204": {
+      "id": 10121204,
+      "name": "친밀한 깃발",
+      "desc": "물물 교환 대상 교역품 획득량이 {0}% 증가합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "type": 1,
+      "group": 2300,
+      "groupOrder": 4,
+      "pointId": 100003,
+      "pointVal": 10000,
+      "buffId": 38099034
+    },
+    "10121205": {
+      "id": 10121205,
+      "name": "절약의 비법",
+      "desc": "교역품 구매 가격이 {0}% 감소합니다.",
+      "descFormatText": [
+        "3"
+      ],
+      "type": 1,
+      "group": 2300,
+      "groupOrder": 5,
+      "pointId": 100001,
+      "pointVal": 1000000000,
+      "buffId": 38099035
+    },
+    "10121301": {
+      "id": 10121301,
+      "name": "공격 전술 교육",
+      "desc": "포격, 백병, 충파 공격력이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.5"
+      ],
+      "type": 1,
+      "group": 2400,
+      "groupOrder": 1,
+      "pointId": 100003,
+      "pointVal": 10000,
+      "buffId": 38099036
+    },
+    "10121302": {
+      "id": 10121302,
+      "name": "방어 전술 교육",
+      "desc": "포격, 백병, 충파 방어력이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.5"
+      ],
+      "type": 1,
+      "group": 2400,
+      "groupOrder": 2,
+      "pointId": 100003,
+      "pointVal": 10000,
+      "buffId": 38099037
+    },
+    "10121303": {
+      "id": 10121303,
+      "name": "돌격 전술 교육",
+      "desc": "포격, 백병, 충파 치명타 발생 확률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "type": 1,
+      "group": 2400,
+      "groupOrder": 3,
+      "pointId": 100003,
+      "pointVal": 10000,
+      "buffId": 38099038
+    },
+    "10121304": {
+      "id": 10121304,
+      "name": "전술 수학 교육",
+      "desc": "포격, 백병 명중률이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "type": 1,
+      "group": 2400,
+      "groupOrder": 4,
+      "pointId": 100001,
+      "pointVal": 1000000000,
+      "buffId": 38099039
+    },
+    "10121305": {
+      "id": 10121305,
+      "name": "회피 진형 교육",
+      "desc": "포격, 백병 회피율이 {0}% 증가합니다.",
+      "descFormatText": [
+        "5.0"
+      ],
+      "type": 1,
+      "group": 2400,
+      "groupOrder": 5,
+      "pointId": 100001,
+      "pointVal": 1000000000,
+      "buffId": 38099040
+    }
+  }
+}

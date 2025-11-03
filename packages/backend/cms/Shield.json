@@ -1,0 +1,61 @@
+{
+  ":Shield": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "desc": "text",
+      "icon": "string",
+      "dailyChargeCount": "number",
+      "dailyChargeCompanyLv": "number"
+    },
+    ":required": {
+      "name": 1,
+      "desc": 1,
+      "icon": 1,
+      "dailyChargeCount": 1,
+      "dailyChargeCompanyLv": 1
+    },
+    ":min": {
+      "dailyChargeCount": 0
+    },
+    ":max": {
+      "dailyChargeCount": 100
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "Shield": {
+    "1100000": {
+      "id": 1100000,
+      "name": "무료 기적",
+      "desc": "재해 발생 시 기적을 무료로 사용할 수 있습니다.",
+      "icon": "icon_Effect_adventure_1010_Sprite",
+      "dailyChargeCount": 10,
+      "dailyChargeCompanyLv": 25
+    },
+    "1100001": {
+      "id": 1100001,
+      "name": "무료 부활",
+      "desc": "항해 불능 상태에서 무료로 부활할 수 있습니다.",
+      "icon": "icon_Effect_adventure_1011_Sprite",
+      "dailyChargeCount": 10,
+      "dailyChargeCompanyLv": 20
+    },
+    "1100002": {
+      "id": 1100002,
+      "name": "안전 회항",
+      "desc": "항해 불능 상태에서 재화 및 적재물 피해 없이 회항할 수 있습니다.",
+      "icon": "icon_Effect_adventure_1012_Sprite",
+      "dailyChargeCount": 10,
+      "dailyChargeCompanyLv": 20
+    },
+    "1100003": {
+      "id": 1100003,
+      "name": "해전 보호",
+      "desc": "해상에서 교전 발생을 막아줍니다.",
+      "icon": "Icon_Battle_Defence_Nomal_Sprite",
+      "dailyChargeCount": 10,
+      "dailyChargeCompanyLv": 100
+    }
+  }
+}

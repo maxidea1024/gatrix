@@ -1,0 +1,1224 @@
+{
+  ":MateAwaken": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "mateGrade": "number",
+      "jobType": "number",
+      "awakenLv": "number",
+      "needJobLv": "number",
+      "passiveSlot": "number",
+      "awakenPieceVal": "number",
+      "awakenTime": "number",
+      "awakenCostType": "number",
+      "awakenCostVal": "number",
+      "awakenItem": [
+        {
+          "Id": "number",
+          "Val": "number"
+        }
+      ]
+    },
+    ":required": {
+      "name": 1,
+      "mateGrade": 1,
+      "jobType": 1,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 1,
+      "awakenTime": 1
+    },
+    ":requiredInObject": {
+      "awakenCostType": 1,
+      "awakenCostVal": 1,
+      "awakenItem": [
+        {
+          "Id": 1,
+          "Val": 1
+        }
+      ]
+    },
+    ":min": {
+      "mateGrade": 0,
+      "jobType": 0,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 0,
+      "awakenCostType": 100000,
+      "awakenItem": [
+        {
+          "Id": 23000000
+        }
+      ]
+    },
+    ":max": {
+      "mateGrade": 5,
+      "jobType": 3,
+      "awakenLv": 99,
+      "needJobLv": 99,
+      "passiveSlot": 4,
+      "awakenCostType": 199999,
+      "awakenItem": [
+        {
+          "Id": 23999999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "awakenCostType": [
+        "Point"
+      ],
+      "awakenItem": [
+        {
+          "Id": [
+            "Item"
+          ]
+        }
+      ]
+    }
+  },
+  "MateAwaken": {
+    "17900000": {
+      "id": 17900000,
+      "name": "C급 0차",
+      "mateGrade": 1,
+      "jobType": 1,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 0,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900001": {
+      "id": 17900001,
+      "name": "C급 1차",
+      "mateGrade": 1,
+      "jobType": 1,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 10000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 40
+        }
+      ]
+    },
+    "17900002": {
+      "id": 17900002,
+      "name": "C급 2차",
+      "mateGrade": 1,
+      "jobType": 1,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 1800,
+      "awakenCostType": 100001,
+      "awakenCostVal": 60000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 60
+        }
+      ]
+    },
+    "17900003": {
+      "id": 17900003,
+      "name": "C급 3차",
+      "mateGrade": 1,
+      "jobType": 1,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 3600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 560000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 80
+        }
+      ]
+    },
+    "17900004": {
+      "id": 17900004,
+      "name": "C급 4차",
+      "mateGrade": 1,
+      "jobType": 1,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 7200,
+      "awakenCostType": 100001,
+      "awakenCostVal": 2880000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 100
+        }
+      ]
+    },
+    "17900005": {
+      "id": 17900005,
+      "name": "B급 0차",
+      "mateGrade": 2,
+      "jobType": 1,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900006": {
+      "id": 17900006,
+      "name": "B급 1차",
+      "mateGrade": 2,
+      "jobType": 1,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 1800,
+      "awakenCostType": 100001,
+      "awakenCostVal": 30000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 60
+        }
+      ]
+    },
+    "17900007": {
+      "id": 17900007,
+      "name": "B급 2차",
+      "mateGrade": 2,
+      "jobType": 1,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 3600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 180000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 80
+        }
+      ]
+    },
+    "17900008": {
+      "id": 17900008,
+      "name": "B급 3차",
+      "mateGrade": 2,
+      "jobType": 1,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 7200,
+      "awakenCostType": 100001,
+      "awakenCostVal": 1190000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 120
+        }
+      ]
+    },
+    "17900009": {
+      "id": 17900009,
+      "name": "B급 4차",
+      "mateGrade": 2,
+      "jobType": 1,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 14400,
+      "awakenCostType": 100001,
+      "awakenCostVal": 6300000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 160
+        }
+      ]
+    },
+    "17900010": {
+      "id": 17900010,
+      "name": "A급 0차",
+      "mateGrade": 3,
+      "jobType": 1,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900011": {
+      "id": 17900011,
+      "name": "A급 1차",
+      "mateGrade": 3,
+      "jobType": 1,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 9000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 240000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 80
+        }
+      ]
+    },
+    "17900012": {
+      "id": 17900012,
+      "name": "A급 2차",
+      "mateGrade": 3,
+      "jobType": 1,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 18000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 720000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 120
+        }
+      ]
+    },
+    "17900013": {
+      "id": 17900013,
+      "name": "A급 3차",
+      "mateGrade": 3,
+      "jobType": 1,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 36000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 2970000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 180
+        }
+      ]
+    },
+    "17900014": {
+      "id": 17900014,
+      "name": "A급 4차",
+      "mateGrade": 3,
+      "jobType": 1,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 72000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 15000000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 240
+        }
+      ]
+    },
+    "17900015": {
+      "id": 17900015,
+      "name": "S급 0차",
+      "mateGrade": 4,
+      "jobType": 1,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900016": {
+      "id": 17900016,
+      "name": "S급 1차",
+      "mateGrade": 4,
+      "jobType": 1,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 21600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 1140000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 100
+        }
+      ]
+    },
+    "17900017": {
+      "id": 17900017,
+      "name": "S급 2차",
+      "mateGrade": 4,
+      "jobType": 1,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 43200,
+      "awakenCostType": 100001,
+      "awakenCostVal": 3000000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 160
+        }
+      ]
+    },
+    "17900018": {
+      "id": 17900018,
+      "name": "S급 3차",
+      "mateGrade": 4,
+      "jobType": 1,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 86400,
+      "awakenCostType": 100001,
+      "awakenCostVal": 7510000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 240
+        }
+      ]
+    },
+    "17900019": {
+      "id": 17900019,
+      "name": "S급 4차",
+      "mateGrade": 4,
+      "jobType": 1,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 172800,
+      "awakenCostType": 100001,
+      "awakenCostVal": 28000000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 320
+        }
+      ]
+    },
+    "17900020": {
+      "id": 17900020,
+      "name": "C급 0차",
+      "mateGrade": 1,
+      "jobType": 2,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900021": {
+      "id": 17900021,
+      "name": "C급 1차",
+      "mateGrade": 1,
+      "jobType": 2,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 10000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 40
+        }
+      ]
+    },
+    "17900022": {
+      "id": 17900022,
+      "name": "C급 2차",
+      "mateGrade": 1,
+      "jobType": 2,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 1800,
+      "awakenCostType": 100001,
+      "awakenCostVal": 60000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 60
+        }
+      ]
+    },
+    "17900023": {
+      "id": 17900023,
+      "name": "C급 3차",
+      "mateGrade": 1,
+      "jobType": 2,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 3600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 560000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 80
+        }
+      ]
+    },
+    "17900024": {
+      "id": 17900024,
+      "name": "C급 4차",
+      "mateGrade": 1,
+      "jobType": 2,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 7200,
+      "awakenCostType": 100001,
+      "awakenCostVal": 2880000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 100
+        }
+      ]
+    },
+    "17900025": {
+      "id": 17900025,
+      "name": "B급 0차",
+      "mateGrade": 2,
+      "jobType": 2,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900026": {
+      "id": 17900026,
+      "name": "B급 1차",
+      "mateGrade": 2,
+      "jobType": 2,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 1800,
+      "awakenCostType": 100001,
+      "awakenCostVal": 30000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 60
+        }
+      ]
+    },
+    "17900027": {
+      "id": 17900027,
+      "name": "B급 2차",
+      "mateGrade": 2,
+      "jobType": 2,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 3600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 180000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 80
+        }
+      ]
+    },
+    "17900028": {
+      "id": 17900028,
+      "name": "B급 3차",
+      "mateGrade": 2,
+      "jobType": 2,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 7200,
+      "awakenCostType": 100001,
+      "awakenCostVal": 1190000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 120
+        }
+      ]
+    },
+    "17900029": {
+      "id": 17900029,
+      "name": "B급 4차",
+      "mateGrade": 2,
+      "jobType": 2,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 14400,
+      "awakenCostType": 100001,
+      "awakenCostVal": 6300000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 160
+        }
+      ]
+    },
+    "17900030": {
+      "id": 17900030,
+      "name": "A급 0차",
+      "mateGrade": 3,
+      "jobType": 2,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900031": {
+      "id": 17900031,
+      "name": "A급 1차",
+      "mateGrade": 3,
+      "jobType": 2,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 9000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 240000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 80
+        }
+      ]
+    },
+    "17900032": {
+      "id": 17900032,
+      "name": "A급 2차",
+      "mateGrade": 3,
+      "jobType": 2,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 18000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 720000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 120
+        }
+      ]
+    },
+    "17900033": {
+      "id": 17900033,
+      "name": "A급 3차",
+      "mateGrade": 3,
+      "jobType": 2,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 36000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 2970000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 180
+        }
+      ]
+    },
+    "17900034": {
+      "id": 17900034,
+      "name": "A급 4차",
+      "mateGrade": 3,
+      "jobType": 2,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 72000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 15000000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 240
+        }
+      ]
+    },
+    "17900035": {
+      "id": 17900035,
+      "name": "S급 0차",
+      "mateGrade": 4,
+      "jobType": 2,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900036": {
+      "id": 17900036,
+      "name": "S급 1차",
+      "mateGrade": 4,
+      "jobType": 2,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 21600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 1140000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 100
+        }
+      ]
+    },
+    "17900037": {
+      "id": 17900037,
+      "name": "S급 2차",
+      "mateGrade": 4,
+      "jobType": 2,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 43200,
+      "awakenCostType": 100001,
+      "awakenCostVal": 3000000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 160
+        }
+      ]
+    },
+    "17900038": {
+      "id": 17900038,
+      "name": "S급 3차",
+      "mateGrade": 4,
+      "jobType": 2,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 86400,
+      "awakenCostType": 100001,
+      "awakenCostVal": 7510000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 240
+        }
+      ]
+    },
+    "17900039": {
+      "id": 17900039,
+      "name": "S급 4차",
+      "mateGrade": 4,
+      "jobType": 2,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 172800,
+      "awakenCostType": 100001,
+      "awakenCostVal": 28000000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 320
+        }
+      ]
+    },
+    "17900040": {
+      "id": 17900040,
+      "name": "C급 0차",
+      "mateGrade": 1,
+      "jobType": 3,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900041": {
+      "id": 17900041,
+      "name": "C급 1차",
+      "mateGrade": 1,
+      "jobType": 3,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 10000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 40
+        }
+      ]
+    },
+    "17900042": {
+      "id": 17900042,
+      "name": "C급 2차",
+      "mateGrade": 1,
+      "jobType": 3,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 1800,
+      "awakenCostType": 100001,
+      "awakenCostVal": 60000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 60
+        }
+      ]
+    },
+    "17900043": {
+      "id": 17900043,
+      "name": "C급 3차",
+      "mateGrade": 1,
+      "jobType": 3,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 3600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 560000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 80
+        }
+      ]
+    },
+    "17900044": {
+      "id": 17900044,
+      "name": "C급 4차",
+      "mateGrade": 1,
+      "jobType": 3,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 7200,
+      "awakenCostType": 100001,
+      "awakenCostVal": 2880000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 100
+        }
+      ]
+    },
+    "17900045": {
+      "id": 17900045,
+      "name": "B급 0차",
+      "mateGrade": 2,
+      "jobType": 3,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900046": {
+      "id": 17900046,
+      "name": "B급 1차",
+      "mateGrade": 2,
+      "jobType": 3,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 1800,
+      "awakenCostType": 100001,
+      "awakenCostVal": 30000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 60
+        }
+      ]
+    },
+    "17900047": {
+      "id": 17900047,
+      "name": "B급 2차",
+      "mateGrade": 2,
+      "jobType": 3,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 3600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 180000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 80
+        }
+      ]
+    },
+    "17900048": {
+      "id": 17900048,
+      "name": "B급 3차",
+      "mateGrade": 2,
+      "jobType": 3,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 7200,
+      "awakenCostType": 100001,
+      "awakenCostVal": 1190000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 120
+        }
+      ]
+    },
+    "17900049": {
+      "id": 17900049,
+      "name": "B급 4차",
+      "mateGrade": 2,
+      "jobType": 3,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 14400,
+      "awakenCostType": 100001,
+      "awakenCostVal": 6300000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 160
+        }
+      ]
+    },
+    "17900050": {
+      "id": 17900050,
+      "name": "A급 0차",
+      "mateGrade": 3,
+      "jobType": 3,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900051": {
+      "id": 17900051,
+      "name": "A급 1차",
+      "mateGrade": 3,
+      "jobType": 3,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 9000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 240000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 80
+        }
+      ]
+    },
+    "17900052": {
+      "id": 17900052,
+      "name": "A급 2차",
+      "mateGrade": 3,
+      "jobType": 3,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 18000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 720000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 120
+        }
+      ]
+    },
+    "17900053": {
+      "id": 17900053,
+      "name": "A급 3차",
+      "mateGrade": 3,
+      "jobType": 3,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 36000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 2970000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 180
+        }
+      ]
+    },
+    "17900054": {
+      "id": 17900054,
+      "name": "A급 4차",
+      "mateGrade": 3,
+      "jobType": 3,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 72000,
+      "awakenCostType": 100001,
+      "awakenCostVal": 15000000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 240
+        }
+      ]
+    },
+    "17900055": {
+      "id": 17900055,
+      "name": "S급 0차",
+      "mateGrade": 4,
+      "jobType": 3,
+      "awakenLv": 0,
+      "needJobLv": 1,
+      "passiveSlot": 1,
+      "awakenPieceVal": 0,
+      "awakenTime": 600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 0,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 0
+        }
+      ]
+    },
+    "17900056": {
+      "id": 17900056,
+      "name": "S급 1차",
+      "mateGrade": 4,
+      "jobType": 3,
+      "awakenLv": 1,
+      "needJobLv": 1,
+      "passiveSlot": 2,
+      "awakenPieceVal": 10,
+      "awakenTime": 21600,
+      "awakenCostType": 100001,
+      "awakenCostVal": 1140000,
+      "awakenItem": [
+        {
+          "Id": 23409999,
+          "Val": 100
+        }
+      ]
+    },
+    "17900057": {
+      "id": 17900057,
+      "name": "S급 2차",
+      "mateGrade": 4,
+      "jobType": 3,
+      "awakenLv": 2,
+      "needJobLv": 1,
+      "passiveSlot": 3,
+      "awakenPieceVal": 20,
+      "awakenTime": 43200,
+      "awakenCostType": 100001,
+      "awakenCostVal": 3000000,
+      "awakenItem": [
+        {
+          "Id": 23410000,
+          "Val": 160
+        }
+      ]
+    },
+    "17900058": {
+      "id": 17900058,
+      "name": "S급 3차",
+      "mateGrade": 4,
+      "jobType": 3,
+      "awakenLv": 3,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 40,
+      "awakenTime": 86400,
+      "awakenCostType": 100001,
+      "awakenCostVal": 7510000,
+      "awakenItem": [
+        {
+          "Id": 23410001,
+          "Val": 240
+        }
+      ]
+    },
+    "17900059": {
+      "id": 17900059,
+      "name": "S급 4차",
+      "mateGrade": 4,
+      "jobType": 3,
+      "awakenLv": 4,
+      "needJobLv": 1,
+      "passiveSlot": 4,
+      "awakenPieceVal": 80,
+      "awakenTime": 172800,
+      "awakenCostType": 100001,
+      "awakenCostVal": 28000000,
+      "awakenItem": [
+        {
+          "Id": 23410002,
+          "Val": 320
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,322 @@
+{
+  ":WorldWarShip": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "desc": "text",
+      "limitNumAliveOnNation": "number",
+      "createDurationSeconds": "number",
+      "WorldWarShipBattleType": "number",
+      "remoteContentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ],
+      "stat": [
+        {
+          "WWStatOperator": "number",
+          "BaseStatValue": "number",
+          "BaseStatMultiply": "number"
+        },
+        {
+          "WWStatOperator": "number",
+          "BaseStatValue": "number",
+          "BaseStatMultiply": "number"
+        },
+        {
+          "WWStatOperator": "number",
+          "BaseStatValue": "number",
+          "BaseStatMultiply": "number"
+        },
+        {
+          "WWStatOperator": "number",
+          "BaseStatValue": "number",
+          "BaseStatMultiply": "number"
+        },
+        {
+          "WWStatOperator": "number",
+          "BaseStatValue": "number",
+          "BaseStatMultiply": "number"
+        },
+        {
+          "WWStatOperator": "number",
+          "BaseStatValue": "number",
+          "BaseStatMultiply": "number"
+        }
+      ]
+    },
+    ":required": {
+      "name": 1,
+      "desc": 1,
+      "createDurationSeconds": 1,
+      "WorldWarShipBattleType": 1
+    },
+    ":requiredInObject": {
+      "remoteContentsTerms": [
+        {
+          "Id": 1,
+          "Count": 1
+        }
+      ],
+      "stat": [
+        {
+          "WWStatOperator": 1,
+          "BaseStatValue": 1,
+          "BaseStatMultiply": 1
+        },
+        {
+          "WWStatOperator": 1,
+          "BaseStatValue": 1,
+          "BaseStatMultiply": 1
+        },
+        {
+          "WWStatOperator": 1,
+          "BaseStatValue": 1,
+          "BaseStatMultiply": 1
+        },
+        {
+          "WWStatOperator": 1,
+          "BaseStatValue": 1,
+          "BaseStatMultiply": 1
+        },
+        {
+          "WWStatOperator": 1,
+          "BaseStatValue": 1,
+          "BaseStatMultiply": 1
+        },
+        {
+          "WWStatOperator": 1,
+          "BaseStatValue": 1,
+          "BaseStatMultiply": 1
+        }
+      ]
+    },
+    ":min": {
+      "WorldWarShipBattleType": 0,
+      "remoteContentsTerms": [
+        {
+          "Id": 81000000
+        }
+      ],
+      "stat": [
+        {
+          "WWStatOperator": 0
+        },
+        {
+          "WWStatOperator": 0
+        },
+        {
+          "WWStatOperator": 0
+        },
+        {
+          "WWStatOperator": 0
+        },
+        {
+          "WWStatOperator": 0
+        },
+        {
+          "WWStatOperator": 0
+        }
+      ]
+    },
+    ":max": {
+      "WorldWarShipBattleType": 4,
+      "remoteContentsTerms": [
+        {
+          "Id": 81999999
+        }
+      ],
+      "stat": [
+        {
+          "WWStatOperator": 100
+        },
+        {
+          "WWStatOperator": 100
+        },
+        {
+          "WWStatOperator": 100
+        },
+        {
+          "WWStatOperator": 100
+        },
+        {
+          "WWStatOperator": 100
+        },
+        {
+          "WWStatOperator": 100
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "remoteContentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ],
+      "stat": [
+        {
+          "WWStatOperator": [
+            "WorldWarStatOperator"
+          ]
+        },
+        {
+          "WWStatOperator": [
+            "WorldWarStatOperator"
+          ]
+        },
+        {
+          "WWStatOperator": [
+            "WorldWarStatOperator"
+          ]
+        },
+        {
+          "WWStatOperator": [
+            "WorldWarStatOperator"
+          ]
+        },
+        {
+          "WWStatOperator": [
+            "WorldWarStatOperator"
+          ]
+        },
+        {
+          "WWStatOperator": [
+            "WorldWarStatOperator"
+          ]
+        }
+      ]
+    }
+  },
+  "WorldWarShip": {
+    "0": {
+      "id": 0,
+      "name": "일반선박",
+      "desc": "설명문구",
+      "createDurationSeconds": 16,
+      "WorldWarShipBattleType": 0,
+      "stat": [
+        {
+          "WWStatOperator": 0,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 1000
+        },
+        {
+          "WWStatOperator": 1,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 1000
+        },
+        {
+          "WWStatOperator": 2,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 1000
+        },
+        {
+          "WWStatOperator": 3,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 1000
+        },
+        {
+          "WWStatOperator": 4,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 1000
+        },
+        {
+          "WWStatOperator": 5,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 1000
+        }
+      ]
+    },
+    "1": {
+      "id": 1,
+      "name": "리로이젠킨스",
+      "desc": "설명문구",
+      "createDurationSeconds": 10,
+      "WorldWarShipBattleType": 4,
+      "stat": [
+        {
+          "WWStatOperator": 0,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 500
+        },
+        {
+          "WWStatOperator": 1,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 500
+        },
+        {
+          "WWStatOperator": 2,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 2500
+        },
+        {
+          "WWStatOperator": 3,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 2500
+        },
+        {
+          "WWStatOperator": 4,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 500
+        },
+        {
+          "WWStatOperator": 5,
+          "BaseStatValue": 0,
+          "BaseStatMultiply": 500
+        }
+      ]
+    },
+    "2": {
+      "id": 2,
+      "name": "블랙펄",
+      "desc": "설명문구",
+      "limitNumAliveOnNation": 1,
+      "createDurationSeconds": 8,
+      "WorldWarShipBattleType": 1,
+      "remoteContentsTerms": [
+        {
+          "Id": 81000056,
+          "Target": 80045635,
+          "Count": 1
+        }
+      ],
+      "stat": [
+        {
+          "WWStatOperator": 0,
+          "BaseStatValue": 100,
+          "BaseStatMultiply": 1800
+        },
+        {
+          "WWStatOperator": 1,
+          "BaseStatValue": 100,
+          "BaseStatMultiply": 1800
+        },
+        {
+          "WWStatOperator": 2,
+          "BaseStatValue": 100,
+          "BaseStatMultiply": 1800
+        },
+        {
+          "WWStatOperator": 3,
+          "BaseStatValue": 100,
+          "BaseStatMultiply": 1800
+        },
+        {
+          "WWStatOperator": 4,
+          "BaseStatValue": 100,
+          "BaseStatMultiply": 1800
+        },
+        {
+          "WWStatOperator": 5,
+          "BaseStatValue": 100,
+          "BaseStatMultiply": 1800
+        }
+      ]
+    }
+  }
+}

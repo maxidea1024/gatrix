@@ -1,8 +1,18 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
+import multer from 'multer';
 import { authenticate, requireAdmin } from '../../middleware/auth';
 import { PlanningDataController } from '../../controllers/PlanningDataController';
 
-const router = Router();
+const router = Router() as any;
+
+// Configure multer for file uploads (memory storage)
+// 100MB file size limit for planning data uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB
+  },
+});
 
 // All planning data routes require authentication and admin role
 router.use(authenticate as any);
@@ -37,6 +47,9 @@ router.post('/materecruiting/build', PlanningDataController.buildMateRecruitingG
 // OceanNpcAreaSpawner routes
 router.get('/oceannpcarea', PlanningDataController.getOceanNpcAreaSpawnerLookup);
 router.post('/oceannpcarea/build', PlanningDataController.buildOceanNpcAreaSpawnerLookup);
+
+// File upload route (drag & drop)
+router.post('/upload', upload.any(), PlanningDataController.uploadPlanningData);
 
 export default router;
 

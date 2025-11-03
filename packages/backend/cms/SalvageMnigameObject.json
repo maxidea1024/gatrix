@@ -1,0 +1,149 @@
+{
+  ":SalvageMnigameObject": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "grade": "number",
+      "type": "number",
+      "interactionDurability": "number",
+      "salvageScore": "number",
+      "salvageObjectWidget": "string",
+      "objectEffect": {
+        "Id": "number",
+        "Val": "number"
+      },
+      "apply": {
+        "Type": "number",
+        "Val": "number"
+      },
+      "soundEventId": "number"
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "objectEffect": {
+        "Id": [
+          "SalvageMinigameObjectEffect"
+        ]
+      }
+    }
+  },
+  "SalvageMnigameObject": {
+    "99930000": {
+      "id": 99930000,
+      "name": "금화",
+      "grade": 1,
+      "type": 0,
+      "interactionDurability": 0,
+      "salvageScore": 225,
+      "salvageObjectWidget": "PWBP_SalvageMiniGameEnemyEntry_GoldFinch",
+      "soundEventId": 96000899
+    },
+    "99930001": {
+      "id": 99930001,
+      "name": "복어",
+      "grade": 1,
+      "type": 0,
+      "interactionDurability": -6.66666666666667,
+      "salvageScore": -600,
+      "salvageObjectWidget": "PWBP_SalvageMiniGameEnemyEntry_BlowFish",
+      "soundEventId": 96000900
+    },
+    "99930002": {
+      "id": 99930002,
+      "name": "진주",
+      "grade": 1,
+      "type": 0,
+      "interactionDurability": 0,
+      "salvageScore": 375,
+      "salvageObjectWidget": "PWBP_SalvageMiniGameEnemyEntry_Clam",
+      "soundEventId": 96000899
+    },
+    "99930003": {
+      "id": 99930003,
+      "name": "산호초",
+      "grade": 1,
+      "type": 0,
+      "interactionDurability": -200,
+      "salvageScore": -300,
+      "salvageObjectWidget": "PWBP_SalvageMiniGameEnemyEntry_CoralReef",
+      "soundEventId": 96000900
+    },
+    "99930004": {
+      "id": 99930004,
+      "name": "오크통",
+      "grade": 1,
+      "type": 0,
+      "interactionDurability": -66.6666666666667,
+      "salvageScore": -900,
+      "salvageObjectWidget": "PWBP_SalvageMiniGameEnemyEntry_OakBarrel",
+      "soundEventId": 96000900
+    },
+    "99930005": {
+      "id": 99930005,
+      "name": "피버타임",
+      "grade": 1,
+      "type": 1,
+      "salvageObjectWidget": "PWBP_SalvageMiniGameEnemyEntry_FeverTime",
+      "objectEffect": {
+        "Id": 100001002,
+        "Val": 500
+      },
+      "apply": {
+        "Type": 1,
+        "Val": 5
+      },
+      "soundEventId": 96000901
+    },
+    "99930006": {
+      "id": 99930006,
+      "name": "점수 감소 무효",
+      "grade": 1,
+      "type": 1,
+      "salvageObjectWidget": "PWBP_SalvageMiniGameEnemyEntry_DefenseScore",
+      "objectEffect": {
+        "Id": 100001003,
+        "Val": 0
+      },
+      "apply": {
+        "Type": 1,
+        "Val": 5
+      },
+      "soundEventId": 96000902
+    },
+    "99930007": {
+      "id": 99930007,
+      "name": "흡수기",
+      "grade": 1,
+      "type": 1,
+      "salvageObjectWidget": "PWBP_SalvageMiniGameEnemyEntry_Magnetic",
+      "objectEffect": {
+        "Id": 100001004,
+        "Val": 0
+      },
+      "apply": {
+        "Type": 3,
+        "Val": 0
+      },
+      "soundEventId": 96000903
+    },
+    "99930008": {
+      "id": 99930008,
+      "name": "로프튼튼",
+      "grade": 1,
+      "type": 1,
+      "salvageObjectWidget": "PWBP_SalvageMiniGameEnemyEntry_HardChain",
+      "objectEffect": {
+        "Id": 100001005,
+        "Val": 0
+      },
+      "apply": {
+        "Type": 1,
+        "Val": 5
+      },
+      "soundEventId": 96000904
+    }
+  }
+}

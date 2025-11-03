@@ -1,4 +1,19 @@
 require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
+
+// Determine migration directory based on environment
+const getMigrationDir = () => {
+  // In production Docker, migrations are in dist/database/migrations
+  // In development, they are in src/database/migrations
+  const distPath = path.join(__dirname, 'dist', 'database', 'migrations');
+  const srcPath = path.join(__dirname, 'src', 'database', 'migrations');
+
+  if (fs.existsSync(distPath)) {
+    return distPath;
+  }
+  return srcPath;
+};
 
 module.exports = {
   development: {
@@ -17,7 +32,7 @@ module.exports = {
       max: 10,
     },
     migrations: {
-      directory: './src/database/migrations',
+      directory: getMigrationDir(),
       tableName: 'chat_migrations',
     },
     seeds: {
@@ -41,7 +56,7 @@ module.exports = {
       max: 30,
     },
     migrations: {
-      directory: './src/database/migrations',
+      directory: getMigrationDir(),
       tableName: 'chat_migrations',
     },
     seeds: {
@@ -52,11 +67,11 @@ module.exports = {
   production: {
     client: 'mysql2',
     connection: {
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT || 3306,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      host: process.env.CHAT_DB_HOST || process.env.DB_HOST,
+      port: process.env.CHAT_DB_PORT || process.env.DB_PORT || 3306,
+      user: process.env.CHAT_DB_USER || process.env.DB_USER,
+      password: process.env.CHAT_DB_PASSWORD || process.env.DB_PASSWORD,
+      database: process.env.CHAT_DB_NAME || 'gatrix_chat',
       charset: 'utf8mb4',
       timezone: 'UTC',
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
@@ -72,7 +87,7 @@ module.exports = {
       createRetryIntervalMillis: 100,
     },
     migrations: {
-      directory: './src/database/migrations',
+      directory: getMigrationDir(),
       tableName: 'chat_migrations',
     },
     seeds: {

@@ -1,0 +1,272 @@
+{
+  ":InvestSeason": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "nameFormatTexts": [
+        "text"
+      ],
+      "seasonNumber": "number",
+      "seasonName": "text",
+      "numberImage": "string",
+      "startFX": "string",
+      "startSE": "number",
+      "startFxJobType": "number",
+      "investItems": [
+        {
+          "Id": "number",
+          "Value": "number",
+          "Description": "text"
+        },
+        {
+          "Id": "number",
+          "Value": "number",
+          "Description": "text"
+        },
+        {
+          "Id": "number",
+          "Value": "number",
+          "Description": "text"
+        }
+      ],
+      "seasonRewardItemId": [
+        "number",
+        "number",
+        "number"
+      ],
+      "investRewardItemId": "number",
+      "viewRankingReward": "bool",
+      "rankingRewardGroup": "number",
+      "nationRankingRewardGroup": [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number"
+      ],
+      "titleImage": "string",
+      "BGImage": "string"
+    },
+    ":required": {
+      "name": 1,
+      "seasonNumber": 1,
+      "investItems": [
+        {
+          "Id": 1,
+          "Value": 1,
+          "Description": 1
+        }
+      ],
+      "viewRankingReward": 1,
+      "rankingRewardGroup": 1,
+      "nationRankingRewardGroup": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    ":requiredInObject": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":asset": {},
+    ":links": {
+      "startSE": [
+        "SoundEvent"
+      ],
+      "investItems": [
+        {
+          "Id": [
+            "Item"
+          ]
+        },
+        {
+          "Id": [
+            "Item"
+          ]
+        },
+        {
+          "Id": [
+            "Item"
+          ]
+        }
+      ],
+      "seasonRewardItemId": [
+        [
+          "Point",
+          "Item"
+        ],
+        [
+          "Point",
+          "Item"
+        ],
+        [
+          "Point",
+          "Item"
+        ]
+      ],
+      "investRewardItemId": [
+        "Point",
+        "Item"
+      ]
+    }
+  },
+  "InvestSeason": {
+    "100070001": {
+      "id": 100070001,
+      "name": "투자 시즌 {0}",
+      "nameFormatTexts": [
+        "1"
+      ],
+      "seasonNumber": 1,
+      "seasonName": "황금의 시대",
+      "numberImage": "WT_SeasonStartNum_1_Sprite",
+      "startFX": "WBP_BaseSeasonStartIntro_S03",
+      "startSE": 96000918,
+      "startFxJobType": 3,
+      "investItems": [
+        {
+          "Id": 23401003,
+          "Value": 1000000,
+          "Description": "육지 탐험, 전투 보상, 거래 점수 보상에서 주로 획득합니다."
+        },
+        {
+          "Id": 23401004,
+          "Value": 100000000,
+          "Description": "순위 보상, 이벤트 보상, 투자 상자에서 낮은 확률로 획득할 수 있습니다."
+        },
+        {
+          "Id": 23401005,
+          "Value": 1000000000,
+          "Description": "순위 보상, 이벤트 보상, 투자 상자에서 매우 낮은 확률로 획득할 수 있습니다."
+        }
+      ],
+      "seasonRewardItemId": [
+        100003,
+        23710168,
+        23401006
+      ],
+      "investRewardItemId": 23401006,
+      "viewRankingReward": true,
+      "rankingRewardGroup": 1000,
+      "nationRankingRewardGroup": [
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006,
+        1007,
+        1008
+      ]
+    },
+    "100070002": {
+      "id": 100070002,
+      "name": "투자 시즌 {0}",
+      "nameFormatTexts": [
+        "2"
+      ],
+      "seasonNumber": 2,
+      "seasonName": "인도양의 패자",
+      "numberImage": "WT_SeasonStartNum_2_Sprite",
+      "startFX": "WBP_BaseSeasonStartIntro_S02",
+      "startSE": 96000915,
+      "startFxJobType": 3,
+      "investItems": [
+        {
+          "Id": 23401007,
+          "Value": 1000000,
+          "Description": "육지 탐험, 전투 보상, 거래 점수 보상에서 주로 획득합니다."
+        },
+        {
+          "Id": 23401008,
+          "Value": 100000000,
+          "Description": "순위 보상, 이벤트 보상, 투자 상자에서 낮은 확률로 획득할 수 있습니다."
+        },
+        {
+          "Id": 23401009,
+          "Value": 1000000000,
+          "Description": "순위 보상, 이벤트 보상, 투자 상자에서 매우 낮은 확률로 획득할 수 있습니다."
+        }
+      ],
+      "seasonRewardItemId": [
+        100003,
+        23710175,
+        23401010
+      ],
+      "investRewardItemId": 23401010,
+      "viewRankingReward": false,
+      "rankingRewardGroup": 1000,
+      "nationRankingRewardGroup": [
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006,
+        1007,
+        1008
+      ],
+      "titleImage": "WT_InfoHeadTitle_Season02_Sprite",
+      "BGImage": "WT_InfoHeadBG_Season3_Sprite"
+    },
+    "100070003": {
+      "id": 100070003,
+      "name": "투자 시즌 {0}",
+      "nameFormatTexts": [
+        "3"
+      ],
+      "seasonNumber": 3,
+      "seasonName": "황금의 시대",
+      "numberImage": "WT_SeasonStartNum_3_Sprite",
+      "startFX": "WBP_BaseSeasonStartIntro_S03",
+      "startSE": 96000918,
+      "startFxJobType": 3,
+      "investItems": [
+        {
+          "Id": 23401011,
+          "Value": 1000000,
+          "Description": "육지 탐험, 전투 보상, 거래 점수 보상에서 주로 획득합니다."
+        },
+        {
+          "Id": 23401012,
+          "Value": 100000000,
+          "Description": "순위 보상, 이벤트 보상, 투자 상자에서 낮은 확률로 획득할 수 있습니다."
+        },
+        {
+          "Id": 23401013,
+          "Value": 1000000000,
+          "Description": "순위 보상, 이벤트 보상, 투자 상자에서 매우 낮은 확률로 획득할 수 있습니다."
+        }
+      ],
+      "seasonRewardItemId": [
+        100003,
+        23810004,
+        23401014
+      ],
+      "investRewardItemId": 23401014,
+      "viewRankingReward": false,
+      "rankingRewardGroup": 1000,
+      "nationRankingRewardGroup": [
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006,
+        1007,
+        1008
+      ],
+      "titleImage": "WT_InfoHeadTitle_Season3_Sprite",
+      "BGImage": "WT_InfoHeadBG_Season3_Sprite"
+    }
+  }
+}

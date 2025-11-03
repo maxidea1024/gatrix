@@ -1,0 +1,5276 @@
+{
+  ":GuildSynthesis": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "groupId": "number",
+      "isAllType": "bool",
+      "type": "number",
+      "synthesisPointId": "number",
+      "synthesisPointVal": "number",
+      "materialGrade": "number",
+      "materialVal": "number",
+      "criticalRewardId": "number",
+      "normalRewardId": "number",
+      "spacialMaterial": [
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        }
+      ],
+      "spacialMaterialCashShopId0": "number",
+      "spacialMaterialCashShopId1": "number",
+      "desc": "text",
+      "descFormatTexts": [
+        "text",
+        "text"
+      ],
+      "synthesisTimeSec": "number",
+      "mainItems": [
+        {
+          "Type": "number",
+          "Id": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number"
+        }
+      ],
+      "synthesisCritical": "number",
+      "synthesisGuildPoint": "number"
+    },
+    ":required": {
+      "materialGrade": 1,
+      "desc": 1,
+      "synthesisTimeSec": 1
+    },
+    ":requiredInObject": {},
+    ":min": {
+      "type": 0,
+      "synthesisPointId": 100000,
+      "materialGrade": 0,
+      "criticalRewardId": 90000000,
+      "normalRewardId": 90000000,
+      "spacialMaterial": [
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        }
+      ]
+    },
+    ":max": {
+      "type": 999,
+      "synthesisPointId": 199999,
+      "materialGrade": 8,
+      "criticalRewardId": 90999999,
+      "normalRewardId": 90999999,
+      "spacialMaterial": [
+        {
+          "Value": 99
+        },
+        {
+          "Value": 99
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "synthesisPointId": [
+        "Point"
+      ],
+      "criticalRewardId": [
+        "Reward"
+      ],
+      "normalRewardId": [
+        "Reward"
+      ],
+      "spacialMaterial": [
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        },
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        }
+      ],
+      "spacialMaterialCashShopId0": [
+        "CashShop"
+      ],
+      "spacialMaterialCashShopId1": [
+        "CashShop"
+      ],
+      "mainItems": [
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        },
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        },
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        },
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        },
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        },
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        },
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        },
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        },
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        },
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        },
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "ShipSlot"
+          ]
+        }
+      ]
+    }
+  },
+  "GuildSynthesis": {
+    "5000": {
+      "id": 5000,
+      "name": "모든 부품",
+      "groupId": 0,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 3,
+      "materialVal": 10,
+      "criticalRewardId": 90038001,
+      "normalRewardId": 90038001,
+      "desc": "A급 부품을 획득합니다.",
+      "synthesisTimeSec": 21600,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 250
+    },
+    "5001": {
+      "id": 5001,
+      "name": "모든 장비",
+      "groupId": 1,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 3,
+      "materialVal": 10,
+      "criticalRewardId": 90038003,
+      "normalRewardId": 90038003,
+      "desc": "A급 장비을 획득합니다.",
+      "synthesisTimeSec": 21600,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 250
+    },
+    "5002": {
+      "id": 5002,
+      "name": "모든 부품",
+      "groupId": 2,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90038001,
+      "normalRewardId": 90038001,
+      "desc": "A급 부품을 획득합니다.",
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 100
+    },
+    "5003": {
+      "id": 5003,
+      "name": "모든 장비",
+      "groupId": 3,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90038003,
+      "normalRewardId": 90038003,
+      "desc": "A급 장비을 획득합니다.",
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 100
+    },
+    "5004": {
+      "id": 5004,
+      "name": "모든 부품",
+      "groupId": 4,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 4,
+      "materialVal": 10,
+      "criticalRewardId": 90038000,
+      "normalRewardId": 90038000,
+      "desc": "S급 부품을 획득합니다.",
+      "synthesisTimeSec": 86400,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5005": {
+      "id": 5005,
+      "name": "모든 장비",
+      "groupId": 5,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 4,
+      "materialVal": 10,
+      "criticalRewardId": 90038002,
+      "normalRewardId": 90038002,
+      "desc": "S급 장비을 획득합니다.",
+      "synthesisTimeSec": 86400,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5006": {
+      "id": 5006,
+      "name": "모든 부품",
+      "groupId": 6,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90038000,
+      "normalRewardId": 90038000,
+      "desc": "S급 부품을 획득합니다.",
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5007": {
+      "id": 5007,
+      "name": "모든 장비",
+      "groupId": 7,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90038002,
+      "normalRewardId": 90038002,
+      "desc": "S급 장비을 획득합니다.",
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5008": {
+      "id": 5008,
+      "name": "대포",
+      "groupId": 2,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120823,
+      "normalRewardId": 90120823,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 부품",
+        "대포"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5009": {
+      "id": 5009,
+      "name": "돛",
+      "groupId": 2,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120824,
+      "normalRewardId": 90120824,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 부품",
+        "돛"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5010": {
+      "id": 5010,
+      "name": "장갑",
+      "groupId": 2,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120825,
+      "normalRewardId": 90120825,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 부품",
+        "장갑"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5011": {
+      "id": 5011,
+      "name": "닻",
+      "groupId": 2,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120826,
+      "normalRewardId": 90120826,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 부품",
+        "닻"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5012": {
+      "id": 5012,
+      "name": "전투 충각",
+      "groupId": 2,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120827,
+      "normalRewardId": 90120827,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 부품",
+        "전투 충각"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5013": {
+      "id": 5013,
+      "name": "항해 충각",
+      "groupId": 2,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120828,
+      "normalRewardId": 90120828,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 부품",
+        "항해 충각"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5014": {
+      "id": 5014,
+      "name": "전투 선수상",
+      "groupId": 2,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120829,
+      "normalRewardId": 90120829,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 부품",
+        "전투 선수상"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5015": {
+      "id": 5015,
+      "name": "항해 선수상",
+      "groupId": 2,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120830,
+      "normalRewardId": 90120830,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 부품",
+        "항해 선수상"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5016": {
+      "id": 5016,
+      "name": "무기",
+      "groupId": 3,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120831,
+      "normalRewardId": 90120831,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 장비",
+        "무기"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5017": {
+      "id": 5017,
+      "name": "머리 장비",
+      "groupId": 3,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120832,
+      "normalRewardId": 90120832,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 장비",
+        "머리 장비"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5018": {
+      "id": 5018,
+      "name": "몸 장비",
+      "groupId": 3,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120833,
+      "normalRewardId": 90120833,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 장비",
+        "몸 장비"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5019": {
+      "id": 5019,
+      "name": "망토",
+      "groupId": 3,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120834,
+      "normalRewardId": 90120834,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 장비",
+        "망토"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5020": {
+      "id": 5020,
+      "name": "장신구",
+      "groupId": 3,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120835,
+      "normalRewardId": 90120835,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 장비",
+        "장신구"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5021": {
+      "id": 5021,
+      "name": "얼굴 장식",
+      "groupId": 3,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 30000000,
+      "materialGrade": 4,
+      "materialVal": 6,
+      "criticalRewardId": 90120836,
+      "normalRewardId": 90120836,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 A등급 장비",
+        "얼굴 장식"
+      ],
+      "synthesisTimeSec": 10800,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5022": {
+      "id": 5022,
+      "name": "대포",
+      "groupId": 6,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120837,
+      "normalRewardId": 90120837,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 부품",
+        "대포"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5023": {
+      "id": 5023,
+      "name": "돛",
+      "groupId": 6,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120838,
+      "normalRewardId": 90120838,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 부품",
+        "돛"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5024": {
+      "id": 5024,
+      "name": "장갑",
+      "groupId": 6,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120839,
+      "normalRewardId": 90120839,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 부품",
+        "장갑"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5025": {
+      "id": 5025,
+      "name": "닻",
+      "groupId": 6,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120840,
+      "normalRewardId": 90120840,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 부품",
+        "닻"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5026": {
+      "id": 5026,
+      "name": "전투 충각",
+      "groupId": 6,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120841,
+      "normalRewardId": 90120841,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 부품",
+        "전투 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5027": {
+      "id": 5027,
+      "name": "항해 충각",
+      "groupId": 6,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120842,
+      "normalRewardId": 90120842,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 부품",
+        "항해 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5028": {
+      "id": 5028,
+      "name": "전투 선수상",
+      "groupId": 6,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120843,
+      "normalRewardId": 90120843,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 부품",
+        "전투 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5029": {
+      "id": 5029,
+      "name": "항해 선수상",
+      "groupId": 6,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120844,
+      "normalRewardId": 90120844,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 부품",
+        "항해 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5030": {
+      "id": 5030,
+      "name": "무기",
+      "groupId": 7,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120845,
+      "normalRewardId": 90120845,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 장비",
+        "무기"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5031": {
+      "id": 5031,
+      "name": "머리 장비",
+      "groupId": 7,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120846,
+      "normalRewardId": 90120846,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 장비",
+        "머리 장비"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5032": {
+      "id": 5032,
+      "name": "몸 장비",
+      "groupId": 7,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120847,
+      "normalRewardId": 90120847,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 장비",
+        "몸 장비"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5033": {
+      "id": 5033,
+      "name": "장신구",
+      "groupId": 7,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120848,
+      "normalRewardId": 90120848,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "지정된 S등급 장비",
+        "장신구"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5034": {
+      "id": 5034,
+      "name": "장비 세트",
+      "groupId": 999998,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120849,
+      "normalRewardId": 90120849,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "창세기전 장비 세트"
+      ],
+      "synthesisTimeSec": 86400,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5035": {
+      "id": 5035,
+      "name": "무기 세트",
+      "groupId": 300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120850,
+      "normalRewardId": 90120850,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창세기전 장비 세트",
+        "무기 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476040
+        },
+        {
+          "Type": 1,
+          "Id": 22164527
+        },
+        {
+          "Type": 1,
+          "Id": 22476042
+        },
+        {
+          "Type": 1,
+          "Id": 22476043
+        },
+        {
+          "Type": 1,
+          "Id": 22476041
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5036": {
+      "id": 5036,
+      "name": "크로우 세트",
+      "groupId": 300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120851,
+      "normalRewardId": 90120851,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창세기전 장비 세트",
+        "크로우 세트"
+      ],
+      "synthesisTimeSec": 86400,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476047
+        },
+        {
+          "Type": 1,
+          "Id": 22476048
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5037": {
+      "id": 5037,
+      "name": "G. S 세트",
+      "groupId": 300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120852,
+      "normalRewardId": 90120852,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창세기전 장비 세트",
+        "G. S 세트"
+      ],
+      "synthesisTimeSec": 86400,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476049
+        },
+        {
+          "Type": 1,
+          "Id": 22476050
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5038": {
+      "id": 5038,
+      "name": "사라 세트",
+      "groupId": 300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120853,
+      "normalRewardId": 90120853,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창세기전 장비 세트",
+        "사라 세트"
+      ],
+      "synthesisTimeSec": 86400,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476051
+        },
+        {
+          "Type": 1,
+          "Id": 22476052
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5039": {
+      "id": 5039,
+      "name": "칼스 세트",
+      "groupId": 300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120854,
+      "normalRewardId": 90120854,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창세기전 장비 세트",
+        "칼스 세트"
+      ],
+      "synthesisTimeSec": 86400,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476053
+        },
+        {
+          "Type": 1,
+          "Id": 22476054
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5040": {
+      "id": 5040,
+      "name": "라시드 세트",
+      "groupId": 300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120855,
+      "normalRewardId": 90120855,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창세기전 장비 세트",
+        "라시드 세트"
+      ],
+      "synthesisTimeSec": 86400,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476055
+        },
+        {
+          "Type": 1,
+          "Id": 22476056
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5041": {
+      "id": 5041,
+      "name": "하야 세트",
+      "groupId": 300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120856,
+      "normalRewardId": 90120856,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창세기전 장비 세트",
+        "하야 세트"
+      ],
+      "synthesisTimeSec": 86400,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476057
+        },
+        {
+          "Type": 1,
+          "Id": 22476064
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5042": {
+      "id": 5042,
+      "name": "로빈 세트",
+      "groupId": 300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120857,
+      "normalRewardId": 90120857,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창세기전 장비 세트",
+        "로빈 세트"
+      ],
+      "synthesisTimeSec": 86400,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476058
+        },
+        {
+          "Type": 1,
+          "Id": 22476059
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5043": {
+      "id": 5043,
+      "name": "카자 세트",
+      "groupId": 300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120858,
+      "normalRewardId": 90120858,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창세기전 장비 세트",
+        "카자 세트"
+      ],
+      "synthesisTimeSec": 86400,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476060
+        },
+        {
+          "Type": 1,
+          "Id": 22476061
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5044": {
+      "id": 5044,
+      "name": "쿤 세트",
+      "groupId": 300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120859,
+      "normalRewardId": 90120859,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 3
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창세기전 장비 세트",
+        "쿤 세트"
+      ],
+      "synthesisTimeSec": 86400,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476062
+        },
+        {
+          "Type": 1,
+          "Id": 22476065
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5045": {
+      "id": 5045,
+      "name": "부품 세트",
+      "groupId": 999999,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120860,
+      "normalRewardId": 90120860,
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 부품 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5046": {
+      "id": 5046,
+      "name": "대포",
+      "groupId": 400,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120861,
+      "normalRewardId": 90120861,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 부품 세트",
+        "대포"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101554
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5047": {
+      "id": 5047,
+      "name": "돛",
+      "groupId": 400,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120862,
+      "normalRewardId": 90120862,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 부품 세트",
+        "돛"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101555
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5048": {
+      "id": 5048,
+      "name": "장갑",
+      "groupId": 400,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120863,
+      "normalRewardId": 90120863,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 부품 세트",
+        "장갑"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101556
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5049": {
+      "id": 5049,
+      "name": "전투 충각",
+      "groupId": 400,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120864,
+      "normalRewardId": 90120864,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 부품 세트",
+        "전투 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101557
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5050": {
+      "id": 5050,
+      "name": "항해 충각",
+      "groupId": 400,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120865,
+      "normalRewardId": 90120865,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 부품 세트",
+        "항해 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101558
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5051": {
+      "id": 5051,
+      "name": "전투 선수상",
+      "groupId": 400,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120866,
+      "normalRewardId": 90120866,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 부품 세트",
+        "전투 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101559
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5052": {
+      "id": 5052,
+      "name": "항해 선수상",
+      "groupId": 400,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120867,
+      "normalRewardId": 90120867,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 부품 세트",
+        "항해 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101560
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5053": {
+      "id": 5053,
+      "name": "닻",
+      "groupId": 400,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120868,
+      "normalRewardId": 90120868,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 부품 세트",
+        "닻"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101561
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5054": {
+      "id": 5054,
+      "name": "특수 부품",
+      "groupId": 400,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120869,
+      "normalRewardId": 90120869,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 부품 세트",
+        "특수 부품"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101562
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5055": {
+      "id": 5055,
+      "name": "장비 세트",
+      "groupId": 999998,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120870,
+      "normalRewardId": 90120870,
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 장비 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5056": {
+      "id": 5056,
+      "name": "무기",
+      "groupId": 500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120871,
+      "normalRewardId": 90120871,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 장비 세트",
+        "무기"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22155009
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5057": {
+      "id": 5057,
+      "name": "머리 장비",
+      "groupId": 500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120872,
+      "normalRewardId": 90120872,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 장비 세트",
+        "머리"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22346039
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5058": {
+      "id": 5058,
+      "name": "몸 장비",
+      "groupId": 500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120873,
+      "normalRewardId": 90120873,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 장비 세트",
+        "몸"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22246039
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5059": {
+      "id": 5059,
+      "name": "장신구",
+      "groupId": 500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120874,
+      "normalRewardId": 90120874,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "구름 사제 장비 세트",
+        "장신구"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476031
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5060": {
+      "id": 5060,
+      "name": "부품 세트",
+      "groupId": 999999,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120958,
+      "normalRewardId": 90120958,
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "신록 부품 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5061": {
+      "id": 5061,
+      "name": "대포",
+      "groupId": 600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120959,
+      "normalRewardId": 90120959,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 부품 세트",
+        "대포"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101577
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5062": {
+      "id": 5062,
+      "name": "돛",
+      "groupId": 600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120960,
+      "normalRewardId": 90120960,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 부품 세트",
+        "돛"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101578
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5063": {
+      "id": 5063,
+      "name": "장갑",
+      "groupId": 600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120961,
+      "normalRewardId": 90120961,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 부품 세트",
+        "장갑"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101579
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5064": {
+      "id": 5064,
+      "name": "전투 충각",
+      "groupId": 600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120962,
+      "normalRewardId": 90120962,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 부품 세트",
+        "전투 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101580
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5065": {
+      "id": 5065,
+      "name": "항해 충각",
+      "groupId": 600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120963,
+      "normalRewardId": 90120963,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 부품 세트",
+        "항해 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101581
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5066": {
+      "id": 5066,
+      "name": "전투 선수상",
+      "groupId": 600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120964,
+      "normalRewardId": 90120964,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 부품 세트",
+        "전투 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101582
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5067": {
+      "id": 5067,
+      "name": "항해 선수상",
+      "groupId": 600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120965,
+      "normalRewardId": 90120965,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 부품 세트",
+        "항해 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101583
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5068": {
+      "id": 5068,
+      "name": "닻",
+      "groupId": 600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120966,
+      "normalRewardId": 90120966,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 부품 세트",
+        "닻"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101584
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5069": {
+      "id": 5069,
+      "name": "특수 부품",
+      "groupId": 600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120967,
+      "normalRewardId": 90120967,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 부품 세트",
+        "특수 부품"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101585
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5070": {
+      "id": 5070,
+      "name": "장비 세트",
+      "groupId": 999998,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120968,
+      "normalRewardId": 90120968,
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "신록 장비 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5071": {
+      "id": 5071,
+      "name": "무기",
+      "groupId": 700,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120969,
+      "normalRewardId": 90120969,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 장비 세트",
+        "무기"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476075
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5072": {
+      "id": 5072,
+      "name": "머리",
+      "groupId": 700,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120970,
+      "normalRewardId": 90120970,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 장비 세트",
+        "머리"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476076
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5073": {
+      "id": 5073,
+      "name": "몸",
+      "groupId": 700,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120971,
+      "normalRewardId": 90120971,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 장비 세트",
+        "몸"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476077
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5074": {
+      "id": 5074,
+      "name": "장신구",
+      "groupId": 700,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90120972,
+      "normalRewardId": 90120972,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "신록 장비 세트",
+        "장신구"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476078
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5075": {
+      "id": 5075,
+      "name": "부품 세트",
+      "groupId": 999999,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121095,
+      "normalRewardId": 90121095,
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 부품 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5076": {
+      "id": 5076,
+      "name": "대포",
+      "groupId": 800,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121096,
+      "normalRewardId": 90121096,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 부품 세트",
+        "대포"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101600
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5077": {
+      "id": 5077,
+      "name": "돛",
+      "groupId": 800,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121097,
+      "normalRewardId": 90121097,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 부품 세트",
+        "돛"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101601
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5078": {
+      "id": 5078,
+      "name": "장갑",
+      "groupId": 800,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121098,
+      "normalRewardId": 90121098,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 부품 세트",
+        "장갑"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101602
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5079": {
+      "id": 5079,
+      "name": "전투 충각",
+      "groupId": 800,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121099,
+      "normalRewardId": 90121099,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 부품 세트",
+        "전투 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101603
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5080": {
+      "id": 5080,
+      "name": "항해 충각",
+      "groupId": 800,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121100,
+      "normalRewardId": 90121100,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 부품 세트",
+        "항해 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101604
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5081": {
+      "id": 5081,
+      "name": "전투 선수상",
+      "groupId": 800,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121101,
+      "normalRewardId": 90121101,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 부품 세트",
+        "전투 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101605
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5082": {
+      "id": 5082,
+      "name": "항해 선수상",
+      "groupId": 800,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121102,
+      "normalRewardId": 90121102,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 부품 세트",
+        "항해 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101606
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5083": {
+      "id": 5083,
+      "name": "닻",
+      "groupId": 800,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121103,
+      "normalRewardId": 90121103,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 부품 세트",
+        "닻"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101607
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5084": {
+      "id": 5084,
+      "name": "특수 부품",
+      "groupId": 800,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121104,
+      "normalRewardId": 90121104,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 부품 세트",
+        "특수 부품"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101608
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5085": {
+      "id": 5085,
+      "name": "장비 세트",
+      "groupId": 999998,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121105,
+      "normalRewardId": 90121105,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 장비 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5086": {
+      "id": 5086,
+      "name": "무기",
+      "groupId": 900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121106,
+      "normalRewardId": 90121106,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 장비 세트",
+        "무기"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264940
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5087": {
+      "id": 5087,
+      "name": "머리",
+      "groupId": 900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121107,
+      "normalRewardId": 90121107,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 장비 세트",
+        "머리"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264941
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5088": {
+      "id": 5088,
+      "name": "몸",
+      "groupId": 900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121108,
+      "normalRewardId": 90121108,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 장비 세트",
+        "몸"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264942
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5089": {
+      "id": 5089,
+      "name": "장신구",
+      "groupId": 900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121109,
+      "normalRewardId": 90121109,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "황금향 장비 세트",
+        "장신구"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264943
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5090": {
+      "id": 5090,
+      "name": "의상 세트",
+      "groupId": 1000,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 300,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121182,
+      "normalRewardId": 90121182,
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "파티 의상 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5091": {
+      "id": 5091,
+      "name": "부품 세트",
+      "groupId": 999999,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121223,
+      "normalRewardId": 90121223,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 2
+        }
+      ],
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "창공 부품 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5092": {
+      "id": 5092,
+      "name": "대포",
+      "groupId": 1100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121224,
+      "normalRewardId": 90121224,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 부품 세트",
+        "대포"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101621
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5093": {
+      "id": 5093,
+      "name": "돛",
+      "groupId": 1100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121225,
+      "normalRewardId": 90121225,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 부품 세트",
+        "돛"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101622
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5094": {
+      "id": 5094,
+      "name": "장갑",
+      "groupId": 1100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121226,
+      "normalRewardId": 90121226,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 부품 세트",
+        "장갑"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101623
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5095": {
+      "id": 5095,
+      "name": "전투 충각",
+      "groupId": 1100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121227,
+      "normalRewardId": 90121227,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 부품 세트",
+        "전투 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101624
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5096": {
+      "id": 5096,
+      "name": "항해 충각",
+      "groupId": 1100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121228,
+      "normalRewardId": 90121228,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 부품 세트",
+        "항해 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101625
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5097": {
+      "id": 5097,
+      "name": "전투 선수상",
+      "groupId": 1100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121229,
+      "normalRewardId": 90121229,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 부품 세트",
+        "전투 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101626
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5098": {
+      "id": 5098,
+      "name": "항해 선수상",
+      "groupId": 1100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121230,
+      "normalRewardId": 90121230,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 부품 세트",
+        "항해 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101627
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5099": {
+      "id": 5099,
+      "name": "닻",
+      "groupId": 1100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121231,
+      "normalRewardId": 90121231,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 부품 세트",
+        "닻"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101628
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5100": {
+      "id": 5100,
+      "name": "특수 부품",
+      "groupId": 1100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121232,
+      "normalRewardId": 90121232,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 부품 세트",
+        "특수 부품"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101629
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5101": {
+      "id": 5101,
+      "name": "장비 세트",
+      "groupId": 999998,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121233,
+      "normalRewardId": 90121233,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "창공 장비 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5102": {
+      "id": 5102,
+      "name": "무기",
+      "groupId": 1200,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121234,
+      "normalRewardId": 90121234,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 장비 세트",
+        "무기"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264977
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5103": {
+      "id": 5103,
+      "name": "머리",
+      "groupId": 1200,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121235,
+      "normalRewardId": 90121235,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 장비 세트",
+        "머리"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264978
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5104": {
+      "id": 5104,
+      "name": "몸",
+      "groupId": 1200,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121236,
+      "normalRewardId": 90121236,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 장비 세트",
+        "몸"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264979
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5105": {
+      "id": 5105,
+      "name": "장신구",
+      "groupId": 1200,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121237,
+      "normalRewardId": 90121237,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "창공 장비 세트",
+        "장신구"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264980
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5106": {
+      "id": 5106,
+      "name": "부품 세트",
+      "groupId": 1300,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 3,
+      "materialVal": 20,
+      "criticalRewardId": 90121328,
+      "normalRewardId": 90121328,
+      "desc": "A급 부품을 획득합니다.",
+      "synthesisTimeSec": 10,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5107": {
+      "id": 5107,
+      "name": "장비 세트",
+      "groupId": 1400,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 3,
+      "materialVal": 20,
+      "criticalRewardId": 90121329,
+      "normalRewardId": 90121329,
+      "desc": "A급 장비을 획득합니다.",
+      "synthesisTimeSec": 10,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5108": {
+      "id": 5108,
+      "name": "부품 세트",
+      "groupId": 1500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 4,
+      "materialVal": 20,
+      "criticalRewardId": 90121330,
+      "normalRewardId": 90121330,
+      "desc": "S급 부품을 획득합니다.",
+      "synthesisTimeSec": 10,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5109": {
+      "id": 5109,
+      "name": "장비 세트",
+      "groupId": 1600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 4,
+      "materialVal": 20,
+      "criticalRewardId": 90121331,
+      "normalRewardId": 90121331,
+      "desc": "S급 장비을 획득합니다.",
+      "synthesisTimeSec": 10,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5124": {
+      "id": 5124,
+      "name": "부품 세트",
+      "groupId": 999999,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121333,
+      "normalRewardId": 90121333,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 2
+        }
+      ],
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "은하 부품 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5125": {
+      "id": 5125,
+      "name": "대포",
+      "groupId": 1900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121334,
+      "normalRewardId": 90121334,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 부품 세트",
+        "대포"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101662
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5126": {
+      "id": 5126,
+      "name": "돛",
+      "groupId": 1900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121335,
+      "normalRewardId": 90121335,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 부품 세트",
+        "돛"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101663
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5127": {
+      "id": 5127,
+      "name": "장갑",
+      "groupId": 1900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121336,
+      "normalRewardId": 90121336,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 부품 세트",
+        "장갑"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101664
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5128": {
+      "id": 5128,
+      "name": "전투 충각",
+      "groupId": 1900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121337,
+      "normalRewardId": 90121337,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 부품 세트",
+        "전투 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101665
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5129": {
+      "id": 5129,
+      "name": "항해 충각",
+      "groupId": 1900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121338,
+      "normalRewardId": 90121338,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 부품 세트",
+        "항해 충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101666
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5130": {
+      "id": 5130,
+      "name": "전투 선수상",
+      "groupId": 1900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121339,
+      "normalRewardId": 90121339,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 부품 세트",
+        "전투 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101667
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5131": {
+      "id": 5131,
+      "name": "항해 선수상",
+      "groupId": 1900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121340,
+      "normalRewardId": 90121340,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 부품 세트",
+        "항해 선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101668
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5132": {
+      "id": 5132,
+      "name": "닻",
+      "groupId": 1900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121341,
+      "normalRewardId": 90121341,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 부품 세트",
+        "닻"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101669
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5133": {
+      "id": 5133,
+      "name": "특수 부품",
+      "groupId": 1900,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121342,
+      "normalRewardId": 90121342,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 부품 세트",
+        "특수 부품"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101670
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5134": {
+      "id": 5134,
+      "name": "장비 세트",
+      "groupId": 999998,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121343,
+      "normalRewardId": 90121343,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 하나를 확률적으로 획득합니다.",
+      "descFormatTexts": [
+        "은하 장비 세트"
+      ],
+      "synthesisTimeSec": 43200,
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5135": {
+      "id": 5135,
+      "name": "무기",
+      "groupId": 2000,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121344,
+      "normalRewardId": 90121344,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 장비 세트",
+        "무기"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264992
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5136": {
+      "id": 5136,
+      "name": "머리",
+      "groupId": 2000,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121345,
+      "normalRewardId": 90121345,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 장비 세트",
+        "머리"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264993
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5137": {
+      "id": 5137,
+      "name": "몸",
+      "groupId": 2000,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121346,
+      "normalRewardId": 90121346,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 장비 세트",
+        "몸"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264994
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5138": {
+      "id": 5138,
+      "name": "장신구",
+      "groupId": 2000,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121347,
+      "normalRewardId": 90121347,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "은하 장비 세트",
+        "장신구"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22264995
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5139": {
+      "id": 5139,
+      "name": "대포",
+      "groupId": 2100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121557,
+      "normalRewardId": 90121557,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "영옥 부품 세트",
+        "대포"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101690
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5140": {
+      "id": 5140,
+      "name": "돛",
+      "groupId": 2100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121558,
+      "normalRewardId": 90121558,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "영옥 부품 세트",
+        "돛"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101691
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5141": {
+      "id": 5141,
+      "name": "장갑",
+      "groupId": 2100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121559,
+      "normalRewardId": 90121559,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "영옥 부품 세트",
+        "장갑"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101692
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5142": {
+      "id": 5142,
+      "name": "충각",
+      "groupId": 2100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121560,
+      "normalRewardId": 90121560,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "영옥 부품 세트",
+        "충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101693
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5143": {
+      "id": 5143,
+      "name": "선수상",
+      "groupId": 2100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121561,
+      "normalRewardId": 90121561,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "영옥 부품 세트",
+        "선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101694
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5144": {
+      "id": 5144,
+      "name": "닻",
+      "groupId": 2100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121562,
+      "normalRewardId": 90121562,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "영옥 부품 세트",
+        "닻"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101695
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5145": {
+      "id": 5145,
+      "name": "특수 부품",
+      "groupId": 2100,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 500,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121563,
+      "normalRewardId": 90121563,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "영옥 부품 세트",
+        "특수 부품"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101696
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5146": {
+      "id": 5146,
+      "name": "무기",
+      "groupId": 2200,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121564,
+      "normalRewardId": 90121564,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "영옥 장비 세트",
+        "무기"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22265125
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5147": {
+      "id": 5147,
+      "name": "머리",
+      "groupId": 2200,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121565,
+      "normalRewardId": 90121565,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "영옥 장비 세트",
+        "머리"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22265126
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5148": {
+      "id": 5148,
+      "name": "몸",
+      "groupId": 2200,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121566,
+      "normalRewardId": 90121566,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "영옥 장비 세트",
+        "몸"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22265127
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5149": {
+      "id": 5149,
+      "name": "장신구",
+      "groupId": 2200,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 50,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121567,
+      "normalRewardId": 90121567,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "영옥 장비 세트",
+        "장신구"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22265128
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5150": {
+      "id": 5150,
+      "name": "대포",
+      "groupId": 2300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121800,
+      "normalRewardId": 90121800,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "광륜 부품 세트",
+        "대포"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101727
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5151": {
+      "id": 5151,
+      "name": "돛",
+      "groupId": 2300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121801,
+      "normalRewardId": 90121801,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "광륜 부품 세트",
+        "돛"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101728
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5152": {
+      "id": 5152,
+      "name": "장갑",
+      "groupId": 2300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121802,
+      "normalRewardId": 90121802,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "광륜 부품 세트",
+        "장갑"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101729
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5153": {
+      "id": 5153,
+      "name": "충각",
+      "groupId": 2300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121803,
+      "normalRewardId": 90121803,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "광륜 부품 세트",
+        "충각"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101730
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5154": {
+      "id": 5154,
+      "name": "선수상",
+      "groupId": 2300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121804,
+      "normalRewardId": 90121804,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "광륜 부품 세트",
+        "선수상"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101731
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5155": {
+      "id": 5155,
+      "name": "닻",
+      "groupId": 2300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121805,
+      "normalRewardId": 90121805,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "광륜 부품 세트",
+        "닻"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101732
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5156": {
+      "id": 5156,
+      "name": "특수 부품",
+      "groupId": 2300,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121806,
+      "normalRewardId": 90121806,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 4
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "광륜 부품 세트",
+        "특수 부품"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101733
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5157": {
+      "id": 5157,
+      "name": "무기",
+      "groupId": 2400,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121807,
+      "normalRewardId": 90121807,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "광륜 장비 세트",
+        "무기"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22265171
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5158": {
+      "id": 5158,
+      "name": "머리",
+      "groupId": 2400,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121808,
+      "normalRewardId": 90121808,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "광륜 장비 세트",
+        "머리"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22265172
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5159": {
+      "id": 5159,
+      "name": "몸",
+      "groupId": 2400,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121809,
+      "normalRewardId": 90121809,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "광륜 장비 세트",
+        "몸"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22265173
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5160": {
+      "id": 5160,
+      "name": "장신구",
+      "groupId": 2400,
+      "isAllType": true,
+      "synthesisPointId": 100001,
+      "synthesisPointVal": 100000000,
+      "materialGrade": 5,
+      "materialVal": 6,
+      "criticalRewardId": 90121810,
+      "normalRewardId": 90121810,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 6
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 높은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "광륜 장비 세트",
+        "장신구"
+      ],
+      "synthesisTimeSec": 43200,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22265174
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5161": {
+      "id": 5161,
+      "name": "대포",
+      "groupId": 2500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 1000,
+      "materialGrade": 5,
+      "materialVal": 10,
+      "criticalRewardId": 90121811,
+      "normalRewardId": 90121811,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "S 등급 대포",
+        "특수 합성 대포"
+      ],
+      "synthesisTimeSec": 10,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101554
+        },
+        {
+          "Type": 2,
+          "Id": 70101577
+        },
+        {
+          "Type": 2,
+          "Id": 70101600
+        },
+        {
+          "Type": 2,
+          "Id": 70101621
+        },
+        {
+          "Type": 2,
+          "Id": 70101662
+        },
+        {
+          "Type": 2,
+          "Id": 70101690
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5162": {
+      "id": 5162,
+      "name": "돛",
+      "groupId": 2500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 1000,
+      "materialGrade": 5,
+      "materialVal": 10,
+      "criticalRewardId": 90121812,
+      "normalRewardId": 90121812,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "S 등급 돛",
+        "특수 합성 돛"
+      ],
+      "synthesisTimeSec": 10,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101555
+        },
+        {
+          "Type": 2,
+          "Id": 70101578
+        },
+        {
+          "Type": 2,
+          "Id": 70101601
+        },
+        {
+          "Type": 2,
+          "Id": 70101622
+        },
+        {
+          "Type": 2,
+          "Id": 70101663
+        },
+        {
+          "Type": 2,
+          "Id": 70101691
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5163": {
+      "id": 5163,
+      "name": "장갑",
+      "groupId": 2500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 1000,
+      "materialGrade": 5,
+      "materialVal": 10,
+      "criticalRewardId": 90121813,
+      "normalRewardId": 90121813,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "S 등급 장갑",
+        "특수 합성 장갑"
+      ],
+      "synthesisTimeSec": 10,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101556
+        },
+        {
+          "Type": 2,
+          "Id": 70101579
+        },
+        {
+          "Type": 2,
+          "Id": 70101602
+        },
+        {
+          "Type": 2,
+          "Id": 70101623
+        },
+        {
+          "Type": 2,
+          "Id": 70101664
+        },
+        {
+          "Type": 2,
+          "Id": 70101692
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5164": {
+      "id": 5164,
+      "name": "충각",
+      "groupId": 2500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 1000,
+      "materialGrade": 5,
+      "materialVal": 10,
+      "criticalRewardId": 90121814,
+      "normalRewardId": 90121814,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "S 등급 충각",
+        "특수 합성 충각"
+      ],
+      "synthesisTimeSec": 10,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101558
+        },
+        {
+          "Type": 2,
+          "Id": 70101557
+        },
+        {
+          "Type": 2,
+          "Id": 70101581
+        },
+        {
+          "Type": 2,
+          "Id": 70101580
+        },
+        {
+          "Type": 2,
+          "Id": 70101604
+        },
+        {
+          "Type": 2,
+          "Id": 70101603
+        },
+        {
+          "Type": 2,
+          "Id": 70101625
+        },
+        {
+          "Type": 2,
+          "Id": 70101624
+        },
+        {
+          "Type": 2,
+          "Id": 70101666
+        },
+        {
+          "Type": 2,
+          "Id": 70101665
+        },
+        {
+          "Type": 2,
+          "Id": 70101693
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5165": {
+      "id": 5165,
+      "name": "선수상",
+      "groupId": 2500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 1000,
+      "materialGrade": 5,
+      "materialVal": 10,
+      "criticalRewardId": 90121815,
+      "normalRewardId": 90121815,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "S 등급 선수상",
+        "특수 합성 선수상"
+      ],
+      "synthesisTimeSec": 10,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101560
+        },
+        {
+          "Type": 2,
+          "Id": 70101559
+        },
+        {
+          "Type": 2,
+          "Id": 70101583
+        },
+        {
+          "Type": 2,
+          "Id": 70101582
+        },
+        {
+          "Type": 2,
+          "Id": 70101606
+        },
+        {
+          "Type": 2,
+          "Id": 70101605
+        },
+        {
+          "Type": 2,
+          "Id": 70101627
+        },
+        {
+          "Type": 2,
+          "Id": 70101626
+        },
+        {
+          "Type": 2,
+          "Id": 70101668
+        },
+        {
+          "Type": 2,
+          "Id": 70101667
+        },
+        {
+          "Type": 2,
+          "Id": 70101694
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5166": {
+      "id": 5166,
+      "name": "닻",
+      "groupId": 2500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 1000,
+      "materialGrade": 5,
+      "materialVal": 10,
+      "criticalRewardId": 90121816,
+      "normalRewardId": 90121816,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "S 등급 닻",
+        "특수 합성 닻"
+      ],
+      "synthesisTimeSec": 10,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101561
+        },
+        {
+          "Type": 2,
+          "Id": 70101584
+        },
+        {
+          "Type": 2,
+          "Id": 70101607
+        },
+        {
+          "Type": 2,
+          "Id": 70101628
+        },
+        {
+          "Type": 2,
+          "Id": 70101669
+        },
+        {
+          "Type": 2,
+          "Id": 70101695
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5167": {
+      "id": 5167,
+      "name": "특수 부품",
+      "groupId": 2500,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 1000,
+      "materialGrade": 5,
+      "materialVal": 10,
+      "criticalRewardId": 90121817,
+      "normalRewardId": 90121817,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720024,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "S 등급 특수 부품",
+        "특수 합성 특수 부품"
+      ],
+      "synthesisTimeSec": 10,
+      "mainItems": [
+        {
+          "Type": 2,
+          "Id": 70101562
+        },
+        {
+          "Type": 2,
+          "Id": 70101585
+        },
+        {
+          "Type": 2,
+          "Id": 70101608
+        },
+        {
+          "Type": 2,
+          "Id": 70101629
+        },
+        {
+          "Type": 2,
+          "Id": 70101670
+        },
+        {
+          "Type": 2,
+          "Id": 70101696
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5168": {
+      "id": 5168,
+      "name": "무기",
+      "groupId": 2600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 100,
+      "materialGrade": 5,
+      "materialVal": 10,
+      "criticalRewardId": 90121818,
+      "normalRewardId": 90121818,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "S 등급 무기",
+        "특수 합성 무기"
+      ],
+      "synthesisTimeSec": 10,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22155009
+        },
+        {
+          "Type": 1,
+          "Id": 22476075
+        },
+        {
+          "Type": 1,
+          "Id": 22264940
+        },
+        {
+          "Type": 1,
+          "Id": 22264977
+        },
+        {
+          "Type": 1,
+          "Id": 22264992
+        },
+        {
+          "Type": 1,
+          "Id": 22265125
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5169": {
+      "id": 5169,
+      "name": "머리",
+      "groupId": 2600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 100,
+      "materialGrade": 5,
+      "materialVal": 10,
+      "criticalRewardId": 90121819,
+      "normalRewardId": 90121819,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "S 등급 머리",
+        "특수 합성 머리"
+      ],
+      "synthesisTimeSec": 10,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22346039
+        },
+        {
+          "Type": 1,
+          "Id": 22476076
+        },
+        {
+          "Type": 1,
+          "Id": 22264941
+        },
+        {
+          "Type": 1,
+          "Id": 22264978
+        },
+        {
+          "Type": 1,
+          "Id": 22264993
+        },
+        {
+          "Type": 1,
+          "Id": 22265126
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5170": {
+      "id": 5170,
+      "name": "몸",
+      "groupId": 2600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 100,
+      "materialGrade": 5,
+      "materialVal": 10,
+      "criticalRewardId": 90121820,
+      "normalRewardId": 90121820,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "S 등급 몸",
+        "특수 합성 몸"
+      ],
+      "synthesisTimeSec": 10,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22246039
+        },
+        {
+          "Type": 1,
+          "Id": 22476077
+        },
+        {
+          "Type": 1,
+          "Id": 22264942
+        },
+        {
+          "Type": 1,
+          "Id": 22264979
+        },
+        {
+          "Type": 1,
+          "Id": 22264994
+        },
+        {
+          "Type": 1,
+          "Id": 22265127
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    },
+    "5171": {
+      "id": 5171,
+      "name": "장신구",
+      "groupId": 2600,
+      "isAllType": true,
+      "synthesisPointId": 100003,
+      "synthesisPointVal": 100,
+      "materialGrade": 5,
+      "materialVal": 10,
+      "criticalRewardId": 90121821,
+      "normalRewardId": 90121821,
+      "spacialMaterial": [
+        {
+          "Type": 1,
+          "Id": 23720025,
+          "Value": 1
+        }
+      ],
+      "desc": "{0} 중 {1}|hpp(을,를) 낮은 확률로 획득합니다.",
+      "descFormatTexts": [
+        "S 등급 장신구",
+        "특수 합성 장신구"
+      ],
+      "synthesisTimeSec": 10,
+      "mainItems": [
+        {
+          "Type": 1,
+          "Id": 22476031
+        },
+        {
+          "Type": 1,
+          "Id": 22476078
+        },
+        {
+          "Type": 1,
+          "Id": 22264943
+        },
+        {
+          "Type": 1,
+          "Id": 22264980
+        },
+        {
+          "Type": 1,
+          "Id": 22264995
+        },
+        {
+          "Type": 1,
+          "Id": 22265128
+        }
+      ],
+      "synthesisCritical": 100,
+      "synthesisGuildPoint": 500
+    }
+  }
+}

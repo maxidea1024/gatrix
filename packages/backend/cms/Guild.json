@@ -1,0 +1,108 @@
+{
+  ":Guild": {
+    ":type": {
+      "id": "key",
+      "level": "number",
+      "exp": "number",
+      "expStack": "number",
+      "maxUser": "number",
+      "makeShipPartsLevel": "number",
+      "makeEquipLevel": "number"
+    },
+    ":required": {
+      "level": 1,
+      "exp": 1,
+      "expStack": 1,
+      "maxUser": 1
+    },
+    ":min": {
+      "makeShipPartsLevel": 0,
+      "makeEquipLevel": 0
+    },
+    ":max": {
+      "makeShipPartsLevel": 5,
+      "makeEquipLevel": 7
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "Guild": {
+    "1": {
+      "id": 1,
+      "level": 1,
+      "exp": 98400,
+      "expStack": 98400,
+      "maxUser": 30
+    },
+    "2": {
+      "id": 2,
+      "level": 2,
+      "exp": 216480,
+      "expStack": 314880,
+      "maxUser": 35
+    },
+    "3": {
+      "id": 3,
+      "level": 3,
+      "exp": 303072,
+      "expStack": 617952,
+      "maxUser": 40
+    },
+    "4": {
+      "id": 4,
+      "level": 4,
+      "exp": 393993,
+      "expStack": 1011945,
+      "maxUser": 45
+    },
+    "5": {
+      "id": 5,
+      "level": 5,
+      "exp": 492491,
+      "expStack": 1504436,
+      "maxUser": 50
+    },
+    "6": {
+      "id": 6,
+      "level": 6,
+      "exp": 590989,
+      "expStack": 2095425,
+      "maxUser": 55
+    },
+    "7": {
+      "id": 7,
+      "level": 7,
+      "exp": 709186,
+      "expStack": 2804611,
+      "maxUser": 60
+    },
+    "8": {
+      "id": 8,
+      "level": 8,
+      "exp": 815563,
+      "expStack": 3620174,
+      "maxUser": 65
+    },
+    "9": {
+      "id": 9,
+      "level": 9,
+      "exp": 946053,
+      "expStack": 4566227,
+      "maxUser": 70
+    },
+    "10": {
+      "id": 10,
+      "level": 10,
+      "exp": 1182566,
+      "expStack": 5748793,
+      "maxUser": 75
+    },
+    "11": {
+      "id": 11,
+      "level": 11,
+      "exp": 5940000,
+      "expStack": 11688793,
+      "maxUser": 75
+    }
+  }
+}

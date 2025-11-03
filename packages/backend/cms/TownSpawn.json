@@ -1,0 +1,4293 @@
+{
+    ":TownSpawn": {
+        ":type": {
+            "id": "key",
+            "spawners": [
+                {
+                    "label": "number",
+                    "name": "number",
+                    "position": {
+                        "x": "number",
+                        "y": "number",
+                        "z": "number"
+                    }
+                }
+            ],
+            "start": {
+                "label": "number",
+                "name": "number",
+                "position": {
+                    "x": "number",
+                    "y": "number",
+                    "z": "number"
+                }
+            }
+        }
+    },
+    "TownSpawn": {
+        "11000000": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 3557.0684,
+                        "y": 9191.5342,
+                        "z": 205.0253
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 75.3555,
+                        "y": 10500.4258,
+                        "z": 15.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": 725.3555,
+                        "y": 12980.4258,
+                        "z": 15.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique3",
+                    "name": "BP_NpcSpawner_Unique3",
+                    "position": {
+                        "x": 3235.3555,
+                        "y": 10430.4258,
+                        "z": 215.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique4",
+                    "name": "BP_NpcSpawner_Unique4",
+                    "position": {
+                        "x": 7255.3555,
+                        "y": 12210.4258,
+                        "z": 215.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique5",
+                    "name": "BP_NpcSpawner_Unique5",
+                    "position": {
+                        "x": 5865.3555,
+                        "y": 13050.4258,
+                        "z": 35.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique6",
+                    "name": "BP_NpcSpawner_Unique6",
+                    "position": {
+                        "x": 565.3555,
+                        "y": 9630.4258,
+                        "z": 35.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique7",
+                    "name": "BP_NpcSpawner_Unique7",
+                    "position": {
+                        "x": 4155.3555,
+                        "y": 13420.4258,
+                        "z": 35.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique9",
+                    "name": "BP_NpcSpawner_Unique9",
+                    "position": {
+                        "x": 465.3555,
+                        "y": 8970.4258,
+                        "z": 35.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique11",
+                    "name": "BP_NpcSpawner_Unique11",
+                    "position": {
+                        "x": 2975.3555,
+                        "y": 11920.4258,
+                        "z": 35.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique8",
+                    "name": "BP_NpcSpawner_Unique8",
+                    "position": {
+                        "x": -1014.6445,
+                        "y": 10610.4258,
+                        "z": 35.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique10",
+                    "name": "BP_NpcSpawner_Unique10",
+                    "position": {
+                        "x": 2925.3555,
+                        "y": 13670.4258,
+                        "z": 35.025
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -1224.5815,
+                    "y": 11519.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000001": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 4820.502,
+                        "y": 9601.0762,
+                        "z": 105.8597
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawnerDog2",
+                    "name": "BP_NpcSpawnerDog2",
+                    "position": {
+                        "x": 4998.4854,
+                        "y": 3750.3408,
+                        "z": 105.8597
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique5",
+                    "name": "BP_NpcSpawner_Unique5",
+                    "position": {
+                        "x": 4652.8521,
+                        "y": 9004.7783,
+                        "z": 105.8597
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 7742.8516,
+                        "y": 10714.7783,
+                        "z": 105.8597
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": 4912.8521,
+                        "y": 2804.7783,
+                        "z": 105.8597
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique9",
+                    "name": "BP_NpcSpawner_Unique9",
+                    "position": {
+                        "x": 12132.8516,
+                        "y": 7624.7783,
+                        "z": 245.8597
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique10",
+                    "name": "BP_NpcSpawner_Unique10",
+                    "position": {
+                        "x": 5162.8521,
+                        "y": 11934.7783,
+                        "z": 105.8597
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3883,
+                    "y": 7507,
+                    "z": 216.6466
+                }
+            }
+        },
+        "11000002": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner",
+                    "name": "BP_NpcSpawner_431",
+                    "position": {
+                        "x": 5935.0425,
+                        "y": -5709.3511,
+                        "z": 255.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner2",
+                    "name": "BP_NpcSpawner2_180",
+                    "position": {
+                        "x": 5526.915,
+                        "y": -3807.8298,
+                        "z": 275.3021
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner3",
+                    "name": "BP_NpcSpawner3_194",
+                    "position": {
+                        "x": 1747.0386,
+                        "y": -2554.8677,
+                        "z": 275.3021
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner4",
+                    "name": "BP_NpcSpawner4_208",
+                    "position": {
+                        "x": 2058.5894,
+                        "y": -4251.8428,
+                        "z": 275.3022
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner5",
+                    "name": "BP_NpcSpawner5_222",
+                    "position": {
+                        "x": 3722.479,
+                        "y": -6559.9063,
+                        "z": 275.3021
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner6",
+                    "name": "BP_NpcSpawner6_236",
+                    "position": {
+                        "x": 3121.2593,
+                        "y": -971.896,
+                        "z": 255.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner7",
+                    "name": "BP_NpcSpawner7_250",
+                    "position": {
+                        "x": 1917.0068,
+                        "y": -4121.168,
+                        "z": 275.3022
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner8",
+                    "name": "BP_NpcSpawner8_264",
+                    "position": {
+                        "x": 5611.8052,
+                        "y": -1265.1132,
+                        "z": 275.3021
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner9",
+                    "name": "BP_NpcSpawner9_278",
+                    "position": {
+                        "x": 8178.707,
+                        "y": -892.4985,
+                        "z": 477.9055
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner10",
+                    "name": "BP_NpcSpawner10_292",
+                    "position": {
+                        "x": 3480.4004,
+                        "y": -4733.23,
+                        "z": 275.3021
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner11",
+                    "name": "BP_NpcSpawner11_306",
+                    "position": {
+                        "x": 3502.0352,
+                        "y": -6900.4775,
+                        "z": 275.3021
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner12",
+                    "name": "BP_NpcSpawner12_320",
+                    "position": {
+                        "x": 6141.9995,
+                        "y": -6277.4126,
+                        "z": 275.3021
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3765.3777,
+                    "y": -6435.5669,
+                    "z": 432.6837
+                }
+            }
+        },
+        "11000003": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 4817.0688,
+                        "y": 5181.5342,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawnerDog2",
+                    "name": "BP_NpcSpawnerDog2",
+                    "position": {
+                        "x": 2409.2449,
+                        "y": 8108.4146,
+                        "z": 5.0246
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": 2790,
+                        "y": 7530,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique7",
+                    "name": "BP_NpcSpawner_Unique7",
+                    "position": {
+                        "x": 7000,
+                        "y": 8450,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique6",
+                    "name": "BP_NpcSpawner_Unique6",
+                    "position": {
+                        "x": 3650,
+                        "y": 9990,
+                        "z": 215.0251
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 6824.2549,
+                    "y": 8155.1699,
+                    "z": 193.9578
+                }
+            }
+        },
+        "11000004": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 107.0684,
+                        "y": 10141.5342,
+                        "z": 145.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 4335.3555,
+                        "y": 7020.4258,
+                        "z": 265.0247
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 3209.1665,
+                    "y": 6460.7427,
+                    "z": 240.5435
+                }
+            }
+        },
+        "11000006": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3973.6963,
+                    "y": 7936.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000007": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4050.2549,
+                    "y": 5624.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000008": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1120.2549,
+                    "y": 8682.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000009": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 3077.0684,
+                        "y": 7041.5342,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 3106.2871,
+                        "y": 7932.6152,
+                        "z": 5.0245
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 743.2549,
+                    "y": 7170.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000010": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 627.0688,
+                        "y": 10531.5342,
+                        "z": 5.0251
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -1787.3037,
+                    "y": 12120.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000011": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 227.2549,
+                    "y": 3851.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000012": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5903.5586,
+                    "y": 7963.4697,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000013": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -1253.5435,
+                    "y": 7396.2324,
+                    "z": 74
+                }
+            }
+        },
+        "11000014": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3770.4565,
+                    "y": 4410.2324,
+                    "z": 153.9578
+                }
+            }
+        },
+        "11000015": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 1567.0688,
+                        "y": 8761.5342,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawnerDog2",
+                    "name": "BP_NpcSpawnerDog2",
+                    "position": {
+                        "x": 5289.2451,
+                        "y": 7128.4146,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": -3714.645,
+                        "y": 8860.4258,
+                        "z": 5.0252
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique5",
+                    "name": "BP_NpcSpawner_Unique5",
+                    "position": {
+                        "x": 1115.355,
+                        "y": 4430.4258,
+                        "z": 5.0252
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique9",
+                    "name": "BP_NpcSpawner_Unique9",
+                    "position": {
+                        "x": 4205.355,
+                        "y": 7880.4258,
+                        "z": 5.0252
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 910.4565,
+                    "y": 3779.2324,
+                    "z": 115
+                }
+            }
+        },
+        "11000016": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 6407.6108,
+                    "y": 12530.123,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000017": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 3067.0684,
+                        "y": 13361.5342,
+                        "z": 5.025
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2604.2549,
+                    "y": 8695.1699,
+                    "z": 133.9578
+                }
+            }
+        },
+        "11000018": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -277.7451,
+                    "y": 8954.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000019": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1245.6963,
+                    "y": 6697.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000020": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 2357.0684,
+                        "y": 3341.5342,
+                        "z": 105.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 385.355,
+                        "y": 5790.4258,
+                        "z": 30.4995
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 227.2549,
+                    "y": 3851.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000021": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 402.2549,
+                    "y": 4796.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000022": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7810.2549,
+                    "y": 4194.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000023": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 4007.0684,
+                        "y": 2971.5342,
+                        "z": 5.0248
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2141.4565,
+                    "y": 6430.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000024": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 2007.7869,
+                    "y": 7979.4634,
+                    "z": 101.9578
+                }
+            }
+        },
+        "11000025": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -840.8335,
+                    "y": 11230.7422,
+                    "z": 240.5435
+                }
+            }
+        },
+        "11000026": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2949.2549,
+                    "y": 6080.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000027": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2085.2549,
+                    "y": 5173.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000028": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -145.7454,
+                    "y": 6385.1699,
+                    "z": 133.9578
+                }
+            }
+        },
+        "11000029": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1101.4565,
+                    "y": 9814.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000030": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1317.0684,
+                        "y": 7351.5342,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": 7819.2451,
+                        "y": 5428.4141,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique3",
+                    "name": "BP_NpcSpawner_Unique3",
+                    "position": {
+                        "x": 1465.3555,
+                        "y": 6840.4258,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique4",
+                    "name": "BP_NpcSpawner_Unique4",
+                    "position": {
+                        "x": 8125.3555,
+                        "y": 5740.4258,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique8",
+                    "name": "BP_NpcSpawner_Unique8",
+                    "position": {
+                        "x": 2965.3555,
+                        "y": 3460.4258,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique9",
+                    "name": "BP_NpcSpawner_Unique9",
+                    "position": {
+                        "x": 2125.3555,
+                        "y": 2550.4258,
+                        "z": 5.0251
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4183.2549,
+                    "y": 9149.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000031": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -3928.7451,
+                    "y": 6866.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000032": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 1570.4565,
+                    "y": 7862.2324,
+                    "z": 73.9578
+                }
+            }
+        },
+        "11000033": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 2067.0688,
+                        "y": 8901.5342,
+                        "z": 5.0251
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart",
+                "position": {
+                    "x": -1787.3037,
+                    "y": 10380.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000034": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 463.2549,
+                    "y": 2359.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000035": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4062.2549,
+                    "y": 10236.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000036": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3574.8928,
+                    "y": 7059.5977,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000037": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -931.7451,
+                    "y": 7175.1699,
+                    "z": 110.9578
+                }
+            }
+        },
+        "11000038": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7151.2549,
+                    "y": -4021.8301,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000039": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -3769.5435,
+                    "y": 5124.2324,
+                    "z": 115
+                }
+            }
+        },
+        "11000040": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1503.6963,
+                    "y": 9166.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000041": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -1274.7451,
+                    "y": 10172.1699,
+                    "z": 110.9578
+                }
+            }
+        },
+        "11000042": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 6547.5806,
+                        "y": 9186.4561,
+                        "z": 208.9097
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4151.2759,
+                    "y": 8798.6543,
+                    "z": 342.4044
+                }
+            }
+        },
+        "11000043": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 6147.0684,
+                        "y": 3311.5342,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": 5559.2451,
+                        "y": 5668.4141,
+                        "z": 5.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": -2004.6445,
+                        "y": 5090.4258,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique6",
+                    "name": "BP_NpcSpawner_Unique6",
+                    "position": {
+                        "x": 6525.3555,
+                        "y": 10380.4258,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique9",
+                    "name": "BP_NpcSpawner_Unique9",
+                    "position": {
+                        "x": -524.6445,
+                        "y": 8900.4258,
+                        "z": 5.0245
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5855.4565,
+                    "y": 6892.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000044": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 2449.1665,
+                    "y": 9195.7422,
+                    "z": 240.5435
+                }
+            }
+        },
+        "11000045": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4386.2549,
+                    "y": 3746.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000046": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 627.0688,
+                        "y": 10531.5342,
+                        "z": 5.0251
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -1787.3037,
+                    "y": 12120.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000047": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 264.2546,
+                    "y": 10625.1699,
+                    "z": 133.9578
+                }
+            }
+        },
+        "11000048": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -4299.7451,
+                    "y": 4050.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000049": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -104.5435,
+                    "y": 9422.2324,
+                    "z": 73.9578
+                }
+            }
+        },
+        "11000050": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5673.6963,
+                    "y": 11216.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000051": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -242.5435,
+                    "y": 8273.2324,
+                    "z": 73.9578
+                }
+            }
+        },
+        "11000052": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 1761.4565,
+                    "y": 7881.2324,
+                    "z": 74
+                }
+            }
+        },
+        "11000053": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1247.0684,
+                        "y": 9061.5342,
+                        "z": 5.0251
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -668.5435,
+                    "y": 7874.2324,
+                    "z": 73.9578
+                }
+            }
+        },
+        "11000054": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -145.7454,
+                    "y": 8735.1699,
+                    "z": 133.9578
+                }
+            }
+        },
+        "11000055": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1867.0684,
+                        "y": 11781.5342,
+                        "z": 5.0248
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2599.4565,
+                    "y": 12623.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000056": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": -3033.7129,
+                        "y": 9352.6152,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1927.0684,
+                        "y": 8661.5342,
+                        "z": 5.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 29.4565,
+                    "y": 8996.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000057": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -698.5435,
+                    "y": 4815.2324,
+                    "z": 76.9578
+                }
+            }
+        },
+        "11000058": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 5487.0684,
+                        "y": 3121.5342,
+                        "z": 5.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": 3539.2451,
+                        "y": 8508.4141,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 6345.3555,
+                        "y": 5460.4258,
+                        "z": 5.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique4",
+                    "name": "BP_NpcSpawner_Unique4",
+                    "position": {
+                        "x": 3165.3555,
+                        "y": 9110.4258,
+                        "z": 5.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique6",
+                    "name": "BP_NpcSpawner_Unique6",
+                    "position": {
+                        "x": 4915.3555,
+                        "y": 7460.4258,
+                        "z": 25.0248
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7399.4565,
+                    "y": 4756.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000059": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1585.2549,
+                    "y": 8493.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000060": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -454.7451,
+                    "y": 6903.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000061": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3784.2539,
+                    "y": -6684.8301,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000062": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": -1753.7129,
+                        "y": 8912.6152,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": -1392.9316,
+                        "y": 7651.5342,
+                        "z": 5.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -1049.5435,
+                    "y": 10328.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000063": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1663.6963,
+                    "y": 5626.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000064": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4910.2549,
+                    "y": 3725.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000065": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 7206.2871,
+                        "y": 5382.6152,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 8657.0684,
+                        "y": 7371.5342,
+                        "z": 5.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7517.2549,
+                    "y": 5239.1699,
+                    "z": 110.9578
+                }
+            }
+        },
+        "11000066": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 1226.2871,
+                        "y": 5672.6152,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1577.0684,
+                        "y": 7261.5342,
+                        "z": 5.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -42.9701,
+                    "y": 5792.8872,
+                    "z": 73.9578
+                }
+            }
+        },
+        "11000067": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 5767.5806,
+                        "y": 6886.4561,
+                        "z": 38.9097
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawnerDog2",
+                    "name": "BP_NpcSpawnerDog2",
+                    "position": {
+                        "x": 9624.2061,
+                        "y": 8837.1582,
+                        "z": 37.0215
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": 5210.1221,
+                        "y": 4641.9458,
+                        "z": 8.9097
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique7",
+                    "name": "BP_NpcSpawner_Unique7",
+                    "position": {
+                        "x": 3070.1221,
+                        "y": 7991.9458,
+                        "z": 8.9097
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique9",
+                    "name": "BP_NpcSpawner_Unique9",
+                    "position": {
+                        "x": 2570.1221,
+                        "y": 3331.9458,
+                        "z": 8.9097
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1983.4565,
+                    "y": 11359.2324,
+                    "z": 153.9578
+                }
+            }
+        },
+        "11000068": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5623.6963,
+                    "y": 10196.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000069": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 3616.2871,
+                        "y": 6662.6152,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 2687.0684,
+                        "y": 5741.5342,
+                        "z": 25.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7864.2549,
+                    "y": 6564.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000070": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 306.2871,
+                        "y": 7232.6157,
+                        "z": 5.0247
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 167.0684,
+                        "y": 7661.5342,
+                        "z": 5.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": 869.2451,
+                        "y": 10268.4141,
+                        "z": 5.0248
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4454.2549,
+                    "y": 5834.1699,
+                    "z": 133.9578
+                }
+            }
+        },
+        "11000071": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1137.0684,
+                        "y": 8711.5342,
+                        "z": 5.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -1310.5435,
+                    "y": 8338.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000072": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 86.756,
+                    "y": 9143.6709,
+                    "z": 73.9578
+                }
+            }
+        },
+        "11000073": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 315.4565,
+                    "y": 6324.2324,
+                    "z": 115
+                }
+            }
+        },
+        "11000074": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3343.6963,
+                    "y": 10986.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000075": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5623.6963,
+                    "y": 13533.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000076": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5103.6963,
+                    "y": 10286.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000077": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 631.6963,
+                    "y": 15011.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000078": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3603.2549,
+                    "y": 4934.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000079": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7522.2549,
+                    "y": -2972.8301,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000080": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3560.2549,
+                    "y": 10745.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000081": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -970.5435,
+                    "y": 5207.2324,
+                    "z": 101.9578
+                }
+            }
+        },
+        "11000082": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 3266.2871,
+                        "y": 9972.6152,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 2447.0684,
+                        "y": 10381.5342,
+                        "z": 5.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4897.2549,
+                    "y": 7891.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000083": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1934.2549,
+                    "y": 5510.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000084": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3908.4565,
+                    "y": 4814.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000085": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 2067.0688,
+                        "y": 8901.5342,
+                        "z": 5.0251
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart",
+                "position": {
+                    "x": -1787.3037,
+                    "y": 10380.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000086": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1607.0684,
+                        "y": 4881.5342,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 1776.2871,
+                        "y": 5772.6152,
+                        "z": 5.0245
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 242.3415,
+                    "y": 6613.4204,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000087": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1763.2549,
+                    "y": 3809.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000088": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 6235.8311,
+                    "y": 10257.4941,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000089": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1395.4565,
+                    "y": 4579.2324,
+                    "z": 115
+                }
+            }
+        },
+        "11000090": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 1537.9525,
+                    "y": 8896.2529,
+                    "z": 73.9578
+                }
+            }
+        },
+        "11000091": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1914.2549,
+                    "y": 3112.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000092": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2993.6963,
+                    "y": 7866.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000093": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3206.4565,
+                    "y": 6744.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000094": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 2027.0684,
+                        "y": 6481.5342,
+                        "z": 5.025
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": 6429.2451,
+                        "y": 8718.4141,
+                        "z": 5.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique3",
+                    "name": "BP_NpcSpawner_Unique3",
+                    "position": {
+                        "x": 7455.3555,
+                        "y": 8700.4258,
+                        "z": 5.0247
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique5",
+                    "name": "BP_NpcSpawner_Unique5",
+                    "position": {
+                        "x": 2915.3555,
+                        "y": 8290.4258,
+                        "z": 5.0247
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique9",
+                    "name": "BP_NpcSpawner_Unique9",
+                    "position": {
+                        "x": 4075.3555,
+                        "y": 7330.4258,
+                        "z": 5.0247
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5074.2549,
+                    "y": 8485.1699,
+                    "z": 133.9578
+                }
+            }
+        },
+        "11000095": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -698.5435,
+                    "y": 4815.2324,
+                    "z": 76.9578
+                }
+            }
+        },
+        "11000096": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 86.2871,
+                        "y": 8342.6152,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": -432.9316,
+                        "y": 9951.5342,
+                        "z": 5.0249
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": -1930.7549,
+                        "y": 13508.4141,
+                        "z": 5.0247
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 514.4565,
+                    "y": 10556.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000097": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 1761.4565,
+                    "y": 7881.2324,
+                    "z": 74
+                }
+            }
+        },
+        "11000098": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2546.2549,
+                    "y": 15605.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000099": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 1657.0688,
+                        "y": 9841.5342,
+                        "z": 5.0249
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawnerDog2",
+                    "name": "BP_NpcSpawnerDog2",
+                    "position": {
+                        "x": 5149.2451,
+                        "y": 6108.4146,
+                        "z": 5.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique3",
+                    "name": "BP_NpcSpawner_Unique3",
+                    "position": {
+                        "x": 2745.355,
+                        "y": 8700.4258,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique7",
+                    "name": "BP_NpcSpawner_Unique7",
+                    "position": {
+                        "x": 3475.355,
+                        "y": 11050.4258,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique10",
+                    "name": "BP_NpcSpawner_Unique10",
+                    "position": {
+                        "x": 6245.355,
+                        "y": 6320.4258,
+                        "z": 5.0251
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3174.4565,
+                    "y": 8484.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000100": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 287.2549,
+                    "y": 11621.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000101": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4703.4565,
+                    "y": 6334.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000102": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 7436.2871,
+                        "y": 9202.6152,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 5857.0684,
+                        "y": 8701.5342,
+                        "z": 5.0249
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": 3999.2451,
+                        "y": 2378.4141,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": 7066.2871,
+                        "y": 8862.6152,
+                        "z": 5.0245
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 6742.4565,
+                    "y": 6110.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000103": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -698.5435,
+                    "y": 4815.2324,
+                    "z": 76.9578
+                }
+            }
+        },
+        "11000104": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 3824.1665,
+                    "y": 7610.7427,
+                    "z": 240.5435
+                }
+            }
+        },
+        "11000105": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": -392.9316,
+                        "y": 7561.5342,
+                        "z": 5.0248
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -891.5435,
+                    "y": 3930.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000106": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1837.0684,
+                        "y": 7331.5342,
+                        "z": 5.0251
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -243.5435,
+                    "y": 6215.2324,
+                    "z": 73.9578
+                }
+            }
+        },
+        "11000107": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": -943.7129,
+                        "y": 6982.6152,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1857.0684,
+                        "y": 7571.5342,
+                        "z": 5.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -685.7451,
+                    "y": 6355.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000108": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 176.4565,
+                    "y": 8856.2324,
+                    "z": 124
+                }
+            }
+        },
+        "11000109": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 2827.0688,
+                        "y": 9551.5342,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawnerDog2",
+                    "name": "BP_NpcSpawnerDog2",
+                    "position": {
+                        "x": 1829.2449,
+                        "y": 6688.4146,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": 390,
+                        "y": 9970,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique6",
+                    "name": "BP_NpcSpawner_Unique6",
+                    "position": {
+                        "x": -340,
+                        "y": 8590,
+                        "z": 15.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique10",
+                    "name": "BP_NpcSpawner_Unique10",
+                    "position": {
+                        "x": 3840,
+                        "y": 6600,
+                        "z": 5.0251
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 504.2549,
+                    "y": 7805.1699,
+                    "z": 133.9578
+                }
+            }
+        },
+        "11000110": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2704.2549,
+                    "y": 12406.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000111": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 753.6963,
+                    "y": 9666.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000112": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 4866.2871,
+                        "y": 6302.6152,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 4787.0684,
+                        "y": 8621.5342,
+                        "z": 5.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2720.4565,
+                    "y": 7017.2324,
+                    "z": 153.9578
+                }
+            }
+        },
+        "11000113": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5125.4565,
+                    "y": 6783.2324,
+                    "z": 115
+                }
+            }
+        },
+        "11000114": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2105.5918,
+                    "y": 6061.8809,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000115": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 6097.0688,
+                        "y": 18241.5352,
+                        "z": 440.4996
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawnerDog2",
+                    "name": "BP_NpcSpawnerDog2",
+                    "position": {
+                        "x": 5599.2451,
+                        "y": 9988.4141,
+                        "z": 440.4996
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": 6625.355,
+                        "y": 17510.4258,
+                        "z": 440.4995
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique3",
+                    "name": "BP_NpcSpawner_Unique3",
+                    "position": {
+                        "x": 2025.355,
+                        "y": 13190.4258,
+                        "z": 440.4995
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique7",
+                    "name": "BP_NpcSpawner_Unique7",
+                    "position": {
+                        "x": 5975.355,
+                        "y": 8340.4258,
+                        "z": 440.4995
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4358.2598,
+                    "y": 14591.2656,
+                    "z": 550.642
+                }
+            }
+        },
+        "11000116": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 577.0688,
+                        "y": 7301.5342,
+                        "z": 210.1841
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3079.26,
+                    "y": 6512.2656,
+                    "z": 351.642
+                }
+            }
+        },
+        "11000117": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -2532.7451,
+                    "y": 10823.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000118": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 6819.1719,
+                        "y": 8907.1621,
+                        "z": 5.0247
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 6207.0684,
+                        "y": 7871.5342,
+                        "z": 5.0247
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": 3129.2451,
+                        "y": 6718.4141,
+                        "z": 5.0258
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7362.083,
+                    "y": 11315.0703,
+                    "z": 103.9549
+                }
+            }
+        },
+        "11000119": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 559.2549,
+                    "y": 2417.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000120": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1127.0684,
+                        "y": 8971.5342,
+                        "z": 5.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4906.4565,
+                    "y": 7329.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000121": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7109.2549,
+                    "y": 11337.1699,
+                    "z": 110.9578
+                }
+            }
+        },
+        "11000122": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 631.6963,
+                    "y": 15011.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000123": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3526.2549,
+                    "y": 12784.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000124": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7499.4565,
+                    "y": 7559.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000125": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 558.2549,
+                    "y": 13382.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000126": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -2678.7451,
+                    "y": -66.8301,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000127": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2523.6963,
+                    "y": 8226.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000128": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3177.6963,
+                    "y": 8425.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000129": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2214.2549,
+                    "y": 4422.1699,
+                    "z": 110.9578
+                }
+            }
+        },
+        "11000130": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1680.5577,
+                        "y": 6191.1899,
+                        "z": 206.2755
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": 5215.9761,
+                        "y": 940.2195,
+                        "z": 206.2755
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": 5992.1172,
+                        "y": 1893.2285,
+                        "z": 208.9097
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique5",
+                    "name": "BP_NpcSpawner_Unique5",
+                    "position": {
+                        "x": 1172.1172,
+                        "y": -136.7715,
+                        "z": 208.9097
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique8",
+                    "name": "BP_NpcSpawner_Unique8",
+                    "position": {
+                        "x": 1272.1172,
+                        "y": 8383.2285,
+                        "z": 208.9097
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique10",
+                    "name": "BP_NpcSpawner_Unique10",
+                    "position": {
+                        "x": -1167.8828,
+                        "y": 3923.2285,
+                        "z": 208.9097
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1795,
+                    "y": 8362,
+                    "z": 316
+                }
+            }
+        },
+        "11000131": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3284.4565,
+                    "y": 7412.2324,
+                    "z": 115
+                }
+            }
+        },
+        "11000132": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1763.2549,
+                    "y": 3809.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000133": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 6870.2549,
+                    "y": 14896.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000134": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 4500.7197,
+                    "y": 2727.0676,
+                    "z": 88.3335
+                }
+            }
+        },
+        "11000135": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5747.6963,
+                    "y": 12120.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000136": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 5532.8032,
+                        "y": 2112.1941,
+                        "z": 205.0064
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawnerDog2",
+                    "name": "BP_NpcSpawnerDog2",
+                    "position": {
+                        "x": 5816.4414,
+                        "y": 11906.25,
+                        "z": 205.0064
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique4",
+                    "name": "BP_NpcSpawner_Unique4",
+                    "position": {
+                        "x": 5450.2354,
+                        "y": 8077.7402,
+                        "z": 249.9814
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique7",
+                    "name": "BP_NpcSpawner_Unique7",
+                    "position": {
+                        "x": 4180.2354,
+                        "y": 13107.7402,
+                        "z": 249.9814
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique9",
+                    "name": "BP_NpcSpawner_Unique9",
+                    "position": {
+                        "x": 10710.2354,
+                        "y": 8007.7402,
+                        "z": 469.9814
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4007.7087,
+                    "y": 5097.9458,
+                    "z": 342.4041
+                }
+            }
+        },
+        "11000137": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 3807.0684,
+                        "y": 5031.5342,
+                        "z": 5.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5313.4565,
+                    "y": 1248.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000138": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5623.6963,
+                    "y": 13533.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000139": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -3928.7451,
+                    "y": 6866.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000140": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 2067.0688,
+                        "y": 8901.5342,
+                        "z": 5.0251
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart",
+                "position": {
+                    "x": -1787.3037,
+                    "y": 10380.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000141": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5775.2549,
+                    "y": 5484.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000142": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7799.2549,
+                    "y": 5613.1699,
+                    "z": 110.9578
+                }
+            }
+        },
+        "11000143": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1637.0684,
+                        "y": 5271.5342,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 1846.2871,
+                        "y": 4172.6152,
+                        "z": 5.0245
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 785.4963,
+                    "y": 3824.0698,
+                    "z": 88.3418
+                }
+            }
+        },
+        "11000144": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 2050.26,
+                    "y": 6881.5449,
+                    "z": 88.3418
+                }
+            }
+        },
+        "11000145": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 2586.2871,
+                        "y": 11042.6152,
+                        "z": 5.0244
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1477.0684,
+                        "y": 8681.5342,
+                        "z": 5.0247
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": 2699.2451,
+                        "y": 13858.4141,
+                        "z": 5.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": 2586.2871,
+                        "y": 11042.6152,
+                        "z": 5.0244
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2042.4565,
+                    "y": 12606.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000146": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 567.0688,
+                        "y": 8431.5342,
+                        "z": 20.1841
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawnerDog2",
+                    "name": "BP_NpcSpawnerDog2",
+                    "position": {
+                        "x": 5349.2451,
+                        "y": 9688.4141,
+                        "z": 10.1841
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique4",
+                    "name": "BP_NpcSpawner_Unique4",
+                    "position": {
+                        "x": 5415.355,
+                        "y": 8310.4258,
+                        "z": 26.3507
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique7",
+                    "name": "BP_NpcSpawner_Unique7",
+                    "position": {
+                        "x": 4805.355,
+                        "y": 9740.4258,
+                        "z": 26.3507
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique9",
+                    "name": "BP_NpcSpawner_Unique9",
+                    "position": {
+                        "x": 6455.355,
+                        "y": 9920.4258,
+                        "z": 26.3507
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7508.2549,
+                    "y": 10188.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000147": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": -2472.9316,
+                        "y": 12021.5342,
+                        "z": 5.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": 2799.2451,
+                        "y": 3388.4141,
+                        "z": 5.0249
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": -1654.6445,
+                        "y": 7080.4258,
+                        "z": 5.0249
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique5",
+                    "name": "BP_NpcSpawner_Unique5",
+                    "position": {
+                        "x": -484.6445,
+                        "y": 10830.4258,
+                        "z": 5.0249
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique10",
+                    "name": "BP_NpcSpawner_Unique10",
+                    "position": {
+                        "x": -2364.6445,
+                        "y": 13530.4258,
+                        "z": 5.0249
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2462.4565,
+                    "y": 10610.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000148": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 432.2549,
+                    "y": 8228.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000149": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 2877.0684,
+                        "y": 5431.5342,
+                        "z": 5.0248
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -755.5435,
+                    "y": 5721.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000150": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": -1212.9316,
+                        "y": 8531.5342,
+                        "z": 5.0244
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1544.4565,
+                    "y": 11139.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000151": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 6279.4565,
+                    "y": 10462.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000152": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5913.4565,
+                    "y": 6914.2324,
+                    "z": 303.9578
+                }
+            }
+        },
+        "11000153": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1038.4565,
+                    "y": 5694.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000154": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 3479.1665,
+                    "y": 2780.7427,
+                    "z": 200.5435
+                }
+            }
+        },
+        "11000155": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 754.1665,
+                    "y": 6340.7427,
+                    "z": 240.5435
+                }
+            }
+        },
+        "11000156": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 2426.4565,
+                    "y": 4320.2324,
+                    "z": 76.9578
+                }
+            }
+        },
+        "11000157": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 674.4963,
+                    "y": 7526.0698,
+                    "z": 88.3418
+                }
+            }
+        },
+        "11000158": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1577.0684,
+                        "y": 9391.5342,
+                        "z": 115.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 166.2871,
+                        "y": 9222.6152,
+                        "z": 135.0245
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 2534.1665,
+                    "y": 6920.7427,
+                    "z": 240.5435
+                }
+            }
+        },
+        "11000159": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 3057.0684,
+                        "y": 7181.5342,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 4966.2871,
+                        "y": 14242.6152,
+                        "z": 5.0245
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5551.2549,
+                    "y": 9651.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000160": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 8594.2549,
+                    "y": 8792.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000161": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2243.6963,
+                    "y": 6906.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000162": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -1214.7451,
+                    "y": 1425.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000163": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -177.7451,
+                    "y": 1241.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000164": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 2133.6714,
+                    "y": 7979.4604,
+                    "z": 88.3418
+                }
+            }
+        },
+        "11000165": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 764.4565,
+                    "y": 8504.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000166": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 2133.6714,
+                    "y": 7979.4604,
+                    "z": 88.3418
+                }
+            }
+        },
+        "11000167": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -5047.7451,
+                    "y": 10492.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000168": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4183.6963,
+                    "y": 10166.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000169": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 4887.3862,
+                        "y": 4309.5034,
+                        "z": 247.6326
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4586.2256,
+                    "y": 6030.8813,
+                    "z": 291.6373
+                }
+            }
+        },
+        "11000170": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 367.0684,
+                        "y": 6091.5342,
+                        "z": 5.0248
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2436.4565,
+                    "y": 8366.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000171": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 6243.6963,
+                    "y": 10546.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000172": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 890.4565,
+                    "y": 5704.2324,
+                    "z": 115
+                }
+            }
+        },
+        "11000173": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -847.5435,
+                    "y": 11990.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000174": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 2377.0684,
+                        "y": 6641.5342,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": -2013.7129,
+                        "y": 7182.6152,
+                        "z": 5.0245
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -610.7451,
+                    "y": 8925.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000175": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 1982.4565,
+                    "y": 10182.2324,
+                    "z": 68.9578
+                }
+            }
+        },
+        "11000176": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1653.6963,
+                    "y": 6846.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000177": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7.4565,
+                    "y": 5137.2324,
+                    "z": 115
+                }
+            }
+        },
+        "11000178": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": -2572.9316,
+                        "y": 12021.5342,
+                        "z": 5.0248
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1652.4565,
+                    "y": 11520.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000179": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5355.2549,
+                    "y": 5605.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000180": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7459.2549,
+                    "y": -3361.8301,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000181": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -235.5435,
+                    "y": 2208.2324,
+                    "z": 115
+                }
+            }
+        },
+        "11000182": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 70.2549,
+                    "y": 6890.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000183": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2033.2549,
+                    "y": 9711.1699,
+                    "z": 110.9578
+                }
+            }
+        },
+        "11000184": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 8607.0684,
+                        "y": 8171.5342,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 6716.2871,
+                        "y": 4462.6152,
+                        "z": 5.0245
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5369.2549,
+                    "y": 6135.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000185": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1531.994,
+                    "y": 1844.0187,
+                    "z": 103.9232
+                }
+            }
+        },
+        "11000186": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4309.2378,
+                    "y": 11921.1719,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000187": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5747.6963,
+                    "y": 12120.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000188": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 4007.0684,
+                        "y": 8961.5342,
+                        "z": 225.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": -163.7129,
+                        "y": 6522.6152,
+                        "z": 155.0245
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": -1922.8335,
+                    "y": 9543.7422,
+                    "z": 240.5435
+                }
+            }
+        },
+        "11000189": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2163.2549,
+                    "y": 9000.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000190": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2378.4565,
+                    "y": 6699.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000191": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2785.2549,
+                    "y": 1786.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000192": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 1747.0684,
+                        "y": 8291.5342,
+                        "z": 5.0251
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique1",
+                    "name": "BP_NpcSpawner_Unique1",
+                    "position": {
+                        "x": 2316.2871,
+                        "y": 7572.6152,
+                        "z": 5.0245
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique2",
+                    "name": "BP_NpcSpawner_Unique2",
+                    "position": {
+                        "x": 3746.2871,
+                        "y": 9882.6152,
+                        "z": 5.0245
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 15.2549,
+                    "y": 7251.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000193": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5210.5464,
+                    "y": 7781.2642,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000194": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 613.2549,
+                    "y": 6543.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000195": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 631.6963,
+                    "y": 15011.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000196": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawnerDog1",
+                    "name": "BP_NpcSpawnerDog1",
+                    "position": {
+                        "x": 9587.0684,
+                        "y": 9491.5342,
+                        "z": 2.718
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawnerDog2",
+                    "name": "BP_NpcSpawnerDog2",
+                    "position": {
+                        "x": 7859.2451,
+                        "y": 3698.4141,
+                        "z": 2.718
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4557.2549,
+                    "y": 2062.1694,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000197": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -946.3047,
+                    "y": 13135.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000198": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5869.2549,
+                    "y": 5313.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000199": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 927.0684,
+                        "y": 6771.5342,
+                        "z": 5.0247
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2864.4565,
+                    "y": 5866.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000200": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1076.2549,
+                    "y": 2048.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000201": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7302.2539,
+                    "y": 1997.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000202": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 427.2549,
+                    "y": 4254.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000203": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5245.4565,
+                    "y": 8847.2324,
+                    "z": 115
+                }
+            }
+        },
+        "11000204": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3177.6963,
+                    "y": 8425.4219,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000205": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3260.2549,
+                    "y": 5481.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000206": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -488.7451,
+                    "y": 3185.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000207": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -946.3047,
+                    "y": 13135.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000208": {
+            "spawners": [
+                {
+                    "label": "BP_NpcSpawner_Dog1",
+                    "name": "BP_NpcSpawner_Dog1",
+                    "position": {
+                        "x": 5487.0684,
+                        "y": 3121.5342,
+                        "z": 5.0248
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Dog2",
+                    "name": "BP_NpcSpawner_Dog2",
+                    "position": {
+                        "x": 609.2451,
+                        "y": 6108.4141,
+                        "z": 5.0243
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique3",
+                    "name": "BP_NpcSpawner_Unique3",
+                    "position": {
+                        "x": 4225.3555,
+                        "y": 9860.4258,
+                        "z": 5.0247
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique5",
+                    "name": "BP_NpcSpawner_Unique5",
+                    "position": {
+                        "x": 3995.3555,
+                        "y": 6350.4258,
+                        "z": 5.0247
+                    }
+                },
+                {
+                    "label": "BP_NpcSpawner_Unique7",
+                    "name": "BP_NpcSpawner_Unique7",
+                    "position": {
+                        "x": 8025.3555,
+                        "y": 3750.4258,
+                        "z": 5.0247
+                    }
+                }
+            ],
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7399.4565,
+                    "y": 4756.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000209": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5172.2549,
+                    "y": 5901.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000210": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -946.3047,
+                    "y": 13135.4229,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000211": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_0",
+                "position": {
+                    "x": 2835.4565,
+                    "y": 9493.2324,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000212": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 5369.2549,
+                    "y": 6135.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000213": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -610.7451,
+                    "y": 8925.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000214": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 4309.2378,
+                    "y": 11921.1719,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000215": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 7517.2549,
+                    "y": 5239.1699,
+                    "z": 110.9578
+                }
+            }
+        },
+        "11000216": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 227.2549,
+                    "y": 3851.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000217": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 1076.2549,
+                    "y": 2048.1699,
+                    "z": 103.9578
+                }
+            }
+        },
+        "11000218": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 2577.5541,
+                    "y": 9491.0156,
+                    "z": 119.6125
+                }
+            }
+        },
+        "11000219": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -786.7451,
+                    "y": 5536.1699,
+                    "z": 119.6125
+                }
+            }
+        },
+        "11000220": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": 3060.6962,
+                    "y": 5922.4228,
+                    "z": 130.0763
+                }
+            }
+        },
+        "11000221": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -8458.7451,
+                    "y": 1718.1699,
+                    "z": 471.9578
+                }
+            }
+        },
+        "11000222": {
+            "start": {
+                "label": "NetworkPlayerStart",
+                "name": "NetworkPlayerStart_2",
+                "position": {
+                    "x": -1972.854614,
+                    "y": -1277.87085,
+                    "z": 235.141144
+                }
+            }
+        }
+    }
+}

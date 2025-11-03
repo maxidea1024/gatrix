@@ -1,0 +1,1098 @@
+{
+  ":MateTraining": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "mateGrade": "number",
+      "mateTrainingGrade": "number",
+      "jobType": "number",
+      "trainingTime": "number",
+      "trainingCostType": "number",
+      "trainingCostVal": "number",
+      "trainingPublicPieceId": "number",
+      "trainingPieceVal": "number",
+      "trainingItem": [
+        {
+          "Id": "number",
+          "Val": "number"
+        },
+        {
+          "Id": "number",
+          "Val": "number"
+        },
+        {
+          "Id": "number",
+          "Val": "number"
+        }
+      ],
+      "specialStatVal": "number",
+      "specialStatExp": "number",
+      "trainingPoint": "number",
+      "trainingPointMax": "number",
+      "resetPriceType": "number",
+      "resetPriceVal": "number"
+    },
+    ":required": {
+      "name": 1,
+      "mateGrade": 1,
+      "mateTrainingGrade": 1,
+      "jobType": 1,
+      "trainingTime": 1,
+      "trainingCostType": 1,
+      "trainingCostVal": 1,
+      "trainingPublicPieceId": 1,
+      "trainingPieceVal": 1,
+      "specialStatVal": 1,
+      "specialStatExp": 1,
+      "trainingPoint": 1,
+      "trainingPointMax": 1,
+      "resetPriceType": 1,
+      "resetPriceVal": 1
+    },
+    ":requiredInObject": {
+      "trainingItem": [
+        {
+          "Id": 1,
+          "Val": 1
+        },
+        {
+          "Id": 1,
+          "Val": 1
+        },
+        {
+          "Id": 1,
+          "Val": 1
+        }
+      ]
+    },
+    ":min": {
+      "mateGrade": 0,
+      "mateTrainingGrade": 0,
+      "jobType": 0,
+      "trainingCostType": 100000,
+      "trainingPublicPieceId": 23000000,
+      "trainingItem": [
+        {
+          "Id": 23000000
+        },
+        {
+          "Id": 23000000
+        },
+        {
+          "Id": 23000000
+        }
+      ],
+      "resetPriceType": 100000
+    },
+    ":max": {
+      "mateGrade": 5,
+      "mateTrainingGrade": 5,
+      "jobType": 3,
+      "trainingCostType": 199999,
+      "trainingPublicPieceId": 23999999,
+      "trainingItem": [
+        {
+          "Id": 23999999
+        },
+        {
+          "Id": 23999999
+        },
+        {
+          "Id": 23999999
+        }
+      ],
+      "resetPriceType": 199999
+    },
+    ":enum": {},
+    ":links": {
+      "trainingCostType": [
+        "Point"
+      ],
+      "trainingPublicPieceId": [
+        "Item"
+      ],
+      "trainingItem": [
+        {
+          "Id": [
+            "Item"
+          ]
+        },
+        {
+          "Id": [
+            "Item"
+          ]
+        },
+        {
+          "Id": [
+            "Item"
+          ]
+        }
+      ],
+      "resetPriceType": [
+        "Point"
+      ]
+    }
+  },
+  "MateTraining": {
+    "17910000": {
+      "id": 17910000,
+      "name": "초급 모험 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 2,
+      "jobType": 1,
+      "trainingTime": 3600,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411001,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410000,
+          "Val": 100
+        },
+        {
+          "Id": 23409999,
+          "Val": 100
+        },
+        {
+          "Id": 23700087,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 15,
+      "specialStatExp": 10,
+      "trainingPoint": 75,
+      "trainingPointMax": 20,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910001": {
+      "id": 17910001,
+      "name": "초급 교역 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 2,
+      "jobType": 2,
+      "trainingTime": 3600,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411001,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410000,
+          "Val": 100
+        },
+        {
+          "Id": 23409999,
+          "Val": 100
+        },
+        {
+          "Id": 23700087,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 15,
+      "specialStatExp": 10,
+      "trainingPoint": 75,
+      "trainingPointMax": 20,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910002": {
+      "id": 17910002,
+      "name": "초급 전투 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 2,
+      "jobType": 3,
+      "trainingTime": 3600,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411001,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410000,
+          "Val": 100
+        },
+        {
+          "Id": 23409999,
+          "Val": 100
+        },
+        {
+          "Id": 23700087,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 15,
+      "specialStatExp": 10,
+      "trainingPoint": 75,
+      "trainingPointMax": 20,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910003": {
+      "id": 17910003,
+      "name": "중급 모험 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 3,
+      "jobType": 1,
+      "trainingTime": 7200,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411002,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410001,
+          "Val": 100
+        },
+        {
+          "Id": 23410000,
+          "Val": 100
+        },
+        {
+          "Id": 23700088,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 35,
+      "specialStatExp": 10,
+      "trainingPoint": 165,
+      "trainingPointMax": 25,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910004": {
+      "id": 17910004,
+      "name": "중급 교역 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 3,
+      "jobType": 2,
+      "trainingTime": 7200,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411002,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410001,
+          "Val": 100
+        },
+        {
+          "Id": 23410000,
+          "Val": 100
+        },
+        {
+          "Id": 23700088,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 35,
+      "specialStatExp": 10,
+      "trainingPoint": 165,
+      "trainingPointMax": 25,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910005": {
+      "id": 17910005,
+      "name": "중급 전투 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 3,
+      "jobType": 3,
+      "trainingTime": 7200,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411002,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410001,
+          "Val": 100
+        },
+        {
+          "Id": 23410000,
+          "Val": 100
+        },
+        {
+          "Id": 23700088,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 35,
+      "specialStatExp": 10,
+      "trainingPoint": 165,
+      "trainingPointMax": 25,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910006": {
+      "id": 17910006,
+      "name": "고급 모험 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 4,
+      "jobType": 1,
+      "trainingTime": 14400,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411003,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410002,
+          "Val": 100
+        },
+        {
+          "Id": 23410001,
+          "Val": 100
+        },
+        {
+          "Id": 23700089,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 75,
+      "specialStatExp": 10,
+      "trainingPoint": 315,
+      "trainingPointMax": 40,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910007": {
+      "id": 17910007,
+      "name": "고급 교역 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 4,
+      "jobType": 2,
+      "trainingTime": 14400,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411003,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410002,
+          "Val": 100
+        },
+        {
+          "Id": 23410001,
+          "Val": 100
+        },
+        {
+          "Id": 23700089,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 75,
+      "specialStatExp": 10,
+      "trainingPoint": 315,
+      "trainingPointMax": 40,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910008": {
+      "id": 17910008,
+      "name": "고급 전투 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 4,
+      "jobType": 3,
+      "trainingTime": 14400,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411003,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410002,
+          "Val": 100
+        },
+        {
+          "Id": 23410001,
+          "Val": 100
+        },
+        {
+          "Id": 23700089,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 75,
+      "specialStatExp": 10,
+      "trainingPoint": 315,
+      "trainingPointMax": 40,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910009": {
+      "id": 17910009,
+      "name": "최고급 모험 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 5,
+      "jobType": 1,
+      "trainingTime": 28800,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 100
+        },
+        {
+          "Id": 23410002,
+          "Val": 100
+        },
+        {
+          "Id": 23700090,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 575,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910010": {
+      "id": 17910010,
+      "name": "최고급 교역 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 5,
+      "jobType": 2,
+      "trainingTime": 28800,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 100
+        },
+        {
+          "Id": 23410002,
+          "Val": 100
+        },
+        {
+          "Id": 23700090,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 575,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910011": {
+      "id": 17910011,
+      "name": "최고급 전투 훈련",
+      "mateGrade": 1,
+      "mateTrainingGrade": 5,
+      "jobType": 3,
+      "trainingTime": 28800,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 50,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 100
+        },
+        {
+          "Id": 23410002,
+          "Val": 100
+        },
+        {
+          "Id": 23700090,
+          "Val": 50
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 575,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910012": {
+      "id": 17910012,
+      "name": "중급 모험 훈련",
+      "mateGrade": 2,
+      "mateTrainingGrade": 3,
+      "jobType": 1,
+      "trainingTime": 14400,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411002,
+      "trainingPieceVal": 65,
+      "trainingItem": [
+        {
+          "Id": 23410001,
+          "Val": 130
+        },
+        {
+          "Id": 23410000,
+          "Val": 130
+        },
+        {
+          "Id": 23700088,
+          "Val": 65
+        }
+      ],
+      "specialStatVal": 35,
+      "specialStatExp": 10,
+      "trainingPoint": 90,
+      "trainingPointMax": 25,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910013": {
+      "id": 17910013,
+      "name": "중급 교역 훈련",
+      "mateGrade": 2,
+      "mateTrainingGrade": 3,
+      "jobType": 2,
+      "trainingTime": 14400,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411002,
+      "trainingPieceVal": 65,
+      "trainingItem": [
+        {
+          "Id": 23410001,
+          "Val": 130
+        },
+        {
+          "Id": 23410000,
+          "Val": 130
+        },
+        {
+          "Id": 23700088,
+          "Val": 65
+        }
+      ],
+      "specialStatVal": 35,
+      "specialStatExp": 10,
+      "trainingPoint": 90,
+      "trainingPointMax": 25,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910014": {
+      "id": 17910014,
+      "name": "중급 전투 훈련",
+      "mateGrade": 2,
+      "mateTrainingGrade": 3,
+      "jobType": 3,
+      "trainingTime": 14400,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411002,
+      "trainingPieceVal": 65,
+      "trainingItem": [
+        {
+          "Id": 23410001,
+          "Val": 130
+        },
+        {
+          "Id": 23410000,
+          "Val": 130
+        },
+        {
+          "Id": 23700088,
+          "Val": 65
+        }
+      ],
+      "specialStatVal": 35,
+      "specialStatExp": 10,
+      "trainingPoint": 90,
+      "trainingPointMax": 25,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910015": {
+      "id": 17910015,
+      "name": "고급 모험 훈련",
+      "mateGrade": 2,
+      "mateTrainingGrade": 4,
+      "jobType": 1,
+      "trainingTime": 28800,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411003,
+      "trainingPieceVal": 65,
+      "trainingItem": [
+        {
+          "Id": 23410002,
+          "Val": 130
+        },
+        {
+          "Id": 23410001,
+          "Val": 130
+        },
+        {
+          "Id": 23700089,
+          "Val": 65
+        }
+      ],
+      "specialStatVal": 75,
+      "specialStatExp": 10,
+      "trainingPoint": 240,
+      "trainingPointMax": 40,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910016": {
+      "id": 17910016,
+      "name": "고급 교역 훈련",
+      "mateGrade": 2,
+      "mateTrainingGrade": 4,
+      "jobType": 2,
+      "trainingTime": 28800,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411003,
+      "trainingPieceVal": 65,
+      "trainingItem": [
+        {
+          "Id": 23410002,
+          "Val": 130
+        },
+        {
+          "Id": 23410001,
+          "Val": 130
+        },
+        {
+          "Id": 23700089,
+          "Val": 65
+        }
+      ],
+      "specialStatVal": 75,
+      "specialStatExp": 10,
+      "trainingPoint": 240,
+      "trainingPointMax": 40,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910017": {
+      "id": 17910017,
+      "name": "고급 전투 훈련",
+      "mateGrade": 2,
+      "mateTrainingGrade": 4,
+      "jobType": 3,
+      "trainingTime": 28800,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411003,
+      "trainingPieceVal": 65,
+      "trainingItem": [
+        {
+          "Id": 23410002,
+          "Val": 130
+        },
+        {
+          "Id": 23410001,
+          "Val": 130
+        },
+        {
+          "Id": 23700089,
+          "Val": 65
+        }
+      ],
+      "specialStatVal": 75,
+      "specialStatExp": 10,
+      "trainingPoint": 240,
+      "trainingPointMax": 40,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910018": {
+      "id": 17910018,
+      "name": "최고급 모험 훈련",
+      "mateGrade": 2,
+      "mateTrainingGrade": 5,
+      "jobType": 1,
+      "trainingTime": 57600,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 65,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 130
+        },
+        {
+          "Id": 23410002,
+          "Val": 130
+        },
+        {
+          "Id": 23700090,
+          "Val": 65
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 500,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910019": {
+      "id": 17910019,
+      "name": "최고급 교역 훈련",
+      "mateGrade": 2,
+      "mateTrainingGrade": 5,
+      "jobType": 2,
+      "trainingTime": 57600,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 65,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 130
+        },
+        {
+          "Id": 23410002,
+          "Val": 130
+        },
+        {
+          "Id": 23700090,
+          "Val": 65
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 500,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910020": {
+      "id": 17910020,
+      "name": "최고급 전투 훈련",
+      "mateGrade": 2,
+      "mateTrainingGrade": 5,
+      "jobType": 3,
+      "trainingTime": 57600,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 65,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 130
+        },
+        {
+          "Id": 23410002,
+          "Val": 130
+        },
+        {
+          "Id": 23700090,
+          "Val": 65
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 500,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910021": {
+      "id": 17910021,
+      "name": "고급 모험 훈련",
+      "mateGrade": 3,
+      "mateTrainingGrade": 4,
+      "jobType": 1,
+      "trainingTime": 36000,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411003,
+      "trainingPieceVal": 85,
+      "trainingItem": [
+        {
+          "Id": 23410002,
+          "Val": 170
+        },
+        {
+          "Id": 23410001,
+          "Val": 170
+        },
+        {
+          "Id": 23700089,
+          "Val": 85
+        }
+      ],
+      "specialStatVal": 75,
+      "specialStatExp": 10,
+      "trainingPoint": 150,
+      "trainingPointMax": 40,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910022": {
+      "id": 17910022,
+      "name": "고급 교역 훈련",
+      "mateGrade": 3,
+      "mateTrainingGrade": 4,
+      "jobType": 2,
+      "trainingTime": 36000,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411003,
+      "trainingPieceVal": 85,
+      "trainingItem": [
+        {
+          "Id": 23410002,
+          "Val": 170
+        },
+        {
+          "Id": 23410001,
+          "Val": 170
+        },
+        {
+          "Id": 23700089,
+          "Val": 85
+        }
+      ],
+      "specialStatVal": 75,
+      "specialStatExp": 10,
+      "trainingPoint": 150,
+      "trainingPointMax": 40,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910023": {
+      "id": 17910023,
+      "name": "고급 전투 훈련",
+      "mateGrade": 3,
+      "mateTrainingGrade": 4,
+      "jobType": 3,
+      "trainingTime": 36000,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411003,
+      "trainingPieceVal": 85,
+      "trainingItem": [
+        {
+          "Id": 23410002,
+          "Val": 170
+        },
+        {
+          "Id": 23410001,
+          "Val": 170
+        },
+        {
+          "Id": 23700089,
+          "Val": 85
+        }
+      ],
+      "specialStatVal": 75,
+      "specialStatExp": 10,
+      "trainingPoint": 150,
+      "trainingPointMax": 40,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910024": {
+      "id": 17910024,
+      "name": "최고급 모험 훈련",
+      "mateGrade": 3,
+      "mateTrainingGrade": 5,
+      "jobType": 1,
+      "trainingTime": 72000,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 85,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 170
+        },
+        {
+          "Id": 23410002,
+          "Val": 170
+        },
+        {
+          "Id": 23700090,
+          "Val": 85
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 410,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910025": {
+      "id": 17910025,
+      "name": "최고급 교역 훈련",
+      "mateGrade": 3,
+      "mateTrainingGrade": 5,
+      "jobType": 2,
+      "trainingTime": 72000,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 85,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 170
+        },
+        {
+          "Id": 23410002,
+          "Val": 170
+        },
+        {
+          "Id": 23700090,
+          "Val": 85
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 410,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910026": {
+      "id": 17910026,
+      "name": "최고급 전투 훈련",
+      "mateGrade": 3,
+      "mateTrainingGrade": 5,
+      "jobType": 3,
+      "trainingTime": 72000,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 85,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 170
+        },
+        {
+          "Id": 23410002,
+          "Val": 170
+        },
+        {
+          "Id": 23700090,
+          "Val": 85
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 410,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910027": {
+      "id": 17910027,
+      "name": "최고급 모험 훈련",
+      "mateGrade": 4,
+      "mateTrainingGrade": 5,
+      "jobType": 1,
+      "trainingTime": 86400,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 110,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 220
+        },
+        {
+          "Id": 23410002,
+          "Val": 220
+        },
+        {
+          "Id": 23700090,
+          "Val": 110
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 260,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910028": {
+      "id": 17910028,
+      "name": "최고급 교역 훈련",
+      "mateGrade": 4,
+      "mateTrainingGrade": 5,
+      "jobType": 2,
+      "trainingTime": 86400,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 110,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 220
+        },
+        {
+          "Id": 23410002,
+          "Val": 220
+        },
+        {
+          "Id": 23700090,
+          "Val": 110
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 260,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    },
+    "17910029": {
+      "id": 17910029,
+      "name": "최고급 전투 훈련",
+      "mateGrade": 4,
+      "mateTrainingGrade": 5,
+      "jobType": 3,
+      "trainingTime": 86400,
+      "trainingCostType": 100003,
+      "trainingCostVal": 100,
+      "trainingPublicPieceId": 23411004,
+      "trainingPieceVal": 110,
+      "trainingItem": [
+        {
+          "Id": 23410003,
+          "Val": 220
+        },
+        {
+          "Id": 23410002,
+          "Val": 220
+        },
+        {
+          "Id": 23700090,
+          "Val": 110
+        }
+      ],
+      "specialStatVal": 130,
+      "specialStatExp": 10,
+      "trainingPoint": 260,
+      "trainingPointMax": 70,
+      "resetPriceType": 100003,
+      "resetPriceVal": 100
+    }
+  }
+}

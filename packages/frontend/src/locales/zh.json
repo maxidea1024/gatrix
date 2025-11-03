@@ -3466,6 +3466,7 @@
     "title": "策划数据",
     "subtitle": "管理游戏策划数据",
     "rebuildData": "重新加载数据",
+    "uploadData": "上传策划数据",
     "rebuildSuccess": "策划数据已成功重新加载",
     "showingFirst100": "仅显示前100项（总计：{{total}}）",
     "search": "搜索",
@@ -3487,6 +3488,20 @@
     "errors": {
       "loadStatsFailed": "加载策划数据统计失败",
       "rebuildFailed": "重新加载数据失败"
+    },
+    "upload": {
+      "title": "上传策划数据",
+      "dragDrop": "将文件拖放到此处以上传",
+      "or": "或",
+      "selectFiles": "选择文件",
+      "selectedFiles": "已选择的文件",
+      "missingFiles": "未选择的文件",
+      "upload": "上传",
+      "uploading": "上传中...",
+      "uploadSuccess": "策划数据已成功上传",
+      "uploadFailed": "策划数据上传失败",
+      "selectFilesToUpload": "请选择要上传的文件",
+      "filesUploadedAndCached": "{{count}}个策划数据文件已上传并缓存成功"
     },
     "tabs": {
       "rewardTypes": "奖励类型",

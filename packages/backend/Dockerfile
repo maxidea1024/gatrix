@@ -9,12 +9,27 @@ WORKDIR /app
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/backend/package.json ./packages/backend/
+COPY packages/frontend/package.json ./packages/frontend/
+COPY packages/chat-server/package.json ./packages/chat-server/
+COPY packages/event-lens/package.json ./packages/event-lens/
 RUN yarn install --frozen-lockfile --production=false
 
 # Rebuild the source code only when needed
 FROM base AS builder
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+
+# Copy all package files first
+COPY package.json yarn.lock* ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/frontend/package.json ./packages/frontend/
+COPY packages/chat-server/package.json ./packages/chat-server/
+COPY packages/event-lens/package.json ./packages/event-lens/
+
+# Install dependencies
+RUN yarn install --frozen-lockfile --production=false
+
+# Copy source code
 COPY . .
 
 # Build the backend
@@ -35,8 +50,8 @@ COPY --from=builder /app/packages/backend/package.json ./package.json
 # Copy production dependencies
 COPY --from=deps /app/node_modules ./node_modules
 
-# Create logs directory
-RUN mkdir -p logs && chown nodejs:nodejs logs
+# Create logs, uploads, and data directories
+RUN mkdir -p logs uploads data && chown nodejs:nodejs logs uploads data
 
 USER nodejs
 

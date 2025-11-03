@@ -1,0 +1,251 @@
+{
+  ":minigameList": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "type": "number",
+      "level": "number",
+      "baseBetMoney": "number",
+      "energy": "number",
+      "upgradeBetMoneyRate": "number",
+      "loyaltyPointWin": "number",
+      "loyaltyPointLose": "number"
+    },
+    ":required": {
+      "name": 1,
+      "type": 1,
+      "level": 1,
+      "baseBetMoney": 1,
+      "energy": 1,
+      "upgradeBetMoneyRate": 1,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "minigameList": {
+    "9000001": {
+      "id": 9000001,
+      "name": "홀덤",
+      "type": 1,
+      "level": 1,
+      "baseBetMoney": 100,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000002": {
+      "id": 9000002,
+      "name": "홀덤",
+      "type": 1,
+      "level": 2,
+      "baseBetMoney": 150,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000003": {
+      "id": 9000003,
+      "name": "홀덤",
+      "type": 1,
+      "level": 3,
+      "baseBetMoney": 200,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000004": {
+      "id": 9000004,
+      "name": "홀덤",
+      "type": 1,
+      "level": 4,
+      "baseBetMoney": 250,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000005": {
+      "id": 9000005,
+      "name": "코이코이",
+      "type": 2,
+      "level": 1,
+      "baseBetMoney": 50,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000006": {
+      "id": 9000006,
+      "name": "코이코이",
+      "type": 2,
+      "level": 2,
+      "baseBetMoney": 100,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000007": {
+      "id": 9000007,
+      "name": "코이코이",
+      "type": 2,
+      "level": 3,
+      "baseBetMoney": 150,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000008": {
+      "id": 9000008,
+      "name": "코이코이",
+      "type": 2,
+      "level": 4,
+      "baseBetMoney": 200,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000009": {
+      "id": 9000009,
+      "name": "다이스",
+      "type": 3,
+      "level": 1,
+      "baseBetMoney": 1500,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000010": {
+      "id": 9000010,
+      "name": "다이스",
+      "type": 3,
+      "level": 2,
+      "baseBetMoney": 2000,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000011": {
+      "id": 9000011,
+      "name": "다이스",
+      "type": 3,
+      "level": 3,
+      "baseBetMoney": 2500,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000012": {
+      "id": 9000012,
+      "name": "다이스",
+      "type": 3,
+      "level": 4,
+      "baseBetMoney": 3000,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000013": {
+      "id": 9000013,
+      "name": "다트",
+      "type": 4,
+      "level": 1,
+      "baseBetMoney": 250,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000014": {
+      "id": 9000014,
+      "name": "다트",
+      "type": 4,
+      "level": 2,
+      "baseBetMoney": 500,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000015": {
+      "id": 9000015,
+      "name": "다트",
+      "type": 4,
+      "level": 3,
+      "baseBetMoney": 1000,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000016": {
+      "id": 9000016,
+      "name": "다트",
+      "type": 4,
+      "level": 4,
+      "baseBetMoney": 1500,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000017": {
+      "id": 9000017,
+      "name": "블랙잭",
+      "type": 5,
+      "level": 1,
+      "baseBetMoney": 1000,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000018": {
+      "id": 9000018,
+      "name": "블랙잭",
+      "type": 5,
+      "level": 2,
+      "baseBetMoney": 1500,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000019": {
+      "id": 9000019,
+      "name": "블랙잭",
+      "type": 5,
+      "level": 3,
+      "baseBetMoney": 2000,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    },
+    "9000020": {
+      "id": 9000020,
+      "name": "블랙잭",
+      "type": 5,
+      "level": 4,
+      "baseBetMoney": 2500,
+      "energy": 1,
+      "upgradeBetMoneyRate": 20,
+      "loyaltyPointWin": 1,
+      "loyaltyPointLose": 0
+    }
+  }
+}

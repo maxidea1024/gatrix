@@ -12,8 +12,9 @@ const RATE_LIMIT_AUTH_MAX_REQUESTS = parseInt(process.env.RATE_LIMIT_AUTH_MAX_RE
 
 // Rate limiter configuration from environment variables
 
-// Skip rate limiting in development if disabled
-const skipRateLimit = isDevelopment && process.env.DISABLE_RATE_LIMIT === 'true';
+// Allow disabling rate limiting in any environment via env flag
+const disableRateLimit = process.env.DISABLE_RATE_LIMIT === 'true';
+const skipRateLimit = disableRateLimit;
 
 // General rate limiter
 export const generalLimiter: RateLimitRequestHandler = rateLimit({

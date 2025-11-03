@@ -1,0 +1,179 @@
+{
+  ":Fortune": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "desc": "text",
+      "fortune": [
+        {
+          "PointId": "number",
+          "PointVal": "number"
+        },
+        {
+          "PointId": "number",
+          "PointVal": "number"
+        },
+        {
+          "PointId": "number",
+          "PointVal": "number"
+        },
+        {
+          "PointId": "number",
+          "PointVal": "number"
+        }
+      ]
+    },
+    ":requiredInObject": {
+      "name": 1,
+      "desc": 1,
+      "fortune": [
+        {
+          "PointId": 1,
+          "PointVal": 1
+        },
+        {
+          "PointId": 1,
+          "PointVal": 1
+        },
+        {
+          "PointId": 1,
+          "PointVal": 1
+        },
+        {
+          "PointId": 1,
+          "PointVal": 1
+        }
+      ]
+    },
+    ":enum": {},
+    ":min": {
+      "fortune": [
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        }
+      ]
+    },
+    ":max": {
+      "fortune": [
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        }
+      ]
+    },
+    ":asset": {},
+    ":links": {
+      "fortune": [
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        }
+      ]
+    }
+  },
+  "Fortune": {
+    "38510000": {
+      "id": 38510000,
+      "name": "_인생운",
+      "desc": "_제독의 운을 점쳐본다.",
+      "fortune": [
+        {
+          "PointId": 100001,
+          "PointVal": 10000
+        },
+        {
+          "PointId": 100001,
+          "PointVal": 100000
+        },
+        {
+          "PointId": 100001,
+          "PointVal": 500000
+        },
+        {
+          "PointId": 100001,
+          "PointVal": 1000000
+        }
+      ]
+    },
+    "38510001": {
+      "id": 38510001,
+      "name": "_사업운",
+      "desc": "_제독의 미래를 점쳐본다.",
+      "fortune": [
+        {
+          "PointId": 100001,
+          "PointVal": 10000
+        },
+        {
+          "PointId": 100001,
+          "PointVal": 100000
+        },
+        {
+          "PointId": 100001,
+          "PointVal": 500000
+        }
+      ]
+    },
+    "38510002": {
+      "id": 38510002,
+      "name": "_동료운",
+      "desc": "_함대 동료들의 운을 점쳐본다.",
+      "fortune": [
+        {
+          "PointId": 100001,
+          "PointVal": 20000
+        },
+        {
+          "PointId": 100001,
+          "PointVal": 200000
+        },
+        {
+          "PointId": 100001,
+          "PointVal": 500000
+        },
+        {
+          "PointId": 100001,
+          "PointVal": 1000000
+        }
+      ]
+    },
+    "38510003": {
+      "id": 38510003,
+      "name": "_연애운",
+      "desc": "_사랑에 대하여 점쳐본다."
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { varsService } from '../services/varsService';
 import { PlatformOption, ChannelOption, PlatformConfigContextType } from '../types/platformConfig';
+import { useAuth } from './AuthContext';
 
 const PlatformConfigContext = createContext<PlatformConfigContextType | undefined>(undefined);
 
@@ -9,6 +10,7 @@ interface PlatformConfigProviderProps {
 }
 
 export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
   const [platforms, setPlatforms] = useState<PlatformOption[]>([]);
   const [channels, setChannels] = useState<ChannelOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,21 +32,30 @@ export const PlatformConfigProvider: React.FC<PlatformConfigProviderProps> = ({ 
     }
   };
 
+  // Fetch only when authenticated
   useEffect(() => {
-    loadPlatformConfig();
-  }, []);
+    if (isAuthenticated) {
+      loadPlatformConfig();
+    } else {
+      // Reset and stop loading when unauthenticated
+      setPlatforms([]);
+      setChannels([]);
+      setError(null);
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
 
-  // Listen for platform/channel updates from backend
+  // Listen for platform/channel updates from backend (only when authenticated)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'platformConfigUpdated') {
+      if (e.key === 'platformConfigUpdated' && isAuthenticated) {
         loadPlatformConfig();
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [isAuthenticated]);
 
   const value: PlatformConfigContextType = {
     platforms,

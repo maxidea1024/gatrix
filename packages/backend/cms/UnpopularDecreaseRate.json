@@ -1,0 +1,37 @@
+{
+  ":UnpopularDecreaseRate": {
+    ":type": {
+      "id": "key",
+      "rate": "number"
+    },
+    ":required": {
+      "rate": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "UnpopularDecreaseRate": {
+    "1": {
+      "id": 1,
+      "rate": 5
+    },
+    "2": {
+      "id": 2,
+      "rate": 10
+    },
+    "3": {
+      "id": 3,
+      "rate": 20
+    },
+    "4": {
+      "id": 4,
+      "rate": 30
+    },
+    "5": {
+      "id": 5,
+      "rate": 35
+    }
+  }
+}

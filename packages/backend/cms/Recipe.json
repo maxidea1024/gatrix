@@ -1,0 +1,265 @@
+{
+  ":Recipe": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "desc": "text",
+      "icon": "string",
+      "manufactureRecipeGrade": "number",
+      "manufactureStat": {
+        "Type": "number",
+        "Lv": "number"
+      },
+      "recipeGroup": "number",
+      "recipeUnlock": [
+        {
+          "Type": "number",
+          "Target": "number"
+        },
+        {
+          "Type": "number",
+          "Target": "number"
+        }
+      ],
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Value": "number"
+        },
+        {
+          "Id": "number",
+          "Target": "number",
+          "Value": "number"
+        }
+      ],
+      "mainIngredient": [
+        {
+          "Type": "number",
+          "Id": "number",
+          "Quantity": "number",
+          "EnchantLv": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Quantity": "number",
+          "EnchantLv": "number"
+        }
+      ],
+      "subIngredient": [
+        {
+          "Type": "number",
+          "Id": "number",
+          "Quantity": "number",
+          "EnchantLv": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Quantity": "number",
+          "EnchantLv": "number"
+        }
+      ],
+      "workingMate": [
+        {
+          "StatType": "number",
+          "StatVal": "number",
+          "AwakenLv": "number",
+          "JobId": "number"
+        },
+        {
+          "StatType": "number",
+          "StatVal": "number",
+          "AwakenLv": "number",
+          "JobId": "number"
+        }
+      ],
+      "costManufacturePoint": "number",
+      "costPoint": {
+        "Type": "number",
+        "Value": "number"
+      },
+      "manufactureTextGroup": "number",
+      "defaultSuccessRate": "number",
+      "mateAdditionalRate": "number"
+    },
+    ":required": {
+      "name": 1,
+      "desc": 1,
+      "icon": 1,
+      "manufactureRecipeGrade": 1,
+      "manufactureStat": {
+        "Type": 1,
+        "Lv": 1
+      },
+      "recipeGroup": 1,
+      "recipeUnlock": [
+        {
+          "Type": 1,
+          "Target": 1
+        },
+        {
+          "Type": 1,
+          "Target": 1
+        }
+      ],
+      "contentsTerms": [
+        {
+          "Id": 1,
+          "Target": 1,
+          "Value": 1
+        },
+        {
+          "Id": 1,
+          "Target": 1,
+          "Value": 1
+        }
+      ],
+      "mainIngredient": [
+        {
+          "Type": 1,
+          "Id": 1,
+          "Quantity": 1,
+          "EnchantLv": 1
+        },
+        {
+          "Type": 1,
+          "Id": 1,
+          "Quantity": 1,
+          "EnchantLv": 1
+        }
+      ],
+      "subIngredient": [
+        {
+          "Type": 1,
+          "Id": 1,
+          "Quantity": 1,
+          "EnchantLv": 1
+        },
+        {
+          "Type": 1,
+          "Id": 1,
+          "Quantity": 1,
+          "EnchantLv": 1
+        }
+      ],
+      "workingMate": [
+        {
+          "StatType": 1,
+          "StatVal": 1,
+          "AwakenLv": 1,
+          "JobId": 1
+        },
+        {
+          "StatType": 1,
+          "StatVal": 1,
+          "AwakenLv": 1,
+          "JobId": 1
+        }
+      ],
+      "costManufacturePoint": 1,
+      "costPoint": {
+        "Type": 1,
+        "Value": 1
+      },
+      "manufactureTextGroup": 1,
+      "defaultSuccessRate": 1,
+      "mateAdditionalRate": 1
+    },
+    ":min": {
+      "manufactureRecipeGrade": 0
+    },
+    ":max": {
+      "manufactureRecipeGrade": 0
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "Recipe": {
+    "15000000": {
+      "id": 15000000,
+      "name": "사누드의 빠에야",
+      "desc": "사누드의 어머니가 전수해주신 빠에야 레시피.",
+      "icon": "1",
+      "manufactureRecipeGrade": 0,
+      "manufactureStat": {
+        "Type": 1,
+        "Lv": 1
+      },
+      "recipeGroup": 1,
+      "recipeUnlock": [
+        {
+          "Type": 1,
+          "Target": 1
+        },
+        {
+          "Type": 1,
+          "Target": 1
+        }
+      ],
+      "contentsTerms": [
+        {
+          "Id": 1,
+          "Target": 1,
+          "Value": 1
+        },
+        {
+          "Id": 1,
+          "Target": 1,
+          "Value": 1
+        }
+      ],
+      "mainIngredient": [
+        {
+          "Type": 1,
+          "Id": 1,
+          "Quantity": 1,
+          "EnchantLv": 1
+        },
+        {
+          "Type": 1,
+          "Id": 1,
+          "Quantity": 1,
+          "EnchantLv": 1
+        }
+      ],
+      "subIngredient": [
+        {
+          "Type": 1,
+          "Id": 1,
+          "Quantity": 1,
+          "EnchantLv": 1
+        },
+        {
+          "Type": 1,
+          "Id": 1,
+          "Quantity": 1,
+          "EnchantLv": 1
+        }
+      ],
+      "workingMate": [
+        {
+          "StatType": 1,
+          "StatVal": 1,
+          "AwakenLv": 1,
+          "JobId": 1
+        },
+        {
+          "StatType": 1,
+          "StatVal": 1,
+          "AwakenLv": 1,
+          "JobId": 1
+        }
+      ],
+      "costManufacturePoint": 1,
+      "costPoint": {
+        "Type": 1,
+        "Value": 1
+      },
+      "manufactureTextGroup": 1,
+      "defaultSuccessRate": 1,
+      "mateAdditionalRate": 1
+    }
+  }
+}

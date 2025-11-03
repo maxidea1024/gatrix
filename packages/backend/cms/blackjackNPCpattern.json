@@ -1,0 +1,169 @@
+{
+  ":blackjackNPCpattern": {
+    ":type": {
+      "id": "key",
+      "sumCondition": "number",
+      "checkRate": "number",
+      "HitRate": "number",
+      "StayRate": "number"
+    },
+    ":required": {
+      "sumCondition": 1,
+      "checkRate": 1,
+      "HitRate": 1,
+      "StayRate": 1
+    },
+    ":min": {
+      "HitRate": 0,
+      "StayRate": 0
+    },
+    ":max": {
+      "HitRate": 1000000,
+      "StayRate": 1000000
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "blackjackNPCpattern": {
+    "101": {
+      "id": 101,
+      "sumCondition": 2,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "102": {
+      "id": 102,
+      "sumCondition": 3,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "103": {
+      "id": 103,
+      "sumCondition": 4,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "104": {
+      "id": 104,
+      "sumCondition": 5,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "105": {
+      "id": 105,
+      "sumCondition": 6,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "106": {
+      "id": 106,
+      "sumCondition": 7,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "107": {
+      "id": 107,
+      "sumCondition": 8,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "108": {
+      "id": 108,
+      "sumCondition": 9,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "109": {
+      "id": 109,
+      "sumCondition": 10,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "110": {
+      "id": 110,
+      "sumCondition": 11,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "111": {
+      "id": 111,
+      "sumCondition": 12,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "112": {
+      "id": 112,
+      "sumCondition": 13,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "113": {
+      "id": 113,
+      "sumCondition": 14,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "114": {
+      "id": 114,
+      "sumCondition": 15,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "115": {
+      "id": 115,
+      "sumCondition": 16,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "116": {
+      "id": 116,
+      "sumCondition": 17,
+      "checkRate": 0,
+      "HitRate": 1000000,
+      "StayRate": 0
+    },
+    "117": {
+      "id": 117,
+      "sumCondition": 18,
+      "checkRate": 500000,
+      "HitRate": 0,
+      "StayRate": 0
+    },
+    "118": {
+      "id": 118,
+      "sumCondition": 19,
+      "checkRate": 600000,
+      "HitRate": 0,
+      "StayRate": 0
+    },
+    "119": {
+      "id": 119,
+      "sumCondition": 20,
+      "checkRate": 700000,
+      "HitRate": 0,
+      "StayRate": 0
+    },
+    "120": {
+      "id": 120,
+      "sumCondition": 21,
+      "checkRate": 0,
+      "HitRate": 0,
+      "StayRate": 1000000
+    }
+  }
+}

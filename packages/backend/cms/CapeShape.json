@@ -1,0 +1,3054 @@
+{
+  ":CapeShape": {
+    ":type": {
+      "id": "key",
+      "skeleton": "string",
+      "atlas": "string",
+      "skin": "string",
+      "color1": "number",
+      "color2": "number",
+      "color3": "number",
+      "backAnim": "bool",
+      "alwaysBodyAnim": "bool"
+    },
+    ":required": {
+      "skeleton": 1,
+      "atlas": 1,
+      "color1": 1,
+      "color2": 1,
+      "color3": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "CapeShape": {
+    "150000000": {
+      "id": 150000000,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "3",
+      "color1": 16184303,
+      "color2": 4605510,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000001": {
+      "id": 150000001,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 3294094,
+      "color2": 3294094,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000002": {
+      "id": 150000002,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 3447003,
+      "color2": 3447003,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000003": {
+      "id": 150000003,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 9802643,
+      "color2": 15149356,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000004": {
+      "id": 150000004,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 16436043,
+      "color2": 43263,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000005": {
+      "id": 150000005,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "3",
+      "color1": 16184303,
+      "color2": 4605510,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000006": {
+      "id": 150000006,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 37119,
+      "color2": 8224125,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000007": {
+      "id": 150000007,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 14957423,
+      "color2": 5433598,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000008": {
+      "id": 150000008,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 15818518,
+      "color2": 3447003,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000009": {
+      "id": 150000009,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 14957423,
+      "color2": 5433598,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000010": {
+      "id": 150000010,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 14957423,
+      "color2": 5433598,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000011": {
+      "id": 150000011,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 14957423,
+      "color2": 15818518,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000012": {
+      "id": 150000012,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 12909717,
+      "color2": 12909717,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "150000013": {
+      "id": 150000013,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 37119,
+      "color2": 8224125,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100100": {
+      "id": 151100100,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 43263,
+      "color2": 13180430,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100101": {
+      "id": 151100101,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 4345710,
+      "color2": 4345710,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100102": {
+      "id": 151100102,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 5592405,
+      "color2": 5592405,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100103": {
+      "id": 151100103,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 8566354,
+      "color2": 8566354,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100104": {
+      "id": 151100104,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 11373164,
+      "color2": 11373164,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100105": {
+      "id": 151100105,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 14531406,
+      "color2": 14531406,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100106": {
+      "id": 151100106,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 15921906,
+      "color2": 1008593,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100107": {
+      "id": 151100107,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 15921906,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100108": {
+      "id": 151100108,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16184303,
+      "color2": 16587550,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100109": {
+      "id": 151100109,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16775802,
+      "color2": 5592405,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100110": {
+      "id": 151100110,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16775802,
+      "color2": 13180430,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100111": {
+      "id": 151100111,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16775802,
+      "color2": 16775802,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100113": {
+      "id": 151100113,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16775802,
+      "color2": 16745513,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100200": {
+      "id": 151100200,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 14531406,
+      "color2": 16587550,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100201": {
+      "id": 151100201,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 1008593,
+      "color2": 1008593,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100202": {
+      "id": 151100202,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 8627714,
+      "color2": 8627714,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100203": {
+      "id": 151100203,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 15230334,
+      "color2": 15230334,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100204": {
+      "id": 151100204,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 15921906,
+      "color2": 1008593,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100205": {
+      "id": 151100205,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 15921906,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100206": {
+      "id": 151100206,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 15921906,
+      "color2": 16775802,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100207": {
+      "id": 151100207,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16775802,
+      "color2": 5592405,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100208": {
+      "id": 151100208,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16775802,
+      "color2": 11534187,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100209": {
+      "id": 151100209,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16775802,
+      "color2": 12543559,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100210": {
+      "id": 151100210,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16775802,
+      "color2": 13180430,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100211": {
+      "id": 151100211,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16775802,
+      "color2": 13180430,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100212": {
+      "id": 151100212,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16775802,
+      "color2": 14957423,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100300": {
+      "id": 151100300,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 6592478,
+      "color2": 4100606,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100301": {
+      "id": 151100301,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 3447003,
+      "color2": 3447003,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100302": {
+      "id": 151100302,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 4345710,
+      "color2": 4345710,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100303": {
+      "id": 151100303,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 5192744,
+      "color2": 5192744,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100304": {
+      "id": 151100304,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 5949382,
+      "color2": 5949382,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100305": {
+      "id": 151100305,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 8566354,
+      "color2": 8566354,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100306": {
+      "id": 151100306,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 8566354,
+      "color2": 12507961,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100307": {
+      "id": 151100307,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 10116949,
+      "color2": 10116949,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100308": {
+      "id": 151100308,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 10851924,
+      "color2": 10851924,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100309": {
+      "id": 151100309,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 13180430,
+      "color2": 13180430,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100310": {
+      "id": 151100310,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100311": {
+      "id": 151100311,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 3026999,
+      "color2": 3026999,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100312": {
+      "id": 151100312,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 8012955,
+      "color2": 8012955,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100400": {
+      "id": 151100400,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 37119,
+      "color2": 37119,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100401": {
+      "id": 151100401,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 10770779,
+      "color2": 10770779,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100402": {
+      "id": 151100402,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16703609,
+      "color2": 12595749,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100500": {
+      "id": 151100500,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 37119,
+      "color2": 37119,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100501": {
+      "id": 151100501,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 4605510,
+      "color2": 4605510,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100502": {
+      "id": 151100502,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 5949382,
+      "color2": 5949382,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100503": {
+      "id": 151100503,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 8566354,
+      "color2": 8566354,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100504": {
+      "id": 151100504,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 9830655,
+      "color2": 9830655,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100505": {
+      "id": 151100505,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 11043968,
+      "color2": 11043968,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100506": {
+      "id": 151100506,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 12543559,
+      "color2": 12543559,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100507": {
+      "id": 151100507,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 13180430,
+      "color2": 13180430,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100508": {
+      "id": 151100508,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 15921906,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100509": {
+      "id": 151100509,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16703609,
+      "color2": 12595749,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100510": {
+      "id": 151100510,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 43263,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100600": {
+      "id": 151100600,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 6592478,
+      "color2": 4100606,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100900": {
+      "id": 151100900,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "6",
+      "color1": 12980737,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200501": {
+      "id": 151200501,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "6",
+      "color1": 10770779,
+      "color2": 10770779,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151101200": {
+      "id": 151101200,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151101301": {
+      "id": 151101301,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 11490593,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200100": {
+      "id": 151200100,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 14423298,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200101": {
+      "id": 151200101,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 92657,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200102": {
+      "id": 151200102,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 4605510,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200103": {
+      "id": 151200103,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 8323327,
+      "color2": 8323327,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200104": {
+      "id": 151200104,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 8545253,
+      "color2": 8545253,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200105": {
+      "id": 151200105,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 8627714,
+      "color2": 8627714,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200106": {
+      "id": 151200106,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 10116949,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200107": {
+      "id": 151200107,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 12543559,
+      "color2": 12543559,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200108": {
+      "id": 151200108,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 14531406,
+      "color2": 14531406,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200109": {
+      "id": 151200109,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 15921906,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200200": {
+      "id": 151200200,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 12980737,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200201": {
+      "id": 151200201,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 92657,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200202": {
+      "id": 151200202,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 4605510,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200203": {
+      "id": 151200203,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 8545253,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200204": {
+      "id": 151200204,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 15921906,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200205": {
+      "id": 151200205,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 9210763,
+      "color2": 14620164,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200300": {
+      "id": 151200300,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "5",
+      "color1": 3951705,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200301": {
+      "id": 151200301,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "5",
+      "color1": 4116940,
+      "color2": 4116940,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200302": {
+      "id": 151200302,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "5",
+      "color1": 10770779,
+      "color2": 14531406,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200303": {
+      "id": 151200303,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "5",
+      "color1": 11043968,
+      "color2": 11043968,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200304": {
+      "id": 151200304,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "5",
+      "color1": 8627714,
+      "color2": 8627714,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200400": {
+      "id": 151200400,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "5",
+      "color1": 3951705,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200600": {
+      "id": 151200600,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "6",
+      "color1": 12980737,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151300100": {
+      "id": 151300100,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "4",
+      "color1": 9802643,
+      "color2": 15149356,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151300200": {
+      "id": 151300200,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "4",
+      "color1": 9802643,
+      "color2": 15149356,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151400100": {
+      "id": 151400100,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "2",
+      "color1": 4427351,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151400200": {
+      "id": 151400200,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "6",
+      "color1": 13156795,
+      "color2": 1867519,
+      "color3": 16773863,
+      "backAnim": true
+    },
+    "151400900": {
+      "id": 151400900,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "6",
+      "color1": 13156795,
+      "color2": 1867519,
+      "color3": 16773863,
+      "backAnim": true
+    },
+    "151400400": {
+      "id": 151400400,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "2",
+      "color1": 4427351,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151400401": {
+      "id": 151400401,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "2",
+      "color1": 15921906,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151400500": {
+      "id": 151400500,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "2",
+      "color1": 3026999,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151400300": {
+      "id": 151400300,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151400700": {
+      "id": 151400700,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "3",
+      "color1": 16777215,
+      "color2": 11490593,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151400701": {
+      "id": 151400701,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "3",
+      "color1": 11043968,
+      "color2": 11043968,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151400702": {
+      "id": 151400702,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "3",
+      "color1": 11440346,
+      "color2": 11440346,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151400703": {
+      "id": 151400703,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "3",
+      "color1": 16777215,
+      "color2": 43263,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151400600": {
+      "id": 151400600,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "2",
+      "color1": 3026999,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151401103": {
+      "id": 151401103,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 12980737,
+      "color2": 16395273,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151400800": {
+      "id": 151400800,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "3",
+      "color1": 16777215,
+      "color2": 11490593,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151300300": {
+      "id": 151300300,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "4",
+      "color1": 16777215,
+      "color2": 16395273,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151300400": {
+      "id": 151300400,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "4",
+      "color1": 16777215,
+      "color2": 16395273,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151300600": {
+      "id": 151300600,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "5",
+      "color1": 16777215,
+      "color2": 43263,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151300500": {
+      "id": 151300500,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "5",
+      "color1": 16777215,
+      "color2": 43263,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151401102": {
+      "id": 151401102,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 11043968,
+      "color2": 11043968,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151401202": {
+      "id": 151401202,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 43263,
+      "color2": 16436043,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200502": {
+      "id": 151200502,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "6",
+      "color1": 12980737,
+      "color2": 16769602,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200601": {
+      "id": 151200601,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "6",
+      "color1": 9420540,
+      "color2": 9420540,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100213": {
+      "id": 151100213,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16769602,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100601": {
+      "id": 151100601,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 11505006,
+      "color2": 11505006,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151401203": {
+      "id": 151401203,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 15921906,
+      "color2": 15149356,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151401204": {
+      "id": 151401204,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 16769602,
+      "color2": 15149356,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200110": {
+      "id": 151200110,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 7481375,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100313": {
+      "id": 151100313,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "1",
+      "color1": 16395273,
+      "color2": 3026999,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151902402": {
+      "id": 151902402,
+      "skeleton": "FCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "1",
+      "color1": 11869712,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000007": {
+      "id": 35000007,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 43263,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000008": {
+      "id": 35000008,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "6",
+      "color1": 7685184,
+      "color2": 7685184,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000009": {
+      "id": 35000009,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "4",
+      "color1": 16777215,
+      "color2": 2126814,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000010": {
+      "id": 35000010,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "4",
+      "color1": 16777215,
+      "color2": 2126814,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000011": {
+      "id": 35000011,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "7",
+      "color1": 16777215,
+      "color2": 14531406,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000012": {
+      "id": 35000012,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "7",
+      "color1": 16777215,
+      "color2": 14531406,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000013": {
+      "id": 35000013,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "7",
+      "color1": 7187709,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000014": {
+      "id": 35000014,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "8",
+      "color1": 8627714,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000015": {
+      "id": 35000015,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "5",
+      "color1": 13317444,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000016": {
+      "id": 35000016,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "9",
+      "color1": 6717367,
+      "color2": 15161226,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000017": {
+      "id": 35000017,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "8",
+      "color1": 15617357,
+      "color2": 16690515,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000018": {
+      "id": 35000018,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "10",
+      "color1": 6717367,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000019": {
+      "id": 35000019,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "11",
+      "color1": 15149356,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000020": {
+      "id": 35000020,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "12",
+      "color1": 7061234,
+      "color2": 14199004,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000021": {
+      "id": 35000021,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "13",
+      "color1": 15285807,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000022": {
+      "id": 35000022,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "14",
+      "color1": 11763556,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000023": {
+      "id": 35000023,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "6",
+      "color1": 7453638,
+      "color2": 8705010,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000024": {
+      "id": 35000024,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "15",
+      "color1": 14695749,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000025": {
+      "id": 35000025,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "16",
+      "color1": 46335,
+      "color2": 16746240,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000026": {
+      "id": 35000026,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "17",
+      "color1": 3061907,
+      "color2": 16746240,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000027": {
+      "id": 35000027,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "9",
+      "color1": 16680523,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000028": {
+      "id": 35000028,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "18",
+      "color1": 16711681,
+      "color2": 23015,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000029": {
+      "id": 35000029,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "1",
+      "color1": 11484242,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000030": {
+      "id": 35000030,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "2",
+      "color1": 15149356,
+      "color2": 16769602,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000031": {
+      "id": 35000031,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "3",
+      "color1": 11763556,
+      "color2": 14531406,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000032": {
+      "id": 35000032,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "4",
+      "color1": 6717367,
+      "color2": 4012424,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000033": {
+      "id": 35000033,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "5",
+      "color1": 14531406,
+      "color2": 10575687,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000034": {
+      "id": 35000034,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "6",
+      "color1": 16777215,
+      "color2": 15617357,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000035": {
+      "id": 35000035,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "10",
+      "color1": 8627714,
+      "color2": 16769602,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000036": {
+      "id": 35000036,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "11",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000037": {
+      "id": 35000037,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "7",
+      "color1": 7187709,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000038": {
+      "id": 35000038,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "8",
+      "color1": 8627714,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000039": {
+      "id": 35000039,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "5",
+      "color1": 13317444,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000040": {
+      "id": 35000040,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "9",
+      "color1": 6717367,
+      "color2": 15161226,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000041": {
+      "id": 35000041,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "8",
+      "color1": 15617357,
+      "color2": 16690515,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000042": {
+      "id": 35000042,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "10",
+      "color1": 6717367,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000043": {
+      "id": 35000043,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "11",
+      "color1": 15149356,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000044": {
+      "id": 35000044,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "12",
+      "color1": 7061234,
+      "color2": 14199004,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000045": {
+      "id": 35000045,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "13",
+      "color1": 15285807,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000046": {
+      "id": 35000046,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "14",
+      "color1": 11763556,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000047": {
+      "id": 35000047,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "6",
+      "color1": 7453638,
+      "color2": 8705010,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000048": {
+      "id": 35000048,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "15",
+      "color1": 14695749,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000049": {
+      "id": 35000049,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "16",
+      "color1": 46335,
+      "color2": 16746240,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000050": {
+      "id": 35000050,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "17",
+      "color1": 3061907,
+      "color2": 16746240,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000051": {
+      "id": 35000051,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "9",
+      "color1": 16680523,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000052": {
+      "id": 35000052,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "18",
+      "color1": 16711681,
+      "color2": 23015,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000053": {
+      "id": 35000053,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "1",
+      "color1": 11484242,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000054": {
+      "id": 35000054,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "2",
+      "color1": 15149356,
+      "color2": 16769602,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000055": {
+      "id": 35000055,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "3",
+      "color1": 11763556,
+      "color2": 14531406,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000056": {
+      "id": 35000056,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "4",
+      "color1": 7187709,
+      "color2": 4347532,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000057": {
+      "id": 35000057,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "5",
+      "color1": 14531406,
+      "color2": 10575687,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000058": {
+      "id": 35000058,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "6",
+      "color1": 16777215,
+      "color2": 15617357,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000059": {
+      "id": 35000059,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "10",
+      "color1": 8627714,
+      "color2": 16769602,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000060": {
+      "id": 35000060,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "11",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000061": {
+      "id": 35000061,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "7",
+      "color1": 12451462,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000062": {
+      "id": 35000062,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "8",
+      "color1": 14270426,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000063": {
+      "id": 35000063,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "7",
+      "color1": 12451462,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000064": {
+      "id": 35000064,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "8",
+      "color1": 14270426,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000065": {
+      "id": 35000065,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "9",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000066": {
+      "id": 35000066,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "9",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200111": {
+      "id": 151200111,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 5737784,
+      "color2": 16703609,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200112": {
+      "id": 151200112,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 14531406,
+      "color2": 10116949,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151401104": {
+      "id": 151401104,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 43263,
+      "color2": 43263,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151401205": {
+      "id": 151401205,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "3",
+      "color1": 16769602,
+      "color2": 10578134,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151100214": {
+      "id": 151100214,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "1",
+      "color1": 16587550,
+      "color2": 16587550,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "151200113": {
+      "id": 151200113,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "1",
+      "color1": 14423298,
+      "color2": 16703609,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000067": {
+      "id": 35000067,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "10",
+      "color1": 14277081,
+      "color2": 13092255,
+      "color3": 7647485,
+      "backAnim": true
+    },
+    "35000068": {
+      "id": 35000068,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "10",
+      "color1": 14277081,
+      "color2": 13092255,
+      "color3": 7647485,
+      "backAnim": true
+    },
+    "35000069": {
+      "id": 35000069,
+      "skeleton": "FCape04Skins",
+      "atlas": "FCape04Skins0001",
+      "skin": "1",
+      "color1": 13712153,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000070": {
+      "id": 35000070,
+      "skeleton": "MCape04Skins",
+      "atlas": "FCape04Skins0001",
+      "skin": "1",
+      "color1": 13712153,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000071": {
+      "id": 35000071,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "11",
+      "color1": 7566195,
+      "color2": 14270426,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000072": {
+      "id": 35000072,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "11",
+      "color1": 7566195,
+      "color2": 14270426,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000073": {
+      "id": 35000073,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "12",
+      "color1": 15154503,
+      "color2": 11499006,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000074": {
+      "id": 35000074,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "12",
+      "color1": 15154503,
+      "color2": 11499006,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000075": {
+      "id": 35000075,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "13",
+      "color1": 4345710,
+      "color2": 32511,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000076": {
+      "id": 35000076,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "13",
+      "color1": 4345710,
+      "color2": 32511,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000077": {
+      "id": 35000077,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "14",
+      "color1": 16746240,
+      "color2": 4210752,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000078": {
+      "id": 35000078,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "14",
+      "color1": 16746240,
+      "color2": 4210752,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000079": {
+      "id": 35000079,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "15",
+      "color1": 15149356,
+      "color2": 15072253,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000080": {
+      "id": 35000080,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "15",
+      "color1": 15149356,
+      "color2": 15072253,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000081": {
+      "id": 35000081,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "16",
+      "color1": 15921906,
+      "color2": 16703609,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000082": {
+      "id": 35000082,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "16",
+      "color1": 15921906,
+      "color2": 16703609,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000083": {
+      "id": 35000083,
+      "skeleton": "MBPack01Skins",
+      "atlas": "MBPack01Skins",
+      "skin": "1",
+      "color1": 15072253,
+      "color2": 16626944,
+      "color3": 10534972,
+      "backAnim": true
+    },
+    "35000084": {
+      "id": 35000084,
+      "skeleton": "FBPack01Skins",
+      "atlas": "FBPack01Skins",
+      "skin": "1",
+      "color1": 15072253,
+      "color2": 16626944,
+      "color3": 10534972,
+      "backAnim": true
+    },
+    "35000085": {
+      "id": 35000085,
+      "skeleton": "MBSword01Skins",
+      "atlas": "FBSword01Skins",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000086": {
+      "id": 35000086,
+      "skeleton": "FBSword01Skins",
+      "atlas": "FBSword01Skins",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000087": {
+      "id": 35000087,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "7",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000088": {
+      "id": 35000088,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "7",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000089": {
+      "id": 35000089,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "1",
+      "color1": 16717312,
+      "color2": 15072253,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000090": {
+      "id": 35000090,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "1",
+      "color1": 16717312,
+      "color2": 15072253,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000091": {
+      "id": 35000091,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "2",
+      "color1": 16717312,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000092": {
+      "id": 35000092,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "2",
+      "color1": 16717312,
+      "color2": 15921906,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000093": {
+      "id": 35000093,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "3",
+      "color1": 6732165,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000094": {
+      "id": 35000094,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "3",
+      "color1": 6732165,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000095": {
+      "id": 35000095,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "4",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000096": {
+      "id": 35000096,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "4",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000097": {
+      "id": 35000097,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "12",
+      "color1": 15072253,
+      "color2": 5065804,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000098": {
+      "id": 35000098,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "12",
+      "color1": 15072253,
+      "color2": 5065804,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000099": {
+      "id": 35000099,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "13",
+      "color1": 15072253,
+      "color2": 5065804,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000100": {
+      "id": 35000100,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "13",
+      "color1": 15072253,
+      "color2": 5065804,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000101": {
+      "id": 35000101,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "8",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000102": {
+      "id": 35000102,
+      "skeleton": "MCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "2",
+      "color1": 15072253,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000103": {
+      "id": 35000103,
+      "skeleton": "FCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "2",
+      "color1": 15072253,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000104": {
+      "id": 35000104,
+      "skeleton": "MCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "1",
+      "color1": 11869712,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000105": {
+      "id": 35000105,
+      "skeleton": "MCape04Skins",
+      "atlas": "FCape04Skins0001",
+      "skin": "2",
+      "color1": 15072253,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000106": {
+      "id": 35000106,
+      "skeleton": "FCape04Skins",
+      "atlas": "FCape04Skins0001",
+      "skin": "2",
+      "color1": 15072253,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000107": {
+      "id": 35000107,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "5",
+      "color1": 5065804,
+      "color2": 16717312,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000108": {
+      "id": 35000108,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "5",
+      "color1": 5065804,
+      "color2": 16717312,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000109": {
+      "id": 35000109,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "7",
+      "color1": 16717312,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000110": {
+      "id": 35000110,
+      "skeleton": "MBFlag01Skins",
+      "atlas": "FBFlag01Skins",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000111": {
+      "id": 35000111,
+      "skeleton": "MBFlag01Skins",
+      "atlas": "FBFlag01Skins",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000112": {
+      "id": 35000112,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "6",
+      "color1": 9134667,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000113": {
+      "id": 35000113,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "6",
+      "color1": 9134667,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000114": {
+      "id": 35000114,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "7",
+      "color1": 16777215,
+      "color2": 5065804,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000115": {
+      "id": 35000115,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "7",
+      "color1": 16777215,
+      "color2": 5065804,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000116": {
+      "id": 35000116,
+      "skeleton": "MCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "3",
+      "color1": 16641695,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000117": {
+      "id": 35000117,
+      "skeleton": "FCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "3",
+      "color1": 16641695,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000118": {
+      "id": 35000118,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "9",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000119": {
+      "id": 35000119,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "9",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000120": {
+      "id": 35000120,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "10",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000121": {
+      "id": 35000121,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "10",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000122": {
+      "id": 35000122,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "11",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000123": {
+      "id": 35000123,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "11",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000124": {
+      "id": 35000124,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "14",
+      "color1": 16717312,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000125": {
+      "id": 35000125,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0001",
+      "skin": "14",
+      "color1": 16717312,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000126": {
+      "id": 35000126,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "12",
+      "color1": 16508321,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000127": {
+      "id": 35000127,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "12",
+      "color1": 16508321,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000128": {
+      "id": 35000128,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "13",
+      "color1": 16641695,
+      "color2": 4609277,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000129": {
+      "id": 35000129,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "13",
+      "color1": 16641695,
+      "color2": 4609277,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000130": {
+      "id": 35000130,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "7",
+      "color1": 16641695,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000131": {
+      "id": 35000131,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "14",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000132": {
+      "id": 35000132,
+      "skeleton": "FWingSkins",
+      "atlas": "FWingSkins",
+      "skin": "1",
+      "color1": 15072253,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000133": {
+      "id": 35000133,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0001",
+      "skin": "7",
+      "color1": 16717312,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000134": {
+      "id": 35000134,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "15",
+      "color1": 16777215,
+      "color2": 3061907,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000135": {
+      "id": 35000135,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "15",
+      "color1": 16777215,
+      "color2": 3061907,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000136": {
+      "id": 35000136,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "8",
+      "color1": 15072253,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000137": {
+      "id": 35000137,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "8",
+      "color1": 15072253,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000138": {
+      "id": 35000138,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "9",
+      "color1": 4347532,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000139": {
+      "id": 35000139,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "9",
+      "color1": 4347532,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000140": {
+      "id": 35000140,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "10",
+      "color1": 14143153,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000141": {
+      "id": 35000141,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "10",
+      "color1": 14143153,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000142": {
+      "id": 35000142,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "11",
+      "color1": 16468251,
+      "color2": 11505006,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000143": {
+      "id": 35000143,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "11",
+      "color1": 16468251,
+      "color2": 11505006,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000144": {
+      "id": 35000144,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "16",
+      "color1": 15072253,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000145": {
+      "id": 35000145,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "16",
+      "color1": 15072253,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000146": {
+      "id": 35000146,
+      "skeleton": "MCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "12",
+      "color1": 4347532,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000147": {
+      "id": 35000147,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "12",
+      "color1": 4347532,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000148": {
+      "id": 35000148,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0001",
+      "skin": "8",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000149": {
+      "id": 35000149,
+      "skeleton": "MBSword01Skins",
+      "atlas": "FBSword01Skins",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000150": {
+      "id": 35000150,
+      "skeleton": "FBSword01Skins",
+      "atlas": "FBSword01Skins",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000151": {
+      "id": 35000151,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0002",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000152": {
+      "id": 35000152,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0002",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000153": {
+      "id": 35000153,
+      "skeleton": "MCape02Skins",
+      "atlas": "FCape02Skins0002",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000154": {
+      "id": 35000154,
+      "skeleton": "FCape02Skins",
+      "atlas": "FCape02Skins0002",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000155": {
+      "id": 35000155,
+      "skeleton": "MCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "4",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000156": {
+      "id": 35000156,
+      "skeleton": "FCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "4",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000157": {
+      "id": 35000157,
+      "skeleton": "MCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "5",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000158": {
+      "id": 35000158,
+      "skeleton": "FCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "5",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000159": {
+      "id": 35000159,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0003",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000160": {
+      "id": 35000160,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0003",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000161": {
+      "id": 35000161,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0003",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000162": {
+      "id": 35000162,
+      "skeleton": "MCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "7",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000163": {
+      "id": 35000163,
+      "skeleton": "FCape05Skins",
+      "atlas": "FCape05Skins0001",
+      "skin": "7",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000164": {
+      "id": 35000164,
+      "skeleton": "MBPack01Skins",
+      "atlas": "MBPack01Skins",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000165": {
+      "id": 35000165,
+      "skeleton": "FBPack01Skins",
+      "atlas": "FBPack01Skins",
+      "skin": "2",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000166": {
+      "id": 35000166,
+      "skeleton": "MBPack01Skins",
+      "atlas": "MBPack01Skins",
+      "skin": "3",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000167": {
+      "id": 35000167,
+      "skeleton": "FBPack01Skins",
+      "atlas": "FBPack01Skins",
+      "skin": "3",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000168": {
+      "id": 35000168,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 15072253,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000169": {
+      "id": 35000169,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0002",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 15137789,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000170": {
+      "id": 35000170,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0003",
+      "skin": "3",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000171": {
+      "id": 35000171,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0003",
+      "skin": "3",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000172": {
+      "id": 35000172,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0003",
+      "skin": "4",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000173": {
+      "id": 35000173,
+      "skeleton": "FCape01Skins",
+      "atlas": "FCape01Skins0002",
+      "skin": "13",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
+    },
+    "35000174": {
+      "id": 35000174,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0003",
+      "skin": "1",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000175": {
+      "id": 35000175,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0003",
+      "skin": "5",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    }
+  }
+}

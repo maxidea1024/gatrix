@@ -1,0 +1,133 @@
+{
+  ":CompanyJob": {
+    ":type": {
+      "id": "key",
+      "type": "number",
+      "desc": "text",
+      "loadageRatio": "number",
+      "worldBuffs": [
+        {
+          "Id": "number",
+          "companyLV": "number"
+        },
+        {
+          "Id": "number",
+          "companyLV": "number"
+        },
+        {
+          "Id": "number",
+          "companyLV": "number"
+        }
+      ]
+    },
+    ":required": {
+      "type": 1,
+      "desc": 1,
+      "loadageRatio": 1
+    },
+    ":min": {
+      "loadageRatio": 62010000,
+      "worldBuffs": [
+        {
+          "Id": 38000000,
+          "companyLV": 1
+        },
+        {
+          "Id": 38000000,
+          "companyLV": 1
+        },
+        {
+          "Id": 38000000,
+          "companyLV": 1
+        }
+      ]
+    },
+    ":max": {
+      "loadageRatio": 62019999,
+      "worldBuffs": [
+        {
+          "Id": 38099999,
+          "companyLV": 1
+        },
+        {
+          "Id": 38099999,
+          "companyLV": 1
+        },
+        {
+          "Id": 38099999,
+          "companyLV": 1
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "loadageRatio": [
+        "LoadageRatio"
+      ],
+      "worldBuffs": [
+        {
+          "Id": [
+            "WorldBuff"
+          ],
+          "companyLV": [
+            "CompanyExp"
+          ]
+        },
+        {
+          "Id": [
+            "WorldBuff"
+          ],
+          "companyLV": [
+            "CompanyExp"
+          ]
+        },
+        {
+          "Id": [
+            "WorldBuff"
+          ],
+          "companyLV": [
+            "CompanyExp"
+          ]
+        }
+      ]
+    }
+  },
+  "CompanyJob": {
+    "21500001": {
+      "id": 21500001,
+      "type": 1,
+      "desc": "모험 성향",
+      "loadageRatio": 62010000,
+      "worldBuffs": [
+        {
+          "Id": 38001001,
+          "companyLV": 1
+        }
+      ]
+    },
+    "21500002": {
+      "id": 21500002,
+      "type": 2,
+      "desc": "교역 성향",
+      "loadageRatio": 62010001,
+      "worldBuffs": [
+        {
+          "Id": 38001002,
+          "companyLV": 1
+        }
+      ]
+    },
+    "21500003": {
+      "id": 21500003,
+      "type": 3,
+      "desc": "전투 성향",
+      "loadageRatio": 62010002,
+      "worldBuffs": [
+        {
+          "Id": 38001003,
+          "companyLV": 1
+        }
+      ]
+    }
+  }
+}

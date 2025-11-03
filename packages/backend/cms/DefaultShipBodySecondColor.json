@@ -1,0 +1,33 @@
+{
+  ":DefaultShipBodySecondColor": {
+    ":type": {
+      "id": "key",
+      "defaultshipbodysecondcolorId": "number"
+    },
+    ":required": {
+      "defaultshipbodysecondcolorId": 1
+    },
+    ":min": {
+      "defaultshipbodysecondcolorId": 47500000
+    },
+    ":max": {
+      "defaultshipbodysecondcolorId": 47599999
+    },
+    ":enum": {},
+    ":links": {
+      "defaultshipbodysecondcolorId": [
+        "ShipBodySecondColor"
+      ]
+    }
+  },
+  "DefaultShipBodySecondColor": {
+    "5251": {
+      "id": 5251,
+      "defaultshipbodysecondcolorId": 47500000
+    },
+    "5252": {
+      "id": 5252,
+      "defaultshipbodysecondcolorId": 47500001
+    }
+  }
+}

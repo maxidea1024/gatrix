@@ -1,0 +1,106 @@
+{
+  ":BossRaidValidDmg": {
+    ":type": {
+      "id": "key",
+      "groupIdx": "number",
+      "companyLvMin": "number",
+      "companyLvMax": "number",
+      "damageMaxPerAction": "number",
+      "damageMaxPerBattle": "number"
+    },
+    ":required": {
+      "groupIdx": 1,
+      "companyLvMin": 1,
+      "companyLvMax": 1,
+      "damageMaxPerAction": 1,
+      "damageMaxPerBattle": 1
+    },
+    ":requiredInObject": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "BossRaidValidDmg": {
+    "57040000": {
+      "id": 57040000,
+      "groupIdx": 1,
+      "companyLvMin": 1,
+      "companyLvMax": 19,
+      "damageMaxPerAction": 1,
+      "damageMaxPerBattle": 1
+    },
+    "57040001": {
+      "id": 57040001,
+      "groupIdx": 1,
+      "companyLvMin": 20,
+      "companyLvMax": 100,
+      "damageMaxPerAction": 500000,
+      "damageMaxPerBattle": 9999999999
+    },
+    "57040002": {
+      "id": 57040002,
+      "groupIdx": 2,
+      "companyLvMin": 1,
+      "companyLvMax": 34,
+      "damageMaxPerAction": 1,
+      "damageMaxPerBattle": 1
+    },
+    "57040003": {
+      "id": 57040003,
+      "groupIdx": 2,
+      "companyLvMin": 35,
+      "companyLvMax": 100,
+      "damageMaxPerAction": 500000,
+      "damageMaxPerBattle": 9999999999
+    },
+    "57040004": {
+      "id": 57040004,
+      "groupIdx": 3,
+      "companyLvMin": 1,
+      "companyLvMax": 29,
+      "damageMaxPerAction": 1,
+      "damageMaxPerBattle": 1
+    },
+    "57040005": {
+      "id": 57040005,
+      "groupIdx": 3,
+      "companyLvMin": 30,
+      "companyLvMax": 100,
+      "damageMaxPerAction": 500000,
+      "damageMaxPerBattle": 9999999999
+    },
+    "57040006": {
+      "id": 57040006,
+      "groupIdx": 101,
+      "companyLvMin": 1,
+      "companyLvMax": 1,
+      "damageMaxPerAction": 1,
+      "damageMaxPerBattle": 1
+    },
+    "57040007": {
+      "id": 57040007,
+      "groupIdx": 102,
+      "companyLvMin": 2,
+      "companyLvMax": 100,
+      "damageMaxPerAction": 500000,
+      "damageMaxPerBattle": 9999999999
+    },
+    "57040008": {
+      "id": 57040008,
+      "groupIdx": 4,
+      "companyLvMin": 1,
+      "companyLvMax": 39,
+      "damageMaxPerAction": 1,
+      "damageMaxPerBattle": 1
+    },
+    "57040009": {
+      "id": 57040009,
+      "groupIdx": 4,
+      "companyLvMin": 40,
+      "companyLvMax": 100,
+      "damageMaxPerAction": 500000,
+      "damageMaxPerBattle": 9999999999
+    }
+  }
+}

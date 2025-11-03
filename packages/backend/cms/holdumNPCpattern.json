@@ -1,0 +1,153 @@
+{
+  ":holdumNPCpattern": {
+    ":type": {
+      "id": "key",
+      "round": "number",
+      "rankingGroup": "number",
+      "CallRate": "number",
+      "BetRate": "number",
+      "FoldRate": "number"
+    },
+    ":required": {
+      "round": 1,
+      "rankingGroup": 1,
+      "CallRate": 1,
+      "BetRate": 1,
+      "FoldRate": 1
+    },
+    ":min": {
+      "CallRate": 0,
+      "BetRate": 0,
+      "FoldRate": 0
+    },
+    ":max": {
+      "CallRate": 1000000,
+      "BetRate": 1000000,
+      "FoldRate": 1000000
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "holdumNPCpattern": {
+    "100": {
+      "id": 100,
+      "round": 1,
+      "rankingGroup": 1,
+      "CallRate": 0,
+      "BetRate": 1000000,
+      "FoldRate": 0
+    },
+    "101": {
+      "id": 101,
+      "round": 1,
+      "rankingGroup": 2,
+      "CallRate": 500000,
+      "BetRate": 500000,
+      "FoldRate": 0
+    },
+    "102": {
+      "id": 102,
+      "round": 1,
+      "rankingGroup": 3,
+      "CallRate": 1000000,
+      "BetRate": 0,
+      "FoldRate": 0
+    },
+    "103": {
+      "id": 103,
+      "round": 1,
+      "rankingGroup": 4,
+      "CallRate": 1000000,
+      "BetRate": 0,
+      "FoldRate": 0
+    },
+    "104": {
+      "id": 104,
+      "round": 1,
+      "rankingGroup": 5,
+      "CallRate": 500000,
+      "BetRate": 0,
+      "FoldRate": 500000
+    },
+    "105": {
+      "id": 105,
+      "round": 2,
+      "rankingGroup": 1,
+      "CallRate": 0,
+      "BetRate": 1000000,
+      "FoldRate": 0
+    },
+    "106": {
+      "id": 106,
+      "round": 2,
+      "rankingGroup": 2,
+      "CallRate": 500000,
+      "BetRate": 500000,
+      "FoldRate": 0
+    },
+    "107": {
+      "id": 107,
+      "round": 2,
+      "rankingGroup": 3,
+      "CallRate": 500000,
+      "BetRate": 0,
+      "FoldRate": 500000
+    },
+    "108": {
+      "id": 108,
+      "round": 2,
+      "rankingGroup": 4,
+      "CallRate": 1000000,
+      "BetRate": 0,
+      "FoldRate": 0
+    },
+    "109": {
+      "id": 109,
+      "round": 2,
+      "rankingGroup": 5,
+      "CallRate": 500000,
+      "BetRate": 0,
+      "FoldRate": 500000
+    },
+    "110": {
+      "id": 110,
+      "round": 3,
+      "rankingGroup": 1,
+      "CallRate": 0,
+      "BetRate": 1000000,
+      "FoldRate": 0
+    },
+    "111": {
+      "id": 111,
+      "round": 3,
+      "rankingGroup": 2,
+      "CallRate": 500000,
+      "BetRate": 500000,
+      "FoldRate": 0
+    },
+    "112": {
+      "id": 112,
+      "round": 3,
+      "rankingGroup": 3,
+      "CallRate": 500000,
+      "BetRate": 0,
+      "FoldRate": 0
+    },
+    "113": {
+      "id": 113,
+      "round": 3,
+      "rankingGroup": 4,
+      "CallRate": 500000,
+      "BetRate": 0,
+      "FoldRate": 500000
+    },
+    "114": {
+      "id": 114,
+      "round": 3,
+      "rankingGroup": 5,
+      "CallRate": 0,
+      "BetRate": 0,
+      "FoldRate": 1000000
+    }
+  }
+}

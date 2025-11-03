@@ -1,0 +1,340 @@
+{
+  ":TownNpcShop": {
+    ":type": {
+      "id": "key",
+      "npcShopGroup": "number",
+      "townId": "number",
+      "order": "number",
+      "npcShopSaleType": "number",
+      "npcShopSaleTypeValue": "number",
+      "npcShopType": "number",
+      "npcShopProductId": "number",
+      "npcShopProductValue": "number",
+      "pointId": "number",
+      "pointVal": "number",
+      "contentsTerms": [
+        {
+          "Group": "number",
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ]
+    },
+    ":required": {
+      "npcShopGroup": 1,
+      "townId": 1,
+      "order": 1,
+      "npcShopSaleType": 1,
+      "npcShopType": 1,
+      "npcShopProductId": 1,
+      "npcShopProductValue": 1,
+      "pointId": 1,
+      "pointVal": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "townId": [
+        "Town"
+      ],
+      "npcShopProductId": [
+        "CEquip",
+        "ShipSlot",
+        "Item"
+      ],
+      "pointId": [
+        "Point"
+      ]
+    }
+  },
+  "TownNpcShop": {
+    "100040001": {
+      "id": 100040001,
+      "npcShopGroup": 1001001,
+      "townId": 11000000,
+      "order": 1,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23700161,
+      "npcShopProductValue": 1,
+      "pointId": 100015,
+      "pointVal": 3000
+    },
+    "100040002": {
+      "id": 100040002,
+      "npcShopGroup": 1001001,
+      "townId": 11000000,
+      "order": 2,
+      "npcShopSaleType": 3,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23411003,
+      "npcShopProductValue": 30,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040003": {
+      "id": 100040003,
+      "npcShopGroup": 1001002,
+      "townId": 11000001,
+      "order": 1,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23710060,
+      "npcShopProductValue": 2,
+      "pointId": 100015,
+      "pointVal": 2000
+    },
+    "100040004": {
+      "id": 100040004,
+      "npcShopGroup": 1001002,
+      "townId": 11000001,
+      "order": 2,
+      "npcShopSaleType": 3,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23411002,
+      "npcShopProductValue": 50,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040005": {
+      "id": 100040005,
+      "npcShopGroup": 1001030,
+      "townId": 11000030,
+      "order": 1,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23710133,
+      "npcShopProductValue": 3,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040006": {
+      "id": 100040006,
+      "npcShopGroup": 1001030,
+      "townId": 11000030,
+      "order": 2,
+      "npcShopSaleType": 3,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23411003,
+      "npcShopProductValue": 30,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040007": {
+      "id": 100040007,
+      "npcShopGroup": 1001118,
+      "townId": 11000118,
+      "order": 1,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23411004,
+      "npcShopProductValue": 10,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040008": {
+      "id": 100040008,
+      "npcShopGroup": 1001118,
+      "townId": 11000118,
+      "order": 2,
+      "npcShopSaleType": 3,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23411002,
+      "npcShopProductValue": 50,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040009": {
+      "id": 100040009,
+      "npcShopGroup": 1001130,
+      "townId": 11000130,
+      "order": 1,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23700033,
+      "npcShopProductValue": 10,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040010": {
+      "id": 100040010,
+      "npcShopGroup": 1001130,
+      "townId": 11000130,
+      "order": 2,
+      "npcShopSaleType": 3,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23411003,
+      "npcShopProductValue": 30,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040011": {
+      "id": 100040011,
+      "npcShopGroup": 1001195,
+      "townId": 11000195,
+      "order": 1,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23700161,
+      "npcShopProductValue": 1,
+      "pointId": 100015,
+      "pointVal": 3000
+    },
+    "100040012": {
+      "id": 100040012,
+      "npcShopGroup": 1001195,
+      "townId": 11000195,
+      "order": 2,
+      "npcShopSaleType": 3,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23411002,
+      "npcShopProductValue": 50,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040013": {
+      "id": 100040013,
+      "npcShopGroup": 1001077,
+      "townId": 11000077,
+      "order": 1,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23710060,
+      "npcShopProductValue": 2,
+      "pointId": 100015,
+      "pointVal": 2000
+    },
+    "100040014": {
+      "id": 100040014,
+      "npcShopGroup": 1001077,
+      "townId": 11000077,
+      "order": 2,
+      "npcShopSaleType": 3,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23411003,
+      "npcShopProductValue": 30,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040015": {
+      "id": 100040015,
+      "npcShopGroup": 1001122,
+      "townId": 11000122,
+      "order": 1,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23710133,
+      "npcShopProductValue": 3,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040016": {
+      "id": 100040016,
+      "npcShopGroup": 1001122,
+      "townId": 11000122,
+      "order": 2,
+      "npcShopSaleType": 3,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23411002,
+      "npcShopProductValue": 50,
+      "pointId": 100015,
+      "pointVal": 500
+    },
+    "100040017": {
+      "id": 100040017,
+      "npcShopGroup": 1003156,
+      "townId": 11000156,
+      "order": 1,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23710157,
+      "npcShopProductValue": 30,
+      "pointId": 100015,
+      "pointVal": 4000
+    },
+    "100040018": {
+      "id": 100040018,
+      "npcShopGroup": 1003156,
+      "townId": 11000156,
+      "order": 2,
+      "npcShopSaleType": 3,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23710157,
+      "npcShopProductValue": 10,
+      "pointId": 100015,
+      "pointVal": 1500
+    },
+    "100040019": {
+      "id": 100040019,
+      "npcShopGroup": 1001002,
+      "townId": 11000001,
+      "order": 3,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23523027,
+      "npcShopProductValue": 1,
+      "pointId": 100015,
+      "pointVal": 20000
+    },
+    "100040020": {
+      "id": 100040020,
+      "npcShopGroup": 1001030,
+      "townId": 11000030,
+      "order": 3,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23523004,
+      "npcShopProductValue": 1,
+      "pointId": 100015,
+      "pointVal": 20000
+    },
+    "100040021": {
+      "id": 100040021,
+      "npcShopGroup": 1001118,
+      "townId": 11000118,
+      "order": 3,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23523022,
+      "npcShopProductValue": 1,
+      "pointId": 100015,
+      "pointVal": 20000
+    },
+    "100040022": {
+      "id": 100040022,
+      "npcShopGroup": 1001130,
+      "townId": 11000130,
+      "order": 3,
+      "npcShopSaleType": 4,
+      "npcShopSaleTypeValue": 1,
+      "npcShopType": 3,
+      "npcShopProductId": 23523018,
+      "npcShopProductValue": 1,
+      "pointId": 100015,
+      "pointVal": 20000
+    }
+  }
+}

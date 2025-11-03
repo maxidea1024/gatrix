@@ -1,0 +1,91 @@
+{
+  ":OceanNpcSpawnLocation": {
+    ":type": {
+      "id": "key",
+      "oceanNpcOccupyType": "number",
+      "jobType": "number",
+      "frontSpawnRate": "number",
+      "sideSpawnRate": "number",
+      "backSpawnRate": "number"
+    },
+    ":required": {
+      "frontSpawnRate": 1,
+      "sideSpawnRate": 1,
+      "backSpawnRate": 1
+    },
+    ":min": {
+      "oceanNpcOccupyType": 0,
+      "jobType": 0,
+      "frontSpawnRate": 0,
+      "sideSpawnRate": 0,
+      "backSpawnRate": 0
+    },
+    ":max": {
+      "oceanNpcOccupyType": 2,
+      "jobType": 3,
+      "frontSpawnRate": 100,
+      "sideSpawnRate": 100,
+      "backSpawnRate": 100
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "OceanNpcSpawnLocation": {
+    "20000": {
+      "id": 20000,
+      "oceanNpcOccupyType": 0,
+      "jobType": 2,
+      "frontSpawnRate": 50,
+      "sideSpawnRate": 30,
+      "backSpawnRate": 20
+    },
+    "20001": {
+      "id": 20001,
+      "oceanNpcOccupyType": 0,
+      "jobType": 3,
+      "frontSpawnRate": 40,
+      "sideSpawnRate": 20,
+      "backSpawnRate": 40
+    },
+    "20002": {
+      "id": 20002,
+      "oceanNpcOccupyType": 0,
+      "jobType": 1,
+      "frontSpawnRate": 60,
+      "sideSpawnRate": 30,
+      "backSpawnRate": 10
+    },
+    "20003": {
+      "id": 20003,
+      "oceanNpcOccupyType": 1,
+      "jobType": 2,
+      "frontSpawnRate": 50,
+      "sideSpawnRate": 30,
+      "backSpawnRate": 20
+    },
+    "20004": {
+      "id": 20004,
+      "oceanNpcOccupyType": 1,
+      "jobType": 3,
+      "frontSpawnRate": 40,
+      "sideSpawnRate": 20,
+      "backSpawnRate": 40
+    },
+    "20005": {
+      "id": 20005,
+      "oceanNpcOccupyType": 1,
+      "jobType": 1,
+      "frontSpawnRate": 60,
+      "sideSpawnRate": 30,
+      "backSpawnRate": 10
+    },
+    "20006": {
+      "id": 20006,
+      "oceanNpcOccupyType": 2,
+      "jobType": 3,
+      "frontSpawnRate": 40,
+      "sideSpawnRate": 20,
+      "backSpawnRate": 40
+    }
+  }
+}

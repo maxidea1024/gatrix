@@ -1,0 +1,133 @@
+{
+  ":VillageFriendship": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "grade": "number",
+      "reputation": "number",
+      "discoveryBasicRate": "number",
+      "defaultSailor": "number",
+      "worldBuffId": "number",
+      "fixedLandFeature": [
+        "number"
+      ],
+      "negoPricePointValue": "number",
+      "negoGetGoodsPointValue": "number",
+      "gradeColor": "string"
+    },
+    ":required": {
+      "name": 1,
+      "grade": 1,
+      "reputation": 1,
+      "discoveryBasicRate": 1,
+      "defaultSailor": 1,
+      "negoPricePointValue": 1,
+      "negoGetGoodsPointValue": 1,
+      "gradeColor": 1
+    },
+    ":min": {
+      "reputation": 1,
+      "worldBuffId": 38000000,
+      "fixedLandFeature": [
+        81000000
+      ]
+    },
+    ":max": {
+      "reputation": 100000,
+      "worldBuffId": 38099999,
+      "fixedLandFeature": [
+        81999999
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "worldBuffId": [
+        "WorldBuff"
+      ],
+      "fixedLandFeature": [
+        [
+          "LandFeature"
+        ]
+      ]
+    }
+  },
+  "VillageFriendship": {
+    "70700000": {
+      "id": 70700000,
+      "name": "우호",
+      "grade": 6,
+      "reputation": 90001,
+      "discoveryBasicRate": 150,
+      "defaultSailor": 100,
+      "negoPricePointValue": 800,
+      "negoGetGoodsPointValue": 800,
+      "gradeColor": "0x529dfe"
+    },
+    "70700001": {
+      "id": 70700001,
+      "name": "신뢰",
+      "grade": 5,
+      "reputation": 75001,
+      "discoveryBasicRate": 120,
+      "defaultSailor": 75,
+      "negoPricePointValue": 900,
+      "negoGetGoodsPointValue": 900,
+      "gradeColor": "0x70d603"
+    },
+    "70700002": {
+      "id": 70700002,
+      "name": "호감",
+      "grade": 4,
+      "reputation": 60001,
+      "discoveryBasicRate": 100,
+      "defaultSailor": 50,
+      "negoPricePointValue": 950,
+      "negoGetGoodsPointValue": 950,
+      "gradeColor": "0xafff6b"
+    },
+    "70700003": {
+      "id": 70700003,
+      "name": "보통",
+      "grade": 3,
+      "reputation": 40001,
+      "discoveryBasicRate": 80,
+      "defaultSailor": 30,
+      "negoPricePointValue": 1000,
+      "negoGetGoodsPointValue": 1000,
+      "gradeColor": "0xf2f2f2"
+    },
+    "70700004": {
+      "id": 70700004,
+      "name": "경계",
+      "grade": 2,
+      "reputation": 25001,
+      "discoveryBasicRate": 40,
+      "defaultSailor": 0,
+      "negoPricePointValue": 1100,
+      "negoGetGoodsPointValue": 1100,
+      "gradeColor": "0xfffa7a"
+    },
+    "70700005": {
+      "id": 70700005,
+      "name": "불신",
+      "grade": 1,
+      "reputation": 10001,
+      "discoveryBasicRate": 10,
+      "defaultSailor": 0,
+      "negoPricePointValue": 1200,
+      "negoGetGoodsPointValue": 1200,
+      "gradeColor": "0xff8429"
+    },
+    "70700006": {
+      "id": 70700006,
+      "name": "적대",
+      "grade": 0,
+      "reputation": 1,
+      "discoveryBasicRate": 0,
+      "defaultSailor": 0,
+      "negoPricePointValue": 1300,
+      "negoGetGoodsPointValue": 1300,
+      "gradeColor": "0xc03225"
+    }
+  }
+}

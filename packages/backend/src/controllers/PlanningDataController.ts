@@ -278,5 +278,29 @@ export class PlanningDataController {
     await pubSubService.invalidateByPattern('planning_data*');
     res.json({ success: true, data: result, message: 'OceanNpcAreaSpawner lookup data built and cache invalidated successfully' });
   });
+
+  /**
+   * Upload planning data files (drag & drop)
+   * POST /api/v1/admin/planning-data/upload
+   */
+  static uploadPlanningData = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    logger.info('Planning data upload requested', {
+      userId: (req as any).userDetails?.id ?? (req as any).user?.id,
+      filesCount: req.files ? Object.keys(req.files).length : 0,
+    });
+
+    const result = await PlanningDataService.uploadPlanningData(req.files as any);
+
+    // Invalidate cache across all servers
+    await pubSubService.invalidateByPattern('planning_data*');
+
+    logger.info('Planning data cache invalidated across all servers');
+
+    res.json({
+      success: true,
+      data: result,
+      message: 'Planning data uploaded and cache invalidated successfully',
+    });
+  });
 }
 

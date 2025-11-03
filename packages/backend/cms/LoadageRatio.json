@@ -1,0 +1,79 @@
+{
+  ":LoadageRatio": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "tradeGoods": "number",
+      "water": "number",
+      "food": "number",
+      "resources": "number",
+      "ammo": "number",
+      "free": "number"
+    },
+    ":required": {
+      "name": 1,
+      "tradeGoods": 1,
+      "water": 1
+    },
+    ":min": {
+      "tradeGoods": 0,
+      "water": 0,
+      "food": 0,
+      "resources": 0,
+      "ammo": 0,
+      "free": 0
+    },
+    ":max": {
+      "tradeGoods": 1000,
+      "water": 1000,
+      "food": 1000,
+      "resources": 1000,
+      "ammo": 1000,
+      "free": 1000
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "LoadageRatio": {
+    "62010000": {
+      "id": 62010000,
+      "name": "모험 중심",
+      "tradeGoods": 200,
+      "water": 350,
+      "food": 350,
+      "resources": 50,
+      "ammo": 50,
+      "free": 0
+    },
+    "62010001": {
+      "id": 62010001,
+      "name": "교역 중심",
+      "tradeGoods": 500,
+      "water": 200,
+      "food": 200,
+      "resources": 50,
+      "ammo": 50,
+      "free": 0
+    },
+    "62010002": {
+      "id": 62010002,
+      "name": "전투 중심",
+      "tradeGoods": 200,
+      "water": 300,
+      "food": 300,
+      "resources": 50,
+      "ammo": 150,
+      "free": 0
+    },
+    "62010003": {
+      "id": 62010003,
+      "name": "사용자",
+      "tradeGoods": 350,
+      "water": 250,
+      "food": 250,
+      "resources": 50,
+      "ammo": 100,
+      "free": 0
+    }
+  }
+}

@@ -1,40 +1,17 @@
 /**
  * Migration: Remove marketTypes KV item
- * - Delete kv:marketTypes from g_vars table
- * - This KV item is no longer used in the system
+ *
+ * Note: This migration is a no-op because marketTypes KV item is not created
+ * in the initial schema, so there's nothing to remove.
  */
 
 exports.up = async function(connection) {
-  console.log('Removing marketTypes KV item...');
-
-  // Delete kv:marketTypes
-  await connection.execute(`
-    DELETE FROM g_vars WHERE varKey = 'kv:marketTypes'
-  `);
-
-  console.log('marketTypes KV item removed successfully');
+  console.log('Skipping: marketTypes KV item not present in initial schema');
+  // No-op: nothing to remove
 };
 
 exports.down = async function(connection) {
-  console.log('Restoring marketTypes KV item...');
-
-  // Restore kv:marketTypes
-  await connection.execute(`
-    INSERT INTO g_vars (varKey, varValue, valueType, description, isSystemDefined, createdBy)
-    VALUES (
-      'kv:marketTypes',
-      '["PC","A1"]',
-      'array',
-      'Market types for the system',
-      TRUE,
-      1
-    )
-    ON DUPLICATE KEY UPDATE
-      varValue = VALUES(varValue),
-      valueType = VALUES(valueType),
-      isSystemDefined = VALUES(isSystemDefined)
-  `);
-
-  console.log('marketTypes KV item restored successfully');
+  console.log('Skipping rollback: no changes were made in this migration');
+  // No-op: nothing to rollback
 };
 

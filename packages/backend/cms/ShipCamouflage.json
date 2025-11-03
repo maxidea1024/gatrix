@@ -1,0 +1,386 @@
+{
+  ":ShipCamouflage": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "cashShopId": "number",
+      "camouflageOrder": "number",
+      "localBitflag": "bit",
+      "shipBodyShapeId": "number",
+      "shipSize": "number",
+      "shipcamouflageIcon": "string",
+      "waterSplash": "string",
+      "worldPassiveId": "number"
+    },
+    ":required": {
+      "name": 1,
+      "shipcamouflageIcon": 1,
+      "waterSplash": 1
+    },
+    ":min": {
+      "cashShopId": 10500000,
+      "shipBodyShapeId": 45000000,
+      "shipSize": 0,
+      "worldPassiveId": 75200000
+    },
+    ":max": {
+      "cashShopId": 10599999,
+      "shipBodyShapeId": 45999999,
+      "shipSize": 5,
+      "worldPassiveId": 75299999
+    },
+    ":enum": {},
+    ":links": {
+      "cashShopId": [
+        "CashShop"
+      ],
+      "shipBodyShapeId": [
+        "ShipBodyShape"
+      ],
+      "worldPassiveId": [
+        "WorldPassive"
+      ]
+    }
+  },
+  "ShipCamouflage": {
+    "41100000": {
+      "id": 41100000,
+      "name": "기본 값",
+      "camouflageOrder": 0,
+      "localBitflag": 219,
+      "shipSize": 0,
+      "shipcamouflageIcon": "Icon_Sail_Pattern_0_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_S"
+    },
+    "41110001": {
+      "id": 41110001,
+      "name": "오크통 뗏목",
+      "camouflageOrder": 1,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000247,
+      "shipSize": 2,
+      "shipcamouflageIcon": "WT_Ship_Avatar_OakCask_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_S",
+      "worldPassiveId": 75258610
+    },
+    "41110002": {
+      "id": 41110002,
+      "name": "통나무 뗏목",
+      "camouflageOrder": 2,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000248,
+      "shipSize": 2,
+      "shipcamouflageIcon": "WT_Ship_Avatar_Log_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_S",
+      "worldPassiveId": 75258610
+    },
+    "41110003": {
+      "id": 41110003,
+      "name": "얼룩 종이선",
+      "camouflageOrder": 3,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000252,
+      "shipSize": 2,
+      "shipcamouflageIcon": "WT_Ship_Avatar_Paper3_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_S",
+      "worldPassiveId": 75258610
+    },
+    "41110004": {
+      "id": 41110004,
+      "name": "분홍 종이선",
+      "camouflageOrder": 4,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000251,
+      "shipSize": 2,
+      "shipcamouflageIcon": "WT_Ship_Avatar_Paper2_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_S",
+      "worldPassiveId": 75258610
+    },
+    "41110005": {
+      "id": 41110005,
+      "name": "파랑 종이선",
+      "camouflageOrder": 5,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000250,
+      "shipSize": 2,
+      "shipcamouflageIcon": "WT_Ship_Avatar_Paper1_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_S",
+      "worldPassiveId": 75258610
+    },
+    "41110006": {
+      "id": 41110006,
+      "name": "보름달 축제선",
+      "camouflageOrder": 6,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000255,
+      "shipSize": 2,
+      "shipcamouflageIcon": "WT_Ship_Avatar_FullMoonFestival_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_S",
+      "worldPassiveId": 75258610
+    },
+    "41110007": {
+      "id": 41110007,
+      "name": "풀잎선",
+      "camouflageOrder": 7,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000254,
+      "shipSize": 2,
+      "shipcamouflageIcon": "WT_Ship_Avatar_Leaf_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_S",
+      "worldPassiveId": 75258610
+    },
+    "41110008": {
+      "id": 41110008,
+      "name": "장난감선",
+      "camouflageOrder": 8,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000257,
+      "shipSize": 2,
+      "shipcamouflageIcon": "WT_Ship_Avatar_Toy_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_S",
+      "worldPassiveId": 75258610
+    },
+    "41120001": {
+      "id": 41120001,
+      "name": "도깨비 갤리",
+      "camouflageOrder": 101,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000244,
+      "shipSize": 3,
+      "shipcamouflageIcon": "WT_Ship_AvatarGoblin_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Gally_M",
+      "worldPassiveId": 75258610
+    },
+    "41120003": {
+      "id": 41120003,
+      "name": "청룡선",
+      "camouflageOrder": 102,
+      "localBitflag": 0,
+      "shipBodyShapeId": 45000244,
+      "shipSize": 3,
+      "shipcamouflageIcon": "WT_Ship_AvatarGoblin_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Gally_M",
+      "worldPassiveId": 75258610
+    },
+    "41130001": {
+      "id": 41130001,
+      "name": "충무공의 거북선",
+      "camouflageOrder": 201,
+      "localBitflag": 0,
+      "shipBodyShapeId": 45000051,
+      "shipSize": 4,
+      "shipcamouflageIcon": "WT_Ship_TurtleShip_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_E_Gally_L",
+      "worldPassiveId": 75258610
+    },
+    "41120002": {
+      "id": 41120002,
+      "name": "소라와 게",
+      "camouflageOrder": 301,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000245,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_Avatar_HermitCrab_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75258610
+    },
+    "41140001": {
+      "id": 41140001,
+      "name": "콜로세움 갤리",
+      "camouflageOrder": 302,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000256,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_Avatar_Colosseum_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Gally_XL",
+      "worldPassiveId": 75258610
+    },
+    "41130002": {
+      "id": 41130002,
+      "name": "천수각 안택선",
+      "camouflageOrder": 303,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000259,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_AvatarTenshu_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Gally_XL",
+      "worldPassiveId": 75258610
+    },
+    "41130003": {
+      "id": 41130003,
+      "name": "날치선",
+      "camouflageOrder": 304,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000260,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_Avatar_Icon_FlyingFish_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75258610
+    },
+    "41130004": {
+      "id": 41130004,
+      "name": "로드 오브 리베리아",
+      "camouflageOrder": 305,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000274,
+      "shipSize": 4,
+      "shipcamouflageIcon": "WT_Ship_Avatar_Riberia_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_L",
+      "worldPassiveId": 75258610
+    },
+    "41130005": {
+      "id": 41130005,
+      "name": "린 아마디오",
+      "camouflageOrder": 306,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000275,
+      "shipSize": 4,
+      "shipcamouflageIcon": "WT_Ship_Avatar_RinAmadio_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_L",
+      "worldPassiveId": 75258610
+    },
+    "41130006": {
+      "id": 41130006,
+      "name": "켈베로스",
+      "camouflageOrder": 307,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000276,
+      "shipSize": 4,
+      "shipcamouflageIcon": "WT_Ship_Avatar_Kelberos_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_L",
+      "worldPassiveId": 75258610
+    },
+    "41130007": {
+      "id": 41130007,
+      "name": "선상 카페 마카롱",
+      "camouflageOrder": 308,
+      "localBitflag": 195,
+      "shipBodyShapeId": 45000280,
+      "shipSize": 4,
+      "shipcamouflageIcon": "WT_Ship_Seacafemacaron_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_E_Gally_L",
+      "worldPassiveId": 75258610
+    },
+    "41130008": {
+      "id": 41130008,
+      "name": "대형 오리선",
+      "camouflageOrder": 309,
+      "localBitflag": 195,
+      "shipBodyShapeId": 45000279,
+      "shipSize": 4,
+      "shipcamouflageIcon": "WT_Ship_RubberDuck_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_L",
+      "worldPassiveId": 75258610
+    },
+    "41130009": {
+      "id": 41130009,
+      "name": "영광의 데뷰테",
+      "camouflageOrder": 401,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000308,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_Skeid1_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75299402
+    },
+    "41130010": {
+      "id": 41130010,
+      "name": "승리의 데뷰테",
+      "camouflageOrder": 402,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000309,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_Skeid2_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75299403
+    },
+    "41130011": {
+      "id": 41130011,
+      "name": "데뷰테",
+      "camouflageOrder": 403,
+      "localBitflag": 219,
+      "shipBodyShapeId": 45000310,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_Skeid3_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75299404
+    },
+    "41130012": {
+      "id": 41130012,
+      "name": "영광의 성 가브리엘",
+      "camouflageOrder": 404,
+      "localBitflag": 27,
+      "shipBodyShapeId": 45000320,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_A_GoldenSaintGarbriel_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75299408
+    },
+    "41130013": {
+      "id": 41130013,
+      "name": "승리의 성 가브리엘",
+      "camouflageOrder": 405,
+      "localBitflag": 27,
+      "shipBodyShapeId": 45000321,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_B_SilverSaintGarbriel_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75299409
+    },
+    "41130014": {
+      "id": 41130014,
+      "name": "특별한 성 가브리엘",
+      "camouflageOrder": 406,
+      "localBitflag": 27,
+      "shipBodyShapeId": 45000322,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_C_CopperSaintGarbriel_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75299410
+    },
+    "41130015": {
+      "id": 41130015,
+      "name": "영광의 산타 마리아",
+      "camouflageOrder": 407,
+      "localBitflag": 27,
+      "shipBodyShapeId": 45000330,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_GloriousSantaMaria_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75299411
+    },
+    "41130016": {
+      "id": 41130016,
+      "name": "승리의 산타 마리아",
+      "camouflageOrder": 408,
+      "localBitflag": 27,
+      "shipBodyShapeId": 45000331,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_VictoriousSantaMaria_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75299412
+    },
+    "41130017": {
+      "id": 41130017,
+      "name": "특별한 산타 마리아",
+      "camouflageOrder": 409,
+      "localBitflag": 27,
+      "shipBodyShapeId": 45000332,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_SpecialSantaMaria_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75299413
+    },
+    "41130018": {
+      "id": 41130018,
+      "name": "순백의 세라프",
+      "camouflageOrder": 310,
+      "localBitflag": 27,
+      "shipBodyShapeId": 45000337,
+      "shipSize": 5,
+      "shipcamouflageIcon": "WT_Ship_R_Angel_Sprite",
+      "waterSplash": "P_Ship_Move_WaterSplash_W_Sailboat_XL",
+      "worldPassiveId": 75280750
+    }
+  }
+}

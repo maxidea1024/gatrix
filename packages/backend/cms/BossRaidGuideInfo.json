@@ -1,0 +1,447 @@
+{
+  ":BossRaidGuideInfo": {
+    ":type": {
+      "id": "key",
+      "hintText": "text",
+      "guideBattleSkill": [
+        {
+          "BattleSkill": "number",
+          "Order": "number"
+        },
+        {
+          "BattleSkill": "number",
+          "Order": "number"
+        },
+        {
+          "BattleSkill": "number",
+          "Order": "number"
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": "number",
+          "Order": "number"
+        },
+        {
+          "BattlePassive": "number",
+          "Order": "number"
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": "number",
+          "Order": "number"
+        },
+        {
+          "BattleBuff": "number",
+          "Order": "number"
+        },
+        {
+          "BattleBuff": "number",
+          "Order": "number"
+        }
+      ]
+    },
+    ":required": {},
+    ":requiredInObject": {},
+    ":min": {
+      "guideBattleSkill": [
+        {
+          "BattleSkill": 65300000,
+          "Order": 0
+        },
+        {
+          "BattleSkill": 65300000,
+          "Order": 0
+        },
+        {
+          "BattleSkill": 65300000,
+          "Order": 0
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": 67000000,
+          "Order": 0
+        },
+        {
+          "BattlePassive": 67000000,
+          "Order": 0
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": 65500000,
+          "Order": 0
+        },
+        {
+          "BattleBuff": 65500000,
+          "Order": 0
+        },
+        {
+          "BattleBuff": 65500000,
+          "Order": 0
+        }
+      ]
+    },
+    ":max": {
+      "guideBattleSkill": [
+        {
+          "BattleSkill": 65499999
+        },
+        {
+          "BattleSkill": 65499999
+        },
+        {
+          "BattleSkill": 65499999
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": 67499999
+        },
+        {
+          "BattlePassive": 67499999
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": 65999999
+        },
+        {
+          "BattleBuff": 65999999
+        },
+        {
+          "BattleBuff": 65999999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "guideBattleSkill": [
+        {
+          "BattleSkill": [
+            "BattleSkill"
+          ]
+        },
+        {
+          "BattleSkill": [
+            "BattleSkill"
+          ]
+        },
+        {
+          "BattleSkill": [
+            "BattleSkill"
+          ]
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": [
+            "BattlePassive"
+          ]
+        },
+        {
+          "BattlePassive": [
+            "BattlePassive"
+          ]
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": [
+            "BattleBuff"
+          ]
+        },
+        {
+          "BattleBuff": [
+            "BattleBuff"
+          ]
+        },
+        {
+          "BattleBuff": [
+            "BattleBuff"
+          ]
+        }
+      ]
+    }
+  },
+  "BossRaidGuideInfo": {
+    "57020000": {
+      "id": 57020000,
+      "hintText": "검은 수염 해적단의 선장 에드워드 티치는 강력한 포격 공격을 주특기로 가졌습니다. 앤 여왕의 복수가 보유한 대량의 포대를 통해 넓은 범위에 강력한 포격을 가하며, 가까이 접근한 적들에게는 뜨거운 화염탄을 퍼붓습니다. 특히, 포격의 제왕이라고 불리는 포격은 주변의 모든 범위에 무차별 난사를 가해, 거대한 바위의 뒤가 아니라면 치명적인 피해를 볼 수 밖에 없습니다.",
+      "guideBattleSkill": [
+        {
+          "BattleSkill": 65459007,
+          "Order": 0
+        },
+        {
+          "BattleSkill": 65459005,
+          "Order": 1
+        },
+        {
+          "BattleSkill": 65459006,
+          "Order": 2
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": 67029000,
+          "Order": 3
+        },
+        {
+          "BattlePassive": 67010043,
+          "Order": 4
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": 65556006,
+          "Order": 5
+        }
+      ]
+    },
+    "57020001": {
+      "id": 57020001,
+      "hintText": "아스테카의 마지막 황제 쿠아우테목은 매우 강력한 백병 공격을 보유하고 있으며, 저주와 투창 등 다양하고 강력한 기술을 구사합니다. 또한 아스테카의 주술을 통해 해상에 다양한 부유물들을 생성하기도 합니다.",
+      "guideBattleSkill": [
+        {
+          "BattleSkill": 65459008,
+          "Order": 4
+        },
+        {
+          "BattleSkill": 65459009,
+          "Order": 1
+        },
+        {
+          "BattleSkill": 65459010,
+          "Order": 2
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": 67010043,
+          "Order": 3
+        },
+        {
+          "BattlePassive": 67029015,
+          "Order": 5
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": 65990014,
+          "Order": 0
+        }
+      ]
+    },
+    "57020002": {
+      "id": 57020002,
+      "hintText": "인도양의 사략해적 토마스 튜는 강력한 충파 공격으로 함선을 밀어내고, 선원들을 황금을 통해 매수합니다. 암초 해역까지 배가 밀리면 큰 데미지를 받을 수도 있습니다.",
+      "guideBattleSkill": [
+        {
+          "BattleSkill": 65459015,
+          "Order": 0
+        },
+        {
+          "BattleSkill": 65459012,
+          "Order": 1
+        },
+        {
+          "BattleSkill": 65459014,
+          "Order": 2
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": 67490006,
+          "Order": 3
+        },
+        {
+          "BattlePassive": 67490005,
+          "Order": 4
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": 65990044,
+          "Order": 5
+        }
+      ]
+    },
+    "57020003": {
+      "id": 57020003,
+      "hintText": "모비딕은 몸집이 거대하다는 향유고래 중에서도 특히 거대한 몸집을 자랑하는 전설의 고래입니다. 거대하고 단단한 몸으로 돌진하여 지금껏 수많은 선박을 침몰시켜왔고, 괴이한 울음소리를 내어 많은 항해사를 공포에 떨게 했습니다. 단단한 외피를 파괴할 수만 있다면, 모비딕에게 커다란 피해를 줄 수 있을 것입니다.",
+      "guideBattleSkill": [
+        {
+          "BattleSkill": 65459910,
+          "Order": 0
+        },
+        {
+          "BattleSkill": 65459914,
+          "Order": 1
+        },
+        {
+          "BattleSkill": 65459916,
+          "Order": 2
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": 67499003,
+          "Order": 3
+        },
+        {
+          "BattlePassive": 67499002,
+          "Order": 4
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": 65990086,
+          "Order": 5
+        }
+      ]
+    },
+    "57020004": {
+      "id": 57020004,
+      "hintText": "심해에 주로 살고 있던 거대한 가오리입니다. 직접적인 공격은 강하지 않지만, 몸에서 치명적인 독과 강력한 전기를 만들어 상대를 공격합니다.",
+      "guideBattleSkill": [
+        {
+          "BattleSkill": 65459940,
+          "Order": 0
+        },
+        {
+          "BattleSkill": 65459939,
+          "Order": 1
+        },
+        {
+          "BattleSkill": 65459937,
+          "Order": 2
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": 67499015,
+          "Order": 3
+        },
+        {
+          "BattlePassive": 67499016,
+          "Order": 4
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": 65990121,
+          "Order": 5
+        }
+      ]
+    },
+    "57020005": {
+      "id": 57020005,
+      "hintText": "알제의 대해적 아이든 레이스는 포격용으로 개조된 거대한 갤리선을 타고 자신을 가로막는 적들을 섬멸합니다. 전방에 있는 큰 포탑에서 퍼붓는 포탄의 위력은 아이든 레이스의 적에게 치명적인 일격을 가합니다.",
+      "guideBattleSkill": [
+        {
+          "BattleSkill": 65459946,
+          "Order": 0
+        },
+        {
+          "BattleSkill": 65459949,
+          "Order": 1
+        },
+        {
+          "BattleSkill": 65459950,
+          "Order": 2
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": 67499024,
+          "Order": 3
+        },
+        {
+          "BattlePassive": 67499026,
+          "Order": 4
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": 65990148,
+          "Order": 5
+        }
+      ]
+    },
+    "57020006": {
+      "id": 57020006,
+      "hintText": "패배를 딛고 몰디브 부근으로 거처를 옮긴 토마스 튜입니다. 기존의 강력한 충파 공격과 더불어 기뢰를 살포해 행동을 방해합니다.",
+      "guideBattleSkill": [
+        {
+          "BattleSkill": 65459958,
+          "Order": 0
+        },
+        {
+          "BattleSkill": 65459961,
+          "Order": 1
+        },
+        {
+          "BattleSkill": 65459962,
+          "Order": 2
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": 67499029,
+          "Order": 3
+        },
+        {
+          "BattlePassive": 67499030,
+          "Order": 4
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": 65990159,
+          "Order": 5
+        }
+      ]
+    },
+    "57020007": {
+      "id": 57020007,
+      "hintText": "숨겨져 있던 막대한 보물을 우연히 발견한 해적 야코프 발바커입니다. 적에게도 자신의 부를 자랑하기 위해 자신의 함선뿐만 아니라 포탄까지 도금을 하여 사용합니다.",
+      "guideBattleSkill": [
+        {
+          "BattleSkill": 65459964,
+          "Order": 0
+        },
+        {
+          "BattleSkill": 65459965,
+          "Order": 1
+        },
+        {
+          "BattleSkill": 65459966,
+          "Order": 2
+        }
+      ],
+      "guideBattlePassive": [
+        {
+          "BattlePassive": 67499033,
+          "Order": 3
+        }
+      ],
+      "guideBattleBuff": [
+        {
+          "BattleBuff": 65990162,
+          "Order": 4
+        },
+        {
+          "BattleBuff": 65990163,
+          "Order": 5
+        },
+        {
+          "BattleBuff": 65990164,
+          "Order": 6
+        }
+      ]
+    }
+  }
+}

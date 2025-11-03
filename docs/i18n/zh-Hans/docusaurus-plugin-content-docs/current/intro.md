@@ -73,9 +73,9 @@ npm run dev
 
 应用程序将在以下地址可用：
 - 前端：http://localhost:3000
-- 后端 API：http://localhost:5001
-- API 文档：http://localhost:5001/api-docs
-- 队列监控：http://localhost:5001/admin/queues
+- 后端 API：http://localhost:5000
+- API 文档：http://localhost:5000/api-docs
+- 队列监控：http://localhost:5000/admin/queues
 
 ## 下一步
 

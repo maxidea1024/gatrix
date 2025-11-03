@@ -1,0 +1,1648 @@
+{
+  ":Fleet": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "mateBaseLv": "number",
+      "fleetBodyId": "number",
+      "fleetHatId": "number",
+      "fleetWeaponId": "number",
+      "ship": [
+        {
+          "TemplateId": "number",
+          "Lv": "number",
+          "foodNum": "number",
+          "waterNum": "number",
+          "ammoNum": "number",
+          "resourceNum": "number"
+        },
+        {
+          "TemplateId": "number",
+          "Lv": "number",
+          "foodNum": "number",
+          "waterNum": "number",
+          "ammoNum": "number",
+          "resourceNum": "number"
+        },
+        {
+          "TemplateId": "number",
+          "Lv": "number",
+          "foodNum": "number",
+          "waterNum": "number",
+          "ammoNum": "number",
+          "resourceNum": "number"
+        },
+        {
+          "TemplateId": "number",
+          "Lv": "number",
+          "foodNum": "number",
+          "waterNum": "number",
+          "ammoNum": "number",
+          "resourceNum": "number"
+        },
+        {
+          "TemplateId": "number",
+          "Lv": "number",
+          "foodNum": "number",
+          "waterNum": "number",
+          "ammoNum": "number",
+          "resourceNum": "number"
+        },
+        {
+          "TemplateId": "number",
+          "Lv": "number",
+          "foodNum": "number",
+          "waterNum": "number",
+          "ammoNum": "number",
+          "resourceNum": "number"
+        },
+        {
+          "TemplateId": "number",
+          "Lv": "number",
+          "foodNum": "number",
+          "waterNum": "number",
+          "ammoNum": "number",
+          "resourceNum": "number"
+        }
+      ]
+    },
+    ":required": {
+      "name": 1,
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 1,
+          "Lv": 1,
+          "foodNum": 1,
+          "waterNum": 1,
+          "ammoNum": 1,
+          "resourceNum": 1
+        }
+      ]
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "fleetBodyId": [
+        "FEquip"
+      ],
+      "fleetHatId": [
+        "FEquip"
+      ],
+      "fleetWeaponId": [
+        "FEquip"
+      ],
+      "ship": [
+        {
+          "TemplateId": [
+            "ShipTemplate"
+          ]
+        },
+        {
+          "TemplateId": [
+            "ShipTemplate"
+          ]
+        },
+        {
+          "TemplateId": [
+            "ShipTemplate"
+          ]
+        },
+        {
+          "TemplateId": [
+            "ShipTemplate"
+          ]
+        },
+        {
+          "TemplateId": [
+            "ShipTemplate"
+          ]
+        },
+        {
+          "TemplateId": [
+            "ShipTemplate"
+          ]
+        },
+        {
+          "TemplateId": [
+            "ShipTemplate"
+          ]
+        }
+      ]
+    }
+  },
+  "Fleet": {
+    "61000001": {
+      "id": 61000001,
+      "name": "상선대_테스트",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000001,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000002,
+          "Lv": 1,
+          "foodNum": 9,
+          "waterNum": 9,
+          "ammoNum": 9,
+          "resourceNum": 9
+        }
+      ]
+    },
+    "61000002": {
+      "id": 61000002,
+      "name": "경비함대_테스트",
+      "mateBaseLv": 2,
+      "ship": [
+        {
+          "TemplateId": 62000008,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000009,
+          "Lv": 1,
+          "foodNum": 9,
+          "waterNum": 9,
+          "ammoNum": 9,
+          "resourceNum": 9
+        },
+        {
+          "TemplateId": 62000003,
+          "Lv": 1,
+          "foodNum": 8,
+          "waterNum": 8,
+          "ammoNum": 8,
+          "resourceNum": 8
+        }
+      ]
+    },
+    "61000003": {
+      "id": 61000003,
+      "name": "원양함대_테스트",
+      "mateBaseLv": 3,
+      "ship": [
+        {
+          "TemplateId": 62000012,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000011,
+          "Lv": 1,
+          "foodNum": 9,
+          "waterNum": 9,
+          "ammoNum": 9,
+          "resourceNum": 9
+        },
+        {
+          "TemplateId": 62000002,
+          "Lv": 1,
+          "foodNum": 8,
+          "waterNum": 8,
+          "ammoNum": 8,
+          "resourceNum": 8
+        },
+        {
+          "TemplateId": 62000002,
+          "Lv": 1,
+          "foodNum": 7,
+          "waterNum": 7,
+          "ammoNum": 7,
+          "resourceNum": 7
+        }
+      ]
+    },
+    "61000004": {
+      "id": 61000004,
+      "name": "#테스트 함대4",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000031,
+          "Lv": 15,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000031,
+          "Lv": 15,
+          "foodNum": 9,
+          "waterNum": 9,
+          "ammoNum": 9,
+          "resourceNum": 9
+        },
+        {
+          "TemplateId": 62000026,
+          "Lv": 15,
+          "foodNum": 8,
+          "waterNum": 8,
+          "ammoNum": 8,
+          "resourceNum": 8
+        },
+        {
+          "TemplateId": 62000026,
+          "Lv": 10,
+          "foodNum": 7,
+          "waterNum": 7,
+          "ammoNum": 7,
+          "resourceNum": 7
+        },
+        {
+          "TemplateId": 62000013,
+          "Lv": 5,
+          "foodNum": 6,
+          "waterNum": 6,
+          "ammoNum": 6,
+          "resourceNum": 6
+        },
+        {
+          "TemplateId": 62000002,
+          "Lv": 1,
+          "foodNum": 5,
+          "waterNum": 5,
+          "ammoNum": 5,
+          "resourceNum": 5
+        }
+      ]
+    },
+    "61000005": {
+      "id": 61000005,
+      "name": "#테스트 함대5",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000046,
+          "Lv": 20,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000038,
+          "Lv": 20,
+          "foodNum": 9,
+          "waterNum": 9,
+          "ammoNum": 9,
+          "resourceNum": 9
+        },
+        {
+          "TemplateId": 62000029,
+          "Lv": 20,
+          "foodNum": 8,
+          "waterNum": 8,
+          "ammoNum": 8,
+          "resourceNum": 8
+        },
+        {
+          "TemplateId": 62000039,
+          "Lv": 15,
+          "foodNum": 7,
+          "waterNum": 7,
+          "ammoNum": 7,
+          "resourceNum": 7
+        },
+        {
+          "TemplateId": 62000019,
+          "Lv": 10,
+          "foodNum": 6,
+          "waterNum": 6,
+          "ammoNum": 6,
+          "resourceNum": 6
+        },
+        {
+          "TemplateId": 62000018,
+          "Lv": 5,
+          "foodNum": 5,
+          "waterNum": 5,
+          "ammoNum": 5,
+          "resourceNum": 5
+        },
+        {
+          "TemplateId": 62000007,
+          "Lv": 1,
+          "foodNum": 4,
+          "waterNum": 4,
+          "ammoNum": 4,
+          "resourceNum": 4
+        }
+      ]
+    },
+    "61000006": {
+      "id": 61000006,
+      "name": "포르투갈 상선대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000067,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000067,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000007": {
+      "id": 61000007,
+      "name": "에스파냐 상선대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000068,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000068,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000008": {
+      "id": 61000008,
+      "name": "프랑스 상선대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000069,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000069,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000009": {
+      "id": 61000009,
+      "name": "제노바 상선대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000070,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000070,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000010": {
+      "id": 61000010,
+      "name": "오스만 상선대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000071,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000071,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000011": {
+      "id": 61000011,
+      "name": "하프시드 상선대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000072,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000072,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000012": {
+      "id": 61000012,
+      "name": "포르투갈 경비함대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000073,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000073,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000067,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000013": {
+      "id": 61000013,
+      "name": "에스파냐 경비함대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000074,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000074,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000068,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000014": {
+      "id": 61000014,
+      "name": "프랑스 경비함대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000075,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000075,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000069,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000015": {
+      "id": 61000015,
+      "name": "제노바 경비함대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000076,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000076,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000070,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000016": {
+      "id": 61000016,
+      "name": "오스만 경비함대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000077,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000077,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000071,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000017": {
+      "id": 61000017,
+      "name": "하프시드 경비함대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000078,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000078,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000072,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000018": {
+      "id": 61000018,
+      "name": "토박이 해적_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000079,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000079,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000019": {
+      "id": 61000019,
+      "name": "불한당_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000080,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000080,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000020": {
+      "id": 61000020,
+      "name": "대서양 순찰함대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000081,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000081,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000021": {
+      "id": 61000021,
+      "name": "지중해 순찰함대_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000082,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000082,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000022": {
+      "id": 61000022,
+      "name": "지중해 탐험단_Lv1",
+      "mateBaseLv": 0,
+      "ship": [
+        {
+          "TemplateId": 62000083,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000023": {
+      "id": 61000023,
+      "name": "바르바리 해적_Lv1",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000084,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000084,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000079,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000024": {
+      "id": 61000024,
+      "name": "코르세르 해적_Lv1",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000085,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000085,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        },
+        {
+          "TemplateId": 62000080,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000025": {
+      "id": 61000025,
+      "name": "상선 Lv1",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000086,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 0,
+          "resourceNum": 10
+        }
+      ]
+    },
+    "61000026": {
+      "id": 61000026,
+      "name": "상선대 Lv10",
+      "mateBaseLv": 10,
+      "ship": [
+        {
+          "TemplateId": 62000087,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 0,
+          "resourceNum": 20
+        },
+        {
+          "TemplateId": 62000087,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 0,
+          "resourceNum": 20
+        },
+        {
+          "TemplateId": 62000087,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 0,
+          "resourceNum": 20
+        }
+      ]
+    },
+    "61000027": {
+      "id": 61000027,
+      "name": "무장상선 Lv30",
+      "mateBaseLv": 30,
+      "ship": [
+        {
+          "TemplateId": 62000088,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 30,
+          "resourceNum": 30
+        },
+        {
+          "TemplateId": 62000088,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 30,
+          "resourceNum": 30
+        },
+        {
+          "TemplateId": 62000088,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 30,
+          "resourceNum": 30
+        },
+        {
+          "TemplateId": 62000088,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 30,
+          "resourceNum": 30
+        },
+        {
+          "TemplateId": 62000088,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 30,
+          "resourceNum": 30
+        }
+      ]
+    },
+    "61000028": {
+      "id": 61000028,
+      "name": "낚싯배 Lv1",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000089,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 0,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000029": {
+      "id": 61000029,
+      "name": "어선 Lv10",
+      "mateBaseLv": 10,
+      "ship": [
+        {
+          "TemplateId": 62000090,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 0,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000090,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 0,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000090,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 0,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000030": {
+      "id": 61000030,
+      "name": "원양어선 Lv30",
+      "mateBaseLv": 30,
+      "ship": [
+        {
+          "TemplateId": 62000091,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 0,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000091,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 0,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000091,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 0,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000091,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 0,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000091,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 0,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000031": {
+      "id": 61000031,
+      "name": "모험선 Lv1",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000092,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 30
+        }
+      ]
+    },
+    "61000032": {
+      "id": 61000032,
+      "name": "탐험선 Lv10",
+      "mateBaseLv": 10,
+      "ship": [
+        {
+          "TemplateId": 62000093,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 60
+        },
+        {
+          "TemplateId": 62000093,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 60
+        },
+        {
+          "TemplateId": 62000093,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 60
+        }
+      ]
+    },
+    "61000033": {
+      "id": 61000033,
+      "name": "발굴단 Lv30",
+      "mateBaseLv": 30,
+      "ship": [
+        {
+          "TemplateId": 62000094,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 90
+        },
+        {
+          "TemplateId": 62000094,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 90
+        },
+        {
+          "TemplateId": 62000094,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 90
+        },
+        {
+          "TemplateId": 62000094,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 90
+        },
+        {
+          "TemplateId": 62000094,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 90
+        }
+      ]
+    },
+    "61000034": {
+      "id": 61000034,
+      "name": "불한당 Lv1",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000095,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000035": {
+      "id": 61000035,
+      "name": "폭도 Lv10",
+      "mateBaseLv": 10,
+      "ship": [
+        {
+          "TemplateId": 62000096,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000096,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000096,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000036": {
+      "id": 61000036,
+      "name": "폭력단 Lv30",
+      "mateBaseLv": 30,
+      "ship": [
+        {
+          "TemplateId": 62000097,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000097,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000097,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000097,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000097,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000037": {
+      "id": 61000037,
+      "name": "해적선 Lv1",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000098,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 20
+        }
+      ]
+    },
+    "61000038": {
+      "id": 61000038,
+      "name": "해적단 Lv10",
+      "mateBaseLv": 10,
+      "ship": [
+        {
+          "TemplateId": 62000099,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 40
+        },
+        {
+          "TemplateId": 62000099,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 40
+        },
+        {
+          "TemplateId": 62000099,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 40
+        }
+      ]
+    },
+    "61000039": {
+      "id": 61000039,
+      "name": "해적함대 Lv30",
+      "mateBaseLv": 30,
+      "ship": [
+        {
+          "TemplateId": 62000100,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 60
+        },
+        {
+          "TemplateId": 62000100,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 60
+        },
+        {
+          "TemplateId": 62000100,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 60
+        },
+        {
+          "TemplateId": 62000100,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 60
+        },
+        {
+          "TemplateId": 62000100,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 60
+        }
+      ]
+    },
+    "61000040": {
+      "id": 61000040,
+      "name": "순찰대 Lv1",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000101,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 20
+        }
+      ]
+    },
+    "61000041": {
+      "id": 61000041,
+      "name": "경비대 Lv10",
+      "mateBaseLv": 10,
+      "ship": [
+        {
+          "TemplateId": 62000102,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 40
+        },
+        {
+          "TemplateId": 62000102,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 40
+        },
+        {
+          "TemplateId": 62000102,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 40
+        }
+      ]
+    },
+    "61000042": {
+      "id": 61000042,
+      "name": "군함대 Lv30",
+      "mateBaseLv": 30,
+      "ship": [
+        {
+          "TemplateId": 62000103,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 60
+        },
+        {
+          "TemplateId": 62000103,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 60
+        },
+        {
+          "TemplateId": 62000103,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 60
+        },
+        {
+          "TemplateId": 62000103,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 60
+        },
+        {
+          "TemplateId": 62000103,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 60
+        }
+      ]
+    },
+    "61000043": {
+      "id": 61000043,
+      "name": "현상수배범 Lv1",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000104,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000044": {
+      "id": 61000044,
+      "name": "현상수배범 Lv10",
+      "mateBaseLv": 10,
+      "ship": [
+        {
+          "TemplateId": 62000105,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000105,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000105,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000045": {
+      "id": 61000045,
+      "name": "현상수배범 Lv30",
+      "mateBaseLv": 30,
+      "ship": [
+        {
+          "TemplateId": 62000106,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000106,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000106,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000106,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000106,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000046": {
+      "id": 61000046,
+      "name": "현상금사냥꾼 Lv1",
+      "mateBaseLv": 1,
+      "ship": [
+        {
+          "TemplateId": 62000107,
+          "Lv": 1,
+          "foodNum": 10,
+          "waterNum": 10,
+          "ammoNum": 10,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000047": {
+      "id": 61000047,
+      "name": "현상금사냥꾼 Lv10",
+      "mateBaseLv": 10,
+      "ship": [
+        {
+          "TemplateId": 62000108,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000108,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000108,
+          "Lv": 10,
+          "foodNum": 30,
+          "waterNum": 30,
+          "ammoNum": 30,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000048": {
+      "id": 61000048,
+      "name": "현상금사냥꾼 Lv30",
+      "mateBaseLv": 30,
+      "ship": [
+        {
+          "TemplateId": 62000109,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000109,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000109,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000109,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        },
+        {
+          "TemplateId": 62000109,
+          "Lv": 30,
+          "foodNum": 50,
+          "waterNum": 50,
+          "ammoNum": 50,
+          "resourceNum": 0
+        }
+      ]
+    },
+    "61000049": {
+      "id": 61000049,
+      "name": "대해적",
+      "mateBaseLv": 50,
+      "ship": [
+        {
+          "TemplateId": 62000110,
+          "Lv": 50,
+          "foodNum": 100,
+          "waterNum": 100,
+          "ammoNum": 100,
+          "resourceNum": 100
+        },
+        {
+          "TemplateId": 62000110,
+          "Lv": 50,
+          "foodNum": 100,
+          "waterNum": 100,
+          "ammoNum": 100,
+          "resourceNum": 100
+        },
+        {
+          "TemplateId": 62000110,
+          "Lv": 50,
+          "foodNum": 100,
+          "waterNum": 100,
+          "ammoNum": 100,
+          "resourceNum": 100
+        },
+        {
+          "TemplateId": 62000110,
+          "Lv": 50,
+          "foodNum": 100,
+          "waterNum": 100,
+          "ammoNum": 100,
+          "resourceNum": 100
+        },
+        {
+          "TemplateId": 62000110,
+          "Lv": 50,
+          "foodNum": 100,
+          "waterNum": 100,
+          "ammoNum": 100,
+          "resourceNum": 100
+        },
+        {
+          "TemplateId": 62000110,
+          "Lv": 50,
+          "foodNum": 100,
+          "waterNum": 100,
+          "ammoNum": 100,
+          "resourceNum": 100
+        },
+        {
+          "TemplateId": 62000110,
+          "Lv": 50,
+          "foodNum": 100,
+          "waterNum": 100,
+          "ammoNum": 100,
+          "resourceNum": 100
+        }
+      ]
+    }
+  }
+}

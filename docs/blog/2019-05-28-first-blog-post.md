@@ -58,10 +58,10 @@ npm run dev
 설치가 완료되면 다음 URL로 접속할 수 있습니다:
 
 - **프론트엔드**: http://localhost:3000
-- **백엔드 API**: http://localhost:5001
+- **백엔드 API**: http://localhost:5000
 - **채팅 서버**: http://localhost:3001
-- **API 문서**: http://localhost:5001/api-docs
-- **큐 모니터**: http://localhost:5001/admin/queues
+- **API 문서**: http://localhost:5000/api-docs
+- **큐 모니터**: http://localhost:5000/admin/queues
 
 ## 🎯 다음 단계
 

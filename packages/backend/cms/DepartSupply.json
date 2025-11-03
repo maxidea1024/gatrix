@@ -1,0 +1,67 @@
+{
+  ":DepartSupply": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "pointId": "number",
+      "pointVal": "number",
+      "desc": "text",
+      "icon": "string"
+    },
+    ":required": {
+      "name": 1,
+      "pointId": 1,
+      "pointVal": 1,
+      "icon": 1
+    },
+    ":min": {
+      "pointId": 100000
+    },
+    ":max": {
+      "pointId": 199999
+    },
+    ":enum": {},
+    ":asset": {
+      "icon": 1
+    },
+    ":links": {
+      "pointId": [
+        "Point"
+      ]
+    }
+  },
+  "DepartSupply": {
+    "40600001": {
+      "id": 40600001,
+      "name": "물",
+      "pointId": 100001,
+      "pointVal": 60,
+      "desc": "항해에 필요한 식수.\n매일 소모되며 보유량이 없으면 생존할 수 없다.\n다친 선원을 치료할 때도 사용된다.",
+      "icon": "Icon_Supply_40600001_Sprite"
+    },
+    "40600002": {
+      "id": 40600002,
+      "name": "식량",
+      "pointId": 100001,
+      "pointVal": 140,
+      "desc": "항해에 필요한 식량.\n매일 소모되며 보유량이 없으면 생존할 수 없다.",
+      "icon": "Icon_Supply_40600002_Sprite"
+    },
+    "40600003": {
+      "id": 40600003,
+      "name": "자재",
+      "pointId": 100001,
+      "pointVal": 400,
+      "desc": "선박 수리에 사용되는 목재.\n보유량이 없으면 전투나 항해 중 선박을 수리할 수 없다.",
+      "icon": "Icon_Supply_40600003_Sprite"
+    },
+    "40600004": {
+      "id": 40600004,
+      "name": "포탄",
+      "pointId": 100001,
+      "pointVal": 70,
+      "desc": "대포에 이용되는 포탄.\n보유량이 없으면 적에게 포격할 수 없다.",
+      "icon": "Icon_Supply_40600004_Sprite"
+    }
+  }
+}

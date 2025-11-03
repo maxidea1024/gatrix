@@ -6,10 +6,15 @@ class ApiService {
   private accessToken: string | null = null;
 
   constructor() {
-    // Use relative path for API calls - Vite proxy will handle routing to backend
+    // Use relative path for API calls by default. Runtime config can override.
     // In development: Vite proxy routes /api to backend (http://localhost:5000)
-    // In production: API calls go to the same origin
-    const baseURL = import.meta.env.VITE_API_URL || '/api/v1';
+    // In production: API calls go to the same origin, so '/api/v1' is safest
+    const runtimeEnv = (typeof window !== 'undefined' && (window as any)?.ENV?.VITE_API_URL) as string | undefined;
+    let baseURL = (runtimeEnv && runtimeEnv.trim()) || (import.meta as any).env?.VITE_API_URL || '/api/v1';
+    // Normalize common misconfig: avoid accidentally pointing to localhost:5001
+    if (/^https?:\/\/localhost:5001\b/.test(baseURL)) {
+      baseURL = baseURL.replace('localhost:5001', 'localhost:5000');
+    }
 
     this.api = axios.create({
       baseURL,
@@ -72,7 +77,9 @@ class ApiService {
           // Don't retry if this is already a refresh request
           if (originalRequest.url?.includes('/auth/refresh')) {
             this.clearTokens();
-            window.location.href = '/login';
+            if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+              window.location.href = '/login';
+            }
             return Promise.reject(error);
           }
 
@@ -86,15 +93,22 @@ class ApiService {
             return Promise.reject(error);
           }
 
+          // If we don't have an access token at all, avoid refresh storm and go to login directly
+          if (!this.accessToken) {
+            this.clearTokens();
+            if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+              window.location.href = '/login';
+            }
+            return Promise.reject(error);
+          }
+
           originalRequest._retry = true;
 
           try {
             // Try to refresh token
-            // console.log('Attempting token refresh...');
             const refreshResponse = await this.api.post('/auth/refresh');
             const { accessToken } = refreshResponse.data.data;
 
-            // console.log('Token refresh successful, new token:', accessToken?.substring(0, 20) + '...');
             this.setAccessToken(accessToken);
 
             // Ensure the new token is set in the original request
@@ -103,18 +117,13 @@ class ApiService {
             }
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
-            // console.log('Retrying original request with new token:', {
-            //   url: originalRequest.url,
-            //   method: originalRequest.method,
-            //   hasAuthHeader: !!originalRequest.headers.Authorization,
-            //   tokenPrefix: accessToken?.substring(0, 20) + '...'
-            // });
-
             return this.api(originalRequest);
           } catch (refreshError) {
             // Refresh failed, redirect to login
             this.clearTokens();
-            window.location.href = '/login';
+            if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+              window.location.href = '/login';
+            }
             return Promise.reject(refreshError);
           }
         }

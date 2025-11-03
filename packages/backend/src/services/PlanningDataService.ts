@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { CustomError } from '../middleware/errorHandler';
 import logger from '../config/logger';
+import { cacheService } from './CacheService';
 
 export interface RewardTypeInfo {
   value: number;
@@ -36,20 +37,45 @@ export interface RewardLookupData {
 }
 
 export class PlanningDataService {
-  private static cmsPath = path.join(__dirname, '../contents/cms');
-  private static rewardLookupPath = path.join(PlanningDataService.cmsPath, 'reward-lookup.json');
-  private static rewardTypeListPath = path.join(PlanningDataService.cmsPath, 'reward-type-list.json');
-  private static localizationKrPath = path.join(PlanningDataService.cmsPath, 'reward-localization-kr.json');
-  private static localizationUsPath = path.join(PlanningDataService.cmsPath, 'reward-localization-us.json');
-  private static localizationCnPath = path.join(PlanningDataService.cmsPath, 'reward-localization-cn.json');
-  private static uiListDataPath = path.join(PlanningDataService.cmsPath, 'ui-list-data.json');
-  private static loctabPath = path.join(PlanningDataService.cmsPath, 'loctab.json');
-  private static hotTimeBuffPath = path.join(PlanningDataService.cmsPath, 'hottimebuff-lookup.json');
-  private static eventPagePath = path.join(PlanningDataService.cmsPath, 'eventpage-lookup.json');
-  private static liveEventPath = path.join(PlanningDataService.cmsPath, 'liveevent-lookup.json');
-  private static mateRecruitingGroupPath = path.join(PlanningDataService.cmsPath, 'materecruiting-lookup.json');
-  private static oceanNpcAreaSpawnerPath = path.join(PlanningDataService.cmsPath, 'oceannpcarea-lookup.json');
+  // Source CMS files (read-only, from src/contents/cms)
+  private static sourceCmsPath = path.join(__dirname, '../contents/cms');
+
+  // Runtime data path (read-write, for dynamically generated files)
+  private static runtimeDataPath = path.join(__dirname, '../../data/planning');
+
+  // Paths for dynamically generated files (stored in runtime data directory)
+  private static rewardLookupPath = path.join(PlanningDataService.runtimeDataPath, 'reward-lookup.json');
+  private static rewardTypeListPath = path.join(PlanningDataService.runtimeDataPath, 'reward-type-list.json');
+  private static localizationKrPath = path.join(PlanningDataService.runtimeDataPath, 'reward-localization-kr.json');
+  private static localizationUsPath = path.join(PlanningDataService.runtimeDataPath, 'reward-localization-us.json');
+  private static localizationCnPath = path.join(PlanningDataService.runtimeDataPath, 'reward-localization-cn.json');
+  private static uiListDataPath = path.join(PlanningDataService.runtimeDataPath, 'ui-list-data.json');
+  private static loctabPath = path.join(PlanningDataService.runtimeDataPath, 'loctab.json');
+  private static hotTimeBuffPath = path.join(PlanningDataService.runtimeDataPath, 'hottimebuff-lookup.json');
+  private static eventPagePath = path.join(PlanningDataService.runtimeDataPath, 'eventpage-lookup.json');
+  private static liveEventPath = path.join(PlanningDataService.runtimeDataPath, 'liveevent-lookup.json');
+  private static mateRecruitingGroupPath = path.join(PlanningDataService.runtimeDataPath, 'materecruiting-lookup.json');
+  private static oceanNpcAreaSpawnerPath = path.join(PlanningDataService.runtimeDataPath, 'oceannpcarea-lookup.json');
   private static initialized = false;
+
+  // Redis cache keys for multi-instance support
+  private static readonly CACHE_KEYS = {
+    REWARD_LOOKUP: 'planning:reward-lookup',
+    REWARD_TYPE_LIST: 'planning:reward-type-list',
+    LOCALIZATION_KR: 'planning:localization-kr',
+    LOCALIZATION_US: 'planning:localization-us',
+    LOCALIZATION_CN: 'planning:localization-cn',
+    UI_LIST_DATA: 'planning:ui-list-data',
+    LOCTAB: 'planning:loctab',
+    HOT_TIME_BUFF: 'planning:hottimebuff-lookup',
+    EVENT_PAGE: 'planning:eventpage-lookup',
+    LIVE_EVENT: 'planning:liveevent-lookup',
+    MATE_RECRUITING: 'planning:materecruiting-lookup',
+    OCEAN_NPC_AREA: 'planning:oceannpcarea-lookup',
+  };
+
+  // Cache TTL: 24 hours (in milliseconds)
+  private static readonly CACHE_TTL = 24 * 60 * 60 * 1000;
 
   /**
    * Initialize planning data on server startup
@@ -61,6 +87,10 @@ export class PlanningDataService {
     }
 
     try {
+      // Ensure runtime data directory exists
+      await fs.mkdir(this.runtimeDataPath, { recursive: true });
+      logger.info('Runtime data directory ready', { path: this.runtimeDataPath });
+
       // Check if reward lookup files exist
       const lookupExists = await fs.access(this.rewardLookupPath).then(() => true).catch(() => false);
       const typeListExists = await fs.access(this.rewardTypeListPath).then(() => true).catch(() => false);
@@ -81,12 +111,25 @@ export class PlanningDataService {
   }
 
   /**
-   * Get reward lookup data (cached in memory)
+   * Get reward lookup data (cached in Redis for multi-instance support)
    */
   static async getRewardLookup(): Promise<RewardLookupData> {
     try {
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<RewardLookupData>(this.CACHE_KEYS.REWARD_LOOKUP);
+      if (cached) {
+        logger.debug('Reward lookup data retrieved from cache');
+        return cached;
+      }
+
+      // If not in cache, read from file
       const data = await fs.readFile(PlanningDataService.rewardLookupPath, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+
+      // Store in Redis cache for other instances
+      await cacheService.set(this.CACHE_KEYS.REWARD_LOOKUP, parsed, this.CACHE_TTL);
+
+      return parsed;
     } catch (error) {
       logger.error('Failed to read reward lookup data', { error });
       throw new CustomError('Failed to load reward lookup data', 500);
@@ -94,12 +137,25 @@ export class PlanningDataService {
   }
 
   /**
-   * Get reward type list
+   * Get reward type list (cached in Redis for multi-instance support)
    */
   static async getRewardTypeList(): Promise<RewardTypeInfo[]> {
     try {
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<RewardTypeInfo[]>(this.CACHE_KEYS.REWARD_TYPE_LIST);
+      if (cached) {
+        logger.debug('Reward type list retrieved from cache');
+        return cached;
+      }
+
+      // If not in cache, read from file
       const data = await fs.readFile(PlanningDataService.rewardTypeListPath, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+
+      // Store in Redis cache for other instances
+      await cacheService.set(this.CACHE_KEYS.REWARD_TYPE_LIST, parsed, this.CACHE_TTL);
+
+      return parsed;
     } catch (error) {
       logger.error('Failed to read reward type list', { error });
       throw new CustomError('Failed to load reward type list', 500);
@@ -172,7 +228,7 @@ export class PlanningDataService {
       logger.info('Starting planning data rebuild using adminToolDataBuilder.js...');
 
       // Check if adminToolDataBuilder.js exists
-      const builderPath = path.join(PlanningDataService.cmsPath, 'adminToolDataBuilder.js');
+      const builderPath = path.join(PlanningDataService.sourceCmsPath, 'adminToolDataBuilder.js');
 
       try {
         await fs.access(builderPath);
@@ -181,15 +237,16 @@ export class PlanningDataService {
       }
 
       // Get the actual CMS directory path (where Point.json, Item.json, etc. are located)
-      // The CMS files are in packages/backend/cmd directory
-      const actualCmsDir = path.join(__dirname, '../../cmd');
+      // The CMS files are in packages/backend/cms directory
+      const actualCmsDir = path.join(__dirname, '../../cms');
 
       // Execute the builder with the correct CMS directory
       // This will generate all 7 files: reward-lookup.json, reward-type-list.json,
       // reward-localization-kr/us/cn.json, ui-list-data.json, loctab.json
+      // Output to runtime data directory (not source directory)
       const { execSync } = require('child_process');
-      const output = execSync(`node "${builderPath}" --all --cms-dir "${actualCmsDir}" --output-dir "${PlanningDataService.cmsPath}"`, {
-        cwd: PlanningDataService.cmsPath,
+      const output = execSync(`node "${builderPath}" --all --cms-dir "${actualCmsDir}" --output-dir "${PlanningDataService.runtimeDataPath}"`, {
+        cwd: PlanningDataService.sourceCmsPath,
         encoding: 'utf-8',
       });
 
@@ -203,7 +260,20 @@ export class PlanningDataService {
         throw new CustomError('Planning data files were not created', 500);
       }
 
-      // Get stats
+      // Invalidate Redis cache for all instances
+      logger.info('Invalidating Redis cache for planning data...');
+      await Promise.all([
+        cacheService.delete(this.CACHE_KEYS.REWARD_LOOKUP),
+        cacheService.delete(this.CACHE_KEYS.REWARD_TYPE_LIST),
+        cacheService.delete(this.CACHE_KEYS.UI_LIST_DATA),
+        cacheService.delete(this.CACHE_KEYS.LOCALIZATION_KR),
+        cacheService.delete(this.CACHE_KEYS.LOCALIZATION_US),
+        cacheService.delete(this.CACHE_KEYS.LOCALIZATION_CN),
+        cacheService.delete(this.CACHE_KEYS.LOCTAB),
+      ]);
+      logger.info('Redis cache invalidated successfully');
+
+      // Get stats (this will reload from files and repopulate cache)
       const lookupData = await PlanningDataService.getRewardLookup();
       const typeList = await PlanningDataService.getRewardTypeList();
       const uiListData = await PlanningDataService.getUIListData();
@@ -234,10 +304,25 @@ export class PlanningDataService {
   }
 
   /**
-   * Get localization data for a specific language
+   * Get localization data for a specific language (cached in Redis for multi-instance support)
    */
   static async getLocalization(language: 'kr' | 'us' | 'cn'): Promise<Record<string, string>> {
     try {
+      const cacheKeyMap = {
+        kr: this.CACHE_KEYS.LOCALIZATION_KR,
+        us: this.CACHE_KEYS.LOCALIZATION_US,
+        cn: this.CACHE_KEYS.LOCALIZATION_CN,
+      };
+
+      const cacheKey = cacheKeyMap[language];
+
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<Record<string, string>>(cacheKey);
+      if (cached) {
+        logger.debug(`Localization data (${language}) retrieved from cache`);
+        return cached;
+      }
+
       const pathMap = {
         kr: this.localizationKrPath,
         us: this.localizationUsPath,
@@ -252,7 +337,12 @@ export class PlanningDataService {
       }
 
       const data = await fs.readFile(filePath, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+
+      // Store in Redis cache for other instances
+      await cacheService.set(cacheKey, parsed, this.CACHE_TTL);
+
+      return parsed;
     } catch (error) {
       logger.error('Failed to read localization data', { error, language });
       throw new CustomError(`Failed to load localization data for ${language}`, 500);
@@ -260,10 +350,17 @@ export class PlanningDataService {
   }
 
   /**
-   * Get UI list data (nations, towns, villages)
+   * Get UI list data (nations, towns, villages) - cached in Redis for multi-instance support
    */
   static async getUIListData(): Promise<any> {
     try {
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<any>(this.CACHE_KEYS.UI_LIST_DATA);
+      if (cached) {
+        logger.debug('UI list data retrieved from cache');
+        return cached;
+      }
+
       const exists = await fs.access(this.uiListDataPath).then(() => true).catch(() => false);
 
       if (!exists) {
@@ -271,7 +368,12 @@ export class PlanningDataService {
       }
 
       const data = await fs.readFile(this.uiListDataPath, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+
+      // Store in Redis cache for other instances
+      await cacheService.set(this.CACHE_KEYS.UI_LIST_DATA, parsed, this.CACHE_TTL);
+
+      return parsed;
     } catch (error) {
       logger.error('Failed to read UI list data', { error });
       throw new CustomError('Failed to load UI list data', 500);
@@ -357,10 +459,17 @@ export class PlanningDataService {
   }
 
   /**
-   * Get HotTimeBuff lookup data
+   * Get HotTimeBuff lookup data (cached in Redis for multi-instance support)
    */
   static async getHotTimeBuffLookup(): Promise<Record<string, any>> {
     try {
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<Record<string, any>>(this.CACHE_KEYS.HOT_TIME_BUFF);
+      if (cached) {
+        logger.debug('HotTimeBuff lookup data retrieved from cache');
+        return cached;
+      }
+
       const exists = await fs.access(this.hotTimeBuffPath).then(() => true).catch(() => false);
 
       if (!exists) {
@@ -368,7 +477,12 @@ export class PlanningDataService {
       }
 
       const data = await fs.readFile(this.hotTimeBuffPath, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+
+      // Store in Redis cache for other instances
+      await cacheService.set(this.CACHE_KEYS.HOT_TIME_BUFF, parsed, this.CACHE_TTL);
+
+      return parsed;
     } catch (error) {
       logger.error('Failed to read HotTimeBuff lookup data', { error });
       throw new CustomError('Failed to load HotTimeBuff lookup data', 500);
@@ -382,15 +496,15 @@ export class PlanningDataService {
     try {
       logger.info('Building HotTimeBuff lookup data...');
 
-      // Read HotTimeBuff.json from cmd directory
-      const cmdDir = path.join(__dirname, '../../cmd');
-      const hotTimeBuffSourcePath = path.join(cmdDir, 'HotTimeBuff.json');
-      const worldBuffSourcePath = path.join(cmdDir, 'WorldBuff.json');
+      // Read HotTimeBuff.json from cms directory
+      const cmsDir = path.join(__dirname, '../../cms');
+      const hotTimeBuffSourcePath = path.join(cmsDir, 'HotTimeBuff.json');
+      const worldBuffSourcePath = path.join(cmsDir, 'WorldBuff.json');
 
       try {
         await fs.access(hotTimeBuffSourcePath);
       } catch {
-        throw new CustomError('HotTimeBuff.json not found in cmd directory', 500);
+        throw new CustomError('HotTimeBuff.json not found in cms directory', 500);
       }
 
       // Load WorldBuff data for name mapping
@@ -454,6 +568,9 @@ export class PlanningDataService {
 
       await fs.writeFile(this.hotTimeBuffPath, JSON.stringify(lookupData, null, 2), 'utf-8');
 
+      // Invalidate Redis cache for all instances
+      await cacheService.delete(this.CACHE_KEYS.HOT_TIME_BUFF);
+
       logger.info('HotTimeBuff lookup data built successfully', { itemCount: items.length });
 
       return {
@@ -471,14 +588,27 @@ export class PlanningDataService {
   }
 
   /**
-   * Get EventPage lookup data
+   * Get EventPage lookup data (cached in Redis for multi-instance support)
    */
   static async getEventPageLookup(): Promise<Record<string, any>> {
     try {
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<Record<string, any>>(this.CACHE_KEYS.EVENT_PAGE);
+      if (cached) {
+        logger.debug('EventPage lookup data retrieved from cache');
+        return cached;
+      }
+
       const exists = await fs.access(this.eventPagePath).then(() => true).catch(() => false);
       if (!exists) return { totalCount: 0, items: [] };
+
       const data = await fs.readFile(this.eventPagePath, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+
+      // Store in Redis cache for other instances
+      await cacheService.set(this.CACHE_KEYS.EVENT_PAGE, parsed, this.CACHE_TTL);
+
+      return parsed;
     } catch (error) {
       logger.error('Failed to read EventPage lookup data', { error });
       throw new CustomError('Failed to load EventPage lookup data', 500);
@@ -491,12 +621,12 @@ export class PlanningDataService {
   static async buildEventPageLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
     try {
       logger.info('Building EventPage lookup data...');
-      const cmdDir = path.join(__dirname, '../../cmd');
-      const sourceFilePath = path.join(cmdDir, 'EventPage.json');
+      const cmsDir = path.join(__dirname, '../../cms');
+      const sourceFilePath = path.join(cmsDir, 'EventPage.json');
       try {
         await fs.access(sourceFilePath);
       } catch {
-        throw new CustomError('EventPage.json not found in cmd directory', 500);
+        throw new CustomError('EventPage.json not found in cms directory', 500);
       }
 
       // PageGroup and Type name mappings
@@ -538,6 +668,10 @@ export class PlanningDataService {
       }));
       const lookupData = { totalCount: items.length, items };
       await fs.writeFile(this.eventPagePath, JSON.stringify(lookupData, null, 2), 'utf-8');
+
+      // Invalidate Redis cache for all instances
+      await cacheService.delete(this.CACHE_KEYS.EVENT_PAGE);
+
       logger.info('EventPage lookup data built successfully', { itemCount: items.length });
       return { success: true, message: 'EventPage lookup data built successfully', itemCount: items.length };
     } catch (error) {
@@ -548,14 +682,27 @@ export class PlanningDataService {
   }
 
   /**
-   * Get LiveEvent lookup data
+   * Get LiveEvent lookup data (cached in Redis for multi-instance support)
    */
   static async getLiveEventLookup(): Promise<Record<string, any>> {
     try {
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<Record<string, any>>(this.CACHE_KEYS.LIVE_EVENT);
+      if (cached) {
+        logger.debug('LiveEvent lookup data retrieved from cache');
+        return cached;
+      }
+
       const exists = await fs.access(this.liveEventPath).then(() => true).catch(() => false);
       if (!exists) return { totalCount: 0, items: [] };
+
       const data = await fs.readFile(this.liveEventPath, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+
+      // Store in Redis cache for other instances
+      await cacheService.set(this.CACHE_KEYS.LIVE_EVENT, parsed, this.CACHE_TTL);
+
+      return parsed;
     } catch (error) {
       logger.error('Failed to read LiveEvent lookup data', { error });
       throw new CustomError('Failed to load LiveEvent lookup data', 500);
@@ -568,12 +715,12 @@ export class PlanningDataService {
   static async buildLiveEventLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
     try {
       logger.info('Building LiveEvent lookup data...');
-      const cmdDir = path.join(__dirname, '../../cmd');
-      const sourceFilePath = path.join(cmdDir, 'LiveEvent.json');
+      const cmsDir = path.join(__dirname, '../../cms');
+      const sourceFilePath = path.join(cmsDir, 'LiveEvent.json');
       try {
         await fs.access(sourceFilePath);
       } catch {
-        throw new CustomError('LiveEvent.json not found in cmd directory', 500);
+        throw new CustomError('LiveEvent.json not found in cms directory', 500);
       }
       const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
       const parsedData = JSON.parse(sourceData);
@@ -599,6 +746,10 @@ export class PlanningDataService {
 
       const lookupData = { totalCount: items.length, items };
       await fs.writeFile(this.liveEventPath, JSON.stringify(lookupData, null, 2), 'utf-8');
+
+      // Invalidate Redis cache for all instances
+      await cacheService.delete(this.CACHE_KEYS.LIVE_EVENT);
+
       logger.info('LiveEvent lookup data built successfully', { itemCount: items.length });
       return { success: true, message: 'LiveEvent lookup data built successfully', itemCount: items.length };
     } catch (error) {
@@ -609,14 +760,27 @@ export class PlanningDataService {
   }
 
   /**
-   * Get MateRecruitingGroup lookup data
+   * Get MateRecruitingGroup lookup data (cached in Redis for multi-instance support)
    */
   static async getMateRecruitingGroupLookup(): Promise<Record<string, any>> {
     try {
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<Record<string, any>>(this.CACHE_KEYS.MATE_RECRUITING);
+      if (cached) {
+        logger.debug('MateRecruitingGroup lookup data retrieved from cache');
+        return cached;
+      }
+
       const exists = await fs.access(this.mateRecruitingGroupPath).then(() => true).catch(() => false);
       if (!exists) return { totalCount: 0, items: [] };
+
       const data = await fs.readFile(this.mateRecruitingGroupPath, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+
+      // Store in Redis cache for other instances
+      await cacheService.set(this.CACHE_KEYS.MATE_RECRUITING, parsed, this.CACHE_TTL);
+
+      return parsed;
     } catch (error) {
       logger.error('Failed to read MateRecruitingGroup lookup data', { error });
       throw new CustomError('Failed to load MateRecruitingGroup lookup data', 500);
@@ -629,17 +793,17 @@ export class PlanningDataService {
   static async buildMateRecruitingGroupLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
     try {
       logger.info('Building MateRecruitingGroup lookup data...');
-      const cmdDir = path.join(__dirname, '../../cmd');
-      const sourceFilePath = path.join(cmdDir, 'MateRecruitingGroup.json');
-      const mateTemplateFilePath = path.join(cmdDir, 'MateTemplate.json');
-      const townFilePath = path.join(cmdDir, 'Town.json');
+      const cmsDir = path.join(__dirname, '../../cms');
+      const sourceFilePath = path.join(cmsDir, 'MateRecruitingGroup.json');
+      const mateTemplateFilePath = path.join(cmsDir, 'MateTemplate.json');
+      const townFilePath = path.join(cmsDir, 'Town.json');
 
       try {
         await fs.access(sourceFilePath);
         await fs.access(mateTemplateFilePath);
         await fs.access(townFilePath);
       } catch {
-        throw new CustomError('Required JSON files not found in cmd directory', 500);
+        throw new CustomError('Required JSON files not found in cms directory', 500);
       }
 
       const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
@@ -752,6 +916,10 @@ export class PlanningDataService {
 
       const lookupData = { totalCount: items.length, items };
       await fs.writeFile(this.mateRecruitingGroupPath, JSON.stringify(lookupData, null, 2), 'utf-8');
+
+      // Invalidate Redis cache for all instances
+      await cacheService.delete(this.CACHE_KEYS.MATE_RECRUITING);
+
       logger.info('MateRecruitingGroup lookup data built successfully', { itemCount: items.length });
       return { success: true, message: 'MateRecruitingGroup lookup data built successfully', itemCount: items.length };
     } catch (error) {
@@ -762,14 +930,27 @@ export class PlanningDataService {
   }
 
   /**
-   * Get OceanNpcAreaSpawner lookup data
+   * Get OceanNpcAreaSpawner lookup data (cached in Redis for multi-instance support)
    */
   static async getOceanNpcAreaSpawnerLookup(): Promise<Record<string, any>> {
     try {
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<Record<string, any>>(this.CACHE_KEYS.OCEAN_NPC_AREA);
+      if (cached) {
+        logger.debug('OceanNpcAreaSpawner lookup data retrieved from cache');
+        return cached;
+      }
+
       const exists = await fs.access(this.oceanNpcAreaSpawnerPath).then(() => true).catch(() => false);
       if (!exists) return { totalCount: 0, items: [] };
+
       const data = await fs.readFile(this.oceanNpcAreaSpawnerPath, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+
+      // Store in Redis cache for other instances
+      await cacheService.set(this.CACHE_KEYS.OCEAN_NPC_AREA, parsed, this.CACHE_TTL);
+
+      return parsed;
     } catch (error) {
       logger.error('Failed to read OceanNpcAreaSpawner lookup data', { error });
       throw new CustomError('Failed to load OceanNpcAreaSpawner lookup data', 500);
@@ -782,15 +963,15 @@ export class PlanningDataService {
   static async buildOceanNpcAreaSpawnerLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
     try {
       logger.info('Building OceanNpcAreaSpawner lookup data...');
-      const cmdDir = path.join(__dirname, '../../cmd');
-      const sourceFilePath = path.join(cmdDir, 'OceanNpcAreaSpawner.json');
-      const oceanNpcFilePath = path.join(cmdDir, 'OceanNpc.json');
+      const cmsDir = path.join(__dirname, '../../cms');
+      const sourceFilePath = path.join(cmsDir, 'OceanNpcAreaSpawner.json');
+      const oceanNpcFilePath = path.join(cmsDir, 'OceanNpc.json');
 
       try {
         await fs.access(sourceFilePath);
         await fs.access(oceanNpcFilePath);
       } catch {
-        throw new CustomError('OceanNpcAreaSpawner.json or OceanNpc.json not found in cmd directory', 500);
+        throw new CustomError('OceanNpcAreaSpawner.json or OceanNpc.json not found in cms directory', 500);
       }
 
       const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
@@ -851,12 +1032,154 @@ export class PlanningDataService {
 
       const lookupData = { totalCount: items.length, items };
       await fs.writeFile(this.oceanNpcAreaSpawnerPath, JSON.stringify(lookupData, null, 2), 'utf-8');
+
+      // Invalidate Redis cache for all instances
+      await cacheService.delete(this.CACHE_KEYS.OCEAN_NPC_AREA);
+
       logger.info('OceanNpcAreaSpawner lookup data built successfully', { itemCount: items.length });
       return { success: true, message: 'OceanNpcAreaSpawner lookup data built successfully', itemCount: items.length };
     } catch (error) {
       if (error instanceof CustomError) throw error;
       logger.error('Failed to build OceanNpcAreaSpawner lookup data', { error });
       throw new CustomError('Failed to build OceanNpcAreaSpawner lookup data', 500);
+    }
+  }
+
+  /**
+   * Upload planning data files (drag & drop)
+   * Saves files to data/planning/ and caches them in Redis
+   */
+  static async uploadPlanningData(files: any): Promise<{ success: boolean; message: string; filesUploaded: string[]; stats: any }> {
+    try {
+      logger.info('Starting planning data upload...');
+
+      // Ensure runtime data directory exists
+      await fs.mkdir(this.runtimeDataPath, { recursive: true });
+
+      // Expected file names
+      const expectedFiles = [
+        'reward-lookup.json',
+        'reward-type-list.json',
+        'reward-localization-kr.json',
+        'reward-localization-us.json',
+        'reward-localization-cn.json',
+        'ui-list-data.json',
+        'loctab.json',
+      ];
+
+      // Validate uploaded files
+      if (!files || Object.keys(files).length === 0) {
+        throw new CustomError('No files uploaded', 400);
+      }
+
+      const uploadedFiles: string[] = [];
+      const fileStats: any = {};
+
+      // Process each uploaded file
+      for (const [fieldName, fileArray] of Object.entries(files)) {
+        const file = Array.isArray(fileArray) ? fileArray[0] : fileArray;
+
+        if (!file) {
+          logger.warn(`No file found for field: ${fieldName}`);
+          continue;
+        }
+
+        const fileName = file.originalname;
+
+        // Validate file name
+        if (!expectedFiles.includes(fileName)) {
+          logger.warn(`Unexpected file name: ${fileName}`);
+          continue;
+        }
+
+        // Validate JSON format
+        try {
+          const content = file.buffer.toString('utf-8');
+          JSON.parse(content);
+        } catch (error) {
+          throw new CustomError(`File ${fileName} is not valid JSON`, 400);
+        }
+
+        // Save file to disk
+        const filePath = path.join(this.runtimeDataPath, fileName);
+        await fs.writeFile(filePath, file.buffer);
+
+        uploadedFiles.push(fileName);
+        fileStats[fileName] = {
+          size: file.size,
+          path: filePath,
+        };
+
+        logger.info(`File saved: ${fileName}`, { size: file.size });
+      }
+
+      if (uploadedFiles.length === 0) {
+        throw new CustomError('No valid files were uploaded', 400);
+      }
+
+      // Cache all uploaded files in Redis
+      await this.cacheUploadedFiles(uploadedFiles);
+
+      logger.info('Planning data uploaded and cached successfully', { filesUploaded: uploadedFiles });
+
+      return {
+        success: true,
+        message: `${uploadedFiles.length} planning data files uploaded and cached successfully`,
+        filesUploaded: uploadedFiles,
+        stats: {
+          filesUploaded: uploadedFiles.length,
+          totalSize: Object.values(fileStats).reduce((sum: number, stat: any) => sum + stat.size, 0),
+          timestamp: new Date().toISOString(),
+        },
+      };
+    } catch (error) {
+      if (error instanceof CustomError) throw error;
+      logger.error('Failed to upload planning data', { error });
+      throw new CustomError('Failed to upload planning data', 500);
+    }
+  }
+
+  /**
+   * Cache uploaded files in Redis
+   * This ensures all instances have access to the latest data
+   */
+  private static async cacheUploadedFiles(uploadedFiles: string[]): Promise<void> {
+    try {
+      logger.info('Caching uploaded files in Redis...');
+
+      // Map file names to cache keys
+      const fileKeyMap: Record<string, string> = {
+        'reward-lookup.json': this.CACHE_KEYS.REWARD_LOOKUP,
+        'reward-type-list.json': this.CACHE_KEYS.REWARD_TYPE_LIST,
+        'reward-localization-kr.json': this.CACHE_KEYS.LOCALIZATION_KR,
+        'reward-localization-us.json': this.CACHE_KEYS.LOCALIZATION_US,
+        'reward-localization-cn.json': this.CACHE_KEYS.LOCALIZATION_CN,
+        'ui-list-data.json': this.CACHE_KEYS.UI_LIST_DATA,
+        'loctab.json': this.CACHE_KEYS.LOCTAB,
+      };
+
+      // Cache each file
+      for (const fileName of uploadedFiles) {
+        const cacheKey = fileKeyMap[fileName];
+        if (!cacheKey) {
+          logger.warn(`No cache key mapping for file: ${fileName}`);
+          continue;
+        }
+
+        const filePath = path.join(this.runtimeDataPath, fileName);
+        const content = await fs.readFile(filePath, 'utf-8');
+        const data = JSON.parse(content);
+
+        // Cache in Redis with 24-hour TTL
+        await cacheService.set(cacheKey, data, this.CACHE_TTL);
+
+        logger.info(`File cached in Redis: ${fileName}`, { cacheKey });
+      }
+
+      logger.info('All uploaded files cached in Redis successfully');
+    } catch (error) {
+      logger.error('Failed to cache uploaded files in Redis', { error });
+      throw new CustomError('Failed to cache planning data', 500);
     }
   }
 }

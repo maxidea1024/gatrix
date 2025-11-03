@@ -1,0 +1,230 @@
+{
+  ":Point": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "hardCap": "number",
+      "pointType": "number",
+      "icon": "string",
+      "displayFormat": "string",
+      "tooltipDesc": "text"
+    },
+    ":required": {
+      "name": 1,
+      "hardCap": 1,
+      "pointType": 1,
+      "displayFormat": 1
+    },
+    ":min": {
+      "pointType": 0
+    },
+    ":max": {
+      "pointType": 3
+    },
+    ":enum": {},
+    ":asset": {},
+    ":links": {}
+  },
+  "Point": {
+    "100001": {
+      "id": 100001,
+      "name": "두카트",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "icon": "WT_Currency_Coin_Sprite",
+      "displayFormat": "[[D]] {0}",
+      "tooltipDesc": "게임에서 사용되는 기본적인 재화"
+    },
+    "100002": {
+      "id": 100002,
+      "name": "잔고",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "displayFormat": "[[D]] {0}"
+    },
+    "100003": {
+      "id": 100003,
+      "name": "블루젬",
+      "hardCap": 900000000000000,
+      "pointType": 1,
+      "icon": "WT_Currency_Gem01_Sprite",
+      "displayFormat": "[[B]] {0}",
+      "tooltipDesc": "각종 편의 기능을 이용할 수 있게 해주는 재화"
+    },
+    "100004": {
+      "id": 100004,
+      "name": "레드젬",
+      "hardCap": 900000000000000,
+      "pointType": 1,
+      "icon": "WT_Currency_Gem02_Sprite",
+      "displayFormat": "[[R]] {0}",
+      "tooltipDesc": "각종 편의 기능을 이용할 수 있게 해주는 재화"
+    },
+    "100005": {
+      "id": 100005,
+      "name": "행동력",
+      "hardCap": 900000000000000,
+      "pointType": 2,
+      "icon": "WT_Currency_Power_Sprite",
+      "displayFormat": "[[E]] {0}",
+      "tooltipDesc": "각종 컨텐츠 이용에 필요한 재화"
+    },
+    "100006": {
+      "id": 100006,
+      "name": "마일리지",
+      "hardCap": 900000000000000,
+      "pointType": 1,
+      "icon": "WT_Currency_Mileage_Sprite",
+      "displayFormat": "[[M]] {0}",
+      "tooltipDesc": "상점에서 상품 구매를 통해 획득하는 재화"
+    },
+    "100007": {
+      "id": 100007,
+      "name": "업적 점수",
+      "hardCap": 900000000000000,
+      "pointType": 3,
+      "icon": "WT_Currency_AchievementPoint_Sprite",
+      "displayFormat": "[[A]] {0}",
+      "tooltipDesc": "업적 완료 시 획득하는 점수"
+    },
+    "100008": {
+      "id": 100008,
+      "name": "상자 교환권",
+      "hardCap": 900000000000000,
+      "pointType": 1,
+      "icon": "WT_Currency_BoxToken_Sprite",
+      "displayFormat": "[[T]] {0}"
+    },
+    "100009": {
+      "id": 100009,
+      "name": "레드젬",
+      "hardCap": 900000000000000,
+      "pointType": 1,
+      "icon": "WT_Currency_Gem02_Sprite",
+      "displayFormat": "[[R]] {0}",
+      "tooltipDesc": "각종 편의 기능을 이용할 수 있게 해주는 재화(유료 획득)"
+    },
+    "100010": {
+      "id": 100010,
+      "name": "공헌도",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "icon": "WT_Currency_Contributiveness_Sprite",
+      "displayFormat": "[[C]] {0}",
+      "tooltipDesc": "왕궁에서 사용할 수 있는 재화"
+    },
+    "100011": {
+      "id": 100011,
+      "name": "상회 화폐",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "icon": "WT_Currency_GuildCoin_Sprite",
+      "displayFormat": "[[G]] {0}",
+      "tooltipDesc": "상회 활동을 통해 획득하는 재화"
+    },
+    "100012": {
+      "id": 100012,
+      "name": "모의전 입장권",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "icon": "WT_Currency_ArenaTicket_Sprite",
+      "displayFormat": "[[F]] {0}",
+      "tooltipDesc": "모의전 참여에 필요한 재화"
+    },
+    "100013": {
+      "id": 100013,
+      "name": "전투 화폐",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "icon": "WT_Currency_PirateCoin_2_Sprite",
+      "displayFormat": "[[P]] {0}",
+      "tooltipDesc": "대전을 통해 획득하는 재화"
+    },
+    "100014": {
+      "id": 100014,
+      "name": "밀수단의 문서 조각",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "icon": "WT_Currency__SmuggleOpenPoint_Sprite",
+      "displayFormat": "[[O]] {0}",
+      "tooltipDesc": "밀수단 교역상 이용에 필요한 재화"
+    },
+    "100015": {
+      "id": 100015,
+      "name": "밀수단의 신용 증서",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "icon": "WT_Currency_SmuggleRewardPoint_Sprite",
+      "displayFormat": "[[S]] {0}",
+      "tooltipDesc": "밀수단 상점 이용에 필요한 재화"
+    },
+    "100016": {
+      "id": 100016,
+      "name": "목재 물자",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "displayFormat": "[[D]] {0}",
+      "tooltipDesc": "대해전에서 선박을 만드는데 드는 물자"
+    },
+    "100017": {
+      "id": 100017,
+      "name": "천 물자",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "displayFormat": "[[D]] {0}",
+      "tooltipDesc": "대해전에서 선박을 만드는데 드는 물자"
+    },
+    "100018": {
+      "id": 100018,
+      "name": "금속 물자",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "displayFormat": "[[D]] {0}",
+      "tooltipDesc": "대해전에서 선박을 만드는데 드는 물자"
+    },
+    "100019": {
+      "id": 100019,
+      "name": "특수 물자",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "displayFormat": "[[D]] {0}",
+      "tooltipDesc": "대해전에서 선박을 만드는데 드는 물자"
+    },
+    "100020": {
+      "id": 100020,
+      "name": "연구",
+      "hardCap": 900000000000000,
+      "pointType": 0,
+      "icon": "Icon_Item_23610071_Sprite",
+      "displayFormat": "[[D]] {0}",
+      "tooltipDesc": "연구를 진행하는데 필요한 재화"
+    },
+    "100021": {
+      "id": 100021,
+      "name": "생산력",
+      "hardCap": 900000000000000,
+      "pointType": 2,
+      "icon": "WT_Currency_Manufacture_Sprite",
+      "displayFormat": "[[Manu]] {0}",
+      "tooltipDesc": "생산 진행에 필요한 재화"
+    },
+    "100022": {
+      "id": 100022,
+      "name": "레드젬 파편",
+      "hardCap": 900000000000000,
+      "pointType": 1,
+      "icon": "WT_Currency_Gem02Shard_Sprite",
+      "displayFormat": "[[RedGemsS]] {0}",
+      "tooltipDesc": "[[R]]의 파편. 1000개를 모으면 [[R]]으로 교환된다."
+    },
+    "100023": {
+      "id": 100023,
+      "name": "레드젬 파편",
+      "hardCap": 900000000000000,
+      "pointType": 1,
+      "icon": "WT_Currency_Gem02Shard_Sprite",
+      "displayFormat": "[[RedGemsS]] {0}",
+      "tooltipDesc": "[[R]]의 파편. 1000개를 모으면 [[R]]으로 교환된다.(유료 획득)"
+    }
+  }
+}

@@ -1,6 +1,8 @@
 import { EventEmitter } from 'events';
 import Keyv from 'keyv';
+import KeyvRedis from '@keyv/redis';
 import logger from '../config/logger';
+import { config } from '../config/index';
 
 export class CacheService extends EventEmitter {
   private static instance: CacheService;
@@ -23,14 +25,22 @@ export class CacheService extends EventEmitter {
       // L1: Memory cache (fastest)
       this.l1Cache = new Keyv();
 
-      // L2: Redis cache (shared, persistent) - optional
-      // Backend typically doesn't need Redis cache, but keeping for consistency
-      // You can add Redis config here if needed
+      // L2: Redis cache (shared, persistent)
+      try {
+        const redisUrl = `redis://${config.redis.host}:${config.redis.port}`;
+        this.l2Cache = new Keyv({
+          store: new KeyvRedis(redisUrl),
+        });
+        logger.info('Redis cache initialized', { url: redisUrl });
+      } catch (error) {
+        logger.warn('Failed to initialize Redis cache, using memory cache only', { error });
+        this.l2Cache = undefined;
+      }
 
       // Create unified cache interface
       this.cache = this.createUnifiedCache();
 
-      logger.info('Cache initialized with Keyv memory cache');
+      logger.info('Cache initialized with Keyv memory + Redis cache');
     } catch (error) {
       logger.error('Failed to initialize cache:', error);
       throw error;

@@ -24,7 +24,7 @@ npx tsx scripts/seed-surveys.ts
 
 ### 3. API URL 변경 (선택사항)
 
-기본값은 `http://localhost:5001/api/v1`입니다. 다른 URL을 사용하려면:
+기본값은 `http://localhost:5000/api/v1`입니다. 다른 URL을 사용하려면:
 
 ```bash
 API_URL="https://your-api-url.com/api/v1" ACCESS_TOKEN="your_token" npx tsx scripts/seed-surveys.ts

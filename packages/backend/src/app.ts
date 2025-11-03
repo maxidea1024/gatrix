@@ -78,8 +78,9 @@ import analyticsRoutes from './routes/analytics';
 app.use('/api/v1/analytics', analyticsRoutes);
 
 // Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// 100MB limit for planning data uploads
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
 // Cookie parsing middleware
 app.use(cookieParser() as any);

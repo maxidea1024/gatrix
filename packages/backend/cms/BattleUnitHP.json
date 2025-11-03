@@ -1,0 +1,410 @@
+{
+  ":BattleUnitHP": {
+    ":type": {
+      "id": "key",
+      "minSailorHPPct3f": "number",
+      "orderChangedMessage": [
+        "text",
+        "text"
+      ],
+      "hp": [
+        {
+          "Name": "text",
+          "StatOperator": "number",
+          "Val": "number",
+          "minSailorHpPct3f": "number",
+          "HPType": "bit",
+          "IsLife": "bool",
+          "IsCheck": "bool",
+          "InterruptHeal": "bool",
+          "Order": "number"
+        },
+        {
+          "Name": "text",
+          "StatOperator": "number",
+          "Val": "number",
+          "minSailorHpPct3f": "number",
+          "HPType": "bit",
+          "IsLife": "bool",
+          "IsCheck": "bool",
+          "InterruptHeal": "bool",
+          "Order": "number"
+        }
+      ]
+    },
+    ":required": {
+      "minSailorHPPct3f": 1,
+      "hp": [
+        {
+          "Name": 1,
+          "StatOperator": 1,
+          "Val": 1,
+          "minSailorHpPct3f": 1,
+          "HPType": 1,
+          "IsLife": 1,
+          "IsCheck": 1,
+          "InterruptHeal": 1,
+          "Order": 1
+        }
+      ]
+    },
+    ":requiredInObject": {
+      "hp": [
+        {
+          "Name": 1,
+          "StatOperator": 1,
+          "Val": 1,
+          "minSailorHpPct3f": 1,
+          "HPType": 1,
+          "IsLife": 1,
+          "IsCheck": 1,
+          "InterruptHeal": 1,
+          "Order": 1
+        },
+        {
+          "Name": 1,
+          "StatOperator": 1,
+          "Val": 1,
+          "minSailorHpPct3f": 1,
+          "HPType": 1,
+          "IsLife": 1,
+          "IsCheck": 1,
+          "InterruptHeal": 1,
+          "Order": 1
+        }
+      ]
+    },
+    ":min": {
+      "minSailorHPPct3f": 1,
+      "hp": [
+        {
+          "StatOperator": 0,
+          "minSailorHpPct3f": 0
+        },
+        {
+          "StatOperator": 0,
+          "minSailorHpPct3f": 0
+        }
+      ]
+    },
+    ":max": {
+      "minSailorHPPct3f": 1000,
+      "hp": [
+        {
+          "StatOperator": 9999,
+          "minSailorHpPct3f": 1000
+        },
+        {
+          "StatOperator": 9999,
+          "minSailorHpPct3f": 1000
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "hp": [
+        {
+          "StatOperator": [
+            "StatOperator"
+          ]
+        },
+        {
+          "StatOperator": [
+            "StatOperator"
+          ]
+        }
+      ]
+    }
+  },
+  "BattleUnitHP": {
+    "1": {
+      "id": 1,
+      "minSailorHPPct3f": 1000,
+      "orderChangedMessage": [
+        "모비딕의 외피가 소모되어 내피가 드러났습니다.",
+        "모비딕의 외피가 회복되었습니다."
+      ],
+      "hp": [
+        {
+          "Name": "고래의 내피",
+          "StatOperator": 7000,
+          "Val": 90000000,
+          "minSailorHpPct3f": 0,
+          "HPType": 2,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        },
+        {
+          "Name": "고래의 외피",
+          "StatOperator": 7001,
+          "Val": 10000,
+          "minSailorHpPct3f": 0,
+          "HPType": 1,
+          "IsLife": false,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 2
+        }
+      ]
+    },
+    "2": {
+      "id": 2,
+      "minSailorHPPct3f": 1000,
+      "orderChangedMessage": [
+        "마장기의 내구도가 0이 되었습니다.",
+        "마장기의 내구도가 0이 되었습니다."
+      ],
+      "hp": [
+        {
+          "Name": "마장기 장갑",
+          "StatOperator": 7000,
+          "Val": 30000,
+          "minSailorHpPct3f": 0,
+          "HPType": 1,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        }
+      ]
+    },
+    "3": {
+      "id": 3,
+      "minSailorHPPct3f": 1000,
+      "orderChangedMessage": [
+        "스킬라의 체력이 전부 소모되었습니다.",
+        "스킬라의 체력이 전부 소모되었습니다."
+      ],
+      "hp": [
+        {
+          "Name": "스킬라의 갑주",
+          "StatOperator": 7000,
+          "Val": 500000000,
+          "minSailorHpPct3f": 0,
+          "HPType": 1,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        }
+      ]
+    },
+    "4": {
+      "id": 4,
+      "minSailorHPPct3f": 1000,
+      "orderChangedMessage": [
+        "용머리의 체력이 전부 소모되었습니다.",
+        "용머리의 체력이 전부 소모되었습니다."
+      ],
+      "hp": [
+        {
+          "Name": "용의 비늘",
+          "StatOperator": 7000,
+          "Val": 3000,
+          "minSailorHpPct3f": 0,
+          "HPType": 1,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        },
+        {
+          "Name": "용의 비늘",
+          "StatOperator": 7001,
+          "Val": 200,
+          "minSailorHpPct3f": 0,
+          "HPType": 2,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        }
+      ]
+    },
+    "5": {
+      "id": 5,
+      "minSailorHPPct3f": 1000,
+      "orderChangedMessage": [
+        "모비딕의 외피가 소모되어 내피가 드러났습니다.",
+        "모비딕의 외피가 회복되었습니다."
+      ],
+      "hp": [
+        {
+          "Name": "고래의 내피",
+          "StatOperator": 7000,
+          "Val": 30000,
+          "minSailorHpPct3f": 0,
+          "HPType": 2,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        },
+        {
+          "Name": "고래의 외피",
+          "StatOperator": 7001,
+          "Val": 5000,
+          "minSailorHpPct3f": 0,
+          "HPType": 1,
+          "IsLife": false,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 2
+        }
+      ]
+    },
+    "6": {
+      "id": 6,
+      "minSailorHPPct3f": 1000,
+      "orderChangedMessage": [
+        "점막이 소진되었습니다.",
+        "점막을 몸에 두르기 시작합니다."
+      ],
+      "hp": [
+        {
+          "Name": "체력",
+          "StatOperator": 7000,
+          "Val": 80000000,
+          "minSailorHpPct3f": 0,
+          "HPType": 1,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        },
+        {
+          "Name": "점막",
+          "StatOperator": 7001,
+          "Val": 10000,
+          "minSailorHpPct3f": 0,
+          "HPType": 1,
+          "IsLife": false,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 2
+        }
+      ]
+    },
+    "7": {
+      "id": 7,
+      "minSailorHPPct3f": 1000,
+      "orderChangedMessage": [
+        "점막이 소진되었습니다.",
+        "점막을 몸에 두르기 시작합니다."
+      ],
+      "hp": [
+        {
+          "Name": "체력",
+          "StatOperator": 7000,
+          "Val": 300,
+          "minSailorHpPct3f": 0,
+          "HPType": 2,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        }
+      ]
+    },
+    "8": {
+      "id": 8,
+      "minSailorHPPct3f": 1000,
+      "orderChangedMessage": [
+        "점막이 소진되었습니다.",
+        "점막을 몸에 두르기 시작합니다."
+      ],
+      "hp": [
+        {
+          "Name": "체력",
+          "StatOperator": 7000,
+          "Val": 18000,
+          "minSailorHpPct3f": 0,
+          "HPType": 1,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        },
+        {
+          "Name": "점막",
+          "StatOperator": 7001,
+          "Val": 10000,
+          "minSailorHpPct3f": 0,
+          "HPType": 1,
+          "IsLife": false,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 2
+        }
+      ]
+    },
+    "9": {
+      "id": 9,
+      "minSailorHPPct3f": 1000,
+      "orderChangedMessage": [
+        "점막이 소진되었습니다.",
+        "점막을 몸에 두르기 시작합니다."
+      ],
+      "hp": [
+        {
+          "Name": "체력",
+          "StatOperator": 7000,
+          "Val": 10000,
+          "minSailorHpPct3f": 0,
+          "HPType": 1,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        },
+        {
+          "Name": "점막",
+          "StatOperator": 7001,
+          "Val": 5000,
+          "minSailorHpPct3f": 0,
+          "HPType": 1,
+          "IsLife": false,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 2
+        }
+      ]
+    },
+    "10": {
+      "id": 10,
+      "minSailorHPPct3f": 1000,
+      "hp": [
+        {
+          "Name": "선체 내구도",
+          "StatOperator": 7000,
+          "Val": 9999999,
+          "minSailorHpPct3f": 0,
+          "HPType": 3,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        }
+      ]
+    },
+    "11": {
+      "id": 11,
+      "minSailorHPPct3f": 1000,
+      "hp": [
+        {
+          "Name": "선체 내구도",
+          "StatOperator": 7000,
+          "Val": 9999999,
+          "minSailorHpPct3f": 0,
+          "HPType": 3,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        }
+      ]
+    }
+  }
+}

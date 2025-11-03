@@ -1,0 +1,135 @@
+{
+  ":InvestRankTax": {
+    ":type": {
+      "id": "key",
+      "taxExemptionRate": "number"
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "InvestRankTax": {
+    "1": {
+      "id": 1,
+      "taxExemptionRate": 5
+    },
+    "2": {
+      "id": 2,
+      "taxExemptionRate": 4
+    },
+    "3": {
+      "id": 3,
+      "taxExemptionRate": 4
+    },
+    "4": {
+      "id": 4,
+      "taxExemptionRate": 4
+    },
+    "5": {
+      "id": 5,
+      "taxExemptionRate": 4
+    },
+    "6": {
+      "id": 6,
+      "taxExemptionRate": 3
+    },
+    "7": {
+      "id": 7,
+      "taxExemptionRate": 3
+    },
+    "8": {
+      "id": 8,
+      "taxExemptionRate": 3
+    },
+    "9": {
+      "id": 9,
+      "taxExemptionRate": 3
+    },
+    "10": {
+      "id": 10,
+      "taxExemptionRate": 3
+    },
+    "11": {
+      "id": 11,
+      "taxExemptionRate": 2
+    },
+    "12": {
+      "id": 12,
+      "taxExemptionRate": 2
+    },
+    "13": {
+      "id": 13,
+      "taxExemptionRate": 2
+    },
+    "14": {
+      "id": 14,
+      "taxExemptionRate": 2
+    },
+    "15": {
+      "id": 15,
+      "taxExemptionRate": 2
+    },
+    "16": {
+      "id": 16,
+      "taxExemptionRate": 2
+    },
+    "17": {
+      "id": 17,
+      "taxExemptionRate": 2
+    },
+    "18": {
+      "id": 18,
+      "taxExemptionRate": 2
+    },
+    "19": {
+      "id": 19,
+      "taxExemptionRate": 2
+    },
+    "20": {
+      "id": 20,
+      "taxExemptionRate": 2
+    },
+    "21": {
+      "id": 21,
+      "taxExemptionRate": 1
+    },
+    "22": {
+      "id": 22,
+      "taxExemptionRate": 1
+    },
+    "23": {
+      "id": 23,
+      "taxExemptionRate": 1
+    },
+    "24": {
+      "id": 24,
+      "taxExemptionRate": 1
+    },
+    "25": {
+      "id": 25,
+      "taxExemptionRate": 1
+    },
+    "26": {
+      "id": 26,
+      "taxExemptionRate": 1
+    },
+    "27": {
+      "id": 27,
+      "taxExemptionRate": 1
+    },
+    "28": {
+      "id": 28,
+      "taxExemptionRate": 1
+    },
+    "29": {
+      "id": 29,
+      "taxExemptionRate": 1
+    },
+    "30": {
+      "id": 30,
+      "taxExemptionRate": 1
+    }
+  }
+}

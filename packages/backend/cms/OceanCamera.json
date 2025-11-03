@@ -1,0 +1,46 @@
+{
+  ":OceanCamera": {
+    ":type": {
+      "id": "key",
+      "cameraName": "text",
+      "cameraType": "number"
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "OceanCamera": {
+    "0": {
+      "id": 0,
+      "cameraName": "자유",
+      "cameraType": 1
+    },
+    "1": {
+      "id": 1,
+      "cameraName": "추적",
+      "cameraType": 2
+    },
+    "2": {
+      "id": 2,
+      "cameraName": "북향",
+      "cameraType": 3
+    },
+    "3": {
+      "id": 3,
+      "cameraName": "남향",
+      "cameraType": 4
+    },
+    "4": {
+      "id": 4,
+      "cameraName": "서향",
+      "cameraType": 5
+    },
+    "5": {
+      "id": 5,
+      "cameraName": "동향",
+      "cameraType": 6
+    }
+  }
+}
