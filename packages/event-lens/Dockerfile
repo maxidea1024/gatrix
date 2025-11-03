@@ -44,6 +44,9 @@ RUN yarn install --frozen-lockfile --production=true && \
 # Copy built files from builder
 COPY --from=builder /app/packages/event-lens/dist ./packages/event-lens/dist
 
+# Copy migration files
+COPY packages/event-lens/migrations ./packages/event-lens/migrations
+
 # Create logs directory
 RUN mkdir -p logs
 

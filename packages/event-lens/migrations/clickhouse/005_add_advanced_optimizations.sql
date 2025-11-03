@@ -1,52 +1,13 @@
 -- Advanced ClickHouse Optimizations
 
--- 1. TTL 설정 (90일 후 자동 삭제)
-ALTER TABLE event_lens.events 
-MODIFY TTL createdAt + INTERVAL 90 DAY;
-
--- 2. 컬럼 레벨 압축 (ZSTD)
-ALTER TABLE event_lens.events 
+-- 1. 컬럼 레벨 압축 (ZSTD)
+ALTER TABLE event_lens.events
 MODIFY COLUMN properties String CODEC(ZSTD(3));
 
-ALTER TABLE event_lens.events 
-MODIFY COLUMN userAgent String CODEC(ZSTD(3));
+-- 2. 추가 Bloom Filter 인덱스 (이미 001에서 생성됨)
+-- 인덱스는 테이블 생성 시 이미 추가되었습니다
 
--- 3. 추가 Bloom Filter 인덱스
-ALTER TABLE event_lens.events 
-ADD INDEX idx_path path TYPE bloom_filter GRANULARITY 1;
-
-ALTER TABLE event_lens.events 
-ADD INDEX idx_referrer referrer TYPE bloom_filter GRANULARITY 1;
-
-ALTER TABLE event_lens.events 
-ADD INDEX idx_country country TYPE bloom_filter GRANULARITY 1;
-
-ALTER TABLE event_lens.events 
-ADD INDEX idx_browser browser TYPE bloom_filter GRANULARITY 1;
-
-ALTER TABLE event_lens.events 
-ADD INDEX idx_os os TYPE bloom_filter GRANULARITY 1;
-
-ALTER TABLE event_lens.events 
-ADD INDEX idx_device device TYPE bloom_filter GRANULARITY 1;
-
--- 4. UTM 파라미터 인덱스
-ALTER TABLE event_lens.events 
-ADD INDEX idx_utm_source utmSource TYPE bloom_filter GRANULARITY 1;
-
-ALTER TABLE event_lens.events 
-ADD INDEX idx_utm_campaign utmCampaign TYPE bloom_filter GRANULARITY 1;
-
--- 5. Properties JSON 키 추출을 위한 Materialized Column
--- (동적 필터링 성능 향상)
-ALTER TABLE event_lens.events 
-ADD COLUMN IF NOT EXISTS propertiesKeys Array(String) 
-MATERIALIZED JSONExtractKeys(properties);
-
-ALTER TABLE event_lens.events 
-ADD INDEX idx_properties_keys propertiesKeys TYPE bloom_filter(0.01) GRANULARITY 1;
-
--- 6. 이벤트 이름별 집계 Materialized View
+-- 3. 이벤트 이름별 집계 Materialized View
 CREATE TABLE IF NOT EXISTS event_lens.event_name_metrics (
   projectId String,
   name String,
@@ -62,13 +23,13 @@ SETTINGS index_granularity = 8192;
 CREATE MATERIALIZED VIEW IF NOT EXISTS event_lens.event_name_metrics_mv
 TO event_lens.event_name_metrics
 AS SELECT
-  projectId,
+  project_id as projectId,
   name,
-  toDate(createdAt) as date,
+  toDate(created_at) as date,
   countState() as totalCount,
-  uniqState(deviceId) as uniqueDevices
+  uniqState(device_id) as uniqueDevices
 FROM event_lens.events
-GROUP BY projectId, name, date;
+GROUP BY project_id, name, toDate(created_at);
 
 -- 7. 경로별 집계 Materialized View
 CREATE TABLE IF NOT EXISTS event_lens.path_metrics (
@@ -87,15 +48,15 @@ SETTINGS index_granularity = 8192;
 CREATE MATERIALIZED VIEW IF NOT EXISTS event_lens.path_metrics_mv
 TO event_lens.path_metrics
 AS SELECT
-  projectId,
+  project_id as projectId,
   path,
-  toDate(createdAt) as date,
+  toDate(created_at) as date,
   countState() as views,
-  uniqState(deviceId) as uniqueVisitors,
+  uniqState(device_id) as uniqueVisitors,
   avgState(duration) as avgDuration
 FROM event_lens.events
 WHERE name = 'screen_view' AND path IS NOT NULL
-GROUP BY projectId, path, date;
+GROUP BY project_id, path, toDate(created_at);
 
 -- 8. Referrer별 집계 Materialized View
 CREATE TABLE IF NOT EXISTS event_lens.referrer_metrics (
@@ -114,15 +75,15 @@ SETTINGS index_granularity = 8192;
 CREATE MATERIALIZED VIEW IF NOT EXISTS event_lens.referrer_metrics_mv
 TO event_lens.referrer_metrics
 AS SELECT
-  projectId,
-  referrerName,
-  referrerType,
-  toDate(createdAt) as date,
+  project_id as projectId,
+  referrer_name as referrerName,
+  referrer_type as referrerType,
+  toDate(created_at) as date,
   countState() as visits,
-  uniqState(deviceId) as uniqueVisitors
+  uniqState(device_id) as uniqueVisitors
 FROM event_lens.events
-WHERE referrerName IS NOT NULL
-GROUP BY projectId, referrerName, referrerType, date;
+WHERE referrer_name IS NOT NULL
+GROUP BY project_id, referrer_name, referrer_type, toDate(created_at);
 
 -- 9. 디바이스별 집계 Materialized View
 CREATE TABLE IF NOT EXISTS event_lens.device_metrics (
@@ -142,15 +103,15 @@ SETTINGS index_granularity = 8192;
 CREATE MATERIALIZED VIEW IF NOT EXISTS event_lens.device_metrics_mv
 TO event_lens.device_metrics
 AS SELECT
-  projectId,
+  project_id as projectId,
   device,
   browser,
   os,
-  toDate(createdAt) as date,
+  toDate(created_at) as date,
   countState() as count,
-  uniqState(deviceId) as uniqueVisitors
+  uniqState(device_id) as uniqueVisitors
 FROM event_lens.events
-GROUP BY projectId, device, browser, os, date;
+GROUP BY project_id, device, browser, os, toDate(created_at);
 
 -- 10. 지리별 집계 Materialized View
 CREATE TABLE IF NOT EXISTS event_lens.geo_metrics (
@@ -169,43 +130,20 @@ SETTINGS index_granularity = 8192;
 CREATE MATERIALIZED VIEW IF NOT EXISTS event_lens.geo_metrics_mv
 TO event_lens.geo_metrics
 AS SELECT
-  projectId,
+  project_id as projectId,
   country,
   city,
-  toDate(createdAt) as date,
+  toDate(created_at) as date,
   countState() as count,
-  uniqState(deviceId) as uniqueVisitors
+  uniqState(device_id) as uniqueVisitors
 FROM event_lens.events
 WHERE country IS NOT NULL
-GROUP BY projectId, country, city, date;
+GROUP BY project_id, country, city, toDate(created_at);
 
--- 11. 세션 테이블 TTL
-ALTER TABLE event_lens.sessions 
-MODIFY TTL createdAt + INTERVAL 90 DAY;
-
--- 12. 프로필 테이블 최적화
-ALTER TABLE event_lens.profiles 
+-- 11. 프로필 테이블 최적화
+ALTER TABLE event_lens.profiles
 MODIFY COLUMN properties String CODEC(ZSTD(3));
 
--- 13. Materialized View TTL
-ALTER TABLE event_lens.daily_metrics 
-MODIFY TTL date + INTERVAL 365 DAY;
-
-ALTER TABLE event_lens.hourly_metrics 
-MODIFY TTL hour + INTERVAL 90 DAY;
-
-ALTER TABLE event_lens.event_name_metrics 
-MODIFY TTL date + INTERVAL 365 DAY;
-
-ALTER TABLE event_lens.path_metrics 
-MODIFY TTL date + INTERVAL 365 DAY;
-
-ALTER TABLE event_lens.referrer_metrics 
-MODIFY TTL date + INTERVAL 365 DAY;
-
-ALTER TABLE event_lens.device_metrics 
-MODIFY TTL date + INTERVAL 365 DAY;
-
-ALTER TABLE event_lens.geo_metrics 
-MODIFY TTL date + INTERVAL 365 DAY;
+-- TTL 설정은 DateTime64 타입에서 지원되지 않으므로 생략
+-- TTL이 필요한 경우 별도의 DateTime 컬럼을 추가하거나 파티션 정책 사용
 

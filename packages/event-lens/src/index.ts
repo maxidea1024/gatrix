@@ -8,9 +8,13 @@ async function start() {
   try {
     logger.info('🚀 Starting Event Lens Server...');
 
+    // ClickHouse 데이터베이스 초기화 (먼저 실행)
+    logger.info('Initializing ClickHouse database...');
+    await initClickHouseDatabase();
+
     // 데이터베이스 연결 테스트
     logger.info('Testing database connections...');
-    
+
     const clickhouseOk = await testClickHouseConnection();
     if (!clickhouseOk) {
       throw new Error('ClickHouse connection failed');
@@ -20,9 +24,6 @@ async function start() {
     if (!mysqlOk) {
       throw new Error('MySQL connection failed');
     }
-
-    // ClickHouse 데이터베이스 초기화
-    await initClickHouseDatabase();
 
     // Fastify 앱 생성
     const app = await createApp();

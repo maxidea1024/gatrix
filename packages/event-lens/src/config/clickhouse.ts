@@ -46,8 +46,19 @@ export async function testClickHouseConnection(): Promise<boolean> {
 // 데이터베이스 초기화
 export async function initClickHouseDatabase(): Promise<void> {
   try {
+    // 데이터베이스 생성을 위해 기본 데이터베이스 없이 클라이언트 생성
+    const adminClient = createClient({
+      host: `http://${config.clickhouse.host}:${config.clickhouse.port}`,
+      username: config.clickhouse.username,
+      password: config.clickhouse.password,
+      compression: {
+        request: true,
+        response: true,
+      },
+    });
+
     // 데이터베이스 생성
-    await clickhouse.exec({
+    await adminClient.exec({
       query: `CREATE DATABASE IF NOT EXISTS ${config.clickhouse.database}`,
     });
     logger.info(`✅ ClickHouse database '${config.clickhouse.database}' ready`);
@@ -80,7 +91,7 @@ async function runClickHouseMigrations(): Promise<void> {
       const statements = sql
         .split(';')
         .map(s => s.trim())
-        .filter(s => s.length > 0);
+        .filter(s => s.length > 0 && !s.startsWith('--')); // 주석과 빈 줄 제거
 
       for (const statement of statements) {
         try {

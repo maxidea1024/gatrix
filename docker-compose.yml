@@ -255,11 +255,11 @@ services:
       - chat_server_uploads:/app/uploads
       - chat_server_logs:/app/logs
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
       timeout: 10s
-      retries: 5
-      interval: 30s
-      start_period: 30s
+      retries: 10
+      interval: 10s
+      start_period: 60s
 
   # Frontend (Nginx)
   frontend:

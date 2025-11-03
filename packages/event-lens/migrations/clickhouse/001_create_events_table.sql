@@ -77,7 +77,6 @@ PARTITION BY toYYYYMM(created_at)
 ORDER BY (project_id, toDate(created_at), profile_id, name)
 SETTINGS index_granularity = 8192;
 
--- TTL 설정 (90일 후 자동 삭제)
-ALTER TABLE event_lens.events
-MODIFY TTL created_at + INTERVAL 90 DAY;
+-- TTL 설정은 DateTime64 타입에서 지원되지 않으므로 생략
+-- TTL이 필요한 경우 별도의 DateTime 컬럼을 추가하거나 파티션 정책 사용
 

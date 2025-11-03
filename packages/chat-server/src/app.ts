@@ -239,23 +239,19 @@ class ChatServerApp {
     try {
       await this.initialize();
 
-      // 기본 API 토큰 생성
-      const defaultToken = await ApiTokenService.ensureDefaultToken();
-      logger.info(`Default API token ready: ${defaultToken.substring(0, 12)}...`);
-      logger.info(`🔑 FULL API TOKEN FOR BACKEND: ${defaultToken}`);
-
-      this.server.listen(config.port, config.host, () => {
-        logger.info(`Chat server running on ${config.host}:${config.port}`, {
-          environment: config.nodeEnv,
-          serverId: process.env.SERVER_ID || 'unknown',
-          pid: process.pid,
-          timestamp: new Date().toISOString(),
-        });
-
-        if (config.monitoring.enabled) {
-          logger.info(`Metrics available at http://${config.host}:${config.monitoring.metricsPort}/metrics`);
-        }
-      });
+      // 기본 API 토큰 생성 (타임아웃 설정)
+      try {
+        const defaultToken = await Promise.race([
+          ApiTokenService.ensureDefaultToken(),
+          new Promise<string>((_, reject) =>
+            setTimeout(() => reject(new Error('Token generation timeout')), 5000)
+          )
+        ]);
+        logger.info(`Default API token ready: ${defaultToken.substring(0, 12)}...`);
+        logger.info(`🔑 FULL API TOKEN FOR BACKEND: ${defaultToken}`);
+      } catch (tokenError) {
+        logger.warn('Failed to generate default API token, continuing anyway:', tokenError);
+      }
 
       // Handle server errors
       this.server.on('error', (error: any) => {
@@ -275,6 +271,26 @@ class ChatServerApp {
           default:
             throw error;
         }
+      });
+
+      // Start listening - wrap in Promise to ensure it completes
+      return new Promise<void>((resolve, reject) => {
+        this.server.listen(config.port, config.host, () => {
+          logger.info(`Chat server running on ${config.host}:${config.port}`, {
+            environment: config.nodeEnv,
+            serverId: process.env.SERVER_ID || 'unknown',
+            pid: process.pid,
+            timestamp: new Date().toISOString(),
+          });
+
+          if (config.monitoring.enabled) {
+            logger.info(`Metrics available at http://${config.host}:${config.monitoring.metricsPort}/metrics`);
+          }
+
+          resolve();
+        });
+
+        this.server.on('error', reject);
       });
 
     } catch (error) {

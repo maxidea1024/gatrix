@@ -10,12 +10,15 @@ const logger = createLogger('DatabaseManager');
 const getMigrationDir = (): string => {
   // In production Docker, migrations are in dist/database/migrations
   // In development, they are in src/database/migrations
+  // __dirname points to dist/config when compiled
   const distPath = path.join(__dirname, '..', 'database', 'migrations');
-  const srcPath = path.join(__dirname, '..', 'database', 'migrations');
 
   if (fs.existsSync(distPath)) {
     return distPath;
   }
+
+  // Fallback to src directory (for development)
+  const srcPath = path.join(__dirname, '..', '..', 'src', 'database', 'migrations');
   return srcPath;
 };
 
@@ -34,6 +37,9 @@ class DatabaseManager {
 
   public async initialize(): Promise<void> {
     try {
+      // First, create database if it doesn't exist
+      await this.createDatabaseIfNotExists();
+
       const knexConfig: Knex.Config = {
         client: 'mysql2',
         connection: {
@@ -88,6 +94,36 @@ class DatabaseManager {
       }
     } catch (error) {
       logger.error('Failed to initialize database:', error);
+      throw error;
+    }
+  }
+
+  private async createDatabaseIfNotExists(): Promise<void> {
+    try {
+      // Create a temporary connection without specifying database
+      const tempKnex = knex({
+        client: 'mysql2',
+        connection: {
+          host: config.database.host,
+          port: config.database.port,
+          user: config.database.user,
+          password: config.database.password,
+          charset: 'utf8mb4',
+        },
+      });
+
+      try {
+        // Create database if not exists
+        await tempKnex.raw(
+          `CREATE DATABASE IF NOT EXISTS ?? CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
+          [config.database.name]
+        );
+        logger.info(`Database '${config.database.name}' created or already exists`);
+      } finally {
+        await tempKnex.destroy();
+      }
+    } catch (error) {
+      logger.error('Failed to create database:', error);
       throw error;
     }
   }
