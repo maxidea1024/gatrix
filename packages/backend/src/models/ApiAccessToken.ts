@@ -10,7 +10,7 @@ export interface ApiAccessTokenData {
   id?: number;
   tokenName: string;
   description?: string;
-  tokenHash: string;
+  tokenValue: string;
   tokenType: TokenType;
   environmentId?: number;
   expiresAt?: Date;
@@ -28,7 +28,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   id!: number;
   tokenName!: string;
   description?: string;
-  tokenHash!: string;
+  tokenValue!: string;
   tokenType!: TokenType;
   environmentId?: number;
   expiresAt?: Date;
@@ -46,11 +46,11 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['tokenName', 'tokenHash', 'tokenType', 'createdBy'],
+      required: ['tokenName', 'tokenValue', 'tokenType', 'createdBy'],
       properties: {
         id: { type: 'integer' },
         tokenName: { type: 'string', minLength: 1, maxLength: 200 },
-        tokenHash: { type: 'string', minLength: 1, maxLength: 255 },
+        tokenValue: { type: 'string', minLength: 1, maxLength: 255 },
         tokenType: { type: 'string', enum: ['client', 'server'] },
         environmentId: { type: ['integer', 'null'] },
         expiresAt: { type: ['string', 'object', 'null'], format: 'date-time' },
@@ -162,7 +162,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     // Create token record (store plain token instead of hash)
     const token = await this.query().insert({
       tokenName: data.tokenName,
-      tokenHash: plainToken, // Store plain token (using tokenHash column name for now)
+      tokenValue: plainToken, // Store plain token
       tokenType: data.tokenType,
       environmentId: data.environmentId,
       expiresAt: data.expiresAt,
@@ -180,7 +180,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   static async findByToken(token: string): Promise<ApiAccessToken | undefined> {
     // Direct database query for plain text token
     const tokenRecord = await this.query()
-      .where('tokenHash', token) // Using tokenHash column name (will be renamed later)
+      .where('tokenValue', token)
       .where(builder => {
         builder.whereNull('expiresAt').orWhere('expiresAt', '>', new Date());
       })

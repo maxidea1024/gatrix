@@ -115,7 +115,7 @@ class ApiTokensController {
       const [id] = await knex('g_api_access_tokens').insert({
         tokenName,
         description: description || null,
-        tokenHash: tokenValue, // Store plain token value
+        tokenValue: tokenValue, // Store plain token value
         tokenType,
         environmentId: null,
         expiresAt: expiresAt || null,
