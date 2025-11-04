@@ -640,13 +640,23 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
     return formatItemName(item, allCmsTables);
   }
 
-  // Helper: replace known KR tokens that may attach without spaces (e.g., "{0}계약서")
+  // Helper: replace known KR tokens and phrases (handles attachments like "{0}계약서")
   const replaceKnownTokens = (text) => {
     if (!text) return text;
-    const known = ['도면', '계약서', '유료', '무료', '필수등장', '확률'];
     let out = text;
+    // phrase-level replacements first
+    const phraseMap = {
+      '인도 계약서': (loctab && loctab['인도 계약서'] && loctab['인도 계약서'] !== '인도 계약서')
+        ? loctab['인도 계약서']
+        : '引渡合同',
+    };
+    for (const [kr, zh] of Object.entries(phraseMap)) {
+      out = out.replace(new RegExp(kr, 'g'), zh);
+    }
+    // token-level replacements next
+    const known = ['도면', '계약서', '유료', '무료', '필수등장', '확률'];
     for (const k of known) {
-      const v = (loctab && loctab[k] !== undefined) ? loctab[k] : k;
+      const v = (loctab && loctab[k] && loctab[k] !== k) ? loctab[k] : k;
       out = out.replace(new RegExp(k, 'g'), v);
     }
     return out;
@@ -675,7 +685,8 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
 
     // Generic: remove comments and translate token-wise
     const baseKr = removeCommentFromName(targetItem.name || targetItem.Name || `${tableName} ${targetId}`);
-    if (loctab && loctab[baseKr] !== undefined) return loctab[baseKr];
+    const mappedBase = loctab ? loctab[baseKr] : undefined;
+    if (mappedBase !== undefined && mappedBase !== baseKr) return mappedBase;
     try {
       const tokens = baseKr.split(/\s+/).filter(Boolean);
       const translated = tokens.map(t => (loctab && loctab[t] !== undefined) ? loctab[t] : t);
@@ -712,7 +723,8 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
       // Apply placeholder replacement on KR template, then localize remaining tokens (like suffixes)
       const formatted = stringFormat(item.name, formatTexts);
       const formattedNoComment = removeCommentFromName(formatted);
-      if (loctab && loctab[formattedNoComment] !== undefined) return loctab[formattedNoComment];
+      const mappedFormatted = loctab ? loctab[formattedNoComment] : undefined;
+      if (mappedFormatted !== undefined && mappedFormatted !== formattedNoComment) return mappedFormatted;
       const withKnown = replaceKnownTokens(formattedNoComment);
       try {
         const tokens = withKnown.split(/\s+/).filter(Boolean);
@@ -729,14 +741,17 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
     const ship = allCmsTables.Ship[item.shipId];
     const shipNameKr = removeCommentFromName(ship.name || `Ship ${item.shipId}`);
     const suffixKr = '도면';
-    const shipNameCn = (loctab && loctab[shipNameKr] !== undefined) ? loctab[shipNameKr] : shipNameKr;
-    const suffixCn = (loctab && loctab[suffixKr] !== undefined) ? loctab[suffixKr] : suffixKr;
+    const shipNameCnCandidate = loctab ? loctab[shipNameKr] : undefined;
+    const shipNameCn = (shipNameCnCandidate && shipNameCnCandidate !== shipNameKr) ? shipNameCnCandidate : shipNameKr;
+    const suffixCnCandidate = loctab ? loctab[suffixKr] : undefined;
+    const suffixCn = (suffixCnCandidate && suffixCnCandidate !== suffixKr) ? suffixCnCandidate : suffixKr;
     return `${shipNameCn} ${suffixCn}`;
   }
 
   // Fallback: translate plain KR name
   const base = removeCommentFromName(item.name || `Item ${item.id}`);
-  if (loctab && loctab[base] !== undefined) return loctab[base];
+  const mappedBase2 = loctab ? loctab[base] : undefined;
+  if (mappedBase2 !== undefined && mappedBase2 !== base) return mappedBase2;
   return replaceKnownTokens(base);
 }
 
@@ -2217,6 +2232,19 @@ function convertLocalizationTable(inputPath, outputPath) {
     processedCount++;
   }
 
+  // Ensure essential localization keys used by builders exist (add only when missing or untranslated)
+  const ensureKey = (k, v) => {
+    if (!Object.prototype.hasOwnProperty.call(loctab, k) || !loctab[k] || loctab[k] === k) {
+      loctab[k] = v;
+    }
+  };
+  ensureKey('필수등장', '必定出现');
+  ensureKey('재고용전용', '再雇佣专用');
+  ensureKey('확률', '概率');
+  ensureKey('도면', '图纸');
+  ensureKey('계약서', '合同');
+  ensureKey('인도 계약서', '引渡合同');
+
   // Save to file only if outputPath is provided
   if (outputPath) {
     fs.writeFileSync(outputPath, JSON.stringify(loctab, null, 2), 'utf8');
@@ -2330,10 +2358,7 @@ function buildEventPageLookup(cmsDir, outputDir) {
     const items = Object.values(eventPageData.EventPage)
       .filter(item => item && item.id)
       .map((item) => {
-        // Create display name as "name - desc"
-        const displayName = item.desc
-          ? `${item.name || ''} - ${item.desc}`.trim()
-          : (item.name || '');
+
 
         // Prepare KR fields only; CN will be computed via loctab during conversion
         const nameKr = item.name || '';
