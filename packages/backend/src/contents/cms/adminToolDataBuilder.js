@@ -630,6 +630,118 @@ function formatItemName(item, allCmsTables) {
 }
 
 /**
+ * Format item name for a target language with localized placeholders.
+ * - For 'cn', localizes descFormat placeholders and known KR suffix tokens (e.g., 도면/계약서).
+ * - For other languages, falls back to KR formatting.
+ */
+function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
+  // Only CN needs special handling for now
+  if (lang !== 'cn') {
+    return formatItemName(item, allCmsTables);
+  }
+
+  // Helper: replace known KR tokens that may attach without spaces (e.g., "{0}계약서")
+  const replaceKnownTokens = (text) => {
+    if (!text) return text;
+    const known = ['도면', '계약서', '유료', '무료', '필수등장', '확률'];
+    let out = text;
+    for (const k of known) {
+      const v = (loctab && loctab[k] !== undefined) ? loctab[k] : k;
+      out = out.replace(new RegExp(k, 'g'), v);
+    }
+    return out;
+  };
+
+  // Localize a CMS reference by table
+  const getCmsNameLocalized = (tableName, targetId) => {
+    if (!allCmsTables[tableName] || !allCmsTables[tableName][targetId]) {
+      return `${tableName} ${targetId}`;
+    }
+    const targetItem = allCmsTables[tableName][targetId];
+
+    // Mate → Character first/last localization
+    if (tableName === 'Mate' && targetItem.characterId && allCmsTables['Character']) {
+      const character = allCmsTables['Character'][targetItem.characterId];
+      if (character) {
+        const rawFirst = character.firstName || '';
+        const rawLast = character.lastName || character.familyName || '';
+        const firstKr = removeParentheses(removeCommentFromName(rawFirst));
+        const lastKr = removeParentheses(removeCommentFromName(rawLast));
+        const firstCn = firstKr ? (loctab[firstKr] || firstKr) : '';
+        const lastCn = lastKr ? (loctab[lastKr] || lastKr) : '';
+        return (firstCn && lastCn) ? `${firstCn} ${lastCn}` : (firstCn || lastCn || removeCommentFromName(targetItem.name || targetItem.Name || ''));
+      }
+    }
+
+    // Generic: remove comments and translate token-wise
+    const baseKr = removeCommentFromName(targetItem.name || targetItem.Name || `${tableName} ${targetId}`);
+    if (loctab && loctab[baseKr] !== undefined) return loctab[baseKr];
+    try {
+      const tokens = baseKr.split(/\s+/).filter(Boolean);
+      const translated = tokens.map(t => (loctab && loctab[t] !== undefined) ? loctab[t] : t);
+      return translated.join(' ');
+    } catch {
+      return baseKr;
+    }
+  };
+
+  // If item has descFormat info, build localized placeholders
+  if (item.descFormat && Array.isArray(item.descFormat) && item.descFormatType && Array.isArray(item.descFormatType)) {
+    const formatTexts = [];
+    for (let i = 0; i < item.descFormat.length; i++) {
+      const format = item.descFormat[i];
+      const formatType = item.descFormatType[i];
+      if (!format || !formatType) continue;
+
+      if (format.Type === DESC_FORMAT_TYPE.COUNT) {
+        formatTexts.push((formatType.target !== undefined && formatType.target !== null) ? formatType.target.toString() : '0');
+      } else if (format.Type === DESC_FORMAT_TYPE.CMS_NAME) {
+        if (format.TypeName && formatType.target !== undefined && formatType.target !== null) {
+          formatTexts.push(getCmsNameLocalized(format.TypeName, formatType.target));
+        } else {
+          formatTexts.push('[Unknown]');
+        }
+      } else if (format.Type === DESC_FORMAT_TYPE.ENUM_NAME) {
+        formatTexts.push(`[Enum-${formatType.target}]`);
+      } else {
+        formatTexts.push('[Unknown]');
+      }
+    }
+
+    if (item.name) {
+      // Apply placeholder replacement on KR template, then localize remaining tokens (like suffixes)
+      const formatted = stringFormat(item.name, formatTexts);
+      const formattedNoComment = removeCommentFromName(formatted);
+      if (loctab && loctab[formattedNoComment] !== undefined) return loctab[formattedNoComment];
+      const withKnown = replaceKnownTokens(formattedNoComment);
+      try {
+        const tokens = withKnown.split(/\s+/).filter(Boolean);
+        const translated = tokens.map(t => (loctab && loctab[t] !== undefined) ? loctab[t] : t);
+        return translated.join(' ');
+      } catch {
+        return withKnown;
+      }
+    }
+  }
+
+  // ShipBlueprint suffix handling
+  if (item.shipId && allCmsTables.Ship && allCmsTables.Ship[item.shipId]) {
+    const ship = allCmsTables.Ship[item.shipId];
+    const shipNameKr = removeCommentFromName(ship.name || `Ship ${item.shipId}`);
+    const suffixKr = '도면';
+    const shipNameCn = (loctab && loctab[shipNameKr] !== undefined) ? loctab[shipNameKr] : shipNameKr;
+    const suffixCn = (loctab && loctab[suffixKr] !== undefined) ? loctab[suffixKr] : suffixKr;
+    return `${shipNameCn} ${suffixCn}`;
+  }
+
+  // Fallback: translate plain KR name
+  const base = removeCommentFromName(item.name || `Item ${item.id}`);
+  if (loctab && loctab[base] !== undefined) return loctab[base];
+  return replaceKnownTokens(base);
+}
+
+
+/**
  * Remove comment part from item name (everything after @)
  * @param {string} name - Item name
  * @returns {string} - Cleaned name
@@ -805,7 +917,8 @@ function buildRewardLookupTable(cmsDir, loctab = {}) {
 
             // Build final object and return (avoid direct shape mutations)
             const base = { ...itemData, nameEn: formattedName };
-            return (loctab && loctab[formattedName]) ? { ...base, nameCn: loctab[formattedName] } : base;
+            const localizedCn = formatItemNameLocalized(item._original, allCmsTables, 'cn', loctab);
+            return { ...base, nameCn: localizedCn };
           });
 
           // Sort by ID
@@ -1889,12 +2002,28 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
     const descriptionEn = item.descriptionEn || descriptionKr;
     const descriptionCn = item.descriptionCn || (loctab[descriptionKr] || translateByTokens(descriptionKr));
 
-    // Create entries with only 'name' field and other non-name/desc fields
+    // Prepare auxiliary localized fields (mateName/npcName/townNames) per language
+    const mateNameKrVal = item.mateNameKr || item.mateName;
+    const mateNameEnVal = item.mateNameEn || mateNameKrVal;
+    const mateNameCnVal = item.mateNameCn || (mateNameKrVal ? (loctab[mateNameKrVal] || translateByTokens(mateNameKrVal)) : undefined);
+
+    const npcNameKrVal = item.npcNameKr || item.npcName;
+    const npcNameEnVal = item.npcNameEn || npcNameKrVal;
+    const npcNameCnVal = item.npcNameCn || (npcNameKrVal ? (loctab[npcNameKrVal] || translateByTokens(npcNameKrVal)) : undefined);
+
+    const townNamesKrVal = item.townNamesKr || item.townNames;
+    const townNamesEnVal = item.townNamesEn || townNamesKrVal;
+    const townNamesCnVal = item.townNamesCn || (townNamesKrVal ? (loctab[townNamesKrVal] || translateByTokens(townNamesKrVal)) : undefined);
+
+    // Create entries with only 'name' field and other non-name/desc fields (strip localized name variants)
     const baseEntry = {};
     for (const [key, value] of Object.entries(item)) {
       if (key !== 'name' && key !== 'nameKr' && key !== 'nameEn' && key !== 'nameCn' &&
           key !== 'desc' && key !== 'descKr' && key !== 'descEn' && key !== 'descCn' &&
-          key !== 'description' && key !== 'descriptionKr' && key !== 'descriptionEn' && key !== 'descriptionCn') {
+          key !== 'description' && key !== 'descriptionKr' && key !== 'descriptionEn' && key !== 'descriptionCn' &&
+          key !== 'mateName' && key !== 'mateNameKr' && key !== 'mateNameEn' && key !== 'mateNameCn' &&
+          key !== 'npcName' && key !== 'npcNameKr' && key !== 'npcNameEn' && key !== 'npcNameCn' &&
+          key !== 'townNames' && key !== 'townNamesKr' && key !== 'townNamesEn' && key !== 'townNamesCn') {
         baseEntry[key] = value;
       }
     }
@@ -1904,6 +2033,9 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
       name: nameKr,
       ...(item.desc !== undefined && { desc: descKr }),
       ...(item.description !== undefined && { description: descriptionKr }),
+      ...(mateNameKrVal !== undefined && { mateName: mateNameKrVal }),
+      ...(npcNameKrVal !== undefined && { npcName: npcNameKrVal }),
+      ...(townNamesKrVal !== undefined && { townNames: townNamesKrVal }),
     });
 
     languageData.en.items.push({
@@ -1911,6 +2043,9 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
       name: nameEn,
       ...(item.desc !== undefined && { desc: descEn }),
       ...(item.description !== undefined && { description: descriptionEn }),
+      ...(mateNameEnVal !== undefined && { mateName: mateNameEnVal }),
+      ...(npcNameEnVal !== undefined && { npcName: npcNameEnVal }),
+      ...(townNamesEnVal !== undefined && { townNames: townNamesEnVal }),
     });
 
     languageData.zh.items.push({
@@ -1918,6 +2053,9 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
       name: nameCn,
       ...(item.desc !== undefined && { desc: descCn }),
       ...(item.description !== undefined && { description: descriptionCn }),
+      ...(mateNameCnVal !== undefined && { mateName: mateNameCnVal }),
+      ...(npcNameCnVal !== undefined && { npcName: npcNameCnVal }),
+      ...(townNamesCnVal !== undefined && { townNames: townNamesCnVal }),
     });
   }
 

@@ -46,32 +46,20 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
   const [items, setItems] = useState<RewardItem[]>([]);
   const [loadingTypes, setLoadingTypes] = useState(false);
   const [loadingItems, setLoadingItems] = useState(false);
-  const [rewardLocalization, setRewardLocalization] = useState<Record<string, string>>({});
 
 
-
-  // Function to load reward types and localization
+  // Function to load reward types
   const loadRewardTypes = useCallback(async () => {
     try {
       setLoadingTypes(true);
       const types = await planningDataService.getRewardTypeList();
       setRewardTypes(types);
-
-      // Load reward localization based on current language
-      const languageMap: Record<string, 'kr' | 'us' | 'cn'> = {
-        'ko': 'kr',
-        'en': 'us',
-        'zh': 'cn',
-      };
-      const localizationLang = languageMap[i18n.language] || 'kr';
-      const localization = await planningDataService.getRewardLocalization(localizationLang);
-      setRewardLocalization(localization);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('planningData.errors.loadRewardTypesFailed'), { variant: 'error' });
     } finally {
       setLoadingTypes(false);
     }
-  }, [i18n.language, enqueueSnackbar, t]);
+  }, [enqueueSnackbar, t]);
 
   // Function to load items for a specific reward type
   const loadItems = useCallback(async (rewardType: number) => {
@@ -205,7 +193,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
           ) : (
             rewardTypes.map((type) => (
               <MenuItem key={type.value} value={type.value.toString()}>
-                [{type.value}] {rewardLocalization[type.nameKey] || type.nameKey}
+                [{type.value}] {t(type.nameKey)}
               </MenuItem>
             ))
           )}

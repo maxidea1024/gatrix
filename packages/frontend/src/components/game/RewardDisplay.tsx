@@ -17,7 +17,7 @@ interface RewardDisplayProps {
  * Can display either direct rewards or rewards from a template
  */
 const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId, maxDisplay = 3 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [rewardTypeMap, setRewardTypeMap] = useState<Map<number, RewardTypeInfo>>(new Map());
   const [rewardItemsMap, setRewardItemsMap] = useState<Map<string, RewardItem>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -64,13 +64,22 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId
           // Get unique reward types
           const uniqueTypes = [...new Set(displayRewards.map(r => parseInt(r.rewardType)))];
 
+
+              // Map i18n language to API language
+              const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
+                'ko': 'kr',
+                'en': 'en',
+                'zh': 'zh',
+              };
+              const language = languageMap[i18n.language] || 'kr';
+
           // Load items for each type that has a table
           await Promise.all(
             uniqueTypes.map(async (rewardType) => {
               const typeInfo = typeMap.get(rewardType);
               if (typeInfo?.hasTable) {
                 try {
-                  const items = await planningDataService.getRewardTypeItems(rewardType);
+                  const items = await planningDataService.getRewardTypeItems(rewardType, language);
                   items.forEach(item => {
                     itemsMap.set(`${rewardType}_${item.id}`, item);
                   });

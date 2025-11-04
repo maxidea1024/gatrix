@@ -130,14 +130,6 @@ class PlanningDataService {
     return response.data;
   }
 
-  /**
-   * Get reward type localization
-   * @param language - Language code (kr, us, cn)
-   */
-  async getRewardLocalization(language: 'kr' | 'us' | 'cn'): Promise<Record<string, string>> {
-    const response = await api.get(`/admin/planning-data/localization/${language}`);
-    return response.data;
-  }
 
   /**
    * Rebuild reward lookup data
@@ -147,13 +139,6 @@ class PlanningDataService {
     return response.data;
   }
 
-  /**
-   * Get localization data for a specific language
-   */
-  async getLocalization(language: 'kr' | 'us' | 'cn'): Promise<Record<string, string>> {
-    const response = await api.get(`/admin/planning-data/localization/${language}`);
-    return response.data;
-  }
 
   /**
    * Get UI list data (nations, towns, villages, etc.)
