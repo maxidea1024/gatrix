@@ -2,27 +2,30 @@
 
 /**
  * Admin Tool Data Builder
- * 
+ *
  * Unified builder for generating all admin tool data files:
  * 1. Reward lookup tables (REWARD_TYPE items)
  * 2. UI list data (Nation, Town, Village)
  * 3. Localization table (loctab-source CSV to JSON)
- * 
+ * 4. Event data (HotTimeBuff, EventPage, LiveEvent, etc.)
+ *
  * Usage:
  *   node adminToolDataBuilder.js [options]
- * 
+ *
  * Options:
  *   --all              Build all data (default)
  *   --rewards          Build reward lookup tables only
  *   --ui-lists         Build UI list data only
  *   --localization     Build localization table only
+ *   --events           Build event data only
  *   --cms-dir <path>   CMS directory path (default: ../../../cms)
  *   --output-dir <path> Output directory path (default: current directory)
  *   --help             Show this help message
- * 
+ *
  * Examples:
  *   node adminToolDataBuilder.js
  *   node adminToolDataBuilder.js --rewards
+ *   node adminToolDataBuilder.js --events
  *   node adminToolDataBuilder.js --cms-dir /path/to/cms/server
  */
 
@@ -1845,6 +1848,436 @@ function convertLocalizationTable(inputPath, outputPath) {
 }
 
 // ============================================================================
+// Event Data Builder Functions
+// ============================================================================
+
+function buildHotTimeBuffLookup(cmsDir, outputDir) {
+  const hotTimeBuffPath = path.join(cmsDir, 'HotTimeBuff.json');
+  const worldBuffPath = path.join(cmsDir, 'WorldBuff.json');
+
+  try {
+    if (!fs.existsSync(hotTimeBuffPath)) {
+      console.log('   ⚠️  HotTimeBuff.json not found, skipping...');
+      return null;
+    }
+
+    const hotTimeBuffData = loadJson5File(hotTimeBuffPath);
+    const worldBuffData = loadJson5File(worldBuffPath);
+
+    if (!hotTimeBuffData || !hotTimeBuffData.HotTimeBuff) {
+      return null;
+    }
+
+    // Create WorldBuff name map
+    const worldBuffMap = {};
+    if (worldBuffData && worldBuffData.WorldBuff) {
+      Object.values(worldBuffData.WorldBuff).forEach((buff) => {
+        if (buff.id && buff.name) {
+          worldBuffMap[buff.id] = buff.name;
+        }
+      });
+    }
+
+    // Convert HotTimeBuff data
+    const items = Object.values(hotTimeBuffData.HotTimeBuff)
+      .filter(item => item && item.id)
+      .map((item) => {
+        const startDateISO = item.startDate ? new Date(item.startDate).toISOString() : null;
+        const endDateISO = item.endDate ? new Date(item.endDate).toISOString() : null;
+        const worldBuffNames = (item.worldBuffId || []).map(id => worldBuffMap[id] || `Unknown (${id})`);
+        const name = worldBuffNames.length > 0 ? worldBuffNames.join(', ') : `HotTimeBuff ${item.id}`;
+
+        return {
+          id: item.id,
+          name,
+          startDate: startDateISO,
+          endDate: endDateISO,
+          localBitflag: item.localBitflag,
+          startHour: item.startHour,
+          endHour: item.endHour,
+          minLv: item.minLv,
+          maxLv: item.maxLv,
+          bitFlagDayOfWeek: item.bitFlagDayOfWeek,
+          worldBuffId: item.worldBuffId || [],
+          worldBuffNames,
+        };
+      });
+
+    const lookupData = { totalCount: items.length, items };
+    const outputPath = path.join(outputDir, 'hottimebuff-lookup.json');
+    fs.writeFileSync(outputPath, JSON.stringify(lookupData, null, 2), 'utf8');
+
+    console.log(`   ✅ HotTimeBuff lookup built (${items.length} items)`);
+    return lookupData;
+  } catch (error) {
+    console.log(`   ⚠️  Error building HotTimeBuff lookup:`, error.message);
+    return null;
+  }
+}
+
+function buildEventPageLookup(cmsDir, outputDir) {
+  const eventPagePath = path.join(cmsDir, 'EventPage.json');
+
+  try {
+    if (!fs.existsSync(eventPagePath)) {
+      console.log('   ⚠️  EventPage.json not found, skipping...');
+      return null;
+    }
+
+    const eventPageData = loadJson5File(eventPagePath);
+    if (!eventPageData || !eventPageData.EventPage) {
+      return null;
+    }
+
+    const pageGroupNames = {
+      0: 'Normal',
+      1: 'Attendance',
+      2: 'Mission',
+      3: 'Ranking',
+      4: 'Special',
+    };
+
+    const items = Object.values(eventPageData.EventPage)
+      .filter(item => item && item.id)
+      .map((item) => ({
+        id: item.id,
+        name: item.name || '',
+        order: item.order || 0,
+        pageGroup: item.pageGroup || 0,
+        pageGroupName: pageGroupNames[item.pageGroup] || 'Unknown',
+        type: item.type || 0,
+        groupRef: item.groupRef,
+        pageWidget: item.pageWidget,
+        pageWidgetName: item.pageWidgetName || '',
+        mainTitle: item.mainTitle || '',
+        subTitle: item.subTitle || '',
+        desc: item.desc || '',
+        startDate: item.startDate ? new Date(item.startDate).toISOString() : null,
+        endDate: item.endDate ? new Date(item.endDate).toISOString() : null,
+        passRewardHour: item.passRewardHour,
+        shopRemainHour: item.shopRemainHour,
+        rankRewardHour: item.rankRewardHour,
+        activeDay: item.activeDay,
+        comeBackDay: item.comeBackDay,
+        localBitflag: item.localBitflag,
+        saleItemId: item.saleItemId,
+        attendSupplement: item.attendSupplement || false,
+        isHideLvBuy: item.isHideLvBuy || false,
+        mail: item.mail,
+        bgIllust: item.bgIllust || '',
+        spineAsset: item.spineAsset || '',
+        completedRemove: item.completedRemove || false,
+        contentsTerms: item.contentsTerms || [],
+        mainTitleIllust: item.mainTitleIllust || '',
+        spineAsset2: item.spineAsset2 || '',
+        dictionaryGroupNo: item.dictionaryGroupNo,
+        cashShopTab: item.cashShopTab,
+        viewHUD: item.viewHUD || false,
+        cashShopUse: item.cashShopUse || false,
+      }));
+
+    const lookupData = { totalCount: items.length, items };
+    const outputPath = path.join(outputDir, 'eventpage-lookup.json');
+    fs.writeFileSync(outputPath, JSON.stringify(lookupData, null, 2), 'utf8');
+
+    console.log(`   ✅ EventPage lookup built (${items.length} items)`);
+    return lookupData;
+  } catch (error) {
+    console.log(`   ⚠️  Error building EventPage lookup:`, error.message);
+    return null;
+  }
+}
+
+function buildLiveEventLookup(cmsDir, outputDir) {
+  const liveEventPath = path.join(cmsDir, 'LiveEvent.json');
+
+  try {
+    if (!fs.existsSync(liveEventPath)) {
+      console.log('   ⚠️  LiveEvent.json not found, skipping...');
+      return null;
+    }
+
+    const liveEventData = loadJson5File(liveEventPath);
+    if (!liveEventData || !liveEventData.LiveEvent) {
+      return null;
+    }
+
+    const items = Object.values(liveEventData.LiveEvent)
+      .filter(item => item && item.id)
+      .map((item) => ({
+        id: item.id,
+        name: item.name || '',
+        description: item.description || '',
+        startDate: item.startDate ? new Date(item.startDate).toISOString() : null,
+        endDate: item.endDate ? new Date(item.endDate).toISOString() : null,
+        eventType: item.eventType || 0,
+        rewardId: item.rewardId,
+      }));
+
+    const lookupData = { totalCount: items.length, items };
+    const outputPath = path.join(outputDir, 'liveevent-lookup.json');
+    fs.writeFileSync(outputPath, JSON.stringify(lookupData, null, 2), 'utf8');
+
+    console.log(`   ✅ LiveEvent lookup built (${items.length} items)`);
+    return lookupData;
+  } catch (error) {
+    console.log(`   ⚠️  Error building LiveEvent lookup:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Build MateRecruitingGroup lookup data
+ * Uses MateTemplate.json and Town.json to resolve group names
+ */
+function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
+  const mateRecruitingGroupPath = path.join(cmsDir, 'MateRecruitingGroup.json');
+  const mateTemplateFilePath = path.join(cmsDir, 'MateTemplate.json');
+  const townFilePath = path.join(cmsDir, 'Town.json');
+  const loctabPath = path.join(outputDir, 'loctab.json');
+
+  try {
+    if (!fs.existsSync(mateRecruitingGroupPath)) {
+      console.log('   ⚠️  MateRecruitingGroup.json not found, skipping...');
+      return null;
+    }
+
+    if (!fs.existsSync(mateTemplateFilePath) || !fs.existsSync(townFilePath)) {
+      console.log('   ⚠️  MateTemplate.json or Town.json not found, skipping...');
+      return null;
+    }
+
+    const mateRecruitingGroupData = loadJson5File(mateRecruitingGroupPath);
+    const mateTemplateData = loadJson5File(mateTemplateFilePath);
+    const townData = loadJson5File(townFilePath);
+
+    if (!mateRecruitingGroupData || !mateRecruitingGroupData.MateRecruitingGroup) {
+      return null;
+    }
+
+    // Load localization table if available
+    let loctab = {};
+    if (fs.existsSync(loctabPath)) {
+      try {
+        const loctabContent = fs.readFileSync(loctabPath, 'utf-8');
+        loctab = JSON.parse(loctabContent);
+      } catch (e) {
+        console.log('   ⚠️  Could not load loctab.json for localization');
+      }
+    }
+
+    // Create a map of mateId to mate names (all languages)
+    const mateNameMap = {};
+    const mateTemplates = mateTemplateData.MateTemplate || {};
+    Object.values(mateTemplates).forEach((mate) => {
+      if (mate && mate.mateId && mate.name) {
+        mateNameMap[mate.mateId] = {
+          nameKr: mate.name,
+          nameEn: loctab[mate.name] || mate.name,
+          nameCn: loctab[mate.name] || mate.name,
+        };
+      }
+    });
+
+    // Create a map of mateRecruitingGroup to town info (all languages with IDs)
+    const groupToTownsMap = {};
+    const towns = townData.Town || {};
+    Object.values(towns).forEach((town) => {
+      if (town && town.mateRecruitingGroup && town.name) {
+        if (!groupToTownsMap[town.mateRecruitingGroup]) {
+          groupToTownsMap[town.mateRecruitingGroup] = [];
+        }
+        groupToTownsMap[town.mateRecruitingGroup].push({
+          id: town.id,
+          nameKr: town.name,
+          nameEn: loctab[town.name] || town.name,
+          nameCn: loctab[town.name] || town.name,
+        });
+      }
+    });
+
+    // Convert MateRecruitingGroup data
+    const items = Object.values(mateRecruitingGroupData.MateRecruitingGroup)
+      .filter(item => item && item.id)
+      .map((item) => {
+        // Check if mate exists in template
+        const mateExists = !!mateNameMap[item.mateId];
+        const mateNames = mateNameMap[item.mateId] || {
+          nameKr: `MISSING MATE ${item.mateId}`,
+          nameEn: `MISSING MATE ${item.mateId}`,
+          nameCn: `MISSING MATE ${item.mateId}`,
+        };
+
+        // Get town info for this group (all languages with IDs)
+        const townsList = groupToTownsMap[item.group] || [];
+        const townNamesKr = townsList.map(t => t.nameKr).join(', ');
+        const townNamesEn = townsList.map(t => t.nameEn).join(', ');
+        const townNamesCn = townsList.map(t => t.nameCn).join(', ');
+
+        // Build name for each language
+        const buildName = (mateName, townNames) => {
+          const nameParts = [];
+          nameParts.push(mateName);
+          if (townNames) {
+            nameParts.push(`- ${townNames}`);
+          }
+
+          const tags = [];
+          if (item.isMustAppear) {
+            tags.push('필수등장');
+          }
+          if (item.isReRecruit) {
+            tags.push('재고용전용');
+          }
+          if (item.Ratio && item.Ratio < 10000 && !item.isMustAppear) {
+            tags.push(`확률:${(item.Ratio / 100).toFixed(0)}%`);
+          }
+
+          let name = nameParts.join(' ');
+          if (tags.length > 0) {
+            name = `${name} (${tags.join(', ')})`;
+          }
+          return name;
+        };
+
+        // Calculate probability percentage
+        const probability = item.Ratio && item.Ratio < 10000 && !item.isMustAppear
+          ? (item.Ratio / 100).toFixed(0)
+          : null;
+
+        return {
+          ...item,
+          name: buildName(mateNames.nameKr, townNamesKr), // Default to Korean
+          nameKr: buildName(mateNames.nameKr, townNamesKr),
+          nameEn: buildName(mateNames.nameEn, townNamesEn),
+          nameCn: buildName(mateNames.nameCn, townNamesCn),
+          mateName: mateNames.nameKr,
+          mateNameKr: mateNames.nameKr,
+          mateNameEn: mateNames.nameEn,
+          mateNameCn: mateNames.nameCn,
+          townNames: townNamesKr,
+          townNamesKr: townNamesKr,
+          townNamesEn: townNamesEn,
+          townNamesCn: townNamesCn,
+          towns: townsList, // Array of { id, nameKr, nameEn, nameCn }
+          probability, // Probability percentage (e.g., "50" for 50%)
+          mateExists,
+          ratio: item.Ratio,
+        };
+      });
+
+    const lookupData = { totalCount: items.length, items };
+    const outputPath = path.join(outputDir, 'materecruiting-lookup.json');
+    fs.writeFileSync(outputPath, JSON.stringify(lookupData, null, 2), 'utf8');
+
+    console.log(`   ✅ MateRecruitingGroup lookup built (${items.length} items)`);
+    return lookupData;
+  } catch (error) {
+    console.log(`   ⚠️  Error building MateRecruitingGroup lookup:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Build OceanNpcAreaSpawner lookup data
+ * Uses OceanNpc.json to resolve NPC names with localization
+ */
+function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir) {
+  const oceanNpcAreaSpawnerPath = path.join(cmsDir, 'OceanNpcAreaSpawner.json');
+  const oceanNpcFilePath = path.join(cmsDir, 'OceanNpc.json');
+  const loctabPath = path.join(outputDir, 'loctab.json');
+
+  try {
+    if (!fs.existsSync(oceanNpcAreaSpawnerPath)) {
+      console.log('   ⚠️  OceanNpcAreaSpawner.json not found, skipping...');
+      return null;
+    }
+
+    if (!fs.existsSync(oceanNpcFilePath)) {
+      console.log('   ⚠️  OceanNpc.json not found, skipping...');
+      return null;
+    }
+
+    const oceanNpcAreaSpawnerData = loadJson5File(oceanNpcAreaSpawnerPath);
+    const oceanNpcData = loadJson5File(oceanNpcFilePath);
+
+    if (!oceanNpcAreaSpawnerData || !oceanNpcAreaSpawnerData.OceanNpcAreaSpawner) {
+      return null;
+    }
+
+    // Load localization table if available
+    let loctab = {};
+    if (fs.existsSync(loctabPath)) {
+      try {
+        const loctabContent = fs.readFileSync(loctabPath, 'utf-8');
+        loctab = JSON.parse(loctabContent);
+      } catch (e) {
+        console.log('   ⚠️  Could not load loctab.json for localization');
+      }
+    }
+
+    // Create a map of oceanNpcId to ocean npc names (all languages)
+    const oceanNpcNameMap = {};
+    const oceanNpcs = oceanNpcData.OceanNpc || {};
+    Object.values(oceanNpcs).forEach((npc) => {
+      if (npc && npc.id && npc.name) {
+        oceanNpcNameMap[npc.id] = {
+          nameKr: npc.name,
+          nameEn: loctab[npc.name] || npc.name,
+          nameCn: loctab[npc.name] || npc.name,
+        };
+      }
+    });
+
+    // Convert OceanNpcAreaSpawner data
+    const items = Object.values(oceanNpcAreaSpawnerData.OceanNpcAreaSpawner)
+      .filter(item => item && item.id)
+      .map((item) => {
+        const npcExists = !!oceanNpcNameMap[item.oceanNpcId];
+        const npcNames = oceanNpcNameMap[item.oceanNpcId] || {
+          nameKr: `MISSING NPC ${item.oceanNpcId}`,
+          nameEn: `MISSING NPC ${item.oceanNpcId}`,
+          nameCn: `MISSING NPC ${item.oceanNpcId}`,
+        };
+
+        // Build name for each language: Spawner - {npcName}
+        const nameKr = `Spawner - ${npcNames.nameKr}`;
+        const nameEn = `Spawner - ${npcNames.nameEn}`;
+        const nameCn = `Spawner - ${npcNames.nameCn}`;
+
+        // Convert startDate and endDate to ISO8601 format if they exist
+        const startDateISO = item.startDate ? new Date(item.startDate).toISOString() : null;
+        const endDateISO = item.endDate ? new Date(item.endDate).toISOString() : null;
+
+        return {
+          ...item,
+          name: nameKr, // Default to Korean
+          nameKr,
+          nameEn,
+          nameCn,
+          npcName: npcNames.nameKr,
+          npcNameKr: npcNames.nameKr,
+          npcNameEn: npcNames.nameEn,
+          npcNameCn: npcNames.nameCn,
+          npcExists,
+          startDate: startDateISO,
+          endDate: endDateISO,
+        };
+      });
+
+    const lookupData = { totalCount: items.length, items };
+    const outputPath = path.join(outputDir, 'oceannpcarea-lookup.json');
+    fs.writeFileSync(outputPath, JSON.stringify(lookupData, null, 2), 'utf8');
+
+    console.log(`   ✅ OceanNpcAreaSpawner lookup built (${items.length} items)`);
+    return lookupData;
+  } catch (error) {
+    console.log(`   ⚠️  Error building OceanNpcAreaSpawner lookup:`, error.message);
+    return null;
+  }
+}
+
+// ============================================================================
 // Main Function
 // ============================================================================
 
@@ -1854,6 +2287,7 @@ function main() {
   let buildRewards = false;
   let buildUILists = false;
   let buildLocalization = false;
+  let buildEvents = false;
   let cmsDir = DEFAULT_CMS_DIR;
   let outputDir = DEFAULT_OUTPUT_DIR;
 
@@ -1873,6 +2307,7 @@ Options:
   --rewards          Build reward lookup tables only
   --ui-lists         Build UI list data only
   --localization     Build localization table only
+  --events           Build event data only
   --cms-dir <path>   CMS directory path (default: ../../../cms)
   --output-dir <path> Output directory path (default: current directory)
   --help, -h         Show this help message
@@ -1880,6 +2315,7 @@ Options:
 Examples:
   node adminToolDataBuilder.js
   node adminToolDataBuilder.js --rewards
+  node adminToolDataBuilder.js --events
   node adminToolDataBuilder.js --cms-dir /path/to/cms
       `);
       process.exit(0);
@@ -1887,12 +2323,15 @@ Examples:
       buildRewards = true;
       buildUILists = true;
       buildLocalization = true;
+      buildEvents = true;
     } else if (arg === '--rewards') {
       buildRewards = true;
     } else if (arg === '--ui-lists') {
       buildUILists = true;
     } else if (arg === '--localization') {
       buildLocalization = true;
+    } else if (arg === '--events') {
+      buildEvents = true;
     } else if (arg === '--cms-dir') {
       cmsDir = args[++i];
     } else if (arg === '--output-dir') {
@@ -1901,10 +2340,11 @@ Examples:
   }
 
   // If no specific option is set, build all
-  if (!buildRewards && !buildUILists && !buildLocalization) {
+  if (!buildRewards && !buildUILists && !buildLocalization && !buildEvents) {
     buildRewards = true;
     buildUILists = true;
     buildLocalization = true;
+    buildEvents = true;
   }
 
   console.log('\n╔════════════════════════════════════════════════════════════════╗');
@@ -1966,6 +2406,36 @@ Examples:
     generatedFiles.push({ name: 'ui-list-data.json', description: 'UI list data (Nation/Town/Village)' });
   }
 
+  // Build event data
+  if (buildEvents) {
+    console.log('🎮 Building event data...');
+
+    const hotTimeBuff = buildHotTimeBuffLookup(cmsDir, outputDir);
+    if (hotTimeBuff) {
+      generatedFiles.push({ name: 'hottimebuff-lookup.json', description: 'HotTimeBuff event data' });
+    }
+
+    const eventPage = buildEventPageLookup(cmsDir, outputDir);
+    if (eventPage) {
+      generatedFiles.push({ name: 'eventpage-lookup.json', description: 'EventPage data' });
+    }
+
+    const liveEvent = buildLiveEventLookup(cmsDir, outputDir);
+    if (liveEvent) {
+      generatedFiles.push({ name: 'liveevent-lookup.json', description: 'LiveEvent data' });
+    }
+
+    const mateRecruiting = buildMateRecruitingGroupLookup(cmsDir, outputDir);
+    if (mateRecruiting) {
+      generatedFiles.push({ name: 'materecruiting-lookup.json', description: 'MateRecruitingGroup data' });
+    }
+
+    const oceanNpcArea = buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir);
+    if (oceanNpcArea) {
+      generatedFiles.push({ name: 'oceannpcarea-lookup.json', description: 'OceanNpcAreaSpawner data' });
+    }
+  }
+
   const endTime = Date.now();
   const duration = ((endTime - startTime) / 1000).toFixed(2);
 
@@ -1994,5 +2464,10 @@ module.exports = {
   generateLocalizations,
   generateUIListData,
   convertLocalizationTable,
+  buildHotTimeBuffLookup,
+  buildEventPageLookup,
+  buildLiveEventLookup,
+  buildMateRecruitingGroupLookup,
+  buildOceanNpcAreaSpawnerLookup,
 };
 

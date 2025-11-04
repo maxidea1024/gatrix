@@ -2,14 +2,14 @@
 
 /**
  * Planning Data Conversion CLI Tool
- * 
+ *
  * 기획데이터 변환 도구
  * CMS 폴더의 원본 데이터를 처리하여 최종 JSON 파일 생성
- * 
+ *
  * Usage:
  *   npx ts-node scripts/convert-planning-data.ts [options]
  *   yarn planning-data:convert [options]
- * 
+ *
  * Options:
  *   --input <path>      CMS 폴더 경로 (기본값: packages/backend/cms)
  *   --output <path>     출력 폴더 경로 (기본값: packages/backend/data/planning)
@@ -17,6 +17,7 @@
  *   --rewards           보상 데이터만 변환
  *   --ui-lists          UI 목록만 변환
  *   --localization      로컬라이징만 변환
+ *   --events            이벤트 데이터만 변환
  *   --verbose           상세 로그 출력
  *   --help              도움말 표시
  */
@@ -32,6 +33,7 @@ interface ConvertOptions {
   rewards: boolean;
   uiLists: boolean;
   localization: boolean;
+  events: boolean;
   verbose: boolean;
 }
 
@@ -101,8 +103,19 @@ class PlanningDataConverter {
 
       this.log('Running adminToolDataBuilder...');
 
-      const command = `node "${builderPath}" --all --cms-dir "${this.options.input}" --output-dir "${this.options.output}"`;
-      
+      // Build command with appropriate flags
+      let flags = [];
+      if (this.options.all) {
+        flags.push('--all');
+      } else {
+        if (this.options.rewards) flags.push('--rewards');
+        if (this.options.uiLists) flags.push('--ui-lists');
+        if (this.options.localization) flags.push('--localization');
+        if (this.options.events) flags.push('--events');
+      }
+
+      const command = `node "${builderPath}" ${flags.join(' ')} --cms-dir "${this.options.input}" --output-dir "${this.options.output}"`;
+
       if (this.options.verbose) {
         this.log(`Command: ${command}`);
       }
@@ -166,8 +179,10 @@ class PlanningDataConverter {
 function parseArgs(): ConvertOptions {
   const args = process.argv.slice(2);
 
-  // Get the workspace root (go up from packages/backend to root)
-  const workspaceRoot = path.resolve(__dirname, '../../..');
+  // Get the workspace root (go up from dist/scripts to root)
+  // __dirname is dist/scripts, so we need to go up 2 levels: scripts -> dist -> backend
+  // Then up 2 more to get to workspace root: backend -> packages -> root
+  const workspaceRoot = path.resolve(__dirname, '../../../..');
 
   const options: ConvertOptions = {
     input: path.join(workspaceRoot, 'packages/backend/cms'),
@@ -176,6 +191,7 @@ function parseArgs(): ConvertOptions {
     rewards: false,
     uiLists: false,
     localization: false,
+    events: false,
     verbose: false,
   };
 
@@ -198,6 +214,10 @@ function parseArgs(): ConvertOptions {
       case '--localization':
         options.all = false;
         options.localization = true;
+        break;
+      case '--events':
+        options.all = false;
+        options.events = true;
         break;
       case '--verbose':
         options.verbose = true;
@@ -227,6 +247,7 @@ Options:
   --rewards           보상 데이터만 변환
   --ui-lists          UI 목록만 변환
   --localization      로컬라이징만 변환
+  --events            이벤트 데이터만 변환
   --verbose           상세 로그 출력
   --help              도움말 표시
 
@@ -242,6 +263,9 @@ Examples:
 
   # 보상 데이터만 변환
   yarn planning-data:convert --rewards
+
+  # 이벤트 데이터만 변환
+  yarn planning-data:convert --events
   `);
 }
 

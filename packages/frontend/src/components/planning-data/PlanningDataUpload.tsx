@@ -15,6 +15,17 @@ import {
   LinearProgress,
   Checkbox,
   ListItemButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from '@mui/material';
 import {
   CloudUpload as CloudUploadIcon,
@@ -30,15 +41,25 @@ interface PlanningDataUploadProps {
   onUploadSuccess?: () => void;
 }
 
-const REQUIRED_FILES = [
-  'reward-lookup.json',
-  'reward-type-list.json',
-  'reward-localization-kr.json',
-  'reward-localization-us.json',
-  'reward-localization-cn.json',
-  'ui-list-data.json',
-  'loctab.json',
+const SUPPORTED_FILES = [
+  // Reward data
+  { name: 'reward-lookup.json', category: 'Reward', description: 'Reward lookup table' },
+  { name: 'reward-type-list.json', category: 'Reward', description: 'Reward type list' },
+  { name: 'reward-localization-kr.json', category: 'Localization', description: 'Korean localization' },
+  { name: 'reward-localization-us.json', category: 'Localization', description: 'English localization' },
+  { name: 'reward-localization-cn.json', category: 'Localization', description: 'Chinese localization' },
+  // UI data
+  { name: 'ui-list-data.json', category: 'UI', description: 'UI list data' },
+  { name: 'loctab.json', category: 'Localization', description: 'Localization table' },
+  // Event data
+  { name: 'hottimebuff-lookup.json', category: 'Event', description: 'HotTimeBuff data' },
+  { name: 'eventpage-lookup.json', category: 'Event', description: 'EventPage data' },
+  { name: 'liveevent-lookup.json', category: 'Event', description: 'LiveEvent data' },
+  { name: 'materecruiting-lookup.json', category: 'Event', description: 'MateRecruiting data' },
+  { name: 'oceannpcarea-lookup.json', category: 'Event', description: 'OceanNpcArea data' },
 ];
+
+const REQUIRED_FILES = SUPPORTED_FILES.map(f => f.name);
 
 export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUploadSuccess }) => {
   const { t } = useTranslation();
@@ -51,6 +72,8 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
   const [uploadProgress, setUploadProgress] = useState(0);
   const [dragOver, setDragOver] = useState(false);
   const [filesToUpload, setFilesToUpload] = useState<Set<string>>(new Set());
+  const [showSupportedFilesDialog, setShowSupportedFilesDialog] = useState(false);
+  const [invalidFileName, setInvalidFileName] = useState<string | null>(null);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -84,9 +107,8 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
     // Validate file names
     const validFiles = files.filter((file) => {
       if (!REQUIRED_FILES.includes(file.name)) {
-        enqueueSnackbar(`Invalid file: ${file.name}. Expected one of: ${REQUIRED_FILES.join(', ')}`, {
-          variant: 'warning',
-        });
+        setInvalidFileName(file.name);
+        setShowSupportedFilesDialog(true);
         return false;
       }
       return true;
@@ -309,6 +331,54 @@ export const PlanningDataUpload: React.FC<PlanningDataUploadProps> = ({ onUpload
         </Box>
         </CardContent>
       </Card>
+
+      {/* Supported Files Dialog */}
+      <Dialog
+        open={showSupportedFilesDialog}
+        onClose={() => setShowSupportedFilesDialog(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {invalidFileName ? `인식할 수 없는 파일입니다: ${invalidFileName}` : '지원하는 파일 목록'}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+              다음 파일들을 업로드할 수 있습니다:
+            </Typography>
+            <TableContainer component={Paper}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                    <TableCell sx={{ fontWeight: 'bold' }}>파일명</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>카테고리</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>설명</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {SUPPORTED_FILES.map((file) => (
+                    <TableRow key={file.name}>
+                      <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                        {file.name}
+                      </TableCell>
+                      <TableCell>
+                        <Chip label={file.category} size="small" variant="outlined" />
+                      </TableCell>
+                      <TableCell>{file.description}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowSupportedFilesDialog(false)} variant="contained">
+            확인
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

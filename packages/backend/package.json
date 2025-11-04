@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "yarn migrate:up && nodemon",
     "dev:no-migrate": "nodemon",
-    "build": "tsc",
+    "build": "tsc && tsc -p tsconfig.scripts.json",
     "start": "yarn migrate:up && node dist/index.js",
     "start:no-migrate": "node dist/index.js",
     "test": "jest",

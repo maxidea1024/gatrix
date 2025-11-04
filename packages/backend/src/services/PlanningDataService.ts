@@ -1065,6 +1065,11 @@ export class PlanningDataService {
         'reward-localization-cn.json',
         'ui-list-data.json',
         'loctab.json',
+        'hottimebuff-lookup.json',
+        'eventpage-lookup.json',
+        'liveevent-lookup.json',
+        'materecruiting-lookup.json',
+        'oceannpcarea-lookup.json',
       ];
 
       // Validate uploaded files
@@ -1076,6 +1081,7 @@ export class PlanningDataService {
       const fileStats: any = {};
 
       // Process each uploaded file
+      const invalidFiles: string[] = [];
       for (const [fieldName, fileArray] of Object.entries(files)) {
         const file = Array.isArray(fileArray) ? fileArray[0] : fileArray;
 
@@ -1089,6 +1095,7 @@ export class PlanningDataService {
         // Validate file name
         if (!expectedFiles.includes(fileName)) {
           logger.warn(`Unexpected file name: ${fileName}`);
+          invalidFiles.push(fileName);
           continue;
         }
 
@@ -1114,6 +1121,9 @@ export class PlanningDataService {
       }
 
       if (uploadedFiles.length === 0) {
+        if (invalidFiles.length > 0) {
+          throw new CustomError(`인식할 수 없는 파일입니다: ${invalidFiles.join(', ')}`, 400);
+        }
         throw new CustomError('No valid files were uploaded', 400);
       }
 
@@ -1156,6 +1166,11 @@ export class PlanningDataService {
         'reward-localization-cn.json': this.CACHE_KEYS.LOCALIZATION_CN,
         'ui-list-data.json': this.CACHE_KEYS.UI_LIST_DATA,
         'loctab.json': this.CACHE_KEYS.LOCTAB,
+        'hottimebuff-lookup.json': this.CACHE_KEYS.HOT_TIME_BUFF,
+        'eventpage-lookup.json': this.CACHE_KEYS.EVENT_PAGE,
+        'liveevent-lookup.json': this.CACHE_KEYS.LIVE_EVENT,
+        'materecruiting-lookup.json': this.CACHE_KEYS.MATE_RECRUITING,
+        'oceannpcarea-lookup.json': this.CACHE_KEYS.OCEAN_NPC_AREA,
       };
 
       // Cache each file
