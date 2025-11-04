@@ -9,7 +9,8 @@ export class CacheService extends EventEmitter {
   private cache!: any;
   private l1Cache!: Keyv; // Memory cache
   private l2Cache?: Keyv; // Redis cache
-  private defaultTTL = 5 * 60 * 1000; // 5 minutes
+  private defaultTTL?: number; // No default TTL by default (persist cache unless explicitly provided)
+
   private keyRegistry: Set<string> = new Set(); // Track all cache keys
 
   constructor() {
@@ -64,7 +65,7 @@ export class CacheService extends EventEmitter {
           value = await this.l2Cache.get(key);
           if (value !== undefined) {
             // Populate L1 cache
-            await this.l1Cache.set(key, value, this.defaultTTL);
+            await this.l1Cache.set(key, value);
             return value;
           }
         }
@@ -73,7 +74,7 @@ export class CacheService extends EventEmitter {
       },
 
       set: async (key: string, value: any, ttl?: number) => {
-        const cacheTTL = ttl || this.defaultTTL;
+        const cacheTTL = ttl;
 
         // Track key in registry
         this.keyRegistry.add(key);
@@ -184,11 +185,71 @@ export class CacheService extends EventEmitter {
    */
   async set<T>(key: string, data: T, ttl?: number): Promise<void> {
     try {
-      await this.cache.set(key, data, ttl || this.defaultTTL);
+      await this.cache.set(key, data, ttl);
       logger.debug(`Cache set: ${key}`);
     } catch (error) {
       logger.error(`Cache set error for key ${key}:`, error);
     }
+  }
+
+  /**
+   * Set cached data explicitly without TTL (persistent)
+   * This bypasses any default TTL configured on Keyv instances.
+   */
+  async setWithoutTTL<T>(key: string, data: T): Promise<void> {
+    try {
+      // Track key in registry
+      this.keyRegistry.add(key);
+
+      // Temporarily disable default TTL for L1, set value, then restore
+      const l1Any: any = this.l1Cache as any;
+      const prevL1Ttl = l1Any?.opts?.ttl;
+      if (l1Any?.opts) l1Any.opts.ttl = undefined;
+      await this.l1Cache.set(key, data);
+      if (l1Any?.opts) l1Any.opts.ttl = prevL1Ttl;
+
+      // Do the same for L2 (Redis) if available
+      if (this.l2Cache) {
+        const l2Any: any = this.l2Cache as any;
+        const prevL2Ttl = l2Any?.opts?.ttl;
+        if (l2Any?.opts) l2Any.opts.ttl = undefined;
+        await this.l2Cache.set(key, data);
+        if (l2Any?.opts) l2Any.opts.ttl = prevL2Ttl;
+      }
+
+      logger.debug(`Cache set (no TTL): ${key}`);
+    } catch (error) {
+      logger.error(`Cache set (no TTL) error for key ${key}:`, error);
+    }
+  }
+
+  /**
+   * Persist existing key by re-setting without TTL.
+   * Returns true if key existed and was persisted, false otherwise.
+   */
+  async persistKey(key: string): Promise<boolean> {
+    try {
+      const current = await this.cache.get(key);
+      if (current === undefined) return false;
+      await this.setWithoutTTL(key, current);
+      return true;
+    } catch (error) {
+      logger.error(`Cache persistKey error for key ${key}:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Persist multiple keys by re-setting without TTL.
+   * Returns number of keys successfully persisted.
+   */
+  async persistKeys(keys: string[]): Promise<number> {
+    let count = 0;
+    for (const key of keys) {
+      const ok = await this.persistKey(key);
+      if (ok) count++;
+    }
+    return count;
   }
 
   /**

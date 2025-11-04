@@ -44,29 +44,39 @@ export class PlanningDataService {
   private static runtimeDataPath = path.join(__dirname, '../../data/planning');
 
   // Paths for dynamically generated files (stored in runtime data directory)
-  private static rewardLookupPath = path.join(PlanningDataService.runtimeDataPath, 'reward-lookup.json');
+  // Language-specific reward lookup files
+  private static rewardLookupKrPath = path.join(PlanningDataService.runtimeDataPath, 'reward-lookup-kr.json');
+  private static rewardLookupEnPath = path.join(PlanningDataService.runtimeDataPath, 'reward-lookup-en.json');
+  private static rewardLookupZhPath = path.join(PlanningDataService.runtimeDataPath, 'reward-lookup-zh.json');
   private static rewardTypeListPath = path.join(PlanningDataService.runtimeDataPath, 'reward-type-list.json');
-  private static localizationKrPath = path.join(PlanningDataService.runtimeDataPath, 'reward-localization-kr.json');
-  private static localizationUsPath = path.join(PlanningDataService.runtimeDataPath, 'reward-localization-us.json');
-  private static localizationCnPath = path.join(PlanningDataService.runtimeDataPath, 'reward-localization-cn.json');
-  private static uiListDataPath = path.join(PlanningDataService.runtimeDataPath, 'ui-list-data.json');
-  private static loctabPath = path.join(PlanningDataService.runtimeDataPath, 'loctab.json');
-  private static hotTimeBuffPath = path.join(PlanningDataService.runtimeDataPath, 'hottimebuff-lookup.json');
-  private static eventPagePath = path.join(PlanningDataService.runtimeDataPath, 'eventpage-lookup.json');
-  private static liveEventPath = path.join(PlanningDataService.runtimeDataPath, 'liveevent-lookup.json');
-  private static mateRecruitingGroupPath = path.join(PlanningDataService.runtimeDataPath, 'materecruiting-lookup.json');
-  private static oceanNpcAreaSpawnerPath = path.join(PlanningDataService.runtimeDataPath, 'oceannpcarea-lookup.json');
+  private static uiListDataKrPath = path.join(PlanningDataService.runtimeDataPath, 'ui-list-data-kr.json');
+  private static uiListDataEnPath = path.join(PlanningDataService.runtimeDataPath, 'ui-list-data-en.json');
+  private static uiListDataZhPath = path.join(PlanningDataService.runtimeDataPath, 'ui-list-data-zh.json');
+  // Language-specific event lookup files
+  private static hotTimeBuffKrPath = path.join(PlanningDataService.runtimeDataPath, 'hottimebuff-lookup-kr.json');
+  private static hotTimeBuffEnPath = path.join(PlanningDataService.runtimeDataPath, 'hottimebuff-lookup-en.json');
+  private static hotTimeBuffZhPath = path.join(PlanningDataService.runtimeDataPath, 'hottimebuff-lookup-zh.json');
+  private static eventPageKrPath = path.join(PlanningDataService.runtimeDataPath, 'eventpage-lookup-kr.json');
+  private static eventPageEnPath = path.join(PlanningDataService.runtimeDataPath, 'eventpage-lookup-en.json');
+  private static eventPageZhPath = path.join(PlanningDataService.runtimeDataPath, 'eventpage-lookup-zh.json');
+  private static liveEventKrPath = path.join(PlanningDataService.runtimeDataPath, 'liveevent-lookup-kr.json');
+  private static liveEventEnPath = path.join(PlanningDataService.runtimeDataPath, 'liveevent-lookup-en.json');
+  private static liveEventZhPath = path.join(PlanningDataService.runtimeDataPath, 'liveevent-lookup-zh.json');
+  private static mateRecruitingGroupKrPath = path.join(PlanningDataService.runtimeDataPath, 'materecruiting-lookup-kr.json');
+  private static mateRecruitingGroupEnPath = path.join(PlanningDataService.runtimeDataPath, 'materecruiting-lookup-en.json');
+  private static mateRecruitingGroupZhPath = path.join(PlanningDataService.runtimeDataPath, 'materecruiting-lookup-zh.json');
+  private static oceanNpcAreaSpawnerKrPath = path.join(PlanningDataService.runtimeDataPath, 'oceannpcarea-lookup-kr.json');
+  private static oceanNpcAreaSpawnerEnPath = path.join(PlanningDataService.runtimeDataPath, 'oceannpcarea-lookup-en.json');
+  private static oceanNpcAreaSpawnerZhPath = path.join(PlanningDataService.runtimeDataPath, 'oceannpcarea-lookup-zh.json');
   private static initialized = false;
 
   // Redis cache keys for multi-instance support
   private static readonly CACHE_KEYS = {
-    REWARD_LOOKUP: 'planning:reward-lookup',
+    REWARD_LOOKUP_KR: 'planning:reward-lookup-kr',
+    REWARD_LOOKUP_EN: 'planning:reward-lookup-en',
+    REWARD_LOOKUP_ZH: 'planning:reward-lookup-zh',
     REWARD_TYPE_LIST: 'planning:reward-type-list',
-    LOCALIZATION_KR: 'planning:localization-kr',
-    LOCALIZATION_US: 'planning:localization-us',
-    LOCALIZATION_CN: 'planning:localization-cn',
     UI_LIST_DATA: 'planning:ui-list-data',
-    LOCTAB: 'planning:loctab',
     HOT_TIME_BUFF: 'planning:hottimebuff-lookup',
     EVENT_PAGE: 'planning:eventpage-lookup',
     LIVE_EVENT: 'planning:liveevent-lookup',
@@ -75,7 +85,7 @@ export class PlanningDataService {
   };
 
   // Cache TTL: 24 hours (in milliseconds)
-  private static readonly CACHE_TTL = 24 * 60 * 60 * 1000;
+
 
   /**
    * Initialize planning data on server startup
@@ -91,17 +101,52 @@ export class PlanningDataService {
       await fs.mkdir(this.runtimeDataPath, { recursive: true });
       logger.info('Runtime data directory ready', { path: this.runtimeDataPath });
 
-      // Check if reward lookup files exist
-      const lookupExists = await fs.access(this.rewardLookupPath).then(() => true).catch(() => false);
+      // Check if reward lookup files exist (all language versions)
+      const lookupKrExists = await fs.access(this.rewardLookupKrPath).then(() => true).catch(() => false);
+      const lookupEnExists = await fs.access(this.rewardLookupEnPath).then(() => true).catch(() => false);
+      const lookupZhExists = await fs.access(this.rewardLookupZhPath).then(() => true).catch(() => false);
       const typeListExists = await fs.access(this.rewardTypeListPath).then(() => true).catch(() => false);
 
-      if (!lookupExists || !typeListExists) {
+      if (!lookupKrExists || !lookupEnExists || !lookupZhExists || !typeListExists) {
         logger.info('Planning data files not found. Building initial data...');
         await this.rebuildRewardLookup();
         logger.info('Planning data initialized successfully');
       } else {
         logger.info('Planning data files found. Skipping initial build.');
       }
+
+      // Ensure existing planning cache keys (if any) become persistent (no TTL)
+      try {
+        const keysToPersist = [
+          this.CACHE_KEYS.REWARD_LOOKUP_KR,
+          this.CACHE_KEYS.REWARD_LOOKUP_EN,
+          this.CACHE_KEYS.REWARD_LOOKUP_ZH,
+          this.CACHE_KEYS.REWARD_TYPE_LIST,
+          `${this.CACHE_KEYS.UI_LIST_DATA}:kr`,
+          `${this.CACHE_KEYS.UI_LIST_DATA}:en`,
+          `${this.CACHE_KEYS.UI_LIST_DATA}:zh`,
+          `${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`,
+          `${this.CACHE_KEYS.HOT_TIME_BUFF}:en`,
+          `${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`,
+          `${this.CACHE_KEYS.EVENT_PAGE}:kr`,
+          `${this.CACHE_KEYS.EVENT_PAGE}:en`,
+          `${this.CACHE_KEYS.EVENT_PAGE}:zh`,
+          `${this.CACHE_KEYS.LIVE_EVENT}:kr`,
+          `${this.CACHE_KEYS.LIVE_EVENT}:en`,
+          `${this.CACHE_KEYS.LIVE_EVENT}:zh`,
+          `${this.CACHE_KEYS.MATE_RECRUITING}:kr`,
+          `${this.CACHE_KEYS.MATE_RECRUITING}:en`,
+          `${this.CACHE_KEYS.MATE_RECRUITING}:zh`,
+          `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`,
+          `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`,
+          `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
+        ];
+        const persisted = await cacheService.persistKeys(keysToPersist);
+        logger.info('Planning cache keys persisted (no TTL)', { persisted });
+      } catch (persistErr) {
+        logger.warn('Failed to persist planning cache keys (no TTL)', { error: persistErr });
+      }
+
 
       this.initialized = true;
     } catch (error) {
@@ -112,26 +157,46 @@ export class PlanningDataService {
 
   /**
    * Get reward lookup data (cached in Redis for multi-instance support)
+   * Data is already localized at generation time, so just load the appropriate language file
+   * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getRewardLookup(): Promise<RewardLookupData> {
+  static async getRewardLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<RewardLookupData> {
     try {
+      // Determine cache key and file path based on language
+      let cacheKey: string;
+      let filePath: string;
+
+      if (lang === 'en') {
+        cacheKey = this.CACHE_KEYS.REWARD_LOOKUP_EN;
+        filePath = PlanningDataService.rewardLookupEnPath;
+      } else if (lang === 'zh') {
+        cacheKey = this.CACHE_KEYS.REWARD_LOOKUP_ZH;
+        filePath = PlanningDataService.rewardLookupZhPath;
+      } else {
+        cacheKey = this.CACHE_KEYS.REWARD_LOOKUP_KR;
+        filePath = PlanningDataService.rewardLookupKrPath;
+      }
+
       // Try to get from Redis cache first
-      const cached = await cacheService.get<RewardLookupData>(this.CACHE_KEYS.REWARD_LOOKUP);
+      const cached = await cacheService.get<RewardLookupData>(cacheKey);
       if (cached) {
-        logger.debug('Reward lookup data retrieved from cache');
+        // Ensure no TTL remains on cached keys
+        await cacheService.setWithoutTTL(cacheKey, cached);
+        logger.debug(`Reward lookup data (${lang}) retrieved from cache`);
         return cached;
       }
 
       // If not in cache, read from file
-      const data = await fs.readFile(PlanningDataService.rewardLookupPath, 'utf-8');
+      const data = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.set(this.CACHE_KEYS.REWARD_LOOKUP, parsed, this.CACHE_TTL);
+      await cacheService.setWithoutTTL(cacheKey, parsed);
 
+      logger.debug(`Reward lookup data (${lang}) loaded from file and cached`);
       return parsed;
     } catch (error) {
-      logger.error('Failed to read reward lookup data', { error });
+      logger.error('Failed to read reward lookup data', { error, lang });
       throw new CustomError('Failed to load reward lookup data', 500);
     }
   }
@@ -144,6 +209,7 @@ export class PlanningDataService {
       // Try to get from Redis cache first
       const cached = await cacheService.get<RewardTypeInfo[]>(this.CACHE_KEYS.REWARD_TYPE_LIST);
       if (cached) {
+        await cacheService.setWithoutTTL(this.CACHE_KEYS.REWARD_TYPE_LIST, cached);
         logger.debug('Reward type list retrieved from cache');
         return cached;
       }
@@ -153,7 +219,7 @@ export class PlanningDataService {
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.set(this.CACHE_KEYS.REWARD_TYPE_LIST, parsed, this.CACHE_TTL);
+      await cacheService.setWithoutTTL(this.CACHE_KEYS.REWARD_TYPE_LIST, parsed);
 
       return parsed;
     } catch (error) {
@@ -165,57 +231,26 @@ export class PlanningDataService {
   /**
    * Get items for a specific reward type with localized names
    * @param rewardType - Reward type number
-   * @param language - Language code (kr, en, cn)
+   * @param language - Language code (kr, en, zh)
    */
-  static async getRewardTypeItems(rewardType: number, language: 'kr' | 'en' | 'cn' = 'kr'): Promise<RewardItem[]> {
+  static async getRewardTypeItems(rewardType: number, language: 'kr' | 'en' | 'zh' = 'kr'): Promise<RewardItem[]> {
     try {
-      const lookupData = await PlanningDataService.getRewardLookup();
+      // Load the language-specific reward lookup data
+      const lookupData = await PlanningDataService.getRewardLookup(language);
       const typeData = lookupData[rewardType.toString()];
 
       if (!typeData) {
         throw new CustomError(`Reward type ${rewardType} not found`, 404);
       }
 
-      const items = typeData.items || [];
-
-      // Return items with localized names based on language
-      return items.map(item => {
-        let localizedName = item.name;
-
-        if (language === 'cn' && item.nameCn) {
-          localizedName = item.nameCn;
-        } else if (language === 'en' && item.nameEn) {
-          localizedName = item.nameEn;
-        } else if (item.nameKr) {
-          localizedName = item.nameKr;
-        }
-
-        return {
-          ...item,
-          name: localizedName, // Override name with localized version
-        };
-      });
+      // Data is already localized at generation time, so just return items as-is
+      return typeData.items || [];
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
       }
       logger.error('Failed to get reward type items', { error, rewardType, language });
       throw new CustomError('Failed to load reward type items', 500);
-    }
-  }
-
-  /**
-   * Get localization table (loctab.json)
-   * Maps Korean text to Chinese text
-   */
-  static async getLoctab(): Promise<Record<string, string>> {
-    try {
-      const data = await fs.readFile(PlanningDataService.loctabPath, 'utf-8');
-      return JSON.parse(data);
-    } catch (error) {
-      logger.error('Failed to load loctab', { error });
-      // Return empty object if file doesn't exist
-      return {};
     }
   }
 
@@ -252,9 +287,11 @@ export class PlanningDataService {
 
       logger.info('Planning data rebuild completed', { output });
 
-      // Verify the core files were created
+      // Verify the core files were created (all language versions)
       try {
-        await fs.access(PlanningDataService.rewardLookupPath);
+        await fs.access(PlanningDataService.rewardLookupKrPath);
+        await fs.access(PlanningDataService.rewardLookupEnPath);
+        await fs.access(PlanningDataService.rewardLookupZhPath);
         await fs.access(PlanningDataService.rewardTypeListPath);
       } catch {
         throw new CustomError('Planning data files were not created', 500);
@@ -263,18 +300,35 @@ export class PlanningDataService {
       // Invalidate Redis cache for all instances
       logger.info('Invalidating Redis cache for planning data...');
       await Promise.all([
-        cacheService.delete(this.CACHE_KEYS.REWARD_LOOKUP),
+        cacheService.delete(this.CACHE_KEYS.REWARD_LOOKUP_KR),
+        cacheService.delete(this.CACHE_KEYS.REWARD_LOOKUP_EN),
+        cacheService.delete(this.CACHE_KEYS.REWARD_LOOKUP_ZH),
         cacheService.delete(this.CACHE_KEYS.REWARD_TYPE_LIST),
-        cacheService.delete(this.CACHE_KEYS.UI_LIST_DATA),
-        cacheService.delete(this.CACHE_KEYS.LOCALIZATION_KR),
-        cacheService.delete(this.CACHE_KEYS.LOCALIZATION_US),
-        cacheService.delete(this.CACHE_KEYS.LOCALIZATION_CN),
-        cacheService.delete(this.CACHE_KEYS.LOCTAB),
+        // UI list per language
+        cacheService.delete(`${this.CACHE_KEYS.UI_LIST_DATA}:kr`),
+        cacheService.delete(`${this.CACHE_KEYS.UI_LIST_DATA}:en`),
+        cacheService.delete(`${this.CACHE_KEYS.UI_LIST_DATA}:zh`),
+        // Event lookups per language
+        cacheService.delete(`${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`),
+        cacheService.delete(`${this.CACHE_KEYS.HOT_TIME_BUFF}:en`),
+        cacheService.delete(`${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`),
+        cacheService.delete(`${this.CACHE_KEYS.EVENT_PAGE}:kr`),
+        cacheService.delete(`${this.CACHE_KEYS.EVENT_PAGE}:en`),
+        cacheService.delete(`${this.CACHE_KEYS.EVENT_PAGE}:zh`),
+        cacheService.delete(`${this.CACHE_KEYS.LIVE_EVENT}:kr`),
+        cacheService.delete(`${this.CACHE_KEYS.LIVE_EVENT}:en`),
+        cacheService.delete(`${this.CACHE_KEYS.LIVE_EVENT}:zh`),
+        cacheService.delete(`${this.CACHE_KEYS.MATE_RECRUITING}:kr`),
+        cacheService.delete(`${this.CACHE_KEYS.MATE_RECRUITING}:en`),
+        cacheService.delete(`${this.CACHE_KEYS.MATE_RECRUITING}:zh`),
+        cacheService.delete(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`),
+        cacheService.delete(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`),
+        cacheService.delete(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`),
       ]);
       logger.info('Redis cache invalidated successfully');
 
       // Get stats (this will reload from files and repopulate cache)
-      const lookupData = await PlanningDataService.getRewardLookup();
+      const lookupData = await PlanningDataService.getRewardLookup('kr');
       const typeList = await PlanningDataService.getRewardTypeList();
       const uiListData = await PlanningDataService.getUIListData();
 
@@ -304,74 +358,46 @@ export class PlanningDataService {
   }
 
   /**
-   * Get localization data for a specific language (cached in Redis for multi-instance support)
+   * Get UI list data (nations, towns, villages) - cached in Redis for multi-instance support
+   * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getLocalization(language: 'kr' | 'us' | 'cn'): Promise<Record<string, string>> {
+  static async getUIListData(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<any> {
     try {
-      const cacheKeyMap = {
-        kr: this.CACHE_KEYS.LOCALIZATION_KR,
-        us: this.CACHE_KEYS.LOCALIZATION_US,
-        cn: this.CACHE_KEYS.LOCALIZATION_CN,
-      };
-
-      const cacheKey = cacheKeyMap[language];
-
       // Try to get from Redis cache first
-      const cached = await cacheService.get<Record<string, string>>(cacheKey);
+      const cacheKey = `${this.CACHE_KEYS.UI_LIST_DATA}:${lang}`;
+      const cached = await cacheService.get<any>(cacheKey);
       if (cached) {
-        logger.debug(`Localization data (${language}) retrieved from cache`);
+        await cacheService.setWithoutTTL(cacheKey, cached);
+        logger.debug(`UI list data (${lang}) retrieved from cache`);
         return cached;
       }
 
-      const pathMap = {
-        kr: this.localizationKrPath,
-        us: this.localizationUsPath,
-        cn: this.localizationCnPath,
-      };
+      // Determine file path based on language
+      let filePath: string;
+      switch (lang) {
+        case 'en':
+          filePath = this.uiListDataEnPath;
+          break;
+        case 'zh':
+          filePath = this.uiListDataZhPath;
+          break;
+        case 'kr':
+        default:
+          filePath = this.uiListDataKrPath;
+          break;
+      }
 
-      const filePath = pathMap[language];
       const exists = await fs.access(filePath).then(() => true).catch(() => false);
 
       if (!exists) {
-        return {};
+        return { nations: [], towns: [], villages: [] };
       }
 
       const data = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.set(cacheKey, parsed, this.CACHE_TTL);
-
-      return parsed;
-    } catch (error) {
-      logger.error('Failed to read localization data', { error, language });
-      throw new CustomError(`Failed to load localization data for ${language}`, 500);
-    }
-  }
-
-  /**
-   * Get UI list data (nations, towns, villages) - cached in Redis for multi-instance support
-   */
-  static async getUIListData(): Promise<any> {
-    try {
-      // Try to get from Redis cache first
-      const cached = await cacheService.get<any>(this.CACHE_KEYS.UI_LIST_DATA);
-      if (cached) {
-        logger.debug('UI list data retrieved from cache');
-        return cached;
-      }
-
-      const exists = await fs.access(this.uiListDataPath).then(() => true).catch(() => false);
-
-      if (!exists) {
-        return { nations: [], towns: [], villages: [] };
-      }
-
-      const data = await fs.readFile(this.uiListDataPath, 'utf-8');
-      const parsed = JSON.parse(data);
-
-      // Store in Redis cache for other instances
-      await cacheService.set(this.CACHE_KEYS.UI_LIST_DATA, parsed, this.CACHE_TTL);
+      await cacheService.setWithoutTTL(cacheKey, parsed);
 
       return parsed;
     } catch (error) {
@@ -382,25 +408,19 @@ export class PlanningDataService {
 
   /**
    * Get UI list items for a specific category with language support
+   * @param category - Category name (nations, towns, villages, ships, mates, etc.)
+   * @param language - Language code (kr, en, zh)
    */
-  static async getUIListItems(category: string, language: string = 'kr'): Promise<any[]> {
+  static async getUIListItems(category: string, language: 'kr' | 'en' | 'zh' = 'kr'): Promise<any[]> {
     try {
-      const uiListData = await PlanningDataService.getUIListData();
+      const uiListData = await PlanningDataService.getUIListData(language);
 
       if (!uiListData[category]) {
         throw new CustomError(`Category '${category}' not found`, 404);
       }
 
-      const items = uiListData[category];
-
-      // Map items to use the appropriate language field as 'name'
-      return items.map((item: any) => {
-        const nameField = language === 'cn' ? 'nameCn' : language === 'en' ? 'nameEn' : 'nameKr';
-        return {
-          ...item,
-          name: item[nameField] || item.name || item.nameKr,
-        };
-      });
+      // Data is already localized at generation time, so just return items as-is
+      return uiListData[category];
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
@@ -421,12 +441,11 @@ export class PlanningDataService {
 
       // Check which files exist
       const filesExist = {
-        rewardLookup: await fs.access(this.rewardLookupPath).then(() => true).catch(() => false),
+        rewardLookupKo: await fs.access(this.rewardLookupKrPath).then(() => true).catch(() => false),
+        rewardLookupEn: await fs.access(this.rewardLookupEnPath).then(() => true).catch(() => false),
+        rewardLookupZh: await fs.access(this.rewardLookupZhPath).then(() => true).catch(() => false),
         rewardTypeList: await fs.access(this.rewardTypeListPath).then(() => true).catch(() => false),
-        localizationKr: await fs.access(this.localizationKrPath).then(() => true).catch(() => false),
-        localizationUs: await fs.access(this.localizationUsPath).then(() => true).catch(() => false),
-        localizationCn: await fs.access(this.localizationCnPath).then(() => true).catch(() => false),
-        uiListData: await fs.access(this.uiListDataPath).then(() => true).catch(() => false),
+        uiListData: await fs.access(this.uiListDataKrPath).then(() => true).catch(() => false),
       };
 
       // Calculate UI list counts (keys are already in SNAKE_CASE_UPPER from build)
@@ -460,27 +479,39 @@ export class PlanningDataService {
 
   /**
    * Get HotTimeBuff lookup data (cached in Redis for multi-instance support)
+   * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getHotTimeBuffLookup(): Promise<Record<string, any>> {
+  static async getHotTimeBuffLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
       // Try to get from Redis cache first
-      const cached = await cacheService.get<Record<string, any>>(this.CACHE_KEYS.HOT_TIME_BUFF);
+      const cached = await cacheService.get<Record<string, any>>(`${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`);
       if (cached) {
-        logger.debug('HotTimeBuff lookup data retrieved from cache');
+        await cacheService.setWithoutTTL(`${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`, cached);
+        logger.debug(`HotTimeBuff lookup data (${lang}) retrieved from cache`);
         return cached;
       }
 
-      const exists = await fs.access(this.hotTimeBuffPath).then(() => true).catch(() => false);
+      // Determine file path based on language
+      let filePath: string;
+      if (lang === 'en') {
+        filePath = this.hotTimeBuffEnPath;
+      } else if (lang === 'zh') {
+        filePath = this.hotTimeBuffZhPath;
+      } else {
+        filePath = this.hotTimeBuffKrPath;
+      }
+
+      const exists = await fs.access(filePath).then(() => true).catch(() => false);
 
       if (!exists) {
         return {};
       }
 
-      const data = await fs.readFile(this.hotTimeBuffPath, 'utf-8');
+      const data = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.set(this.CACHE_KEYS.HOT_TIME_BUFF, parsed, this.CACHE_TTL);
+      await cacheService.setWithoutTTL(`${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`, parsed);
 
       return parsed;
     } catch (error) {
@@ -560,13 +591,9 @@ export class PlanningDataService {
         };
       });
 
-      // Save to lookup file
-      const lookupData = {
-        totalCount: items.length,
-        items,
-      };
-
-      await fs.writeFile(this.hotTimeBuffPath, JSON.stringify(lookupData, null, 2), 'utf-8');
+      // Note: Data is now generated by adminToolDataBuilder.js and uploaded via API
+      // No need to save here - just invalidate cache
+      // await fs.writeFile(this.hotTimeBuffKrPath, JSON.stringify(lookupData, null, 2), 'utf-8');
 
       // Invalidate Redis cache for all instances
       await cacheService.delete(this.CACHE_KEYS.HOT_TIME_BUFF);
@@ -589,24 +616,36 @@ export class PlanningDataService {
 
   /**
    * Get EventPage lookup data (cached in Redis for multi-instance support)
+   * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getEventPageLookup(): Promise<Record<string, any>> {
+  static async getEventPageLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
       // Try to get from Redis cache first
-      const cached = await cacheService.get<Record<string, any>>(this.CACHE_KEYS.EVENT_PAGE);
+      const cached = await cacheService.get<Record<string, any>>(`${this.CACHE_KEYS.EVENT_PAGE}:${lang}`);
       if (cached) {
-        logger.debug('EventPage lookup data retrieved from cache');
+        await cacheService.setWithoutTTL(`${this.CACHE_KEYS.EVENT_PAGE}:${lang}`, cached);
+        logger.debug(`EventPage lookup data (${lang}) retrieved from cache`);
         return cached;
       }
 
-      const exists = await fs.access(this.eventPagePath).then(() => true).catch(() => false);
+      // Determine file path based on language
+      let filePath: string;
+      if (lang === 'en') {
+        filePath = this.eventPageEnPath;
+      } else if (lang === 'zh') {
+        filePath = this.eventPageZhPath;
+      } else {
+        filePath = this.eventPageKrPath;
+      }
+
+      const exists = await fs.access(filePath).then(() => true).catch(() => false);
       if (!exists) return { totalCount: 0, items: [] };
 
-      const data = await fs.readFile(this.eventPagePath, 'utf-8');
+      const data = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.set(this.CACHE_KEYS.EVENT_PAGE, parsed, this.CACHE_TTL);
+      await cacheService.setWithoutTTL(`${this.CACHE_KEYS.EVENT_PAGE}:${lang}`, parsed);
 
       return parsed;
     } catch (error) {
@@ -666,8 +705,8 @@ export class PlanningDataService {
         pageGroupName: pageGroupNames[item.pageGroup] || `Unknown (${item.pageGroup})`,
         typeName: typeNames[item.type] || `Unknown (${item.type})`,
       }));
-      const lookupData = { totalCount: items.length, items };
-      await fs.writeFile(this.eventPagePath, JSON.stringify(lookupData, null, 2), 'utf-8');
+      // Note: Data is now generated by adminToolDataBuilder.js and uploaded via API
+      // await fs.writeFile(this.eventPageKrPath, JSON.stringify(lookupData, null, 2), 'utf-8');
 
       // Invalidate Redis cache for all instances
       await cacheService.delete(this.CACHE_KEYS.EVENT_PAGE);
@@ -683,24 +722,36 @@ export class PlanningDataService {
 
   /**
    * Get LiveEvent lookup data (cached in Redis for multi-instance support)
+   * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getLiveEventLookup(): Promise<Record<string, any>> {
+  static async getLiveEventLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
       // Try to get from Redis cache first
-      const cached = await cacheService.get<Record<string, any>>(this.CACHE_KEYS.LIVE_EVENT);
+      const cached = await cacheService.get<Record<string, any>>(`${this.CACHE_KEYS.LIVE_EVENT}:${lang}`);
       if (cached) {
-        logger.debug('LiveEvent lookup data retrieved from cache');
+        await cacheService.setWithoutTTL(`${this.CACHE_KEYS.LIVE_EVENT}:${lang}`, cached);
+        logger.debug(`LiveEvent lookup data (${lang}) retrieved from cache`);
         return cached;
       }
 
-      const exists = await fs.access(this.liveEventPath).then(() => true).catch(() => false);
+      // Determine file path based on language
+      let filePath: string;
+      if (lang === 'en') {
+        filePath = this.liveEventEnPath;
+      } else if (lang === 'zh') {
+        filePath = this.liveEventZhPath;
+      } else {
+        filePath = this.liveEventKrPath;
+      }
+
+      const exists = await fs.access(filePath).then(() => true).catch(() => false);
       if (!exists) return { totalCount: 0, items: [] };
 
-      const data = await fs.readFile(this.liveEventPath, 'utf-8');
+      const data = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.set(this.CACHE_KEYS.LIVE_EVENT, parsed, this.CACHE_TTL);
+      await cacheService.setWithoutTTL(`${this.CACHE_KEYS.LIVE_EVENT}:${lang}`, parsed);
 
       return parsed;
     } catch (error) {
@@ -730,7 +781,7 @@ export class PlanningDataService {
       // Remove loginBgmTag field - not needed
       // Convert dates to ISO8601 format
       const items = Object.values(liveEventData).map((item: any) => {
-        const { loginBgmTag, ...rest } = item;
+        const { loginBgmTag: _loginBgmTag, ...rest } = item;
 
         // Convert startDate and endDate to ISO8601 format if they exist
         const startDateISO = item.startDate ? new Date(item.startDate).toISOString() : null;
@@ -744,8 +795,8 @@ export class PlanningDataService {
         };
       });
 
-      const lookupData = { totalCount: items.length, items };
-      await fs.writeFile(this.liveEventPath, JSON.stringify(lookupData, null, 2), 'utf-8');
+      // Note: Data is now generated by adminToolDataBuilder.js and uploaded via API
+      // await fs.writeFile(this.liveEventKrPath, JSON.stringify(lookupData, null, 2), 'utf-8');
 
       // Invalidate Redis cache for all instances
       await cacheService.delete(this.CACHE_KEYS.LIVE_EVENT);
@@ -761,24 +812,36 @@ export class PlanningDataService {
 
   /**
    * Get MateRecruitingGroup lookup data (cached in Redis for multi-instance support)
+   * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getMateRecruitingGroupLookup(): Promise<Record<string, any>> {
+  static async getMateRecruitingGroupLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
       // Try to get from Redis cache first
-      const cached = await cacheService.get<Record<string, any>>(this.CACHE_KEYS.MATE_RECRUITING);
+      const cached = await cacheService.get<Record<string, any>>(`${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`);
       if (cached) {
-        logger.debug('MateRecruitingGroup lookup data retrieved from cache');
+        await cacheService.setWithoutTTL(`${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`, cached);
+        logger.debug(`MateRecruitingGroup lookup data (${lang}) retrieved from cache`);
         return cached;
       }
 
-      const exists = await fs.access(this.mateRecruitingGroupPath).then(() => true).catch(() => false);
+      // Determine file path based on language
+      let filePath: string;
+      if (lang === 'en') {
+        filePath = this.mateRecruitingGroupEnPath;
+      } else if (lang === 'zh') {
+        filePath = this.mateRecruitingGroupZhPath;
+      } else {
+        filePath = this.mateRecruitingGroupKrPath;
+      }
+
+      const exists = await fs.access(filePath).then(() => true).catch(() => false);
       if (!exists) return { totalCount: 0, items: [] };
 
-      const data = await fs.readFile(this.mateRecruitingGroupPath, 'utf-8');
+      const data = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.set(this.CACHE_KEYS.MATE_RECRUITING, parsed, this.CACHE_TTL);
+      await cacheService.setWithoutTTL(`${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`, parsed);
 
       return parsed;
     } catch (error) {
@@ -789,6 +852,7 @@ export class PlanningDataService {
 
   /**
    * Build MateRecruitingGroup lookup data from CMS file
+   * NOTE: This method is deprecated. Use adminToolDataBuilder.js instead.
    */
   static async buildMateRecruitingGroupLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
     try {
@@ -806,122 +870,21 @@ export class PlanningDataService {
         throw new CustomError('Required JSON files not found in cms directory', 500);
       }
 
-      const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
-      const mateTemplateData = await fs.readFile(mateTemplateFilePath, 'utf-8');
-      const townData = await fs.readFile(townFilePath, 'utf-8');
-      const parsedData = JSON.parse(sourceData);
-      const parsedMateTemplate = JSON.parse(mateTemplateData);
-      const parsedTown = JSON.parse(townData);
+      // This method is deprecated. Data should be built using adminToolDataBuilder.js
+      // For now, just return a message indicating this is deprecated
+      logger.warn('buildMateRecruitingGroupLookup is deprecated. Use adminToolDataBuilder.js instead.');
 
-      // Load localization table
-      const loctabData = await fs.readFile(this.loctabPath, 'utf-8');
-      const loctab = JSON.parse(loctabData);
-
-      // Create a map of mateId to mate names (all languages)
-      const mateNameMap: Record<number, { nameKr: string; nameEn: string; nameCn: string }> = {};
-      const mateTemplates = parsedMateTemplate.MateTemplate || {};
-      Object.values(mateTemplates).forEach((mate: any) => {
-        if (mate.mateId && mate.name) {
-          mateNameMap[mate.mateId] = {
-            nameKr: mate.name,
-            nameEn: loctab[mate.name] || mate.name,
-            nameCn: loctab[mate.name] || mate.name,
-          };
-        }
-      });
-
-      // Create a map of mateRecruitingGroup to town info (all languages with IDs)
-      const groupToTownsMap: Record<number, Array<{ id: number; nameKr: string; nameEn: string; nameCn: string }>> = {};
-      const towns = parsedTown.Town || {};
-      Object.values(towns).forEach((town: any) => {
-        if (town.mateRecruitingGroup && town.name) {
-          if (!groupToTownsMap[town.mateRecruitingGroup]) {
-            groupToTownsMap[town.mateRecruitingGroup] = [];
-          }
-          groupToTownsMap[town.mateRecruitingGroup].push({
-            id: town.id,
-            nameKr: town.name,
-            nameEn: loctab[town.name] || town.name,
-            nameCn: loctab[town.name] || town.name,
-          });
-        }
-      });
-
-      const mateRecruitingGroupData = parsedData.MateRecruitingGroup || {};
-      const items = Object.values(mateRecruitingGroupData).map((item: any) => {
-        // Check if mate exists in template
-        const mateExists = !!mateNameMap[item.mateId];
-        const mateNames = mateNameMap[item.mateId] || {
-          nameKr: `MISSING MATE ${item.mateId}`,
-          nameEn: `MISSING MATE ${item.mateId}`,
-          nameCn: `MISSING MATE ${item.mateId}`,
-        };
-
-        // Get town info for this group (all languages with IDs)
-        const townsList = groupToTownsMap[item.group] || [];
-        const townNamesKr = townsList.map(t => t.nameKr).join(', ');
-        const townNamesEn = townsList.map(t => t.nameEn).join(', ');
-        const townNamesCn = townsList.map(t => t.nameCn).join(', ');
-
-        // Build name for each language
-        const buildName = (mateName: string, townNames: string) => {
-          const nameParts: string[] = [];
-          nameParts.push(mateName);
-          if (townNames) {
-            nameParts.push(`- ${townNames}`);
-          }
-
-          const tags: string[] = [];
-          if (item.isMustAppear) {
-            tags.push('필수등장'); // TODO: localize
-          }
-          if (item.isReRecruit) {
-            tags.push('재고용전용'); // TODO: localize
-          }
-          if (item.Ratio && item.Ratio < 10000 && !item.isMustAppear) {
-            tags.push(`확률:${(item.Ratio / 100).toFixed(0)}%`); // TODO: localize
-          }
-
-          let name = nameParts.join(' ');
-          if (tags.length > 0) {
-            name = `${name} (${tags.join(', ')})`;
-          }
-          return name;
-        };
-
-        // Calculate probability percentage
-        const probability = item.Ratio && item.Ratio < 10000 && !item.isMustAppear
-          ? (item.Ratio / 100).toFixed(0)
-          : null;
-
-        return {
-          ...item,
-          name: buildName(mateNames.nameKr, townNamesKr), // Default to Korean
-          nameKr: buildName(mateNames.nameKr, townNamesKr),
-          nameEn: buildName(mateNames.nameEn, townNamesEn),
-          nameCn: buildName(mateNames.nameCn, townNamesCn),
-          mateName: mateNames.nameKr,
-          mateNameKr: mateNames.nameKr,
-          mateNameEn: mateNames.nameEn,
-          mateNameCn: mateNames.nameCn,
-          townNames: townNamesKr,
-          townNamesKr: townNamesKr,
-          townNamesEn: townNamesEn,
-          townNamesCn: townNamesCn,
-          towns: townsList, // Array of { id, nameKr, nameEn, nameCn }
-          probability, // Probability percentage (e.g., "50" for 50%)
-          mateExists,
-        };
-      });
-
-      const lookupData = { totalCount: items.length, items };
-      await fs.writeFile(this.mateRecruitingGroupPath, JSON.stringify(lookupData, null, 2), 'utf-8');
+      // Check if the file exists
+      const exists = await fs.access(this.mateRecruitingGroupKrPath).then(() => true).catch(() => false);
+      if (!exists) {
+        throw new CustomError('MateRecruitingGroup lookup file not found. Please run adminToolDataBuilder.js', 500);
+      }
 
       // Invalidate Redis cache for all instances
       await cacheService.delete(this.CACHE_KEYS.MATE_RECRUITING);
 
-      logger.info('MateRecruitingGroup lookup data built successfully', { itemCount: items.length });
-      return { success: true, message: 'MateRecruitingGroup lookup data built successfully', itemCount: items.length };
+      logger.info('MateRecruitingGroup cache invalidated');
+      return { success: true, message: 'MateRecruitingGroup cache invalidated (data should be built using adminToolDataBuilder.js)', itemCount: 0 };
     } catch (error) {
       if (error instanceof CustomError) throw error;
       logger.error('Failed to build MateRecruitingGroup lookup data', { error });
@@ -931,24 +894,36 @@ export class PlanningDataService {
 
   /**
    * Get OceanNpcAreaSpawner lookup data (cached in Redis for multi-instance support)
+   * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getOceanNpcAreaSpawnerLookup(): Promise<Record<string, any>> {
+  static async getOceanNpcAreaSpawnerLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
       // Try to get from Redis cache first
-      const cached = await cacheService.get<Record<string, any>>(this.CACHE_KEYS.OCEAN_NPC_AREA);
+      const cached = await cacheService.get<Record<string, any>>(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`);
       if (cached) {
-        logger.debug('OceanNpcAreaSpawner lookup data retrieved from cache');
+        await cacheService.setWithoutTTL(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`, cached);
+        logger.debug(`OceanNpcAreaSpawner lookup data (${lang}) retrieved from cache`);
         return cached;
       }
 
-      const exists = await fs.access(this.oceanNpcAreaSpawnerPath).then(() => true).catch(() => false);
+      // Determine file path based on language
+      let filePath: string;
+      if (lang === 'en') {
+        filePath = this.oceanNpcAreaSpawnerEnPath;
+      } else if (lang === 'zh') {
+        filePath = this.oceanNpcAreaSpawnerZhPath;
+      } else {
+        filePath = this.oceanNpcAreaSpawnerKrPath;
+      }
+
+      const exists = await fs.access(filePath).then(() => true).catch(() => false);
       if (!exists) return { totalCount: 0, items: [] };
 
-      const data = await fs.readFile(this.oceanNpcAreaSpawnerPath, 'utf-8');
+      const data = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.set(this.CACHE_KEYS.OCEAN_NPC_AREA, parsed, this.CACHE_TTL);
+      await cacheService.setWithoutTTL(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`, parsed);
 
       return parsed;
     } catch (error) {
@@ -959,85 +934,27 @@ export class PlanningDataService {
 
   /**
    * Build OceanNpcAreaSpawner lookup data from CMS file
+   * NOTE: This method is deprecated. Use adminToolDataBuilder.js instead.
    */
   static async buildOceanNpcAreaSpawnerLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
     try {
       logger.info('Building OceanNpcAreaSpawner lookup data...');
-      const cmsDir = path.join(__dirname, '../../cms');
-      const sourceFilePath = path.join(cmsDir, 'OceanNpcAreaSpawner.json');
-      const oceanNpcFilePath = path.join(cmsDir, 'OceanNpc.json');
 
-      try {
-        await fs.access(sourceFilePath);
-        await fs.access(oceanNpcFilePath);
-      } catch {
-        throw new CustomError('OceanNpcAreaSpawner.json or OceanNpc.json not found in cms directory', 500);
+      // This method is deprecated. Data should be built using adminToolDataBuilder.js
+      // For now, just return a message indicating this is deprecated
+      logger.warn('buildOceanNpcAreaSpawnerLookup is deprecated. Use adminToolDataBuilder.js instead.');
+
+      // Check if the file exists
+      const exists = await fs.access(this.oceanNpcAreaSpawnerKrPath).then(() => true).catch(() => false);
+      if (!exists) {
+        throw new CustomError('OceanNpcAreaSpawner lookup file not found. Please run adminToolDataBuilder.js', 500);
       }
-
-      const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
-      const oceanNpcData = await fs.readFile(oceanNpcFilePath, 'utf-8');
-      const parsedData = JSON.parse(sourceData);
-      const parsedOceanNpc = JSON.parse(oceanNpcData);
-
-      // Load localization table
-      const loctabData = await fs.readFile(this.loctabPath, 'utf-8');
-      const loctab = JSON.parse(loctabData);
-
-      // Create a map of oceanNpcId to ocean npc names (all languages)
-      const oceanNpcNameMap: Record<number, { nameKr: string; nameEn: string; nameCn: string }> = {};
-      const oceanNpcs = parsedOceanNpc.OceanNpc || {};
-      Object.values(oceanNpcs).forEach((npc: any) => {
-        if (npc.id && npc.name) {
-          oceanNpcNameMap[npc.id] = {
-            nameKr: npc.name,
-            nameEn: loctab[npc.name] || npc.name,
-            nameCn: loctab[npc.name] || npc.name,
-          };
-        }
-      });
-
-      const oceanNpcAreaSpawnerData = parsedData.OceanNpcAreaSpawner || {};
-      const items = Object.values(oceanNpcAreaSpawnerData).map((item: any) => {
-        const npcExists = !!oceanNpcNameMap[item.oceanNpcId];
-        const npcNames = oceanNpcNameMap[item.oceanNpcId] || {
-          nameKr: `MISSING NPC ${item.oceanNpcId}`,
-          nameEn: `MISSING NPC ${item.oceanNpcId}`,
-          nameCn: `MISSING NPC ${item.oceanNpcId}`,
-        };
-
-        // Build name for each language: Spawner - {npcName}
-        const nameKr = `Spawner - ${npcNames.nameKr}`;
-        const nameEn = `Spawner - ${npcNames.nameEn}`;
-        const nameCn = `Spawner - ${npcNames.nameCn}`;
-
-        // Convert startDate and endDate to ISO8601 format if they exist
-        const startDateISO = item.startDate ? new Date(item.startDate).toISOString() : null;
-        const endDateISO = item.endDate ? new Date(item.endDate).toISOString() : null;
-
-        return {
-          ...item,
-          name: nameKr, // Default to Korean
-          nameKr,
-          nameEn,
-          nameCn,
-          npcName: npcNames.nameKr,
-          npcNameKr: npcNames.nameKr,
-          npcNameEn: npcNames.nameEn,
-          npcNameCn: npcNames.nameCn,
-          npcExists,
-          startDate: startDateISO,
-          endDate: endDateISO,
-        };
-      });
-
-      const lookupData = { totalCount: items.length, items };
-      await fs.writeFile(this.oceanNpcAreaSpawnerPath, JSON.stringify(lookupData, null, 2), 'utf-8');
 
       // Invalidate Redis cache for all instances
       await cacheService.delete(this.CACHE_KEYS.OCEAN_NPC_AREA);
 
-      logger.info('OceanNpcAreaSpawner lookup data built successfully', { itemCount: items.length });
-      return { success: true, message: 'OceanNpcAreaSpawner lookup data built successfully', itemCount: items.length };
+      logger.info('OceanNpcAreaSpawner cache invalidated');
+      return { success: true, message: 'OceanNpcAreaSpawner cache invalidated (data should be built using adminToolDataBuilder.js)', itemCount: 0 };
     } catch (error) {
       if (error instanceof CustomError) throw error;
       logger.error('Failed to build OceanNpcAreaSpawner lookup data', { error });
@@ -1058,18 +975,35 @@ export class PlanningDataService {
 
       // Expected file names
       const expectedFiles = [
-        'reward-lookup.json',
+        // Reward data
         'reward-type-list.json',
-        'reward-localization-kr.json',
-        'reward-localization-us.json',
-        'reward-localization-cn.json',
-        'ui-list-data.json',
-        'loctab.json',
-        'hottimebuff-lookup.json',
-        'eventpage-lookup.json',
-        'liveevent-lookup.json',
-        'materecruiting-lookup.json',
-        'oceannpcarea-lookup.json',
+        'reward-lookup-kr.json',
+        'reward-lookup-en.json',
+        'reward-lookup-zh.json',
+        // UI data
+        'ui-list-data-kr.json',
+        'ui-list-data-en.json',
+        'ui-list-data-zh.json',
+        // Event data - HotTimeBuff
+        'hottimebuff-lookup-kr.json',
+        'hottimebuff-lookup-en.json',
+        'hottimebuff-lookup-zh.json',
+        // Event data - EventPage
+        'eventpage-lookup-kr.json',
+        'eventpage-lookup-en.json',
+        'eventpage-lookup-zh.json',
+        // Event data - LiveEvent
+        'liveevent-lookup-kr.json',
+        'liveevent-lookup-en.json',
+        'liveevent-lookup-zh.json',
+        // Event data - MateRecruiting
+        'materecruiting-lookup-kr.json',
+        'materecruiting-lookup-en.json',
+        'materecruiting-lookup-zh.json',
+        // Event data - OceanNpcArea
+        'oceannpcarea-lookup-kr.json',
+        'oceannpcarea-lookup-en.json',
+        'oceannpcarea-lookup-zh.json',
       ];
 
       // Validate uploaded files
@@ -1159,18 +1093,28 @@ export class PlanningDataService {
 
       // Map file names to cache keys
       const fileKeyMap: Record<string, string> = {
-        'reward-lookup.json': this.CACHE_KEYS.REWARD_LOOKUP,
+        'reward-lookup-kr.json': this.CACHE_KEYS.REWARD_LOOKUP_KR,
+        'reward-lookup-en.json': this.CACHE_KEYS.REWARD_LOOKUP_EN,
+        'reward-lookup-zh.json': this.CACHE_KEYS.REWARD_LOOKUP_ZH,
         'reward-type-list.json': this.CACHE_KEYS.REWARD_TYPE_LIST,
-        'reward-localization-kr.json': this.CACHE_KEYS.LOCALIZATION_KR,
-        'reward-localization-us.json': this.CACHE_KEYS.LOCALIZATION_US,
-        'reward-localization-cn.json': this.CACHE_KEYS.LOCALIZATION_CN,
-        'ui-list-data.json': this.CACHE_KEYS.UI_LIST_DATA,
-        'loctab.json': this.CACHE_KEYS.LOCTAB,
-        'hottimebuff-lookup.json': this.CACHE_KEYS.HOT_TIME_BUFF,
-        'eventpage-lookup.json': this.CACHE_KEYS.EVENT_PAGE,
-        'liveevent-lookup.json': this.CACHE_KEYS.LIVE_EVENT,
-        'materecruiting-lookup.json': this.CACHE_KEYS.MATE_RECRUITING,
-        'oceannpcarea-lookup.json': this.CACHE_KEYS.OCEAN_NPC_AREA,
+        'ui-list-data-kr.json': `${this.CACHE_KEYS.UI_LIST_DATA}:kr`,
+        'ui-list-data-en.json': `${this.CACHE_KEYS.UI_LIST_DATA}:en`,
+        'ui-list-data-zh.json': `${this.CACHE_KEYS.UI_LIST_DATA}:zh`,
+        'hottimebuff-lookup-kr.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`,
+        'hottimebuff-lookup-en.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:en`,
+        'hottimebuff-lookup-zh.json': `${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`,
+        'eventpage-lookup-kr.json': `${this.CACHE_KEYS.EVENT_PAGE}:kr`,
+        'eventpage-lookup-en.json': `${this.CACHE_KEYS.EVENT_PAGE}:en`,
+        'eventpage-lookup-zh.json': `${this.CACHE_KEYS.EVENT_PAGE}:zh`,
+        'liveevent-lookup-kr.json': `${this.CACHE_KEYS.LIVE_EVENT}:kr`,
+        'liveevent-lookup-en.json': `${this.CACHE_KEYS.LIVE_EVENT}:en`,
+        'liveevent-lookup-zh.json': `${this.CACHE_KEYS.LIVE_EVENT}:zh`,
+        'materecruiting-lookup-kr.json': `${this.CACHE_KEYS.MATE_RECRUITING}:kr`,
+        'materecruiting-lookup-en.json': `${this.CACHE_KEYS.MATE_RECRUITING}:en`,
+        'materecruiting-lookup-zh.json': `${this.CACHE_KEYS.MATE_RECRUITING}:zh`,
+        'oceannpcarea-lookup-kr.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`,
+        'oceannpcarea-lookup-en.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`,
+        'oceannpcarea-lookup-zh.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
       };
 
       // Cache each file
@@ -1185,8 +1129,8 @@ export class PlanningDataService {
         const content = await fs.readFile(filePath, 'utf-8');
         const data = JSON.parse(content);
 
-        // Cache in Redis with 24-hour TTL
-        await cacheService.set(cacheKey, data, this.CACHE_TTL);
+        // Cache in Redis without TTL (persistent)
+        await cacheService.setWithoutTTL(cacheKey, data);
 
         logger.info(`File cached in Redis: ${fileName}`, { cacheKey });
       }

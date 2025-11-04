@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+/* eslint-disable */
+
 
 /**
  * Admin Tool Data Builder
@@ -647,6 +649,17 @@ function removeCommentFromName(name) {
 }
 
 /**
+ * Remove any parenthetical content e.g., "페레이라(ペレイア)" -> "페레이라"
+ * @param {string} text
+ * @returns {string}
+ */
+function removeParentheses(text) {
+  if (!text || typeof text !== 'string') return text;
+  return text.replace(/\([^)]*\)/g, '').trim();
+}
+
+
+/**
  * Remove game client tags from text
  * Tags like [[D]], [[B]], [[R]], [[CR]], [[/]], etc.
  * @param {string} text - Text with game tags
@@ -749,6 +762,30 @@ function buildRewardLookupTable(cmsDir, loctab = {}) {
               nameKr: formattedName,  // Korean name
             };
 
+            // Special handling for ShipBlueprint: split ship name + '도면' for CN
+            if (rewardTypeNum === REWARD_TYPE.SHIP_BLUEPRINT && item._original.shipId && allCmsTables.Ship && allCmsTables.Ship[item._original.shipId]) {
+              const rawShipName = allCmsTables.Ship[item._original.shipId].name || '';
+              const shipNameKr = removeCommentFromName(rawShipName);
+              const suffixKr = '도면';
+              const shipNameCn = loctab[shipNameKr] || shipNameKr;
+              const suffixCn = loctab[suffixKr] || suffixKr;
+              // Return merged object to avoid shape warnings
+              return { ...itemData, nameCn: `${shipNameCn} ${suffixCn}`, nameEn: `${shipNameKr} Blueprint` };
+            }
+
+            // Special handling for Mate: translate firstName and lastName separately for CN
+            if (rewardTypeNum === REWARD_TYPE.MATE && item._original.characterId && allCmsTables.Character && allCmsTables.Character[item._original.characterId]) {
+              const character = allCmsTables.Character[item._original.characterId];
+              const rawFirst = character.firstName || '';
+              const rawLast = character.lastName || character.familyName || '';
+              const firstKr = removeParentheses(removeCommentFromName(rawFirst));
+              const lastKr = removeParentheses(removeCommentFromName(rawLast));
+              const firstCn = firstKr ? (loctab[firstKr] || firstKr) : '';
+              const lastCn = lastKr ? (loctab[lastKr] || lastKr) : '';
+              const joinedCn = (firstCn && lastCn) ? `${firstCn} ${lastCn}` : (firstCn || lastCn || formattedName);
+              return { ...itemData, nameCn: joinedCn, nameEn: formattedName };
+            }
+
             // Special handling for Point items with paid/free distinction
             if (item._original.tooltipDesc && item._original.name) {
               // Remove @ comment before checking
@@ -762,21 +799,13 @@ function buildRewardLookupTable(cmsDir, loctab = {}) {
                 const suffix = isPaid ? '유료' : '무료';
                 const suffixCn = loctab[suffix] || suffix;
 
-                itemData.nameCn = `${baseCn} (${suffixCn})`;
-                itemData.nameEn = formattedName;
-                return itemData;
+                return { ...itemData, nameCn: `${baseCn} (${suffixCn})`, nameEn: formattedName };
               }
             }
 
-            // Add Chinese translation from loctab
-            if (loctab && loctab[formattedName]) {
-              itemData.nameCn = loctab[formattedName];
-            }
-
-            // English name is same as Korean for now (no English translation table)
-            itemData.nameEn = formattedName;
-
-            return itemData;
+            // Build final object and return (avoid direct shape mutations)
+            const base = { ...itemData, nameEn: formattedName };
+            return (loctab && loctab[formattedName]) ? { ...base, nameCn: loctab[formattedName] } : base;
           });
 
           // Sort by ID
@@ -820,29 +849,60 @@ function generateRewardTypeList(lookupTable) {
 }
 
 /**
- * Generate localization files
+ * Generate reward lookup data with items for each reward type
+ * NOTE: Output must be language-specific. Each file should contain only 'name' per item.
  */
 function generateLocalizations(lookupTable) {
   const localizations = {
     kr: {},
-    us: {},
+    us: {}, // 'us' is used for English file output (reward-lookup-en.json)
     cn: {},
   };
 
-  // Add REWARD_TYPE name translations
-  for (const [, info] of Object.entries(lookupTable)) {
-    const typeKey = `REWARD_TYPE_${info.rewardTypeName}`;
+  for (const [rewardTypeValue, info] of Object.entries(lookupTable)) {
+    const rewardTypeNum = parseInt(rewardTypeValue);
 
-    localizations.kr[typeKey] = REWARD_TYPE_TRANSLATIONS.kr[info.rewardTypeName] || info.rewardTypeName;
-    localizations.us[typeKey] = REWARD_TYPE_TRANSLATIONS.us[info.rewardTypeName] || info.rewardTypeName;
-    localizations.cn[typeKey] = REWARD_TYPE_TRANSLATIONS.cn[info.rewardTypeName] || info.rewardTypeName;
+    // Map items to language-specific minimal shape: keep 'name' only plus non-name fields
+    const mapItems = (items, lang) => {
+      if (!Array.isArray(items)) return [];
+      return items.map((item) => {
+        const baseEntry = {};
+        for (const [key, value] of Object.entries(item)) {
+          if (key !== 'name' && key !== 'nameKr' && key !== 'nameEn' && key !== 'nameCn') {
+            baseEntry[key] = value;
+          }
+        }
+        let localizedName = item.name || '';
+        if (lang === 'kr') localizedName = item.nameKr || item.name || '';
+        else if (lang === 'en') localizedName = item.nameEn || item.name || '';
+        else if (lang === 'cn') localizedName = item.nameCn || item.name || '';
+        return { ...baseEntry, name: localizedName };
+      });
+    };
 
-    // Add description if exists
-    if (info.description) {
-      localizations.kr[info.description] = `${localizations.kr[typeKey]} (수치만큼 증가)`;
-      localizations.us[info.description] = `${localizations.us[typeKey]} (increases by amount)`;
-      localizations.cn[info.description] = `${localizations.cn[typeKey]} (增加指定数值)`;
-    }
+    const common = {
+      rewardType: rewardTypeNum,
+      rewardTypeName: info.rewardTypeName,
+      tableFile: info.tableFile || null,
+      hasTable: !!info.hasTable,
+      description: info.description || null,
+      idFieldName: info.idFieldName,
+      requiresAmount: info.requiresAmount,
+      itemCount: info.itemCount || (Array.isArray(info.items) ? info.items.length : 0),
+    };
+
+    localizations.kr[rewardTypeValue] = {
+      ...common,
+      items: mapItems(info.items || [], 'kr'),
+    };
+    localizations.us[rewardTypeValue] = {
+      ...common,
+      items: mapItems(info.items || [], 'en'),
+    };
+    localizations.cn[rewardTypeValue] = {
+      ...common,
+      items: mapItems(info.items || [], 'cn'),
+    };
   }
 
   return localizations;
@@ -898,7 +958,7 @@ function generateUIListData(cmsDir, loctab = {}) {
   };
 
   // Helper function to extract basic list from a table with localization
-  const extractList = (tableName, listKey, additionalFields = [], loctab = {}) => {
+  const extractList = (tableName, _listKey, additionalFields = [], loctab = {}) => {
     const table = loadTable(tableName);
     if (!table || !table[tableName]) {
       return [];
@@ -1184,12 +1244,18 @@ function generateUIListData(cmsDir, loctab = {}) {
         nameKr = `${shipName} 도면`;
       }
 
+      const baseShipNameKr = ship && ship.name ? ship.name.split('@')[0].trim() : '';
+      const nameCn = nameKr.endsWith(' 도면') && baseShipNameKr
+        ? `${(loctab[baseShipNameKr] || baseShipNameKr)} ${(loctab['도면'] || '도면')}`
+        : (loctab[nameKr] || nameKr);
+      const nameEn = baseShipNameKr ? `${baseShipNameKr} Blueprint` : nameKr;
+
       uiListData.shipBlueprints.push({
         id: blueprint.id,
         name: nameKr,
-        nameKr: nameKr,
-        nameCn: loctab[nameKr] || nameKr,
-        nameEn: nameKr,
+        nameKr,
+        nameCn,
+        nameEn,
         shipId: blueprint.shipId,
         grade: blueprint.grade,
       });
@@ -1687,7 +1753,6 @@ function generateUIListData(cmsDir, loctab = {}) {
 
   // 25. Mail (메일) - languageMailTitle[0] 사용 + descFormat 플레이스홀더 치환
   const mailTable = loadTable('Mail');
-  const townTable = loadTable('Town');
   if (mailTable && mailTable.Mail) {
     for (const [key, mail] of Object.entries(mailTable.Mail)) {
       if (!mail || !mail.id || key.startsWith(':')) {
@@ -1755,6 +1820,187 @@ function generateUIListData(cmsDir, loctab = {}) {
   }
 
   return convertedData;
+}
+
+/**
+ * Convert event data to language-specific files
+ * Takes the multi-language event data and creates separate files for kr, en, zh
+ * Each file contains only the 'name' field (no nameKr, nameEn, nameCn)
+ */
+function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
+  const languageData = {
+    kr: { totalCount: 0, items: [] },
+    en: { totalCount: 0, items: [] },
+    zh: { totalCount: 0, items: [] },
+  };
+
+  if (!eventData || !eventData.items) {
+    return;
+  }
+
+  // Load localization table if exists
+  const loctabPath = path.join(outputDir, 'loctab.json');
+  let loctab = {};
+  if (fs.existsSync(loctabPath)) {
+    try {
+      loctab = JSON.parse(fs.readFileSync(loctabPath, 'utf-8'));
+    } catch (e) {
+      console.log('   ⚠️  Could not load loctab.json for localization');
+    }
+  }
+
+  for (const item of eventData.items) {
+    // Extract language-specific names
+    const nameKr = item.nameKr || item.name || '';
+
+    // Special handling for HotTimeBuff: comma-separated WorldBuff names
+    const computeHotTimeNameCn = (kr) => {
+      if (!kr) return kr;
+      // split by comma and optional spaces
+      const parts = kr.split(',').map(p => p.trim()).filter(Boolean);
+      if (!parts.length) return kr;
+      return parts.map(p => loctab[p] || p).join(', ');
+    };
+
+    // Helper: token-wise translation fallback when full phrase not found
+    const translateByTokens = (kr) => {
+      if (!kr || !loctab) return kr;
+      try {
+        const tokens = kr.split(/\s+/).filter(Boolean);
+        const translated = tokens.map(t => (loctab[t] !== undefined ? loctab[t] : t));
+        return translated.join(' ');
+      } catch {
+        return kr;
+      }
+    };
+
+    const nameEn = item.nameEn || nameKr; // No English translation table for now
+    let nameCn = item.nameCn || (eventType === 'hottimebuff'
+      ? computeHotTimeNameCn(nameKr)
+      : (loctab[nameKr] || translateByTokens(nameKr)));
+
+    // Extract language-specific descriptions (if available)
+    const descKr = item.descKr || item.desc || '';
+    const descEn = item.descEn || descKr;
+    const descCn = item.descCn || (loctab[descKr] || translateByTokens(descKr));
+
+    // Extract language-specific descriptions for LiveEvent (if available)
+    const descriptionKr = item.descriptionKr || item.description || '';
+    const descriptionEn = item.descriptionEn || descriptionKr;
+    const descriptionCn = item.descriptionCn || (loctab[descriptionKr] || translateByTokens(descriptionKr));
+
+    // Create entries with only 'name' field and other non-name/desc fields
+    const baseEntry = {};
+    for (const [key, value] of Object.entries(item)) {
+      if (key !== 'name' && key !== 'nameKr' && key !== 'nameEn' && key !== 'nameCn' &&
+          key !== 'desc' && key !== 'descKr' && key !== 'descEn' && key !== 'descCn' &&
+          key !== 'description' && key !== 'descriptionKr' && key !== 'descriptionEn' && key !== 'descriptionCn') {
+        baseEntry[key] = value;
+      }
+    }
+
+    languageData.kr.items.push({
+      ...baseEntry,
+      name: nameKr,
+      ...(item.desc !== undefined && { desc: descKr }),
+      ...(item.description !== undefined && { description: descriptionKr }),
+    });
+
+    languageData.en.items.push({
+      ...baseEntry,
+      name: nameEn,
+      ...(item.desc !== undefined && { desc: descEn }),
+      ...(item.description !== undefined && { description: descriptionEn }),
+    });
+
+    languageData.zh.items.push({
+      ...baseEntry,
+      name: nameCn,
+      ...(item.desc !== undefined && { desc: descCn }),
+      ...(item.description !== undefined && { description: descriptionCn }),
+    });
+  }
+
+  // Update total counts
+  languageData.kr.totalCount = languageData.kr.items.length;
+  languageData.en.totalCount = languageData.en.items.length;
+  languageData.zh.totalCount = languageData.zh.items.length;
+
+  // Save language-specific files
+  const krFile = path.join(outputDir, `${eventType}-lookup-kr.json`);
+  fs.writeFileSync(krFile, JSON.stringify(languageData.kr, null, 2), 'utf8');
+
+  const enFile = path.join(outputDir, `${eventType}-lookup-en.json`);
+  fs.writeFileSync(enFile, JSON.stringify(languageData.en, null, 2), 'utf8');
+
+  const zhFile = path.join(outputDir, `${eventType}-lookup-zh.json`);
+  fs.writeFileSync(zhFile, JSON.stringify(languageData.zh, null, 2), 'utf8');
+}
+
+/**
+ * Convert UI list data to language-specific files
+ * Takes the multi-language data and creates separate files for kr, en, zh
+ * Each file contains only the 'name' field (no nameKr, nameEn, nameCn)
+ */
+function convertUIListDataToLanguageSpecific(uiListData, outputDir) {
+  const languageData = {
+    kr: {},
+    en: {},
+    zh: {},
+  };
+
+  // Process each category
+  for (const [category, items] of Object.entries(uiListData)) {
+    if (!Array.isArray(items)) {
+      continue;
+    }
+
+    languageData.kr[category] = [];
+    languageData.en[category] = [];
+    languageData.zh[category] = [];
+
+    for (const item of items) {
+      // Extract language-specific names
+      const nameKr = item.nameKr || item.name || '';
+      const nameEn = item.nameEn || item.name || '';
+      const nameCn = item.nameCn || item.name || '';
+
+      // Create entries with only 'name' field and other non-name fields
+      const baseEntry = {};
+      for (const [key, value] of Object.entries(item)) {
+        if (key !== 'name' && key !== 'nameKr' && key !== 'nameEn' && key !== 'nameCn') {
+          baseEntry[key] = value;
+        }
+      }
+
+      languageData.kr[category].push({
+        ...baseEntry,
+        name: nameKr,
+      });
+
+      languageData.en[category].push({
+        ...baseEntry,
+        name: nameEn,
+      });
+
+      languageData.zh[category].push({
+        ...baseEntry,
+        name: nameCn,
+      });
+    }
+  }
+
+  // Save language-specific files
+  const krFile = path.join(outputDir, 'ui-list-data-kr.json');
+  fs.writeFileSync(krFile, JSON.stringify(languageData.kr, null, 2), 'utf8');
+
+  const enFile = path.join(outputDir, 'ui-list-data-en.json');
+  fs.writeFileSync(enFile, JSON.stringify(languageData.en, null, 2), 'utf8');
+
+  const zhFile = path.join(outputDir, 'ui-list-data-zh.json');
+  fs.writeFileSync(zhFile, JSON.stringify(languageData.zh, null, 2), 'utf8');
+
+  return true;
 }
 
 /**
@@ -1833,8 +2079,10 @@ function convertLocalizationTable(inputPath, outputPath) {
     processedCount++;
   }
 
-  // Save to file
-  fs.writeFileSync(outputPath, JSON.stringify(loctab, null, 2), 'utf8');
+  // Save to file only if outputPath is provided
+  if (outputPath) {
+    fs.writeFileSync(outputPath, JSON.stringify(loctab, null, 2), 'utf8');
+  }
 
   console.log(`   ✅ Localization table converted successfully!`);
   console.log(`   📊 Statistics:`);
@@ -1904,8 +2152,9 @@ function buildHotTimeBuffLookup(cmsDir, outputDir) {
       });
 
     const lookupData = { totalCount: items.length, items };
-    const outputPath = path.join(outputDir, 'hottimebuff-lookup.json');
-    fs.writeFileSync(outputPath, JSON.stringify(lookupData, null, 2), 'utf8');
+
+    // Convert to language-specific files
+    convertEventDataToLanguageSpecific(lookupData, 'hottimebuff', outputDir);
 
     console.log(`   ✅ HotTimeBuff lookup built (${items.length} items)`);
     return lookupData;
@@ -1918,6 +2167,7 @@ function buildHotTimeBuffLookup(cmsDir, outputDir) {
 function buildEventPageLookup(cmsDir, outputDir) {
   const eventPagePath = path.join(cmsDir, 'EventPage.json');
 
+
   try {
     if (!fs.existsSync(eventPagePath)) {
       console.log('   ⚠️  EventPage.json not found, skipping...');
@@ -1929,6 +2179,8 @@ function buildEventPageLookup(cmsDir, outputDir) {
       return null;
     }
 
+
+
     const pageGroupNames = {
       0: 'Normal',
       1: 'Attendance',
@@ -1939,46 +2191,62 @@ function buildEventPageLookup(cmsDir, outputDir) {
 
     const items = Object.values(eventPageData.EventPage)
       .filter(item => item && item.id)
-      .map((item) => ({
-        id: item.id,
-        name: item.name || '',
-        order: item.order || 0,
-        pageGroup: item.pageGroup || 0,
-        pageGroupName: pageGroupNames[item.pageGroup] || 'Unknown',
-        type: item.type || 0,
-        groupRef: item.groupRef,
-        pageWidget: item.pageWidget,
-        pageWidgetName: item.pageWidgetName || '',
-        mainTitle: item.mainTitle || '',
-        subTitle: item.subTitle || '',
-        desc: item.desc || '',
-        startDate: item.startDate ? new Date(item.startDate).toISOString() : null,
-        endDate: item.endDate ? new Date(item.endDate).toISOString() : null,
-        passRewardHour: item.passRewardHour,
-        shopRemainHour: item.shopRemainHour,
-        rankRewardHour: item.rankRewardHour,
-        activeDay: item.activeDay,
-        comeBackDay: item.comeBackDay,
-        localBitflag: item.localBitflag,
-        saleItemId: item.saleItemId,
-        attendSupplement: item.attendSupplement || false,
-        isHideLvBuy: item.isHideLvBuy || false,
-        mail: item.mail,
-        bgIllust: item.bgIllust || '',
-        spineAsset: item.spineAsset || '',
-        completedRemove: item.completedRemove || false,
-        contentsTerms: item.contentsTerms || [],
-        mainTitleIllust: item.mainTitleIllust || '',
-        spineAsset2: item.spineAsset2 || '',
-        dictionaryGroupNo: item.dictionaryGroupNo,
-        cashShopTab: item.cashShopTab,
-        viewHUD: item.viewHUD || false,
-        cashShopUse: item.cashShopUse || false,
-      }));
+      .map((item) => {
+        // Create display name as "name - desc"
+        const displayName = item.desc
+          ? `${item.name || ''} - ${item.desc}`.trim()
+          : (item.name || '');
+
+        // Prepare KR fields only; CN will be computed via loctab during conversion
+        const nameKr = item.name || '';
+        const descKr = item.desc || '';
+
+        return {
+          id: item.id,
+          name: nameKr,  // Use Korean name; conversion step will localize per language
+          nameKr: nameKr,
+          // Do NOT set nameEn/nameCn here to avoid blocking localization
+          order: item.order || 0,
+          pageGroup: item.pageGroup || 0,
+          pageGroupName: pageGroupNames[item.pageGroup] || 'Unknown',
+          type: item.type || 0,
+          groupRef: item.groupRef,
+          pageWidget: item.pageWidget,
+          pageWidgetName: item.pageWidgetName || '',
+          mainTitle: item.mainTitle || '',
+          subTitle: item.subTitle || '',
+          desc: descKr,
+          descKr: descKr,
+          // Do NOT set descEn/descCn here; conversion will localize
+          startDate: item.startDate ? new Date(item.startDate).toISOString() : null,
+          endDate: item.endDate ? new Date(item.endDate).toISOString() : null,
+          passRewardHour: item.passRewardHour,
+          shopRemainHour: item.shopRemainHour,
+          rankRewardHour: item.rankRewardHour,
+          activeDay: item.activeDay,
+          comeBackDay: item.comeBackDay,
+          localBitflag: item.localBitflag,
+          saleItemId: item.saleItemId,
+          attendSupplement: item.attendSupplement || false,
+          isHideLvBuy: item.isHideLvBuy || false,
+          mail: item.mail,
+          bgIllust: item.bgIllust || '',
+          spineAsset: item.spineAsset || '',
+          completedRemove: item.completedRemove || false,
+          contentsTerms: item.contentsTerms || [],
+          mainTitleIllust: item.mainTitleIllust || '',
+          spineAsset2: item.spineAsset2 || '',
+          dictionaryGroupNo: item.dictionaryGroupNo,
+          cashShopTab: item.cashShopTab,
+          viewHUD: item.viewHUD || false,
+          cashShopUse: item.cashShopUse || false,
+        };
+      });
 
     const lookupData = { totalCount: items.length, items };
-    const outputPath = path.join(outputDir, 'eventpage-lookup.json');
-    fs.writeFileSync(outputPath, JSON.stringify(lookupData, null, 2), 'utf8');
+
+    // Convert to language-specific files
+    convertEventDataToLanguageSpecific(lookupData, 'eventpage', outputDir);
 
     console.log(`   ✅ EventPage lookup built (${items.length} items)`);
     return lookupData;
@@ -1991,6 +2259,7 @@ function buildEventPageLookup(cmsDir, outputDir) {
 function buildLiveEventLookup(cmsDir, outputDir) {
   const liveEventPath = path.join(cmsDir, 'LiveEvent.json');
 
+
   try {
     if (!fs.existsSync(liveEventPath)) {
       console.log('   ⚠️  LiveEvent.json not found, skipping...');
@@ -2002,21 +2271,35 @@ function buildLiveEventLookup(cmsDir, outputDir) {
       return null;
     }
 
+
+
     const items = Object.values(liveEventData.LiveEvent)
       .filter(item => item && item.id)
-      .map((item) => ({
-        id: item.id,
-        name: item.name || '',
-        description: item.description || '',
-        startDate: item.startDate ? new Date(item.startDate).toISOString() : null,
-        endDate: item.endDate ? new Date(item.endDate).toISOString() : null,
-        eventType: item.eventType || 0,
-        rewardId: item.rewardId,
-      }));
+      .map((item) => {
+
+        // Prepare KR fields only; CN will be computed via loctab during conversion
+        const nameKr = item.name || '';
+        const descKr = item.description || '';
+
+        return {
+          id: item.id,
+          name: nameKr,  // Use Korean name; conversion step will localize per language
+          nameKr: nameKr,
+          // Do NOT set nameEn/nameCn here to avoid blocking localization
+          description: descKr,
+          descriptionKr: descKr,
+          // Do NOT set descriptionEn/descriptionCn here; conversion will localize
+          startDate: item.startDate ? new Date(item.startDate).toISOString() : null,
+          endDate: item.endDate ? new Date(item.endDate).toISOString() : null,
+          eventType: item.eventType || 0,
+          rewardId: item.rewardId,
+        };
+      });
 
     const lookupData = { totalCount: items.length, items };
-    const outputPath = path.join(outputDir, 'liveevent-lookup.json');
-    fs.writeFileSync(outputPath, JSON.stringify(lookupData, null, 2), 'utf8');
+
+    // Convert to language-specific files
+    convertEventDataToLanguageSpecific(lookupData, 'liveevent', outputDir);
 
     console.log(`   ✅ LiveEvent lookup built (${items.length} items)`);
     return lookupData;
@@ -2033,6 +2316,8 @@ function buildLiveEventLookup(cmsDir, outputDir) {
 function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
   const mateRecruitingGroupPath = path.join(cmsDir, 'MateRecruitingGroup.json');
   const mateTemplateFilePath = path.join(cmsDir, 'MateTemplate.json');
+  const mateFilePath = path.join(cmsDir, 'Mate.json');
+  const characterFilePath = path.join(cmsDir, 'Character.json');
   const townFilePath = path.join(cmsDir, 'Town.json');
   const loctabPath = path.join(outputDir, 'loctab.json');
 
@@ -2047,8 +2332,14 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
       return null;
     }
 
+    if (!fs.existsSync(mateFilePath) || !fs.existsSync(characterFilePath)) {
+      console.log('   ⚠️  Mate.json or Character.json not found, falling back to tokenized name translation...');
+    }
+
     const mateRecruitingGroupData = loadJson5File(mateRecruitingGroupPath);
     const mateTemplateData = loadJson5File(mateTemplateFilePath);
+    const mateData = fs.existsSync(mateFilePath) ? loadJson5File(mateFilePath) : null;
+    const characterData = fs.existsSync(characterFilePath) ? loadJson5File(characterFilePath) : null;
     const townData = loadJson5File(townFilePath);
 
     if (!mateRecruitingGroupData || !mateRecruitingGroupData.MateRecruitingGroup) {
@@ -2069,12 +2360,36 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
     // Create a map of mateId to mate names (all languages)
     const mateNameMap = {};
     const mateTemplates = mateTemplateData.MateTemplate || {};
+    const matesTable = (mateData && mateData.Mate) ? mateData.Mate : {};
+    const characterTable = (characterData && characterData.Character) ? characterData.Character : {};
     Object.values(mateTemplates).forEach((mate) => {
       if (mate && mate.mateId && mate.name) {
+        const cleanKr = removeCommentFromName(mate.name);
+
+        // Try to resolve Character from Mate -> Character
+        const mateRow = matesTable[mate.mateId];
+        const character = mateRow && mateRow.characterId ? characterTable[mateRow.characterId] : null;
+
+        let nameCn = '';
+        if (character) {
+          const firstKr = removeParentheses(removeCommentFromName(character.firstName || ''));
+          const lastKr = removeParentheses(removeCommentFromName(character.lastName || character.familyName || ''));
+          const firstCn = firstKr ? (loctab[firstKr] || firstKr) : '';
+          const lastCn = lastKr ? (loctab[lastKr] || lastKr) : '';
+          nameCn = (firstCn && lastCn) ? `${firstCn} ${lastCn}` : (firstCn || lastCn || '');
+        }
+
+        // Fallback: token-wise translation from template name
+        if (!nameCn) {
+          const tokens = cleanKr.split(/\s+/).filter(Boolean);
+          const nameCnTokens = tokens.map(t => (loctab[t] !== undefined ? loctab[t] : t));
+          nameCn = nameCnTokens.join(' ');
+        }
+
         mateNameMap[mate.mateId] = {
-          nameKr: mate.name,
-          nameEn: loctab[mate.name] || mate.name,
-          nameCn: loctab[mate.name] || mate.name,
+          nameKr: cleanKr,
+          nameEn: cleanKr, // EN table not provided; keep KR as-is
+          nameCn,
         };
       }
     });
@@ -2114,8 +2429,8 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
         const townNamesEn = townsList.map(t => t.nameEn).join(', ');
         const townNamesCn = townsList.map(t => t.nameCn).join(', ');
 
-        // Build name for each language
-        const buildName = (mateName, townNames) => {
+        // Build KR name with KR tags
+        const buildNameKr = (mateName, townNames) => {
           const nameParts = [];
           nameParts.push(mateName);
           if (townNames) {
@@ -2140,6 +2455,33 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
           return name;
         };
 
+        // Build ZH name with localized tags via loctab
+        const buildNameZh = (mateName, townNames) => {
+          const nameParts = [];
+          nameParts.push(mateName);
+          if (townNames) {
+            nameParts.push(`- ${townNames}`);
+          }
+
+          const tags = [];
+          if (item.isMustAppear) {
+            tags.push(loctab['필수등장'] || '필수등장');
+          }
+          if (item.isReRecruit) {
+            tags.push(loctab['재고용전용'] || '재고용전용');
+          }
+          if (item.Ratio && item.Ratio < 10000 && !item.isMustAppear) {
+            const probLabel = loctab['확률'] || '확률';
+            tags.push(`${probLabel}:${(item.Ratio / 100).toFixed(0)}%`);
+          }
+
+          let name = nameParts.join(' ');
+          if (tags.length > 0) {
+            name = `${name} (${tags.join(', ')})`;
+          }
+          return name;
+        };
+
         // Calculate probability percentage
         const probability = item.Ratio && item.Ratio < 10000 && !item.isMustAppear
           ? (item.Ratio / 100).toFixed(0)
@@ -2147,10 +2489,10 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
 
         return {
           ...item,
-          name: buildName(mateNames.nameKr, townNamesKr), // Default to Korean
-          nameKr: buildName(mateNames.nameKr, townNamesKr),
-          nameEn: buildName(mateNames.nameEn, townNamesEn),
-          nameCn: buildName(mateNames.nameCn, townNamesCn),
+          name: buildNameKr(mateNames.nameKr, townNamesKr), // Default to Korean
+          nameKr: buildNameKr(mateNames.nameKr, townNamesKr),
+          nameEn: buildNameKr(mateNames.nameEn, townNamesEn),
+          nameCn: buildNameZh(mateNames.nameCn, townNamesCn),
           mateName: mateNames.nameKr,
           mateNameKr: mateNames.nameKr,
           mateNameEn: mateNames.nameEn,
@@ -2167,8 +2509,9 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
       });
 
     const lookupData = { totalCount: items.length, items };
-    const outputPath = path.join(outputDir, 'materecruiting-lookup.json');
-    fs.writeFileSync(outputPath, JSON.stringify(lookupData, null, 2), 'utf8');
+
+    // Convert to language-specific files
+    convertEventDataToLanguageSpecific(lookupData, 'materecruiting', outputDir);
 
     console.log(`   ✅ MateRecruitingGroup lookup built (${items.length} items)`);
     return lookupData;
@@ -2266,8 +2609,9 @@ function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir) {
       });
 
     const lookupData = { totalCount: items.length, items };
-    const outputPath = path.join(outputDir, 'oceannpcarea-lookup.json');
-    fs.writeFileSync(outputPath, JSON.stringify(lookupData, null, 2), 'utf8');
+
+    // Convert to language-specific files
+    convertEventDataToLanguageSpecific(lookupData, 'oceannpcarea', outputDir);
 
     console.log(`   ✅ OceanNpcAreaSpawner lookup built (${items.length} items)`);
     return lookupData;
@@ -2354,26 +2698,18 @@ Examples:
   const startTime = Date.now();
   const generatedFiles = [];
 
-  // Build localization table FIRST (needed for reward lookup)
+  // Build localization table FIRST (needed for reward/UI/event build)
   let loctab = {};
-  if (buildLocalization || buildRewards) {
+  if (buildLocalization || buildRewards || buildUILists || buildEvents) {
     const loctabSource = path.join(cmsDir, 'locdata', 'locdata');
-    const loctabOutput = path.join(outputDir, 'loctab.json');
-
-    loctab = convertLocalizationTable(loctabSource, loctabOutput);
-    if (loctab && buildLocalization) {
-      generatedFiles.push({ name: 'loctab.json', description: 'Localization table (Korean → Chinese)' });
-    }
+    const loctabOut = path.join(outputDir, 'loctab.json');
+    loctab = convertLocalizationTable(loctabSource, loctabOut);
+    generatedFiles.push({ name: 'loctab.json', description: 'Localization table (Korean → Chinese)' });
   }
 
   // Build reward lookup tables (with loctab for translations)
   if (buildRewards) {
     const lookupTable = buildRewardLookupTable(cmsDir, loctab);
-
-    // Save full lookup table
-    const lookupFile = path.join(outputDir, 'reward-lookup.json');
-    fs.writeFileSync(lookupFile, JSON.stringify(lookupTable, null, 2), 'utf8');
-    generatedFiles.push({ name: 'reward-lookup.json', description: 'Full reward lookup table' });
 
     // Generate and save REWARD_TYPE list
     const rewardTypeList = generateRewardTypeList(lookupTable);
@@ -2381,29 +2717,34 @@ Examples:
     fs.writeFileSync(typeListFile, JSON.stringify(rewardTypeList, null, 2), 'utf8');
     generatedFiles.push({ name: 'reward-type-list.json', description: 'REWARD_TYPE dropdown list' });
 
-    // Generate and save localizations
+    // Generate and save language-specific reward lookup files
     const localizations = generateLocalizations(lookupTable);
 
-    const locKrFile = path.join(outputDir, 'reward-localization-kr.json');
-    fs.writeFileSync(locKrFile, JSON.stringify(localizations.kr, null, 2), 'utf8');
-    generatedFiles.push({ name: 'reward-localization-kr.json', description: 'Korean localization' });
+    // Korean reward lookup
+    const locKoFile = path.join(outputDir, 'reward-lookup-kr.json');
+    fs.writeFileSync(locKoFile, JSON.stringify(localizations.kr, null, 2), 'utf8');
+    generatedFiles.push({ name: 'reward-lookup-kr.json', description: 'Reward lookup (Korean)' });
 
-    const locUsFile = path.join(outputDir, 'reward-localization-us.json');
-    fs.writeFileSync(locUsFile, JSON.stringify(localizations.us, null, 2), 'utf8');
-    generatedFiles.push({ name: 'reward-localization-us.json', description: 'English localization' });
+    // English reward lookup
+    const locEnFile = path.join(outputDir, 'reward-lookup-en.json');
+    fs.writeFileSync(locEnFile, JSON.stringify(localizations.us, null, 2), 'utf8');
+    generatedFiles.push({ name: 'reward-lookup-en.json', description: 'Reward lookup (English)' });
 
-    const locCnFile = path.join(outputDir, 'reward-localization-cn.json');
-    fs.writeFileSync(locCnFile, JSON.stringify(localizations.cn, null, 2), 'utf8');
-    generatedFiles.push({ name: 'reward-localization-cn.json', description: 'Chinese localization' });
+    // Chinese reward lookup
+    const locZhFile = path.join(outputDir, 'reward-lookup-zh.json');
+    fs.writeFileSync(locZhFile, JSON.stringify(localizations.cn, null, 2), 'utf8');
+    generatedFiles.push({ name: 'reward-lookup-zh.json', description: 'Reward lookup (Chinese)' });
   }
 
   // Build UI list data (with loctab for translations)
   if (buildUILists) {
     const uiListData = generateUIListData(cmsDir, loctab);
 
-    const uiListFile = path.join(outputDir, 'ui-list-data.json');
-    fs.writeFileSync(uiListFile, JSON.stringify(uiListData, null, 2), 'utf8');
-    generatedFiles.push({ name: 'ui-list-data.json', description: 'UI list data (Nation/Town/Village)' });
+    // Convert to language-specific files
+    convertUIListDataToLanguageSpecific(uiListData, outputDir);
+    generatedFiles.push({ name: 'ui-list-data-kr.json', description: 'UI list data (Korean)' });
+    generatedFiles.push({ name: 'ui-list-data-en.json', description: 'UI list data (English)' });
+    generatedFiles.push({ name: 'ui-list-data-zh.json', description: 'UI list data (Chinese)' });
   }
 
   // Build event data
@@ -2412,27 +2753,37 @@ Examples:
 
     const hotTimeBuff = buildHotTimeBuffLookup(cmsDir, outputDir);
     if (hotTimeBuff) {
-      generatedFiles.push({ name: 'hottimebuff-lookup.json', description: 'HotTimeBuff event data' });
+      generatedFiles.push({ name: 'hottimebuff-lookup-kr.json', description: 'HotTimeBuff (Korean)' });
+      generatedFiles.push({ name: 'hottimebuff-lookup-en.json', description: 'HotTimeBuff (English)' });
+      generatedFiles.push({ name: 'hottimebuff-lookup-zh.json', description: 'HotTimeBuff (Chinese)' });
     }
 
     const eventPage = buildEventPageLookup(cmsDir, outputDir);
     if (eventPage) {
-      generatedFiles.push({ name: 'eventpage-lookup.json', description: 'EventPage data' });
+      generatedFiles.push({ name: 'eventpage-lookup-kr.json', description: 'EventPage (Korean)' });
+      generatedFiles.push({ name: 'eventpage-lookup-en.json', description: 'EventPage (English)' });
+      generatedFiles.push({ name: 'eventpage-lookup-zh.json', description: 'EventPage (Chinese)' });
     }
 
     const liveEvent = buildLiveEventLookup(cmsDir, outputDir);
     if (liveEvent) {
-      generatedFiles.push({ name: 'liveevent-lookup.json', description: 'LiveEvent data' });
+      generatedFiles.push({ name: 'liveevent-lookup-kr.json', description: 'LiveEvent (Korean)' });
+      generatedFiles.push({ name: 'liveevent-lookup-en.json', description: 'LiveEvent (English)' });
+      generatedFiles.push({ name: 'liveevent-lookup-zh.json', description: 'LiveEvent (Chinese)' });
     }
 
     const mateRecruiting = buildMateRecruitingGroupLookup(cmsDir, outputDir);
     if (mateRecruiting) {
-      generatedFiles.push({ name: 'materecruiting-lookup.json', description: 'MateRecruitingGroup data' });
+      generatedFiles.push({ name: 'materecruiting-lookup-kr.json', description: 'MateRecruiting (Korean)' });
+      generatedFiles.push({ name: 'materecruiting-lookup-en.json', description: 'MateRecruiting (English)' });
+      generatedFiles.push({ name: 'materecruiting-lookup-zh.json', description: 'MateRecruiting (Chinese)' });
     }
 
     const oceanNpcArea = buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir);
     if (oceanNpcArea) {
-      generatedFiles.push({ name: 'oceannpcarea-lookup.json', description: 'OceanNpcAreaSpawner data' });
+      generatedFiles.push({ name: 'oceannpcarea-lookup-kr.json', description: 'OceanNpcArea (Korean)' });
+      generatedFiles.push({ name: 'oceannpcarea-lookup-en.json', description: 'OceanNpcArea (English)' });
+      generatedFiles.push({ name: 'oceannpcarea-lookup-zh.json', description: 'OceanNpcArea (Chinese)' });
     }
   }
 

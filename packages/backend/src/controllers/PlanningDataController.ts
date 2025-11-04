@@ -8,10 +8,24 @@ import logger from '../config/logger';
 export class PlanningDataController {
   /**
    * Get reward lookup data
-   * GET /api/v1/admin/planning-data/reward-lookup
+   * GET /api/v1/admin/planning-data/reward-lookup?lang=kr|en|zh
    */
   static getRewardLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const data = await PlanningDataService.getRewardLookup();
+    const { lang } = req.query;
+
+    // Map language codes to standardized format
+    const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
+      'ko': 'kr',  // Korean variants
+      'kr': 'kr',
+      'en': 'en',  // English
+      'zh': 'zh',  // Chinese variants
+      'cn': 'zh',
+    };
+
+    const rawLanguage = (lang as string) || 'kr';
+    const language = languageMap[rawLanguage] || 'kr';
+
+    const data = await PlanningDataService.getRewardLookup(language);
 
     res.json({
       success: true,
@@ -36,16 +50,26 @@ export class PlanningDataController {
 
   /**
    * Get items for a specific reward type
-   * GET /api/v1/admin/planning-data/reward-types/:rewardType/items?lang=kr|en|cn
+   * GET /api/v1/admin/planning-data/reward-types/:rewardType/items?lang=kr|en|zh
    */
   static getRewardTypeItems = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { rewardType } = req.params;
     const { lang } = req.query;
 
-    // Default to Korean if no language specified
-    const language = (lang as string) || 'kr';
+    // Map language codes to standardized format
+    const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
+      'ko': 'kr',  // Korean variants
+      'kr': 'kr',
+      'en': 'en',  // English
+      'zh': 'zh',  // Chinese variants
+      'cn': 'zh',
+    };
 
-    const data = await PlanningDataService.getRewardTypeItems(parseInt(rewardType), language as 'kr' | 'en' | 'cn');
+    // Default to Korean if no language specified
+    const rawLanguage = (lang as string) || 'kr';
+    const language = languageMap[rawLanguage] || 'kr';
+
+    const data = await PlanningDataService.getRewardTypeItems(parseInt(rewardType), language);
 
     res.json({
       success: true,
@@ -78,34 +102,25 @@ export class PlanningDataController {
   });
 
   /**
-   * Get localization data
-   * GET /api/v1/admin/planning-data/localization/:language
-   */
-  static getLocalization = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { language } = req.params;
-
-    if (!['kr', 'us', 'cn'].includes(language)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid language. Must be kr, us, or cn',
-      });
-    }
-
-    const data = await PlanningDataService.getLocalization(language as 'kr' | 'us' | 'cn');
-
-    res.json({
-      success: true,
-      data,
-      message: `Localization data for ${language} retrieved successfully`,
-    });
-  });
-
-  /**
    * Get UI list data (nations, towns, villages)
-   * GET /api/v1/admin/planning-data/ui-list
+   * GET /api/v1/admin/planning-data/ui-list?lang=kr|en|zh
    */
   static getUIListData = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const data = await PlanningDataService.getUIListData();
+    const { lang } = req.query;
+
+    // Map language codes to standardized format
+    const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
+      'ko': 'kr',  // Korean variants
+      'kr': 'kr',
+      'en': 'en',  // English
+      'zh': 'zh',  // Chinese variants
+      'cn': 'zh',
+    };
+
+    const rawLanguage = (lang as string) || 'kr';
+    const language = languageMap[rawLanguage] || 'kr';
+
+    const data = await PlanningDataService.getUIListData(language);
 
     res.json({
       success: true,
@@ -116,35 +131,30 @@ export class PlanningDataController {
 
   /**
    * Get items for a specific UI list category
-   * GET /api/v1/admin/planning-data/ui-list/:category/items?lang=kr|en|cn
+   * GET /api/v1/admin/planning-data/ui-list/:category/items?lang=kr|en|zh
    */
   static getUIListItems = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { category } = req.params;
     const { lang } = req.query;
 
-    // Default to Korean if no language specified
-    const language = (lang as string) || 'kr';
+    // Map language codes to standardized format
+    const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
+      'ko': 'kr',  // Korean variants
+      'kr': 'kr',
+      'en': 'en',  // English
+      'zh': 'zh',  // Chinese variants
+      'cn': 'zh',
+    };
 
-    const data = await PlanningDataService.getUIListItems(category, language as 'kr' | 'en' | 'cn');
+    const rawLanguage = (lang as string) || 'kr';
+    const language = languageMap[rawLanguage] || 'kr';
+
+    const data = await PlanningDataService.getUIListItems(category, language);
 
     res.json({
       success: true,
       data,
       message: `UI list items for ${category} retrieved successfully`,
-    });
-  });
-
-  /**
-   * Get localization table (loctab)
-   * GET /api/v1/admin/planning-data/loctab
-   */
-  static getLoctab = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const data = await PlanningDataService.getLoctab();
-
-    res.json({
-      success: true,
-      data,
-      message: 'Localization table retrieved successfully',
     });
   });
 
@@ -164,10 +174,24 @@ export class PlanningDataController {
 
   /**
    * Get HotTimeBuff lookup data
-   * GET /api/v1/admin/planning-data/hottimebuff
+   * GET /api/v1/admin/planning-data/hottimebuff?lang=kr|en|zh
    */
   static getHotTimeBuffLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const data = await PlanningDataService.getHotTimeBuffLookup();
+    const { lang } = req.query;
+
+    // Map language codes to standardized format
+    const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
+      'ko': 'kr',  // Korean variants
+      'kr': 'kr',
+      'en': 'en',  // English
+      'zh': 'zh',  // Chinese variants
+      'cn': 'zh',
+    };
+
+    const rawLanguage = (lang as string) || 'kr';
+    const language = languageMap[rawLanguage] || 'kr';
+
+    const data = await PlanningDataService.getHotTimeBuffLookup(language);
 
     res.json({
       success: true,
@@ -201,10 +225,24 @@ export class PlanningDataController {
 
   /**
    * Get EventPage lookup data
-   * GET /api/v1/admin/planning-data/eventpage
+   * GET /api/v1/admin/planning-data/eventpage?lang=kr|en|zh
    */
   static getEventPageLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const data = await PlanningDataService.getEventPageLookup();
+    const { lang } = req.query;
+
+    // Map language codes to standardized format
+    const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
+      'ko': 'kr',  // Korean variants
+      'kr': 'kr',
+      'en': 'en',  // English
+      'zh': 'zh',  // Chinese variants
+      'cn': 'zh',
+    };
+
+    const rawLanguage = (lang as string) || 'kr';
+    const language = languageMap[rawLanguage] || 'kr';
+
+    const data = await PlanningDataService.getEventPageLookup(language);
     res.json({ success: true, data, message: 'EventPage lookup data retrieved successfully' });
   });
 
@@ -221,10 +259,24 @@ export class PlanningDataController {
 
   /**
    * Get LiveEvent lookup data
-   * GET /api/v1/admin/planning-data/liveevent
+   * GET /api/v1/admin/planning-data/liveevent?lang=kr|en|zh
    */
   static getLiveEventLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const data = await PlanningDataService.getLiveEventLookup();
+    const { lang } = req.query;
+
+    // Map language codes to standardized format
+    const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
+      'ko': 'kr',  // Korean variants
+      'kr': 'kr',
+      'en': 'en',  // English
+      'zh': 'zh',  // Chinese variants
+      'cn': 'zh',
+    };
+
+    const rawLanguage = (lang as string) || 'kr';
+    const language = languageMap[rawLanguage] || 'kr';
+
+    const data = await PlanningDataService.getLiveEventLookup(language);
     res.json({ success: true, data, message: 'LiveEvent lookup data retrieved successfully' });
   });
 
@@ -241,10 +293,24 @@ export class PlanningDataController {
 
   /**
    * Get MateRecruitingGroup lookup data
-   * GET /api/v1/admin/planning-data/materecruiting
+   * GET /api/v1/admin/planning-data/materecruiting?lang=kr|en|zh
    */
   static getMateRecruitingGroupLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const data = await PlanningDataService.getMateRecruitingGroupLookup();
+    const { lang } = req.query;
+
+    // Map language codes to standardized format
+    const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
+      'ko': 'kr',  // Korean variants
+      'kr': 'kr',
+      'en': 'en',  // English
+      'zh': 'zh',  // Chinese variants
+      'cn': 'zh',
+    };
+
+    const rawLanguage = (lang as string) || 'kr';
+    const language = languageMap[rawLanguage] || 'kr';
+
+    const data = await PlanningDataService.getMateRecruitingGroupLookup(language);
     res.json({ success: true, data, message: 'MateRecruitingGroup lookup data retrieved successfully' });
   });
 
@@ -261,10 +327,24 @@ export class PlanningDataController {
 
   /**
    * Get OceanNpcAreaSpawner lookup data
-   * GET /api/v1/admin/planning-data/oceannpcarea
+   * GET /api/v1/admin/planning-data/oceannpcarea?lang=kr|en|zh
    */
   static getOceanNpcAreaSpawnerLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const data = await PlanningDataService.getOceanNpcAreaSpawnerLookup();
+    const { lang } = req.query;
+
+    // Map language codes to standardized format
+    const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
+      'ko': 'kr',  // Korean variants
+      'kr': 'kr',
+      'en': 'en',  // English
+      'zh': 'zh',  // Chinese variants
+      'cn': 'zh',
+    };
+
+    const rawLanguage = (lang as string) || 'kr';
+    const language = languageMap[rawLanguage] || 'kr';
+
+    const data = await PlanningDataService.getOceanNpcAreaSpawnerLookup(language);
     res.json({ success: true, data, message: 'OceanNpcAreaSpawner lookup data retrieved successfully' });
   });
 

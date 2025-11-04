@@ -81,10 +81,10 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
 
       if (typeInfo && typeInfo.hasTable) {
         // Map i18n language to backend language code
-        const languageMap: Record<string, 'kr' | 'en' | 'cn'> = {
+        const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
           'ko': 'kr',
           'en': 'en',
-          'zh': 'cn',
+          'zh': 'zh',
         };
         const language = languageMap[i18n.language] || 'kr';
 

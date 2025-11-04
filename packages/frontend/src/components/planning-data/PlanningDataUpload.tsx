@@ -43,20 +43,34 @@ interface PlanningDataUploadProps {
 
 const SUPPORTED_FILES = [
   // Reward data
-  { name: 'reward-lookup.json', category: 'Reward', description: 'Reward lookup table' },
   { name: 'reward-type-list.json', category: 'Reward', description: 'Reward type list' },
-  { name: 'reward-localization-kr.json', category: 'Localization', description: 'Korean localization' },
-  { name: 'reward-localization-us.json', category: 'Localization', description: 'English localization' },
-  { name: 'reward-localization-cn.json', category: 'Localization', description: 'Chinese localization' },
+  { name: 'reward-lookup-kr.json', category: 'Reward', description: 'Reward lookup (Korean)' },
+  { name: 'reward-lookup-en.json', category: 'Reward', description: 'Reward lookup (English)' },
+  { name: 'reward-lookup-zh.json', category: 'Reward', description: 'Reward lookup (Chinese)' },
   // UI data
-  { name: 'ui-list-data.json', category: 'UI', description: 'UI list data' },
-  { name: 'loctab.json', category: 'Localization', description: 'Localization table' },
-  // Event data
-  { name: 'hottimebuff-lookup.json', category: 'Event', description: 'HotTimeBuff data' },
-  { name: 'eventpage-lookup.json', category: 'Event', description: 'EventPage data' },
-  { name: 'liveevent-lookup.json', category: 'Event', description: 'LiveEvent data' },
-  { name: 'materecruiting-lookup.json', category: 'Event', description: 'MateRecruiting data' },
-  { name: 'oceannpcarea-lookup.json', category: 'Event', description: 'OceanNpcArea data' },
+  { name: 'ui-list-data-kr.json', category: 'UI', description: 'UI list data (Korean)' },
+  { name: 'ui-list-data-en.json', category: 'UI', description: 'UI list data (English)' },
+  { name: 'ui-list-data-zh.json', category: 'UI', description: 'UI list data (Chinese)' },
+  // Event data - HotTimeBuff
+  { name: 'hottimebuff-lookup-kr.json', category: 'Event', description: 'HotTimeBuff (Korean)' },
+  { name: 'hottimebuff-lookup-en.json', category: 'Event', description: 'HotTimeBuff (English)' },
+  { name: 'hottimebuff-lookup-zh.json', category: 'Event', description: 'HotTimeBuff (Chinese)' },
+  // Event data - EventPage
+  { name: 'eventpage-lookup-kr.json', category: 'Event', description: 'EventPage (Korean)' },
+  { name: 'eventpage-lookup-en.json', category: 'Event', description: 'EventPage (English)' },
+  { name: 'eventpage-lookup-zh.json', category: 'Event', description: 'EventPage (Chinese)' },
+  // Event data - LiveEvent
+  { name: 'liveevent-lookup-kr.json', category: 'Event', description: 'LiveEvent (Korean)' },
+  { name: 'liveevent-lookup-en.json', category: 'Event', description: 'LiveEvent (English)' },
+  { name: 'liveevent-lookup-zh.json', category: 'Event', description: 'LiveEvent (Chinese)' },
+  // Event data - MateRecruiting
+  { name: 'materecruiting-lookup-kr.json', category: 'Event', description: 'MateRecruiting (Korean)' },
+  { name: 'materecruiting-lookup-en.json', category: 'Event', description: 'MateRecruiting (English)' },
+  { name: 'materecruiting-lookup-zh.json', category: 'Event', description: 'MateRecruiting (Chinese)' },
+  // Event data - OceanNpcArea
+  { name: 'oceannpcarea-lookup-kr.json', category: 'Event', description: 'OceanNpcArea (Korean)' },
+  { name: 'oceannpcarea-lookup-en.json', category: 'Event', description: 'OceanNpcArea (English)' },
+  { name: 'oceannpcarea-lookup-zh.json', category: 'Event', description: 'OceanNpcArea (Chinese)' },
 ];
 
 const REQUIRED_FILES = SUPPORTED_FILES.map(f => f.name);

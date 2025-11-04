@@ -84,10 +84,30 @@ export interface HotTimeBuffLookup {
 
 class PlanningDataService {
   /**
+   * Helper function to get current language code
+   * Gets language from localStorage (set by i18next)
+   */
+  private getCurrentLanguage(): 'kr' | 'en' | 'zh' {
+    try {
+      const lang = localStorage.getItem('i18nextLng') || 'ko';
+      // Map language codes to API format
+      const langMap: Record<string, 'kr' | 'en' | 'zh'> = {
+        'en': 'en',
+        'ko': 'kr',  // Changed from 'ko' to 'kr'
+        'zh': 'zh',
+      };
+      return langMap[lang] || 'kr';  // Changed default from 'ko' to 'kr'
+    } catch {
+      return 'kr';  // Changed default from 'ko' to 'kr'
+    }
+  }
+
+  /**
    * Get reward lookup data
    */
   async getRewardLookup(): Promise<RewardLookupData> {
-    const response = await api.get('/admin/planning-data/reward-lookup');
+    const lang = this.getCurrentLanguage();
+    const response = await api.get('/admin/planning-data/reward-lookup', { params: { lang } });
     return response.data;
   }
 
@@ -102,11 +122,11 @@ class PlanningDataService {
   /**
    * Get items for a specific reward type
    * @param rewardType - Reward type number
-   * @param language - Language code (kr, en, cn)
+   * @param language - Language code (kr, en, zh)
    */
-  async getRewardTypeItems(rewardType: number, language?: 'kr' | 'en' | 'cn'): Promise<RewardItem[]> {
-    const params = language ? { lang: language } : {};
-    const response = await api.get(`/admin/planning-data/reward-types/${rewardType}/items`, { params });
+  async getRewardTypeItems(rewardType: number, language?: 'kr' | 'en' | 'zh'): Promise<RewardItem[]> {
+    const lang = language || this.getCurrentLanguage();
+    const response = await api.get(`/admin/planning-data/reward-types/${rewardType}/items`, { params: { lang } });
     return response.data;
   }
 
@@ -139,18 +159,18 @@ class PlanningDataService {
    * Get UI list data (nations, towns, villages, etc.)
    */
   async getUIListData(): Promise<UIListData> {
-    const response = await api.get('/admin/planning-data/ui-list');
+    const lang = this.getCurrentLanguage();
+    const response = await api.get('/admin/planning-data/ui-list', { params: { lang } });
     return response.data;
   }
 
   /**
    * Get items for a specific UI list category
    * @param category - Category name (nations, towns, villages, ships, mates, etc.)
-   * @param language - Language code (kr, en, cn)
    */
-  async getUIListItems(category: string, language?: 'kr' | 'en' | 'cn'): Promise<any[]> {
-    const params = language ? { lang: language } : {};
-    const response = await api.get(`/admin/planning-data/ui-list/${category}/items`, { params });
+  async getUIListItems(category: string): Promise<any[]> {
+    const lang = this.getCurrentLanguage();
+    const response = await api.get(`/admin/planning-data/ui-list/${category}/items`, { params: { lang } });
     return response.data;
   }
 
@@ -166,8 +186,11 @@ class PlanningDataService {
    * Get HotTimeBuff lookup data
    */
   async getHotTimeBuffLookup(): Promise<HotTimeBuffLookup> {
-    const response = await api.get('/admin/planning-data/hottimebuff');
-    return response.data;
+    const lang = this.getCurrentLanguage();
+    const response = await api.get('/admin/planning-data/hottimebuff', { params: { lang } });
+    // api.get() returns { success, data: { totalCount, items }, message }
+    // We need to return just the data part
+    return response.data as HotTimeBuffLookup;
   }
 
   /**
@@ -182,7 +205,10 @@ class PlanningDataService {
    * Get EventPage lookup data
    */
   async getEventPageLookup(): Promise<any> {
-    const response = await api.get('/admin/planning-data/eventpage');
+    const lang = this.getCurrentLanguage();
+    const response = await api.get('/admin/planning-data/eventpage', { params: { lang } });
+    // api.get() returns { success, data: { totalCount, items }, message }
+    // We need to return just the data part
     return response.data;
   }
 
@@ -198,7 +224,10 @@ class PlanningDataService {
    * Get LiveEvent lookup data
    */
   async getLiveEventLookup(): Promise<any> {
-    const response = await api.get('/admin/planning-data/liveevent');
+    const lang = this.getCurrentLanguage();
+    const response = await api.get('/admin/planning-data/liveevent', { params: { lang } });
+    // api.get() returns { success, data: { totalCount, items }, message }
+    // We need to return just the data part
     return response.data;
   }
 
@@ -214,7 +243,8 @@ class PlanningDataService {
    * Get MateRecruitingGroup lookup data
    */
   async getMateRecruitingGroupLookup(): Promise<any> {
-    const response = await api.get('/admin/planning-data/materecruiting');
+    const lang = this.getCurrentLanguage();
+    const response = await api.get('/admin/planning-data/materecruiting', { params: { lang } });
     return response.data;
   }
 
@@ -230,7 +260,8 @@ class PlanningDataService {
    * Get OceanNpcAreaSpawner lookup data
    */
   async getOceanNpcAreaSpawnerLookup(): Promise<any> {
-    const response = await api.get('/admin/planning-data/oceannpcarea');
+    const lang = this.getCurrentLanguage();
+    const response = await api.get('/admin/planning-data/oceannpcarea', { params: { lang } });
     return response.data;
   }
 

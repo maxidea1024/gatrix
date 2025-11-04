@@ -50,19 +50,6 @@ const PlanningDataPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
-  // Helper function to get localized field based on current language
-  const getLocalizedField = (item: any, fieldPrefix: string) => {
-    const lang = i18n.language;
-    if (lang === 'en' && item[`${fieldPrefix}En`]) {
-      return item[`${fieldPrefix}En`];
-    } else if (lang === 'zh' && item[`${fieldPrefix}Cn`]) {
-      return item[`${fieldPrefix}Cn`];
-    } else if (item[`${fieldPrefix}Kr`]) {
-      return item[`${fieldPrefix}Kr`];
-    }
-    return item[fieldPrefix];
-  };
-
   // State
   const [stats, setStats] = useState<PlanningDataStats | null>(null);
   const [loading, setLoading] = useState(false);
@@ -176,6 +163,30 @@ const PlanningDataPage: React.FC = () => {
     loadStats();
   }, []);
 
+  // Reload data when language changes
+  useEffect(() => {
+    // Clear all cached data when language changes
+    setHotTimeBuffData(null);
+    setEventPageData(null);
+    setLiveEventData(null);
+    setMateRecruitingGroupData(null);
+    setOceanNpcAreaSpawnerData(null);
+    setCategoryItems({});
+
+    // Reload current tab data
+    if (activeTab === 2) {
+      loadHotTimeBuff();
+    } else if (activeTab === 3) {
+      loadEventPage();
+    } else if (activeTab === 4) {
+      loadLiveEvent();
+    } else if (activeTab === 5) {
+      loadMateRecruitingGroup();
+    } else if (activeTab === 6) {
+      loadOceanNpcAreaSpawner();
+    }
+  }, [i18n.language]);
+
   // Load data for active tab when tab changes or on mount
   useEffect(() => {
     if (activeTab === 2 && !hotTimeBuffData) {
@@ -219,6 +230,10 @@ const PlanningDataPage: React.FC = () => {
     try {
       setLoadingHotTimeBuff(true);
       const data = await planningDataService.getHotTimeBuffLookup();
+      console.log('HotTimeBuff data loaded:', data);
+      if (data?.items?.[0]) {
+        console.log('First HotTimeBuff item:', data.items[0]);
+      }
       setHotTimeBuffData(data);
     } catch (error: any) {
       let errorMessage = t('planningData.errors.loadStatsFailed');
@@ -237,6 +252,10 @@ const PlanningDataPage: React.FC = () => {
     try {
       setLoadingEventPage(true);
       const data = await planningDataService.getEventPageLookup();
+      console.log('EventPage data loaded:', data);
+      if (data?.items?.[0]) {
+        console.log('First EventPage item:', data.items[0]);
+      }
       setEventPageData(data);
     } catch (error: any) {
       let errorMessage = t('planningData.errors.loadStatsFailed');
@@ -255,6 +274,10 @@ const PlanningDataPage: React.FC = () => {
     try {
       setLoadingLiveEvent(true);
       const data = await planningDataService.getLiveEventLookup();
+      console.log('LiveEvent data loaded:', data);
+      if (data?.items?.[0]) {
+        console.log('First LiveEvent item:', data.items[0]);
+      }
       setLiveEventData(data);
     } catch (error: any) {
       let errorMessage = t('planningData.errors.loadStatsFailed');
@@ -399,7 +422,7 @@ const PlanningDataPage: React.FC = () => {
       const loadItems = async () => {
         try {
           setLoadingRewardType(currentRewardType.value);
-          const language = i18n.language === 'zh' ? 'cn' : i18n.language === 'en' ? 'en' : 'kr';
+          const language = i18n.language === 'zh' ? 'zh' : i18n.language === 'en' ? 'en' : 'kr';
           const items = await planningDataService.getRewardTypeItems(currentRewardType.value, language);
           setRewardTypeItems(prev => ({ ...prev, [currentRewardType.value]: items }));
         } catch (error: any) {
@@ -1395,7 +1418,31 @@ const PlanningDataPage: React.FC = () => {
                           overflow: 'hidden',
                         }}>
                           {filteredHotTimeBuffItems.map((item: HotTimeBuffItem) => {
-                            const buffNames = item.worldBuffNames?.join(', ') || item.worldBuffId?.join(', ') || 'No Buff';
+                            // Get localized world buff names based on current language
+                            let buffNames = 'No Buff';
+                            const lang = i18n.language;
+                            const krNames = item.worldBuffNamesKr || item.worldBuffNames;
+                            const enNames = item.worldBuffNamesEn;
+                            const cnNames = item.worldBuffNamesCn;
+
+                            if (lang === 'en') {
+                              // If English names exist and are different from Korean (i.e., real translations)
+                              if (enNames && enNames.length > 0 && enNames[0] !== krNames?.[0]) {
+                                buffNames = enNames.join(', ');
+                              } else {
+                                buffNames = krNames?.join(', ') || 'No Buff';
+                              }
+                            } else if (lang === 'zh') {
+                              // If Chinese names exist and are different from Korean (i.e., real translations)
+                              if (cnNames && cnNames.length > 0 && cnNames[0] !== krNames?.[0]) {
+                                buffNames = cnNames.join(', ');
+                              } else {
+                                buffNames = krNames?.join(', ') || 'No Buff';
+                              }
+                            } else {
+                              // Korean or default
+                              buffNames = krNames?.join(', ') || item.worldBuffId?.join(', ') || 'No Buff';
+                            }
                             const label = `${item.id}: ${buffNames}`;
                             return (
                               <Tooltip key={item.id} title={label} arrow>
@@ -1546,7 +1593,31 @@ const PlanningDataPage: React.FC = () => {
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                           {item.worldBuffId && item.worldBuffId.length > 0 ? (
                                             item.worldBuffId.map((buffId, index) => {
-                                              const buffName = item.worldBuffNames?.[index] || buffId;
+                                              // Get localized world buff name based on current language
+                                              let buffName = buffId;
+                                              const lang = i18n.language;
+                                              const krName = item.worldBuffNamesKr?.[index] || item.worldBuffNames?.[index];
+                                              const enName = item.worldBuffNamesEn?.[index];
+                                              const cnName = item.worldBuffNamesCn?.[index];
+
+                                              if (lang === 'en') {
+                                                // If English name exists and is different from Korean (i.e., real translation)
+                                                if (enName && enName !== krName) {
+                                                  buffName = enName;
+                                                } else {
+                                                  buffName = krName || buffId;
+                                                }
+                                              } else if (lang === 'zh') {
+                                                // If Chinese name exists and is different from Korean (i.e., real translation)
+                                                if (cnName && cnName !== krName) {
+                                                  buffName = cnName;
+                                                } else {
+                                                  buffName = krName || buffId;
+                                                }
+                                              } else {
+                                                // Korean or default
+                                                buffName = krName || buffId;
+                                              }
                                               return (
                                                 <Chip
                                                   key={buffId}
@@ -1695,11 +1766,12 @@ const PlanningDataPage: React.FC = () => {
                               overflow: 'hidden',
                             }}>
                               {eventPageData.items.map((item: any) => {
+                                const localizedName = item.name;
                                 const groupType = [item.pageGroupName, item.typeName]
                                   .filter((v: any) => v && !String(v).startsWith('Unknown'))
                                   .join('/');
-                                const label = groupType ? `${item.id}: ${item.name} (${groupType})` : `${item.id}: ${item.name}`;
-                                const fullLabel = `ID: ${item.id}\nName: ${item.name}\nPageGroup: ${(!item.pageGroupName || String(item.pageGroupName).startsWith('Unknown')) ? '-' : item.pageGroupName}\nType: ${(!item.typeName || String(item.typeName).startsWith('Unknown')) ? '-' : item.typeName}`;
+                                const label = groupType ? `${item.id}: ${localizedName} (${groupType})` : `${item.id}: ${localizedName}`;
+                                const fullLabel = `ID: ${item.id}\nName: ${localizedName}\nPageGroup: ${(!item.pageGroupName || String(item.pageGroupName).startsWith('Unknown')) ? '-' : item.pageGroupName}\nType: ${(!item.typeName || String(item.typeName).startsWith('Unknown')) ? '-' : item.typeName}`;
                                 return (
                                   <Tooltip key={item.id} title={fullLabel} arrow>
                                     <Box
@@ -1880,7 +1952,8 @@ const PlanningDataPage: React.FC = () => {
                               overflow: 'hidden',
                             }}>
                               {liveEventData.items.map((item: any) => {
-                                const label = `${item.id}: ${item.name ?? item.loginBgmTag ?? String(item.id)}`;
+                                const localizedName = item.name;
+                                const label = `${item.id}: ${localizedName ?? item.loginBgmTag ?? String(item.id)}`;
                                 return (
                                   <Tooltip key={item.id} title={label} arrow>
                                     <Box
@@ -2118,7 +2191,7 @@ const PlanningDataPage: React.FC = () => {
                               overflow: 'hidden',
                             }}>
                               {mateRecruitingGroupData.items.map((item: any) => {
-                                const itemName = getLocalizedField(item, 'name');
+                                const itemName = item.name;
                                 const label = `${item.id}: ${itemName ?? (item.mateId ?? '')}`;
                                 const tooltipTitle = item.mateExists === false
                                   ? `⚠️ 오류: 항해사가 MateTemplate에 존재하지 않습니다.\n${label}`
@@ -2165,8 +2238,8 @@ const PlanningDataPage: React.FC = () => {
                                   </TableHead>
                                   <TableBody>
                                     {mateRecruitingGroupData.items.slice(mateRecruitingGroupPage * mateRecruitingGroupRowsPerPage, (mateRecruitingGroupPage + 1) * mateRecruitingGroupRowsPerPage).map((item: any) => {
-                                      const itemName = getLocalizedField(item, 'name');
-                                      const mateName = getLocalizedField(item, 'mateName');
+                                      const itemName = item.name;
+                                      const mateName = item.mateName;
 
                                       return (
                                         <TableRow
@@ -2362,7 +2435,7 @@ const PlanningDataPage: React.FC = () => {
                             }}>
                               {oceanNpcAreaSpawnerData.items.map((item: any) => {
                                 // Use localized name
-                                const itemName = getLocalizedField(item, 'name');
+                                const itemName = item.name;
                                 const label = itemName ?? `${item.id}: ${item.oceanNpcId}`;
                                 const tooltipTitle = item.npcExists === false
                                   ? `${t('planningData.error.npcNotFound')}\n${label}`
@@ -2482,8 +2555,8 @@ const PlanningDataPage: React.FC = () => {
                                       };
 
                                       // Use localized fields
-                                      const itemName = getLocalizedField(item, 'name');
-                                      const npcName = getLocalizedField(item, 'npcName');
+                                      const itemName = item.name;
+                                      const npcName = item.npcName;
 
                                       const startDate = formatDate(item.startDate);
                                       const endDate = formatDate(item.endDate);
