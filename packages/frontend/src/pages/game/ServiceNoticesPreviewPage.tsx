@@ -478,7 +478,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 <Chip
-                  label={t(`serviceNotices.categories.${selectedNotice.category}`)}
+                  label={selectedNotice.category.toUpperCase()}
                   size="small"
                   sx={{
                     bgcolor: GAME_COLORS.categoryBg,
@@ -493,8 +493,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                     color: GAME_COLORS.textSecondary, // Fixed color, not theme-dependent
                   }}
                 >
-                  {formatDateTime(selectedNotice.startDate)} ~{' '}
-                  {formatDateTime(selectedNotice.endDate)}
+                  {formatDateTime(selectedNotice.createdAt)}
                 </Typography>
               </Box>
             </Box>

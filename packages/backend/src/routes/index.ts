@@ -34,6 +34,6 @@ router.use('/users', userRoutes);
 router.use('/link-preview', linkPreviewRoutes);
 router.use('/mails', mailRoutes);
 router.use('/coupons', couponRoutes);
-router.use('/', publicRoutes);
+router.use('/public', publicRoutes);
 
 export default router;
