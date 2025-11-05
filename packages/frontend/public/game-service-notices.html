@@ -355,12 +355,35 @@
       }
     }
 
+    // Get URL parameters
+    function getUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        platform: params.get('platform'),
+        channel: params.get('channel'),
+        subChannel: params.get('subChannel')
+      };
+    }
+
     // Load notices from API
     function loadNotices() {
       const sidebar = document.getElementById('sidebar');
       sidebar.innerHTML = '<div class="loading">Loading notices...</div>';
 
-      fetch(NOTICES_ENDPOINT + '?limit=100')
+      // Build query string with platform, channel, subChannel parameters
+      const urlParams = getUrlParams();
+      let queryString = '?limit=100';
+      if (urlParams.platform) {
+        queryString += '&platform=' + encodeURIComponent(urlParams.platform);
+      }
+      if (urlParams.channel) {
+        queryString += '&channel=' + encodeURIComponent(urlParams.channel);
+      }
+      if (urlParams.subChannel) {
+        queryString += '&subchannel=' + encodeURIComponent(urlParams.subChannel);
+      }
+
+      fetch(NOTICES_ENDPOINT + queryString)
         .then(function(response) {
           if (!response.ok) {
             throw new Error('Failed to load notices');

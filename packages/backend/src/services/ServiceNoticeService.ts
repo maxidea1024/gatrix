@@ -7,6 +7,8 @@ export interface ServiceNotice {
   isActive: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
+  channels?: string[];
+  subchannels?: string[];
   startDate: string | null;
   endDate: string;
   tabTitle?: string;
@@ -21,6 +23,8 @@ export interface CreateServiceNoticeData {
   isActive: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
+  channels?: string[] | null;
+  subchannels?: string[] | null;
   startDate?: string | null;
   endDate: string;
   tabTitle?: string;
@@ -37,6 +41,10 @@ export interface ServiceNoticeFilters {
   category?: string;
   platform?: string | string[];
   platformOperator?: 'any_of' | 'include_all';
+  channel?: string | string[];
+  channelOperator?: 'any_of' | 'include_all';
+  subchannel?: string | string[];
+  subchannelOperator?: 'any_of' | 'include_all';
   search?: string;
 }
 
@@ -96,6 +104,46 @@ class ServiceNoticeService {
         }
       }
 
+      if (filters.channel) {
+        const channels = Array.isArray(filters.channel) ? filters.channel : [filters.channel];
+        const operator = filters.channelOperator || 'any_of';
+
+        if (operator === 'include_all') {
+          // AND condition: notice must include ALL selected channels OR be empty (all channels)
+          channels.forEach(channel => {
+            whereClauses.push('(JSON_LENGTH(channels) = 0 OR JSON_CONTAINS(channels, ?))');
+            queryParams.push(JSON.stringify(channel));
+          });
+        } else {
+          // OR condition: notice must include ANY of the selected channels OR be empty (all channels)
+          const channelConditions = channels.map(() => 'JSON_CONTAINS(channels, ?)').join(' OR ');
+          whereClauses.push(`(JSON_LENGTH(channels) = 0 OR (${channelConditions}))`);
+          channels.forEach(channel => {
+            queryParams.push(JSON.stringify(channel));
+          });
+        }
+      }
+
+      if (filters.subchannel) {
+        const subchannels = Array.isArray(filters.subchannel) ? filters.subchannel : [filters.subchannel];
+        const operator = filters.subchannelOperator || 'any_of';
+
+        if (operator === 'include_all') {
+          // AND condition: notice must include ALL selected subchannels OR be empty (all subchannels)
+          subchannels.forEach(subchannel => {
+            whereClauses.push('(JSON_LENGTH(subchannels) = 0 OR JSON_CONTAINS(subchannels, ?))');
+            queryParams.push(JSON.stringify(subchannel));
+          });
+        } else {
+          // OR condition: notice must include ANY of the selected subchannels OR be empty (all subchannels)
+          const subchannelConditions = subchannels.map(() => 'JSON_CONTAINS(subchannels, ?)').join(' OR ');
+          whereClauses.push(`(JSON_LENGTH(subchannels) = 0 OR (${subchannelConditions}))`);
+          subchannels.forEach(subchannel => {
+            queryParams.push(JSON.stringify(subchannel));
+          });
+        }
+      }
+
       if (filters.search) {
         whereClauses.push('(title LIKE ? OR content LIKE ? OR description LIKE ?)');
         const searchPattern = `%${filters.search}%`;
@@ -123,6 +171,8 @@ class ServiceNoticeService {
           isActive: Boolean(row.isActive),
           category: row.category,
           platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
+          channels: typeof row.channels === 'string' ? JSON.parse(row.channels) : row.channels,
+          subchannels: typeof row.subchannels === 'string' ? JSON.parse(row.subchannels) : row.subchannels,
           startDate: row.startDate,
           endDate: row.endDate,
           tabTitle: row.tabTitle,
@@ -196,12 +246,14 @@ class ServiceNoticeService {
 
       const [result] = await pool.execute<ResultSetHeader>(
         `INSERT INTO g_service_notices
-        (isActive, category, platforms, startDate, endDate, tabTitle, title, content, description)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (isActive, category, platforms, channels, subchannels, startDate, endDate, tabTitle, title, content, description)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           data.isActive,
           data.category,
           JSON.stringify(data.platforms),
+          data.channels ? JSON.stringify(data.channels) : null,
+          data.subchannels ? JSON.stringify(data.subchannels) : null,
           data.startDate ? convertToMySQLDateTime(data.startDate) : null,
           convertToMySQLDateTime(data.endDate),
           data.tabTitle || null,
@@ -244,6 +296,16 @@ class ServiceNoticeService {
       if (data.platforms) {
         updates.push('platforms = ?');
         values.push(JSON.stringify(data.platforms));
+      }
+
+      if (data.channels !== undefined) {
+        updates.push('channels = ?');
+        values.push(data.channels ? JSON.stringify(data.channels) : null);
+      }
+
+      if (data.subchannels !== undefined) {
+        updates.push('subchannels = ?');
+        values.push(data.subchannels ? JSON.stringify(data.subchannels) : null);
       }
 
       if (data.startDate !== undefined) {

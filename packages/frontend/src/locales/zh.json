@@ -1893,6 +1893,7 @@
     "import": "导入",
     "lastModified": "最后修改",
     "noData": "无数据",
+    "noItemsSelected": "未选择任何项目。",
     "page": "页面",
     "selectAll": "全选",
     "start": "开始",

@@ -47,6 +47,7 @@ export interface TargetSettingsGroupProps {
   onUserIdsChange?: (ids: string) => void;
   onUserIdsInvertedChange?: (inverted: boolean) => void;
   showUserIdFilter?: boolean;
+  showWorldFilter?: boolean;
 }
 
 const TargetSettingsGroup: React.FC<TargetSettingsGroupProps> = ({
@@ -67,6 +68,7 @@ const TargetSettingsGroup: React.FC<TargetSettingsGroupProps> = ({
   onUserIdsChange,
   onUserIdsInvertedChange,
   showUserIdFilter = false,
+  showWorldFilter = true,
 }) => {
   const { t } = useTranslation();
   const [showPlatformTable, setShowPlatformTable] = useState(false);
@@ -159,7 +161,7 @@ const TargetSettingsGroup: React.FC<TargetSettingsGroupProps> = ({
     if (targetPlatforms.length === 0) {
       return !targetPlatformsInverted && (
         <Typography variant="body2" color="text.secondary">
-          선택된 항목이 없습니다.
+          {t('common.noItemsSelected')}
         </Typography>
       );
     }
@@ -185,7 +187,7 @@ const TargetSettingsGroup: React.FC<TargetSettingsGroupProps> = ({
     if (targetChannelSubchannels.length === 0) {
       return !targetChannelSubchannelsInverted && (
         <Typography variant="body2" color="text.secondary">
-          선택된 항목이 없습니다.
+          {t('common.noItemsSelected')}
         </Typography>
       );
     }
@@ -216,7 +218,7 @@ const TargetSettingsGroup: React.FC<TargetSettingsGroupProps> = ({
     if (targetWorlds.length === 0) {
       return !targetWorldsInverted && (
         <Typography variant="body2" color="text.secondary">
-          선택된 항목이 없습니다.
+          {t('common.noItemsSelected')}
         </Typography>
       );
     }
@@ -517,6 +519,7 @@ const TargetSettingsGroup: React.FC<TargetSettingsGroupProps> = ({
       </Box>
 
       {/* World */}
+      {showWorldFilter && (
       <Box>
         <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 500 }}>
           {t('coupons.couponSettings.form.targetWorlds')}
@@ -582,6 +585,7 @@ const TargetSettingsGroup: React.FC<TargetSettingsGroupProps> = ({
         </Box>
         <FormHelperText sx={{ mt: 1 }}>{t('coupons.couponSettings.form.targetWorldsHelp')}</FormHelperText>
       </Box>
+      )}
 
       {/* User IDs */}
       {showUserIdFilter && (

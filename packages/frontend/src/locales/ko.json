@@ -1848,6 +1848,7 @@
     "import": "가져오기",
     "lastModified": "마지막 수정",
     "noData": "데이터 없음",
+    "noItemsSelected": "선택된 항목이 없습니다.",
     "page": "페이지",
     "selectAll": "모두 선택",
     "start": "시작",

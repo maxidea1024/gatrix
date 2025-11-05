@@ -1848,6 +1848,7 @@
     "import": "Import",
     "lastModified": "Last Modified",
     "noData": "No Data",
+    "noItemsSelected": "No items selected.",
     "page": "Page",
     "selectAll": "Select All",
     "start": "Start",

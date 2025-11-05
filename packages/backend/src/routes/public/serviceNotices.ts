@@ -20,6 +20,22 @@ router.get('/', async (req, res) => {
         : (req.query.platform as string).split(',').filter(p => p.trim());
     }
 
+    // Parse channel - can be string or array
+    let channel: string | string[] | undefined;
+    if (req.query.channel) {
+      channel = Array.isArray(req.query.channel)
+        ? req.query.channel as string[]
+        : (req.query.channel as string).split(',').filter(c => c.trim());
+    }
+
+    // Parse subchannel - can be string or array
+    let subchannel: string | string[] | undefined;
+    if (req.query.subchannel) {
+      subchannel = Array.isArray(req.query.subchannel)
+        ? req.query.subchannel as string[]
+        : (req.query.subchannel as string).split(',').filter(s => s.trim());
+    }
+
     // Public endpoint only returns active notices
     const filters = {
       isActive: true, // Always filter for active notices only
@@ -27,6 +43,10 @@ router.get('/', async (req, res) => {
       category: req.query.category as string,
       platform,
       platformOperator: req.query.platformOperator as 'any_of' | 'include_all' | undefined,
+      channel,
+      channelOperator: req.query.channelOperator as 'any_of' | 'include_all' | undefined,
+      subchannel,
+      subchannelOperator: req.query.subchannelOperator as 'any_of' | 'include_all' | undefined,
       search: req.query.search as string,
     };
 

@@ -29,6 +29,8 @@ import { useSnackbar } from 'notistack';
 import { ServiceNotice, CreateServiceNoticeData, UpdateServiceNoticeData } from '../../services/serviceNoticeService';
 import RichTextEditor from '../mailbox/RichTextEditor';
 import { parseUTCForPicker } from '../../utils/dateFormat';
+import TargetSettingsGroup, { ChannelSubchannelData } from './TargetSettingsGroup';
+import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 
 interface ServiceNoticeFormDialogProps {
   open: boolean;
@@ -48,6 +50,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { platforms: platformConfig, channels: channelConfig } = usePlatformConfig();
   const [submitting, setSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
@@ -55,6 +58,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   const [isActive, setIsActive] = useState(true);
   const [category, setCategory] = useState<string>('notice');
   const [platforms, setPlatforms] = useState<string[]>([]);
+  const [platformsInverted, setPlatformsInverted] = useState(false);
+  const [channelSubchannels, setChannelSubchannels] = useState<ChannelSubchannelData[]>([]);
+  const [channelSubchannelsInverted, setChannelSubchannelsInverted] = useState(false);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [tabTitle, setTabTitle] = useState('');
@@ -235,6 +241,29 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       setIsActive(notice.isActive);
       setCategory(notice.category);
       setPlatforms(notice.platforms);
+      setPlatformsInverted(false);
+      // Convert channels and subchannels to ChannelSubchannelData format
+      const channelMap = new Map<string, Set<string>>();
+      if (notice.channels && Array.isArray(notice.channels)) {
+        notice.channels.forEach(channel => {
+          channelMap.set(channel, new Set());
+        });
+      }
+      if (notice.subchannels && Array.isArray(notice.subchannels)) {
+        notice.subchannels.forEach(subchannel => {
+          const [channel, subch] = subchannel.split(':');
+          if (!channelMap.has(channel)) {
+            channelMap.set(channel, new Set());
+          }
+          channelMap.get(channel)!.add(subch);
+        });
+      }
+      const channelSubchannelData: ChannelSubchannelData[] = Array.from(channelMap.entries()).map(([channel, subchannels]) => ({
+        channel,
+        subchannels: Array.from(subchannels),
+      }));
+      setChannelSubchannels(channelSubchannelData);
+      setChannelSubchannelsInverted(false);
       // Parse UTC time and convert to user's timezone for display
       setStartDate(parseUTCForPicker(notice.startDate));
       setEndDate(parseUTCForPicker(notice.endDate));
@@ -247,6 +276,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       setIsActive(true);
       setCategory('notice');
       setPlatforms([]);
+      setPlatformsInverted(false);
+      setChannelSubchannels([]);
+      setChannelSubchannelsInverted(false);
       setStartDate(null);
       setEndDate(null);
       setTabTitle('');
@@ -255,11 +287,6 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       setDescription('');
     }
   }, [notice, open]);
-
-  const handlePlatformChange = (event: SelectChangeEvent<string[]>) => {
-    const value = event.target.value;
-    setPlatforms(typeof value === 'string' ? value.split(',') : value);
-  };
 
   const handleSubmit = async () => {
     // Validation
@@ -291,10 +318,27 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       const trimmedTabTitle = tabTitle.trim();
       const trimmedDescription = description.trim();
 
+      // Convert ChannelSubchannelData to channels and subchannels arrays
+      const channels: string[] = [];
+      const subchannels: string[] = [];
+      channelSubchannels.forEach(item => {
+        if (!channels.includes(item.channel)) {
+          channels.push(item.channel);
+        }
+        item.subchannels.forEach(subchannel => {
+          const subchannelKey = `${item.channel}:${subchannel}`;
+          if (!subchannels.includes(subchannelKey)) {
+            subchannels.push(subchannelKey);
+          }
+        });
+      });
+
       const data: CreateServiceNoticeData | UpdateServiceNoticeData = {
         isActive,
         category: category as any,
         platforms,
+        channels: channels.length > 0 ? channels : null,
+        subchannels: subchannels.length > 0 ? subchannels : null,
         startDate: startDate ? startDate.toISOString() : null,
         endDate: endDate.toISOString(),
         tabTitle: trimmedTabTitle ? trimmedTabTitle : null,
@@ -386,36 +430,29 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
             </Typography>
           </Box>
 
-          {/* Platforms */}
-          <FormControl fullWidth>
-            <InputLabel>{t('serviceNotices.platforms')}</InputLabel>
-            <Select
-              multiple
-              value={platforms}
-              onChange={handlePlatformChange}
-              input={<OutlinedInput label={t('serviceNotices.platforms')} />}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {selected.length === 0 ? (
-                    <Chip label={t('common.all')} size="small" variant="outlined" />
-                  ) : (
-                    selected.map((value) => (
-                      <Chip key={value} label={value} size="small" />
-                    ))
-                  )}
-                </Box>
-              )}
-            >
-              {PLATFORMS.map((platform) => (
-                <MenuItem key={platform} value={platform}>
-                  {platform}
-                </MenuItem>
-              ))}
-            </Select>
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
-              {t('serviceNotices.platformsHelp')}
-            </Typography>
-          </FormControl>
+          {/* Target Settings (Platform + Channel/Subchannel) */}
+          <TargetSettingsGroup
+            targetPlatforms={platforms}
+            targetPlatformsInverted={platformsInverted}
+            platforms={platformConfig}
+            onPlatformsChange={(newPlatforms, inverted) => {
+              setPlatforms(newPlatforms);
+              setPlatformsInverted(inverted);
+            }}
+            targetChannelSubchannels={channelSubchannels}
+            targetChannelSubchannelsInverted={channelSubchannelsInverted}
+            channels={channelConfig}
+            onChannelsChange={(newChannels, inverted) => {
+              setChannelSubchannels(newChannels);
+              setChannelSubchannelsInverted(inverted);
+            }}
+            targetWorlds={[]}
+            targetWorldsInverted={false}
+            worlds={[]}
+            onWorldsChange={() => {}}
+            showUserIdFilter={false}
+            showWorldFilter={false}
+          />
 
           {/* Date Range */}
           <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
