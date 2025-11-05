@@ -18,7 +18,6 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
-  FormHelperText,
 } from '@mui/material';
 import {
   Visibility,
@@ -443,18 +442,20 @@ const LoginPage: React.FC = () => {
           readOnly
         />
 
-        {/* Error Alert - Fixed height to prevent layout shift */}
+        {/* Error Alert - Smooth animation without fixed height */}
         <Box
           sx={{
-            mb: 3,
-            minHeight: loginError ? 'auto' : '0px',
+            mb: loginError ? 3 : 0,
             overflow: 'hidden',
+            height: loginError ? 'auto' : 0,
+            transition: 'all 0.3s ease-out',
           }}
         >
           {loginError && (
             <Box
               sx={{
-                animation: 'slideDown 0.3s ease-in-out',
+                width: '100%',
+                animation: 'slideDown 0.3s ease-out forwards',
                 '@keyframes slideDown': {
                   from: {
                     opacity: 0,
@@ -470,6 +471,7 @@ const LoginPage: React.FC = () => {
               <Alert
                 severity="error"
                 sx={{
+                  width: '100%',
                   backgroundColor: 'rgba(244, 67, 54, 0.1)',
                   color: '#ff6b6b',
                   border: '1px solid rgba(244, 67, 54, 0.2)',
@@ -485,130 +487,124 @@ const LoginPage: React.FC = () => {
           )}
         </Box>
 
-        <Box sx={{ mb: 2 }}>
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                label={t('auth.email')}
-                type="email"
-                error={!!errors.email}
-                helperText=" "
-                margin="normal"
-                autoComplete="off"
-                autoFocus
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#667eea',
-                    },
+        <Controller
+          name="email"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              fullWidth
+              label={t('auth.email')}
+              type="email"
+              error={!!errors.email}
+              helperText={t('auth.emailLoginHelp')}
+              margin="normal"
+              autoComplete="off"
+              autoFocus
+              sx={{
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  '& fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
                   },
-                  '& .MuiInputLabel-root': {
-                    color: 'rgba(255, 255, 255, 0.7)',
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
                   },
-                  '& .MuiInputBase-input': {
-                    color: 'white',
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#667eea',
                   },
-                  '& .MuiFormHelperText-root': {
-                    minHeight: '20px',
-                    display: 'block',
-                    height: '20px',
-                    lineHeight: '20px',
-                  },
-                }}
-                inputProps={{
-                  autoComplete: 'off',
-                  'data-lpignore': 'true',
-                  'data-form-type': 'other',
-                  'data-1p-ignore': 'true',
-                }}
-              />
-            )}
-          />
-          {errors.email && (
-            <FormHelperText error sx={{ ml: 1.75, mt: 0.5 }}>
-              {errors.email.message}
-            </FormHelperText>
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                },
+                '& .MuiInputBase-input': {
+                  color: 'white',
+                },
+                '& .MuiFormHelperText-root': {
+                  minHeight: '20px',
+                  height: '20px',
+                  lineHeight: '20px',
+                  color: errors.email ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                },
+              }}
+              inputProps={{
+                autoComplete: 'off',
+                'data-lpignore': 'true',
+                'data-form-type': 'other',
+                'data-1p-ignore': 'true',
+              }}
+            />
           )}
-        </Box>
+        />
 
-        <Box sx={{ mb: 2 }}>
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                label={t('auth.password')}
-                type={isWebkit ? 'text' : (showPassword ? 'text' : passwordFieldType)}
-                error={false}
-                helperText=" "
-                margin="normal"
-                autoComplete="off"
-                onFocus={(e) => {
-                  // Remove readonly on focus to allow user input
-                  if (!isWebkit) {
-                    // For non-WebKit, switch to password to maintain masking
-                    setPasswordFieldType('password');
-                  }
-                  e.target.removeAttribute('readonly');
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#667eea',
-                    },
+        <Controller
+          name="password"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              fullWidth
+              label={t('auth.password')}
+              type={isWebkit ? 'text' : (showPassword ? 'text' : passwordFieldType)}
+              error={false}
+              helperText={t('auth.passwordLoginHelp')}
+              margin="normal"
+              autoComplete="off"
+              onFocus={(e) => {
+                // Remove readonly on focus to allow user input
+                if (!isWebkit) {
+                  // For non-WebKit, switch to password to maintain masking
+                  setPasswordFieldType('password');
+                }
+                e.target.removeAttribute('readonly');
+              }}
+              sx={{
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  '& fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
                   },
-                  '& .MuiInputLabel-root': {
-                    color: 'rgba(255, 255, 255, 0.7)',
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
                   },
-                  '& .MuiInputBase-input': {
-                    color: 'white',
-                    // Mask characters when using type=text on WebKit browsers
-                    ...(isWebkit && !showPassword ? {
-                      WebkitTextSecurity: 'disc',
-                    } : {}),
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#667eea',
                   },
-                  '& .MuiFormHelperText-root': {
-                    minHeight: '20px',
-                    display: 'block',
-                    height: '20px',
-                    lineHeight: '20px',
-                  },
-                }}
-                inputProps={{
-                  autoComplete: 'off',
-                  'data-lpignore': 'true',
-                  'data-form-type': 'other',
-                  'data-1p-ignore': 'true',
-                  'aria-autocomplete': 'none',
-                  readOnly: true, // Prevent autofill, will be removed on focus
-                  name: `password-${Math.random().toString(36).substring(7)}`, // Random name to prevent autofill
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={togglePasswordVisibility}
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                },
+                '& .MuiInputBase-input': {
+                  color: 'white',
+                  // Mask characters when using type=text on WebKit browsers
+                  ...(isWebkit && !showPassword ? {
+                    WebkitTextSecurity: 'disc',
+                  } : {}),
+                },
+                '& .MuiFormHelperText-root': {
+                  minHeight: '20px',
+                  height: '20px',
+                  lineHeight: '20px',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                },
+              }}
+              inputProps={{
+                autoComplete: 'off',
+                'data-lpignore': 'true',
+                'data-form-type': 'other',
+                'data-1p-ignore': 'true',
+                'aria-autocomplete': 'none',
+                readOnly: true, // Prevent autofill, will be removed on focus
+                name: `password-${Math.random().toString(36).substring(7)}`, // Random name to prevent autofill
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={togglePasswordVisibility}
                       edge="end"
                       tabIndex={-1}
                       sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
@@ -619,9 +615,8 @@ const LoginPage: React.FC = () => {
                 ),
               }}
             />
-            )}
-          />
-        </Box>
+          )}
+        />
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Controller

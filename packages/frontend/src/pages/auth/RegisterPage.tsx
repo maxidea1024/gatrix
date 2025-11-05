@@ -13,7 +13,6 @@ import {
   Tooltip,
   Card,
   CardContent,
-  FormHelperText,
 } from '@mui/material';
 import {
   Visibility,
@@ -540,20 +539,22 @@ const RegisterPage: React.FC = () => {
           </Alert>
         )}
 
-        {/* Error Alert - Fixed height to prevent layout shift */}
+        {/* Error Alert - Smooth animation without fixed height */}
         <Box
           sx={{
-            mb: 3,
-            minHeight: registerError ? 'auto' : '0px',
+            mb: registerError ? 3 : 0,
             overflow: 'hidden',
+            height: registerError ? 'auto' : 0,
+            transition: 'all 0.3s ease-out',
           }}
         >
           {registerError && (
             <Box
               sx={{
+                width: '100%',
                 animation: isShaking
-                  ? 'errorShake 0.5s ease-in-out'
-                  : 'slideDown 0.3s ease-in-out',
+                  ? 'errorShake 0.5s ease-in-out forwards'
+                  : 'slideDown 0.3s ease-out forwards',
                 '@keyframes slideDown': {
                   from: {
                     opacity: 0,
@@ -574,6 +575,7 @@ const RegisterPage: React.FC = () => {
               <Alert
                 severity="error"
                 sx={{
+                  width: '100%',
                   backgroundColor: 'rgba(244, 67, 54, 0.1)',
                   color: '#ff6b6b',
                   border: '1px solid rgba(244, 67, 54, 0.2)',
@@ -598,7 +600,7 @@ const RegisterPage: React.FC = () => {
               {...field}
               fullWidth
               label={`${t('auth.name')} *`}
-              helperText={errors.name?.message || t('auth.nameHelp')}
+              helperText={t('auth.nameHelp')}
               autoComplete="off"
               autoFocus
               sx={{
@@ -632,92 +634,176 @@ const RegisterPage: React.FC = () => {
         />
 
         {/* Email Field */}
-        <Box sx={{ mb: 2 }}>
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                label={`${t('auth.email')} *`}
-                type="email"
-                helperText=" "
-                autoComplete="off"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#667eea',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: 'rgba(255, 255, 255, 0.7)',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: 'white',
-                  },
-                  '& .MuiFormHelperText-root': {
-                    minHeight: '20px',
-                    display: 'block',
-                    height: '20px',
-                    lineHeight: '20px',
-                  },
-                }}
-              />
-            )}
-          />
-          {(errors.email || !errors.email) && (
-            <FormHelperText
-              error={!!errors.email}
+        <Controller
+          name="email"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              fullWidth
+              label={`${t('auth.email')} *`}
+              type="email"
+              helperText={t('auth.emailHelp')}
+              autoComplete="off"
               sx={{
-                ml: 1.75,
-                mt: 0.5,
-                color: errors.email ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  '& fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#667eea',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                },
+                '& .MuiInputBase-input': {
+                  color: 'white',
+                },
+                '& .MuiFormHelperText-root': {
+                  minHeight: '20px',
+                  height: '20px',
+                  lineHeight: '20px',
+                  color: errors.email ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                },
               }}
-            >
-              {errors.email?.message || t('auth.emailHelp')}
-            </FormHelperText>
+            />
           )}
-        </Box>
+        />
 
         {/* Password Field */}
-        <Box sx={{ mb: 2 }}>
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
+        <Controller
+          name="password"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              fullWidth
+              label={`${t('auth.password')} *`}
+              type={isWebkit ? 'text' : (showPassword ? 'text' : passwordFieldType)}
+              helperText={t('auth.passwordHelp')}
+              autoComplete="off"
+              onFocus={(e) => {
+                // Remove readonly on focus to allow user input
+                if (!isWebkit) {
+                  setPasswordFieldType('password');
+                }
+                e.target.removeAttribute('readonly');
+              }}
+              sx={{
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  '& fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#667eea',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                },
+                '& .MuiInputBase-input': {
+                  color: 'white',
+                  // Mask characters when using type=text on WebKit browsers
+                  ...(isWebkit && !showPassword ? {
+                    WebkitTextSecurity: 'disc',
+                  } : {}),
+                },
+                '& .MuiFormHelperText-root': {
+                  minHeight: '20px',
+                  height: '20px',
+                  lineHeight: '20px',
+                  color: errors.password ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                },
+              }}
+              inputProps={{
+                autoComplete: 'off',
+                'data-lpignore': 'true',
+                'data-form-type': 'other',
+                'data-1p-ignore': 'true',
+                'aria-autocomplete': 'none',
+                readOnly: true, // Prevent autofill, will be removed on focus
+                name: `password-${Math.random().toString(36).substring(7)}`, // Random name to prevent autofill
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={togglePasswordVisibility}
+                      edge="end"
+                      tabIndex={-1}
+                      sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          )}
+        />
+
+        {/* Confirm Password Field */}
+        <Controller
+          name="confirmPassword"
+          control={control}
+          render={({ field }) => {
+            const isPasswordMatch = field.value && watchedPassword && field.value === watchedPassword;
+            const hasConfirmPasswordValue = field.value && field.value.length > 0;
+            const showMatchIndicator = hasConfirmPasswordValue && watchedPassword;
+
+            // Determine helper text based on validation state
+            let helperText = t('auth.confirmPasswordHelp');
+            if (errors.confirmPassword?.message) {
+              helperText = errors.confirmPassword.message;
+            } else if (isPasswordMatch) {
+              helperText = t('auth.passwordsMatch');
+            }
+
+            return (
               <TextField
                 {...field}
                 fullWidth
-                label={`${t('auth.password')} *`}
-                type={isWebkit ? 'text' : (showPassword ? 'text' : passwordFieldType)}
-                helperText=" "
+                label={`${t('auth.confirmPassword')} *`}
+                type={isWebkit ? 'text' : (showConfirmPassword ? 'text' : confirmPasswordFieldType)}
+                helperText={helperText}
                 autoComplete="off"
                 onFocus={(e) => {
                   // Remove readonly on focus to allow user input
                   if (!isWebkit) {
-                    setPasswordFieldType('password');
+                    setConfirmPasswordFieldType('password');
                   }
                   e.target.removeAttribute('readonly');
                 }}
                 sx={{
+                  mb: 2,
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
                     '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
+                      borderColor: showMatchIndicator
+                        ? (isPasswordMatch ? 'rgba(76, 175, 80, 0.5)' : 'rgba(244, 67, 54, 0.5)')
+                        : 'rgba(255, 255, 255, 0.2)',
                     },
                     '&:hover fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
+                      borderColor: showMatchIndicator
+                        ? (isPasswordMatch ? 'rgba(76, 175, 80, 0.7)' : 'rgba(244, 67, 54, 0.7)')
+                        : 'rgba(255, 255, 255, 0.3)',
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: '#667eea',
+                      borderColor: showMatchIndicator
+                        ? (isPasswordMatch ? '#4caf50' : '#f44336')
+                        : '#667eea',
                     },
                   },
                   '& .MuiInputLabel-root': {
@@ -726,15 +812,19 @@ const RegisterPage: React.FC = () => {
                   '& .MuiInputBase-input': {
                     color: 'white',
                     // Mask characters when using type=text on WebKit browsers
-                    ...(isWebkit && !showPassword ? {
+                    ...(isWebkit && !showConfirmPassword ? {
                       WebkitTextSecurity: 'disc',
                     } : {}),
                   },
                   '& .MuiFormHelperText-root': {
                     minHeight: '20px',
-                    display: 'block',
                     height: '20px',
                     lineHeight: '20px',
+                    color: errors.confirmPassword
+                      ? 'rgba(255, 182, 193, 0.8)'
+                      : (showMatchIndicator && isPasswordMatch
+                          ? 'rgba(129, 199, 132, 0.8)'
+                          : 'rgba(255, 255, 255, 0.6)'),
                   },
                 }}
                 inputProps={{
@@ -744,167 +834,27 @@ const RegisterPage: React.FC = () => {
                   'data-1p-ignore': 'true',
                   'aria-autocomplete': 'none',
                   readOnly: true, // Prevent autofill, will be removed on focus
-                  name: `password-${Math.random().toString(36).substring(7)}`, // Random name to prevent autofill
+                  name: `confirm-password-${Math.random().toString(36).substring(7)}`, // Random name to prevent autofill
                 }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={togglePasswordVisibility}
+                        aria-label="toggle confirm password visibility"
+                        onClick={toggleConfirmPasswordVisibility}
                         edge="end"
                         tabIndex={-1}
                         sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                       >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
               />
-            )}
-          />
-          {(errors.password || !errors.password) && (
-            <FormHelperText
-              error={!!errors.password}
-              sx={{
-                ml: 1.75,
-                mt: 0.5,
-                color: errors.password ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
-              }}
-            >
-              {errors.password?.message || t('auth.passwordHelp')}
-            </FormHelperText>
-          )}
-        </Box>
-
-        {/* Confirm Password Field */}
-        <Box sx={{ mb: 2 }}>
-          <Controller
-            name="confirmPassword"
-            control={control}
-            render={({ field }) => {
-              const isPasswordMatch = field.value && watchedPassword && field.value === watchedPassword;
-              const hasConfirmPasswordValue = field.value && field.value.length > 0;
-              const showMatchIndicator = hasConfirmPasswordValue && watchedPassword;
-
-              // Determine helper text based on validation state
-              let helperText = t('auth.confirmPasswordHelp');
-              if (errors.confirmPassword?.message) {
-                helperText = errors.confirmPassword.message;
-              } else if (isPasswordMatch) {
-                helperText = t('auth.passwordsMatch');
-              }
-
-              return (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label={`${t('auth.confirmPassword')} *`}
-                  type={isWebkit ? 'text' : (showConfirmPassword ? 'text' : confirmPasswordFieldType)}
-                  helperText=" "
-                  autoComplete="off"
-                  onFocus={(e) => {
-                    // Remove readonly on focus to allow user input
-                    if (!isWebkit) {
-                      setConfirmPasswordFieldType('password');
-                    }
-                    e.target.removeAttribute('readonly');
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                      '& fieldset': {
-                        borderColor: showMatchIndicator
-                          ? (isPasswordMatch ? 'rgba(76, 175, 80, 0.5)' : 'rgba(244, 67, 54, 0.5)')
-                          : 'rgba(255, 255, 255, 0.2)',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: showMatchIndicator
-                          ? (isPasswordMatch ? 'rgba(76, 175, 80, 0.7)' : 'rgba(244, 67, 54, 0.7)')
-                          : 'rgba(255, 255, 255, 0.3)',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: showMatchIndicator
-                          ? (isPasswordMatch ? '#4caf50' : '#f44336')
-                          : '#667eea',
-                      },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: 'rgba(255, 255, 255, 0.7)',
-                    },
-                    '& .MuiInputBase-input': {
-                      color: 'white',
-                      // Mask characters when using type=text on WebKit browsers
-                      ...(isWebkit && !showConfirmPassword ? {
-                        WebkitTextSecurity: 'disc',
-                      } : {}),
-                    },
-                    '& .MuiFormHelperText-root': {
-                      minHeight: '20px',
-                      display: 'block',
-                      height: '20px',
-                      lineHeight: '20px',
-                    },
-                  }}
-                  inputProps={{
-                    autoComplete: 'off',
-                    'data-lpignore': 'true',
-                    'data-form-type': 'other',
-                    'data-1p-ignore': 'true',
-                    'aria-autocomplete': 'none',
-                    readOnly: true, // Prevent autofill, will be removed on focus
-                    name: `confirm-password-${Math.random().toString(36).substring(7)}`, // Random name to prevent autofill
-                  }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle confirm password visibility"
-                      onClick={toggleConfirmPasswordVisibility}
-                      edge="end"
-                      tabIndex={-1}
-                      sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-                />
-              );
-            }}
-          />
-          {(() => {
-            const isPasswordMatch = watch('confirmPassword') && watch('password') && watch('confirmPassword') === watch('password');
-            const hasConfirmPasswordValue = watch('confirmPassword') && watch('confirmPassword').length > 0;
-            const showMatchIndicator = hasConfirmPasswordValue && watch('password');
-
-            let helperText = t('auth.confirmPasswordHelp');
-            if (errors.confirmPassword?.message) {
-              helperText = errors.confirmPassword.message;
-            } else if (isPasswordMatch) {
-              helperText = t('auth.passwordsMatch');
-            }
-
-            return (
-              <FormHelperText
-                error={!!errors.confirmPassword}
-                sx={{
-                  ml: 1.75,
-                  mt: 0.5,
-                  color: errors.confirmPassword
-                    ? 'rgba(255, 182, 193, 0.8)'
-                    : (showMatchIndicator && isPasswordMatch
-                        ? 'rgba(129, 199, 132, 0.8)'
-                        : 'rgba(255, 255, 255, 0.6)'),
-                }}
-              >
-                {helperText}
-              </FormHelperText>
             );
-          })()}
-        </Box>
+          }}
+        />
 
         <Button
           type="submit"
