@@ -2038,10 +2038,21 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
           key !== 'description' && key !== 'descriptionKr' && key !== 'descriptionEn' && key !== 'descriptionCn' &&
           key !== 'mateName' && key !== 'mateNameKr' && key !== 'mateNameEn' && key !== 'mateNameCn' &&
           key !== 'npcName' && key !== 'npcNameKr' && key !== 'npcNameEn' && key !== 'npcNameCn' &&
-          key !== 'townNames' && key !== 'townNamesKr' && key !== 'townNamesEn' && key !== 'townNamesCn') {
+          key !== 'townNames' && key !== 'townNamesKr' && key !== 'townNamesEn' && key !== 'townNamesCn' &&
+          key !== 'towns') { // exclude nested towns to localize per-language below
         baseEntry[key] = value;
       }
     }
+
+    // Localize nested towns array per language (id + name only)
+    const townsArray = Array.isArray(item.towns) ? item.towns : null;
+    const townsKr = townsArray ? townsArray.map(t => ({ id: t.id, name: (t.nameKr || t.name || '') })) : undefined;
+    const townsEn = townsArray ? townsArray.map(t => ({ id: t.id, name: (t.nameEn || t.name || t.nameKr || '') })) : undefined;
+    const townsCn = townsArray ? townsArray.map(t => {
+      const baseNm = (t.nameCn || t.nameKr || t.name || '');
+      const nm = t.nameCn || (loctab[baseNm] || translateByTokens(baseNm));
+      return { id: t.id, name: nm };
+    }) : undefined;
 
     languageData.kr.items.push({
       ...baseEntry,
@@ -2051,6 +2062,7 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
       ...(mateNameKrVal !== undefined && { mateName: mateNameKrVal }),
       ...(npcNameKrVal !== undefined && { npcName: npcNameKrVal }),
       ...(townNamesKrVal !== undefined && { townNames: townNamesKrVal }),
+      ...(townsKr !== undefined && { towns: townsKr }),
     });
 
     languageData.en.items.push({
@@ -2061,6 +2073,7 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
       ...(mateNameEnVal !== undefined && { mateName: mateNameEnVal }),
       ...(npcNameEnVal !== undefined && { npcName: npcNameEnVal }),
       ...(townNamesEnVal !== undefined && { townNames: townNamesEnVal }),
+      ...(townsEn !== undefined && { towns: townsEn }),
     });
 
     languageData.zh.items.push({
@@ -2071,6 +2084,7 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
       ...(mateNameCnVal !== undefined && { mateName: mateNameCnVal }),
       ...(npcNameCnVal !== undefined && { npcName: npcNameCnVal }),
       ...(townNamesCnVal !== undefined && { townNames: townNamesCnVal }),
+      ...(townsCn !== undefined && { towns: townsCn }),
     });
   }
 

@@ -122,16 +122,21 @@ export class AuthService {
       // Verify refresh token
       const payload = JwtUtils.verifyRefreshToken(refreshToken);
       if (!payload) {
+        logger.warn('Refresh token verification failed: invalid or expired token');
         throw new CustomError('Invalid or expired refresh token', 401);
       }
+
+      logger.debug('Refresh token verified, looking up user:', { userId: payload.userId });
 
       // Get user details
       const user = await UserModel.findById(payload.userId);
       if (!user) {
+        logger.warn('User not found during token refresh:', { userId: payload.userId });
         throw new CustomError('User not found', 401);
       }
 
       if (user.status !== 'active') {
+        logger.warn('User account is not active during token refresh:', { userId: payload.userId, status: user.status });
         throw new CustomError('User account is not active', 401);
       }
 

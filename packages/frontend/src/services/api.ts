@@ -107,7 +107,9 @@ class ApiService {
           try {
             // Try to refresh token
             const refreshResponse = await this.api.post('/auth/refresh');
-            const { accessToken } = refreshResponse.data.data;
+            // refreshResponse is already { success, data: { accessToken }, message }
+            // because api.request() returns response.data
+            const { accessToken } = refreshResponse.data;
 
             this.setAccessToken(accessToken);
 
