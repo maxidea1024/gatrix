@@ -103,6 +103,7 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         agent: httpAgent,
+        ws: true,
       },
     },
   },

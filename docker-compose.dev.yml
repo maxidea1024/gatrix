@@ -76,10 +76,11 @@ services:
       DISABLE_X_POWERED_BY: true
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
       # Chat Server Integration
-      CHAT_SERVER_URL: http://chat-server-dev:53001
+      CHAT_SERVER_URL: http://chat-server-dev:3001
+      CHAT_SERVER_API_TOKEN: ${CHAT_SERVER_API_TOKEN:-gatrix-api-d58e8c748ac604b8020526904558251a0604000f8a5898a1b5e28b99aee9ed79}
       # Service Discovery
       SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-etcd}
-      ETCD_HOSTS: ${ETCD_HOSTS:-http://etcd:52379}
+      ETCD_HOSTS: ${ETCD_HOSTS:-http://etcd:2379}
     ports:
       - "${BACKEND_PORT:-55000}:5000"
       - "59229:9229" # Debug port
@@ -337,7 +338,7 @@ services:
       MONITORING_ENABLED: true
       METRICS_PORT: 9090
       # Gatrix Integration
-      GATRIX_API_URL: http://backend-dev:55000
+      GATRIX_API_URL: http://backend-dev:5000
       GATRIX_API_SECRET: ${GATRIX_API_SECRET:-dev-shared-secret}
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-debug}

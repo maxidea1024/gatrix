@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { apiService } from './api';
 
 export interface ServerTimeResponse {
   success: boolean;
@@ -29,13 +29,10 @@ class TimeService {
     const clientLocalTime = new Date().getTime();
 
     try {
-      const runtimeEnv = (typeof window !== 'undefined' && (window as any)?.ENV?.VITE_API_URL) as string | undefined;
-      let baseURL = runtimeEnv || (import.meta as any).env?.VITE_API_URL || '/api/v1';
-      if (/^https?:\/\/localhost:5001\b/.test(baseURL)) baseURL = baseURL.replace('localhost:5001', 'localhost:5000');
-      const response = await axios.get<ServerTimeResponse>(`${baseURL}/time?clientLocalTime=${clientLocalTime}`);
+      const response = await apiService.get<ServerTimeResponse>(`/public/time?clientLocalTime=${clientLocalTime}`);
       const currentLocalTime = new Date().getTime();
 
-      const { serverLocalTime, uptime } = response.data;
+      const { serverLocalTime, uptime } = response.data || {};
 
       const roundTripTime = currentLocalTime - clientLocalTime;
       const ping = roundTripTime / 2;

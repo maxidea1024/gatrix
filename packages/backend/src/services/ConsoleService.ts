@@ -244,6 +244,13 @@ class ConsoleService {
       .register()
       .action(async (args, ctx, opts) => this.sha256Command(args, ctx, opts));
 
+    this.command('chat-token')
+      .description('Generate Chat Server API token')
+      .option('--name', 'Token name (default: gatrix-backend-token)')
+      .option('--permissions', 'Comma-separated permissions (default: read,write,admin)')
+      .audit(true)
+      .register()
+      .action(async (args, ctx, opts) => this.chatTokenCommand(args, ctx, opts));
 
   }
 
@@ -350,6 +357,7 @@ class ConsoleService {
       'Auth Utilities': ['gen-login-id', 'gen-login-password'],
       'Security & Crypto': ['jwt-secret', 'hash', 'encrypt', 'decrypt', 'random', 'md5', 'sha256'],
       'API Management': ['api-token', 'api-token-delete', 'api-token-list'],
+      'Chat Management': ['chat-token'],
       'Database': ['db-stats'],
       'Cache': ['cache-clear', 'cache-stats'],
       'User Management': ['user-info'],
@@ -1276,6 +1284,41 @@ class ConsoleService {
     }
   };
 
+  // Command: chat-token - Generate Chat Server API token
+  private chatTokenCommand = async (args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    try {
+      const { ChatServerService } = await import('./ChatServerService');
+      const chatServerService = ChatServerService.getInstance();
+
+      // Get token name from options or use default
+      const tokenName = opts?.name || 'gatrix-backend-token';
+
+      // Get permissions from options or use default
+      let permissions = ['read', 'write', 'admin'];
+      if (opts?.permissions) {
+        permissions = opts.permissions.split(',').map((p: string) => p.trim());
+      }
+
+      // Generate token via Chat Server
+      const token = await chatServerService.generateChatApiToken(tokenName, permissions);
+
+      const output = [
+        `\x1b[32m✅ Chat Server API Token Generated\x1b[0m`,
+        ``,
+        `Token Name: ${tokenName}`,
+        `Permissions: ${permissions.join(', ')}`,
+        ``,
+        `\x1b[1mToken:\x1b[0m`,
+        `${token}`,
+        ``,
+        `\x1b[33m⚠️  Save this token securely. You won't be able to see it again.\x1b[0m`,
+      ].join('\n');
+
+      return { output };
+    } catch (error: any) {
+      return { output: `\x1b[31mError generating chat token:\x1b[0m ${error?.message || 'Unknown error'}` };
+    }
+  };
 
 }
 

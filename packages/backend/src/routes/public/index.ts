@@ -23,13 +23,15 @@ router.get('/health', (req, res) => {
 router.get('/time', (req, res) => {
   const clientLocalTime = req.query.clientLocalTime ? parseInt(req.query.clientLocalTime as string) : null;
   const serverLocalTime = Date.now();
-  
+
   res.json({
     success: true,
-    serverLocalTimeISO: new Date(serverLocalTime).toISOString(),
-    serverLocalTime,
-    clientLocalTime,
-    uptime: process.uptime()
+    data: {
+      serverLocalTimeISO: new Date(serverLocalTime).toISOString(),
+      serverLocalTime,
+      clientLocalTime,
+      uptime: process.uptime()
+    }
   });
 });
 

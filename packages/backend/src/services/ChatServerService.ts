@@ -343,5 +343,36 @@ export class ChatServerService {
     }
   }
 
+  /**
+   * Generate Chat Server API token
+   */
+  async generateChatApiToken(tokenName: string, permissions: string[] = ['read', 'write', 'admin']): Promise<string> {
+    try {
+      logger.info(`🔑 Generating Chat Server API token: ${tokenName}`);
+
+      const response = await this.axiosInstance.post(
+        '/api/v1/admin/tokens',
+        {
+          name: tokenName,
+          permissions,
+        }
+      );
+
+      if (!response.data.success) {
+        throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
+      }
+
+      const token = response.data.data?.token;
+      if (!token) {
+        throw new Error('No token returned from Chat Server');
+      }
+
+      logger.info(`✅ Chat Server API token generated successfully`);
+      return token;
+    } catch (error: any) {
+      logger.error(`❌ Failed to generate Chat Server API token:`, error.message);
+      throw error;
+    }
+  }
 
 }
