@@ -49,13 +49,13 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
 }));
 
-// CORS configuration
-app.use(cors({
-  origin: true, // Allow all origins in development
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ALLOWED_HEADERS,
-}));
+// CORS configuration - Disabled in development
+// app.use(cors({
+//   origin: corsOrigin,
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//   allowedHeaders: ALLOWED_HEADERS,
+// }));
 
 // Compression middleware (disable for SSE streams)
 app.use(compression({

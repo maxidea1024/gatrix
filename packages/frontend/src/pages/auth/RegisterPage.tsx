@@ -622,6 +622,18 @@ const RegisterPage: React.FC = () => {
                 },
                 '& .MuiInputBase-input': {
                   color: 'white',
+                  '&:-webkit-autofill': {
+                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitTextFillColor: 'white !important',
+                  },
+                  '&:-webkit-autofill:hover': {
+                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitTextFillColor: 'white !important',
+                  },
+                  '&:-webkit-autofill:focus': {
+                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitTextFillColor: 'white !important',
+                  },
                 },
                 '& .MuiFormHelperText-root': {
                   minHeight: '20px',
@@ -664,6 +676,18 @@ const RegisterPage: React.FC = () => {
                 },
                 '& .MuiInputBase-input': {
                   color: 'white',
+                  '&:-webkit-autofill': {
+                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitTextFillColor: 'white !important',
+                  },
+                  '&:-webkit-autofill:hover': {
+                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitTextFillColor: 'white !important',
+                  },
+                  '&:-webkit-autofill:focus': {
+                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitTextFillColor: 'white !important',
+                  },
                 },
                 '& .MuiFormHelperText-root': {
                   minHeight: '20px',
@@ -718,6 +742,18 @@ const RegisterPage: React.FC = () => {
                   ...(isWebkit && !showPassword ? {
                     WebkitTextSecurity: 'disc',
                   } : {}),
+                  '&:-webkit-autofill': {
+                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitTextFillColor: 'white !important',
+                  },
+                  '&:-webkit-autofill:hover': {
+                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitTextFillColor: 'white !important',
+                  },
+                  '&:-webkit-autofill:focus': {
+                    WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                    WebkitTextFillColor: 'white !important',
+                  },
                 },
                 '& .MuiFormHelperText-root': {
                   minHeight: '20px',
@@ -815,6 +851,18 @@ const RegisterPage: React.FC = () => {
                     ...(isWebkit && !showConfirmPassword ? {
                       WebkitTextSecurity: 'disc',
                     } : {}),
+                    '&:-webkit-autofill': {
+                      WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                      WebkitTextFillColor: 'white !important',
+                    },
+                    '&:-webkit-autofill:hover': {
+                      WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                      WebkitTextFillColor: 'white !important',
+                    },
+                    '&:-webkit-autofill:focus': {
+                      WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
+                      WebkitTextFillColor: 'white !important',
+                    },
                   },
                   '& .MuiFormHelperText-root': {
                     minHeight: '20px',

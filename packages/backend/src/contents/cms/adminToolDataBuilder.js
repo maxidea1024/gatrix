@@ -2039,7 +2039,8 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
           key !== 'mateName' && key !== 'mateNameKr' && key !== 'mateNameEn' && key !== 'mateNameCn' &&
           key !== 'npcName' && key !== 'npcNameKr' && key !== 'npcNameEn' && key !== 'npcNameCn' &&
           key !== 'townNames' && key !== 'townNamesKr' && key !== 'townNamesEn' && key !== 'townNamesCn' &&
-          key !== 'towns') { // exclude nested towns to localize per-language below
+          key !== 'worldBuffNames' &&
+          key !== 'towns') { // exclude nested towns and worldBuffNames to localize per-language below
         baseEntry[key] = value;
       }
     }
@@ -2054,6 +2055,11 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
       return { id: t.id, name: nm };
     }) : undefined;
 
+    // Localize worldBuffNames per language
+    const worldBuffNamesKrVal = item.worldBuffNames;
+    const worldBuffNamesEnVal = item.worldBuffNames;
+    const worldBuffNamesCnVal = item.worldBuffNames ? item.worldBuffNames.map(name => loctab[name] || name) : undefined;
+
     languageData.kr.items.push({
       ...baseEntry,
       name: nameKr,
@@ -2062,6 +2068,7 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
       ...(mateNameKrVal !== undefined && { mateName: mateNameKrVal }),
       ...(npcNameKrVal !== undefined && { npcName: npcNameKrVal }),
       ...(townNamesKrVal !== undefined && { townNames: townNamesKrVal }),
+      ...(worldBuffNamesKrVal !== undefined && { worldBuffNames: worldBuffNamesKrVal }),
       ...(townsKr !== undefined && { towns: townsKr }),
     });
 
@@ -2073,6 +2080,7 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
       ...(mateNameEnVal !== undefined && { mateName: mateNameEnVal }),
       ...(npcNameEnVal !== undefined && { npcName: npcNameEnVal }),
       ...(townNamesEnVal !== undefined && { townNames: townNamesEnVal }),
+      ...(worldBuffNamesEnVal !== undefined && { worldBuffNames: worldBuffNamesEnVal }),
       ...(townsEn !== undefined && { towns: townsEn }),
     });
 
@@ -2084,6 +2092,7 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
       ...(mateNameCnVal !== undefined && { mateName: mateNameCnVal }),
       ...(npcNameCnVal !== undefined && { npcName: npcNameCnVal }),
       ...(townNamesCnVal !== undefined && { townNames: townNamesCnVal }),
+      ...(worldBuffNamesCnVal !== undefined && { worldBuffNames: worldBuffNamesCnVal }),
       ...(townsCn !== undefined && { towns: townsCn }),
     });
   }
@@ -2805,10 +2814,11 @@ function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir) {
 function main() {
   // Parse command line arguments
   const args = process.argv.slice(2);
-  let buildRewards = false;
-  let buildUILists = false;
-  let buildLocalization = false;
-  let buildEvents = false;
+  // Always build all data - ignore specific options
+  let buildRewards = true;
+  let buildUILists = true;
+  let buildLocalization = true;
+  let buildEvents = true;
   let cmsDir = DEFAULT_CMS_DIR;
   let outputDir = DEFAULT_OUTPUT_DIR;
 
@@ -2824,48 +2834,21 @@ Usage:
   node adminToolDataBuilder.js [options]
 
 Options:
-  --all              Build all data (default)
-  --rewards          Build reward lookup tables only
-  --ui-lists         Build UI list data only
-  --localization     Build localization table only
-  --events           Build event data only
   --cms-dir <path>   CMS directory path (default: ../../../cms)
   --output-dir <path> Output directory path (default: current directory)
   --help, -h         Show this help message
 
 Examples:
   node adminToolDataBuilder.js
-  node adminToolDataBuilder.js --rewards
-  node adminToolDataBuilder.js --events
   node adminToolDataBuilder.js --cms-dir /path/to/cms
       `);
       process.exit(0);
-    } else if (arg === '--all') {
-      buildRewards = true;
-      buildUILists = true;
-      buildLocalization = true;
-      buildEvents = true;
-    } else if (arg === '--rewards') {
-      buildRewards = true;
-    } else if (arg === '--ui-lists') {
-      buildUILists = true;
-    } else if (arg === '--localization') {
-      buildLocalization = true;
-    } else if (arg === '--events') {
-      buildEvents = true;
     } else if (arg === '--cms-dir') {
       cmsDir = args[++i];
     } else if (arg === '--output-dir') {
       outputDir = args[++i];
     }
-  }
-
-  // If no specific option is set, build all
-  if (!buildRewards && !buildUILists && !buildLocalization && !buildEvents) {
-    buildRewards = true;
-    buildUILists = true;
-    buildLocalization = true;
-    buildEvents = true;
+    // All other options are ignored - always build everything
   }
 
   console.log('\n╔════════════════════════════════════════════════════════════════╗');
@@ -2876,12 +2859,11 @@ Examples:
   const generatedFiles = [];
 
   // Build localization table FIRST (needed for reward/UI/event build)
+  // NOTE: loctab.json is NOT saved to output - it's only used internally for conversion
   let loctab = {};
   if (buildLocalization || buildRewards || buildUILists || buildEvents) {
     const loctabSource = path.join(cmsDir, 'locdata', 'locdata');
-    const loctabOut = path.join(outputDir, 'loctab.json');
-    loctab = convertLocalizationTable(loctabSource, loctabOut);
-    generatedFiles.push({ name: 'loctab.json', description: 'Localization table (Korean → Chinese)' });
+    loctab = convertLocalizationTable(loctabSource, null); // Pass null to skip file output
   }
 
   // Build reward lookup tables (with loctab for translations)
@@ -2999,3 +2981,7 @@ module.exports = {
   buildOceanNpcAreaSpawnerLookup,
 };
 
+// Run main function if this file is executed directly
+if (require.main === module) {
+  main();
+}

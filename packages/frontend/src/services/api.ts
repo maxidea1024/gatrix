@@ -9,12 +9,22 @@ class ApiService {
     // Use relative path for API calls by default. Runtime config can override.
     // In development: Vite proxy routes /api to backend (http://localhost:5000)
     // In production: API calls go to the same origin, so '/api/v1' is safest
-    const runtimeEnv = (typeof window !== 'undefined' && (window as any)?.ENV?.VITE_API_URL) as string | undefined;
-    let baseURL = (runtimeEnv && runtimeEnv.trim()) || (import.meta as any).env?.VITE_API_URL || '/api/v1';
+    let baseURL = (import.meta as any).env?.VITE_API_URL || '/api/v1';
+
+    // Only use runtime config in production (when explicitly set)
+    if (import.meta.env.PROD) {
+      const runtimeEnv = (typeof window !== 'undefined' && (window as any)?.ENV?.VITE_API_URL) as string | undefined;
+      if (runtimeEnv && runtimeEnv.trim()) {
+        baseURL = runtimeEnv.trim();
+      }
+    }
+
     // Normalize common misconfig: avoid accidentally pointing to localhost:5001
     if (/^https?:\/\/localhost:5001\b/.test(baseURL)) {
       baseURL = baseURL.replace('localhost:5001', 'localhost:5000');
     }
+
+    console.log('[ApiService] Constructor - baseURL:', baseURL, 'PROD:', import.meta.env.PROD);
 
     this.api = axios.create({
       baseURL,
@@ -24,6 +34,8 @@ class ApiService {
         'Content-Type': 'application/json',
       },
     });
+
+    console.log('[ApiService] After axios.create - baseURL:', this.api.defaults.baseURL);
 
     this.setupInterceptors();
   }
@@ -37,7 +49,8 @@ class ApiService {
         //   method: config.method,
         //   hasToken: !!this.accessToken,
         //   headers: config.headers,
-        //   baseURL: config.baseURL
+        //   baseURL: config.baseURL,
+        //   fullURL: config.url
         // });
 
         if (this.accessToken) {
@@ -177,6 +190,12 @@ class ApiService {
   // Generic request method
   private async request<T = any>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
     try {
+      // console.log('[ApiService] Request:', {
+      //   url: config.url,
+      //   method: config.method,
+      //   baseURL: this.api.defaults.baseURL,
+      //   fullURL: `${this.api.defaults.baseURL}${config.url}`
+      // });
       const response = await this.api.request<ApiResponse<T>>(config);
       return response.data;
     } catch (error: any) {
@@ -323,4 +342,11 @@ class ApiService {
 
 export const apiService = new ApiService();
 export const api = apiService; // alias for convenience
+
+// Expose to window for debugging
+if (typeof window !== 'undefined') {
+  (window as any).__GATRIX_API_SERVICE__ = apiService;
+  (window as any).__GATRIX_API_INSTANCE__ = apiService['api'];
+}
+
 export default apiService;

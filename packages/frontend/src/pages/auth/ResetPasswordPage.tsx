@@ -60,6 +60,24 @@ const ResetPasswordPage: React.FC = () => {
     validateToken();
   }, [token]);
 
+  // Disable autofill styling
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      input:-webkit-autofill,
+      input:-webkit-autofill:hover,
+      input:-webkit-autofill:focus,
+      input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.05) inset !important;
+        -webkit-text-fill-color: white !important;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   const validateToken = async () => {
     try {
       const response = await AuthService.validateResetToken(token!);
@@ -306,23 +324,50 @@ const ResetPasswordPage: React.FC = () => {
         }} />
       </Box>
 
-      {message && (
-        <Alert
-          severity={message.type}
-          sx={{
-            mb: 3,
-            backgroundColor: message.type === 'error' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(76, 175, 80, 0.1)',
-            color: message.type === 'error' ? '#ff6b6b' : '#4caf50',
-            border: `1px solid ${message.type === 'error' ? 'rgba(244, 67, 54, 0.2)' : 'rgba(76, 175, 80, 0.2)'}`,
-            '& .MuiAlert-icon': {
-              color: message.type === 'error' ? '#ff6b6b' : '#4caf50'
-            }
-          }}
-          onClose={() => setMessage(null)}
-        >
-          {message.text}
-        </Alert>
-      )}
+      {/* Message Alert - Smooth animation without fixed height */}
+      <Box
+        sx={{
+          mb: message ? 3 : 0,
+          overflow: 'hidden',
+          height: message ? 'auto' : 0,
+          transition: 'all 0.3s ease-out',
+        }}
+      >
+        {message && (
+          <Box
+            sx={{
+              width: '100%',
+              animation: 'slideDown 0.3s ease-out forwards',
+              '@keyframes slideDown': {
+                from: {
+                  opacity: 0,
+                  transform: 'translateY(-10px)',
+                },
+                to: {
+                  opacity: 1,
+                  transform: 'translateY(0)',
+                },
+              },
+            }}
+          >
+            <Alert
+              severity={message.type}
+              sx={{
+                width: '100%',
+                backgroundColor: message.type === 'error' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(76, 175, 80, 0.1)',
+                color: message.type === 'error' ? '#ff6b6b' : '#4caf50',
+                border: `1px solid ${message.type === 'error' ? 'rgba(244, 67, 54, 0.2)' : 'rgba(76, 175, 80, 0.2)'}`,
+                '& .MuiAlert-icon': {
+                  color: message.type === 'error' ? '#ff6b6b' : '#4caf50'
+                }
+              }}
+              onClose={() => setMessage(null)}
+            >
+              {message.text}
+            </Alert>
+          </Box>
+        )}
+      </Box>
 
       <Box component="form" onSubmit={handleSubmit}>
         <TextField
@@ -334,6 +379,8 @@ const ResetPasswordPage: React.FC = () => {
           disabled={isSubmitting}
           required
           autoFocus
+          autoComplete="new-password"
+          spellCheck="false"
           sx={{
             mb: 2,
             '& .MuiOutlinedInput-root': {
@@ -391,6 +438,8 @@ const ResetPasswordPage: React.FC = () => {
           onChange={(e) => setConfirmPassword(e.target.value)}
           disabled={isSubmitting}
           required
+          autoComplete="new-password"
+          spellCheck="false"
           sx={{
             mb: 3,
             '& .MuiOutlinedInput-root': {

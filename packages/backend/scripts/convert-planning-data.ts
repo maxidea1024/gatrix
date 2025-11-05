@@ -5,6 +5,7 @@
  *
  * 기획데이터 변환 도구
  * CMS 폴더의 원본 데이터를 처리하여 최종 JSON 파일 생성
+ * 항상 모든 데이터를 변환합니다 (옵션으로 선택 불가)
  *
  * Usage:
  *   npx ts-node scripts/convert-planning-data.ts [options]
@@ -13,11 +14,6 @@
  * Options:
  *   --input <path>      CMS 폴더 경로 (기본값: packages/backend/cms)
  *   --output <path>     출력 폴더 경로 (기본값: packages/backend/data/planning)
- *   --all               모든 데이터 변환 (기본값)
- *   --rewards           보상 데이터만 변환
- *   --ui-lists          UI 목록만 변환
- *   --localization      로컬라이징만 변환
- *   --events            이벤트 데이터만 변환
  *   --verbose           상세 로그 출력
  *   --help              도움말 표시
  */
@@ -29,11 +25,6 @@ import { execSync } from 'child_process';
 interface ConvertOptions {
   input: string;
   output: string;
-  all: boolean;
-  rewards: boolean;
-  uiLists: boolean;
-  localization: boolean;
-  events: boolean;
   verbose: boolean;
 }
 
@@ -103,18 +94,8 @@ class PlanningDataConverter {
 
       this.log('Running adminToolDataBuilder...');
 
-      // Build command with appropriate flags
-      let flags = [];
-      if (this.options.all) {
-        flags.push('--all');
-      } else {
-        if (this.options.rewards) flags.push('--rewards');
-        if (this.options.uiLists) flags.push('--ui-lists');
-        if (this.options.localization) flags.push('--localization');
-        if (this.options.events) flags.push('--events');
-      }
-
-      const command = `node "${builderPath}" ${flags.join(' ')} --cms-dir "${this.options.input}" --output-dir "${this.options.output}"`;
+      // Always build all data - no options needed
+      const command = `node "${builderPath}" --cms-dir "${this.options.input}" --output-dir "${this.options.output}"`;
 
       if (this.options.verbose) {
         this.log(`Command: ${command}`);
@@ -143,13 +124,13 @@ class PlanningDataConverter {
 
   private async verifyOutputFiles(): Promise<void> {
     const requiredFiles = [
-      'reward-lookup.json',
+      'reward-lookup-kr.json',
+      'reward-lookup-en.json',
+      'reward-lookup-zh.json',
       'reward-type-list.json',
-      'reward-localization-kr.json',
-      'reward-localization-us.json',
-      'reward-localization-cn.json',
-      'ui-list-data.json',
-      'loctab.json',
+      'ui-list-data-kr.json',
+      'ui-list-data-en.json',
+      'ui-list-data-zh.json',
     ];
 
     this.log('Verifying output files...');
@@ -179,19 +160,22 @@ class PlanningDataConverter {
 function parseArgs(): ConvertOptions {
   const args = process.argv.slice(2);
 
-  // Get the workspace root (go up from dist/scripts to root)
-  // __dirname is dist/scripts, so we need to go up 2 levels: scripts -> dist -> backend
-  // Then up 2 more to get to workspace root: backend -> packages -> root
-  const workspaceRoot = path.resolve(__dirname, '../../../..');
+  // Get the backend root
+  // When run via ts-node: __dirname is scripts directory
+  // When run via compiled JS: __dirname is dist/scripts directory
+  let backendRoot: string;
+
+  if (__dirname.includes('dist')) {
+    // Compiled: dist/scripts -> backend
+    backendRoot = path.resolve(__dirname, '../..');
+  } else {
+    // ts-node: scripts -> backend
+    backendRoot = path.resolve(__dirname, '..');
+  }
 
   const options: ConvertOptions = {
-    input: path.join(workspaceRoot, 'packages/backend/cms'),
-    output: path.join(workspaceRoot, 'packages/backend/data/planning'),
-    all: true,
-    rewards: false,
-    uiLists: false,
-    localization: false,
-    events: false,
+    input: path.join(backendRoot, 'cms'),
+    output: path.join(backendRoot, 'data', 'planning'),
     verbose: false,
   };
 
@@ -202,22 +186,6 @@ function parseArgs(): ConvertOptions {
         break;
       case '--output':
         options.output = args[++i];
-        break;
-      case '--rewards':
-        options.all = false;
-        options.rewards = true;
-        break;
-      case '--ui-lists':
-        options.all = false;
-        options.uiLists = true;
-        break;
-      case '--localization':
-        options.all = false;
-        options.localization = true;
-        break;
-      case '--events':
-        options.all = false;
-        options.events = true;
         break;
       case '--verbose':
         options.verbose = true;
@@ -243,11 +211,6 @@ Usage:
 Options:
   --input <path>      CMS 폴더 경로 (기본값: packages/backend/cms)
   --output <path>     출력 폴더 경로 (기본값: packages/backend/data/planning)
-  --all               모든 데이터 변환 (기본값)
-  --rewards           보상 데이터만 변환
-  --ui-lists          UI 목록만 변환
-  --localization      로컬라이징만 변환
-  --events            이벤트 데이터만 변환
   --verbose           상세 로그 출력
   --help              도움말 표시
 
@@ -260,12 +223,6 @@ Examples:
 
   # 상세 로그 출력
   yarn planning-data:convert --verbose
-
-  # 보상 데이터만 변환
-  yarn planning-data:convert --rewards
-
-  # 이벤트 데이터만 변환
-  yarn planning-data:convert --events
   `);
 }
 

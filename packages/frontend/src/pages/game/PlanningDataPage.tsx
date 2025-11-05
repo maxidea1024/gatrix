@@ -1418,32 +1418,9 @@ const PlanningDataPage: React.FC = () => {
                           overflow: 'hidden',
                         }}>
                           {filteredHotTimeBuffItems.map((item: HotTimeBuffItem) => {
-                            // Get localized world buff names based on current language
-                            let buffNames = 'No Buff';
-                            const lang = i18n.language;
-                            const krNames = item.worldBuffNamesKr || item.worldBuffNames;
-                            const enNames = item.worldBuffNamesEn;
-                            const cnNames = item.worldBuffNamesCn;
-
-                            if (lang === 'en') {
-                              // If English names exist and are different from Korean (i.e., real translations)
-                              if (enNames && enNames.length > 0 && enNames[0] !== krNames?.[0]) {
-                                buffNames = enNames.join(', ');
-                              } else {
-                                buffNames = krNames?.join(', ') || 'No Buff';
-                              }
-                            } else if (lang === 'zh') {
-                              // If Chinese names exist and are different from Korean (i.e., real translations)
-                              if (cnNames && cnNames.length > 0 && cnNames[0] !== krNames?.[0]) {
-                                buffNames = cnNames.join(', ');
-                              } else {
-                                buffNames = krNames?.join(', ') || 'No Buff';
-                              }
-                            } else {
-                              // Korean or default
-                              buffNames = krNames?.join(', ') || item.worldBuffId?.join(', ') || 'No Buff';
-                            }
-                            const label = `${item.id}: ${buffNames}`;
+                            // Get localized world buff names (file is already language-specific)
+                            const buffNames = item.worldBuffNames?.join(', ') || item.worldBuffId?.join(', ') || 'No Buff';
+                            const label = `${item.id}:${item.name} - ${buffNames}`;
                             return (
                               <Tooltip key={item.id} title={label} arrow>
                                 <Box
@@ -2436,7 +2413,7 @@ const PlanningDataPage: React.FC = () => {
                               {oceanNpcAreaSpawnerData.items.map((item: any) => {
                                 // Use localized name
                                 const itemName = item.name;
-                                const label = itemName ?? `${item.id}: ${item.oceanNpcId}`;
+                                const label = itemName ? `${item.id}:${itemName}` : `${item.id}: ${item.oceanNpcId}`;
                                 const tooltipTitle = item.npcExists === false
                                   ? `${t('planningData.error.npcNotFound')}\n${label}`
                                   : label;

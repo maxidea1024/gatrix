@@ -1,5 +1,22 @@
 /* Global styles for the application */
 
+/* Disable autofill styling completely */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+  box-shadow: 0 0 0 30px transparent inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white !important;
+}
+
+/* Remove autofill background transition delay */
+input:-webkit-autofill {
+  -webkit-transition: background-color 5000s ease-in-out 0s !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
 /* Ensure snackbar notifications appear above all modals and backdrops */
 .snackbar-container-root {
   z-index: 9999 !important;
