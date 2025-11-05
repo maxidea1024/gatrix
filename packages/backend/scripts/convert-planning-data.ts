@@ -131,6 +131,21 @@ class PlanningDataConverter {
       'ui-list-data-kr.json',
       'ui-list-data-en.json',
       'ui-list-data-zh.json',
+      'hottimebuff-lookup-kr.json',
+      'hottimebuff-lookup-en.json',
+      'hottimebuff-lookup-zh.json',
+      'eventpage-lookup-kr.json',
+      'eventpage-lookup-en.json',
+      'eventpage-lookup-zh.json',
+      'liveevent-lookup-kr.json',
+      'liveevent-lookup-en.json',
+      'liveevent-lookup-zh.json',
+      'materecruiting-lookup-kr.json',
+      'materecruiting-lookup-en.json',
+      'materecruiting-lookup-zh.json',
+      'oceannpcarea-lookup-kr.json',
+      'oceannpcarea-lookup-en.json',
+      'oceannpcarea-lookup-zh.json',
     ];
 
     this.log('Verifying output files...');

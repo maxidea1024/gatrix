@@ -1955,7 +1955,7 @@ function generateUIListData(cmsDir, loctab = {}) {
  * Takes the multi-language event data and creates separate files for kr, en, zh
  * Each file contains only the 'name' field (no nameKr, nameEn, nameCn)
  */
-function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
+function convertEventDataToLanguageSpecific(eventData, eventType, outputDir, loctab = {}) {
   const languageData = {
     kr: { totalCount: 0, items: [] },
     en: { totalCount: 0, items: [] },
@@ -1966,16 +1966,8 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
     return;
   }
 
-  // Load localization table if exists
-  const loctabPath = path.join(outputDir, 'loctab.json');
-  let loctab = {};
-  if (fs.existsSync(loctabPath)) {
-    try {
-      loctab = JSON.parse(fs.readFileSync(loctabPath, 'utf-8'));
-    } catch (e) {
-      console.log('   ⚠️  Could not load loctab.json for localization');
-    }
-  }
+  // Use provided loctab (passed from main function)
+  // If not provided, loctab defaults to empty object
 
   for (const item of eventData.items) {
     // Extract language-specific names
@@ -2118,11 +2110,23 @@ function convertEventDataToLanguageSpecific(eventData, eventType, outputDir) {
  * Takes the multi-language data and creates separate files for kr, en, zh
  * Each file contains only the 'name' field (no nameKr, nameEn, nameCn)
  */
-function convertUIListDataToLanguageSpecific(uiListData, outputDir) {
+function convertUIListDataToLanguageSpecific(uiListData, outputDir, loctab = {}) {
   const languageData = {
     kr: {},
     en: {},
     zh: {},
+  };
+
+  // Helper: token-wise translation fallback when full phrase not found
+  const translateByTokens = (kr) => {
+    if (!kr || !loctab) return kr;
+    try {
+      const tokens = kr.split(/\s+/).filter(Boolean);
+      const translated = tokens.map(t => (loctab[t] !== undefined ? loctab[t] : t));
+      return translated.join(' ');
+    } catch {
+      return kr;
+    }
   };
 
   // Process each category
@@ -2139,7 +2143,11 @@ function convertUIListDataToLanguageSpecific(uiListData, outputDir) {
       // Extract language-specific names
       const nameKr = item.nameKr || item.name || '';
       const nameEn = item.nameEn || item.name || '';
-      const nameCn = item.nameCn || item.name || '';
+      // For Chinese: use nameCn if available, otherwise translate from Korean using loctab
+      let nameCn = item.nameCn || '';
+      if (!nameCn && nameKr) {
+        nameCn = loctab[nameKr] || translateByTokens(nameKr);
+      }
 
       // Create entries with only 'name' field and other non-name fields
       const baseEntry = {};
@@ -2288,7 +2296,7 @@ function convertLocalizationTable(inputPath, outputPath) {
 // Event Data Builder Functions
 // ============================================================================
 
-function buildHotTimeBuffLookup(cmsDir, outputDir) {
+function buildHotTimeBuffLookup(cmsDir, outputDir, loctab = {}) {
   const hotTimeBuffPath = path.join(cmsDir, 'HotTimeBuff.json');
   const worldBuffPath = path.join(cmsDir, 'WorldBuff.json');
 
@@ -2342,8 +2350,8 @@ function buildHotTimeBuffLookup(cmsDir, outputDir) {
 
     const lookupData = { totalCount: items.length, items };
 
-    // Convert to language-specific files
-    convertEventDataToLanguageSpecific(lookupData, 'hottimebuff', outputDir);
+    // Convert to language-specific files (pass loctab for Chinese translation)
+    convertEventDataToLanguageSpecific(lookupData, 'hottimebuff', outputDir, loctab);
 
     console.log(`   ✅ HotTimeBuff lookup built (${items.length} items)`);
     return lookupData;
@@ -2353,7 +2361,7 @@ function buildHotTimeBuffLookup(cmsDir, outputDir) {
   }
 }
 
-function buildEventPageLookup(cmsDir, outputDir) {
+function buildEventPageLookup(cmsDir, outputDir, loctab = {}) {
   const eventPagePath = path.join(cmsDir, 'EventPage.json');
 
 
@@ -2431,8 +2439,8 @@ function buildEventPageLookup(cmsDir, outputDir) {
 
     const lookupData = { totalCount: items.length, items };
 
-    // Convert to language-specific files
-    convertEventDataToLanguageSpecific(lookupData, 'eventpage', outputDir);
+    // Convert to language-specific files (pass loctab for Chinese translation)
+    convertEventDataToLanguageSpecific(lookupData, 'eventpage', outputDir, loctab);
 
     console.log(`   ✅ EventPage lookup built (${items.length} items)`);
     return lookupData;
@@ -2442,7 +2450,7 @@ function buildEventPageLookup(cmsDir, outputDir) {
   }
 }
 
-function buildLiveEventLookup(cmsDir, outputDir) {
+function buildLiveEventLookup(cmsDir, outputDir, loctab = {}) {
   const liveEventPath = path.join(cmsDir, 'LiveEvent.json');
 
 
@@ -2484,8 +2492,8 @@ function buildLiveEventLookup(cmsDir, outputDir) {
 
     const lookupData = { totalCount: items.length, items };
 
-    // Convert to language-specific files
-    convertEventDataToLanguageSpecific(lookupData, 'liveevent', outputDir);
+    // Convert to language-specific files (pass loctab for Chinese translation)
+    convertEventDataToLanguageSpecific(lookupData, 'liveevent', outputDir, loctab);
 
     console.log(`   ✅ LiveEvent lookup built (${items.length} items)`);
     return lookupData;
@@ -2499,13 +2507,12 @@ function buildLiveEventLookup(cmsDir, outputDir) {
  * Build MateRecruitingGroup lookup data
  * Uses MateTemplate.json and Town.json to resolve group names
  */
-function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
+function buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab = {}) {
   const mateRecruitingGroupPath = path.join(cmsDir, 'MateRecruitingGroup.json');
   const mateTemplateFilePath = path.join(cmsDir, 'MateTemplate.json');
   const mateFilePath = path.join(cmsDir, 'Mate.json');
   const characterFilePath = path.join(cmsDir, 'Character.json');
   const townFilePath = path.join(cmsDir, 'Town.json');
-  const loctabPath = path.join(outputDir, 'loctab.json');
 
   try {
     if (!fs.existsSync(mateRecruitingGroupPath)) {
@@ -2532,16 +2539,8 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
       return null;
     }
 
-    // Load localization table if available
-    let loctab = {};
-    if (fs.existsSync(loctabPath)) {
-      try {
-        const loctabContent = fs.readFileSync(loctabPath, 'utf-8');
-        loctab = JSON.parse(loctabContent);
-      } catch (e) {
-        console.log('   ⚠️  Could not load loctab.json for localization');
-      }
-    }
+    // Use provided loctab (passed from main function)
+    // loctab is already loaded and passed as parameter
 
     // Create a map of mateId to mate names (all languages)
     const mateNameMap = {};
@@ -2696,8 +2695,8 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
 
     const lookupData = { totalCount: items.length, items };
 
-    // Convert to language-specific files
-    convertEventDataToLanguageSpecific(lookupData, 'materecruiting', outputDir);
+    // Convert to language-specific files (pass loctab for Chinese translation)
+    convertEventDataToLanguageSpecific(lookupData, 'materecruiting', outputDir, loctab);
 
     console.log(`   ✅ MateRecruitingGroup lookup built (${items.length} items)`);
     return lookupData;
@@ -2711,10 +2710,9 @@ function buildMateRecruitingGroupLookup(cmsDir, outputDir) {
  * Build OceanNpcAreaSpawner lookup data
  * Uses OceanNpc.json to resolve NPC names with localization
  */
-function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir) {
+function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir, loctab = {}) {
   const oceanNpcAreaSpawnerPath = path.join(cmsDir, 'OceanNpcAreaSpawner.json');
   const oceanNpcFilePath = path.join(cmsDir, 'OceanNpc.json');
-  const loctabPath = path.join(outputDir, 'loctab.json');
 
   try {
     if (!fs.existsSync(oceanNpcAreaSpawnerPath)) {
@@ -2734,16 +2732,8 @@ function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir) {
       return null;
     }
 
-    // Load localization table if available
-    let loctab = {};
-    if (fs.existsSync(loctabPath)) {
-      try {
-        const loctabContent = fs.readFileSync(loctabPath, 'utf-8');
-        loctab = JSON.parse(loctabContent);
-      } catch (e) {
-        console.log('   ⚠️  Could not load loctab.json for localization');
-      }
-    }
+    // Use provided loctab (passed from main function)
+    // loctab is already loaded and passed as parameter
 
     // Create a map of oceanNpcId to ocean npc names (all languages)
     const oceanNpcNameMap = {};
@@ -2796,8 +2786,8 @@ function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir) {
 
     const lookupData = { totalCount: items.length, items };
 
-    // Convert to language-specific files
-    convertEventDataToLanguageSpecific(lookupData, 'oceannpcarea', outputDir);
+    // Convert to language-specific files (pass loctab for Chinese translation)
+    convertEventDataToLanguageSpecific(lookupData, 'oceannpcarea', outputDir, loctab);
 
     console.log(`   ✅ OceanNpcAreaSpawner lookup built (${items.length} items)`);
     return lookupData;
@@ -2863,7 +2853,10 @@ Examples:
   let loctab = {};
   if (buildLocalization || buildRewards || buildUILists || buildEvents) {
     const loctabSource = path.join(cmsDir, 'locdata', 'locdata');
-    loctab = convertLocalizationTable(loctabSource, null); // Pass null to skip file output
+    const loadedLoctab = convertLocalizationTable(loctabSource, null); // Pass null to skip file output
+    if (loadedLoctab) {
+      loctab = loadedLoctab;
+    }
   }
 
   // Build reward lookup tables (with loctab for translations)
@@ -2899,8 +2892,8 @@ Examples:
   if (buildUILists) {
     const uiListData = generateUIListData(cmsDir, loctab);
 
-    // Convert to language-specific files
-    convertUIListDataToLanguageSpecific(uiListData, outputDir);
+    // Convert to language-specific files (pass loctab for Chinese translation)
+    convertUIListDataToLanguageSpecific(uiListData, outputDir, loctab);
     generatedFiles.push({ name: 'ui-list-data-kr.json', description: 'UI list data (Korean)' });
     generatedFiles.push({ name: 'ui-list-data-en.json', description: 'UI list data (English)' });
     generatedFiles.push({ name: 'ui-list-data-zh.json', description: 'UI list data (Chinese)' });
@@ -2910,35 +2903,35 @@ Examples:
   if (buildEvents) {
     console.log('🎮 Building event data...');
 
-    const hotTimeBuff = buildHotTimeBuffLookup(cmsDir, outputDir);
+    const hotTimeBuff = buildHotTimeBuffLookup(cmsDir, outputDir, loctab);
     if (hotTimeBuff) {
       generatedFiles.push({ name: 'hottimebuff-lookup-kr.json', description: 'HotTimeBuff (Korean)' });
       generatedFiles.push({ name: 'hottimebuff-lookup-en.json', description: 'HotTimeBuff (English)' });
       generatedFiles.push({ name: 'hottimebuff-lookup-zh.json', description: 'HotTimeBuff (Chinese)' });
     }
 
-    const eventPage = buildEventPageLookup(cmsDir, outputDir);
+    const eventPage = buildEventPageLookup(cmsDir, outputDir, loctab);
     if (eventPage) {
       generatedFiles.push({ name: 'eventpage-lookup-kr.json', description: 'EventPage (Korean)' });
       generatedFiles.push({ name: 'eventpage-lookup-en.json', description: 'EventPage (English)' });
       generatedFiles.push({ name: 'eventpage-lookup-zh.json', description: 'EventPage (Chinese)' });
     }
 
-    const liveEvent = buildLiveEventLookup(cmsDir, outputDir);
+    const liveEvent = buildLiveEventLookup(cmsDir, outputDir, loctab);
     if (liveEvent) {
       generatedFiles.push({ name: 'liveevent-lookup-kr.json', description: 'LiveEvent (Korean)' });
       generatedFiles.push({ name: 'liveevent-lookup-en.json', description: 'LiveEvent (English)' });
       generatedFiles.push({ name: 'liveevent-lookup-zh.json', description: 'LiveEvent (Chinese)' });
     }
 
-    const mateRecruiting = buildMateRecruitingGroupLookup(cmsDir, outputDir);
+    const mateRecruiting = buildMateRecruitingGroupLookup(cmsDir, outputDir, loctab);
     if (mateRecruiting) {
       generatedFiles.push({ name: 'materecruiting-lookup-kr.json', description: 'MateRecruiting (Korean)' });
       generatedFiles.push({ name: 'materecruiting-lookup-en.json', description: 'MateRecruiting (English)' });
       generatedFiles.push({ name: 'materecruiting-lookup-zh.json', description: 'MateRecruiting (Chinese)' });
     }
 
-    const oceanNpcArea = buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir);
+    const oceanNpcArea = buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir, loctab);
     if (oceanNpcArea) {
       generatedFiles.push({ name: 'oceannpcarea-lookup-kr.json', description: 'OceanNpcArea (Korean)' });
       generatedFiles.push({ name: 'oceannpcarea-lookup-en.json', description: 'OceanNpcArea (English)' });
