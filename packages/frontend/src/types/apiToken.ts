@@ -5,6 +5,7 @@ export interface ApiAccessToken {
   tokenName: string;
   description?: string;
   tokenHash: string;
+  tokenValue?: string; // Original token value for copying (only in list response)
   tokenType: TokenType;
   environmentId?: number;
   expiresAt?: string;
@@ -14,7 +15,7 @@ export interface ApiAccessToken {
   updatedBy?: number;
   createdAt: string;
   updatedAt: string;
-  
+
   // Relations
   environment?: {
     id: number;

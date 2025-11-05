@@ -10,7 +10,7 @@ services:
       MYSQL_USER: ${DB_USER:-gatrix_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
     ports:
-      - "${DB_PORT:-3306}:3306"
+      - "${DB_PORT:-53306}:3306"
     volumes:
       - mysql_dev_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
@@ -31,7 +31,7 @@ services:
     restart: unless-stopped
     command: redis-server --appendonly yes
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "${REDIS_PORT:-56379}:6379"
     volumes:
       - redis_dev_data:/data
     networks:
@@ -76,13 +76,13 @@ services:
       DISABLE_X_POWERED_BY: true
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
       # Chat Server Integration
-      CHAT_SERVER_URL: http://chat-server-dev:3001
+      CHAT_SERVER_URL: http://chat-server-dev:53001
       # Service Discovery
       SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-etcd}
-      ETCD_HOSTS: ${ETCD_HOSTS:-http://etcd:2379}
+      ETCD_HOSTS: ${ETCD_HOSTS:-http://etcd:52379}
     ports:
-      - "${BACKEND_PORT:-5000}:5000"
-      - "9229:9229" # Debug port
+      - "${BACKEND_PORT:-55000}:5000"
+      - "59229:9229" # Debug port
     depends_on:
       mysql:
         condition: service_healthy
@@ -111,7 +111,7 @@ services:
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
     ports:
-      - "${FRONTEND_PORT:-3000}:3000"
+      - "${FRONTEND_PORT:-53000}:3000"
     depends_on:
       - backend-dev
     networks:
@@ -127,7 +127,7 @@ services:
     container_name: gatrix-adminer-dev
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "58080:8080"
     depends_on:
       - mysql
     networks:
@@ -141,7 +141,7 @@ services:
     container_name: gatrix-redis-commander-dev
     restart: unless-stopped
     ports:
-      - "8081:8081"
+      - "58081:8081"
     depends_on:
       - redis
     networks:
@@ -167,8 +167,8 @@ services:
       - --initial-cluster-state=new
       - --log-level=info
     ports:
-      - "${ETCD_PORT:-2379}:2379"
-      - "2380:2380"
+      - "${ETCD_PORT:-52379}:2379"
+      - "52380:2380"
     volumes:
       - etcd_dev_data:/etcd-data
     networks:
@@ -186,8 +186,8 @@ services:
     container_name: gatrix-clickhouse-dev
     restart: unless-stopped
     ports:
-      - "${CLICKHOUSE_PORT:-8123}:8123"
-      - "9000:9000"
+      - "${CLICKHOUSE_PORT:-58123}:8123"
+      - "59000:9000"
     volumes:
       - clickhouse_dev_data:/var/lib/clickhouse
     networks:
@@ -236,7 +236,7 @@ services:
       WORKER_BATCH_TIMEOUT: ${WORKER_BATCH_TIMEOUT:-5000}
       WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-10}
     ports:
-      - "${EVENT_LENS_PORT:-3002}:3002"
+      - "${EVENT_LENS_PORT:-53002}:3002"
     depends_on:
       mysql:
         condition: service_healthy
@@ -337,13 +337,13 @@ services:
       MONITORING_ENABLED: true
       METRICS_PORT: 9090
       # Gatrix Integration
-      GATRIX_API_URL: http://backend-dev:5000
+      GATRIX_API_URL: http://backend-dev:55000
       GATRIX_API_SECRET: ${GATRIX_API_SECRET:-dev-shared-secret}
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-debug}
     ports:
-      - "${CHAT_PORT:-3001}:3001"
-      - "9090:9090" # Metrics port
+      - "${CHAT_PORT:-53001}:3001"
+      - "59090:9090" # Metrics port
     depends_on:
       mysql:
         condition: service_healthy

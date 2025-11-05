@@ -56,12 +56,18 @@ class ApiTokensController {
         .limit(Number(limit))
         .offset(Number(offset));
 
-      // Format tokens (include full token hash for copying)
+      // Format tokens (mask token for security)
       const formattedTokens = tokens.map((token: any) => {
+        // Mask the token: show first 4 and last 4 characters
+        const maskedToken = token.tokenHash && token.tokenHash.length > 8
+          ? `${token.tokenHash.substring(0, 4)}${'•'.repeat(token.tokenHash.length - 8)}${token.tokenHash.substring(token.tokenHash.length - 4)}`
+          : token.tokenHash;
+
         return {
           ...token,
-          // Keep the full tokenHash for copying purposes
-          tokenHash: token.tokenHash,
+          // Store masked token for display, keep original for copying
+          tokenHash: maskedToken,
+          tokenValue: token.tokenHash, // Store original value for copying
           creator: {
             name: token.creatorName || 'Unknown',
             email: token.creatorEmail || ''

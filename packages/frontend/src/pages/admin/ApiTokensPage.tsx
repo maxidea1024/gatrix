@@ -89,6 +89,7 @@ import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import { useI18n } from '@/contexts/I18nContext';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 
 interface CreateTokenData {
   tokenName: string;
@@ -612,7 +613,13 @@ const ApiTokensPage: React.FC = () => {
   };
 
   const copyTokenValue = (token: ApiAccessToken) => {
-    navigator.clipboard.writeText(token.tokenHash); // tokenHash now contains the plain token
+    // Use tokenValue if available (from list), otherwise use tokenHash
+    const tokenToCopy = (token as any).tokenValue || token.tokenHash;
+    if (!tokenToCopy) {
+      enqueueSnackbar(t('apiTokens.tokenValueError'), { variant: 'error' });
+      return;
+    }
+    navigator.clipboard.writeText(tokenToCopy);
     enqueueSnackbar(t('apiTokens.tokenCopied'), { variant: 'success' });
   };
 
