@@ -5,6 +5,8 @@ export interface ServiceNotice {
   isActive: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
+  channels?: string[];
+  subchannels?: string[];
   startDate: string | null;
   endDate: string;
   tabTitle?: string | null;

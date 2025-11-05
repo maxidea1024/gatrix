@@ -20,6 +20,7 @@ export interface GameWorld {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
   customPayload?: Record<string, any> | null;
+  worldServerAddress?: string | null;
   tags?: Tag[]; // normalized
   createdAt: string;
   updatedAt: string;

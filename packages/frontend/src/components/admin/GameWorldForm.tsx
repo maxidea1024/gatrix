@@ -130,6 +130,20 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
         </Typography>
       </Box>
 
+      {/* World Server Address */}
+      <Box>
+        <TextField
+          fullWidth
+          label={t('gameWorlds.worldServerAddress')}
+          value={formData.worldServerAddress || ''}
+          onChange={(e) => onFormDataChange({ ...formData, worldServerAddress: e.target.value || null })}
+          placeholder="e.g., game-server.example.com:8080"
+        />
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+          {t('gameWorlds.form.worldServerAddressHelp')}
+        </Typography>
+      </Box>
+
       {/* Tags */}
       <Box>
         <Autocomplete

@@ -29,6 +29,7 @@ export interface GameWorld {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
   customPayload?: Record<string, any> | null;
+  worldServerAddress?: string | null;
   createdBy: number;
   updatedBy?: number;
   createdAt: string;
@@ -54,6 +55,7 @@ export interface CreateGameWorldData {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
   customPayload?: Record<string, any> | null;
+  worldServerAddress?: string | null;
   createdBy: number;
 }
 
@@ -72,6 +74,7 @@ export interface UpdateGameWorldData {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
   customPayload?: Record<string, any> | null;
+  worldServerAddress?: string | null;
   updatedBy?: number;
 }
 
@@ -293,6 +296,7 @@ export class GameWorldModel {
           maintenanceMessage: gameWorldData.maintenanceMessage || null,
           supportsMultiLanguage: gameWorldData.supportsMultiLanguage ?? false,
           customPayload: gameWorldData.customPayload ?? {},
+          worldServerAddress: gameWorldData.worldServerAddress || null,
           createdBy: gameWorldData.createdBy
         };
 

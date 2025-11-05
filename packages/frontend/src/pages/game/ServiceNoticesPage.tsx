@@ -36,6 +36,7 @@ import {
   Close as CloseIcon,
   Refresh as RefreshIcon,
   ContentCopy as ContentCopyIcon,
+  Info as InfoIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -115,7 +116,7 @@ const ServiceNoticesPage: React.FC = () => {
     { id: 'currentlyVisible', labelKey: 'serviceNotices.currentlyVisible', visible: true },
     { id: 'status', labelKey: 'serviceNotices.status', visible: true },
     { id: 'category', labelKey: 'serviceNotices.category', visible: true },
-    { id: 'platforms', labelKey: 'serviceNotices.platforms', visible: true },
+    { id: 'targetAudience', labelKey: 'serviceNotices.targetAudience', visible: true },
     { id: 'period', labelKey: 'serviceNotices.period', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
   ];
@@ -661,16 +662,43 @@ const ServiceNoticesPage: React.FC = () => {
                             </TableCell>
                           );
                         }
-                        if (column.id === 'platforms') {
+                        if (column.id === 'targetAudience') {
+                          const hasChannels = notice.channels && notice.channels.length > 0;
+                          const platformsText = notice.platforms.length === 0
+                            ? t('common.all')
+                            : notice.platforms.join(', ');
+                          const channelsText = hasChannels
+                            ? notice.channels.join(', ')
+                            : null;
+
                           return (
                             <TableCell key={column.id}>
-                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                {notice.platforms.length === 0 ? (
-                                  <Chip label={t('common.all')} size="small" variant="outlined" />
-                                ) : (
-                                  notice.platforms.map((platform) => (
-                                    <Chip key={platform} label={platform} size="small" />
-                                  ))
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Box sx={{ flex: 1 }}>
+                                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                    {platformsText}
+                                  </Typography>
+                                  {channelsText && (
+                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                                      {channelsText}
+                                    </Typography>
+                                  )}
+                                </Box>
+                                {(hasChannels || notice.platforms.length > 2) && (
+                                  <Tooltip title={
+                                    <Box>
+                                      <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
+                                        <strong>{t('serviceNotices.platforms')}:</strong> {platformsText}
+                                      </Typography>
+                                      {channelsText && (
+                                        <Typography variant="caption" sx={{ display: 'block' }}>
+                                          <strong>{t('serviceNotices.channels')}:</strong> {channelsText}
+                                        </Typography>
+                                      )}
+                                    </Box>
+                                  }>
+                                    <InfoIcon sx={{ fontSize: '1rem', cursor: 'pointer', color: 'action.active' }} />
+                                  </Tooltip>
                                 )}
                               </Box>
                             </TableCell>

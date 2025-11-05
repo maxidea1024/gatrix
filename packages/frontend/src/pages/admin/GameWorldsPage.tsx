@@ -400,6 +400,7 @@ const GameWorldsPage: React.FC = () => {
     { id: 'worldId', labelKey: 'gameWorlds.worldId', visible: true },
     { id: 'name', labelKey: 'gameWorlds.name', visible: true },
     { id: 'description', labelKey: 'gameWorlds.description', visible: true },
+    { id: 'worldServerAddress', labelKey: 'gameWorlds.worldServerAddress', visible: true },
     { id: 'isVisible', labelKey: 'gameWorlds.isVisible', visible: true },
     { id: 'isMaintenance', labelKey: 'gameWorlds.isMaintenance', visible: true },
     { id: 'tags', labelKey: 'common.tags', visible: true },
@@ -698,6 +699,7 @@ const GameWorldsPage: React.FC = () => {
       isVisible: true,
       isMaintenance: false,
       description: '',
+      worldServerAddress: null,
       maintenanceStartDate: '',
       maintenanceEndDate: '',
       maintenanceMessage: '',
@@ -735,6 +737,7 @@ const GameWorldsPage: React.FC = () => {
       isVisible: Boolean(world.isVisible),
       isMaintenance: Boolean(world.isMaintenance),
       description: world.description || '',
+      worldServerAddress: world.worldServerAddress || null,
       maintenanceStartDate: world.maintenanceStartDate || '',
       maintenanceEndDate: world.maintenanceEndDate || '',
       maintenanceMessage: world.maintenanceMessage || '',
@@ -768,6 +771,7 @@ const GameWorldsPage: React.FC = () => {
       isVisible: Boolean(world.isVisible),
       isMaintenance: Boolean(world.isMaintenance),
       description: world.description || '',
+      worldServerAddress: world.worldServerAddress || null,
       maintenanceStartDate: world.maintenanceStartDate || '',
       maintenanceEndDate: world.maintenanceEndDate || '',
       maintenanceMessage: world.maintenanceMessage || '',
@@ -1193,6 +1197,25 @@ const GameWorldsPage: React.FC = () => {
           <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 300 }}>
             {world.description || '-'}
           </Typography>
+        );
+      case 'worldServerAddress':
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" sx={{ fontFamily: 'monospace', maxWidth: 250 }}>
+              {world.worldServerAddress || '-'}
+            </Typography>
+            {world.worldServerAddress && (
+              <Tooltip title={t('common.copy')}>
+                <IconButton
+                  size="small"
+                  onClick={() => handleCopy(world.worldServerAddress || '', t('gameWorlds.worldServerAddress'))}
+                  sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+                >
+                  <CopyIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
         );
       case 'isVisible':
         return (
