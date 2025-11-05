@@ -928,6 +928,22 @@ function buildRewardLookupTable(cmsDir, loctab = {}) {
 
                 return { ...itemData, nameCn: `${baseCn} (${suffixCn})`, nameEn: formattedName };
               }
+
+              // For all other Point items, translate the name using token-wise translation
+              const baseName = cleanName;
+              // Try full phrase first, then token-wise
+              let baseCn = loctab[baseName];
+              if (!baseCn || baseCn === baseName) {
+                // Token-wise translation fallback
+                try {
+                  const tokens = baseName.split(/\s+/).filter(Boolean);
+                  const translated = tokens.map(t => (loctab && loctab[t] !== undefined ? loctab[t] : t));
+                  baseCn = translated.join(' ');
+                } catch {
+                  baseCn = baseName;
+                }
+              }
+              return { ...itemData, nameCn: baseCn, nameEn: formattedName };
             }
 
             // Build final object and return (avoid direct shape mutations)
