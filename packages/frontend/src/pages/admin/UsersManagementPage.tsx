@@ -94,6 +94,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { User, Tag } from '@/types';
 import { apiService } from '@/services/api';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { tagService } from '@/services/tagService';
 import { UserService } from '@/services/users';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
@@ -196,15 +197,14 @@ const UsersManagementPage: React.FC = () => {
 
   // 클립보드 복사 함수
   const copyToClipboard = async (text: string, type: 'name' | 'email') => {
-    try {
-      await navigator.clipboard.writeText(text);
-      enqueueSnackbar(
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(
         t(type === 'name' ? 'users.nameCopied' : 'users.emailCopied'),
         { variant: 'success' }
-      );
-    } catch (error) {
-      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
-    }
+      ),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   // 페이지 상태 관리 (URL params 연동)

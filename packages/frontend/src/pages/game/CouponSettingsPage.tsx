@@ -4,6 +4,7 @@ import { Settings as SettingsIcon, Delete as DeleteIcon, Edit as EditIcon, Add a
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useDebounce } from '@/hooks/useDebounce';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import SimplePagination from '@/components/common/SimplePagination';
 import { couponService, CouponSetting, CouponStatus, CouponType, IssuedCouponCode } from '@/services/couponService';
 import { generateExampleCouponCode, CodePattern } from '@/utils/couponCodeGenerator';
@@ -97,23 +98,19 @@ const CouponSettingsPage: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<CouponSetting | null>(null);
 
   const handleCopyCode = async (code: string) => {
-    try {
-      await navigator.clipboard.writeText(code);
-      enqueueSnackbar(t('coupons.couponSettings.codeCopied'), { variant: 'success' });
-    } catch (e) {
-      // noop: clipboard may not be available in some contexts
-      console.error('Failed to copy coupon code', e);
-    }
+    copyToClipboardWithNotification(
+      code,
+      () => enqueueSnackbar(t('coupons.couponSettings.codeCopied'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const handleCopyName = async (name: string) => {
-    try {
-      await navigator.clipboard.writeText(name);
-      enqueueSnackbar(t('coupons.couponSettings.nameCopied'), { variant: 'success' });
-    } catch (e) {
-      // noop: clipboard may not be available in some contexts
-      console.error('Failed to copy coupon name', e);
-    }
+    copyToClipboardWithNotification(
+      name,
+      () => enqueueSnackbar(t('coupons.couponSettings.nameCopied'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   // Export all issued codes to CSV/XLSX (chunked for large datasets)

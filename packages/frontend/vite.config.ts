@@ -71,7 +71,7 @@ export default defineConfig({
     },
     // Let Vite infer the HMR host from the page URL so LAN clients use the correct IP
     hmr: {
-      port: 3000,
+      port: 53000,
     },
     proxy: {
       '/api': {

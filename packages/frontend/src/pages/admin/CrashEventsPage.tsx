@@ -68,6 +68,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import dayjs, { Dayjs } from 'dayjs';
 
 // Types and Services
@@ -648,20 +649,29 @@ const CrashEventsPage: React.FC = () => {
       ['User Message', event.userMessage || '-'],
     ];
     const tsvData = fields.map(([key, value]) => `${key}\t${value}`).join('\n');
-    navigator.clipboard.writeText(tsvData);
-    enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+    copyToClipboardWithNotification(
+      tsvData,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   }, [t, enqueueSnackbar]);
 
   const handleCopyJsonData = useCallback((event: CrashEvent) => {
     const jsonData = JSON.stringify(event, null, 2);
-    navigator.clipboard.writeText(jsonData);
-    enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+    copyToClipboardWithNotification(
+      jsonData,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   }, [t, enqueueSnackbar]);
 
   const handleCopyCurrentView = useCallback(() => {
     const currentUrl = window.location.href;
-    navigator.clipboard.writeText(currentUrl);
-    enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+    copyToClipboardWithNotification(
+      currentUrl,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   }, [t, enqueueSnackbar]);
 
   const handleViewLog = async (event: CrashEvent) => {

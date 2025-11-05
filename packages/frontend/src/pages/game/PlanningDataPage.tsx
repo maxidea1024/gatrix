@@ -40,6 +40,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import planningDataService, { PlanningDataStats, HotTimeBuffLookup, HotTimeBuffItem } from '../../services/planningDataService';
 import SimplePagination from '../../components/common/SimplePagination';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -358,11 +359,11 @@ const PlanningDataPage: React.FC = () => {
   const handleCellClick = (event: React.MouseEvent, text: string) => {
     if (event.ctrlKey || event.metaKey) {
       event.preventDefault();
-      navigator.clipboard.writeText(text).then(() => {
-        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
-      }).catch(() => {
-        enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
-      });
+      copyToClipboardWithNotification(
+        text,
+        () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      );
     }
   };
 

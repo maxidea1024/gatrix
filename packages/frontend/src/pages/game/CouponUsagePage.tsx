@@ -4,6 +4,7 @@ import { History as HistoryIcon, Search as SearchIcon, ViewColumn as ViewColumnI
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import SimplePagination from '@/components/common/SimplePagination';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { useDebounce } from '@/hooks/useDebounce';
 import DynamicFilterBar, { ActiveFilter, FilterDefinition } from '@/components/common/DynamicFilterBar';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
@@ -129,11 +130,11 @@ const CouponUsagePage: React.FC = () => {
   // Copy to clipboard handler
   const handleCopy = (text: string | undefined) => {
     if (!text) return;
-    navigator.clipboard.writeText(text).then(() => {
-      enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
-    }).catch(() => {
-      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
-    });
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const sortedRecords = useMemo(() => {

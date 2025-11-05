@@ -608,8 +608,11 @@ const ApiTokensPage: React.FC = () => {
 
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    enqueueSnackbar(t('apiTokens.tokenCopied'), { variant: 'success' });
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(t('apiTokens.tokenCopied'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const copyTokenValue = (token: ApiAccessToken) => {
@@ -619,8 +622,11 @@ const ApiTokensPage: React.FC = () => {
       enqueueSnackbar(t('apiTokens.tokenValueError'), { variant: 'error' });
       return;
     }
-    navigator.clipboard.writeText(tokenToCopy);
-    enqueueSnackbar(t('apiTokens.tokenCopied'), { variant: 'success' });
+    copyToClipboardWithNotification(
+      tokenToCopy,
+      () => enqueueSnackbar(t('apiTokens.tokenCopied'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const maskToken = (token: string) => {

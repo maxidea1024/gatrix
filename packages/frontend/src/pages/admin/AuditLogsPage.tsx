@@ -75,6 +75,7 @@ import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
 
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { AuditLogService, AuditLogFilters } from '../../services/auditLogService';
 import { AuditLog } from '../../types';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
@@ -521,21 +522,20 @@ const AuditLogsPage: React.FC = () => {
   };
 
   const handleCopyDetails = async (details: any) => {
-    try {
-      let text = '';
-      if (!details) {
-        text = 'No details available';
-      } else if (typeof details === 'string') {
-        text = details;
-      } else {
-        text = JSON.stringify(details, null, 2);
-      }
-      await navigator.clipboard.writeText(text);
-      enqueueSnackbar(t('auditLogs.detailsCopied'), { variant: 'success' });
-    } catch (error) {
-      console.error('Copy failed:', error);
-      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
+    let text = '';
+    if (!details) {
+      text = 'No details available';
+    } else if (typeof details === 'string') {
+      text = details;
+    } else {
+      text = JSON.stringify(details, null, 2);
     }
+
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(t('auditLogs.detailsCopied'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   return (
