@@ -358,7 +358,7 @@ const ServiceNoticesPage: React.FC = () => {
   // Copy notice URL to clipboard
   const handleCopyNoticeUrl = async () => {
     try {
-      const noticeUrl = `${window.location.origin}/game-notices.html`;
+      const noticeUrl = `${window.location.origin}/game-service-notices.html`;
       await navigator.clipboard.writeText(noticeUrl);
       enqueueSnackbar(t('serviceNotices.copyUrlSuccess'), { variant: 'success' });
     } catch (error) {

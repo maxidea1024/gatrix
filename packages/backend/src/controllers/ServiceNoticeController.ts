@@ -88,10 +88,11 @@ class ServiceNoticeController {
         });
       }
 
-      if (!data.platforms || !Array.isArray(data.platforms) || data.platforms.length === 0) {
+      // Platforms is optional - empty array means "all platforms"
+      if (!Array.isArray(data.platforms)) {
         return res.status(400).json({
           success: false,
-          message: 'At least one platform is required',
+          message: 'Platforms must be an array',
         });
       }
 
