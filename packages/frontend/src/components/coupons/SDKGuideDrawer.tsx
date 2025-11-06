@@ -25,6 +25,7 @@ import { useTheme } from '@mui/material/styles';
 import Editor from '@monaco-editor/react';
 import { useSnackbar } from 'notistack';
 import ResizableDrawer from '../common/ResizableDrawer';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 
 interface SDKGuideDrawerProps {
   open: boolean;
@@ -236,11 +237,12 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
   }
 }`;
 
-  const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    enqueueSnackbar(t('coupons.couponSettings.sdkGuideDrawer.copiedToClipboard'), {
-      variant: 'success',
-    });
+  const handleCopyCode = async (code: string) => {
+    await copyToClipboardWithNotification(
+      code,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const handleTestAPI = async () => {

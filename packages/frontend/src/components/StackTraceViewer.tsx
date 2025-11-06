@@ -13,6 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { Virtuoso } from 'react-virtuoso';
+import { copyToClipboardWithNotification } from '../utils/clipboard';
 
 interface StackTraceViewerProps {
   stackTrace: string;
@@ -133,8 +134,11 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
   const lines = useMemo(() => stackTrace.split('\n'), [stackTrace]);
 
   const handleCopyAll = () => {
-    navigator.clipboard.writeText(stackTrace);
-    enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+    copyToClipboardWithNotification(
+      stackTrace,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   // Memoize style objects

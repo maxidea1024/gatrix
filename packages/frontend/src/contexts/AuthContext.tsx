@@ -178,8 +178,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               const user = await AuthService.getProfile();
               setUser(user);
               devLogger.info('✅ AuthContext: User profile fetched successfully');
-            } catch (error) {
+            } catch (error: any) {
               devLogger.error('❌ AuthContext: Failed to fetch user profile:', error);
+
+              // Check if this is a "user not found" error
+              if (error?.response?.status === 404 &&
+                  (error?.response?.data?.message === 'USER_NOT_FOUND' ||
+                   error?.response?.data?.error?.message === 'USER_NOT_FOUND' ||
+                   error?.response?.data?.message?.includes('User not found'))) {
+                // User was deleted - redirect to session expired page
+                // The API interceptor will handle the redirect, just clear data here
+                devLogger.warn('⚠️ AuthContext: User not found - account may have been deleted');
+              }
+
               AuthService.clearAuthData();
               setUser(null);
             }

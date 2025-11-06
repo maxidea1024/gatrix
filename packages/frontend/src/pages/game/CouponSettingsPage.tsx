@@ -100,7 +100,7 @@ const CouponSettingsPage: React.FC = () => {
   const handleCopyCode = async (code: string) => {
     copyToClipboardWithNotification(
       code,
-      () => enqueueSnackbar(t('coupons.couponSettings.codeCopied'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };
@@ -108,7 +108,7 @@ const CouponSettingsPage: React.FC = () => {
   const handleCopyName = async (name: string) => {
     copyToClipboardWithNotification(
       name,
-      () => enqueueSnackbar(t('coupons.couponSettings.nameCopied'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
   };

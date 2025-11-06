@@ -4,6 +4,7 @@ import { Terminal as TerminalIcon } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
+import { copyToClipboard } from '../../utils/clipboard';
 import apiService from '../../services/api';
 
 import { Terminal } from '@xterm/xterm';
@@ -196,7 +197,7 @@ const SystemConsolePage: React.FC = () => {
   const handleCopy = async () => {
     try {
       const sel = termRef.current?.getSelection();
-      if (sel) await navigator.clipboard.writeText(sel);
+      if (sel) await copyToClipboard(sel);
     } catch {}
     setCtxMenu(null);
   };
@@ -364,7 +365,7 @@ const SystemConsolePage: React.FC = () => {
         // First check xterm selection (mouse selection)
         const sel = term.getSelection();
         if (sel) {
-          navigator.clipboard?.writeText(sel).catch(() => {});
+          copyToClipboard(sel).catch(() => {});
           return false; // prevent ^C input
         }
 
@@ -374,7 +375,7 @@ const SystemConsolePage: React.FC = () => {
           const end = Math.max(selectionStartRef.current, selectionEndRef.current);
           const selectedText = inputBufRef.current.slice(start, end);
           if (selectedText) {
-            navigator.clipboard?.writeText(selectedText).catch(() => {});
+            copyToClipboard(selectedText).catch(() => {});
             selectionStartRef.current = null;
             selectionEndRef.current = null;
             return false;
@@ -619,8 +620,12 @@ const SystemConsolePage: React.FC = () => {
               if (shouldCopyToClipboard && output) {
                 // Remove ANSI codes for clipboard
                 const plainText = output.replace(/\u001b\[[0-9;]*m/g, '');
-                navigator.clipboard?.writeText(plainText).then(() => {
-                  term.write('\u001b[32m✓ Copied to clipboard\u001b[0m\r\n');
+                copyToClipboard(plainText).then((success) => {
+                  if (success) {
+                    term.write('\u001b[32m✓ Copied to clipboard\u001b[0m\r\n');
+                  } else {
+                    term.write('\u001b[33m⚠ Failed to copy to clipboard\u001b[0m\r\n');
+                  }
                   writePrompt(term);
                 }).catch(() => {
                   term.write('\u001b[33m⚠ Failed to copy to clipboard\u001b[0m\r\n');

@@ -25,7 +25,7 @@ import {
 // Cache schema versioning for localStorage-stored messages
 const CHAT_CACHE_VERSION = '2';
 
-// 로컬 스토리지에서 메시지 캐시 로드
+// Helper function to load cached messages (called only when ChatProvider mounts)
 const loadCachedMessages = (): Record<number, Message[]> => {
   try {
     console.log('🔍 Loading cached messages from localStorage...');
@@ -91,8 +91,8 @@ const saveCachedMessages = (messages: Record<number, Message[]>) => {
   }
 };
 
-// Initial state
-const initialState: ChatState = {
+// Initial state factory function (called only when ChatProvider mounts)
+const createInitialState = (): ChatState => ({
   channels: [],
   currentChannelId: null,
   messages: loadCachedMessages(),
@@ -107,7 +107,7 @@ const initialState: ChatState = {
   loadingStartTime: null, // 로딩 시작 시간
   pendingInvitationsCount: 0,
   error: null,
-};
+});
 
 // Action types
 type ChatAction =
@@ -484,7 +484,7 @@ const ChatContext = createContext<ChatContextType | null>(null);
 
 // Provider component
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(chatReducer, initialState);
+  const [state, dispatch] = useReducer(chatReducer, undefined, createInitialState);
   const { user, getToken } = useAuth();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();

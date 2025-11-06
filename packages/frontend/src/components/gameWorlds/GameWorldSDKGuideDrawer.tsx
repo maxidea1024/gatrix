@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
 import Editor from '@monaco-editor/react';
 import { useSnackbar } from 'notistack';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../common/ResizableDrawer';
 
 interface GameWorldSDKGuideDrawerProps {
@@ -156,10 +157,11 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
 }`;
 
   const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    enqueueSnackbar(t('gameWorlds.sdkGuide.copiedToClipboard'), {
-      variant: 'success',
-    });
+    copyToClipboardWithNotification(
+      code,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const handleTestAPI = async () => {

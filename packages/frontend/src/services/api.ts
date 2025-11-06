@@ -86,6 +86,25 @@ class ApiService {
       async (error) => {
         const originalRequest = error.config;
 
+        // Check for "user not found" error - this happens when user is deleted but token is still valid
+        // Redirect to session expired page to prevent infinite loop
+        if (error.response?.status === 404 &&
+            (error.response?.data?.message === 'USER_NOT_FOUND' ||
+             error.response?.data?.error?.message === 'USER_NOT_FOUND' ||
+             error.response?.data?.message?.includes('User not found'))) {
+          // Clear all auth data
+          this.clearTokens();
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('user');
+            localStorage.removeItem('accessToken');
+          }
+          // Redirect to session expired page
+          if (typeof window !== 'undefined' && window.location.pathname !== '/session-expired') {
+            window.location.href = '/session-expired';
+          }
+          return Promise.reject(error);
+        }
+
         if (error.response?.status === 401 && !originalRequest._retry) {
           // Don't retry if this is already a refresh request
           if (originalRequest.url?.includes('/auth/refresh')) {

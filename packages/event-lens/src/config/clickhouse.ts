@@ -9,7 +9,7 @@ let clickhouseClient: ClickHouseClient | null = null;
 export function getClickHouseClient(): ClickHouseClient {
   if (!clickhouseClient) {
     clickhouseClient = createClient({
-      host: `http://${config.clickhouse.host}:${config.clickhouse.port}`,
+      url: `http://${config.clickhouse.host}:${config.clickhouse.port}`,
       database: config.clickhouse.database,
       username: config.clickhouse.username,
       password: config.clickhouse.password,
@@ -48,7 +48,7 @@ export async function initClickHouseDatabase(): Promise<void> {
   try {
     // 데이터베이스 생성을 위해 기본 데이터베이스 없이 클라이언트 생성
     const adminClient = createClient({
-      host: `http://${config.clickhouse.host}:${config.clickhouse.port}`,
+      url: `http://${config.clickhouse.host}:${config.clickhouse.port}`,
       username: config.clickhouse.username,
       password: config.clickhouse.password,
       compression: {

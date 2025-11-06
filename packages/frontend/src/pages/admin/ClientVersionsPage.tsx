@@ -118,6 +118,7 @@ import ClientVersionForm from '../../components/admin/ClientVersionForm';
 import BulkClientVersionForm from '../../components/admin/BulkClientVersionForm';
 import PlatformDefaultsDialog from '../../components/admin/PlatformDefaultsDialog';
 import { formatDateTimeDetailed, parseUTCForPicker } from '../../utils/dateFormat';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
@@ -1095,12 +1096,18 @@ const ClientVersionsPage: React.FC = () => {
           <Chip
             label={clientVersion.clientVersion}
             size="small"
+            variant="filled"
             sx={{
               ...getVersionColorStyle(clientVersion.clientVersion, theme.palette.mode === 'dark'),
               cursor: 'pointer',
+              fontWeight: 600,
+              borderRadius: '4px',
               '&:hover': {
                 opacity: 0.8,
-              }
+                transform: 'scale(1.05)',
+                boxShadow: 2,
+              },
+              transition: 'all 0.2s ease-in-out',
             }}
             onClick={() => {
               setEditingClientVersion(clientVersion);
@@ -1126,9 +1133,12 @@ const ClientVersionsPage: React.FC = () => {
             <Tooltip title={t('common.copy')}>
               <IconButton
                 size="small"
-                onClick={() => {
-                  navigator.clipboard.writeText(clientVersion.gameServerAddress);
-                  enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                onClick={async () => {
+                  await copyToClipboardWithNotification(
+                    clientVersion.gameServerAddress,
+                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                  );
                 }}
                 sx={{ p: 0.5 }}
               >
@@ -1146,9 +1156,12 @@ const ClientVersionsPage: React.FC = () => {
             <Tooltip title={t('common.copy')}>
               <IconButton
                 size="small"
-                onClick={() => {
-                  navigator.clipboard.writeText(clientVersion.patchAddress);
-                  enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                onClick={async () => {
+                  await copyToClipboardWithNotification(
+                    clientVersion.patchAddress,
+                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                  );
                 }}
                 sx={{ p: 0.5 }}
               >

@@ -28,6 +28,7 @@ import {
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { Invitation } from '../../types/invitation';
 import { invitationService } from '../../services/invitationService';
 
@@ -48,14 +49,12 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
 
   const inviteUrl = invitationService.generateInviteUrl(invitation.token);
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(inviteUrl);
-      enqueueSnackbar('초대 링크가 클립보드에 복사되었습니다.', { variant: 'success' });
-    } catch (error) {
-      console.error('Failed to copy link:', error);
-      enqueueSnackbar('링크 복사에 실패했습니다.', { variant: 'error' });
-    }
+  const handleCopyLink = () => {
+    copyToClipboardWithNotification(
+      inviteUrl,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const formatDate = (dateString: string) => {

@@ -35,6 +35,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
 import Editor from '@monaco-editor/react';
 import { useSnackbar } from 'notistack';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../common/ResizableDrawer';
 
 interface ClientVersionGuideDrawerProps {
@@ -167,10 +168,11 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
 }`;
 
   const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    enqueueSnackbar(t('coupons.couponSettings.sdkGuideDrawer.copiedToClipboard'), {
-      variant: 'success',
-    });
+    copyToClipboardWithNotification(
+      code,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const handleTestAPI = async () => {

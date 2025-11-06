@@ -1404,6 +1404,12 @@
     "emailSendFailed": "发送邮件失败。请稍后重试。",
     "emailSent": "邮件已发送",
     "enterEmailToReset": "输入您的邮箱地址以重置密码",
+    "sessionExpired": {
+      "title": "会话已过期",
+      "description": "您的登录信息已失效。请重新登录。",
+      "reason": "服务器可能已重置或您的账户可能已被删除。如果问题持续存在，请联系管理员。",
+      "backToLogin": "前往登录页面"
+    },
     "errors": {
       "invalidCredentials": "邮箱或密码不正确。",
       "authenticationFailed": "认证失败。请检查您的邮箱和密码。",

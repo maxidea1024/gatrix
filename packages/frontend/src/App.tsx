@@ -27,6 +27,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { I18nProvider, useI18n } from './contexts/I18nContext';
 import { PlatformConfigProvider } from './contexts/PlatformConfigContext';
 import { GameWorldProvider } from './contexts/GameWorldContext';
+import { PlanningDataProvider } from './contexts/PlanningDataContext';
 
 // Components
 import { LoadingIndicator } from './components/LoadingIndicator';
@@ -42,6 +43,7 @@ import LogoutPage from './pages/auth/LogoutPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import PendingApprovalPage from './pages/auth/PendingApprovalPage';
 import AccountSuspendedPage from './pages/auth/AccountSuspendedPage';
+import SessionExpiredPage from './pages/auth/SessionExpiredPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import OAuthCallbackPage from './pages/auth/OAuthCallbackPage';
@@ -246,20 +248,20 @@ const AppContent: React.FC = () => {
         <PlatformConfigProvider>
           <GameWorldProvider>
             <AuthInitializer>
-              <LocalizedDatePickers>
-                <CssBaseline />
-                {/* Global scrollbar styles */}
-                <GlobalStyles
-                  styles={(theme) => ({
-                    // Firefox - thin scrollbar for all elements
-                    'html, body, *, div, main, section, article, aside, nav': {
-                      scrollbarWidth: 'thin',
-                    },
-                    // WebKit/Blink (Chrome, Edge, Safari)
-                    'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar': {
-                      width: '8px',
-                      height: '8px',
-                    },
+            <LocalizedDatePickers>
+              <CssBaseline />
+              {/* Global scrollbar styles */}
+              <GlobalStyles
+                styles={(theme) => ({
+                  // Firefox - thin scrollbar for all elements
+                  'html, body, *, div, main, section, article, aside, nav': {
+                    scrollbarWidth: 'thin',
+                  },
+                  // WebKit/Blink (Chrome, Edge, Safari)
+                  'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar': {
+                    width: '8px',
+                    height: '8px',
+                  },
                     'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track': {
                       background: 'transparent',
                     },
@@ -296,6 +298,7 @@ const AppContent: React.FC = () => {
                       <Route path="/signup" element={<RegisterPage />} />
                       <Route path="/invalid-invite" element={<InvalidInvitePage />} />
                       <Route path="/pending-approval" element={<PendingApprovalPage />} />
+                      <Route path="/session-expired" element={<SessionExpiredPage />} />
                       <Route path="/auth/pending" element={<PendingApprovalPage />} />
                       <Route path="/auth/callback" element={<OAuthCallbackPage />} />
                       <Route path="/account-suspended" element={<AccountSuspendedPage />} />
@@ -396,20 +399,22 @@ const AppContent: React.FC = () => {
                       {/* Game Routes */}
                       <Route path="/game/*" element={
                         <ProtectedRoute requiredRoles={['admin']}>
-                          <MainLayout>
-                            <Routes>
-                              <Route path="service-notices" element={<ServiceNoticesPage />} />
-                              <Route path="ingame-popup-notices" element={<IngamePopupNoticesPage />} />
-                              <Route path="coupons" element={<CouponsPage />} />
-                              <Route path="surveys" element={<SurveysPage />} />
-                              <Route path="reward-templates" element={<RewardTemplatesPage />} />
-                              <Route path="hot-time-button-event" element={<HotTimeButtonEventPage />} />
-                              <Route path="coupon-settings" element={<CouponSettingsPage />} />
-                              <Route path="coupon-usage" element={<CouponUsagePage />} />
-                              <Route path="live-event" element={<LiveEventPage />} />
-                              <Route path="planning-data" element={<PlanningDataPage />} />
-                            </Routes>
-                          </MainLayout>
+                          <PlanningDataProvider>
+                            <MainLayout>
+                              <Routes>
+                                <Route path="service-notices" element={<ServiceNoticesPage />} />
+                                <Route path="ingame-popup-notices" element={<IngamePopupNoticesPage />} />
+                                <Route path="coupons" element={<CouponsPage />} />
+                                <Route path="surveys" element={<SurveysPage />} />
+                                <Route path="reward-templates" element={<RewardTemplatesPage />} />
+                                <Route path="hot-time-button-event" element={<HotTimeButtonEventPage />} />
+                                <Route path="coupon-settings" element={<CouponSettingsPage />} />
+                                <Route path="coupon-usage" element={<CouponUsagePage />} />
+                                <Route path="live-event" element={<LiveEventPage />} />
+                                <Route path="planning-data" element={<PlanningDataPage />} />
+                              </Routes>
+                            </MainLayout>
+                          </PlanningDataProvider>
                         </ProtectedRoute>
                       } />
 
@@ -418,7 +423,7 @@ const AppContent: React.FC = () => {
                     </Routes>
                   </Router>
                 </SnackbarProvider>
-              </LocalizedDatePickers>
+            </LocalizedDatePickers>
             </AuthInitializer>
           </GameWorldProvider>
         </PlatformConfigProvider>

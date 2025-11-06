@@ -55,6 +55,7 @@ import {
 } from '@mui/icons-material';
 
 import { useSnackbar } from 'notistack';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { WhitelistService, Whitelist, CreateWhitelistData } from '../../services/whitelistService';
 import SimplePagination from '../../components/common/SimplePagination';
 import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
@@ -261,14 +262,12 @@ const WhitelistPage: React.FC = () => {
   };
 
   // 복사 기능
-  const handleCopyToClipboard = async (text: string, type: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      enqueueSnackbar(`${type}이(가) 복사되었습니다.`, { variant: 'success' });
-    } catch (error) {
-      console.error('복사 실패:', error);
-      enqueueSnackbar('복사에 실패했습니다.', { variant: 'error' });
-    }
+  const handleCopyToClipboard = (text: string, type: string) => {
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const handleAdd = () => {

@@ -13,7 +13,7 @@ exports.up = async function(connection) {
       id INT AUTO_INCREMENT PRIMARY KEY,
       tokenName VARCHAR(255) NOT NULL,
       description TEXT NULL,
-      tokenHash VARCHAR(255) NOT NULL UNIQUE,
+      tokenValue VARCHAR(255) NOT NULL UNIQUE,
       tokenType ENUM('client', 'server') NOT NULL,
       environmentId INT NULL,
       expiresAt TIMESTAMP NULL,
@@ -23,10 +23,10 @@ exports.up = async function(connection) {
       updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      
+
       CONSTRAINT fk_api_token_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id),
       CONSTRAINT fk_api_token_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id),
-      
+
       INDEX idx_token_type (tokenType),
       INDEX idx_created_by (createdBy),
       INDEX idx_created_at (createdAt),

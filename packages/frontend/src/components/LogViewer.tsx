@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { copyToClipboardWithNotification } from '../utils/clipboard';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 interface LogViewerProps {
@@ -171,26 +172,32 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
     setSelectedLine(null);
   };
 
-  const handleCopyLine = () => {
+  const handleCopyLine = async () => {
     if (selectedLine !== null) {
       const lineContent = lines[selectedLine - 1];
-      navigator.clipboard.writeText(lineContent);
-      enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+      await copyToClipboardWithNotification(
+        lineContent,
+        () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      );
       handleClose();
     }
   };
 
-  const handleCopyLineWithNumber = () => {
+  const handleCopyLineWithNumber = async () => {
     if (selectedLine !== null) {
       const lineContent = lines[selectedLine - 1];
       const textToCopy = `${selectedLine}: ${lineContent}`;
-      navigator.clipboard.writeText(textToCopy);
-      enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+      await copyToClipboardWithNotification(
+        textToCopy,
+        () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      );
       handleClose();
     }
   };
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     if (selectedLine !== null && eventId) {
       // Build absolute URL with eventId and action parameters for auto-opening log drawer
       // Uses window.location.origin so it automatically adapts to dev/staging/production environments
@@ -198,8 +205,11 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
       params.set('eventId', eventId);
       params.set('action', 'viewLog');
       const url = `${window.location.origin}${window.location.pathname}?${params.toString()}#L${selectedLine}`;
-      navigator.clipboard.writeText(url);
-      enqueueSnackbar(t('crashes.linkCopied'), { variant: 'success' });
+      await copyToClipboardWithNotification(
+        url,
+        () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      );
       handleClose();
     }
   };
@@ -217,9 +227,12 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
     enqueueSnackbar(t('crashes.logDownloaded'), { variant: 'success' });
   };
 
-  const handleCopyAll = () => {
-    navigator.clipboard.writeText(logContent);
-    enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+  const handleCopyAll = async () => {
+    await copyToClipboardWithNotification(
+      logContent,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const handleGoToLine = () => {

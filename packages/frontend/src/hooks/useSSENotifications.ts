@@ -229,6 +229,11 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         // Keep-alive ping, no action needed
         break;
 
+      case 'planning_data_updated':
+        // Dispatch custom event for PlanningDataContext to listen
+        window.dispatchEvent(new CustomEvent('planning-data-updated', { detail: event.data }));
+        break;
+
       case 'remote_config_change':
         handleRemoteConfigChange(event.data);
         break;

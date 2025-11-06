@@ -200,7 +200,7 @@ const UsersManagementPage: React.FC = () => {
     copyToClipboardWithNotification(
       text,
       () => enqueueSnackbar(
-        t(type === 'name' ? 'users.nameCopied' : 'users.emailCopied'),
+        t('common.copiedToClipboard'),
         { variant: 'success' }
       ),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })

@@ -21,6 +21,9 @@ RUN yarn install --frozen-lockfile
 # Copy source code
 COPY packages/frontend ./packages/frontend
 
+# Increase Node.js heap size for development server to prevent out of memory errors
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 # Switch to non-root user
 USER node
 

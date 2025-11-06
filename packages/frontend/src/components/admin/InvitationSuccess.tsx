@@ -19,6 +19,7 @@ import {
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { InvitationResponse } from '../../types/invitation';
 
 interface InvitationSuccessProps {
@@ -33,19 +34,17 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation();
 
-  const handleCopyLink = async () => {
-    try {
-      const inviteUrl = invitationData?.inviteUrl || '';
-      if (!inviteUrl) {
-        enqueueSnackbar(t('invitations.noInviteLink'), { variant: 'error' });
-        return;
-      }
-      await navigator.clipboard.writeText(inviteUrl);
-      enqueueSnackbar(t('invitations.linkCopied'), { variant: 'success' });
-    } catch (error) {
-      console.error('Failed to copy link:', error);
-      enqueueSnackbar(t('invitations.copyFailed'), { variant: 'error' });
+  const handleCopyLink = () => {
+    const inviteUrl = invitationData?.inviteUrl || '';
+    if (!inviteUrl) {
+      enqueueSnackbar(t('invitations.noInviteLink'), { variant: 'error' });
+      return;
     }
+    copyToClipboardWithNotification(
+      inviteUrl,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const formatExpirationDate = (dateString: string) => {

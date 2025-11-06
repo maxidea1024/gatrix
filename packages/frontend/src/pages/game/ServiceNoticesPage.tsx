@@ -48,6 +48,7 @@ import EmptyTableRow from '../../components/common/EmptyTableRow';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { formatDateTime } from '../../utils/dateFormat';
 import { useDebounce } from '../../hooks/useDebounce';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -358,14 +359,12 @@ const ServiceNoticesPage: React.FC = () => {
 
   // Copy notice URL to clipboard
   const handleCopyNoticeUrl = async () => {
-    try {
-      const noticeUrl = `${window.location.origin}/game-service-notices.html`;
-      await navigator.clipboard.writeText(noticeUrl);
-      enqueueSnackbar(t('serviceNotices.copyUrlSuccess'), { variant: 'success' });
-    } catch (error) {
-      console.error('Failed to copy notice URL:', error);
-      enqueueSnackbar(t('serviceNotices.copyUrlFailed'), { variant: 'error' });
-    }
+    const noticeUrl = `${window.location.origin}/game-service-notices.html`;
+    copyToClipboardWithNotification(
+      noticeUrl,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const handleToggleActive = async (notice: ServiceNotice) => {

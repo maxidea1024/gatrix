@@ -89,7 +89,7 @@ export class PlanningDataService {
 
   /**
    * Initialize planning data on server startup
-   * Builds reward lookup if files don't exist
+   * Does NOT automatically build if files don't exist - users must manually upload via API
    */
   static async initialize(): Promise<void> {
     if (this.initialized) {
@@ -108,11 +108,9 @@ export class PlanningDataService {
       const typeListExists = await fs.access(this.rewardTypeListPath).then(() => true).catch(() => false);
 
       if (!lookupKrExists || !lookupEnExists || !lookupZhExists || !typeListExists) {
-        logger.info('Planning data files not found. Building initial data...');
-        await this.rebuildRewardLookup();
-        logger.info('Planning data initialized successfully');
+        logger.warn('Planning data files not found. Please upload planning data via API endpoint: POST /api/v1/admin/planning-data/rebuild');
       } else {
-        logger.info('Planning data files found. Skipping initial build.');
+        logger.info('Planning data files found. Ready to serve.');
       }
 
       // Ensure existing planning cache keys (if any) become persistent (no TTL)
@@ -146,7 +144,6 @@ export class PlanningDataService {
       } catch (persistErr) {
         logger.warn('Failed to persist planning cache keys (no TTL)', { error: persistErr });
       }
-
 
       this.initialized = true;
     } catch (error) {

@@ -1352,6 +1352,12 @@
     "emailSendFailed": "Failed to send email. Please try again later.",
     "emailSent": "Email sent",
     "enterEmailToReset": "Enter your email address to reset your password",
+    "sessionExpired": {
+      "title": "Session Expired",
+      "description": "Your login information is no longer valid. Please log in again.",
+      "reason": "The server may have been reset or your account may have been deleted. If the problem persists, please contact the administrator.",
+      "backToLogin": "Go to Login Page"
+    },
     "errors": {
       "invalidCredentials": "Email or password is incorrect.",
       "authenticationFailed": "Authentication failed. Please check your email and password.",

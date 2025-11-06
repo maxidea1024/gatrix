@@ -1100,9 +1100,12 @@ const CrashEventsPage: React.FC = () => {
                                           </Typography>
                                           <IconButton
                                             size="small"
-                                            onClick={() => {
-                                              navigator.clipboard.writeText(event.id);
-                                              enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                            onClick={async () => {
+                                              await copyToClipboardWithNotification(
+                                                event.id,
+                                                () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                              );
                                             }}
                                           >
                                             <CopyIcon fontSize="small" />
@@ -1138,9 +1141,12 @@ const CrashEventsPage: React.FC = () => {
                                           />
                                           <IconButton
                                             size="small"
-                                            onClick={() => {
-                                              navigator.clipboard.writeText(event.platform);
-                                              enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                            onClick={async () => {
+                                              await copyToClipboardWithNotification(
+                                                event.platform,
+                                                () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                              );
                                             }}
                                           >
                                             <CopyIcon fontSize="small" />
@@ -1164,9 +1170,12 @@ const CrashEventsPage: React.FC = () => {
                                           />
                                           <IconButton
                                             size="small"
-                                            onClick={() => {
-                                              navigator.clipboard.writeText(event.environment);
-                                              enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                            onClick={async () => {
+                                              await copyToClipboardWithNotification(
+                                                event.environment,
+                                                () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                              );
                                             }}
                                           >
                                             <CopyIcon fontSize="small" />
@@ -1190,9 +1199,12 @@ const CrashEventsPage: React.FC = () => {
                                           />
                                           <IconButton
                                             size="small"
-                                            onClick={() => {
-                                              navigator.clipboard.writeText(event.branch);
-                                              enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                            onClick={async () => {
+                                              await copyToClipboardWithNotification(
+                                                event.branch,
+                                                () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                              );
                                             }}
                                           >
                                             <CopyIcon fontSize="small" />
@@ -1216,9 +1228,12 @@ const CrashEventsPage: React.FC = () => {
                                           {event.appVersion && (
                                             <IconButton
                                               size="small"
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(event.appVersion!);
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              onClick={async () => {
+                                                await copyToClipboardWithNotification(
+                                                  event.appVersion!,
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />
@@ -1243,9 +1258,12 @@ const CrashEventsPage: React.FC = () => {
                                           {event.resVersion && (
                                             <IconButton
                                               size="small"
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(event.resVersion!);
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              onClick={async () => {
+                                                await copyToClipboardWithNotification(
+                                                  event.resVersion!,
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />
@@ -1266,9 +1284,12 @@ const CrashEventsPage: React.FC = () => {
                                             <Typography variant="body2">{event.accountId}</Typography>
                                             <IconButton
                                               size="small"
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(String(event.accountId));
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              onClick={async () => {
+                                                await copyToClipboardWithNotification(
+                                                  String(event.accountId),
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />
@@ -1289,9 +1310,12 @@ const CrashEventsPage: React.FC = () => {
                                             <Typography variant="body2">{event.characterId}</Typography>
                                             <IconButton
                                               size="small"
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(String(event.characterId));
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              onClick={async () => {
+                                                await copyToClipboardWithNotification(
+                                                  String(event.characterId),
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />
@@ -1312,9 +1336,12 @@ const CrashEventsPage: React.FC = () => {
                                             <Typography variant="body2">{event.gameUserId}</Typography>
                                             <IconButton
                                               size="small"
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(String(event.gameUserId));
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              onClick={async () => {
+                                                await copyToClipboardWithNotification(
+                                                  String(event.gameUserId),
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />
@@ -1335,9 +1362,12 @@ const CrashEventsPage: React.FC = () => {
                                             <Typography variant="body2">{event.userName}</Typography>
                                             <IconButton
                                               size="small"
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(event.userName!);
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              onClick={async () => {
+                                                await copyToClipboardWithNotification(
+                                                  event.userName!,
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />
@@ -1358,9 +1388,12 @@ const CrashEventsPage: React.FC = () => {
                                             <Typography variant="body2">{event.gameServerId}</Typography>
                                             <IconButton
                                               size="small"
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(String(event.gameServerId));
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              onClick={async () => {
+                                                await copyToClipboardWithNotification(
+                                                  String(event.gameServerId),
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />
@@ -1381,9 +1414,12 @@ const CrashEventsPage: React.FC = () => {
                                             <Typography variant="body2">{event.marketType}</Typography>
                                             <IconButton
                                               size="small"
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(event.marketType!);
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              onClick={async () => {
+                                                await copyToClipboardWithNotification(
+                                                  event.marketType!,
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />
@@ -1418,9 +1454,12 @@ const CrashEventsPage: React.FC = () => {
                                           {event.crashEventIp && (
                                             <IconButton
                                               size="small"
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(event.crashEventIp!);
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              onClick={async () => {
+                                                await copyToClipboardWithNotification(
+                                                  event.crashEventIp!,
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />
@@ -1443,9 +1482,12 @@ const CrashEventsPage: React.FC = () => {
                                           {event.crashEventUserAgent && (
                                             <IconButton
                                               size="small"
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(event.crashEventUserAgent!);
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              onClick={async () => {
+                                                await copyToClipboardWithNotification(
+                                                  event.crashEventUserAgent!,
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />
@@ -1469,8 +1511,11 @@ const CrashEventsPage: React.FC = () => {
                                             <IconButton
                                               size="small"
                                               onClick={() => {
-                                                navigator.clipboard.writeText((event as any).firstLine!);
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                                copyToClipboardWithNotification(
+                                                  (event as any).firstLine!,
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />
@@ -1500,9 +1545,12 @@ const CrashEventsPage: React.FC = () => {
                                             </Typography>
                                             <IconButton
                                               size="small"
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(event.userMessage!);
-                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              onClick={async () => {
+                                                await copyToClipboardWithNotification(
+                                                  event.userMessage!,
+                                                  () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                                                  () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                                                );
                                               }}
                                             >
                                               <CopyIcon fontSize="small" />

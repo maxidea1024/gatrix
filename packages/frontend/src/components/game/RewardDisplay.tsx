@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Box, Chip, Typography, Skeleton, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ParticipationReward } from '../../services/surveyService';
-import planningDataService, { RewardTypeInfo, RewardItem } from '../../services/planningDataService';
+import { RewardTypeInfo, RewardItem } from '../../services/planningDataService';
 import rewardTemplateService from '../../services/rewardTemplateService';
+import { usePlanningData } from '../../contexts/PlanningDataContext';
 
 interface RewardDisplayProps {
   rewards?: ParticipationReward[];
@@ -17,7 +18,8 @@ interface RewardDisplayProps {
  * Can display either direct rewards or rewards from a template
  */
 const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId, maxDisplay = 3 }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { rewardTypes, rewardLookup, isLoading: contextLoading } = usePlanningData();
   const [rewardTypeMap, setRewardTypeMap] = useState<Map<number, RewardTypeInfo>>(new Map());
   const [rewardItemsMap, setRewardItemsMap] = useState<Map<string, RewardItem>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -43,64 +45,41 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId
     loadTemplateRewards();
   }, [rewardTemplateId, rewards]);
 
-  // Load reward types and items
+  // Build reward type map from context
   useEffect(() => {
-    const loadRewardData = async () => {
-      try {
-        setLoading(true);
+    if (rewardTypes && rewardTypes.length > 0) {
+      const typeMap = new Map<number, RewardTypeInfo>();
+      rewardTypes.forEach(type => {
+        typeMap.set(type.value, type);
+      });
+      setRewardTypeMap(typeMap);
+    }
+  }, [rewardTypes]);
 
-        // Load reward types (using getRewardTypeList function)
-        const types = await planningDataService.getRewardTypeList();
-        const typeMap = new Map<number, RewardTypeInfo>();
-        types.forEach(type => {
-          typeMap.set(type.value, type);
-        });
-        setRewardTypeMap(typeMap);
+  // Build reward items map from context lookup data
+  useEffect(() => {
+    if (rewardLookup && displayRewards && displayRewards.length > 0) {
+      const itemsMap = new Map<string, RewardItem>();
 
-        // Load all reward items for the types used in rewards
-        if (displayRewards && displayRewards.length > 0) {
-          const itemsMap = new Map<string, RewardItem>();
+      // Get unique reward types
+      const uniqueTypes = [...new Set(displayRewards.map(r => parseInt(r.rewardType)))];
 
-          // Get unique reward types
-          const uniqueTypes = [...new Set(displayRewards.map(r => parseInt(r.rewardType)))];
-
-
-              // Map i18n language to API language
-              const languageMap: Record<string, 'kr' | 'en' | 'zh'> = {
-                'ko': 'kr',
-                'en': 'en',
-                'zh': 'zh',
-              };
-              const language = languageMap[i18n.language] || 'kr';
-
-          // Load items for each type that has a table
-          await Promise.all(
-            uniqueTypes.map(async (rewardType) => {
-              const typeInfo = typeMap.get(rewardType);
-              if (typeInfo?.hasTable) {
-                try {
-                  const items = await planningDataService.getRewardTypeItems(rewardType, language);
-                  items.forEach(item => {
-                    itemsMap.set(`${rewardType}_${item.id}`, item);
-                  });
-                } catch (error) {
-                  console.error(`Failed to load items for reward type ${rewardType}:`, error);
-                }
-              }
-            })
-          );
-
-          setRewardItemsMap(itemsMap);
+      // Extract items from reward lookup data
+      uniqueTypes.forEach(rewardType => {
+        const rewardTypeData = rewardLookup[rewardType];
+        if (rewardTypeData?.items && Array.isArray(rewardTypeData.items)) {
+          rewardTypeData.items.forEach(item => {
+            itemsMap.set(`${rewardType}_${item.id}`, item);
+          });
         }
-      } catch (error) {
-        console.error('Failed to load reward data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      });
 
-    loadRewardData();
-  }, [displayRewards]);
+      setRewardItemsMap(itemsMap);
+      setLoading(false);
+    } else if (!contextLoading && displayRewards && displayRewards.length === 0) {
+      setLoading(false);
+    }
+  }, [rewardLookup, displayRewards, contextLoading]);
 
   // No rewards
   if (!displayRewards || displayRewards.length === 0) {

@@ -30,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
 import Editor from '@monaco-editor/react';
 import { useSnackbar } from 'notistack';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../common/ResizableDrawer';
 
 interface IngamePopupNoticeGuideDrawerProps {
@@ -81,8 +82,11 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
   }, [apiToken, applicationName]);
 
   const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    enqueueSnackbar(t('common.copied') || 'Copied to clipboard', { variant: 'success' });
+    copyToClipboardWithNotification(
+      code,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const handleTestAPI = async () => {

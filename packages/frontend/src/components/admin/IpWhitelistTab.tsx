@@ -53,6 +53,7 @@ import {
 } from '../../services/ipWhitelistService';
 import SimplePagination from '../common/SimplePagination';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import FormDialogHeader from '../common/FormDialogHeader';
 import EmptyTableRow from '../common/EmptyTableRow';
 import dayjs from 'dayjs';
@@ -163,14 +164,12 @@ const IpWhitelistTab: React.FC = () => {
   };
 
   // 복사 기능
-  const handleCopyToClipboard = async (text: string, type: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      enqueueSnackbar(t('common.copySuccess', { type }), { variant: 'success' });
-    } catch (error) {
-      console.error('복사 실패:', error);
-      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
-    }
+  const handleCopyToClipboard = (text: string, type: string) => {
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
   const handleAdd = () => {

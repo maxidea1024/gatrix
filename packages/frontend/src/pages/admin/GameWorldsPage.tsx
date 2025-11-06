@@ -97,6 +97,7 @@ import { gameWorldService } from '../../services/gameWorldService';
 import { tagService, Tag } from '@/services/tagService';
 import { GameWorld, CreateGameWorldData, GameWorldMaintenanceLocale } from '../../types/gameWorld';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import translationService from '../../services/translationService';
@@ -1104,14 +1105,12 @@ const GameWorldsPage: React.FC = () => {
     }
   };
 
-  const handleCopy = async (text: string, type: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      enqueueSnackbar(t('common.copied', { type, value: text }), { variant: 'success' });
-    } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
-      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
-    }
+  const handleCopy = (text: string, type: string) => {
+    copyToClipboardWithNotification(
+      text,
+      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+    );
   };
 
 

@@ -8,7 +8,7 @@ const LOCK_NAME = 'gatrix_event_lens_clickhouse_migration_lock';
 const LOCK_TIMEOUT = 300; // 5 minutes in seconds
 
 const client = createClient({
-  host: `http://${process.env.CLICKHOUSE_HOST || 'localhost'}:${process.env.CLICKHOUSE_PORT || '8123'}`,
+  url: `http://${process.env.CLICKHOUSE_HOST || 'localhost'}:${process.env.CLICKHOUSE_PORT || '8123'}`,
   database: process.env.CLICKHOUSE_DATABASE || 'event_lens',
   username: process.env.CLICKHOUSE_USERNAME || 'default',
   password: process.env.CLICKHOUSE_PASSWORD || '',

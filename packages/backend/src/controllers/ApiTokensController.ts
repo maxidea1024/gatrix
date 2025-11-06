@@ -56,23 +56,34 @@ class ApiTokensController {
         .limit(Number(limit))
         .offset(Number(offset));
 
-      // Format tokens (mask token for security)
+      // Format tokens (mask token for display, keep original for copying)
       const formattedTokens = tokens.map((token: any) => {
         // Mask the token: show first 4 and last 4 characters
-        const maskedToken = token.tokenHash && token.tokenHash.length > 8
-          ? `${token.tokenHash.substring(0, 4)}${'•'.repeat(token.tokenHash.length - 8)}${token.tokenHash.substring(token.tokenHash.length - 4)}`
-          : token.tokenHash;
+        const maskedToken = token.tokenValue && token.tokenValue.length > 8
+          ? `${token.tokenValue.substring(0, 4)}${'•'.repeat(token.tokenValue.length - 8)}${token.tokenValue.substring(token.tokenValue.length - 4)}`
+          : token.tokenValue;
 
-        return {
+        const formatted = {
           ...token,
-          // Store masked token for display, keep original for copying
-          tokenHash: maskedToken,
-          tokenValue: token.tokenHash, // Store original value for copying
+          // Keep original tokenValue for copying
+          // Add maskedTokenValue for display
+          maskedTokenValue: maskedToken,
           creator: {
             name: token.creatorName || 'Unknown',
             email: token.creatorEmail || ''
           }
         };
+
+        console.log('[ApiTokensController] Formatted token:', {
+          id: formatted.id,
+          tokenName: formatted.tokenName,
+          hasTokenValue: !!formatted.tokenValue,
+          tokenValueLength: formatted.tokenValue?.length || 0,
+          tokenValuePreview: formatted.tokenValue?.substring(0, 10) + '...',
+          maskedTokenValue: formatted.maskedTokenValue?.substring(0, 10) + '...'
+        });
+
+        return formatted;
       });
 
       const responseData = {
@@ -117,7 +128,7 @@ class ApiTokensController {
       // Generate secure token (store as plain text)
       const tokenValue = crypto.randomBytes(32).toString('hex');
 
-      // Insert token (store plain text, no hashing)
+      // Insert token (store plain text)
       const [id] = await knex('g_api_access_tokens').insert({
         tokenName,
         description: description || null,

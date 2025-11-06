@@ -19,6 +19,8 @@ COPY . .
 
 # Build the frontend
 ENV NODE_ENV=production
+# Increase Node.js heap size for build process to prevent out of memory errors
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN yarn workspace @gatrix/frontend build
 
 # Production image with Nginx

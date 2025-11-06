@@ -79,6 +79,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
 import { tagService, Tag } from '@/services/tagService';
@@ -166,18 +167,14 @@ const MessageTemplatesPage: React.FC = () => {
   const loadStartTimeRef = useRef<number>(0);
   // Copy helper with type/label for proper i18n interpolation
   // includeValue=false -> use short toast without the copied value
-  const copyWithToast = async (value: string, typeLabel?: string, includeValue: boolean = true) => {
-    try {
-      await navigator.clipboard.writeText(value);
-      const message = includeValue && typeLabel
-        ? t('common.copied', { type: typeLabel, value })
-        : typeLabel
-          ? t('common.copySuccess', { type: typeLabel })
-          : t('common.copySuccess', { type: t('common.copy') });
-      enqueueSnackbar(message, { variant: 'success' });
-    } catch (e) {
+  const copyWithToast = (value: string, _typeLabel?: string, _includeValue: boolean = true) => {
+    const onSuccess = () => {
+      enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+    };
+    const onError = () => {
       enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
-    }
+    };
+    copyToClipboardWithNotification(value, onSuccess, onError);
   };
 
   const [saving, setSaving] = useState(false);

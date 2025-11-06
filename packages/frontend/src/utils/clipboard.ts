@@ -8,19 +8,26 @@
  * @returns Promise that resolves when copy is successful
  */
 export const copyToClipboard = async (text: string): Promise<boolean> => {
+  console.log('[Clipboard] Starting copy, text length:', text.length);
+  console.log('[Clipboard] navigator.clipboard available:', !!navigator.clipboard);
+
   // Try modern Clipboard API first (HTTPS/localhost only)
-  if (navigator.clipboard && window.isSecureContext) {
+  // Note: window.isSecureContext includes localhost and HTTPS
+  if (navigator.clipboard) {
     try {
+      console.log('[Clipboard] Trying modern Clipboard API...');
       await navigator.clipboard.writeText(text);
+      console.log('[Clipboard] ✓ Modern Clipboard API success');
       return true;
     } catch (error) {
-      console.warn('Clipboard API failed, trying fallback:', error);
+      console.warn('[Clipboard] Modern Clipboard API failed, trying fallback:', error);
       // Fall through to fallback method
     }
   }
 
   // Fallback method for non-HTTPS environments
   try {
+    console.log('[Clipboard] Using fallback method (execCommand)...');
     const textArea = document.createElement('textarea');
     textArea.value = text;
     textArea.style.position = 'fixed';
@@ -37,13 +44,14 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
     document.body.removeChild(textArea);
 
     if (successful) {
+      console.log('[Clipboard] ✓ Fallback method success');
       return true;
     } else {
-      console.error('execCommand copy failed');
+      console.error('[Clipboard] execCommand copy failed');
       return false;
     }
   } catch (error) {
-    console.error('Fallback clipboard copy failed:', error);
+    console.error('[Clipboard] Fallback clipboard copy failed:', error);
     return false;
   }
 };
@@ -59,15 +67,19 @@ export const copyToClipboardWithNotification = async (
   onSuccess: () => void,
   onError: () => void
 ): Promise<void> => {
+  console.log('[ClipboardNotification] Starting copy with notification');
   try {
     const success = await copyToClipboard(text);
+    console.log('[ClipboardNotification] Copy result:', success);
     if (success) {
+      console.log('[ClipboardNotification] Calling onSuccess');
       onSuccess();
     } else {
+      console.log('[ClipboardNotification] Calling onError - copy failed');
       onError();
     }
   } catch (error) {
-    console.error('Copy to clipboard error:', error);
+    console.error('[ClipboardNotification] Copy to clipboard error:', error);
     onError();
   }
 };

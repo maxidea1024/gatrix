@@ -374,7 +374,8 @@ const ApiTokensPage: React.FC = () => {
             <Chip
               label={t(`apiTokens.types.${token.tokenType}`)}
               size="small"
-              color={token.tokenType === 'server' ? 'primary' : 'default'}
+              color={token.tokenType === 'server' ? 'primary' : 'success'}
+              variant="filled"
             />
           </Tooltip>
         );
@@ -607,25 +608,41 @@ const ApiTokensPage: React.FC = () => {
 
 
 
-  const copyToClipboard = (text: string) => {
-    copyToClipboardWithNotification(
+  const copyToClipboard = async (text: string) => {
+    console.log('[ApiTokensPage] copyToClipboard called, text length:', text.length);
+    await copyToClipboardWithNotification(
       text,
-      () => enqueueSnackbar(t('apiTokens.tokenCopied'), { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      () => {
+        console.log('[ApiTokensPage] Copy success callback');
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+      },
+      () => {
+        console.log('[ApiTokensPage] Copy error callback');
+        enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
+      }
     );
   };
 
-  const copyTokenValue = (token: ApiAccessToken) => {
-    // Use tokenValue if available (from list), otherwise use tokenHash
-    const tokenToCopy = (token as any).tokenValue || token.tokenHash;
+  const copyTokenValue = async (token: ApiAccessToken) => {
+    console.log('[ApiTokensPage] copyTokenValue called, token:', token);
+    // Use tokenValue only (original token for copying)
+    const tokenToCopy = (token as any).tokenValue;
+    console.log('[ApiTokensPage] tokenToCopy:', tokenToCopy ? `${tokenToCopy.substring(0, 10)}...` : 'EMPTY');
     if (!tokenToCopy) {
+      console.error('[ApiTokensPage] No token value found');
       enqueueSnackbar(t('apiTokens.tokenValueError'), { variant: 'error' });
       return;
     }
-    copyToClipboardWithNotification(
+    await copyToClipboardWithNotification(
       tokenToCopy,
-      () => enqueueSnackbar(t('apiTokens.tokenCopied'), { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      () => {
+        console.log('[ApiTokensPage] Token copy success callback');
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+      },
+      () => {
+        console.log('[ApiTokensPage] Token copy error callback');
+        enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
+      }
     );
   };
 
@@ -893,7 +910,7 @@ const ApiTokensPage: React.FC = () => {
                     <TableCell align="center">
                       <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                         <Tooltip title={t('apiTokens.copyToken')}>
-                          <IconButton size="small" onClick={() => copyTokenValue(token)}>
+                          <IconButton size="small" onClick={async () => await copyTokenValue(token)}>
                             <CopyIcon />
                           </IconButton>
                         </Tooltip>
@@ -1747,7 +1764,7 @@ const ApiTokensPage: React.FC = () => {
                   </Typography>
                   <Tooltip title={t('apiTokens.copyTokenValue')}>
                     <IconButton
-                      onClick={() => copyToClipboard(newTokenValue)}
+                      onClick={async () => await copyToClipboard(newTokenValue)}
                       size="small"
                       color="primary"
                     >

@@ -748,6 +748,37 @@ function formatItemNameLocalized(item, allCmsTables, lang, loctab = {}) {
     return `${shipNameCn} ${suffixCn}`;
   }
 
+  // Special handling for TaxFreePermit - combine nation name, typeName and permitName
+  if (item.typeName !== undefined && item.permitName !== undefined) {
+    let nameKr = '';
+
+    // Add nation name if nationId exists
+    if (item.nationId && allCmsTables.Nation && allCmsTables.Nation[item.nationId]) {
+      const nation = allCmsTables.Nation[item.nationId];
+      const nationName = removeCommentFromName(nation.name) || `Nation ${item.nationId}`;
+      const typeName = removeCommentFromName(item.typeName);
+      const permitName = removeCommentFromName(item.permitName);
+      nameKr = `[${nationName}] ${typeName} ${permitName}`;
+    } else {
+      const typeName = removeCommentFromName(item.typeName);
+      const permitName = removeCommentFromName(item.permitName);
+      nameKr = `${typeName} ${permitName}`;
+    }
+
+    // Try to translate the full name first
+    const mappedFull = loctab ? loctab[nameKr] : undefined;
+    if (mappedFull !== undefined && mappedFull !== nameKr) return mappedFull;
+
+    // Token-wise translation fallback
+    try {
+      const tokens = nameKr.split(/[\[\]\s]+/).filter(Boolean);
+      const translated = tokens.map(t => (loctab && loctab[t] !== undefined) ? loctab[t] : t);
+      return translated.join(' ');
+    } catch {
+      return nameKr;
+    }
+  }
+
   // Fallback: translate plain KR name
   const base = removeCommentFromName(item.name || `Item ${item.id}`);
   const mappedBase2 = loctab ? loctab[base] : undefined;

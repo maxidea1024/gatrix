@@ -16,9 +16,23 @@ class ApiTokenService {
     try {
       const response = await api.get('/admin/api-tokens', { params });
 
-      // Backend returns: { success: true, data: { tokens: [...], pagination: {...} } }
-      // API service returns the full response, so response.data contains the nested data
+      // api.request() returns response.data which is: { success: true, data: { tokens: [...], pagination: {...} } }
+      // So response is already the full response object
       const backendData = response.data; // This is the nested data object from backend
+
+      console.log('[ApiTokenService] getTokens response:', {
+        hasData: !!backendData,
+        hasTokens: !!backendData?.tokens,
+        tokensLength: backendData?.tokens?.length || 0,
+        firstToken: backendData?.tokens?.[0] ? {
+          id: backendData.tokens[0].id,
+          tokenName: backendData.tokens[0].tokenName,
+          hasTokenValue: !!(backendData.tokens[0] as any).tokenValue,
+          tokenValueLength: (backendData.tokens[0] as any).tokenValue?.length || 0,
+          tokenValuePreview: (backendData.tokens[0] as any).tokenValue?.substring(0, 10) + '...',
+          hasTokenHash: !!backendData.tokens[0].tokenHash,
+        } : null
+      });
 
       const result = {
         data: backendData.tokens || [],

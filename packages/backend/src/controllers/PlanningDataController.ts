@@ -91,8 +91,21 @@ export class PlanningDataController {
 
     // Invalidate cache across all servers
     await pubSubService.invalidateByPattern('planning_data*');
-    
+
     logger.info('Planning data cache invalidated across all servers');
+
+    // Notify all clients via SSE about planning data update
+    const { SSENotificationService } = await import('../services/sseNotificationService');
+    const sseService = SSENotificationService.getInstance();
+    sseService.sendNotification({
+      type: 'planning_data_updated',
+      data: {
+        reason: 'reward_lookup_rebuilt',
+        timestamp: new Date().toISOString(),
+      },
+      timestamp: new Date(),
+      targetChannels: ['admin'],
+    });
 
     res.json({
       success: true,
@@ -375,6 +388,19 @@ export class PlanningDataController {
     await pubSubService.invalidateByPattern('planning_data*');
 
     logger.info('Planning data cache invalidated across all servers');
+
+    // Notify all clients via SSE about planning data update
+    const { SSENotificationService } = await import('../services/sseNotificationService');
+    const sseService = SSENotificationService.getInstance();
+    sseService.sendNotification({
+      type: 'planning_data_updated',
+      data: {
+        filesUploaded: result.filesUploaded,
+        timestamp: new Date().toISOString(),
+      },
+      timestamp: new Date(),
+      targetChannels: ['admin'],
+    });
 
     res.json({
       success: true,
