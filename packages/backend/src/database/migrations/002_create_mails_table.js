@@ -4,10 +4,13 @@
  */
 
 exports.up = async function(connection) {
-  console.log('Creating g_mails table...');
+  console.log('Recreating g_mails table with correct schema...');
+
+  // Drop the table if it exists (to fix schema mismatch from 001_initial_schema.js)
+  await connection.execute('DROP TABLE IF EXISTS g_mails');
 
   await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_mails (
+    CREATE TABLE g_mails (
       id INT AUTO_INCREMENT PRIMARY KEY,
       
       -- Sender information (NULL for system messages)

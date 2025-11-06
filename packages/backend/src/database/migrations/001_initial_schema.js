@@ -609,32 +609,8 @@ exports.up = async function(connection) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='In-game popup notice system'
   `);
 
-  // 32. Mails table
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_mails (
-      id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Mail ID',
-      senderId INT NULL COMMENT 'Sender user ID',
-      recipientId INT NOT NULL COMMENT 'Recipient user ID',
-      mailType VARCHAR(50) NOT NULL COMMENT 'Mail type (system, user, event, etc)',
-      category VARCHAR(50) NULL COMMENT 'Mail category',
-      title VARCHAR(500) NOT NULL COMMENT 'Mail title',
-      content TEXT NOT NULL COMMENT 'Mail content',
-      mailData JSON NULL COMMENT 'Additional mail data',
-      isRead BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether mail has been read',
-      isDeleted BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether mail has been deleted',
-      isStarred BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether mail is starred',
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_recipient (recipientId, isDeleted, createdAt),
-      INDEX idx_sender (senderId, createdAt),
-      INDEX idx_read_status (recipientId, isRead, isDeleted),
-      INDEX idx_mail_type (mailType, recipientId),
-      INDEX idx_category (category, recipientId),
-      INDEX idx_starred (recipientId, isStarred, isDeleted),
-      FOREIGN KEY (senderId) REFERENCES g_users(id) ON DELETE SET NULL,
-      FOREIGN KEY (recipientId) REFERENCES g_users(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `);
+  // 32. Mails table - Removed (now in 002_create_mails_table.js migration)
+  // The g_mails table is created in a separate migration file with the correct schema
 
   // 33. Surveys table
   await connection.execute(`
