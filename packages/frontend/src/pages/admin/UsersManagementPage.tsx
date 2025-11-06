@@ -1866,7 +1866,7 @@ const UsersManagementPage: React.FC = () => {
       <Drawer
         anchor="right"
         open={confirmDialog.open}
-        onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
+        onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
         sx={{
           zIndex: 1301,
           '& .MuiDrawer-paper': {
@@ -1891,7 +1891,7 @@ const UsersManagementPage: React.FC = () => {
             {confirmDialog.title}
           </Typography>
           <IconButton
-            onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}
+            onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
             size="small"
             sx={{
               '&:hover': {
@@ -1919,7 +1919,7 @@ const UsersManagementPage: React.FC = () => {
           justifyContent: 'flex-end'
         }}>
           <Button
-            onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}
+            onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
             variant="outlined"
           >
             {t('common.cancel')}
