@@ -2252,24 +2252,14 @@ const PlanningDataPage: React.FC = () => {
                                           <TableCell>
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                               {item.towns && item.towns.length > 0 ? (
-                                                item.towns.map((town: any) => {
-                                                  // Get localized town name
-                                                  let townName = town.nameKr;
-                                                  if (i18n.language === 'zh' && town.nameCn) {
-                                                    townName = town.nameCn;
-                                                  } else if (i18n.language === 'en' && town.nameEn) {
-                                                    townName = town.nameEn;
-                                                  }
-
-                                                  return (
-                                                    <Chip
-                                                      key={town.id}
-                                                      label={`${town.id}: ${townName}`}
-                                                      size="small"
-                                                      variant="outlined"
-                                                    />
-                                                  );
-                                                })
+                                                item.towns.map((town: any) => (
+                                                  <Chip
+                                                    key={town.id}
+                                                    label={`${town.id}: ${town.name}`}
+                                                    size="small"
+                                                    variant="outlined"
+                                                  />
+                                                ))
                                               ) : (
                                                 '-'
                                               )}
