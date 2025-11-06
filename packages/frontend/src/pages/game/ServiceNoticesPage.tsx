@@ -37,7 +37,12 @@ import {
   Refresh as RefreshIcon,
   ContentCopy as ContentCopyIcon,
   Info as InfoIcon,
+  SportsEsports as SportsEsportsIcon,
 } from '@mui/icons-material';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import serviceNoticeService, { ServiceNotice, ServiceNoticeFilters } from '../../services/serviceNoticeService';
@@ -110,6 +115,9 @@ const ServiceNoticesPage: React.FC = () => {
   const [deletingNotice, setDeletingNotice] = useState<ServiceNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+
+  // Webview menu state
+  const [webviewMenuAnchorEl, setWebviewMenuAnchorEl] = useState<null | HTMLElement>(null);
 
   // Default column configuration - title moved to first position
   const defaultColumns: ColumnConfig[] = [
@@ -357,6 +365,21 @@ const ServiceNoticesPage: React.FC = () => {
     }
   };
 
+  // Webview menu handlers
+  const handleWebviewMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setWebviewMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleWebviewMenuClose = () => {
+    setWebviewMenuAnchorEl(null);
+  };
+
+  const handleOpenWebviewPreview = () => {
+    // Open the actual game webview HTML page in a new window (same size as preview dialog)
+    window.open('/game-service-notices.html', '_blank', 'width=1536,height=928');
+    handleWebviewMenuClose();
+  };
+
   // Copy notice URL to clipboard
   const handleCopyNoticeUrl = async () => {
     const noticeUrl = `${window.location.origin}/game-service-notices.html`;
@@ -365,6 +388,7 @@ const ServiceNoticesPage: React.FC = () => {
       () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
       () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
     );
+    handleWebviewMenuClose();
   };
 
   const handleToggleActive = async (notice: ServiceNotice) => {
@@ -406,13 +430,13 @@ const ServiceNoticesPage: React.FC = () => {
             {t('serviceNotices.createNotice')}
           </Button>
           <Divider orientation="vertical" sx={{ height: 32, mx: 0.5 }} />
-          <Tooltip title={t('serviceNotices.copyUrlTooltip')}>
+          <Tooltip title={t('serviceNotices.webviewMenuTooltip')}>
             <IconButton
               size="small"
-              onClick={handleCopyNoticeUrl}
+              onClick={handleWebviewMenuOpen}
               sx={{ p: 1 }}
             >
-              <ContentCopyIcon />
+              <SportsEsportsIcon />
             </IconButton>
           </Tooltip>
         </Box>
@@ -890,6 +914,34 @@ const ServiceNoticesPage: React.FC = () => {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Webview Context Menu */}
+      <Menu
+        anchorEl={webviewMenuAnchorEl}
+        open={Boolean(webviewMenuAnchorEl)}
+        onClose={handleWebviewMenuClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <MenuItem onClick={handleOpenWebviewPreview}>
+          <ListItemIcon>
+            <VisibilityIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('serviceNotices.webviewPreview')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleCopyNoticeUrl}>
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('serviceNotices.copyWebviewUrl')}</ListItemText>
+        </MenuItem>
+      </Menu>
     </Box>
   );
 };

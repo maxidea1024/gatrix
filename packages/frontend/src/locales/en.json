@@ -2932,6 +2932,9 @@
     "copyUrlTooltip": "Copy the notice page URL to clipboard",
     "copyUrlSuccess": "Notice URL copied to clipboard",
     "copyUrlFailed": "Failed to copy URL",
+    "webviewMenuTooltip": "Webview preview and URL copy",
+    "webviewPreview": "Webview Preview",
+    "copyWebviewUrl": "Copy Webview URL",
     "previewPage": {
       "title": "Service Notices",
       "subtitle": "This preview shows how notices will appear in the in-game webview. Actual display may vary slightly.",
