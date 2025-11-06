@@ -1408,7 +1408,7 @@ const GameWorldsPage: React.FC = () => {
                 <TableBody>
                   {worlds.length === 0 ? (
                     <EmptyTableRow
-                      colSpan={9}
+                      colSpan={1 + columns.filter(col => col.visible).length + 2}
                       loading={loading}
                       message={t('gameWorlds.noWorldsFound')}
                       loadingMessage={t('common.loadingData')}
