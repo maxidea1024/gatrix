@@ -1154,6 +1154,7 @@
     "tokenSecurityNotice": "For security reasons, this token value cannot be viewed again. Please copy it now and store it in a safe place.",
     "tokenMasked": "Token is displayed masked",
     "copyTokenValue": "Copy Token Value",
+    "copyTokenName": "Copy Token Name",
     "tokenCopied": "Token copied to clipboard",
     "createdBy": "Created By",
     "createdAt": "Created Date",

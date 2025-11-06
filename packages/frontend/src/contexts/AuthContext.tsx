@@ -61,8 +61,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Don't set isLoading here - it's for initial auth check only
       // Individual pages should manage their own loading states
       setError(null);
-      const response = await AuthService.register(data);
-      setUser(response);
+      await AuthService.register(data);
+      // Don't set user here - registration doesn't log the user in
+      // User needs to be approved by admin first (status: 'pending')
     } catch (error: any) {
       setError(error.message || 'Registration failed');
       throw error;

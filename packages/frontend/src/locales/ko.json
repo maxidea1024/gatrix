@@ -1154,6 +1154,7 @@
     "tokenSecurityNotice": "보안상 이 토큰 값은 다시 볼 수 없습니다. 지금 복사해서 안전한 곳에 보관하세요.",
     "tokenMasked": "토큰이 마스킹되어 표시됩니다",
     "copyTokenValue": "토큰 값 복사",
+    "copyTokenName": "토큰 이름 복사",
     "tokenCopied": "토큰이 클립보드에 복사되었습니다",
     "createdBy": "생성자",
     "createdAt": "생성일",

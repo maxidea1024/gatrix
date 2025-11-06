@@ -364,7 +364,40 @@ const ApiTokensPage: React.FC = () => {
   const renderCellContent = (token: ApiAccessToken, columnId: string) => {
     switch (columnId) {
       case 'tokenName':
-        return <Typography variant="body2" sx={{ fontWeight: 500 }}>{token.tokenName}</Typography>;
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 500,
+                cursor: 'pointer',
+                '&:hover': {
+                  color: 'primary.main',
+                  textDecoration: 'underline',
+                },
+              }}
+              onClick={() => openEditDialog(token)}
+            >
+              {token.tokenName}
+            </Typography>
+            <Tooltip title={t('apiTokens.copyTokenName')}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyToClipboardWithNotification(
+                    token.tokenName,
+                    () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+                    () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+                  );
+                }}
+                sx={{ p: 0.5 }}
+              >
+                <CopyIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        );
       case 'tokenType':
         return (
           <Tooltip
