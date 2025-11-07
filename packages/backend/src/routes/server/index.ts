@@ -9,6 +9,7 @@ import ServerChatController from '../../controllers/ServerChatController';
 import { CouponRedeemController } from '../../controllers/CouponRedeemController';
 import ServerGameWorldController from '../../controllers/ServerGameWorldController';
 import IngamePopupNoticeController from '../../controllers/IngamePopupNoticeController';
+import { SurveyController } from '../../controllers/SurveyController';
 import serviceDiscoveryRoutes from './serviceDiscovery';
 
 const router = express.Router();
@@ -74,6 +75,9 @@ router.get('/game-worlds/:id', serverSDKAuth, ServerGameWorldController.getGameW
 
 // Ingame popup notice routes
 router.get('/ingame-popup-notices', serverSDKAuth, IngamePopupNoticeController.getServerIngamePopupNotices);
+
+// Survey routes
+router.get('/surveys', serverSDKAuth, SurveyController.getServerSurveys);
 
 // Service discovery routes
 router.use('/services', serviceDiscoveryRoutes);

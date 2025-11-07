@@ -21,6 +21,7 @@ export interface InstanceStats {
 export interface ServiceInstance {
   instanceId: string;           // ULID
   type: string;                 // world, auth, channel, chat, etc.
+  serviceGroup: string;         // Service group for grouping servers (e.g., 'kr-1', 'us-east', 'production', 'staging')
   hostname: string;             // Server hostname
   externalAddress: string;      // Public IP address
   internalAddress: string;      // NIC address (internal IP)
@@ -33,6 +34,7 @@ export interface ServiceInstance {
 
 export interface RegisterServiceInput {
   type: string;
+  serviceGroup: string;
   hostname: string;
   externalAddress: string;
   internalAddress: string;

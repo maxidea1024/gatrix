@@ -188,5 +188,23 @@ export class SurveyController {
       message: 'Survey configuration updated successfully',
     });
   });
+
+  /**
+   * Get active surveys for Server SDK
+   * GET /api/v1/server/surveys
+   * Returns only active surveys
+   */
+  static getServerSurveys = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const result = await SurveyService.getSurveys({
+      page: 1,
+      limit: 1000,
+      isActive: true,
+    });
+
+    res.json({
+      success: true,
+      data: result.surveys,
+    });
+  });
 }
 

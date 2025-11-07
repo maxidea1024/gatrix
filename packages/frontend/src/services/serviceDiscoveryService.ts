@@ -21,6 +21,7 @@ export interface InstanceStats {
 export interface ServiceInstance {
   instanceId: string;
   type: string;
+  serviceGroup: string;
   hostname: string;
   externalAddress: string;
   internalAddress: string;

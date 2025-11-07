@@ -1,0 +1,82 @@
+{
+  "name": "@gatrix/server-sdk",
+  "version": "1.0.0",
+  "description": "Gatrix Server-side SDK for Node.js - Provides easy access to Gatrix backend APIs with caching, event handling, and service discovery",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "prepublishOnly": "npm run build",
+    "clean": "rimraf dist",
+    "test:servers": "ts-node test-servers/orchestrator.ts",
+    "test:authd": "ts-node test-servers/authd.ts",
+    "test:lobbyd": "ts-node test-servers/lobbyd.ts",
+    "test:chatd": "ts-node test-servers/chatd.ts",
+    "test:worldd": "ts-node test-servers/worldd.ts"
+  },
+  "keywords": [
+    "gatrix",
+    "sdk",
+    "server",
+    "game",
+    "backend",
+    "api",
+    "cache",
+    "bullmq",
+    "etcd",
+    "service-discovery",
+    "coupon",
+    "game-world",
+    "survey",
+    "popup-notice"
+  ],
+  "author": "Gatrix Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "bullmq": "^5.28.2",
+    "etcd3": "^1.1.2",
+    "ioredis": "^5.4.2",
+    "ulid": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
+    "eslint": "^9.16.0",
+    "jest": "^29.7.0",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gatrix/gatrix.git",
+    "directory": "packages/sdks/server-sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/gatrix/gatrix/issues"
+  },
+  "homepage": "https://github.com/gatrix/gatrix/tree/main/packages/sdks/server-sdk#readme"
+}
+
