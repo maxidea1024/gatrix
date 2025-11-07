@@ -60,14 +60,16 @@ class ChatServer extends BaseTestServer {
 
       this.log(`Message in ${channel.name}: Total ${this.messageCount} messages`);
 
-      // Update service stats
-      this.sdk.updateServiceStatus({
-        status: 'ready',
-        meta: {
-          totalMessages: this.messageCount,
-          activeChannels: this.channels.size,
-        },
-      }).catch(err => this.logError('Failed to update service status', err));
+      // Update service stats (only if service discovery is enabled)
+      if (this.config.enableServiceDiscovery) {
+        this.sdk.updateServiceStatus({
+          status: 'ready',
+          meta: {
+            totalMessages: this.messageCount,
+            activeChannels: this.channels.size,
+          },
+        }).catch(err => this.logError('Failed to update service status', err));
+      }
     }
   }
 }
@@ -75,13 +77,15 @@ class ChatServer extends BaseTestServer {
 // Parse command line arguments
 const instanceId = process.argv[2] || '1';
 const port = parseInt(process.argv[3] || '8003');
+const group = process.argv[4] || 'production';
+const enableDiscovery = process.argv[5] === 'true' || false;
 
 const config: BaseServerConfig = {
   serverType: 'chatd',
-  serviceGroup: 'production',
+  serviceGroup: group,
   instanceName: `chatd-${instanceId}`,
   port: port,
-  enableServiceDiscovery: false, // Disabled for testing without etcd/redis
+  enableServiceDiscovery: enableDiscovery,
   enableCache: true,
   enableEvents: false, // Disabled for testing without redis
 };

@@ -33,17 +33,17 @@ export class BaseTestServer {
       apiToken: process.env.API_TOKEN || '3569268f61a7396e494a10ddc9b08652f583ee06875c91efac56e6b6b5633bf3',
       applicationName: config.serverType,
       
-      // Redis for events
-      redis: config.enableEvents !== false ? {
+      // Redis for events and service discovery
+      redis: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379'),
-      } : undefined,
+      },
 
       // Cache configuration
       cache: {
         enabled: config.enableCache !== false,
         ttl: 300,
-        autoRefresh: true,
+        autoRefresh: config.enableEvents !== false, // Only auto-refresh if events are enabled
       },
 
       // Service discovery configuration (disabled by default for testing)
@@ -75,6 +75,11 @@ export class BaseTestServer {
       // Initialize SDK
       await this.sdk.initialize();
       this.log('SDK initialized');
+
+      // Note: Events are disabled for testing, but Redis is still available for service discovery
+
+      // Test service discovery via API
+      await this.testServiceDiscoveryAPI();
 
       // Register to service discovery
       if (this.config.enableServiceDiscovery === true) {
@@ -162,7 +167,8 @@ export class BaseTestServer {
     const popups = await this.sdk.getPopupNotices();
     this.log(`Popup Notices: ${popups.length} loaded`);
     popups.forEach(popup => {
-      this.log(`  - ${popup.id}: ${popup.title || 'No title'}`);
+      const contentPreview = popup.content.substring(0, 50) + (popup.content.length > 50 ? '...' : '');
+      this.log(`  - ${popup.id}: ${contentPreview}`);
     });
 
     // Surveys (may fail if admin auth is required)
@@ -245,6 +251,38 @@ export class BaseTestServer {
   protected logError(message: string, error: any): void {
     const timestamp = new Date().toISOString();
     console.error(`[${timestamp}] [${this.config.instanceName}] ERROR: ${message}`, error);
+  }
+
+  /**
+   * Test service discovery via Backend API
+   */
+  protected async testServiceDiscoveryAPI(): Promise<void> {
+    try {
+      // Get all services
+      const allServices = await this.sdk.getServicesViaAPI();
+      this.log(`Service Discovery API: ${allServices.length} total services`);
+
+      // Get services by type
+      const authServices = await this.sdk.getServicesViaAPI({ type: 'authd' });
+      this.log(`  - authd: ${authServices.length} instances`);
+
+      const lobbydServices = await this.sdk.getServicesViaAPI({ type: 'lobbyd' });
+      this.log(`  - lobbyd: ${lobbydServices.length} instances`);
+
+      const chatdServices = await this.sdk.getServicesViaAPI({ type: 'chatd' });
+      this.log(`  - chatd: ${chatdServices.length} instances`);
+
+      const worlddServices = await this.sdk.getServicesViaAPI({ type: 'worldd' });
+      this.log(`  - worldd: ${worlddServices.length} instances`);
+
+      // Get services by group
+      if (worlddServices.length > 0) {
+        const groups = [...new Set(worlddServices.map(s => s.serviceGroup))];
+        this.log(`  - worldd groups: ${groups.join(', ')}`);
+      }
+    } catch (error: any) {
+      this.log(`Service Discovery API not available: ${error.message}`);
+    }
   }
 
   /**

@@ -12,6 +12,7 @@ import { ErrorCode, createError } from '../utils/errors';
 export class RedisServiceDiscovery implements IServiceDiscovery {
   private client: Redis;
   private logger: Logger;
+  private ttlSeconds: number = 30; // Default TTL, will be updated on register
 
   constructor(config: RedisConfig, logger: Logger) {
     this.logger = logger;
@@ -42,6 +43,9 @@ export class RedisServiceDiscovery implements IServiceDiscovery {
    */
   async register(instance: ServiceInstance, ttlSeconds: number): Promise<string> {
     try {
+      // Store TTL for heartbeat
+      this.ttlSeconds = ttlSeconds;
+
       const key = this.getServiceKey(instance.instanceId, instance.type);
 
       // Store service instance data with TTL
@@ -85,18 +89,15 @@ export class RedisServiceDiscovery implements IServiceDiscovery {
       // Update timestamp
       instance.updatedAt = new Date().toISOString();
 
-      // Get current TTL
-      const ttl = await this.client.ttl(key);
+      // Refresh with original TTL (not current TTL!)
+      // This ensures the service doesn't expire as long as heartbeat is sent
+      await this.client.setex(key, this.ttlSeconds, JSON.stringify(instance));
 
-      if (ttl > 0) {
-        // Refresh with same TTL
-        await this.client.setex(key, ttl, JSON.stringify(instance));
-      } else {
-        // Default TTL if not found
-        await this.client.setex(key, 30, JSON.stringify(instance));
-      }
-
-      this.logger.debug('Heartbeat sent to Redis', { instanceId, type });
+      this.logger.debug('Heartbeat sent to Redis', {
+        instanceId,
+        type,
+        ttl: this.ttlSeconds,
+      });
     } catch (error: any) {
       this.logger.error('Failed to send heartbeat to Redis', { error: error.message });
       throw createError(
@@ -110,15 +111,36 @@ export class RedisServiceDiscovery implements IServiceDiscovery {
 
   /**
    * Unregister service instance
+   * Mark as terminated with 5 minutes TTL (same as etcd)
+   * This allows users to see terminated/error servers before cleanup
    */
   async unregister(instanceId: string, type: string): Promise<void> {
     try {
       const key = this.getServiceKey(instanceId, type);
 
-      // Delete key
-      await this.client.del(key);
+      // Get current instance data
+      const data = await this.client.get(key);
 
-      this.logger.info('Service unregistered from Redis', { instanceId, type, key });
+      if (data) {
+        const instance = JSON.parse(data) as ServiceInstance;
+
+        // Update status to terminated
+        instance.status = 'terminated';
+        instance.updatedAt = new Date().toISOString();
+
+        // Set with 5 minutes TTL for cleanup (same as etcd)
+        await this.client.setex(key, 300, JSON.stringify(instance));
+
+        this.logger.info('Service marked as terminated', {
+          instanceId,
+          type,
+          key,
+          ttl: 300,
+        });
+      } else {
+        // If not found, just log
+        this.logger.warn('Service not found for unregister', { instanceId, type, key });
+      }
     } catch (error: any) {
       this.logger.error('Failed to unregister service from Redis', { error: error.message });
       throw createError(

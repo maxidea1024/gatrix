@@ -54,13 +54,15 @@ class LobbyServer extends BaseTestServer {
 
     this.log(`Created lobby ${lobbyId} for world ${world.name} (Total lobbies: ${this.lobbies.size})`);
 
-    // Update service stats
-    this.sdk.updateServiceStatus({
-      status: 'ready',
-      meta: {
-        activeLobbies: this.lobbies.size,
-      },
-    }).catch(err => this.logError('Failed to update service status', err));
+    // Update service stats (only if service discovery is enabled)
+    if (this.config.enableServiceDiscovery) {
+      this.sdk.updateServiceStatus({
+        status: 'ready',
+        meta: {
+          activeLobbies: this.lobbies.size,
+        },
+      }).catch(err => this.logError('Failed to update service status', err));
+    }
   }
 }
 
@@ -68,13 +70,14 @@ class LobbyServer extends BaseTestServer {
 const instanceId = process.argv[2] || '1';
 const port = parseInt(process.argv[3] || '8002');
 const group = process.argv[4] || 'production';
+const enableDiscovery = process.argv[5] === 'true' || false;
 
 const config: BaseServerConfig = {
   serverType: 'lobbyd',
   serviceGroup: group,
   instanceName: `lobbyd-${instanceId}`,
   port: port,
-  enableServiceDiscovery: false, // Disabled for testing without etcd/redis
+  enableServiceDiscovery: enableDiscovery,
   enableCache: true,
   enableEvents: false, // Disabled for testing without redis
 };

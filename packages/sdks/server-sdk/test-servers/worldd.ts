@@ -41,9 +41,13 @@ class WorldServer extends BaseTestServer {
     const popups = await this.sdk.getPopupNotices();
     this.log(`Active popups: ${popups.length}`);
 
-    // Check surveys
-    const surveys = await this.sdk.getSurveys();
-    this.log(`Active surveys: ${surveys.length}`);
+    // Check surveys (may fail if not available)
+    try {
+      const surveys = await this.sdk.getSurveys();
+      this.log(`Active surveys: ${surveys.length}`);
+    } catch (error: any) {
+      this.log(`Surveys not available: ${error.message}`);
+    }
   }
 
   private simulatePlayerActivity(): void {
@@ -66,19 +70,21 @@ class WorldServer extends BaseTestServer {
       this.log(`Player left: ${playerId} (Total: ${this.players.size})`);
     }
 
-    // Update service stats
-    this.sdk.updateServiceStatus({
-      status: 'ready',
-      instanceStats: {
-        cpuUsage: Math.random() * 100,
-        memoryUsage: Math.random() * 2048,
-        memoryTotal: 4096,
-      },
-      meta: {
-        activePlayers: this.players.size,
-        npcs: this.npcs,
-      },
-    }).catch(err => this.logError('Failed to update service status', err));
+    // Update service stats (only if service discovery is enabled)
+    if (this.config.enableServiceDiscovery) {
+      this.sdk.updateServiceStatus({
+        status: 'ready',
+        instanceStats: {
+          cpuUsage: Math.random() * 100,
+          memoryUsage: Math.random() * 2048,
+          memoryTotal: 4096,
+        },
+        meta: {
+          activePlayers: this.players.size,
+          npcs: this.npcs,
+        },
+      }).catch(err => this.logError('Failed to update service status', err));
+    }
   }
 
   private async testCouponRedemption(): Promise<void> {
@@ -95,6 +101,8 @@ class WorldServer extends BaseTestServer {
       const result = await this.sdk.redeemCoupon({
         code: couponCode,
         userId: playerId,
+        userName: `Player_${playerId}`,
+        characterId: `char_${playerId}`,
       });
       this.log(`Coupon redeemed successfully: ${JSON.stringify(result)}`);
     } catch (error: any) {
@@ -108,13 +116,14 @@ class WorldServer extends BaseTestServer {
 const instanceId = process.argv[2] || '1';
 const port = parseInt(process.argv[3] || '8004');
 const group = process.argv[4] || 'kr-1';
+const enableDiscovery = process.argv[5] === 'true' || false;
 
 const config: BaseServerConfig = {
   serverType: 'worldd',
   serviceGroup: group,
   instanceName: `worldd-${group}-${instanceId}`,
   port: port,
-  enableServiceDiscovery: false, // Disabled for testing without etcd/redis
+  enableServiceDiscovery: enableDiscovery,
   enableCache: true,
   enableEvents: false, // Disabled for testing without redis
 };

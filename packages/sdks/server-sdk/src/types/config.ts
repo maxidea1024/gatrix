@@ -29,6 +29,8 @@ export interface ServiceDiscoveryConfig {
   mode?: 'redis' | 'etcd'; // Service discovery mode (default: 'redis')
   ttlSeconds?: number; // Service TTL in seconds (default: 30)
   heartbeatIntervalMs?: number; // Heartbeat interval in milliseconds (default: 10000)
+  redis?: RedisConfig; // Redis configuration for service discovery (when mode is 'redis')
+  etcd?: EtcdConfig; // etcd configuration for service discovery (when mode is 'etcd')
 }
 
 /**

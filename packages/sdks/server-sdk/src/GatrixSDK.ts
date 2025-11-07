@@ -11,6 +11,7 @@ import { CouponService } from './services/CouponService';
 import { GameWorldService } from './services/GameWorldService';
 import { PopupNoticeService } from './services/PopupNoticeService';
 import { SurveyService } from './services/SurveyService';
+import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
 import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
 import { ServiceDiscovery } from './discovery/ServiceDiscovery';
@@ -24,6 +25,7 @@ import {
   ServiceInstance,
   RegisterServiceInput,
   UpdateServiceStatusInput,
+  GetServicesParams,
 } from './types/api';
 
 export class GatrixSDK {
@@ -37,6 +39,7 @@ export class GatrixSDK {
   public readonly gameWorld: GameWorldService;
   public readonly popupNotice: PopupNoticeService;
   public readonly survey: SurveyService;
+  public readonly serviceDiscoveryService: ServiceDiscoveryService;
 
   // Cache and Events
   private cacheManager?: CacheManager;
@@ -67,6 +70,7 @@ export class GatrixSDK {
     this.gameWorld = new GameWorldService(this.apiClient, this.logger);
     this.popupNotice = new PopupNoticeService(this.apiClient, this.logger);
     this.survey = new SurveyService(this.apiClient, this.logger);
+    this.serviceDiscoveryService = new ServiceDiscoveryService(this.apiClient, this.logger);
 
     this.logger.info('Gatrix SDK created', {
       gatrixUrl: config.gatrixUrl,
@@ -358,7 +362,12 @@ export class GatrixSDK {
       throw createError(ErrorCode.NOT_INITIALIZED, 'Service discovery not initialized');
     }
 
-    return await this.serviceDiscovery.register(input);
+    const instanceId = await this.serviceDiscovery.register(input);
+
+    // Set instance ID for ServiceDiscoveryService (for excludeSelf filtering)
+    this.serviceDiscoveryService.setInstanceId(instanceId);
+
+    return instanceId;
   }
 
   /**
@@ -395,6 +404,18 @@ export class GatrixSDK {
   }
 
   /**
+   * Get services with filtering
+   * @param params - Filter parameters (type, serviceGroup, status, excludeSelf)
+   */
+  async getServicesFiltered(params?: GetServicesParams): Promise<ServiceInstance[]> {
+    if (!this.serviceDiscovery) {
+      throw createError(ErrorCode.NOT_INITIALIZED, 'Service discovery not initialized');
+    }
+
+    return await this.serviceDiscovery.getServicesFiltered(params);
+  }
+
+  /**
    * Get a specific service instance
    */
   async getService(instanceId: string, type: string): Promise<ServiceInstance | null> {
@@ -403,6 +424,21 @@ export class GatrixSDK {
     }
 
     return await this.serviceDiscovery.getService(instanceId, type);
+  }
+
+  /**
+   * Get services via Backend API (alternative to direct etcd/Redis access)
+   * @param params - Filter parameters (type, serviceGroup, status, excludeSelf)
+   */
+  async getServicesViaAPI(params?: GetServicesParams): Promise<ServiceInstance[]> {
+    return await this.serviceDiscoveryService.getServices(params);
+  }
+
+  /**
+   * Get a specific service instance via Backend API
+   */
+  async getServiceViaAPI(type: string, instanceId: string): Promise<ServiceInstance | null> {
+    return await this.serviceDiscoveryService.getService(type, instanceId);
   }
 
   /**

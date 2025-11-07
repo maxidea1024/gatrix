@@ -174,6 +174,7 @@ export interface ServiceInstance {
 }
 
 export interface RegisterServiceInput {
+  instanceId?: string; // Optional instance ID (auto-generated ULID if not provided)
   type: string;
   serviceGroup: string;
   hostname: string;
@@ -189,5 +190,12 @@ export interface UpdateServiceStatusInput {
   status: ServiceStatus;
   instanceStats?: InstanceStats;
   meta?: Record<string, any>;
+}
+
+export interface GetServicesParams {
+  type?: string; // Filter by service type
+  serviceGroup?: string; // Filter by service group
+  status?: ServiceStatus; // Filter by status
+  excludeSelf?: boolean; // Exclude current instance (default: true)
 }
 

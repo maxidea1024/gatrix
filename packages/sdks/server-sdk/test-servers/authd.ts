@@ -32,26 +32,30 @@ class AuthServer extends BaseTestServer {
 
     this.log(`User logged in: ${userId} (Total sessions: ${this.userSessions.size})`);
 
-    // Update service stats
-    this.sdk.updateServiceStatus({
-      status: 'ready',
-      meta: {
-        activeSessions: this.userSessions.size,
-      },
-    }).catch(err => this.logError('Failed to update service status', err));
+    // Update service stats (only if service discovery is enabled)
+    if (this.config.enableServiceDiscovery) {
+      this.sdk.updateServiceStatus({
+        status: 'ready',
+        meta: {
+          activeSessions: this.userSessions.size,
+        },
+      }).catch(err => this.logError('Failed to update service status', err));
+    }
   }
 }
 
 // Parse command line arguments
 const instanceId = process.argv[2] || '1';
 const port = parseInt(process.argv[3] || '8001');
+const group = process.argv[4] || 'production';
+const enableDiscovery = process.argv[5] === 'true' || false;
 
 const config: BaseServerConfig = {
   serverType: 'authd',
-  serviceGroup: 'production',
+  serviceGroup: group,
   instanceName: `authd-${instanceId}`,
   port: port,
-  enableServiceDiscovery: false, // Disabled for testing without etcd/redis
+  enableServiceDiscovery: enableDiscovery,
   enableCache: true,
   enableEvents: false, // Disabled for testing without redis
 };

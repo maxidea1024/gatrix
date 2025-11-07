@@ -322,7 +322,8 @@ const ServerListPage: React.FC = () => {
                 }
               });
             } else if (event.type === 'delete') {
-              // Service removed
+              // Service deleted/expired - remove from list immediately
+              // Terminated services are kept for 5 minutes with TTL, so this only fires after TTL expires
               setServices((prev) => prev.filter((s) => !(s.instanceId === event.data.instanceId && s.type === event.data.type)));
             }
           }

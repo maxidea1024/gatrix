@@ -10,6 +10,7 @@ import {
   ServiceInstance,
   RegisterServiceInput,
   UpdateServiceStatusInput,
+  GetServicesParams,
 } from '../types/api';
 import { ServiceDiscoveryConfig, RedisConfig, EtcdConfig } from '../types/config';
 import { EtcdServiceDiscovery } from './EtcdServiceDiscovery';
@@ -57,21 +58,25 @@ export class ServiceDiscovery {
    */
   private initializeProvider(redisConfig?: RedisConfig, etcdConfig?: EtcdConfig): void {
     if (this.config.mode === 'etcd') {
-      if (!etcdConfig) {
+      // Use etcd config from serviceDiscovery config or global config
+      const etcdCfg = this.config.etcd || etcdConfig;
+      if (!etcdCfg) {
         throw createError(
           ErrorCode.INVALID_CONFIG,
           'etcd configuration is required when mode is "etcd"'
         );
       }
-      this.provider = new EtcdServiceDiscovery(etcdConfig, this.logger);
+      this.provider = new EtcdServiceDiscovery(etcdCfg, this.logger);
     } else if (this.config.mode === 'redis') {
-      if (!redisConfig) {
+      // Use redis config from serviceDiscovery config or global config
+      const redisCfg = this.config.redis || redisConfig;
+      if (!redisCfg) {
         throw createError(
           ErrorCode.INVALID_CONFIG,
           'Redis configuration is required when mode is "redis"'
         );
       }
-      this.provider = new RedisServiceDiscovery(redisConfig, this.logger);
+      this.provider = new RedisServiceDiscovery(redisCfg, this.logger);
     } else {
       throw createError(
         ErrorCode.INVALID_CONFIG,
@@ -91,7 +96,8 @@ export class ServiceDiscovery {
       return '';
     }
 
-    const instanceId = ulid();
+    // Use provided instanceId or generate new ULID
+    const instanceId = input.instanceId || ulid();
     this.instanceId = instanceId;
     this.serviceType = input.type;
 
@@ -211,6 +217,36 @@ export class ServiceDiscovery {
     }
 
     return await this.provider.getServices(type);
+  }
+
+  /**
+   * Get services with filtering
+   */
+  async getServicesFiltered(params?: GetServicesParams): Promise<ServiceInstance[]> {
+    if (!this.config.enabled || !this.provider) {
+      return [];
+    }
+
+    // Get all services or services of a specific type
+    let services = await this.provider.getServices(params?.type);
+
+    // Filter by service group
+    if (params?.serviceGroup) {
+      services = services.filter((s) => s.serviceGroup === params.serviceGroup);
+    }
+
+    // Filter by status
+    if (params?.status) {
+      services = services.filter((s) => s.status === params.status);
+    }
+
+    // Exclude self (default: true)
+    const excludeSelf = params?.excludeSelf !== false;
+    if (excludeSelf && this.instanceId) {
+      services = services.filter((s) => s.instanceId !== this.instanceId);
+    }
+
+    return services;
   }
 
   /**
