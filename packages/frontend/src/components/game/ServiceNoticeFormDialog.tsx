@@ -237,6 +237,17 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       font-size: 85%;
       padding: 2px 4px;
     }
+    /* Ensure images and videos don't overflow */
+    .content img {
+      max-width: 100%;
+      height: auto;
+    }
+    .content iframe {
+      max-width: 100%;
+    }
+    .content .video-wrapper {
+      max-width: 100%;
+    }
   </style>
 </head>
 <body>

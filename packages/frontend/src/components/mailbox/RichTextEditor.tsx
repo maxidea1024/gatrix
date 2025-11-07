@@ -206,6 +206,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [videoCustomWidth, setVideoCustomWidth] = useState('');
   const [videoAlign, setVideoAlign] = useState<'left' | 'center' | 'right'>('center');
   const [videoAutoplay, setVideoAutoplay] = useState(false);
+  const [videoMuted, setVideoMuted] = useState(false);
+  const [videoLoop, setVideoLoop] = useState(false);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const [videoUrlValidating, setVideoUrlValidating] = useState(false);
   const savedSelectionRef = useRef<{ index: number; length: number } | null>(null);
@@ -338,7 +340,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
     // Debounce validation
     videoValidationTimeoutRef.current = setTimeout(() => {
-      const videoInfo = getVideoEmbedUrl(videoUrl, videoAutoplay);
+      const videoInfo = getVideoEmbedUrl(videoUrl, videoAutoplay, videoMuted, videoLoop);
       if (videoInfo) {
         setVideoPreviewUrl(videoInfo.embedUrl);
       } else {
@@ -352,10 +354,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         clearTimeout(videoValidationTimeoutRef.current);
       }
     };
-  }, [videoUrl, videoAutoplay]);
+  }, [videoUrl, videoAutoplay, videoMuted, videoLoop]);
 
   // Extract video embed URL from YouTube or Bilibili URL
-  const getVideoEmbedUrl = (url: string, autoplay: boolean = false): { embedUrl: string; platform: 'youtube' | 'bilibili' | null } | null => {
+  const getVideoEmbedUrl = (
+    url: string,
+    autoplay: boolean = false,
+    muted: boolean = false,
+    loop: boolean = false
+  ): { embedUrl: string; platform: 'youtube' | 'bilibili' | null } | null => {
     try {
       const urlObj = new URL(url);
 
@@ -375,10 +382,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
 
         if (videoId) {
-          // Add autoplay parameter (0 = no autoplay, 1 = autoplay)
-          const autoplayParam = autoplay ? '1' : '0';
+          // Build YouTube embed URL with parameters
+          const params = new URLSearchParams();
+          params.set('autoplay', autoplay ? '1' : '0');
+          params.set('mute', muted ? '1' : '0');
+          if (loop) {
+            params.set('loop', '1');
+            params.set('playlist', videoId); // Required for loop to work
+          }
           return {
-            embedUrl: `https://www.youtube.com/embed/${videoId}?autoplay=${autoplayParam}`,
+            embedUrl: `https://www.youtube.com/embed/${videoId}?${params.toString()}`,
             platform: 'youtube',
           };
         }
@@ -395,10 +408,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
 
         if (bvid) {
-          // Add autoplay parameter (0 = no autoplay, 1 = autoplay)
-          const autoplayParam = autoplay ? '1' : '0';
+          // Build Bilibili embed URL with parameters
+          const params = new URLSearchParams();
+          params.set('bvid', bvid);
+          params.set('autoplay', autoplay ? '1' : '0');
+          params.set('muted', muted ? '1' : '0');
+          // Note: Bilibili doesn't have a native loop parameter
           return {
-            embedUrl: `https://player.bilibili.com/player.html?bvid=${bvid}&autoplay=${autoplayParam}`,
+            embedUrl: `https://player.bilibili.com/player.html?${params.toString()}`,
             platform: 'bilibili',
           };
         }
@@ -539,6 +556,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     setVideoCustomWidth('');
     setVideoAlign('center');
     setVideoAutoplay(false);
+    setVideoMuted(false);
+    setVideoLoop(false);
     setVideoPreviewUrl(null);
     setVideoUrlValidating(false);
 
@@ -553,7 +572,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const handleVideoInsert = () => {
     if (quillRef.current && videoUrl) {
-      const videoInfo = getVideoEmbedUrl(videoUrl, videoAutoplay);
+      const videoInfo = getVideoEmbedUrl(videoUrl, videoAutoplay, videoMuted, videoLoop);
 
       if (!videoInfo) {
         alert(t('richTextEditor.invalidVideoUrl', 'Invalid video URL. Please use YouTube or Bilibili URL.'));
@@ -562,7 +581,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
       const editor = quillRef.current.getEditor();
       const selection = savedSelectionRef.current;
-      const position = selection ? selection.index : editor.getLength();
+      let position = selection ? selection.index : editor.getLength();
+
+      // If inserting at the very beginning (position 0), add an empty line first
+      // This allows users to add content above the video later
+      if (position === 0) {
+        editor.insertText(0, '\n');
+        position = 1; // Insert video after the empty line
+      }
 
       // Calculate width
       let width = '100%';
@@ -956,9 +982,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       } else {
         // Insert mode: insert new image
         const selection = savedSelectionRef.current;
-        const position = selection ? selection.index : editor.getLength();
+        let position = selection ? selection.index : editor.getLength();
 
-        // Insert a newline before image if not at the start
+        // If inserting at the very beginning (position 0), add an empty line first
+        // This allows users to add content above the image later
+        if (position === 0) {
+          editor.insertText(0, '\n');
+          position = 1; // Insert image after the empty line
+        }
+
+        // Insert a newline before image if not at the start and previous char is not newline
         if (position > 0) {
           const previousChar = editor.getText(position - 1, 1);
           if (previousChar !== '\n') {
@@ -974,12 +1007,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             editor.insertText(position + 1, '\n');
             editor.setSelection(position + 2, 0);
           }
-        } else {
-          // At the start of document
-          editor.insertEmbed(position, 'image', imageUrl);
-          // Insert one newline after image
-          editor.insertText(position + 1, '\n');
-          editor.setSelection(position + 2, 0);
         }
 
         // Apply style to the inserted image using setTimeout to ensure DOM is updated
@@ -1029,6 +1056,30 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           },
       clipboard: {
         matchVisual: false,
+        matchers: [
+          // Preserve image styles when copying/pasting
+          ['IMG', (node: any, delta: any) => {
+            const ops = delta.ops;
+            if (ops && ops.length > 0 && ops[0].insert && typeof ops[0].insert === 'object' && ops[0].insert.image) {
+              // Preserve style, alt, and data-image-metadata attributes
+              const attributes: any = {};
+              if (node.hasAttribute('style')) {
+                attributes.style = node.getAttribute('style');
+              }
+              if (node.hasAttribute('alt')) {
+                attributes.alt = node.getAttribute('alt');
+              }
+              if (node.hasAttribute('data-image-metadata')) {
+                attributes['data-image-metadata'] = node.getAttribute('data-image-metadata');
+              }
+
+              if (Object.keys(attributes).length > 0) {
+                ops[0].attributes = { ...ops[0].attributes, ...attributes };
+              }
+            }
+            return delta;
+          }],
+        ],
       },
       keyboard: {
         bindings: {
@@ -2005,6 +2056,38 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               />
               <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
                 {t('richTextEditor.videoAutoplayHelp')}
+              </Typography>
+            </FormControl>
+
+            {/* Muted */}
+            <FormControl>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={videoMuted}
+                    onChange={(e) => setVideoMuted(e.target.checked)}
+                  />
+                }
+                label={t('richTextEditor.videoMuted')}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
+                {t('richTextEditor.videoMutedHelp')}
+              </Typography>
+            </FormControl>
+
+            {/* Loop */}
+            <FormControl>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={videoLoop}
+                    onChange={(e) => setVideoLoop(e.target.checked)}
+                  />
+                }
+                label={t('richTextEditor.videoLoop')}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
+                {t('richTextEditor.videoLoopHelp')}
               </Typography>
             </FormControl>
               </Box>

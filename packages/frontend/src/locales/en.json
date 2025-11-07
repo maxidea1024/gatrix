@@ -2925,6 +2925,10 @@
     "videoAlignRight": "Right",
     "videoAutoplay": "Autoplay",
     "videoAutoplayHelp": "Automatically play the video (default: no autoplay)",
+    "videoMuted": "Muted",
+    "videoMutedHelp": "Play the video with sound muted",
+    "videoLoop": "Loop",
+    "videoLoopHelp": "Loop the video continuously (YouTube only)",
     "videoPreview": "Preview",
     "invalidVideoUrl": "Invalid video URL. Please use YouTube or Bilibili URL."
   },

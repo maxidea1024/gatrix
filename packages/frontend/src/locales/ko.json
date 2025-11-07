@@ -2925,6 +2925,10 @@
     "videoAlignRight": "오른쪽",
     "videoAutoplay": "자동 재생",
     "videoAutoplayHelp": "동영상을 자동으로 재생합니다 (기본: 자동 재생 안 함)",
+    "videoMuted": "음소거",
+    "videoMutedHelp": "동영상을 음소거 상태로 재생합니다",
+    "videoLoop": "반복 재생",
+    "videoLoopHelp": "동영상을 반복 재생합니다 (YouTube만 지원)",
     "videoPreview": "미리보기",
     "invalidVideoUrl": "유효하지 않은 동영상 URL입니다. 유튜브 또는 빌리빌리 URL을 사용하세요."
   },
