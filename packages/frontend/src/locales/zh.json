@@ -2996,6 +2996,7 @@
     "startDate": "开始日期",
     "startDateHelp": "设置公告开始显示的日期和时间（可选，未设置时立即开始）",
     "startImmediately": "立即开始",
+    "permanentDisplay": "永久显示",
     "endDate": "结束日期",
     "endDateHelp": "设置公告停止显示的日期和时间（可选，未设置时为永久公告）",
     "permanent": "永久公告",

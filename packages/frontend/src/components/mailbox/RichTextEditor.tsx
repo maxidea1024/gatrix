@@ -44,7 +44,11 @@ class VideoBlot extends BlockEmbed {
 
   static create(value: any) {
     const node = super.create(value) as HTMLDivElement;
+    // Set contenteditable to false to prevent editing the iframe
+    // But keep the wrapper deletable by Quill
     node.setAttribute('contenteditable', 'false');
+    // Add data attribute to help with selection and deletion
+    node.setAttribute('data-video-embed', 'true');
 
     const iframe = document.createElement('iframe');
 
@@ -92,6 +96,11 @@ class VideoBlot extends BlockEmbed {
       height: iframe.style.height,
       align: iframe.style.float || (iframe.style.display === 'block' && iframe.style.marginLeft === 'auto' ? 'center' : 'left'),
     };
+  }
+
+  // Override deleteAt to ensure proper deletion
+  deleteAt(index: number, length: number) {
+    super.deleteAt(index, length);
   }
 }
 
@@ -998,6 +1007,36 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       clipboard: {
         matchVisual: false,
       },
+      keyboard: {
+        bindings: {
+          // Handle delete key for custom embeds (video, image)
+          'delete': {
+            key: 'Delete',
+            handler: function(this: any, range: any) {
+              const editor = this.quill;
+              if (range.length > 0) {
+                // If there's a selection, delete it
+                editor.deleteText(range.index, range.length, 'user');
+                return false; // Prevent default
+              }
+              return true; // Allow default behavior for single character delete
+            }
+          },
+          // Handle backspace key for custom embeds
+          'backspace': {
+            key: 'Backspace',
+            handler: function(this: any, range: any) {
+              const editor = this.quill;
+              if (range.length > 0) {
+                // If there's a selection, delete it
+                editor.deleteText(range.index, range.length, 'user');
+                return false; // Prevent default
+              }
+              return true; // Allow default behavior for single character backspace
+            }
+          }
+        }
+      }
     }),
     [readOnly]
   );

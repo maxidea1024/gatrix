@@ -2960,6 +2960,7 @@
     "startDate": "시작일시",
     "startDateHelp": "공지가 표시되기 시작하는 일시를 설정합니다 (선택사항, 미설정 시 바로 시작)",
     "startImmediately": "바로시작",
+    "permanentDisplay": "영구 표시",
     "endDate": "종료일시",
     "endDateHelp": "공지가 표시되는 마지막 일시를 설정합니다 (선택사항, 미설정 시 영구 공지)",
     "permanent": "영구 공지",

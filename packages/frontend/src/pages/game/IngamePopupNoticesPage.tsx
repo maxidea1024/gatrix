@@ -549,10 +549,11 @@ const IngamePopupNoticesPage: React.FC = () => {
                         if (column.id === 'currentlyVisible') {
                           // Check if notice is currently visible (isActive + within date range)
                           // startDate is optional - if null, treat as immediately available
+                          // endDate is optional - if null, treat as permanent (no end date)
                           const now = dayjs();
                           const startDate = notice.startDate ? dayjs(notice.startDate) : null;
-                          const endDate = dayjs(notice.endDate);
-                          const isCurrentlyVisible = notice.isActive && (!startDate || now.isAfter(startDate)) && now.isBefore(endDate);
+                          const endDate = notice.endDate ? dayjs(notice.endDate) : null;
+                          const isCurrentlyVisible = notice.isActive && (!startDate || now.isAfter(startDate)) && (!endDate || now.isBefore(endDate));
 
                           return (
                             <TableCell key={column.id}>

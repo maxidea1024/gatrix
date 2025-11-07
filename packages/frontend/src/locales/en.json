@@ -2960,6 +2960,7 @@
     "startDate": "Start Date",
     "startDateHelp": "Set the date and time when the notice starts displaying (optional, starts immediately if not set)",
     "startImmediately": "Start Immediately",
+    "permanentDisplay": "Permanent Display",
     "endDate": "End Date",
     "endDateHelp": "Set the date and time when the notice stops displaying (optional, permanent if not set)",
     "permanent": "Permanent",
