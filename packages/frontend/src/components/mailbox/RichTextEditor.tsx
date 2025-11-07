@@ -628,6 +628,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   // Handle image insertion
   const insertImage = () => {
     handleContextMenuClose();
+    // Save current cursor position before opening dialog
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const selection = editor.getSelection();
+      savedSelectionRef.current = selection;
+    }
     setIsEditingImage(false);
     setImageUrl('');
     setImageWidth('100');
