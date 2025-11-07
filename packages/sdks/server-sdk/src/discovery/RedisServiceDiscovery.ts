@@ -12,9 +12,11 @@ import { ErrorCode, createError } from '../utils/errors';
 export class RedisServiceDiscovery implements IServiceDiscovery {
   private client: Redis;
   private logger: Logger;
-  private ttlSeconds: number = 30; // Default TTL, will be updated on register
+  private ttlSeconds: number = 30; // Default heartbeat TTL, will be updated on register
+  private terminatedTTL: number = 300; // Default terminated service TTL (5 minutes)
 
-  constructor(config: RedisConfig, logger: Logger) {
+  constructor(config: RedisConfig, logger: Logger, terminatedTTL: number = 300) {
+    this.terminatedTTL = terminatedTTL;
     this.logger = logger;
 
     this.client = new Redis({
@@ -111,7 +113,7 @@ export class RedisServiceDiscovery implements IServiceDiscovery {
 
   /**
    * Unregister service instance
-   * Mark as terminated with 5 minutes TTL (same as etcd)
+   * Mark as terminated with configured TTL (same as etcd)
    * This allows users to see terminated/error servers before cleanup
    */
   async unregister(instanceId: string, type: string): Promise<void> {
@@ -128,14 +130,14 @@ export class RedisServiceDiscovery implements IServiceDiscovery {
         instance.status = 'terminated';
         instance.updatedAt = new Date().toISOString();
 
-        // Set with 5 minutes TTL for cleanup (same as etcd)
-        await this.client.setex(key, 300, JSON.stringify(instance));
+        // Set with configured TTL for cleanup (same as etcd)
+        await this.client.setex(key, this.terminatedTTL, JSON.stringify(instance));
 
         this.logger.info('Service marked as terminated', {
           instanceId,
           type,
           key,
-          ttl: 300,
+          ttl: this.terminatedTTL,
         });
       } else {
         // If not found, just log

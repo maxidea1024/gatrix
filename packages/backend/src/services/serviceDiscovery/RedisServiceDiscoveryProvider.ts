@@ -6,6 +6,7 @@
 
 import Redis from 'ioredis';
 import logger from '../../config/logger';
+import config from '../../config';
 import {
   IServiceDiscoveryProvider,
   ServiceInstance,
@@ -121,12 +122,12 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
       if (value) {
         const instance: ServiceInstance = JSON.parse(value);
 
-        // Update status to terminated with 5 minutes TTL (same as etcd)
+        // Update status to terminated with configured TTL (same as etcd)
         // This allows users to see terminated/error servers before cleanup
         instance.status = 'terminated';
         instance.updatedAt = new Date().toISOString();
 
-        await this.client.set(key, JSON.stringify(instance), 'EX', 300); // 5 minutes
+        await this.client.set(key, JSON.stringify(instance), 'EX', config.serviceDiscovery.terminatedTTL);
 
         // Publish update event (status changed to terminated)
         await this.publishEvent({
@@ -178,12 +179,12 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         instance.meta = meta;
       }
 
-      // Use short TTL (5 minutes) for terminated/error servers, otherwise keep existing TTL
+      // Use configured TTL for terminated/error servers, otherwise keep existing TTL
       let ttl = await this.client.ttl(key);
       if (status === 'terminated' || status === 'error') {
-        ttl = 300; // 5 minutes for auto-cleanup
+        ttl = config.serviceDiscovery.terminatedTTL; // Configured TTL for auto-cleanup
       } else {
-        ttl = Math.max(ttl, 30);
+        ttl = Math.max(ttl, config.serviceDiscovery.heartbeatTTL);
       }
 
       await this.client.set(key, JSON.stringify(instance), 'EX', ttl);
@@ -325,7 +326,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
                 logger.info(`Broadcasting DELETE event to ${this.watchCallbacks.size} callbacks: ${type}:${instanceId} (final cleanup)`);
                 this.watchCallbacks.forEach(cb => cb(event));
               } else {
-                // First expiration - mark as terminated and set 5 minutes TTL
+                // First expiration - mark as terminated and set configured TTL
                 const key = `services:${type}:${instanceId}`;
                 const terminatedInstance = {
                   ...instance,
@@ -333,8 +334,8 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
                   updatedAt: new Date().toISOString(),
                 };
 
-                // Save back to Redis with 5 minutes TTL
-                await this.client.set(key, JSON.stringify(terminatedInstance), 'EX', 300);
+                // Save back to Redis with configured TTL
+                await this.client.set(key, JSON.stringify(terminatedInstance), 'EX', config.serviceDiscovery.terminatedTTL);
 
                 // Update tracked services
                 this.trackedServices.set(trackedKey, terminatedInstance);
@@ -344,7 +345,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
                   type: 'put',
                   instance: terminatedInstance,
                 };
-                logger.info(`Broadcasting PUT event to ${this.watchCallbacks.size} callbacks: ${type}:${instanceId} (marked as terminated, TTL: 300s)`);
+                logger.info(`Broadcasting PUT event to ${this.watchCallbacks.size} callbacks: ${type}:${instanceId} (marked as terminated, TTL: ${config.serviceDiscovery.terminatedTTL}s)`);
                 this.watchCallbacks.forEach(cb => cb(event));
               }
             }

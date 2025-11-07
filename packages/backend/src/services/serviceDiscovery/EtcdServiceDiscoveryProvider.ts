@@ -6,6 +6,7 @@
  */
 
 import logger from '../../config/logger';
+import config from '../../config';
 import {
   IServiceDiscoveryProvider,
   ServiceInstance,
@@ -148,13 +149,13 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           }
         }
 
-        // Create new lease with 5 minutes TTL
-        const newLease = this.client.lease(300); // 5 minutes
+        // Create new lease with configured TTL
+        const newLease = this.client.lease(config.serviceDiscovery.terminatedTTL);
         await newLease.put(key).value(JSON.stringify(instance));
         this.leases.set(leaseKey, newLease);
         lease = newLease;
 
-        logger.debug(`Service status updated: ${type}:${instanceId} -> ${status} (TTL: 300s)`);
+        logger.debug(`Service status updated: ${type}:${instanceId} -> ${status} (TTL: ${config.serviceDiscovery.terminatedTTL}s)`);
       } else {
         // For other statuses, use existing lease
         if (lease) {

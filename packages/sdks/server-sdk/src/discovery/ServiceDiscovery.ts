@@ -44,6 +44,7 @@ export class ServiceDiscovery {
       enabled: config.enabled !== false,
       mode: config.mode || 'redis',
       ttlSeconds: config.ttlSeconds || 30,
+      terminatedTTL: config.terminatedTTL || 300, // Default 5 minutes
       heartbeatIntervalMs: config.heartbeatIntervalMs || 10000,
     };
     this.logger = logger || new Logger();
@@ -76,7 +77,7 @@ export class ServiceDiscovery {
           'Redis configuration is required when mode is "redis"'
         );
       }
-      this.provider = new RedisServiceDiscovery(redisCfg, this.logger);
+      this.provider = new RedisServiceDiscovery(redisCfg, this.logger, this.config.terminatedTTL);
     } else {
       throw createError(
         ErrorCode.INVALID_CONFIG,

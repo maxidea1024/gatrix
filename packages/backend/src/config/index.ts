@@ -83,6 +83,12 @@ const config = {
     url: process.env.CHAT_SERVER_URL || 'http://localhost:3001',
     apiToken: process.env.CHAT_SERVER_API_TOKEN || 'gatrix-api-default-token',
   },
+
+  // Service Discovery configuration
+  serviceDiscovery: {
+    heartbeatTTL: parseInt(process.env.SERVICE_DISCOVERY_HEARTBEAT_TTL || '30', 10), // Heartbeat TTL in seconds
+    terminatedTTL: parseInt(process.env.SERVICE_DISCOVERY_TERMINATED_TTL || '300', 10), // Terminated service TTL in seconds (5 minutes)
+  },
 };
 
 // Validate required environment variables

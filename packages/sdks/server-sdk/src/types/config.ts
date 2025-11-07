@@ -27,7 +27,8 @@ export interface LoggerConfig {
 export interface ServiceDiscoveryConfig {
   enabled?: boolean; // Enable service discovery (default: false)
   mode?: 'redis' | 'etcd'; // Service discovery mode (default: 'redis')
-  ttlSeconds?: number; // Service TTL in seconds (default: 30)
+  ttlSeconds?: number; // Service heartbeat TTL in seconds (default: 30)
+  terminatedTTL?: number; // Terminated service TTL in seconds (default: 300 = 5 minutes)
   heartbeatIntervalMs?: number; // Heartbeat interval in milliseconds (default: 10000)
   redis?: RedisConfig; // Redis configuration for service discovery (when mode is 'redis')
   etcd?: EtcdConfig; // etcd configuration for service discovery (when mode is 'etcd')
