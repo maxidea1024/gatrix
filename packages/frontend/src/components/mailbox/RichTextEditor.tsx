@@ -171,6 +171,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [videoWidth, setVideoWidth] = useState<'25' | '50' | '75' | '100' | 'custom'>('100');
   const [videoCustomWidth, setVideoCustomWidth] = useState('');
   const [videoAlign, setVideoAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [videoAutoplay, setVideoAutoplay] = useState(false);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const savedSelectionRef = useRef<{ index: number; length: number } | null>(null);
   const imageValidationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -313,7 +314,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   }, [videoUrl]);
 
   // Extract video embed URL from YouTube or Bilibili URL
-  const getVideoEmbedUrl = (url: string): { embedUrl: string; platform: 'youtube' | 'bilibili' | null } | null => {
+  const getVideoEmbedUrl = (url: string, autoplay: boolean = false): { embedUrl: string; platform: 'youtube' | 'bilibili' | null } | null => {
     try {
       const urlObj = new URL(url);
 
@@ -333,8 +334,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
 
         if (videoId) {
+          // Add autoplay parameter (0 = no autoplay, 1 = autoplay)
+          const autoplayParam = autoplay ? '1' : '0';
           return {
-            embedUrl: `https://www.youtube.com/embed/${videoId}`,
+            embedUrl: `https://www.youtube.com/embed/${videoId}?autoplay=${autoplayParam}`,
             platform: 'youtube',
           };
         }
@@ -351,8 +354,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
 
         if (bvid) {
+          // Add autoplay parameter (0 = no autoplay, 1 = autoplay)
+          const autoplayParam = autoplay ? '1' : '0';
           return {
-            embedUrl: `https://player.bilibili.com/player.html?bvid=${bvid}`,
+            embedUrl: `https://player.bilibili.com/player.html?bvid=${bvid}&autoplay=${autoplayParam}`,
             platform: 'bilibili',
           };
         }
@@ -492,6 +497,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     setVideoWidth('100');
     setVideoCustomWidth('');
     setVideoAlign('center');
+    setVideoAutoplay(false);
     setVideoPreviewUrl(null);
 
     // Return focus to editor after dialog closes to prevent aria-hidden warning
@@ -505,7 +511,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const handleVideoInsert = () => {
     if (quillRef.current && videoUrl) {
-      const videoInfo = getVideoEmbedUrl(videoUrl);
+      const videoInfo = getVideoEmbedUrl(videoUrl, videoAutoplay);
 
       if (!videoInfo) {
         alert(t('richTextEditor.invalidVideoUrl', 'Invalid video URL. Please use YouTube or Bilibili URL.'));
@@ -1935,6 +1941,22 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   label={t('richTextEditor.videoAlignRight')}
                 />
               </RadioGroup>
+            </FormControl>
+
+            {/* Autoplay */}
+            <FormControl>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={videoAutoplay}
+                    onChange={(e) => setVideoAutoplay(e.target.checked)}
+                  />
+                }
+                label={t('richTextEditor.videoAutoplay')}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
+                {t('richTextEditor.videoAutoplayHelp')}
+              </Typography>
             </FormControl>
 
             {/* Video Preview */}
