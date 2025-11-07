@@ -199,8 +199,25 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       color: #06c;
       text-decoration: underline;
     }
+    /* Image styles - respect inline styles from editor */
     .content img {
-      max-width: 100%;
+      display: block;
+      margin: 0;
+    }
+    /* Remove extra spacing from empty paragraphs (Quill creates <p><br></p> for empty lines) */
+    .content p:empty {
+      margin: 0 !important;
+      padding: 0 !important;
+      line-height: 0 !important;
+      height: 0 !important;
+    }
+    .content p > br:only-child {
+      display: none;
+    }
+    /* Remove margin from paragraphs containing only images */
+    .content p:has(> img:only-child) {
+      margin: 0;
+      padding: 0;
     }
     .content blockquote {
       border-left: 4px solid #ccc;

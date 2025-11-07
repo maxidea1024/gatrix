@@ -221,14 +221,10 @@
       word-break: break-word;
     }
 
+    /* Image styles - respect inline styles from editor */
     .content-text img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      border: 2px solid #4A3D32;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       display: block;
-      margin: 0.5em 0;
+      margin: 0;
     }
 
     .content-text a {
@@ -249,6 +245,24 @@
       margin-bottom: 0;
     }
 
+    /* Remove extra spacing from empty paragraphs */
+    .content-text p:empty {
+      margin: 0 !important;
+      padding: 0 !important;
+      line-height: 0 !important;
+      height: 0 !important;
+    }
+
+    .content-text p > br:only-child {
+      display: none;
+    }
+
+    /* Remove margin from paragraphs containing only images */
+    .content-text p:has(> img:only-child) {
+      margin: 0;
+      padding: 0;
+    }
+
     .content-text h1, .content-text h2, .content-text h3,
     .content-text h4, .content-text h5, .content-text h6 {
       color: #3D3228;
@@ -265,6 +279,17 @@
     .content-text li {
       margin-bottom: 0.4em;
       line-height: 1.6;
+    }
+
+    /* Video wrapper styling */
+    .content-text .video-wrapper {
+      margin: 10px 0;
+      position: relative;
+    }
+
+    .content-text .video-wrapper iframe {
+      border: none;
+      display: block;
     }
 
     .loading, .error, .empty {
@@ -446,7 +471,7 @@
         const categoryIcon = getCategoryIcon(notice.category);
         const unreadIcon = getUnreadIcon();
 
-        html += '<div class="notice-item' + (selectedNotice && selectedNotice.id === notice.id ? ' active' : '') + '" data-notice-id="' + notice.id + '" onclick="selectNotice(' + JSON.stringify(notice).replace(/"/g, '&quot;') + ')">';
+        html += '<div class="notice-item' + (selectedNotice && selectedNotice.id === notice.id ? ' active' : '') + '" data-notice-id="' + notice.id + '" onclick="selectNoticeById(' + notice.id + ')">';
         html += '<div class="notice-item-content">';
         html += '<div class="notice-item-header">';
         html += '<div class="notice-item-icon" style="color: #D4A574;">' + categoryIcon + '</div>';
@@ -458,6 +483,14 @@
       });
 
       sidebar.innerHTML = html;
+    }
+
+    // Select notice by ID (helper function for onclick)
+    function selectNoticeById(noticeId) {
+      const notice = notices.find(function(n) { return n.id === noticeId; });
+      if (notice) {
+        selectNotice(notice);
+      }
     }
 
     // Select and display notice

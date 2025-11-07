@@ -538,14 +538,10 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   fontFamily: '"Noto Sans KR", "Roboto", sans-serif',
                   WebkitFontSmoothing: 'antialiased',
                   MozOsxFontSmoothing: 'grayscale',
+                  // Image styles - respect inline styles from editor
                   '& img': {
-                    maxWidth: '100%',
-                    height: 'auto',
-                    borderRadius: '8px',
-                    border: `2px solid ${GAME_COLORS.border}`,
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
                     display: 'block',
-                    margin: '0.5em 0',
+                    margin: 0,
                   },
                   '& a': {
                     color: '#8B4513',
@@ -562,6 +558,21 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   },
                   '& p:last-child': {
                     marginBottom: 0,
+                  },
+                  // Remove extra spacing from empty paragraphs
+                  '& p:empty': {
+                    margin: '0 !important',
+                    padding: '0 !important',
+                    lineHeight: '0 !important',
+                    height: '0 !important',
+                  },
+                  '& p > br:only-child': {
+                    display: 'none',
+                  },
+                  // Remove margin from paragraphs containing only images
+                  '& p:has(> img:only-child)': {
+                    margin: 0,
+                    padding: 0,
                   },
                   '& h1, & h2, & h3, & h4, & h5, & h6': {
                     color: GAME_COLORS.textPrimary,
@@ -671,6 +682,15 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                     marginRight: 0,
                     color: GAME_COLORS.textSecondary,
                     fontStyle: 'italic',
+                  },
+                  // Video wrapper styling
+                  '& .video-wrapper': {
+                    margin: '10px 0',
+                    position: 'relative',
+                  },
+                  '& .video-wrapper iframe': {
+                    border: 'none',
+                    display: 'block',
                   },
                 }}
                 dangerouslySetInnerHTML={{ __html: selectedNotice.content }}
