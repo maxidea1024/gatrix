@@ -2857,6 +2857,7 @@
     "linkTextPlaceholder": "표시할 텍스트",
     "linkTextHelp": "비워두면 URL이 텍스트로 표시됩니다",
     "image": "이미지",
+    "video": "동영상",
     "insertImage": "이미지 삽입",
     "imageUrl": "이미지 URL",
     "imageUrlHelp": "이미지 주소를 입력하세요 (예: https://example.com/image.jpg)",
@@ -2922,6 +2923,8 @@
     "videoAlignLeft": "왼쪽",
     "videoAlignCenter": "가운데",
     "videoAlignRight": "오른쪽",
+    "videoAutoplay": "자동 재생",
+    "videoAutoplayHelp": "동영상을 자동으로 재생합니다 (기본: 자동 재생 안 함)",
     "videoPreview": "미리보기",
     "invalidVideoUrl": "유효하지 않은 동영상 URL입니다. 유튜브 또는 빌리빌리 URL을 사용하세요."
   },

@@ -2857,6 +2857,7 @@
     "linkTextPlaceholder": "Text to display",
     "linkTextHelp": "Leave empty to use URL as text",
     "image": "Image",
+    "video": "Video",
     "insertImage": "Insert Image",
     "imageUrl": "Image URL",
     "imageUrlHelp": "Enter the image URL (e.g., https://example.com/image.jpg)",
@@ -2922,6 +2923,8 @@
     "videoAlignLeft": "Left",
     "videoAlignCenter": "Center",
     "videoAlignRight": "Right",
+    "videoAutoplay": "Autoplay",
+    "videoAutoplayHelp": "Automatically play the video (default: no autoplay)",
     "videoPreview": "Preview",
     "invalidVideoUrl": "Invalid video URL. Please use YouTube or Bilibili URL."
   },

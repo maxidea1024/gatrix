@@ -2893,6 +2893,7 @@
     "linkTextPlaceholder": "要显示的文本",
     "linkTextHelp": "留空则使用URL作为文本",
     "image": "图片",
+    "video": "视频",
     "insertImage": "插入图片",
     "imageUrl": "图片URL",
     "imageUrlHelp": "输入图片地址 (例: https://example.com/image.jpg)",
@@ -2958,6 +2959,8 @@
     "videoAlignLeft": "左对齐",
     "videoAlignCenter": "居中",
     "videoAlignRight": "右对齐",
+    "videoAutoplay": "自动播放",
+    "videoAutoplayHelp": "自动播放视频（默认：不自动播放）",
     "videoPreview": "预览",
     "invalidVideoUrl": "无效的视频URL。请使用YouTube或哔哩哔哩URL。"
   },

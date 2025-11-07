@@ -34,6 +34,38 @@ import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import EmojiPicker, { EmojiClickData, Theme as EmojiTheme, Categories } from 'emoji-picker-react';
 
+// Register custom image blot for Quill to preserve style attribute
+const ImageBlot = Quill.import('formats/image') as any;
+
+class CustomImageBlot extends ImageBlot {
+  static formats(node: HTMLImageElement) {
+    // Preserve all attributes including style
+    const formats: any = {};
+    if (node.hasAttribute('alt')) {
+      formats.alt = node.getAttribute('alt');
+    }
+    if (node.hasAttribute('style')) {
+      formats.style = node.getAttribute('style');
+    }
+    if (node.hasAttribute('data-image-metadata')) {
+      formats['data-image-metadata'] = node.getAttribute('data-image-metadata');
+    }
+    return formats;
+  }
+
+  format(name: string, value: any) {
+    if (name === 'style' || name === 'alt' || name === 'data-image-metadata') {
+      if (value) {
+        this.domNode.setAttribute(name, value);
+      } else {
+        this.domNode.removeAttribute(name);
+      }
+    } else {
+      super.format(name, value);
+    }
+  }
+}
+
 // Register custom video blot for Quill
 const BlockEmbed = Quill.import('blots/block/embed') as any;
 
@@ -80,7 +112,8 @@ class VideoBlot extends BlockEmbed {
     iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
     iframe.style.border = 'none';
 
-    node.style.margin = '10px 0';
+    // Remove margin to avoid dead space
+    node.style.margin = '0';
     node.appendChild(iframe);
 
     return node;
@@ -104,6 +137,7 @@ class VideoBlot extends BlockEmbed {
   }
 }
 
+Quill.register(CustomImageBlot, true); // true to overwrite default image format
 Quill.register(VideoBlot);
 import {
   EmojiEmotions as EmojiIcon,
@@ -173,6 +207,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [videoAlign, setVideoAlign] = useState<'left' | 'center' | 'right'>('center');
   const [videoAutoplay, setVideoAutoplay] = useState(false);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
+  const [videoUrlValidating, setVideoUrlValidating] = useState(false);
   const savedSelectionRef = useRef<{ index: number; length: number } | null>(null);
   const imageValidationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const videoValidationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -293,25 +328,31 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
     if (!videoUrl) {
       setVideoPreviewUrl(null);
+      setVideoUrlValidating(false);
       return;
     }
 
+    // Clear preview immediately and set validating state to prevent error message flash
+    setVideoPreviewUrl(null);
+    setVideoUrlValidating(true);
+
     // Debounce validation
     videoValidationTimeoutRef.current = setTimeout(() => {
-      const videoInfo = getVideoEmbedUrl(videoUrl);
+      const videoInfo = getVideoEmbedUrl(videoUrl, videoAutoplay);
       if (videoInfo) {
         setVideoPreviewUrl(videoInfo.embedUrl);
       } else {
         setVideoPreviewUrl(null);
       }
-    }, 500);
+      setVideoUrlValidating(false);
+    }, 300); // Reduced from 500ms to 300ms
 
     return () => {
       if (videoValidationTimeoutRef.current) {
         clearTimeout(videoValidationTimeoutRef.current);
       }
     };
-  }, [videoUrl]);
+  }, [videoUrl, videoAutoplay]);
 
   // Extract video embed URL from YouTube or Bilibili URL
   const getVideoEmbedUrl = (url: string, autoplay: boolean = false): { embedUrl: string; platform: 'youtube' | 'bilibili' | null } | null => {
@@ -499,6 +540,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     setVideoAlign('center');
     setVideoAutoplay(false);
     setVideoPreviewUrl(null);
+    setVideoUrlValidating(false);
 
     // Return focus to editor after dialog closes to prevent aria-hidden warning
     setTimeout(() => {
@@ -546,42 +588,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         iframeStyle += ' float: right; margin-left: 10px; margin-bottom: 10px;';
       }
 
-      // Insert a newline before video if not at the start
-      if (position > 0) {
-        const previousChar = editor.getText(position - 1, 1);
-        if (previousChar !== '\n') {
-          editor.insertText(position, '\n');
-          editor.insertEmbed(position + 1, 'video', {
-            src: videoInfo.embedUrl,
-            width: width,
-            height: `${height}px`,
-            align: videoAlign,
-          });
-          // Insert two newlines after video for better editing
-          editor.insertText(position + 2, '\n\n');
-          editor.setSelection(position + 3, 0);
-        } else {
-          editor.insertEmbed(position, 'video', {
-            src: videoInfo.embedUrl,
-            width: width,
-            height: `${height}px`,
-            align: videoAlign,
-          });
-          // Insert two newlines after video for better editing
-          editor.insertText(position + 1, '\n\n');
-          editor.setSelection(position + 2, 0);
-        }
-      } else {
-        editor.insertEmbed(position, 'video', {
-          src: videoInfo.embedUrl,
-          width: width,
-          height: `${height}px`,
-          align: videoAlign,
-        });
-        // Insert two newlines after video for better editing
-        editor.insertText(position + 1, '\n\n');
-        editor.setSelection(position + 2, 0);
-      }
+      // Insert video - Quill automatically handles newlines for BlockEmbed
+      editor.insertEmbed(position, 'video', {
+        src: videoInfo.embedUrl,
+        width: width,
+        height: `${height}px`,
+        align: videoAlign,
+      });
+
+      // Set cursor position after the video
+      editor.setSelection(position + 1, 0);
 
       editor.focus();
     }
@@ -1003,11 +1019,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               [{ color: [] }, { background: [] }],
               [{ list: 'ordered' }, { list: 'bullet' }],
               [{ align: [] }], // Text alignment
-              ['link', 'image'],
+              ['link', 'image', 'video'],
               ['clean'],
             ],
             handlers: {
               image: imageHandler,
+              video: insertVideo,
             },
           },
       clipboard: {
@@ -1091,6 +1108,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       '.ql-align': t('richTextEditor.align', 'Align'),
       '.ql-link': t('richTextEditor.link'),
       '.ql-image': t('richTextEditor.image'),
+      '.ql-video': t('richTextEditor.video'),
       '.ql-clean': t('richTextEditor.clean'),
     };
 
@@ -1488,14 +1506,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       <Dialog
         open={imageDialogOpen}
         onClose={handleImageDialogClose}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
       >
         <DialogTitle>
           {isEditingImage ? t('richTextEditor.imageEdit') : t('richTextEditor.insertImage')}
         </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+        <DialogContent sx={{ height: '70vh', p: 0, overflow: 'hidden' }}>
+          <Box sx={{ display: 'flex', height: '100%' }}>
+            {/* Left Panel: Settings */}
+            <Box sx={{ width: '50%', height: '100%', overflow: 'auto', p: 3, borderRight: (theme) => `1px solid ${theme.palette.divider}` }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
             {/* Image Source Group */}
             <Paper variant="outlined" sx={{ p: 2 }}>
               <Typography variant="subtitle2" gutterBottom sx={{ mb: 2, fontWeight: 600 }}>
@@ -1764,22 +1785,30 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 </Box>
               </AccordionDetails>
             </Accordion>
+              </Box>
+            </Box>
 
-            {/* Preview Section - Outside accordion */}
-            {imageUrl && (
-              <>
-                <Divider />
-                <Box>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {t('richTextEditor.imagePreview')}
-                  </Typography>
+            {/* Right Panel: Preview */}
+            <Box sx={{ width: '50%', height: '100%', overflow: 'auto', p: 3, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.02)' }}>
+              <Box
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
+                  {t('richTextEditor.imagePreview')}
+                </Typography>
+                {imageUrl ? (
                   <Paper
                     variant="outlined"
                     sx={{
                       p: 2,
                       display: 'flex',
                       justifyContent: imageAlign === 'left' ? 'flex-start' : imageAlign === 'right' ? 'flex-end' : 'center',
-                      minHeight: 200,
+                      minHeight: 300,
+                      flex: 1,
                       backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)',
                     }}
                   >
@@ -1799,7 +1828,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                           height: imageAspectRatio ? 'auto' : undefined,
                           width: imageWidth === 'original' ? 'auto' : imageWidth === 'custom' && imageCustomWidth ? `${imageCustomWidth}px` : `${imageWidth}%`,
                           maxWidth: '100%',
-                          maxHeight: 400,
+                          maxHeight: 500,
                           objectFit: imageAspectRatio ? 'contain' : 'fill',
                           border: imageBorder !== 'none' ? `${imageBorder === 'thin' ? '1px' : imageBorder === 'medium' ? '2px' : '3px'} solid ${imageBorderColor}` : 'none',
                           boxShadow: imageShadow !== 'none' ? (() => {
@@ -1842,9 +1871,26 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                       />
                     </Box>
                   </Paper>
-                </Box>
-              </>
-            )}
+                ) : (
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 4,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: 300,
+                      flex: 1,
+                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)',
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      {t('richTextEditor.imageUrlHelp')}
+                    </Typography>
+                  </Paper>
+                )}
+              </Box>
+            </Box>
           </Box>
         </DialogContent>
         <DialogActions>
@@ -1870,12 +1916,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       <Dialog
         open={videoDialogOpen}
         onClose={handleVideoDialogClose}
-        maxWidth="sm"
+        maxWidth="lg"
         fullWidth
       >
         <DialogTitle>{t('richTextEditor.insertVideo')}</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+        <DialogContent sx={{ height: '60vh', p: 0, overflow: 'hidden' }}>
+          <Box sx={{ display: 'flex', height: '100%' }}>
+            {/* Left Panel: Settings */}
+            <Box sx={{ width: '50%', height: '100%', overflow: 'auto', p: 3, borderRight: (theme) => `1px solid ${theme.palette.divider}` }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {/* Video URL */}
             <TextField
               autoFocus
@@ -1958,51 +2007,106 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 {t('richTextEditor.videoAutoplayHelp')}
               </Typography>
             </FormControl>
+              </Box>
+            </Box>
 
-            {/* Video Preview */}
-            {videoPreviewUrl && (
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
+            {/* Right Panel: Preview */}
+            <Box sx={{ width: '50%', height: '100%', overflow: 'auto', p: 3, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.02)' }}>
+              <Box
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
                   {t('richTextEditor.videoPreview')}
                 </Typography>
-                <Paper
-                  variant="outlined"
-                  sx={{
-                    p: 2,
-                    backgroundColor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
-                  }}
-                >
-                  <Box
+                {videoPreviewUrl ? (
+                  <Paper
+                    variant="outlined"
                     sx={{
-                      position: 'relative',
-                      paddingBottom: '56.25%', // 16:9 aspect ratio
-                      height: 0,
-                      overflow: 'hidden',
+                      p: 2,
+                      flex: 1,
+                      backgroundColor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
                     }}
                   >
-                    <iframe
-                      src={videoPreviewUrl}
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        border: 'none',
+                    <Box
+                      sx={{
+                        position: 'relative',
+                        paddingBottom: '56.25%', // 16:9 aspect ratio
+                        height: 0,
+                        overflow: 'hidden',
                       }}
-                      allowFullScreen
-                    />
-                  </Box>
-                </Paper>
+                    >
+                      <iframe
+                        src={videoPreviewUrl}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          border: 'none',
+                        }}
+                        allowFullScreen
+                      />
+                    </Box>
+                  </Paper>
+                ) : videoUrlValidating ? (
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 4,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: 300,
+                      flex: 1,
+                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)',
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      {t('richTextEditor.validatingVideoUrl', 'URL 검증 중...')}
+                    </Typography>
+                  </Paper>
+                ) : videoUrl ? (
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 4,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: 300,
+                      flex: 1,
+                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)',
+                    }}
+                  >
+                    <Typography variant="body2" color="error">
+                      {t('richTextEditor.invalidVideoUrl')}
+                    </Typography>
+                  </Paper>
+                ) : (
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 4,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: 300,
+                      flex: 1,
+                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)',
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      {t('richTextEditor.videoUrlHelp')}
+                    </Typography>
+                  </Paper>
+                )}
               </Box>
-            )}
-
-            {/* Invalid URL message */}
-            {videoUrl && !videoPreviewUrl && (
-              <Typography variant="body2" color="error">
-                {t('richTextEditor.invalidVideoUrl')}
-              </Typography>
-            )}
+            </Box>
           </Box>
         </DialogContent>
         <DialogActions>

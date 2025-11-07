@@ -20,7 +20,7 @@ import {
   AppBar,
   Toolbar,
 } from '@mui/material';
-import { Visibility as VisibilityIcon, Close as CloseIcon } from '@mui/icons-material';
+import { Close as CloseIcon, ChevronRight as ChevronRightIcon, ChevronLeft as ChevronLeftIcon } from '@mui/icons-material';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
@@ -52,7 +52,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const { platforms: platformConfig, channels: channelConfig } = usePlatformConfig();
   const [submitting, setSubmitting] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
+  const [previewCollapsed, setPreviewCollapsed] = useState(true); // Default: collapsed
 
   // Form state
   const [isActive, setIsActive] = useState(true);
@@ -78,6 +78,10 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       setDebouncedTabTitle(tabTitle);
       setDebouncedTitle(title);
       setDebouncedContent(content);
+      // Debug: Log content to see if styles are included
+      if (content) {
+        console.log('Preview HTML content:', content);
+      }
     }, 500);
 
     return () => clearTimeout(timer);
@@ -198,11 +202,6 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     .content a {
       color: #06c;
       text-decoration: underline;
-    }
-    /* Image styles - respect inline styles from editor */
-    .content img {
-      display: block;
-      margin: 0;
     }
     /* Preserve empty paragraphs for blank lines - match Quill editor spacing */
     .content p {
@@ -381,6 +380,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     }
   };
 
+
+
   return (
     <ResizableDrawer
       open={open}
@@ -388,44 +389,75 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       title={notice ? t('serviceNotices.editNotice') : t('serviceNotices.createNotice')}
       subtitle={notice ? t('serviceNotices.editNoticeSubtitle') : t('serviceNotices.createNoticeSubtitle')}
       storageKey="serviceNoticeFormDrawerWidth"
-      defaultWidth={800}
-      minWidth={600}
+      defaultWidth={1000}
+      minWidth={800}
       zIndex={1300}
     >
       {/* Content */}
       <Box
+        data-resizable-container
         sx={{
-          p: 3,
           flexGrow: 1,
-          overflow: 'auto',
-          // Chat message list scrollbar style
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-          },
-          '&::-webkit-scrollbar-thumb:active': {
-            background: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-          },
-          scrollbarWidth: 'thin',
-          scrollbarColor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.2) transparent'
-              : 'rgba(0, 0, 0, 0.2) transparent',
+          overflow: 'hidden',
+          display: 'flex',
+          position: 'relative',
         }}
       >
-        <Stack spacing={3}>
+        {/* Toggle Button - At the divider position */}
+        <IconButton
+          onClick={() => setPreviewCollapsed(!previewCollapsed)}
+          sx={{
+            position: 'absolute',
+            left: previewCollapsed ? 'calc(100% - 20px)' : '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 10,
+            bgcolor: (theme) => theme.palette.background.paper,
+            boxShadow: 2,
+            '&:hover': {
+              bgcolor: (theme) => theme.palette.action.hover,
+            },
+          }}
+        >
+          {previewCollapsed ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        </IconButton>
+
+        {/* Left Panel: Edit Form */}
+        <Box
+          sx={{
+            width: previewCollapsed ? 'calc(100% - 40px)' : '50%',
+            height: '100%',
+            overflow: 'auto',
+            p: 3,
+            transition: 'width 0.3s ease-in-out',
+            // Chat message list scrollbar style
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: (theme) =>
+                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: (theme) =>
+                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+            },
+            '&::-webkit-scrollbar-thumb:active': {
+              background: (theme) =>
+                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+            },
+            scrollbarWidth: 'thin',
+            scrollbarColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.2) transparent'
+                : 'rgba(0, 0, 0, 0.2) transparent',
+          }}
+        >
+          <Stack spacing={3}>
           {/* Active Status */}
           <Box>
             <FormControlLabel
@@ -574,25 +606,69 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
             rows={3}
             helperText={t('serviceNotices.descriptionHelp')}
           />
+          </Stack>
+        </Box>
 
-          {/* Preview Section */}
-          <Box>
-            <Button
-              variant="outlined"
-              startIcon={<VisibilityIcon />}
-              onClick={() => setShowPreview(!showPreview)}
-              fullWidth
-            >
-              {showPreview ? t('serviceNotices.hidePreview') : t('serviceNotices.showPreview')}
-            </Button>
+        {/* Divider */}
+        {!previewCollapsed && (
+          <Box
+            sx={{
+              width: '1px',
+              height: '100%',
+              bgcolor: (theme) => theme.palette.divider,
+              flexShrink: 0,
+            }}
+          />
+        )}
 
-            {showPreview && (
+        {/* Right Panel: Preview */}
+        <Box
+          sx={{
+            width: previewCollapsed ? '40px' : '50%',
+            height: '100%',
+            overflow: previewCollapsed ? 'visible' : 'auto',
+            p: previewCollapsed ? 0 : 3,
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.02)',
+            transition: 'width 0.3s ease-in-out, padding 0.3s ease-in-out',
+            position: 'relative',
+            // Chat message list scrollbar style
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: (theme) =>
+                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: (theme) =>
+                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+            },
+            '&::-webkit-scrollbar-thumb:active': {
+              background: (theme) =>
+                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+            },
+            scrollbarWidth: 'thin',
+            scrollbarColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.2) transparent'
+                : 'rgba(0, 0, 0, 0.2) transparent',
+          }}
+        >
+          {!previewCollapsed && (
+            <>
+              <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+                {t('serviceNotices.preview')}
+              </Typography>
               <Paper
                 variant="outlined"
                 sx={{
-                  mt: 2,
                   p: 0,
-                  height: 400,
+                  height: 'calc(100% - 72px)',
                   overflow: 'auto',
                 }}
               >
@@ -606,9 +682,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
                   title="Notice Preview"
                 />
               </Paper>
-            )}
-          </Box>
-        </Stack>
+            </>
+          )}
+        </Box>
       </Box>
 
       {/* Footer */}
