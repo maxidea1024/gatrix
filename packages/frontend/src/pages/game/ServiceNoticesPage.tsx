@@ -622,17 +622,20 @@ const ServiceNoticesPage: React.FC = () => {
                           const endDate = notice.endDate ? new Date(notice.endDate) : null;
                           const isCurrentlyVisible = notice.isActive && (!startDate || now >= startDate) && (!endDate || now <= endDate);
 
-                          // Create tooltip message
+                          // Create tooltip message with user-friendly text for null dates
+                          const startText = startDate ? formatDateTime(startDate) : t('serviceNotices.startImmediately');
+                          const endText = endDate ? formatDateTime(endDate) : t('serviceNotices.permanentDisplay');
+
                           const tooltipMessage = isCurrentlyVisible
                             ? t('serviceNotices.currentlyVisibleTooltip', {
                                 time: formatDateTime(now),
-                                start: formatDateTime(startDate),
-                                end: formatDateTime(endDate)
+                                start: startText,
+                                end: endText
                               })
                             : t('serviceNotices.notVisibleTooltip', {
                                 time: formatDateTime(now),
-                                start: formatDateTime(startDate),
-                                end: formatDateTime(endDate),
+                                start: startText,
+                                end: endText,
                                 isActive: notice.isActive
                               });
 
