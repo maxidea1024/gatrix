@@ -204,15 +204,14 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       display: block;
       margin: 0;
     }
-    /* Remove extra spacing from empty paragraphs (Quill creates <p><br></p> for empty lines) */
-    .content p:empty {
-      margin: 0 !important;
-      padding: 0 !important;
-      line-height: 0 !important;
-      height: 0 !important;
+    /* Preserve empty paragraphs for blank lines - match Quill editor spacing */
+    .content p {
+      min-height: 1em;
+      margin: 0;
+      padding: 0;
     }
-    .content p > br:only-child {
-      display: none;
+    .content p:empty {
+      min-height: 1em;
     }
     /* Remove margin from paragraphs containing only images */
     .content p:has(> img:only-child) {
@@ -313,11 +312,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     }
 
     // Note: platforms is optional - empty array means "all platforms"
-
-    if (!endDate) {
-      enqueueSnackbar(t('serviceNotices.endDateRequired'), { variant: 'error' });
-      return;
-    }
+    // Note: endDate is now optional - null means no end date (permanent notice)
 
     if (!title.trim()) {
       enqueueSnackbar(t('serviceNotices.titleRequired'), { variant: 'error' });
@@ -357,7 +352,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
         channels: channels.length > 0 ? channels : null,
         subchannels: subchannels.length > 0 ? subchannels : null,
         startDate: startDate ? startDate.toISOString() : null,
-        endDate: endDate.toISOString(),
+        endDate: endDate ? endDate.toISOString() : null,
         tabTitle: trimmedTabTitle ? trimmedTabTitle : null,
         title: title.trim(),
         content: content.trim(),
@@ -496,7 +491,10 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
                 slotProps={{
                   textField: {
                     fullWidth: true,
-                    required: true,
+                    required: false,
+                  },
+                  actionBar: {
+                    actions: ['clear', 'cancel', 'accept'],
                   },
                 }}
               />

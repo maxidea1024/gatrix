@@ -116,12 +116,7 @@ class ServiceNoticeController {
         });
       }
 
-      if (!data.endDate) {
-        return res.status(400).json({
-          success: false,
-          message: 'End date is required',
-        });
-      }
+      // endDate is now optional - null means no end date (permanent notice)
 
       if (!data.title) {
         return res.status(400).json({

@@ -8,7 +8,7 @@ export interface ServiceNotice {
   channels?: string[];
   subchannels?: string[];
   startDate: string | null;
-  endDate: string;
+  endDate: string | null;
   tabTitle?: string | null;
   title: string;
   content: string;
@@ -22,7 +22,7 @@ export interface CreateServiceNoticeData {
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
   startDate?: string | null;
-  endDate: string;
+  endDate?: string | null;
   tabTitle?: string | null;
   title: string;
   content: string;

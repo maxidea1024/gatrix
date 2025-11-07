@@ -955,7 +955,14 @@ const MailboxPage: React.FC = () => {
                   className="ql-editor"
                   sx={{
                     padding: 0,
-                    '& p': { marginBottom: 1 },
+                    '& p': {
+                      margin: 0,
+                      padding: 0,
+                      minHeight: '1em',
+                    },
+                    '& p:empty': {
+                      minHeight: '1em',
+                    },
                     '& a': { color: 'primary.main', textDecoration: 'underline' },
                     '& img': { maxWidth: '100%', height: 'auto' },
                   }}

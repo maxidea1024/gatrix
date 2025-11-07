@@ -191,10 +191,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       return;
     }
 
-    if (!endDate) {
-      enqueueSnackbar(t('ingamePopupNotices.endDateRequired'), { variant: 'error' });
-      return;
-    }
+    // Note: endDate is now optional - null means no end date (permanent notice)
 
     setSubmitting(true);
 
@@ -234,7 +231,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
         showOnce,
         // Convert local time to UTC (12:00 KST -> 03:00 UTC)
         startDate: startDate ? startDate.toISOString() : null,
-        endDate: endDate.toISOString(),
+        endDate: endDate ? endDate.toISOString() : null,
         useTemplate,
         messageTemplateId: useTemplate ? messageTemplateId : null,
         description: description.trim() || null,
@@ -375,7 +372,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
                 slotProps={{
                   textField: {
                     fullWidth: true,
-                    required: true,
+                    required: false,
                   },
                   actionBar: {
                     actions: ['clear', 'cancel', 'accept'],

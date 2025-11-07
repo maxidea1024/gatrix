@@ -238,23 +238,14 @@
     }
 
     .content-text p {
-      margin: 0 0 0.75em 0;
+      margin: 0;
+      padding: 0;
+      min-height: 1em;
     }
 
-    .content-text p:last-child {
-      margin-bottom: 0;
-    }
-
-    /* Remove extra spacing from empty paragraphs */
+    /* Preserve empty paragraphs for blank lines */
     .content-text p:empty {
-      margin: 0 !important;
-      padding: 0 !important;
-      line-height: 0 !important;
-      height: 0 !important;
-    }
-
-    .content-text p > br:only-child {
-      display: none;
+      min-height: 1em;
     }
 
     /* Remove margin from paragraphs containing only images */
@@ -421,8 +412,9 @@
           notices = noticeList.filter(function(notice) {
             const now = new Date();
             const startDate = notice.startDate ? new Date(notice.startDate) : null;
-            const endDate = new Date(notice.endDate);
-            return (!startDate || now >= startDate) && now <= endDate;
+            const endDate = notice.endDate ? new Date(notice.endDate) : null;
+            // Show if: (no startDate OR now >= startDate) AND (no endDate OR now <= endDate)
+            return (!startDate || now >= startDate) && (!endDate || now <= endDate);
           });
 
           renderNoticeList(notices);

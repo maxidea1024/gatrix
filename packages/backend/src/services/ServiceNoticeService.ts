@@ -10,7 +10,7 @@ export interface ServiceNotice {
   channels?: string[];
   subchannels?: string[];
   startDate: string | null;
-  endDate: string;
+  endDate: string | null;
   tabTitle?: string;
   title: string;
   content: string;
@@ -26,7 +26,7 @@ export interface CreateServiceNoticeData {
   channels?: string[] | null;
   subchannels?: string[] | null;
   startDate?: string | null;
-  endDate: string;
+  endDate?: string | null;
   tabTitle?: string;
   title: string;
   content: string;
@@ -241,7 +241,7 @@ class ServiceNoticeService {
         startDate: data.startDate,
         endDate: data.endDate,
         convertedStartDate: convertToMySQLDateTime(data.startDate),
-        convertedEndDate: convertToMySQLDateTime(data.endDate),
+        convertedEndDate: data.endDate ? convertToMySQLDateTime(data.endDate) : null,
       });
 
       const [result] = await pool.execute<ResultSetHeader>(
@@ -255,7 +255,7 @@ class ServiceNoticeService {
           data.channels ? JSON.stringify(data.channels) : null,
           data.subchannels ? JSON.stringify(data.subchannels) : null,
           data.startDate ? convertToMySQLDateTime(data.startDate) : null,
-          convertToMySQLDateTime(data.endDate),
+          data.endDate ? convertToMySQLDateTime(data.endDate) : null,
           data.tabTitle || null,
           data.title,
           data.content,
@@ -313,9 +313,9 @@ class ServiceNoticeService {
         values.push(data.startDate ? convertToMySQLDateTime(data.startDate) : null);
       }
 
-      if (data.endDate) {
+      if (data.endDate !== undefined) {
         updates.push('endDate = ?');
-        values.push(convertToMySQLDateTime(data.endDate));
+        values.push(data.endDate ? convertToMySQLDateTime(data.endDate) : null);
       }
 
       if (data.tabTitle !== undefined) {

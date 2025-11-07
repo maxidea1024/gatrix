@@ -19,7 +19,7 @@ export interface IngamePopupNotice {
   displayPriority: number;
   showOnce: boolean;
   startDate?: string | null;
-  endDate: string;
+  endDate: string | null;
   messageTemplateId: bigint | null;
   useTemplate: boolean;
   description: string | null;
@@ -45,7 +45,7 @@ export interface CreateIngamePopupNoticeData {
   displayPriority?: number;
   showOnce?: boolean;
   startDate?: string | null;
-  endDate: string;
+  endDate?: string | null;
   messageTemplateId?: bigint | null;
   useTemplate?: boolean;
   description?: string | null;
@@ -215,7 +215,7 @@ class IngamePopupNoticeService {
           data.displayPriority ?? 100,
           data.showOnce ?? false,
           convertToMySQLDateTime(data.startDate),
-          convertToMySQLDateTime(data.endDate),
+          data.endDate ? convertToMySQLDateTime(data.endDate) : null,
           data.messageTemplateId ?? null,
           data.useTemplate ?? false,
           data.description ?? null,
@@ -318,9 +318,9 @@ class IngamePopupNoticeService {
         values.push(data.startDate ? convertToMySQLDateTime(data.startDate) : null);
       }
 
-      if (data.endDate) {
+      if (data.endDate !== undefined) {
         updates.push('endDate = ?');
-        values.push(convertToMySQLDateTime(data.endDate));
+        values.push(data.endDate ? convertToMySQLDateTime(data.endDate) : null);
       }
 
       if (data.messageTemplateId !== undefined) {

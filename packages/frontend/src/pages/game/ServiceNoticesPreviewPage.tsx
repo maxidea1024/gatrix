@@ -147,11 +147,12 @@ const ServiceNoticesPreviewPage: React.FC = () => {
         if (result && result.notices) {
           // Filter notices that are currently active (within date range)
           // startDate is optional - if null, treat as immediately available
+          // endDate is optional - if null, treat as permanent (no end date)
           const now = new Date();
           const activeNotices = result.notices.filter(notice => {
             const startDate = notice.startDate ? new Date(notice.startDate) : null;
-            const endDate = new Date(notice.endDate);
-            return (!startDate || now >= startDate) && now <= endDate;
+            const endDate = notice.endDate ? new Date(notice.endDate) : null;
+            return (!startDate || now >= startDate) && (!endDate || now <= endDate);
           });
 
           console.log('[ServiceNoticesPreview] Active notices count:', activeNotices.length);
@@ -552,19 +553,15 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                     },
                   },
                   '& p': {
-                    margin: '0 0 0.75em 0',
+                    margin: 0,
+                    padding: 0,
                     wordWrap: 'break-word',
                     wordBreak: 'break-word',
+                    minHeight: '1em', // Ensure empty paragraphs have height
                   },
-                  '& p:last-child': {
-                    marginBottom: 0,
-                  },
-                  // Remove extra spacing from empty paragraphs
+                  // Preserve empty paragraphs for blank lines
                   '& p:empty': {
-                    margin: '0 !important',
-                    padding: '0 !important',
-                    lineHeight: '0 !important',
-                    height: '0 !important',
+                    minHeight: '1em',
                   },
                   '& p > br:only-child': {
                     display: 'none',

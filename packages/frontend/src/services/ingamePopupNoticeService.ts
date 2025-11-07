@@ -17,7 +17,7 @@ export interface IngamePopupNotice {
   displayPriority: number;
   showOnce: boolean;
   startDate?: string | null;
-  endDate: string;
+  endDate: string | null;
   messageTemplateId: number | null;
   useTemplate: boolean;
   description: string | null;
@@ -43,7 +43,7 @@ export interface CreateIngamePopupNoticeData {
   displayPriority?: number;
   showOnce?: boolean;
   startDate?: string | null;
-  endDate: string;
+  endDate?: string | null;
   messageTemplateId?: number | null;
   useTemplate?: boolean;
   description?: string | null;
