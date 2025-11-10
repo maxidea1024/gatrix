@@ -3643,7 +3643,8 @@
       "ready": "온라인",
       "shuttingDown": "종료 중",
       "error": "오류",
-      "terminated": "종료됨"
+      "terminated": "종료됨",
+      "noResponse": "응답 없음"
     },
     "table": {
       "instanceId": "인스턴스 ID",

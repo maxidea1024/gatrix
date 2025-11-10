@@ -18,6 +18,7 @@ import {
 export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider {
   private client: Redis;
   private subscriber: Redis;
+  private keyspaceSubscriber: Redis;
   private heartbeatIntervals: Map<string, ReturnType<typeof setInterval>> = new Map();
   private watchCallbacks: Set<WatchCallback> = new Set();
   private isWatching = false;
@@ -42,12 +43,23 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
       db: db || 0,
     });
 
+    this.keyspaceSubscriber = new Redis({
+      host,
+      port,
+      password: password || undefined,
+      db: db || 0,
+    });
+
     this.client.on('error', (error) => {
       logger.error('Redis client error in ServiceDiscovery:', error);
     });
 
     this.subscriber.on('error', (error) => {
       logger.error('Redis subscriber error in ServiceDiscovery:', error);
+    });
+
+    this.keyspaceSubscriber.on('error', (error) => {
+      logger.error('Redis keyspace subscriber error in ServiceDiscovery:', error);
     });
 
     logger.info('RedisServiceDiscoveryProvider initialized');
@@ -91,16 +103,8 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         instance,
       });
 
-      // Setup auto-heartbeat
-      const interval = setInterval(async () => {
-        try {
-          await this.heartbeat(instance.instanceId, serviceType);
-        } catch (error) {
-          logger.error(`Heartbeat failed for ${serviceType}:${instance.instanceId}:`, error);
-        }
-      }, (ttlSeconds / 2) * 1000);
-
-      this.heartbeatIntervals.set(`${serviceType}:${instance.instanceId}`, interval);
+      // Note: Heartbeat is handled by the SDK client, not by the backend
+      // Backend only stores the service data and publishes events
 
       logger.info(`Service registered: ${serviceType}:${instance.instanceId}`, { labels: instance.labels });
     } catch (error) {
@@ -179,11 +183,21 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
             terminatedTTL: config?.serviceDiscovery?.terminatedTTL
           });
 
-          const ttl = config?.serviceDiscovery?.terminatedTTL || 300;
+          const ttl = config?.serviceDiscovery?.terminatedTTL || 15;
+
+          // Set stat key with TTL
           await this.client.set(statKey, JSON.stringify(stat), 'EX', ttl);
 
-          // Publish update event (merge meta + stat for compatibility)
+          // Set terminated marker to distinguish explicit termination from heartbeat timeout
+          const terminatedMarkerKey = `services:${serviceType}:terminated:${instanceId}`;
+          await this.client.set(terminatedMarkerKey, '1', 'EX', ttl);
+
+          // Update trackedServices so keyspace notification handler can find it when stat key expires
+          const trackedKey = `${serviceType}:${instanceId}`;
           const instance: ServiceInstance = { ...meta, ...stat };
+          this.trackedServices.set(trackedKey, instance);
+
+          // Publish update event (merge meta + stat for compatibility)
           await this.publishEvent({
             type: 'put',
             instance,
@@ -271,9 +285,23 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         }
       }
 
+      // Check if service is marked as terminated/error - ignore updateStatus calls
+      const terminatedMarkerKey = `services:${serviceType}:terminated:${input.instanceId}`;
+      const isTerminated = await this.client.exists(terminatedMarkerKey);
+      if (isTerminated) {
+        logger.debug(`Ignoring updateStatus for ${serviceType}:${input.instanceId} - service is marked as terminated`);
+        return;
+      }
+
       // Update stat only (meta is immutable)
       const statValue = await this.client.get(statKey);
       const stat = statValue ? JSON.parse(statValue) : {};
+
+      // Check if service is already in error or no-response state - ignore updateStatus calls
+      if (stat.status === 'error' || stat.status === 'no-response') {
+        logger.debug(`Ignoring updateStatus for ${serviceType}:${input.instanceId} - already in ${stat.status} state`);
+        return;
+      }
 
       if (input.status !== undefined) {
         stat.status = input.status;
@@ -288,11 +316,15 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
 
       // Use configured TTL based on status
       const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
-      const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
+      const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 15;
 
       let ttl: number;
       if (stat.status === 'terminated' || stat.status === 'error') {
         ttl = terminatedTTL; // Configured TTL for auto-cleanup
+
+        // Set terminated marker so keyspace notification knows to delete this service
+        const terminatedMarkerKey = `services:${serviceType}:terminated:${input.instanceId}`;
+        await this.client.set(terminatedMarkerKey, '1', 'EX', ttl);
       } else {
         ttl = heartbeatTTL; // Always use configured heartbeat TTL
       }
@@ -319,7 +351,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
 
     try {
       if (serviceType) {
-        // Get all instances of a specific type
+        // Get all active instances of a specific type
         const ids = await this.client.smembers(this.getTypeSetKey(serviceType));
         for (const id of ids) {
           const instance = await this.getService(id, serviceType);
@@ -327,8 +359,20 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
             instances.push(instance);
           }
         }
+
+        // Get inactive instances (no-response, terminated) from collection
+        const inactiveCollectionKey = `services:${serviceType}:inactive`;
+        const inactiveData = await this.client.hgetall(inactiveCollectionKey);
+        for (const [, value] of Object.entries(inactiveData)) {
+          try {
+            const instance = JSON.parse(value);
+            instances.push(instance);
+          } catch (error) {
+            logger.error('Failed to parse inactive instance:', error);
+          }
+        }
       } else {
-        // Get all instances by scanning meta keys
+        // Get all active instances by scanning meta keys
         const metaKeys = await this.client.keys('services:*:meta:*');
         for (const metaKey of metaKeys) {
           // Extract serviceType and instanceId from key: services:{type}:meta:{id}
@@ -339,6 +383,20 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
             const instance = await this.getService(id, type);
             if (instance) {
               instances.push(instance);
+            }
+          }
+        }
+
+        // Get all inactive instances from all collections
+        const inactiveKeys = await this.client.keys('services:*:inactive');
+        for (const inactiveKey of inactiveKeys) {
+          const inactiveData = await this.client.hgetall(inactiveKey);
+          for (const [, value] of Object.entries(inactiveData)) {
+            try {
+              const instance = JSON.parse(value);
+              instances.push(instance);
+            } catch (error) {
+              logger.error('Failed to parse inactive instance:', error);
             }
           }
         }
@@ -449,37 +507,120 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         }
       });
 
-      // Subscribe to keyspace expired events for stat keys
-      await this.subscriber.psubscribe('__keyevent@0__:expired');
+      // Subscribe to keyspace expired events for stat keys and inactive collections
+      // Use separate keyspaceSubscriber to avoid conflicts with subscribe mode
+      await this.keyspaceSubscriber.psubscribe('__keyevent@0__:expired');
       logger.info('Subscribed to keyspace expired events');
 
       // Handle keyspace expired events
-      this.subscriber.on('pmessage', async (pattern, channel, message) => {
-        if (pattern === '__keyevent@0__:expired' && message.startsWith('services:') && message.includes(':stat:')) {
+      this.keyspaceSubscriber.on('pmessage', async (pattern, channel, message) => {
+        logger.info(`Received pmessage: pattern=${pattern}, channel=${channel}, message=${message}`);
+        if (pattern === '__keyevent@0__:expired' && message.startsWith('services:')) {
           try {
-            // Extract service type and instance ID from expired stat key
-            // Format: services:{type}:stat:{id}
-            const parts = message.split(':');
-            if (parts.length === 4 && parts[2] === 'stat') {
-              const serviceType = parts[1];
-              const instanceId = parts[3];
-              const trackedKey = `${serviceType}:${instanceId}`;
+            // Handle stat key expiration (heartbeat timeout or explicit termination)
+            if (message.includes(':stat:')) {
+              // Format: services:{type}:stat:{id}
+              const parts = message.split(':');
+              if (parts.length === 4 && parts[2] === 'stat') {
+                const serviceType = parts[1];
+                const instanceId = parts[3];
+                const trackedKey = `${serviceType}:${instanceId}`;
+                const terminatedMarkerKey = `services:${serviceType}:terminated:${instanceId}`;
+                const inactiveCollectionKey = `services:${serviceType}:inactive`;
 
-              const instance = this.trackedServices.get(trackedKey);
-              if (instance) {
-                this.trackedServices.delete(trackedKey);
+                // Check if this service was marked as terminated (explicit unregister)
+                const isTerminated = await this.client.exists(terminatedMarkerKey);
 
-                // Publish delete event
-                await this.publishEvent({
-                  type: 'delete',
-                  instance: {
-                    ...instance,
-                    status: 'terminated',
-                    updatedAt: new Date().toISOString(),
-                  },
-                });
+                const instance = this.trackedServices.get(trackedKey);
+                if (instance) {
+                  if (isTerminated) {
+                    // Explicit termination: clean up marker
+                    await this.client.del(terminatedMarkerKey);
+                    this.trackedServices.delete(trackedKey);
 
-                logger.info(`Service expired (TTL): ${serviceType}:${instanceId}`);
+                    // Store in inactive collection for 15 seconds (for audit trail)
+                    const inactiveEntry: ServiceInstance = {
+                      ...instance,
+                      status: 'terminated',
+                      updatedAt: new Date().toISOString(),
+                    };
+                    await this.client.hset(inactiveCollectionKey, instanceId, JSON.stringify(inactiveEntry));
+
+                    // Create a separate key for tracking inactive item expiration
+                    const inactiveItemKey = `services:${serviceType}:inactive:${instanceId}`;
+                    await this.client.set(inactiveItemKey, '1', 'EX', 15);
+
+                    // Publish update event to notify UI of terminated status
+                    await this.publishEvent({
+                      type: 'put',
+                      instance: inactiveEntry,
+                    });
+
+                    logger.info(`Service terminated (explicit): ${serviceType}:${instanceId}`);
+                  } else {
+                    // No heartbeat received: mark as no-response and store in inactive collection
+                    this.trackedServices.delete(trackedKey);
+
+                    const inactiveEntry: ServiceInstance = {
+                      ...instance,
+                      status: 'no-response',
+                      updatedAt: new Date().toISOString(),
+                    };
+
+                    // Store in inactive collection for 15 seconds (for audit trail)
+                    await this.client.hset(inactiveCollectionKey, instanceId, JSON.stringify(inactiveEntry));
+
+                    // Create a separate key for tracking inactive item expiration
+                    const inactiveItemKey = `services:${serviceType}:inactive:${instanceId}`;
+                    await this.client.set(inactiveItemKey, '1', 'EX', 15);
+
+                    // Publish update event to notify UI of no-response status
+                    await this.publishEvent({
+                      type: 'put',
+                      instance: inactiveEntry,
+                    });
+
+                    logger.info(`Service no-response (heartbeat timeout): ${serviceType}:${instanceId}`);
+                  }
+                }
+              }
+            }
+            // Handle inactive item expiration (publish delete event)
+            else if (message.includes(':inactive:')) {
+              // Format: services:{type}:inactive:{id}
+              logger.info(`Inactive item key expired: ${message}`);
+              const parts = message.split(':');
+              if (parts.length === 4 && parts[2] === 'inactive') {
+                const serviceType = parts[1];
+                const instanceId = parts[3];
+                const inactiveCollectionKey = `services:${serviceType}:inactive`;
+
+                logger.info(`Attempting to retrieve inactive entry: ${serviceType}:${instanceId}`);
+
+                // Retrieve the inactive entry from the collection before it's deleted
+                const inactiveData = await this.client.hget(inactiveCollectionKey, instanceId);
+                if (inactiveData) {
+                  try {
+                    const inactiveEntry: ServiceInstance = JSON.parse(inactiveData);
+
+                    // Remove from inactive collection
+                    await this.client.hdel(inactiveCollectionKey, instanceId);
+
+                    // Publish delete event
+                    await this.publishEvent({
+                      type: 'delete',
+                      instance: inactiveEntry,
+                    });
+
+                    logger.info(`Service deleted from inactive collection: ${serviceType}:${instanceId} (status: ${inactiveEntry.status})`);
+                  } catch (error) {
+                    logger.error('Failed to parse inactive entry:', error);
+                  }
+                } else {
+                  logger.warn(`Inactive entry not found in collection: ${serviceType}:${instanceId}`);
+                }
+              } else {
+                logger.warn(`Invalid inactive item key format: ${message} (parts: ${parts.length})`);
               }
             }
           } catch (error) {

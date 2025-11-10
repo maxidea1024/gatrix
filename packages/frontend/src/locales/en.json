@@ -3642,7 +3642,8 @@
       "ready": "Online",
       "shuttingDown": "Shutting Down",
       "error": "Error",
-      "terminated": "Terminated"
+      "terminated": "Terminated",
+      "noResponse": "No Response"
     },
     "table": {
       "instanceId": "Instance ID",

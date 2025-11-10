@@ -4,7 +4,7 @@
  * Defines types for service discovery system using etcd or Redis
  */
 
-export type ServiceStatus = 'initializing' | 'ready' | 'shutting_down' | 'error' | 'terminated';
+export type ServiceStatus = 'initializing' | 'ready' | 'no-response' | 'error' | 'terminated';
 
 export interface ServicePorts {
   tcp?: number[];

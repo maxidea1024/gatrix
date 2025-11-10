@@ -175,10 +175,6 @@ export class GameWorldModel {
         }
       }
 
-      const whereClause = whereConditions.length > 0
-        ? `WHERE ${whereConditions.join(' AND ')}`
-        : '';
-
       // Convert raw SQL to knex query builder
       let query = db('g_game_worlds as gw')
         .leftJoin('g_users as c', 'gw.createdBy', 'c.id')

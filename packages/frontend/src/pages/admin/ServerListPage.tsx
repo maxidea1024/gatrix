@@ -41,6 +41,7 @@ import {
   Error as ErrorIcon,
   HourglassEmpty as HourglassEmptyIcon,
   PowerSettingsNew as PowerSettingsNewIcon,
+  Warning as WarningIcon,
   ViewColumn as ViewColumnIcon,
   DragIndicator as DragIndicatorIcon,
   Visibility as VisibilityIcon,
@@ -554,9 +555,22 @@ const ServerListPage: React.FC = () => {
       initializing: { color: 'warning' as const, icon: <HourglassEmptyIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.initializing') },
       shutting_down: { color: 'info' as const, icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.shuttingDown') },
       terminated: { color: 'default' as const, icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.terminated') },
+      'no-response': { color: 'warning' as const, icon: <WarningIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.noResponse') },
     };
 
     const config = statusConfig[status];
+    if (!config) {
+      // Fallback for unknown status
+      return (
+        <Chip
+          label={status}
+          color="default"
+          size="small"
+          sx={{ fontWeight: 600 }}
+        />
+      );
+    }
+
     return (
       <Chip
         icon={config.icon}

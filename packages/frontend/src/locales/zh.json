@@ -3662,7 +3662,8 @@
       "ready": "在线",
       "shuttingDown": "关闭中",
       "error": "错误",
-      "terminated": "已终止"
+      "terminated": "已终止",
+      "noResponse": "无响应"
     },
     "table": {
       "instanceId": "实例ID",
