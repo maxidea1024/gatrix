@@ -29,7 +29,9 @@ services:
     image: redis:7-alpine
     container_name: gatrix-redis-dev
     restart: unless-stopped
-    command: redis-server --appendonly yes --notify-keyspace-events KEA
+    # Enable keyspace notifications for expired events (Ex)
+    # Used for detecting TTL expiration of service stat keys
+    command: redis-server --appendonly yes --notify-keyspace-events Ex
     ports:
       - "0.0.0.0:${REDIS_PORT:-56379}:6379"
     volumes:

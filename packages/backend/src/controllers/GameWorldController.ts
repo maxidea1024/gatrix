@@ -32,7 +32,10 @@ const createGameWorldSchema = Joi.object({
     })
   ).optional().default([]),
   customPayload: Joi.object().unknown(true).optional().default({}),
-  worldServerAddress: Joi.string().max(255).optional().allow('').empty('').default(null),
+  worldServerAddress: Joi.string().pattern(/^[\d.]+:\d+$/).max(255).required().messages({
+    'string.pattern.base': 'worldServerAddress must be in ip:port format (e.g., 192.168.1.100:8080)',
+    'any.required': 'worldServerAddress is required'
+  }),
   tagIds: Joi.array().items(Joi.number().integer().min(1)).optional()
 });
 
@@ -59,7 +62,9 @@ const updateGameWorldSchema = Joi.object({
     })
   ).optional().default([]),
   customPayload: Joi.object().unknown(true).optional().allow(null),
-  worldServerAddress: Joi.string().max(255).optional().allow('').empty('').default(null),
+  worldServerAddress: Joi.string().pattern(/^[\d.]+:\d+$/).max(255).optional().messages({
+    'string.pattern.base': 'worldServerAddress must be in ip:port format (e.g., 192.168.1.100:8080)'
+  }),
   tagIds: Joi.array().items(Joi.number().integer().min(1)).optional()
 });
 

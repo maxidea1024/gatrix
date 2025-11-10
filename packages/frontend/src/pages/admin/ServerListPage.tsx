@@ -152,12 +152,20 @@ const ServerListPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [services, setServices] = useState<ServiceInstance[]>([]);
   const [pendingUpdates, setPendingUpdates] = useState<ServiceInstance[]>([]);
-  const [isPaused, setIsPaused] = useState(false);
+
+  // Real-time view state (persisted in localStorage)
+  const [isPaused, setIsPaused] = useState(() => {
+    const saved = localStorage.getItem('serverListRealTimeEnabled');
+    // Default to true (real-time enabled), so isPaused = false
+    return saved === null ? false : saved === 'false';
+  });
 
   // Track isPaused state in ref for use in SSE event handler
   const isPausedRef = useRef(false);
   useEffect(() => {
     isPausedRef.current = isPaused;
+    // Save to localStorage (inverted: realTimeEnabled = !isPaused)
+    localStorage.setItem('serverListRealTimeEnabled', (!isPaused).toString());
   }, [isPaused]);
 
   // Sort state (persisted in localStorage)
@@ -782,20 +790,47 @@ const ServerListPage: React.FC = () => {
             {/* Pause/Resume Button */}
             <Tooltip title={isPaused ? t('serverList.resumeUpdates') : t('serverList.pauseUpdates')}>
               <Badge badgeContent={pendingUpdates.length} color="warning" invisible={!isPaused || pendingUpdates.length === 0}>
-                <IconButton
-                  onClick={handleTogglePause}
-                  sx={{
-                    bgcolor: isPaused ? 'warning.main' : 'background.paper',
-                    color: isPaused ? 'warning.contrastText' : 'text.primary',
-                    border: 1,
-                    borderColor: isPaused ? 'warning.main' : 'divider',
-                    '&:hover': {
-                      bgcolor: isPaused ? 'warning.dark' : 'action.hover',
-                    },
-                  }}
-                >
-                  {isPaused ? <PlayArrowIcon /> : <PauseIcon />}
-                </IconButton>
+                <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                  {/* Rotating ring animation when real-time is active */}
+                  {!isPaused && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: -4,
+                        left: -4,
+                        right: -4,
+                        bottom: -4,
+                        borderRadius: '50%',
+                        border: '2px solid transparent',
+                        borderTopColor: 'primary.main',
+                        borderRightColor: 'primary.main',
+                        animation: 'spin 1.5s linear infinite',
+                        '@keyframes spin': {
+                          '0%': {
+                            transform: 'rotate(0deg)',
+                          },
+                          '100%': {
+                            transform: 'rotate(360deg)',
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                  <IconButton
+                    onClick={handleTogglePause}
+                    sx={{
+                      bgcolor: isPaused ? 'warning.main' : 'background.paper',
+                      color: isPaused ? 'warning.contrastText' : 'text.primary',
+                      border: 1,
+                      borderColor: isPaused ? 'warning.main' : 'divider',
+                      '&:hover': {
+                        bgcolor: isPaused ? 'warning.dark' : 'action.hover',
+                      },
+                    }}
+                  >
+                    {isPaused ? <PlayArrowIcon /> : <PauseIcon />}
+                  </IconButton>
+                </Box>
               </Badge>
             </Tooltip>
 

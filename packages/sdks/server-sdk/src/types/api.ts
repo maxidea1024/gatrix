@@ -58,7 +58,7 @@ export interface GameWorld {
   maintenanceMessage?: string;
   displayOrder: number;
   customPayload?: Record<string, any>;
-  worldServerAddress?: string | null;
+  worldServerAddress: string; // Required: ip:port format (e.g., 192.168.1.100:8080)
   tags?: string[];
   createdAt: string;
   updatedAt: string;
@@ -197,12 +197,21 @@ export interface RegisterServiceInput {
 /**
  * Update service status input (partial merge)
  * Only sends changed fields. Stats are merged, not replaced.
- * Meta is not included (immutable after registration).
+ *
+ * Auto-register fields (only used when autoRegisterIfMissing=true and instance doesn't exist):
+ * - hostname, internalAddress, ports are required for auto-register
+ * - meta is optional
  */
 export interface UpdateServiceStatusInput {
   status?: ServiceStatus; // Optional: Update status
   stats?: Record<string, any>; // Optional: Merge stats
   autoRegisterIfMissing?: boolean; // Optional: Auto-register if not found (default: false)
+
+  // Auto-register fields (only used when autoRegisterIfMissing=true)
+  hostname?: string; // Required for auto-register
+  internalAddress?: string; // Required for auto-register
+  ports?: ServicePorts; // Required for auto-register
+  meta?: Record<string, any>; // Optional: static metadata (only set during auto-register)
 }
 
 /**

@@ -161,7 +161,8 @@ router.post('/unregister', serverSDKAuth, async (req: any, res: any) => {
  */
 router.post('/status', serverSDKAuth, async (req: any, res: any) => {
   try {
-    const { instanceId, labels, status, stats, autoRegisterIfMissing } = req.body;
+    const { instanceId, labels, status, stats, hostname, internalAddress, ports, meta } = req.body;
+    const autoRegisterIfMissing = req.body.autoRegisterIfMissing || false;
 
     if (!instanceId || !labels || !labels.service) {
       return res.status(400).json({
@@ -170,13 +171,28 @@ router.post('/status', serverSDKAuth, async (req: any, res: any) => {
       });
     }
 
-    const input = {
+    // Validate auto-register fields if autoRegisterIfMissing is true
+    if (autoRegisterIfMissing && (!hostname || !internalAddress || !ports)) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Auto-register requires hostname, internalAddress, and ports fields' },
+      });
+    }
+
+    const input: any = {
       instanceId,
       labels,
       status,
       stats,
-      autoRegisterIfMissing: autoRegisterIfMissing || false,
     };
+
+    // Add auto-register fields if provided
+    if (autoRegisterIfMissing) {
+      input.hostname = hostname;
+      input.internalAddress = internalAddress;
+      input.ports = ports;
+      input.meta = meta;
+    }
 
     await serviceDiscoveryService.updateStatus(input, autoRegisterIfMissing);
 

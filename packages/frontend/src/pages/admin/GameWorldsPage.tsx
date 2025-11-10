@@ -701,7 +701,7 @@ const GameWorldsPage: React.FC = () => {
       isVisible: true,
       isMaintenance: false,
       description: '',
-      worldServerAddress: null,
+      worldServerAddress: '',
       maintenanceStartDate: '',
       maintenanceEndDate: '',
       maintenanceMessage: '',
@@ -809,6 +809,13 @@ const GameWorldsPage: React.FC = () => {
 
     if (!formData.name.trim()) {
       errors.name = t('validation.fieldRequired', { field: t('gameWorlds.name') });
+    }
+
+    // worldServerAddress 필수 체크 및 형식 검증
+    if (!formData.worldServerAddress || !formData.worldServerAddress.trim()) {
+      errors.worldServerAddress = t('validation.fieldRequired', { field: t('gameWorlds.worldServerAddress') });
+    } else if (!/^[\d.]+:\d+$/.test(formData.worldServerAddress.trim())) {
+      errors.worldServerAddress = t('gameWorlds.form.worldServerAddressInvalid');
     }
 
     // 점검 모드일 때 기본 점검 메시지 필수 체크

@@ -82,27 +82,47 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     }
   }
 
-  async unregister(instanceId: string, serviceType: string): Promise<void> {
+  async unregister(instanceId: string, serviceType: string, forceDelete: boolean = false): Promise<void> {
     const key = this.getInstanceKey(serviceType, instanceId);
     const leaseKey = `${serviceType}:${instanceId}`;
     const lease = this.leases.get(leaseKey);
 
     try {
-      if (lease) {
-        // Clear heartbeat interval
-        if ((lease as any)._heartbeatInterval) {
-          clearInterval((lease as any)._heartbeatInterval);
+      if (forceDelete) {
+        // Force delete: immediately remove the key
+        if (lease) {
+          // Clear heartbeat interval
+          if ((lease as any)._heartbeatInterval) {
+            clearInterval((lease as any)._heartbeatInterval);
+          }
+
+          // Revoke lease (this will delete the key)
+          await lease.revoke();
+          this.leases.delete(leaseKey);
+        } else {
+          // Manually delete if no lease found
+          await this.client.delete().key(key);
         }
 
-        // Revoke lease (this will delete the key)
-        await lease.revoke();
-        this.leases.delete(leaseKey);
+        logger.info(`Service deleted permanently: ${serviceType}:${instanceId}`);
       } else {
-        // Manually delete if no lease found
-        await this.client.delete().key(key);
-      }
+        // Graceful unregister: mark as terminated (etcd doesn't support TTL update, so just delete)
+        if (lease) {
+          // Clear heartbeat interval
+          if ((lease as any)._heartbeatInterval) {
+            clearInterval((lease as any)._heartbeatInterval);
+          }
 
-      logger.info(`Service unregistered: ${serviceType}:${instanceId}`);
+          // Revoke lease (this will delete the key)
+          await lease.revoke();
+          this.leases.delete(leaseKey);
+        } else {
+          // Manually delete if no lease found
+          await this.client.delete().key(key);
+        }
+
+        logger.info(`Service unregistered: ${serviceType}:${instanceId}`);
+      }
     } catch (error) {
       logger.error(`Failed to unregister service ${serviceType}:${instanceId}:`, error);
       throw error;
@@ -134,7 +154,8 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           };
 
           // Create new lease with configured TTL
-          lease = this.client.lease(config.serviceDiscovery.heartbeatTTL);
+          const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
+          lease = this.client.lease(heartbeatTTL);
           await lease.put(key).value(JSON.stringify(newInstance));
           this.leases.set(leaseKey, lease);
 
@@ -174,12 +195,13 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         }
 
         // Create new lease with configured TTL
-        const newLease = this.client.lease(config.serviceDiscovery.terminatedTTL);
+        const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
+        const newLease = this.client.lease(terminatedTTL);
         await newLease.put(key).value(JSON.stringify(instance));
         this.leases.set(leaseKey, newLease);
         lease = newLease;
 
-        logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${instance.status} (TTL: ${config.serviceDiscovery.terminatedTTL}s)`);
+        logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${instance.status} (TTL: ${terminatedTTL}s)`);
       } else {
         // For other statuses, use existing lease
         if (lease) {
@@ -234,10 +256,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     }
   }
 
-  async watch(callback: WatchCallback): Promise<void> {
+  async watch(callback: WatchCallback): Promise<() => void> {
     try {
       const watcher = await this.client.watch().prefix('/services/').create();
-      
+
       watcher.on('put', (kv: any) => {
         try {
           const instance: ServiceInstance = JSON.parse(kv.value.toString());
@@ -246,7 +268,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           logger.error('Failed to parse put event:', error);
         }
       });
-      
+
       watcher.on('delete', (kv: any) => {
         try {
           // Parse key to extract serviceType and id
@@ -273,9 +295,19 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           logger.error('Failed to parse delete event:', error);
         }
       });
-      
+
       this.watchers.push(watcher);
       logger.info('Started watching service changes');
+
+      // Return unwatch function
+      return async () => {
+        await watcher.cancel();
+        const index = this.watchers.indexOf(watcher);
+        if (index > -1) {
+          this.watchers.splice(index, 1);
+        }
+        logger.info('Watcher cancelled');
+      };
     } catch (error) {
       logger.error('Failed to start watching:', error);
       throw error;

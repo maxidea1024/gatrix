@@ -10,7 +10,6 @@ import config from '../../config';
 import {
   IServiceDiscoveryProvider,
   ServiceInstance,
-  ServiceStatus,
   WatchCallback,
   WatchEvent,
   UpdateServiceStatusInput,
@@ -22,7 +21,6 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
   private heartbeatIntervals: Map<string, ReturnType<typeof setInterval>> = new Map();
   private watchCallbacks: Set<WatchCallback> = new Set();
   private isWatching = false;
-  private ttlCheckInterval: ReturnType<typeof setInterval> | null = null;
   private trackedServices: Map<string, ServiceInstance> = new Map();
 
   constructor(host: string, port: number, password?: string, db?: number) {
@@ -115,17 +113,14 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
     const statKey = this.getStatKey(serviceType, instanceId);
 
     try {
-      const ttl = await this.client.ttl(statKey);
+      const value = await this.client.get(statKey);
+      if (value) {
+        const stat = JSON.parse(value);
+        stat.updatedAt = new Date().toISOString();
 
-      if (ttl > 0) {
-        const value = await this.client.get(statKey);
-        if (value) {
-          const stat = JSON.parse(value);
-          stat.updatedAt = new Date().toISOString();
-
-          // Renew TTL (double the remaining TTL to ensure it doesn't expire)
-          await this.client.set(statKey, JSON.stringify(stat), 'EX', Math.max(ttl * 2, 30));
-        }
+        // Renew TTL with configured heartbeat TTL (not based on remaining TTL)
+        const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
+        await this.client.set(statKey, JSON.stringify(stat), 'EX', heartbeatTTL);
       } else {
         logger.warn(`Service ${serviceType}:${instanceId} not found or expired`);
       }
@@ -135,32 +130,71 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
     }
   }
 
-  async unregister(instanceId: string, serviceType: string): Promise<void> {
-    const key = this.getInstanceKey(serviceType, instanceId);
+  async unregister(instanceId: string, serviceType: string, forceDelete: boolean = false): Promise<void> {
+    const metaKey = this.getMetaKey(serviceType, instanceId);
+    const statKey = this.getStatKey(serviceType, instanceId);
 
     try {
-      // Get instance before updating
-      const value = await this.client.get(key);
+      // Get meta and stat before deleting/updating
+      const metaValue = await this.client.get(metaKey);
+      const statValue = await this.client.get(statKey);
 
-      if (value) {
-        const instance: ServiceInstance = JSON.parse(value);
+      if (forceDelete) {
+        // Force delete: completely remove meta and stat keys
+        if (metaValue && statValue) {
+          const meta = JSON.parse(metaValue);
+          const stat = JSON.parse(statValue);
 
-        // Update status to terminated with configured TTL (same as etcd)
-        // This allows users to see terminated/error servers before cleanup
-        instance.status = 'terminated';
-        instance.updatedAt = new Date().toISOString();
+          // Delete both keys
+          await this.client.del(metaKey);
+          await this.client.del(statKey);
 
-        await this.client.set(key, JSON.stringify(instance), 'EX', config.serviceDiscovery.terminatedTTL);
+          // Publish delete event
+          const instance: ServiceInstance = { ...meta, ...stat };
+          await this.publishEvent({
+            type: 'delete',
+            instance: {
+              ...instance,
+              status: 'terminated',
+              updatedAt: new Date().toISOString(),
+            },
+          });
 
-        // Publish update event (status changed to terminated)
-        await this.publishEvent({
-          type: 'put',
-          instance,
-        });
-
-        logger.info(`Service marked as terminated: ${serviceType}:${instanceId} (will be removed in 5 minutes)`);
+          logger.info(`Service deleted permanently: ${serviceType}:${instanceId}`);
+        }
       } else {
-        // If not found, just remove from type set
+        // Graceful unregister: mark as terminated with TTL
+        if (metaValue && statValue) {
+          const meta = JSON.parse(metaValue);
+          const stat = JSON.parse(statValue);
+
+          // Update status to terminated with configured TTL
+          stat.status = 'terminated';
+          stat.updatedAt = new Date().toISOString();
+
+          // Debug: log config
+          logger.debug('Config check in unregister:', {
+            hasConfig: !!config,
+            hasServiceDiscovery: !!config?.serviceDiscovery,
+            terminatedTTL: config?.serviceDiscovery?.terminatedTTL
+          });
+
+          const ttl = config?.serviceDiscovery?.terminatedTTL || 300;
+          await this.client.set(statKey, JSON.stringify(stat), 'EX', ttl);
+
+          // Publish update event (merge meta + stat for compatibility)
+          const instance: ServiceInstance = { ...meta, ...stat };
+          await this.publishEvent({
+            type: 'put',
+            instance,
+          });
+
+          logger.info(`Service marked as terminated: ${serviceType}:${instanceId} (will be removed in ${ttl}s)`);
+        }
+      }
+
+      // Remove from type set if not found
+      if (!metaValue || !statValue) {
         await this.client.srem(this.getTypeSetKey(serviceType), instanceId);
       }
 
@@ -184,32 +218,50 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
    */
   async updateStatus(input: UpdateServiceStatusInput, autoRegisterIfMissing = false): Promise<void> {
     const serviceType = input.labels.service;
-    const key = this.getInstanceKey(serviceType, input.instanceId);
+    const metaKey = this.getMetaKey(serviceType, input.instanceId);
+    const statKey = this.getStatKey(serviceType, input.instanceId);
 
     try {
-      const value = await this.client.get(key);
+      const metaValue = await this.client.get(metaKey);
 
-      if (!value) {
+      if (!metaValue) {
         if (autoRegisterIfMissing) {
           // Auto-register: create new instance with provided data
-          const newInstance: ServiceInstance = {
+          if (!input.hostname || !input.internalAddress || !input.ports) {
+            throw new Error(`Auto-register requires hostname, internalAddress, and ports fields`);
+          }
+
+          const meta = {
             instanceId: input.instanceId,
             labels: input.labels,
-            hostname: '', // Will be updated later
-            externalAddress: '', // Will be updated later
-            internalAddress: '', // Will be updated later
-            ports: { tcp: [], udp: [], http: [] }, // Empty ports
+            hostname: input.hostname,
+            externalAddress: '', // Will be set by controller from req.ip
+            internalAddress: input.internalAddress,
+            ports: input.ports,
+            meta: input.meta || {},
+          };
+
+          const stat = {
             status: input.status || 'ready',
             updatedAt: new Date().toISOString(),
             stats: input.stats || {},
           };
 
-          await this.client.set(key, JSON.stringify(newInstance), 'EX', config.serviceDiscovery.heartbeatTTL);
+          // Store meta without TTL (permanent)
+          await this.client.set(metaKey, JSON.stringify(meta));
+
+          // Store stat with TTL
+          const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
+          await this.client.set(statKey, JSON.stringify(stat), 'EX', heartbeatTTL);
+
+          // Add to type set
           await this.client.sadd(this.getTypeSetKey(serviceType), input.instanceId);
 
+          // Publish event (merge meta + stat for compatibility)
+          const instance: ServiceInstance = { ...meta, ...stat };
           await this.publishEvent({
             type: 'put',
-            instance: newInstance,
+            instance,
           });
 
           logger.info(`Service auto-registered: ${serviceType}:${input.instanceId}`, { labels: input.labels });
@@ -219,37 +271,43 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         }
       }
 
-      // Partial merge: update only provided fields
-      const instance: ServiceInstance = JSON.parse(value);
+      // Update stat only (meta is immutable)
+      const statValue = await this.client.get(statKey);
+      const stat = statValue ? JSON.parse(statValue) : {};
 
       if (input.status !== undefined) {
-        instance.status = input.status;
+        stat.status = input.status;
       }
 
       if (input.stats !== undefined) {
         // Merge stats (not replace)
-        instance.stats = { ...instance.stats, ...input.stats };
+        stat.stats = { ...stat.stats, ...input.stats };
       }
 
-      instance.updatedAt = new Date().toISOString();
+      stat.updatedAt = new Date().toISOString();
 
-      // Use configured TTL for terminated/error servers, otherwise keep existing TTL
-      let ttl = await this.client.ttl(key);
-      if (instance.status === 'terminated' || instance.status === 'error') {
-        ttl = config.serviceDiscovery.terminatedTTL; // Configured TTL for auto-cleanup
+      // Use configured TTL based on status
+      const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
+      const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
+
+      let ttl: number;
+      if (stat.status === 'terminated' || stat.status === 'error') {
+        ttl = terminatedTTL; // Configured TTL for auto-cleanup
       } else {
-        ttl = Math.max(ttl, config.serviceDiscovery.heartbeatTTL);
+        ttl = heartbeatTTL; // Always use configured heartbeat TTL
       }
 
-      await this.client.set(key, JSON.stringify(instance), 'EX', ttl);
+      await this.client.set(statKey, JSON.stringify(stat), 'EX', ttl);
 
-      // Publish update event
+      // Publish update event (merge meta + stat for compatibility)
+      const meta = JSON.parse(metaValue);
+      const instance: ServiceInstance = { ...meta, ...stat };
       await this.publishEvent({
         type: 'put',
         instance,
       });
 
-      logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${instance.status} (TTL: ${ttl}s)`);
+      logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${stat.status} (TTL: ${ttl}s)`);
     } catch (error) {
       logger.error(`Failed to update status for ${serviceType}:${input.instanceId}:`, error);
       throw error;
@@ -264,22 +322,24 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         // Get all instances of a specific type
         const ids = await this.client.smembers(this.getTypeSetKey(serviceType));
         for (const id of ids) {
-          const value = await this.client.get(this.getInstanceKey(serviceType, id));
-          if (value) {
-            instances.push(JSON.parse(value));
+          const instance = await this.getService(id, serviceType);
+          if (instance) {
+            instances.push(instance);
           }
         }
       } else {
-        // Get all instances
-        const keys = await this.client.keys('services:*');
-        for (const key of keys) {
-          // Skip type set keys
-          if (key.startsWith('services:type:')) {
-            continue;
-          }
-          const value = await this.client.get(key);
-          if (value) {
-            instances.push(JSON.parse(value));
+        // Get all instances by scanning meta keys
+        const metaKeys = await this.client.keys('services:*:meta:*');
+        for (const metaKey of metaKeys) {
+          // Extract serviceType and instanceId from key: services:{type}:meta:{id}
+          const parts = metaKey.split(':');
+          if (parts.length === 4) {
+            const type = parts[1];
+            const id = parts[3];
+            const instance = await this.getService(id, type);
+            if (instance) {
+              instances.push(instance);
+            }
           }
         }
       }
@@ -297,142 +357,69 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
   }
 
   async getService(instanceId: string, serviceType: string): Promise<ServiceInstance | null> {
-    const key = this.getInstanceKey(serviceType, instanceId);
+    const metaKey = this.getMetaKey(serviceType, instanceId);
+    const statKey = this.getStatKey(serviceType, instanceId);
 
     try {
-      const value = await this.client.get(key);
-      return value ? JSON.parse(value) : null;
+      const metaValue = await this.client.get(metaKey);
+      const statValue = await this.client.get(statKey);
+
+      if (!metaValue) {
+        return null; // Service not found
+      }
+
+      const meta = JSON.parse(metaValue);
+      const stat = statValue ? JSON.parse(statValue) : {
+        status: 'terminated', // If stat is missing, assume terminated
+        updatedAt: new Date().toISOString(),
+        stats: {},
+      };
+
+      // Merge meta + stat
+      return { ...meta, ...stat };
     } catch (error) {
       logger.error(`Failed to get service ${serviceType}:${instanceId}:`, error);
       throw error;
     }
   }
 
-  async watch(callback: WatchCallback): Promise<void> {
+  async watch(callback: WatchCallback): Promise<() => void> {
     this.watchCallbacks.add(callback);
     logger.info(`Watch callback added (total: ${this.watchCallbacks.size})`);
 
     if (!this.isWatching) {
       logger.info('Starting Redis watch - subscribing to keyspace events');
 
-      // Load existing services into trackedServices
-      const keys = await this.client.keys('services:*');
-      for (const key of keys) {
-        const value = await this.client.get(key);
-        if (value) {
+      // Load existing services into trackedServices (meta + stat)
+      const metaKeys = await this.client.keys('services:*:meta:*');
+      for (const metaKey of metaKeys) {
+        const metaValue = await this.client.get(metaKey);
+        if (metaValue) {
           try {
-            const instance: ServiceInstance = JSON.parse(value);
-            const serviceType = instance.labels.service;
-            const trackedKey = `${serviceType}:${instance.instanceId}`;
-            this.trackedServices.set(trackedKey, instance);
+            const meta = JSON.parse(metaValue);
+            const serviceType = meta.labels.service;
+            const instanceId = meta.instanceId;
+
+            // Get corresponding stat
+            const statKey = this.getStatKey(serviceType, instanceId);
+            const statValue = await this.client.get(statKey);
+
+            if (statValue) {
+              const stat = JSON.parse(statValue);
+              const instance: ServiceInstance = { ...meta, ...stat };
+              const trackedKey = `${serviceType}:${instanceId}`;
+              this.trackedServices.set(trackedKey, instance);
+            }
           } catch (error) {
-            logger.warn(`Failed to parse service data for key ${key}:`, error);
+            logger.warn(`Failed to parse service data for key ${metaKey}:`, error);
           }
         }
       }
       logger.info(`Loaded ${this.trackedServices.size} existing services into tracker`);
 
-      // Subscribe to keyspace events for services:* pattern
-      // Pattern: __keyspace@0__:services:*
-      await this.subscriber.psubscribe('__keyspace@0__:services:*');
-
-      // Also subscribe to custom events channel for backward compatibility
+      // Subscribe to custom events channel (published by register/updateStatus/unregister)
       await this.subscriber.subscribe('service:events');
-
-      // Handle pattern-based messages (keyspace notifications)
-      this.subscriber.on('pmessage', async (pattern, channel, message) => {
-        try {
-          // channel format: __keyspace@0__:services:type:instanceId
-          // message: set, del, expired, etc.
-          logger.debug(`Keyspace event: ${channel} -> ${message}`);
-
-          const keyMatch = channel.match(/__keyspace@0__:services:([^:]+):([^:]+)/);
-          if (!keyMatch) return;
-
-          const [, serviceType, instanceId] = keyMatch;
-
-          if (message === 'set') {
-            // Key was created or updated
-            const key = `services:${serviceType}:${instanceId}`;
-            const data = await this.client.get(key);
-            if (data) {
-              const instance: ServiceInstance = JSON.parse(data);
-
-              // Track service
-              this.trackedServices.set(`${serviceType}:${instanceId}`, instance);
-
-              // Broadcast put event
-              const event: WatchEvent = { type: 'put', instance };
-              logger.info(`Broadcasting PUT event to ${this.watchCallbacks.size} callbacks: ${serviceType}:${instanceId}`);
-              this.watchCallbacks.forEach(cb => cb(event));
-            }
-          } else if (message === 'expired') {
-            // Key expired (TTL reached 0) - mark as terminated with 5 minutes TTL
-            const trackedKey = `${serviceType}:${instanceId}`;
-            const instance = this.trackedServices.get(trackedKey);
-
-            if (instance) {
-              // If already terminated, this is the final cleanup - send DELETE event
-              if (instance.status === 'terminated') {
-                this.trackedServices.delete(trackedKey);
-
-                const event: WatchEvent = {
-                  type: 'delete',
-                  instance: {
-                    ...instance,
-                    updatedAt: new Date().toISOString(),
-                  },
-                };
-                logger.info(`Broadcasting DELETE event to ${this.watchCallbacks.size} callbacks: ${serviceType}:${instanceId} (final cleanup)`);
-                this.watchCallbacks.forEach(cb => cb(event));
-              } else {
-                // First expiration - mark as terminated and set configured TTL
-                const key = `services:${serviceType}:${instanceId}`;
-                const terminatedInstance = {
-                  ...instance,
-                  status: 'terminated' as ServiceStatus,
-                  updatedAt: new Date().toISOString(),
-                };
-
-                // Save back to Redis with configured TTL
-                await this.client.set(key, JSON.stringify(terminatedInstance), 'EX', config.serviceDiscovery.terminatedTTL);
-
-                // Update tracked services
-                this.trackedServices.set(trackedKey, terminatedInstance);
-
-                // Broadcast PUT event (status changed to terminated)
-                const event: WatchEvent = {
-                  type: 'put',
-                  instance: terminatedInstance,
-                };
-                logger.info(`Broadcasting PUT event to ${this.watchCallbacks.size} callbacks: ${serviceType}:${instanceId} (marked as terminated, TTL: ${config.serviceDiscovery.terminatedTTL}s)`);
-                this.watchCallbacks.forEach(cb => cb(event));
-              }
-            }
-          } else if (message === 'del') {
-            // Key was manually deleted - send DELETE event immediately
-            const trackedKey = `${serviceType}:${instanceId}`;
-            const instance = this.trackedServices.get(trackedKey);
-
-            if (instance) {
-              this.trackedServices.delete(trackedKey);
-
-              const event: WatchEvent = {
-                type: 'delete',
-                instance: {
-                  ...instance,
-                  status: 'terminated',
-                  updatedAt: new Date().toISOString(),
-                },
-              };
-              logger.info(`Broadcasting DELETE event to ${this.watchCallbacks.size} callbacks: ${serviceType}:${instanceId} (manual delete)`);
-              this.watchCallbacks.forEach(cb => cb(event));
-            }
-          }
-        } catch (error) {
-          logger.error('Failed to handle keyspace event:', error);
-        }
-      });
+      logger.info('Subscribed to service:events channel');
 
       // Handle regular messages (custom events channel)
       this.subscriber.on('message', (channel, message) => {
@@ -462,51 +449,60 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         }
       });
 
-      this.isWatching = true;
-      logger.info('Redis watch started successfully (keyspace + custom events)');
-      logger.info('Started watching service changes with TTL expiration detection');
-    }
-  }
+      // Subscribe to keyspace expired events for stat keys
+      await this.subscriber.psubscribe('__keyevent@0__:expired');
+      logger.info('Subscribed to keyspace expired events');
 
-  /**
-   * Check for expired services and emit delete events
-   */
-  private async checkExpiredServices(): Promise<void> {
-    try {
-      for (const [key, instance] of this.trackedServices.entries()) {
-        const serviceType = instance.labels.service;
-        const redisKey = this.getInstanceKey(serviceType, instance.instanceId);
-        const exists = await this.client.exists(redisKey);
+      // Handle keyspace expired events
+      this.subscriber.on('pmessage', async (pattern, channel, message) => {
+        if (pattern === '__keyevent@0__:expired' && message.startsWith('services:') && message.includes(':stat:')) {
+          try {
+            // Extract service type and instance ID from expired stat key
+            // Format: services:{type}:stat:{id}
+            const parts = message.split(':');
+            if (parts.length === 4 && parts[2] === 'stat') {
+              const serviceType = parts[1];
+              const instanceId = parts[3];
+              const trackedKey = `${serviceType}:${instanceId}`;
 
-        if (!exists) {
-          // Service has expired, emit delete event
-          this.trackedServices.delete(key);
-          await this.publishEvent({
-            type: 'delete',
-            instance: {
-              ...instance,
-              status: 'terminated',
-              updatedAt: new Date().toISOString(),
-            },
-          });
-          logger.info(`Service expired (TTL): ${serviceType}:${instance.instanceId}`);
+              const instance = this.trackedServices.get(trackedKey);
+              if (instance) {
+                this.trackedServices.delete(trackedKey);
+
+                // Publish delete event
+                await this.publishEvent({
+                  type: 'delete',
+                  instance: {
+                    ...instance,
+                    status: 'terminated',
+                    updatedAt: new Date().toISOString(),
+                  },
+                });
+
+                logger.info(`Service expired (TTL): ${serviceType}:${instanceId}`);
+              }
+            }
+          } catch (error) {
+            logger.error('Failed to handle expired event:', error);
+          }
         }
-      }
-    } catch (error) {
-      logger.error('Error checking expired services:', error);
+      });
+
+      this.isWatching = true;
+      logger.info('Redis watch started successfully (custom events + keyspace expired events)');
     }
+
+    // Return unwatch function
+    return () => {
+      this.watchCallbacks.delete(callback);
+      logger.info(`Watch callback removed (total: ${this.watchCallbacks.size})`);
+    };
   }
 
   async close(): Promise<void> {
     // Clear all heartbeat intervals
     this.heartbeatIntervals.forEach(interval => clearInterval(interval));
     this.heartbeatIntervals.clear();
-
-    // Clear TTL check interval
-    if (this.ttlCheckInterval) {
-      clearInterval(this.ttlCheckInterval);
-      this.ttlCheckInterval = null;
-    }
 
     // Clear tracked services
     this.trackedServices.clear();

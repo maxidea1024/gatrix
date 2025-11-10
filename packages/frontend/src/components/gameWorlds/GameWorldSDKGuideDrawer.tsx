@@ -104,6 +104,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
         "worldId": "world_001",
         "name": "Main World",
         "isMaintenance": false,
+        "worldServerAddress": "192.168.1.100:8080",
         "customPayload": {
           "region": "asia",
           "maxPlayers": 1000
@@ -115,6 +116,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
         "name": "PvP Arena",
         "isMaintenance": true,
         "maintenanceMessage": "Server maintenance in progress. Expected completion: 2025-10-30 14:00 UTC",
+        "worldServerAddress": "192.168.1.101:8081",
         "customPayload": null,
         "tags": ["pvp"]
       }
@@ -430,6 +432,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
                       { field: 'name', type: 'string', desc: 'fieldNameDesc' },
                       { field: 'isMaintenance', type: 'boolean', desc: 'fieldIsMaintenanceDesc' },
                       { field: 'maintenanceMessage', type: 'string', desc: 'fieldMaintenanceMessageDesc' },
+                      { field: 'worldServerAddress', type: 'string', desc: 'fieldWorldServerAddressDesc' },
                       { field: 'customPayload', type: 'object', desc: 'fieldCustomPayloadDesc' },
                       { field: 'tags', type: 'array', desc: 'fieldTagsDesc' },
                     ].map((row, idx) => (

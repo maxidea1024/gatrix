@@ -23,6 +23,7 @@ export class BaseTestServer {
   protected sdk: GatrixServerSDK;
   protected config: BaseServerConfig;
   protected startTime: Date;
+  private isShuttingDown: boolean = false;
 
   constructor(config: BaseServerConfig) {
     this.config = config;
@@ -54,6 +55,57 @@ export class BaseTestServer {
     });
 
     this.log('Server instance created');
+
+    // Setup global error handlers
+    this.setupErrorHandlers();
+  }
+
+  /**
+   * Setup global error handlers for uncaught exceptions
+   * This ensures the service status is updated to 'error' before shutdown
+   */
+  private setupErrorHandlers(): void {
+    process.on('uncaughtException', async (error: Error) => {
+      this.logError('Uncaught Exception', error);
+      await this.handleFatalError('UNCAUGHT_EXCEPTION');
+    });
+
+    process.on('unhandledRejection', async (reason: any, promise: Promise<any>) => {
+      this.logError('Unhandled Rejection', { reason, promise });
+      await this.handleFatalError('UNHANDLED_REJECTION');
+    });
+  }
+
+  /**
+   * Handle fatal errors by updating service status to 'error' and shutting down
+   */
+  private async handleFatalError(errorType: string): Promise<void> {
+    if (this.isShuttingDown) {
+      return; // Prevent multiple shutdown attempts
+    }
+    this.isShuttingDown = true;
+
+    try {
+      // Update service status to 'error' if service discovery is enabled
+      if (this.config.enableServiceDiscovery) {
+        await this.sdk.updateServiceStatus({
+          status: 'error',
+          stats: {
+            errorType,
+            errorTime: new Date().toISOString(),
+          },
+        }).catch(err => {
+          this.logError('Failed to update service status to error', err);
+        });
+      }
+
+      // Graceful shutdown
+      await this.stop();
+    } catch (shutdownError) {
+      this.logError('Error during fatal error handling', shutdownError);
+    } finally {
+      process.exit(1);
+    }
   }
 
   /**

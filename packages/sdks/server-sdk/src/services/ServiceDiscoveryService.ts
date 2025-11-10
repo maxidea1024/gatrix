@@ -126,6 +126,9 @@ export class ServiceDiscoveryService {
    *
    * Only sends changed fields. Stats are merged, not replaced.
    * Meta is not sent (immutable after registration).
+   *
+   * If autoRegisterIfMissing=true and instance doesn't exist, it will auto-register
+   * using the provided hostname, internalAddress, ports, and meta fields.
    */
   async updateStatus(input: UpdateServiceStatusInput): Promise<void> {
     if (!this.instanceId || !this.labels) {
@@ -137,15 +140,25 @@ export class ServiceDiscoveryService {
       labels: this.labels,
       status: input.status,
       stats: input.stats,
+      autoRegisterIfMissing: input.autoRegisterIfMissing,
     });
 
-    const response = await this.apiClient.post('/api/v1/server/services/status', {
+    const payload: any = {
       instanceId: this.instanceId,
       labels: this.labels,
       status: input.status,
       stats: input.stats,
-      autoRegisterIfMissing: input.autoRegisterIfMissing,
-    });
+    };
+
+    // Add auto-register fields if provided
+    if (input.autoRegisterIfMissing) {
+      payload.hostname = input.hostname;
+      payload.internalAddress = input.internalAddress;
+      payload.ports = input.ports;
+      payload.meta = input.meta;
+    }
+
+    const response = await this.apiClient.post('/api/v1/server/services/status', payload);
 
     if (!response.success) {
       throw new Error(response.error?.message || 'Failed to update service status');

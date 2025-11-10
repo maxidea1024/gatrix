@@ -136,12 +136,12 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
           fullWidth
           label={t('gameWorlds.worldServerAddress')}
           value={formData.worldServerAddress || ''}
-          onChange={(e) => onFormDataChange({ ...formData, worldServerAddress: e.target.value || null })}
-          placeholder="e.g., game-server.example.com:8080"
+          onChange={(e) => onFormDataChange({ ...formData, worldServerAddress: e.target.value })}
+          placeholder="e.g., 192.168.1.100:8080"
+          required
+          error={!!formErrors.worldServerAddress}
+          helperText={formErrors.worldServerAddress || t('gameWorlds.form.worldServerAddressHelp')}
         />
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-          {t('gameWorlds.form.worldServerAddressHelp')}
-        </Typography>
       </Box>
 
       {/* Tags */}

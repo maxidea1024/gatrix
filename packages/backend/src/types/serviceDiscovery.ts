@@ -89,8 +89,9 @@ export interface IServiceDiscoveryProvider {
 
   /**
    * Unregister a service instance
+   * @param forceDelete - If true, permanently delete the service. If false, mark as terminated with TTL.
    */
-  unregister(instanceId: string, serviceType: string): Promise<void>;
+  unregister(instanceId: string, serviceType: string, forceDelete?: boolean): Promise<void>;
 
   /**
    * Update service status (partial merge)
@@ -111,8 +112,9 @@ export interface IServiceDiscoveryProvider {
 
   /**
    * Watch for service changes
+   * Returns an unwatch function to remove the callback
    */
-  watch(callback: WatchCallback): Promise<void>;
+  watch(callback: WatchCallback): Promise<() => void>;
 
   /**
    * Close connections and cleanup

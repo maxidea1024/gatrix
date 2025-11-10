@@ -1,6 +1,6 @@
 import db from '../config/knex';
 import logger from '../config/logger';
-import { convertDateFieldsForMySQL, convertDateFieldsFromMySQL, COMMON_DATE_FIELDS } from '../utils/dateUtils';
+import { convertDateFieldsForMySQL } from '../utils/dateUtils';
 
 export interface GameWorldMaintenanceLocale {
   id?: number;
@@ -29,7 +29,7 @@ export interface GameWorld {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
   customPayload?: Record<string, any> | null;
-  worldServerAddress?: string | null;
+  worldServerAddress: string; // Required: ip:port format (e.g., 192.168.1.100:8080)
   createdBy: number;
   updatedBy?: number;
   createdAt: string;
@@ -55,7 +55,7 @@ export interface CreateGameWorldData {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
   customPayload?: Record<string, any> | null;
-  worldServerAddress?: string | null;
+  worldServerAddress: string; // Required: ip:port format (e.g., 192.168.1.100:8080)
   createdBy: number;
 }
 
@@ -179,18 +179,6 @@ export class GameWorldModel {
         ? `WHERE ${whereConditions.join(' AND ')}`
         : '';
 
-      const dataQuery = `
-        SELECT
-          gw.*,
-          c.name as createdByName,
-          u.name as updatedByName
-        FROM g_game_worlds gw
-        LEFT JOIN g_users c ON gw.createdBy = c.id
-        LEFT JOIN g_users u ON gw.updatedBy = u.id
-        ${whereClause}
-        ORDER BY gw.displayOrder ASC
-      `;
-
       // Convert raw SQL to knex query builder
       let query = db('g_game_worlds as gw')
         .leftJoin('g_users as c', 'gw.createdBy', 'c.id')
@@ -296,7 +284,7 @@ export class GameWorldModel {
           maintenanceMessage: gameWorldData.maintenanceMessage || null,
           supportsMultiLanguage: gameWorldData.supportsMultiLanguage ?? false,
           customPayload: gameWorldData.customPayload ?? {},
-          worldServerAddress: gameWorldData.worldServerAddress || null,
+          worldServerAddress: gameWorldData.worldServerAddress, // Required field
           createdBy: gameWorldData.createdBy
         };
 

@@ -63,6 +63,7 @@ export class ServerGameWorldController {
             worldId: world.worldId,
             name: world.name,
             isMaintenance: toBoolean(world.isMaintenance),
+            worldServerAddress: world.worldServerAddress || null,
             customPayload: parseCustomPayload(world.customPayload),
             tags: tagNames
           };
@@ -157,6 +158,7 @@ export class ServerGameWorldController {
           isVisible: toBoolean(world.isVisible),
           isMaintenance: toBoolean(world.isMaintenance),
           displayOrder: world.displayOrder,
+          worldServerAddress: world.worldServerAddress || null,
           customPayload: parseCustomPayload(world.customPayload),
           createdAt: world.createdAt,
           updatedAt: world.updatedAt
@@ -233,6 +235,7 @@ export class ServerGameWorldController {
           isVisible: toBoolean(world.isVisible),
           isMaintenance: toBoolean(world.isMaintenance),
           displayOrder: world.displayOrder,
+          worldServerAddress: world.worldServerAddress || null,
           customPayload: parseCustomPayload(world.customPayload),
           createdAt: world.createdAt,
           updatedAt: world.updatedAt

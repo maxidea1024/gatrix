@@ -40,9 +40,10 @@ class ServiceDiscoveryService {
 
   /**
    * Watch for service changes (Admin monitoring via SSE)
+   * Returns an unwatch function to remove the callback
    */
-  async watchServices(callback: WatchCallback): Promise<void> {
-    await this.provider.watch(callback);
+  async watchServices(callback: WatchCallback): Promise<() => void> {
+    return await this.provider.watch(callback);
   }
 
   /**
@@ -58,9 +59,10 @@ class ServiceDiscoveryService {
 
   /**
    * Unregister a service instance (Server SDK or Admin cleanup)
+   * @param forceDelete - If true, permanently delete the service. If false, mark as terminated with TTL.
    */
-  async unregister(instanceId: string, serviceType: string): Promise<void> {
-    await this.provider.unregister(instanceId, serviceType);
+  async unregister(instanceId: string, serviceType: string, forceDelete: boolean = false): Promise<void> {
+    await this.provider.unregister(instanceId, serviceType, forceDelete);
   }
 
   /**

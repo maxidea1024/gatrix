@@ -92,24 +92,30 @@ router.get('/sse', authenticateSSE, async (req, res) => {
     const services = await serviceDiscoveryService.getServices();
     res.write(`data: ${JSON.stringify({ type: 'init', data: services })}\n\n`);
 
-    // Watch for changes (don't await - watcher runs in background)
-    serviceDiscoveryService.watchServices((event) => {
-      try {
-        res.write(`data: ${JSON.stringify({ type: event.type, data: event.instance })}\n\n`);
-      } catch (error) {
-        logger.error('Failed to send SSE event:', error);
-      }
-    }).catch((error) => {
+    // Watch for changes and get unwatch function
+    let unwatch: (() => void) | null = null;
+    try {
+      unwatch = await serviceDiscoveryService.watchServices((event) => {
+        try {
+          res.write(`data: ${JSON.stringify({ type: event.type, data: event.instance })}\n\n`);
+        } catch (error) {
+          logger.error('Failed to send SSE event:', error);
+        }
+      });
+    } catch (error) {
       logger.error('Failed to start watching services:', error);
       if (!res.headersSent) {
         res.write(`data: ${JSON.stringify({ type: 'error', data: { message: 'Failed to watch services' } })}\n\n`);
       }
-    });
+    }
 
     logger.info(`SSE connection established for service discovery: ${clientId}`);
 
     // Handle client disconnect
     req.on('close', () => {
+      if (unwatch) {
+        unwatch();
+      }
       logger.info(`SSE connection closed for service discovery: ${clientId}`);
     });
   } catch (error) {
@@ -145,10 +151,10 @@ router.post('/cleanup', async (req: Request, res: Response) => {
       });
     }
 
-    // Delete all terminated/error services
+    // Delete all terminated/error services (force delete = true)
     const results = await Promise.allSettled(
       toDelete.map((service) =>
-        serviceDiscoveryService.unregister(service.instanceId, service.labels.service)
+        serviceDiscoveryService.unregister(service.instanceId, service.labels.service, true)
       )
     );
 
@@ -212,8 +218,8 @@ router.delete('/:type/:instanceId', async (req: Request, res: Response) => {
       });
     }
 
-    // Unregister the service from storage
-    await serviceDiscoveryService.unregister(instanceId, type);
+    // Unregister the service from storage (force delete = true)
+    await serviceDiscoveryService.unregister(instanceId, type, true);
 
     logger.info(`Service deleted: ${type}:${instanceId}`);
 
