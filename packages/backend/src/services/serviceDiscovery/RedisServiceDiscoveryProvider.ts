@@ -184,13 +184,15 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
           });
 
           const ttl = config?.serviceDiscovery?.terminatedTTL || 15;
+          const terminatedMarkerTTL = config?.serviceDiscovery?.terminatedMarkerTTL || 300; // 5 minutes for audit trail
 
-          // Set stat key with TTL
+          // Set stat key with TTL (15 seconds - service will move to inactive collection)
           await this.client.set(statKey, JSON.stringify(stat), 'EX', ttl);
 
           // Set terminated marker to distinguish explicit termination from heartbeat timeout
+          // Use much longer TTL (5 minutes) to keep the service visible for audit trail
           const terminatedMarkerKey = `services:${serviceType}:terminated:${instanceId}`;
-          await this.client.set(terminatedMarkerKey, '1', 'EX', ttl);
+          await this.client.set(terminatedMarkerKey, '1', 'EX', terminatedMarkerTTL);
 
           // Update trackedServices so keyspace notification handler can find it when stat key expires
           const trackedKey = `${serviceType}:${instanceId}`;
