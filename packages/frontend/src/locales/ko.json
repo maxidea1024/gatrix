@@ -3628,8 +3628,11 @@
     "pauseUpdates": "실시간 업데이트 일시 중지",
     "resumeUpdates": "실시간 업데이트 재개",
     "cleanup": "서버 목록 정리",
+    "noInactiveServers": "정리할 서버가 없습니다",
     "cleanupConfirmTitle": "서버 목록 정리 확인",
     "cleanupConfirmMessage": "종료됨, 오류, 응답 없음 상태의 서버를 목록에서 제거하시겠습니까?",
+    "cleanupSuccess": "{{count}}개의 서버가 정리되었습니다.",
+    "cleanupFailed": "서버 정리에 실패했습니다.",
     "viewMode": {
       "list": "리스트 뷰",
       "grid": "그리드 뷰",
@@ -3637,7 +3640,14 @@
     },
     "filters": {
       "service": "서비스 타입",
-      "status": "상태"
+      "status": "상태",
+      "instanceId": "인스턴스 ID",
+      "group": "그룹",
+      "region": "지역",
+      "env": "환경",
+      "role": "역할",
+      "internalAddress": "내부 IP",
+      "externalAddress": "공인 IP"
     },
     "status": {
       "initializing": "초기화 중",
@@ -3659,6 +3669,7 @@
       "status": "상태",
       "stats": "통계",
       "meta": "메타 정보",
+      "createdAt": "생성 시간",
       "updatedAt": "업데이트 시간"
     }
   },

@@ -226,64 +226,76 @@ export class ApiClient {
   }
 
   /**
-   * POST request (with retry and auto-generated requestId)
+   * POST request (with retry and auto-generated requestId in header)
    */
   async post<T = any>(
     url: string,
     data?: any,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    // Auto-generate requestId if not provided
-    const requestData = data || {};
-    if (!requestData.requestId) {
-      requestData.requestId = ulid();
-      this.logger.debug('Auto-generated requestId', { requestId: requestData.requestId, url });
+    // Auto-generate requestId if not provided in headers
+    const requestConfig = config || {};
+    const headers = requestConfig.headers || {};
+
+    if (!headers['x-request-id']) {
+      headers['x-request-id'] = ulid();
+      this.logger.debug('Auto-generated requestId', { requestId: headers['x-request-id'], url });
     }
 
+    requestConfig.headers = headers;
+
     return this.executeWithRetry(
-      () => this.client.post<ApiResponse<T>>(url, requestData, config),
+      () => this.client.post<ApiResponse<T>>(url, data, requestConfig),
       { method: 'POST', url }
     );
   }
 
   /**
-   * PUT request (with retry and auto-generated requestId)
+   * PUT request (with retry and auto-generated requestId in header)
    */
   async put<T = any>(
     url: string,
     data?: any,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    // Auto-generate requestId if not provided
-    const requestData = data || {};
-    if (!requestData.requestId) {
-      requestData.requestId = ulid();
-      this.logger.debug('Auto-generated requestId', { requestId: requestData.requestId, url });
+    // Auto-generate requestId if not provided in headers
+    const requestConfig = config || {};
+    const headers = requestConfig.headers || {};
+
+    if (!headers['x-request-id']) {
+      headers['x-request-id'] = ulid();
+      this.logger.debug('Auto-generated requestId', { requestId: headers['x-request-id'], url });
     }
 
+    requestConfig.headers = headers;
+
     return this.executeWithRetry(
-      () => this.client.put<ApiResponse<T>>(url, requestData, config),
+      () => this.client.put<ApiResponse<T>>(url, data, requestConfig),
       { method: 'PUT', url }
     );
   }
 
   /**
-   * PATCH request (with retry and auto-generated requestId)
+   * PATCH request (with retry and auto-generated requestId in header)
    */
   async patch<T = any>(
     url: string,
     data?: any,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    // Auto-generate requestId if not provided
-    const requestData = data || {};
-    if (!requestData.requestId) {
-      requestData.requestId = ulid();
-      this.logger.debug('Auto-generated requestId', { requestId: requestData.requestId, url });
+    // Auto-generate requestId if not provided in headers
+    const requestConfig = config || {};
+    const headers = requestConfig.headers || {};
+
+    if (!headers['x-request-id']) {
+      headers['x-request-id'] = ulid();
+      this.logger.debug('Auto-generated requestId', { requestId: headers['x-request-id'], url });
     }
 
+    requestConfig.headers = headers;
+
     return this.executeWithRetry(
-      () => this.client.patch<ApiResponse<T>>(url, requestData, config),
+      () => this.client.patch<ApiResponse<T>>(url, data, requestConfig),
       { method: 'PATCH', url }
     );
   }

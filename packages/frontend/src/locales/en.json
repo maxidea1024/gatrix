@@ -3627,8 +3627,11 @@
     "pauseUpdates": "Pause Real-time Updates",
     "resumeUpdates": "Resume Real-time Updates",
     "cleanup": "Clean Up Server List",
+    "noInactiveServers": "No servers to clean up",
     "cleanupConfirmTitle": "Confirm Server List Cleanup",
     "cleanupConfirmMessage": "Are you sure you want to remove terminated, error, and no-response servers from the list?",
+    "cleanupSuccess": "{{count}} server(s) cleaned up successfully.",
+    "cleanupFailed": "Failed to clean up servers.",
     "viewMode": {
       "list": "List View",
       "grid": "Grid View",
@@ -3636,7 +3639,14 @@
     },
     "filters": {
       "service": "Service Type",
-      "status": "Status"
+      "status": "Status",
+      "instanceId": "Instance ID",
+      "group": "Group",
+      "region": "Region",
+      "env": "Environment",
+      "role": "Role",
+      "internalAddress": "Internal IP",
+      "externalAddress": "External IP"
     },
     "status": {
       "initializing": "Initializing",
@@ -3658,6 +3668,7 @@
       "status": "Status",
       "stats": "Stats",
       "meta": "Meta Info",
+      "createdAt": "Created At",
       "updatedAt": "Updated At"
     }
   },

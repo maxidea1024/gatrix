@@ -26,7 +26,8 @@ export interface ServiceInstance {
   internalAddress: string;
   ports: ServicePorts;
   status: 'initializing' | 'ready' | 'shutting_down' | 'error' | 'terminated' | 'no-response';
-  updatedAt: string;
+  createdAt: string;            // Creation time (immutable)
+  updatedAt: string;            // Last update time
   stats?: Record<string, any>;  // Renamed from instanceStats
   meta?: Record<string, any>;
 }

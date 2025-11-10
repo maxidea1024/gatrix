@@ -32,7 +32,7 @@ export class BaseTestServer {
     // Create SDK instance
     this.sdk = new GatrixServerSDK({
       gatrixUrl: process.env.GATRIX_URL || 'http://localhost:55000',
-      apiToken: process.env.API_TOKEN, // Optional: defaults to 'gatrix-unsecured-server-api-token'
+      apiToken: process.env.API_TOKEN || 'gatrix-unsecured-server-api-token',
       applicationName: config.serviceType,
 
       // Redis for events
@@ -74,6 +74,49 @@ export class BaseTestServer {
       this.logError('Unhandled Rejection', { reason, promise });
       await this.handleFatalError('UNHANDLED_REJECTION');
     });
+
+    // Handle graceful shutdown signals
+    process.on('SIGTERM', async () => {
+      this.log('Received SIGTERM signal, initiating graceful shutdown...');
+      await this.handleGracefulShutdown();
+    });
+
+    process.on('SIGINT', async () => {
+      this.log('Received SIGINT signal, initiating graceful shutdown...');
+      await this.handleGracefulShutdown();
+    });
+  }
+
+  /**
+   * Handle graceful shutdown (SIGTERM/SIGINT)
+   * Update service status to 'terminated' and shut down cleanly
+   */
+  private async handleGracefulShutdown(): Promise<void> {
+    if (this.isShuttingDown) {
+      return; // Prevent multiple shutdown attempts
+    }
+    this.isShuttingDown = true;
+
+    try {
+      // Update service status to 'terminated' if service discovery is enabled
+      if (this.config.enableServiceDiscovery) {
+        await this.sdk.updateServiceStatus({
+          status: 'terminated',
+          stats: {
+            shutdownTime: new Date().toISOString(),
+          },
+        }).catch(err => {
+          this.logError('Failed to update service status to terminated', err);
+        });
+      }
+
+      // Graceful shutdown
+      await this.stop();
+    } catch (shutdownError) {
+      this.logError('Error during graceful shutdown', shutdownError);
+    } finally {
+      process.exit(0);
+    }
   }
 
   /**
@@ -215,7 +258,7 @@ export class BaseTestServer {
     const popups = await this.sdk.getPopupNotices();
     this.log(`Popup Notices: ${popups.length} loaded`);
     popups.forEach(popup => {
-      const contentPreview = popup.content.substring(0, 50) + (popup.content.length > 50 ? '...' : '');
+      const contentPreview = popup.message.substring(0, 50) + (popup.message.length > 50 ? '...' : '');
       this.log(`  - ${popup.id}: ${contentPreview}`);
     });
 

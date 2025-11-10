@@ -59,6 +59,7 @@ router.post('/register', serverSDKAuth, async (req: any, res: any) => {
     const externalAddress = req.ip || req.connection.remoteAddress || '0.0.0.0';
 
     // Create service instance (full snapshot)
+    const now = new Date().toISOString();
     const instance = {
       instanceId,
       labels,
@@ -67,9 +68,10 @@ router.post('/register', serverSDKAuth, async (req: any, res: any) => {
       internalAddress,
       ports,
       status: status || 'ready',
+      createdAt: now,
+      updatedAt: now,
       stats,
       meta,
-      updatedAt: new Date().toISOString(),
     };
 
     // Register to service discovery

@@ -3647,8 +3647,11 @@
     "pauseUpdates": "暂停实时更新",
     "resumeUpdates": "恢复实时更新",
     "cleanup": "清理服务器列表",
+    "noInactiveServers": "没有要清理的服务器",
     "cleanupConfirmTitle": "确认清理服务器列表",
     "cleanupConfirmMessage": "确定要从列表中删除已终止、错误和无响应状态的服务器吗？",
+    "cleanupSuccess": "{{count}}个服务器已成功清理。",
+    "cleanupFailed": "服务器清理失败。",
     "viewMode": {
       "list": "列表视图",
       "grid": "网格视图",
@@ -3656,7 +3659,14 @@
     },
     "filters": {
       "service": "服务类型",
-      "status": "状态"
+      "status": "状态",
+      "instanceId": "实例ID",
+      "group": "组",
+      "region": "地区",
+      "env": "环境",
+      "role": "角色",
+      "internalAddress": "内部IP",
+      "externalAddress": "外部IP"
     },
     "status": {
       "initializing": "初始化中",
@@ -3678,6 +3688,7 @@
       "status": "状态",
       "stats": "统计",
       "meta": "元信息",
+      "createdAt": "创建时间",
       "updatedAt": "更新时间"
     }
   },

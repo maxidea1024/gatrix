@@ -23,31 +23,25 @@ class TestOrchestrator {
   }
 
   private setupServers(): void {
-    // Auth servers (2 instances)
+    // Auth servers (1 instance)
     this.servers.push(
-      { name: 'authd-1', script: 'authd.ts', args: ['1', '8001', 'production', 'true'] },
-      { name: 'authd-2', script: 'authd.ts', args: ['2', '8011', 'production', 'true'] }
+      { name: 'authd-1', script: 'authd.ts', args: ['1', '8001', 'production', 'true'] }
     );
 
-    // Lobby servers (3 instances - 2 production, 1 staging)
+    // Lobby servers (2 instances)
     this.servers.push(
       { name: 'lobbyd-1', script: 'lobbyd.ts', args: ['1', '8002', 'production', 'true'] },
-      { name: 'lobbyd-2', script: 'lobbyd.ts', args: ['2', '8012', 'production', 'true'] },
-      { name: 'lobbyd-3', script: 'lobbyd.ts', args: ['3', '8022', 'staging', 'true'] }
+      { name: 'lobbyd-2', script: 'lobbyd.ts', args: ['2', '8012', 'production', 'true'] }
     );
 
-    // Chat servers (2 instances)
+    // Chat servers (1 instance)
     this.servers.push(
-      { name: 'chatd-1', script: 'chatd.ts', args: ['1', '8003', 'production', 'true'] },
-      { name: 'chatd-2', script: 'chatd.ts', args: ['2', '8013', 'production', 'true'] }
+      { name: 'chatd-1', script: 'chatd.ts', args: ['1', '8003', 'production', 'true'] }
     );
 
-    // World servers (4 instances - different regions)
+    // World servers (1 instance)
     this.servers.push(
-      { name: 'worldd-kr-1', script: 'worldd.ts', args: ['1', '8004', 'kr-1', 'true'] },
-      { name: 'worldd-kr-2', script: 'worldd.ts', args: ['2', '8014', 'kr-2', 'true'] },
-      { name: 'worldd-us-east', script: 'worldd.ts', args: ['3', '8024', 'us-east', 'true'] },
-      { name: 'worldd-us-west', script: 'worldd.ts', args: ['4', '8034', 'us-west', 'true'] }
+      { name: 'worldd-kr-1', script: 'worldd.ts', args: ['1', '8004', 'kr-1', 'true'] }
     );
   }
 
@@ -57,12 +51,12 @@ class TestOrchestrator {
     console.log('='.repeat(80));
     console.log('');
     console.log('Test Scenario:');
-    console.log('  - 2 Auth servers (production)');
-    console.log('  - 3 Lobby servers (2 production, 1 staging)');
-    console.log('  - 2 Chat servers (production)');
-    console.log('  - 4 World servers (kr-1, kr-2, us-east, us-west)');
+    console.log('  - 1 Auth server (production)');
+    console.log('  - 2 Lobby servers (production)');
+    console.log('  - 1 Chat server (production)');
+    console.log('  - 1 World server (kr-1)');
     console.log('');
-    console.log('Total: 11 server instances');
+    console.log('Total: 5 server instances');
     console.log('='.repeat(80));
     console.log('');
 
@@ -86,11 +80,13 @@ class TestOrchestrator {
       console.log(`[ORCHESTRATOR] Starting ${server.name}...`);
 
       const scriptPath = path.join(__dirname, server.script);
-      
+
       // Use ts-node to run TypeScript directly
+      // Use shell: true for both Windows and Unix to ensure proper signal handling
       const proc = spawn('npx', ['ts-node', scriptPath, ...server.args], {
         stdio: 'inherit',
         shell: true,
+        detached: false, // Don't detach - let orchestrator manage the process
         env: {
           ...process.env,
           FORCE_COLOR: '1',
@@ -130,6 +126,8 @@ class TestOrchestrator {
     for (const server of this.servers) {
       if (server.process) {
         console.log(`[ORCHESTRATOR] Stopping ${server.name}...`);
+        // Send SIGTERM to the process
+        // Since detached: false, this will terminate the shell and the child process
         server.process.kill('SIGTERM');
       }
     }

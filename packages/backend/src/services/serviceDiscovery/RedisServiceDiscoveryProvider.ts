@@ -72,6 +72,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
 
     try {
       // Separate meta (immutable) and stat (mutable) data
+      const now = new Date().toISOString();
       const meta = {
         instanceId: instance.instanceId,
         labels: instance.labels,
@@ -79,12 +80,13 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         externalAddress: instance.externalAddress,
         internalAddress: instance.internalAddress,
         ports: instance.ports,
+        createdAt: instance.createdAt || now, // Set createdAt if not provided
         meta: instance.meta, // Static metadata
       };
 
       const stat = {
         status: instance.status,
-        updatedAt: instance.updatedAt,
+        updatedAt: instance.updatedAt || now,
         stats: instance.stats || {},
       };
 
@@ -256,6 +258,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
             throw new Error(`Auto-register requires hostname, internalAddress, and ports fields`);
           }
 
+          const now = new Date().toISOString();
           const meta = {
             instanceId: input.instanceId,
             labels: input.labels,
@@ -263,12 +266,13 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
             externalAddress: '', // Will be set by controller from req.ip
             internalAddress: input.internalAddress,
             ports: input.ports,
+            createdAt: now,
             meta: input.meta || {},
           };
 
           const stat = {
             status: input.status || 'ready',
-            updatedAt: new Date().toISOString(),
+            updatedAt: now,
             stats: input.stats || {},
           };
 
@@ -307,6 +311,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
       // Update stat only (meta is immutable)
       const statValue = await this.client.get(statKey);
       const stat = statValue ? JSON.parse(statValue) : {};
+      const meta = JSON.parse(metaValue);
 
       // Check if service is already in error or no-response state - ignore updateStatus calls
       if (stat.status === 'error' || stat.status === 'no-response') {
@@ -336,6 +341,15 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         // Set terminated marker so keyspace notification knows to delete this service
         const terminatedMarkerKey = `services:${serviceType}:terminated:${input.instanceId}`;
         await this.client.set(terminatedMarkerKey, '1', 'EX', ttl);
+
+        // Also add to inactive collection for UI display
+        const inactiveCollectionKey = `services:${serviceType}:inactive`;
+        const inactiveEntry: ServiceInstance = { ...meta, ...stat };
+        await this.client.hset(inactiveCollectionKey, input.instanceId, JSON.stringify(inactiveEntry));
+
+        // Create a separate key for tracking inactive item expiration (5 seconds for testing)
+        const inactiveItemKey = `services:${serviceType}:inactive:${input.instanceId}`;
+        await this.client.set(inactiveItemKey, '1', 'EX', 5);
       } else {
         ttl = heartbeatTTL; // Always use configured heartbeat TTL
       }
@@ -343,12 +357,13 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
       await this.client.set(statKey, JSON.stringify(stat), 'EX', ttl);
 
       // Publish update event (merge meta + stat for compatibility)
-      const meta = JSON.parse(metaValue);
       const instance: ServiceInstance = { ...meta, ...stat };
       await this.publishEvent({
         type: 'put',
         instance,
       });
+
+      logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${stat.status}`);
 
       logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${stat.status} (TTL: ${ttl}s)`);
     } catch (error) {
@@ -417,6 +432,13 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
       if (serviceGroup) {
         instances = instances.filter(instance => instance.labels.group === serviceGroup);
       }
+
+      // Sort by createdAt (ascending - oldest first, newest last)
+      instances.sort((a, b) => {
+        const aTime = new Date(a.createdAt).getTime();
+        const bTime = new Date(b.createdAt).getTime();
+        return aTime - bTime;
+      });
 
       return instances;
     } catch (error) {
@@ -549,7 +571,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
                     await this.client.del(terminatedMarkerKey);
                     this.trackedServices.delete(trackedKey);
 
-                    // Store in inactive collection for 15 seconds (for audit trail)
+                    // Store in inactive collection for 5 seconds (for testing - normally 300 seconds)
                     const inactiveEntry: ServiceInstance = {
                       ...instance,
                       status: 'terminated',
@@ -557,9 +579,9 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
                     };
                     await this.client.hset(inactiveCollectionKey, instanceId, JSON.stringify(inactiveEntry));
 
-                    // Create a separate key for tracking inactive item expiration (300 seconds)
+                    // Create a separate key for tracking inactive item expiration (5 seconds for testing)
                     const inactiveItemKey = `services:${serviceType}:inactive:${instanceId}`;
-                    await this.client.set(inactiveItemKey, '1', 'EX', 300);
+                    await this.client.set(inactiveItemKey, '1', 'EX', 5);
 
                     // Publish update event to notify UI of terminated status
                     await this.publishEvent({
@@ -578,12 +600,12 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
                       updatedAt: new Date().toISOString(),
                     };
 
-                    // Store in inactive collection for 300 seconds (5 minutes for audit trail)
+                    // Store in inactive collection for 5 seconds (for testing - normally 300 seconds)
                     await this.client.hset(inactiveCollectionKey, instanceId, JSON.stringify(inactiveEntry));
 
-                    // Create a separate key for tracking inactive item expiration (300 seconds)
+                    // Create a separate key for tracking inactive item expiration (5 seconds for testing)
                     const inactiveItemKey = `services:${serviceType}:inactive:${instanceId}`;
-                    await this.client.set(inactiveItemKey, '1', 'EX', 300);
+                    await this.client.set(inactiveItemKey, '1', 'EX', 5);
 
                     // Publish update event to notify UI of no-response status
                     await this.publishEvent({
@@ -649,6 +671,92 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
       this.watchCallbacks.delete(callback);
       logger.info(`Watch callback removed (total: ${this.watchCallbacks.size})`);
     };
+  }
+
+  /**
+   * Clean up all inactive services (terminated, error, no-response)
+   * Directly clears inactive collections and terminated meta keys from Redis
+   */
+  async cleanupInactiveServices(serviceTypes: string[]): Promise<{ deletedCount: number; serviceTypes: string[] }> {
+    let totalDeletedCount = 0;
+
+    for (const serviceType of serviceTypes) {
+      try {
+        // 1. Clean up inactive collection (if exists)
+        const inactiveCollectionKey = `services:${serviceType}:inactive`;
+        const inactiveData = await this.client.hgetall(inactiveCollectionKey);
+        const inactiveEntryCount = Object.keys(inactiveData).length;
+
+        if (inactiveEntryCount > 0) {
+          // Delete the entire inactive collection hash
+          await this.client.del(inactiveCollectionKey);
+          totalDeletedCount += inactiveEntryCount;
+          logger.info(`🗑️ Cleared inactive collection for ${serviceType}: ${inactiveEntryCount} entries deleted`);
+
+          // Also delete all inactive item keys (services:{type}:inactive:{id})
+          const inactiveItemKeys = await this.client.keys(`services:${serviceType}:inactive:*`);
+          if (inactiveItemKeys.length > 0) {
+            await this.client.del(...inactiveItemKeys);
+            logger.info(`🗑️ Deleted ${inactiveItemKeys.length} inactive item keys for ${serviceType}`);
+          }
+
+          // Publish delete events for each inactive service
+          for (const [instanceId, value] of Object.entries(inactiveData)) {
+            try {
+              const instance: ServiceInstance = JSON.parse(value);
+              await this.publishEvent({
+                type: 'delete',
+                instance,
+              });
+            } catch (error) {
+              logger.error(`Failed to parse inactive entry for delete event: ${instanceId}`, error);
+            }
+          }
+        }
+
+        // 2. Clean up terminated meta keys (meta without stat)
+        const metaKeys = await this.client.keys(`services:${serviceType}:meta:*`);
+        for (const metaKey of metaKeys) {
+          const parts = metaKey.split(':');
+          if (parts.length === 4) {
+            const instanceId = parts[3];
+            const statKey = this.getStatKey(serviceType, instanceId);
+
+            // Check if stat key exists
+            const statExists = await this.client.exists(statKey);
+            if (!statExists) {
+              // Stat key doesn't exist, so this is a terminated service
+              try {
+                const metaValue = await this.client.get(metaKey);
+                if (metaValue) {
+                  const instance: ServiceInstance = JSON.parse(metaValue);
+                  instance.status = 'terminated';
+                  instance.updatedAt = new Date().toISOString();
+
+                  // Delete the meta key
+                  await this.client.del(metaKey);
+                  totalDeletedCount++;
+                  logger.info(`🗑️ Deleted terminated service: ${serviceType}:${instanceId}`);
+
+                  // Publish delete event
+                  await this.publishEvent({
+                    type: 'delete',
+                    instance,
+                  });
+                }
+              } catch (error) {
+                logger.error(`Failed to cleanup terminated service ${serviceType}:${instanceId}:`, error);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        logger.error(`Failed to cleanup inactive services for ${serviceType}:`, error);
+      }
+    }
+
+    logger.info(`✅ Cleanup completed: ${totalDeletedCount} inactive services deleted`);
+    return { deletedCount: totalDeletedCount, serviceTypes };
   }
 
   async close(): Promise<void> {

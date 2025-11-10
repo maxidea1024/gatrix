@@ -101,6 +101,10 @@ class WorldServer extends BaseTestServer {
         userId: playerId,
         userName: `Player_${playerId}`,
         characterId: `char_${playerId}`,
+        worldId: 'world-1',
+        platform: 'pc',
+        channel: 'steam',
+        subChannel: 'global',
       });
       this.log(`Coupon redeemed successfully: ${JSON.stringify(result)}`);
     } catch (error: any) {

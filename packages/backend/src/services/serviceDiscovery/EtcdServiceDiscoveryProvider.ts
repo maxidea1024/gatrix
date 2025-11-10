@@ -44,8 +44,16 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
     try {
       const lease = this.client.lease(ttlSeconds);
+      const now = new Date().toISOString();
 
-      await lease.put(key).value(JSON.stringify(instance));
+      // Ensure createdAt is set
+      const instanceData = {
+        ...instance,
+        createdAt: instance.createdAt || now,
+        updatedAt: instance.updatedAt || now,
+      };
+
+      await lease.put(key).value(JSON.stringify(instanceData));
       this.leases.set(`${serviceType}:${instance.instanceId}`, lease);
 
       // Auto-heartbeat
@@ -141,6 +149,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       if (!value) {
         if (autoRegisterIfMissing) {
           // Auto-register: create new instance
+          const now = new Date().toISOString();
           const newInstance: ServiceInstance = {
             instanceId: input.instanceId,
             labels: input.labels,
@@ -149,7 +158,8 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
             internalAddress: '',
             ports: { tcp: [], udp: [], http: [] },
             status: input.status || 'ready',
-            updatedAt: new Date().toISOString(),
+            createdAt: now,
+            updatedAt: now,
             stats: input.stats || {},
           };
 
@@ -237,6 +247,13 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         instances = instances.filter(instance => instance.labels.group === serviceGroup);
       }
 
+      // Sort by createdAt (ascending - oldest first, newest last)
+      instances.sort((a, b) => {
+        const aTime = new Date(a.createdAt).getTime();
+        const bTime = new Date(b.createdAt).getTime();
+        return aTime - bTime;
+      });
+
       return instances;
     } catch (error) {
       logger.error('Failed to get services:', error);
@@ -278,6 +295,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           const id = parts[3];
 
           // Emit a minimal instance object for delete events to satisfy typing
+          const now = new Date().toISOString();
           callback({
             type: 'delete',
             instance: {
@@ -288,7 +306,8 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
               internalAddress: '',
               ports: { tcp: [], udp: [], http: [] },
               status: 'terminated',
-              updatedAt: new Date().toISOString(),
+              createdAt: now,
+              updatedAt: now,
             } as ServiceInstance,
           });
         } catch (error) {
@@ -310,6 +329,40 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       };
     } catch (error) {
       logger.error('Failed to start watching:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Clean up all inactive services (terminated, error, no-response)
+   * For etcd, this deletes all services with terminated/error/no-response status
+   */
+  async cleanupInactiveServices(serviceTypes: string[]): Promise<{ deletedCount: number; serviceTypes: string[] }> {
+    let totalDeletedCount = 0;
+
+    try {
+      // Get all services and filter by status
+      const allServices = await this.getServices();
+      const inactiveServices = allServices.filter(
+        (s) => s.status === 'terminated' || s.status === 'error' || s.status === 'no-response'
+      );
+
+      // Delete each inactive service
+      for (const service of inactiveServices) {
+        try {
+          const key = this.getInstanceKey(service.labels.service, service.instanceId);
+          await this.client.delete().key(key).exec();
+          totalDeletedCount++;
+          logger.info(`🗑️ Deleted service from etcd: ${service.labels.service}:${service.instanceId}`);
+        } catch (error) {
+          logger.error(`Failed to delete service ${service.labels.service}:${service.instanceId}:`, error);
+        }
+      }
+
+      logger.info(`✅ Cleanup completed: ${totalDeletedCount} inactive services deleted from etcd`);
+      return { deletedCount: totalDeletedCount, serviceTypes };
+    } catch (error) {
+      logger.error('Failed to cleanup inactive services:', error);
       throw error;
     }
   }

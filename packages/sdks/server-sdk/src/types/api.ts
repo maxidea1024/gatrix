@@ -28,11 +28,12 @@ export interface RedeemCouponRequest {
   code: string; // Coupon code
   userId: string; // User ID
   userName: string; // User name
-  characterId: string; // Character ID
-  worldId: string; // Game world ID
-  platform: string; // Platform
-  channel: string; // Channel
-  subChannel: string; // Sub-channel
+  characterId?: string; // Character ID (optional)
+  worldId?: string; // Game world ID (optional)
+  platform?: string; // Platform (optional)
+  channel?: string; // Channel (optional)
+  subChannel?: string; // Sub-channel (optional)
+  // Note: requestId is passed via x-request-id header, not in body
 }
 
 export interface RedeemCouponResponse {
@@ -225,7 +226,13 @@ export interface GetServicesParams {
  * Whitelist data structure
  */
 export interface WhitelistData {
-  ipWhitelist: string[]; // List of whitelisted IPs (supports CIDR notation)
-  accountWhitelist: string[]; // List of whitelisted account IDs
+  ipWhitelist: {
+    enabled: boolean;
+    ips: string[]; // List of whitelisted IPs (supports CIDR notation)
+  };
+  accountWhitelist: {
+    enabled: boolean;
+    accountIds: string[]; // List of whitelisted account IDs
+  };
 }
 

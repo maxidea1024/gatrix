@@ -35,7 +35,8 @@ export interface ServiceInstance {
   internalAddress: string;      // NIC address (internal IP)
   ports: ServicePorts;          // TCP, UDP, HTTP ports
   status: ServiceStatus;        // Current status
-  updatedAt: string;            // ISO8601 timestamp
+  createdAt: string;            // ISO8601 timestamp (creation time, immutable)
+  updatedAt: string;            // ISO8601 timestamp (last update time)
   stats?: Record<string, any>;  // Dynamic stats (e.g., cpuUsage, memoryUsage, userCount)
   meta?: Record<string, any>;   // Static metadata (set at registration, immutable)
 }
@@ -115,6 +116,13 @@ export interface IServiceDiscoveryProvider {
    * Returns an unwatch function to remove the callback
    */
   watch(callback: WatchCallback): Promise<() => void>;
+
+  /**
+   * Clean up all inactive services (terminated, error, no-response)
+   * @param serviceTypes - Array of service types to clean up
+   * @returns Object with deletedCount and serviceTypes
+   */
+  cleanupInactiveServices(serviceTypes: string[]): Promise<{ deletedCount: number; serviceTypes: string[] }>;
 
   /**
    * Close connections and cleanup

@@ -72,6 +72,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import useSWR from 'swr';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -148,6 +149,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
 
 const ServerListPage: React.FC = () => {
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -171,7 +173,7 @@ const ServerListPage: React.FC = () => {
 
   // Sort state (persisted in localStorage)
   const [sortBy, setSortBy] = useState<string>(() => {
-    return localStorage.getItem('serverListSortBy') || 'updatedAt';
+    return localStorage.getItem('serverListSortBy') || 'createdAt';
   });
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(() => {
     return (localStorage.getItem('serverListSortOrder') as 'asc' | 'desc') || 'desc';
@@ -201,6 +203,7 @@ const ServerListPage: React.FC = () => {
     { id: 'ports', labelKey: 'serverList.table.ports', visible: true },
     { id: 'stats', labelKey: 'serverList.table.stats', visible: true },
     { id: 'meta', labelKey: 'serverList.table.meta', visible: true },
+    { id: 'createdAt', labelKey: 'serverList.table.createdAt', visible: true },
     { id: 'updatedAt', labelKey: 'serverList.table.updatedAt', visible: true },
   ];
 
@@ -328,8 +331,14 @@ const ServerListPage: React.FC = () => {
                   newServices[index] = event.data;
                   return newServices;
                 } else {
-                  // Add new service at the end (bottom)
-                  return [...prev, event.data];
+                  // Add new service and sort by createdAt (ascending - oldest first, newest last)
+                  const newServices = [...prev, event.data];
+                  newServices.sort((a, b) => {
+                    const aTime = new Date(a.createdAt).getTime();
+                    const bTime = new Date(b.createdAt).getTime();
+                    return aTime - bTime;
+                  });
+                  return newServices;
                 }
               });
             } else if (event.type === 'delete') {
@@ -368,6 +377,12 @@ const ServerListPage: React.FC = () => {
             updated.push(pendingService);
           }
         });
+        // Sort by createdAt (ascending - oldest first, newest last)
+        updated.sort((a, b) => {
+          const aTime = new Date(a.createdAt).getTime();
+          const bTime = new Date(b.createdAt).getTime();
+          return aTime - bTime;
+        });
         return updated;
       });
       setPendingUpdates([]);
@@ -395,11 +410,19 @@ const ServerListPage: React.FC = () => {
 
       console.log(`✅ Cleanup complete: ${result.deletedCount}/${result.totalCount} servers deleted`);
 
-      // Remove from frontend state (will be updated by SSE delete events)
+      // Remove from frontend state immediately
       setServices((prev) => prev.filter((s) => s.status !== 'terminated' && s.status !== 'error' && s.status !== 'no-response'));
+
+      // Show success message
+      enqueueSnackbar(
+        t('serverList.cleanupSuccess', { count: result.deletedCount }),
+        { variant: 'success' }
+      );
+
       setCleanupDialogOpen(false);
     } catch (error) {
       console.error('❌ Cleanup failed:', error);
+      enqueueSnackbar(t('serverList.cleanupFailed'), { variant: 'error' });
     }
   };
 
@@ -426,6 +449,41 @@ const ServerListPage: React.FC = () => {
         { value: 'error', label: t('serverList.status.error') },
         { value: 'terminated', label: t('serverList.status.terminated') },
       ],
+    },
+    {
+      key: 'instanceId',
+      label: t('serverList.filters.instanceId'),
+      type: 'text',
+    },
+    {
+      key: 'group',
+      label: t('serverList.filters.group'),
+      type: 'text',
+    },
+    {
+      key: 'region',
+      label: t('serverList.filters.region'),
+      type: 'text',
+    },
+    {
+      key: 'env',
+      label: t('serverList.filters.env'),
+      type: 'text',
+    },
+    {
+      key: 'role',
+      label: t('serverList.filters.role'),
+      type: 'text',
+    },
+    {
+      key: 'internalAddress',
+      label: t('serverList.filters.internalAddress'),
+      type: 'text',
+    },
+    {
+      key: 'externalAddress',
+      label: t('serverList.filters.externalAddress'),
+      type: 'text',
     },
   ];
 
@@ -485,6 +543,9 @@ const ServerListPage: React.FC = () => {
     }
   };
 
+  // Count inactive services (terminated, error, no-response)
+  const inactiveCount = services.filter((s) => s.status === 'terminated' || s.status === 'error' || s.status === 'no-response').length;
+
   // Apply filters and search
   const filteredServices = services.filter((service) => {
     // Search filter
@@ -511,6 +572,27 @@ const ServerListPage: React.FC = () => {
       if (filter.key === 'status' && filter.value && service.status !== filter.value) {
         return false;
       }
+      if (filter.key === 'instanceId' && filter.value && !service.instanceId.toLowerCase().includes(filter.value.toLowerCase())) {
+        return false;
+      }
+      if (filter.key === 'group' && filter.value && !service.labels.group?.toLowerCase().includes(filter.value.toLowerCase())) {
+        return false;
+      }
+      if (filter.key === 'region' && filter.value && !service.labels.region?.toLowerCase().includes(filter.value.toLowerCase())) {
+        return false;
+      }
+      if (filter.key === 'env' && filter.value && !service.labels.env?.toLowerCase().includes(filter.value.toLowerCase())) {
+        return false;
+      }
+      if (filter.key === 'role' && filter.value && !service.labels.role?.toLowerCase().includes(filter.value.toLowerCase())) {
+        return false;
+      }
+      if (filter.key === 'internalAddress' && filter.value && !service.internalAddress?.toLowerCase().includes(filter.value.toLowerCase())) {
+        return false;
+      }
+      if (filter.key === 'externalAddress' && filter.value && !service.externalAddress?.toLowerCase().includes(filter.value.toLowerCase())) {
+        return false;
+      }
     }
 
     return true;
@@ -534,7 +616,7 @@ const ServerListPage: React.FC = () => {
     }
 
     // Handle special cases
-    if (sortBy === 'updatedAt') {
+    if (sortBy === 'createdAt' || sortBy === 'updatedAt') {
       aValue = new Date(aValue).getTime();
       bValue = new Date(bValue).getTime();
     }
@@ -860,20 +942,23 @@ const ServerListPage: React.FC = () => {
             />
 
             {/* Cleanup Button */}
-            <Tooltip title={t('serverList.cleanup')}>
-              <IconButton
-                onClick={handleCleanupClick}
-                sx={{
-                  bgcolor: 'background.paper',
-                  border: 1,
-                  borderColor: 'divider',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  },
-                }}
-              >
-                <CleaningServicesIcon />
-              </IconButton>
+            <Tooltip title={inactiveCount === 0 ? t('serverList.noInactiveServers') : t('serverList.cleanup')}>
+              <span>
+                <IconButton
+                  onClick={handleCleanupClick}
+                  disabled={inactiveCount === 0}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': {
+                      bgcolor: inactiveCount === 0 ? 'background.paper' : 'action.hover',
+                    },
+                  }}
+                >
+                  <CleaningServicesIcon />
+                </IconButton>
+              </span>
             </Tooltip>
           </Box>
         </CardContent>
@@ -985,7 +1070,7 @@ const ServerListPage: React.FC = () => {
                                     .filter(([key]) => key !== 'service' && key !== 'group')
                                     .map(([key, value]) => (
                                       <Chip
-                                        key={key}
+                                        key={`${service.instanceId}-${key}`}
                                         label={`${key}=${value}`}
                                         size="small"
                                         variant="outlined"
@@ -1027,8 +1112,8 @@ const ServerListPage: React.FC = () => {
                                     <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
                                       <Typography variant="caption" color="text.secondary" sx={{ minWidth: '35px' }}>TCP:</Typography>
                                       <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                        {service.ports.tcp.map((port) => (
-                                          <Chip key={`tcp-${port}`} label={port} size="small" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', height: '20px' }} />
+                                        {service.ports.tcp.map((port, idx) => (
+                                          <Chip key={`${service.instanceId}-tcp-${idx}`} label={port} size="small" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', height: '20px' }} />
                                         ))}
                                       </Box>
                                     </Box>
@@ -1037,8 +1122,8 @@ const ServerListPage: React.FC = () => {
                                     <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
                                       <Typography variant="caption" color="text.secondary" sx={{ minWidth: '35px' }}>UDP:</Typography>
                                       <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                        {service.ports.udp.map((port) => (
-                                          <Chip key={`udp-${port}`} label={port} size="small" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', height: '20px' }} />
+                                        {service.ports.udp.map((port, idx) => (
+                                          <Chip key={`${service.instanceId}-udp-${idx}`} label={port} size="small" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', height: '20px' }} />
                                         ))}
                                       </Box>
                                     </Box>
@@ -1047,8 +1132,8 @@ const ServerListPage: React.FC = () => {
                                     <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
                                       <Typography variant="caption" color="text.secondary" sx={{ minWidth: '35px' }}>HTTP:</Typography>
                                       <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                        {service.ports.http.map((port) => (
-                                          <Chip key={`http-${port}`} label={port} size="small" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', height: '20px' }} />
+                                        {service.ports.http.map((port, idx) => (
+                                          <Chip key={`${service.instanceId}-http-${idx}`} label={port} size="small" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', height: '20px' }} />
                                         ))}
                                       </Box>
                                     </Box>
@@ -1068,7 +1153,7 @@ const ServerListPage: React.FC = () => {
                                 {service.stats && Object.keys(service.stats).length > 0 && (
                                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                                     {Object.entries(service.stats).map(([key, value]) => (
-                                      <Typography key={key} variant="caption" color="text.secondary">
+                                      <Typography key={`${service.instanceId}-${key}`} variant="caption" color="text.secondary">
                                         {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
                                       </Typography>
                                     ))}
@@ -1152,7 +1237,7 @@ const ServerListPage: React.FC = () => {
                     {service.stats && Object.keys(service.stats).length > 0 && (
                       <>
                         {Object.entries(service.stats).map(([key, value]) => (
-                          <Typography key={key} variant="caption" sx={{ display: 'block' }}>
+                          <Typography key={`${service.instanceId}-${key}`} variant="caption" sx={{ display: 'block' }}>
                             {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
                           </Typography>
                         ))}
@@ -1275,7 +1360,7 @@ const ServerListPage: React.FC = () => {
                         .filter(([key]) => key !== 'service' && key !== 'group')
                         .map(([key, value]) => (
                           <Chip
-                            key={key}
+                            key={`${service.instanceId}-${key}`}
                             label={`${key}=${value}`}
                             size="small"
                             variant="outlined"
@@ -1309,7 +1394,7 @@ const ServerListPage: React.FC = () => {
                     {service.stats && Object.keys(service.stats).length > 0 && (
                       <>
                         {Object.entries(service.stats).map(([key, value]) => (
-                          <Typography key={key} variant="caption" color="text.secondary">
+                          <Typography key={`${service.instanceId}-${key}`} variant="caption" color="text.secondary">
                             {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
                           </Typography>
                         ))}
@@ -1318,7 +1403,7 @@ const ServerListPage: React.FC = () => {
                     {service.meta && Object.keys(service.meta).length > 0 && (
                       <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 1 }}>
                         {Object.entries(service.meta).map(([key, value]) => (
-                          <Chip key={key} label={`${key}: ${value}`} size="small" variant="outlined" />
+                          <Chip key={`${service.instanceId}-${key}`} label={`${key}: ${value}`} size="small" variant="outlined" />
                         ))}
                       </Box>
                     )}

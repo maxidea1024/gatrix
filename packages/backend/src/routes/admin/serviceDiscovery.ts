@@ -135,12 +135,21 @@ router.use(authenticate as any, requireAdmin as any);
  */
 router.post('/cleanup', async (req: Request, res: Response) => {
   try {
+    logger.info('🗑️ Starting server cleanup...');
+
     const services = await serviceDiscoveryService.getServices();
+    logger.info(`📊 Total services: ${services.length}`);
 
     // Filter terminated, error, and no-response services
     const toDelete = services.filter((s) => s.status === 'terminated' || s.status === 'error' || s.status === 'no-response');
+    logger.info(`🎯 Services to delete: ${toDelete.length}`, {
+      terminated: toDelete.filter(s => s.status === 'terminated').length,
+      error: toDelete.filter(s => s.status === 'error').length,
+      noResponse: toDelete.filter(s => s.status === 'no-response').length,
+    });
 
     if (toDelete.length === 0) {
+      logger.info('✅ No services to clean up');
       return res.json({
         success: true,
         data: {
@@ -151,27 +160,19 @@ router.post('/cleanup', async (req: Request, res: Response) => {
       });
     }
 
-    // Delete all terminated/error/no-response services (force delete = true)
-    const results = await Promise.allSettled(
-      toDelete.map((service) =>
-        serviceDiscoveryService.unregister(service.instanceId, service.labels.service, true)
-      )
-    );
-
-    const successCount = results.filter((r) => r.status === 'fulfilled').length;
-
-    logger.info(`Cleanup completed: ${successCount}/${toDelete.length} services deleted`);
+    // Clean up inactive collections (service types are determined internally)
+    const result = await serviceDiscoveryService.cleanupInactiveServices();
 
     res.json({
       success: true,
       data: {
-        deletedCount: successCount,
+        deletedCount: result.deletedCount,
         totalCount: toDelete.length,
       },
-      message: `Cleanup completed: ${successCount}/${toDelete.length} services deleted`,
+      message: `Cleanup completed: ${result.deletedCount} services deleted`,
     });
   } catch (error) {
-    logger.error('Error during cleanup:', error);
+    logger.error('❌ Error during cleanup:', error);
     res.status(500).json({
       success: false,
       error: { message: 'Failed to cleanup services' },

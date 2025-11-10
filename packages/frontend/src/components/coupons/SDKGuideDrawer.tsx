@@ -27,6 +27,13 @@ import { useSnackbar } from 'notistack';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 
+// Generate ULID format request ID
+function generateULID(): string {
+  const timestamp = Date.now();
+  const randomPart = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  return `${timestamp.toString(36).toUpperCase()}${randomPart.toUpperCase()}`.substring(0, 26);
+}
+
 interface SDKGuideDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -263,6 +270,9 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
     const startTime = performance.now();
 
     try {
+      // Generate requestId (ULID format)
+      const requestId = generateULID();
+
       const response = await fetch(
         `/api/v1/server/coupons/${couponCode}/redeem`,
         {
@@ -271,6 +281,7 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
             'Content-Type': 'application/json',
             'X-Application-Name': 'AdminTestClient',
             'X-API-Token': apiToken,
+            'X-Request-Id': requestId,
           },
           body: JSON.stringify({
             userId,
@@ -297,6 +308,7 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
         'Content-Type': 'application/json',
         'X-Application-Name': 'AdminTestClient',
         'X-API-Token': apiToken,
+        'X-Request-Id': requestId,
       });
 
       // Set response headers (basic info)

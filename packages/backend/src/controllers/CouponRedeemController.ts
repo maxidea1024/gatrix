@@ -8,11 +8,11 @@ import { CouponRedeemService } from '../services/CouponRedeemService';
 const redeemSchema = Joi.object({
   userId: Joi.string().max(64).required(),
   userName: Joi.string().max(128).required(),
-  characterId: Joi.string().max(64).required(),
-  worldId: Joi.string().max(64).required(),
-  platform: Joi.string().max(32).required(),
-  channel: Joi.string().max(64).required(),
-  subChannel: Joi.string().max(64).required(),
+  characterId: Joi.string().max(64).optional(),
+  worldId: Joi.string().max(64).optional(),
+  platform: Joi.string().max(32).optional(),
+  channel: Joi.string().max(64).optional(),
+  subChannel: Joi.string().max(64).optional(),
 });
 
 export class CouponRedeemController {
