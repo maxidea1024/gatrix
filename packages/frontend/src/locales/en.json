@@ -868,6 +868,7 @@
     "manualStop": "Stop Manually",
     "duration": "Duration",
     "validationTimeInPast": "Start time is in the past. Please set a future time.",
+    "validationEndTimeInPast": "End time is in the past. Please set a future time.",
     "validationEndBeforeStart": "End time is earlier than start time.",
     "validationTooShort": "Maintenance time is too short. Please set at least 5 minutes.",
     "directInput": "Direct Input",

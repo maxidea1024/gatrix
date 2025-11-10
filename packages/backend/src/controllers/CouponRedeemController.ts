@@ -9,11 +9,10 @@ const redeemSchema = Joi.object({
   userId: Joi.string().max(64).required(),
   userName: Joi.string().max(128).required(),
   characterId: Joi.string().max(64).required(),
-  worldId: Joi.string().max(64).optional().allow(null, ''),
-  platform: Joi.string().max(32).optional().allow(null, ''),
-  channel: Joi.string().max(64).optional().allow(null, ''),
-  subChannel: Joi.string().max(64).optional().allow(null, ''),
-  requestId: Joi.string().optional().allow(null, ''),
+  worldId: Joi.string().max(64).required(),
+  platform: Joi.string().max(32).required(),
+  channel: Joi.string().max(64).required(),
+  subChannel: Joi.string().max(64).required(),
 });
 
 export class CouponRedeemController {

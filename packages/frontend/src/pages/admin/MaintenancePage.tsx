@@ -162,31 +162,45 @@ const MaintenancePage: React.FC = () => {
   const validateMaintenanceTime = () => {
     const now = dayjs();
 
-    // 시작 시간이 과거인지 확인
-    if (startsAt && startsAt.isBefore(now)) {
-      enqueueSnackbar(t('maintenance.validationTimeInPast'), { variant: 'error' });
-      startsAtRef.current?.focus();
-      return { valid: false };
-    }
-
-    // 종료 시간이 시작 시간보다 이른지 확인
-    if (startsAt && endsAt && endsAt.isBefore(startsAt)) {
-      enqueueSnackbar(t('maintenance.validationEndBeforeStart'), { variant: 'error' });
+    // 종료 시간이 과거인 경우: 에러
+    if (endsAt && endsAt.isBefore(now)) {
+      enqueueSnackbar(t('maintenance.validationEndTimeInPast'), { variant: 'error' });
       endsAtRef.current?.focus();
       return { valid: false };
     }
 
-    // 점검 시간이 너무 짧은지 확인 (5분 미만)
-    if (startsAt && endsAt) {
-      const duration = endsAt.diff(startsAt, 'minute');
-      if (duration < 5) {
-        enqueueSnackbar(t('maintenance.validationTooShort'), { variant: 'error' });
+    // 시작 시간이 설정되지 않았고 종료 시간만 설정된 경우: 유효함 (즉시 시작)
+    if (!startsAt && endsAt) {
+      return { valid: true };
+    }
+
+    // 시작 시간이 설정된 경우
+    if (startsAt) {
+      // 종료 시간이 시작 시간보다 이른지 확인
+      if (endsAt && endsAt.isBefore(startsAt)) {
+        enqueueSnackbar(t('maintenance.validationEndBeforeStart'), { variant: 'error' });
         endsAtRef.current?.focus();
         return { valid: false };
+      }
+
+      // 점검 시간이 너무 짧은지 확인 (5분 미만)
+      if (endsAt) {
+        const duration = endsAt.diff(startsAt, 'minute');
+        if (duration < 5) {
+          enqueueSnackbar(t('maintenance.validationTooShort'), { variant: 'error' });
+          endsAtRef.current?.focus();
+          return { valid: false };
+        }
       }
     }
 
     return { valid: true };
+  };
+
+  // 시작 시간이 과거인지 확인하는 헬퍼 함수
+  const isStartTimeInPast = (): boolean => {
+    if (!startsAt) return false;
+    return startsAt.isBefore(dayjs());
   };
 
   const startMaintenance = async () => {
@@ -396,7 +410,15 @@ const MaintenancePage: React.FC = () => {
                               {t('maintenance.startsAt')}:
                             </Box>
                             <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                              {startsAt.format('YYYY-MM-DD A h:mm')} ({startsAt.toISOString()})
+                              {startsAt.format('YYYY-MM-DD A h:mm')}
+                              {isStartTimeInPast() && (
+                                <Box component="span" sx={{ color: 'warning.main', fontWeight: 600, ml: 0.5 }}>
+                                  ({t('maintenance.immediateStartLabel')})
+                                </Box>
+                              )}
+                              <Box component="span" sx={{ color: 'text.secondary', ml: 0.5 }}>
+                                ({startsAt.toISOString()})
+                              </Box>
                             </Box>
                           </Box>
                         )}

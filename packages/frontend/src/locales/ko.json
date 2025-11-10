@@ -868,6 +868,7 @@
     "manualStop": "수동 종료",
     "duration": "소요 시간",
     "validationTimeInPast": "시작 시간이 과거입니다. 현재 시간 이후로 설정해주세요.",
+    "validationEndTimeInPast": "종료 시간이 과거입니다. 현재 시간 이후로 설정해주세요.",
     "validationEndBeforeStart": "종료 시간이 시작 시간보다 이릅니다.",
     "validationTooShort": "점검 시간이 너무 짧습니다. 최소 5분 이상 설정해주세요.",
     "directInput": "직접 입력",

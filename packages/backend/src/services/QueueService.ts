@@ -2,6 +2,7 @@ import { Queue, Worker, Job, QueueEvents, RepeatableJob } from 'bullmq';
 import logger from '../config/logger';
 import { BullBoardConfig } from '../config/bullboard';
 import { CouponSettingsService } from './CouponSettingsService';
+import { serviceMaintenanceScheduler } from './ServiceMaintenanceScheduler';
 
 export interface QueueJobData {
   type: string;
@@ -42,6 +43,7 @@ export class QueueService {
       await this.createQueue('audit-log', this.processAuditLogJob.bind(this));
       await this.createQueue('cleanup', this.processCleanupJob.bind(this));
       await this.createQueue('scheduler', this.processSchedulerJob.bind(this));
+      await this.createQueue('maintenance-scheduler', this.processMaintenanceSchedulerJob.bind(this));
 
       // Register repeatable scheduler jobs (idempotent)
       try {
@@ -55,6 +57,20 @@ export class QueueService {
         }
       } catch (e) {
         logger.error('Failed to register repeatable scheduler jobs:', e);
+      }
+
+      // Register maintenance scheduler job (idempotent)
+      try {
+        const maintenanceRepeatables = await this.listRepeatable('maintenance-scheduler');
+        const maintenanceExists = maintenanceRepeatables.some((r) => r.name === 'maintenance:check');
+        if (!maintenanceExists) {
+          await this.addJob('maintenance-scheduler', 'maintenance:check', {}, { repeat: { pattern: '* * * * *' } });
+          logger.info('Registered repeatable job: maintenance:check (every minute)');
+        } else {
+          logger.info('Repeatable job already exists: maintenance:check');
+        }
+      } catch (e) {
+        logger.error('Failed to register maintenance scheduler job:', e);
       }
 
       this.isInitialized = true;
@@ -426,6 +442,30 @@ export class QueueService {
       }
     } catch (error) {
       logger.error('Scheduler job failed', { jobId: job.id, jobType, error });
+      throw error;
+    }
+  }
+
+  /**
+   * Process maintenance scheduler job
+   */
+  private async processMaintenanceSchedulerJob(job: Job<QueueJobData>): Promise<void> {
+    const jobType = job.name || job.data?.type;
+    logger.info('Processing maintenance scheduler job:', { jobId: job.id, jobType });
+
+    try {
+      switch (jobType) {
+        case 'maintenance:check': {
+          await serviceMaintenanceScheduler.checkAndEmitEvents();
+          logger.info('maintenance:check completed', { jobId: job.id });
+          break;
+        }
+        default: {
+          logger.info('Unhandled maintenance scheduler job type', { jobId: job.id, jobType });
+        }
+      }
+    } catch (error) {
+      logger.error('Maintenance scheduler job failed', { jobId: job.id, jobType, error });
       throw error;
     }
   }

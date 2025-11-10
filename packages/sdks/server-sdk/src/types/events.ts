@@ -12,7 +12,9 @@ export type StandardEventType =
   | 'popup.updated'
   | 'popup.deleted'
   | 'survey.updated'
-  | 'survey.deleted';
+  | 'survey.deleted'
+  | 'maintenance.started'
+  | 'maintenance.ended';
 
 export interface StandardEventData {
   id: number | string;

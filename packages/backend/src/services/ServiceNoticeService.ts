@@ -57,162 +57,121 @@ class ServiceNoticeService {
     limit: number = 10,
     filters: ServiceNoticeFilters = {}
   ): Promise<{ notices: ServiceNotice[]; total: number }> {
-    try {
-      const pool = database.getPool();
-      const offset = (page - 1) * limit;
-      const whereClauses: string[] = [];
-      const queryParams: any[] = [];
+    const pool = database.getPool();
+    const offset = (page - 1) * limit;
+    const whereClauses: string[] = [];
+    const queryParams: any[] = [];
 
-      // Apply filters
-      if (filters.isActive !== undefined) {
-        whereClauses.push('isActive = ?');
-        queryParams.push(filters.isActive);
-      }
-
-      if (filters.currentlyVisible !== undefined) {
-        // Filter by currently visible (isActive + within date range)
-        // startDate is optional - if null, treat as immediately available
-        if (filters.currentlyVisible) {
-          whereClauses.push('isActive = 1 AND (startDate IS NULL OR startDate <= NOW()) AND endDate >= NOW()');
-        } else {
-          whereClauses.push('(isActive = 0 OR (startDate IS NOT NULL AND startDate > NOW()) OR endDate < NOW())');
-        }
-      }
-
-      if (filters.category) {
-        whereClauses.push('category = ?');
-        queryParams.push(filters.category);
-      }
-
-      if (filters.platform) {
-        const platforms = Array.isArray(filters.platform) ? filters.platform : [filters.platform];
-        const operator = filters.platformOperator || 'any_of';
-
-        if (operator === 'include_all') {
-          // AND condition: notice must include ALL selected platforms OR be empty (all platforms)
-          platforms.forEach(platform => {
-            whereClauses.push('(JSON_LENGTH(platforms) = 0 OR JSON_CONTAINS(platforms, ?))');
-            queryParams.push(JSON.stringify(platform));
-          });
-        } else {
-          // OR condition: notice must include ANY of the selected platforms OR be empty (all platforms)
-          const platformConditions = platforms.map(() => 'JSON_CONTAINS(platforms, ?)').join(' OR ');
-          whereClauses.push(`(JSON_LENGTH(platforms) = 0 OR (${platformConditions}))`);
-          platforms.forEach(platform => {
-            queryParams.push(JSON.stringify(platform));
-          });
-        }
-      }
-
-      if (filters.channel) {
-        const channels = Array.isArray(filters.channel) ? filters.channel : [filters.channel];
-        const operator = filters.channelOperator || 'any_of';
-
-        if (operator === 'include_all') {
-          // AND condition: notice must include ALL selected channels OR be empty (all channels)
-          channels.forEach(channel => {
-            whereClauses.push('(JSON_LENGTH(channels) = 0 OR JSON_CONTAINS(channels, ?))');
-            queryParams.push(JSON.stringify(channel));
-          });
-        } else {
-          // OR condition: notice must include ANY of the selected channels OR be empty (all channels)
-          const channelConditions = channels.map(() => 'JSON_CONTAINS(channels, ?)').join(' OR ');
-          whereClauses.push(`(JSON_LENGTH(channels) = 0 OR (${channelConditions}))`);
-          channels.forEach(channel => {
-            queryParams.push(JSON.stringify(channel));
-          });
-        }
-      }
-
-      if (filters.subchannel) {
-        const subchannels = Array.isArray(filters.subchannel) ? filters.subchannel : [filters.subchannel];
-        const operator = filters.subchannelOperator || 'any_of';
-
-        if (operator === 'include_all') {
-          // AND condition: notice must include ALL selected subchannels OR be empty (all subchannels)
-          subchannels.forEach(subchannel => {
-            whereClauses.push('(JSON_LENGTH(subchannels) = 0 OR JSON_CONTAINS(subchannels, ?))');
-            queryParams.push(JSON.stringify(subchannel));
-          });
-        } else {
-          // OR condition: notice must include ANY of the selected subchannels OR be empty (all subchannels)
-          const subchannelConditions = subchannels.map(() => 'JSON_CONTAINS(subchannels, ?)').join(' OR ');
-          whereClauses.push(`(JSON_LENGTH(subchannels) = 0 OR (${subchannelConditions}))`);
-          subchannels.forEach(subchannel => {
-            queryParams.push(JSON.stringify(subchannel));
-          });
-        }
-      }
-
-      if (filters.search) {
-        whereClauses.push('(title LIKE ? OR content LIKE ? OR description LIKE ?)');
-        const searchPattern = `%${filters.search}%`;
-        queryParams.push(searchPattern, searchPattern, searchPattern);
-      }
-
-      const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
-
-      // Get total count
-      const [countResult] = await pool.execute<RowDataPacket[]>(
-        `SELECT COUNT(*) as total FROM g_service_notices ${whereClause}`,
-        queryParams
-      );
-      const total = countResult[0].total;
-
-      // Get paginated results
-      const [rows] = await pool.execute<RowDataPacket[]>(
-        `SELECT * FROM g_service_notices ${whereClause} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
-        queryParams
-      );
-
-      const notices = rows.map(row => {
-        const notice = {
-          id: row.id,
-          isActive: Boolean(row.isActive),
-          category: row.category,
-          platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
-          channels: typeof row.channels === 'string' ? JSON.parse(row.channels) : row.channels,
-          subchannels: typeof row.subchannels === 'string' ? JSON.parse(row.subchannels) : row.subchannels,
-          startDate: row.startDate,
-          endDate: row.endDate,
-          tabTitle: row.tabTitle,
-          title: row.title,
-          content: row.content,
-          description: row.description,
-          createdAt: row.createdAt,
-          updatedAt: row.updatedAt,
-        };
-        // Convert MySQL DATETIME to ISO 8601
-        return convertDateFieldsFromMySQL(notice, ['startDate', 'endDate', 'createdAt', 'updatedAt']);
-      });
-
-      return { notices, total };
-    } catch (error) {
-      throw error;
+    // Apply filters
+    if (filters.isActive !== undefined) {
+      whereClauses.push('isActive = ?');
+      queryParams.push(filters.isActive);
     }
-  }
 
-  /**
-   * Get service notice by ID
-   */
-  async getServiceNoticeById(id: number): Promise<ServiceNotice | null> {
-    try {
-      const pool = database.getPool();
-      const [rows] = await pool.execute<RowDataPacket[]>(
-        'SELECT * FROM g_service_notices WHERE id = ?',
-        [id]
-      );
-
-      if (rows.length === 0) {
-        return null;
+    if (filters.currentlyVisible !== undefined) {
+      // Filter by currently visible (isActive + within date range)
+      // startDate is optional - if null, treat as immediately available
+      if (filters.currentlyVisible) {
+        whereClauses.push('isActive = 1 AND (startDate IS NULL OR startDate <= NOW()) AND endDate >= NOW()');
+      } else {
+        whereClauses.push('(isActive = 0 OR (startDate IS NOT NULL AND startDate > NOW()) OR endDate < NOW())');
       }
+    }
 
-      const row = rows[0];
+    if (filters.category) {
+      whereClauses.push('category = ?');
+      queryParams.push(filters.category);
+    }
+
+    if (filters.platform) {
+      const platforms = Array.isArray(filters.platform) ? filters.platform : [filters.platform];
+      const operator = filters.platformOperator || 'any_of';
+
+      if (operator === 'include_all') {
+        // AND condition: notice must include ALL selected platforms OR be empty (all platforms)
+        platforms.forEach(platform => {
+          whereClauses.push('(JSON_LENGTH(platforms) = 0 OR JSON_CONTAINS(platforms, ?))');
+          queryParams.push(JSON.stringify(platform));
+        });
+      } else {
+        // OR condition: notice must include ANY of the selected platforms OR be empty (all platforms)
+        const platformConditions = platforms.map(() => 'JSON_CONTAINS(platforms, ?)').join(' OR ');
+        whereClauses.push(`(JSON_LENGTH(platforms) = 0 OR (${platformConditions}))`);
+        platforms.forEach(platform => {
+          queryParams.push(JSON.stringify(platform));
+        });
+      }
+    }
+
+    if (filters.channel) {
+      const channels = Array.isArray(filters.channel) ? filters.channel : [filters.channel];
+      const operator = filters.channelOperator || 'any_of';
+
+      if (operator === 'include_all') {
+        // AND condition: notice must include ALL selected channels OR be empty (all channels)
+        channels.forEach(channel => {
+          whereClauses.push('(JSON_LENGTH(channels) = 0 OR JSON_CONTAINS(channels, ?))');
+          queryParams.push(JSON.stringify(channel));
+        });
+      } else {
+        // OR condition: notice must include ANY of the selected channels OR be empty (all channels)
+        const channelConditions = channels.map(() => 'JSON_CONTAINS(channels, ?)').join(' OR ');
+        whereClauses.push(`(JSON_LENGTH(channels) = 0 OR (${channelConditions}))`);
+        channels.forEach(channel => {
+          queryParams.push(JSON.stringify(channel));
+        });
+      }
+    }
+
+    if (filters.subchannel) {
+      const subchannels = Array.isArray(filters.subchannel) ? filters.subchannel : [filters.subchannel];
+      const operator = filters.subchannelOperator || 'any_of';
+
+      if (operator === 'include_all') {
+        // AND condition: notice must include ALL selected subchannels OR be empty (all subchannels)
+        subchannels.forEach(subchannel => {
+          whereClauses.push('(JSON_LENGTH(subchannels) = 0 OR JSON_CONTAINS(subchannels, ?))');
+          queryParams.push(JSON.stringify(subchannel));
+        });
+      } else {
+        // OR condition: notice must include ANY of the selected subchannels OR be empty (all subchannels)
+        const subchannelConditions = subchannels.map(() => 'JSON_CONTAINS(subchannels, ?)').join(' OR ');
+        whereClauses.push(`(JSON_LENGTH(subchannels) = 0 OR (${subchannelConditions}))`);
+        subchannels.forEach(subchannel => {
+          queryParams.push(JSON.stringify(subchannel));
+        });
+      }
+    }
+
+    if (filters.search) {
+      whereClauses.push('(title LIKE ? OR content LIKE ? OR description LIKE ?)');
+      const searchPattern = `%${filters.search}%`;
+      queryParams.push(searchPattern, searchPattern, searchPattern);
+    }
+
+    const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
+    // Get total count
+    const [countResult] = await pool.execute<RowDataPacket[]>(
+      `SELECT COUNT(*) as total FROM g_service_notices ${whereClause}`,
+      queryParams
+    );
+    const total = countResult[0].total;
+
+    // Get paginated results
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      `SELECT * FROM g_service_notices ${whereClause} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
+      queryParams
+    );
+
+    const notices = rows.map(row => {
       const notice = {
         id: row.id,
         isActive: Boolean(row.isActive),
         category: row.category,
         platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
+        channels: typeof row.channels === 'string' ? JSON.parse(row.channels) : row.channels,
+        subchannels: typeof row.subchannels === 'string' ? JSON.parse(row.subchannels) : row.subchannels,
         startDate: row.startDate,
         endDate: row.endDate,
         tabTitle: row.tabTitle,
@@ -224,189 +183,202 @@ class ServiceNoticeService {
       };
       // Convert MySQL DATETIME to ISO 8601
       return convertDateFieldsFromMySQL(notice, ['startDate', 'endDate', 'createdAt', 'updatedAt']);
-    } catch (error) {
-      throw error;
+    });
+
+    return { notices, total };
+  }
+
+  /**
+   * Get service notice by ID
+   */
+  async getServiceNoticeById(id: number): Promise<ServiceNotice | null> {
+    const pool = database.getPool();
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      'SELECT * FROM g_service_notices WHERE id = ?',
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return null;
     }
+
+    const row = rows[0];
+    const notice = {
+      id: row.id,
+      isActive: Boolean(row.isActive),
+      category: row.category,
+      platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
+      startDate: row.startDate,
+      endDate: row.endDate,
+      tabTitle: row.tabTitle,
+      title: row.title,
+      content: row.content,
+      description: row.description,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    };
+    // Convert MySQL DATETIME to ISO 8601
+    return convertDateFieldsFromMySQL(notice, ['startDate', 'endDate', 'createdAt', 'updatedAt']);
   }
 
   /**
    * Create service notice
    */
   async createServiceNotice(data: CreateServiceNoticeData): Promise<ServiceNotice> {
-    try {
-      const pool = database.getPool();
+    const pool = database.getPool();
 
-      // Debug logging
-      console.log('Creating service notice with data:', {
-        startDate: data.startDate,
-        endDate: data.endDate,
-        convertedStartDate: convertToMySQLDateTime(data.startDate),
-        convertedEndDate: data.endDate ? convertToMySQLDateTime(data.endDate) : null,
-      });
+    // Debug logging
+    console.log('Creating service notice with data:', {
+      startDate: data.startDate,
+      endDate: data.endDate,
+      convertedStartDate: convertToMySQLDateTime(data.startDate),
+      convertedEndDate: data.endDate ? convertToMySQLDateTime(data.endDate) : null,
+    });
 
-      const [result] = await pool.execute<ResultSetHeader>(
-        `INSERT INTO g_service_notices
-        (isActive, category, platforms, channels, subchannels, startDate, endDate, tabTitle, title, content, description)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          data.isActive,
-          data.category,
-          JSON.stringify(data.platforms),
-          data.channels ? JSON.stringify(data.channels) : null,
-          data.subchannels ? JSON.stringify(data.subchannels) : null,
-          data.startDate ? convertToMySQLDateTime(data.startDate) : null,
-          data.endDate ? convertToMySQLDateTime(data.endDate) : null,
-          data.tabTitle || null,
-          data.title,
-          data.content,
-          data.description || null,
-        ]
-      );
+    const [result] = await pool.execute<ResultSetHeader>(
+      `INSERT INTO g_service_notices
+      (isActive, category, platforms, channels, subchannels, startDate, endDate, tabTitle, title, content, description)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        data.isActive,
+        data.category,
+        JSON.stringify(data.platforms),
+        data.channels ? JSON.stringify(data.channels) : null,
+        data.subchannels ? JSON.stringify(data.subchannels) : null,
+        data.startDate ? convertToMySQLDateTime(data.startDate) : null,
+        data.endDate ? convertToMySQLDateTime(data.endDate) : null,
+        data.tabTitle || null,
+        data.title,
+        data.content,
+        data.description || null,
+      ]
+    );
 
-      const notice = await this.getServiceNoticeById(result.insertId);
-      if (!notice) {
-        throw new Error('Failed to retrieve created service notice');
-      }
-
-      return notice;
-    } catch (error) {
-      throw error;
+    const notice = await this.getServiceNoticeById(result.insertId);
+    if (!notice) {
+      throw new Error('Failed to retrieve created service notice');
     }
+
+    return notice;
   }
 
   /**
    * Update service notice
    */
   async updateServiceNotice(id: number, data: UpdateServiceNoticeData): Promise<ServiceNotice> {
-    try {
-      const pool = database.getPool();
-      const updates: string[] = [];
-      const values: any[] = [];
+    const pool = database.getPool();
+    const updates: string[] = [];
+    const values: any[] = [];
 
-      if (data.isActive !== undefined) {
-        updates.push('isActive = ?');
-        values.push(data.isActive);
-      }
-
-      if (data.category) {
-        updates.push('category = ?');
-        values.push(data.category);
-      }
-
-      if (data.platforms) {
-        updates.push('platforms = ?');
-        values.push(JSON.stringify(data.platforms));
-      }
-
-      if (data.channels !== undefined) {
-        updates.push('channels = ?');
-        values.push(data.channels ? JSON.stringify(data.channels) : null);
-      }
-
-      if (data.subchannels !== undefined) {
-        updates.push('subchannels = ?');
-        values.push(data.subchannels ? JSON.stringify(data.subchannels) : null);
-      }
-
-      if (data.startDate !== undefined) {
-        updates.push('startDate = ?');
-        values.push(data.startDate ? convertToMySQLDateTime(data.startDate) : null);
-      }
-
-      if (data.endDate !== undefined) {
-        updates.push('endDate = ?');
-        values.push(data.endDate ? convertToMySQLDateTime(data.endDate) : null);
-      }
-
-      if (data.tabTitle !== undefined) {
-        updates.push('tabTitle = ?');
-        values.push(data.tabTitle || null);
-      }
-
-      if (data.title) {
-        updates.push('title = ?');
-        values.push(data.title);
-      }
-
-      if (data.content) {
-        updates.push('content = ?');
-        values.push(data.content);
-      }
-
-      if (data.description !== undefined) {
-        updates.push('description = ?');
-        values.push(data.description || null);
-      }
-
-      updates.push('updatedAt = NOW()');
-      values.push(id);
-
-      await pool.execute(
-        `UPDATE g_service_notices SET ${updates.join(', ')} WHERE id = ?`,
-        values
-      );
-
-      const notice = await this.getServiceNoticeById(id);
-      if (!notice) {
-        throw new Error('Service notice not found');
-      }
-
-      return notice;
-    } catch (error) {
-      throw error;
+    if (data.isActive !== undefined) {
+      updates.push('isActive = ?');
+      values.push(data.isActive);
     }
+
+    if (data.category) {
+      updates.push('category = ?');
+      values.push(data.category);
+    }
+
+    if (data.platforms) {
+      updates.push('platforms = ?');
+      values.push(JSON.stringify(data.platforms));
+    }
+
+    if (data.channels !== undefined) {
+      updates.push('channels = ?');
+      values.push(data.channels ? JSON.stringify(data.channels) : null);
+    }
+
+    if (data.subchannels !== undefined) {
+      updates.push('subchannels = ?');
+      values.push(data.subchannels ? JSON.stringify(data.subchannels) : null);
+    }
+
+    if (data.startDate !== undefined) {
+      updates.push('startDate = ?');
+      values.push(data.startDate ? convertToMySQLDateTime(data.startDate) : null);
+    }
+
+    if (data.endDate !== undefined) {
+      updates.push('endDate = ?');
+      values.push(data.endDate ? convertToMySQLDateTime(data.endDate) : null);
+    }
+
+    if (data.tabTitle !== undefined) {
+      updates.push('tabTitle = ?');
+      values.push(data.tabTitle || null);
+    }
+
+    if (data.title) {
+      updates.push('title = ?');
+      values.push(data.title);
+    }
+
+    if (data.content) {
+      updates.push('content = ?');
+      values.push(data.content);
+    }
+
+    if (data.description !== undefined) {
+      updates.push('description = ?');
+      values.push(data.description || null);
+    }
+
+    updates.push('updatedAt = NOW()');
+    values.push(id);
+
+    await pool.execute(
+      `UPDATE g_service_notices SET ${updates.join(', ')} WHERE id = ?`,
+      values
+    );
+
+    const notice = await this.getServiceNoticeById(id);
+    if (!notice) {
+      throw new Error('Service notice not found');
+    }
+
+    return notice;
   }
 
   /**
    * Delete service notice
    */
   async deleteServiceNotice(id: number): Promise<void> {
-    try {
-      const pool = database.getPool();
-      await pool.execute('DELETE FROM g_service_notices WHERE id = ?', [id]);
-    } catch (error) {
-      throw error;
-    }
+    const pool = database.getPool();
+    await pool.execute('DELETE FROM g_service_notices WHERE id = ?', [id]);
   }
 
   /**
    * Delete multiple service notices
    */
   async deleteMultipleServiceNotices(ids: number[]): Promise<void> {
-    try {
-      if (ids.length === 0) return;
+    if (ids.length === 0) return;
 
-      const pool = database.getPool();
-      const placeholders = ids.map(() => '?').join(',');
-      await pool.execute(
-        `DELETE FROM g_service_notices WHERE id IN (${placeholders})`,
-        ids
-      );
-    } catch (error) {
-      throw error;
-    }
+    const pool = database.getPool();
+    const placeholders = ids.map(() => '?').join(',');
+    await pool.execute(
+      `DELETE FROM g_service_notices WHERE id IN (${placeholders})`,
+      ids
+    );
   }
 
   /**
    * Toggle active status
    */
   async toggleActive(id: number): Promise<ServiceNotice> {
-    try {
-      const pool = database.getPool();
-      await pool.execute(
-        'UPDATE g_service_notices SET isActive = NOT isActive, updatedAt = NOW() WHERE id = ?',
-        [id]
-      );
+    const pool = database.getPool();
+    await pool.execute(
+      'UPDATE g_service_notices SET isActive = NOT isActive, updatedAt = NOW() WHERE id = ?',
+      [id]
+    );
 
-      const notice = await this.getServiceNoticeById(id);
-      if (!notice) {
-        throw new Error('Service notice not found');
-      }
-
-      return notice;
-    } catch (error) {
-      throw error;
+    const notice = await this.getServiceNoticeById(id);
+    if (!notice) {
+      throw new Error('Service notice not found');
     }
+
+    return notice;
   }
 }
 

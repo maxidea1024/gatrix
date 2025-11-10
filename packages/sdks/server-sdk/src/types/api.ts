@@ -29,19 +29,20 @@ export interface RedeemCouponRequest {
   userId: string; // User ID
   userName: string; // User name
   characterId: string; // Character ID
-  worldId?: string; // Game world ID
-  platform?: string; // Platform
-  channel?: string; // Channel
-  subChannel?: string; // Sub-channel
-  requestId?: string; // Request ID (for idempotency)
+  worldId: string; // Game world ID
+  platform: string; // Platform
+  channel: string; // Channel
+  subChannel: string; // Sub-channel
 }
 
 export interface RedeemCouponResponse {
-  reward: any[]; // Reward list
+  reward: Reward[]; // Reward list
   userUsedCount: number; // User usage count
   globalUsed: number; // Global usage count
   sequence: number; // Sequence number
   usedAt: string; // Usage timestamp
+  rewardMailTitle?: string | null; // Reward email title
+  rewardMailContent?: string | null; // Reward email content
 }
 
 // ============================================================================
@@ -52,16 +53,12 @@ export interface GameWorld {
   id: number;
   worldId: string;
   name: string;
-  description?: string;
-  isVisible: boolean;
   isMaintenance: boolean;
   maintenanceMessage?: string;
   displayOrder: number;
   customPayload?: Record<string, any>;
   worldServerAddress: string; // Required: ip:port format (e.g., 192.168.1.100:8080)
   tags?: string[];
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface GameWorldListResponse {
@@ -75,7 +72,7 @@ export interface GameWorldListResponse {
 export interface PopupNotice {
   id: number;
   isActive: boolean;
-  content: string;
+  message: string; // Actual message content (from template or direct)
   targetWorlds: string[] | null;
   targetWorldsInverted?: boolean;
   targetPlatforms: string[] | null;
@@ -90,13 +87,16 @@ export interface PopupNotice {
   showOnce: boolean;
   startDate?: string | null;
   endDate: string | null;
-  messageTemplateId: number | null;
-  useTemplate: boolean;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
-  createdBy: number;
-  updatedBy: number | null;
+}
+
+// ============================================================================
+// Reward Types
+// ============================================================================
+
+export interface Reward {
+  type: string;
+  id: number;
+  quantity: number;
 }
 
 // ============================================================================
@@ -104,14 +104,8 @@ export interface PopupNotice {
 // ============================================================================
 
 export interface TriggerCondition {
-  type: string;
-  value: any;
-}
-
-export interface ParticipationReward {
-  type: string;
-  id: number;
-  amount: number;
+  type: 'userLevel' | 'joinDays'; // Trigger condition type
+  value: number; // Condition value
 }
 
 export interface Survey {
@@ -120,8 +114,7 @@ export interface Survey {
   surveyTitle: string;
   surveyContent?: string;
   triggerConditions: TriggerCondition[];
-  participationRewards?: ParticipationReward[];
-  rewardTemplateId?: string;
+  participationRewards?: Reward[];
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive: boolean;
@@ -133,19 +126,17 @@ export interface Survey {
   targetSubchannelsInverted?: boolean;
   targetWorlds?: string[];
   targetWorldsInverted?: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface SurveyListParams {
-  isActive?: boolean;
+  // Survey list query parameters
 }
 
 // ============================================================================
 // Service Discovery Types
 // ============================================================================
 
-export type ServiceStatus = 'initializing' | 'ready' | 'shutting_down' | 'error' | 'terminated';
+export type ServiceStatus = 'initializing' | 'ready' | 'shutting_down' | 'error' | 'terminated' | 'no-response';
 
 export interface ServicePorts {
   tcp?: number[];
@@ -234,13 +225,7 @@ export interface GetServicesParams {
  * Whitelist data structure
  */
 export interface WhitelistData {
-  ipWhitelist: {
-    enabled: boolean; // Whether IP whitelist is enabled
-    ips: string[]; // List of whitelisted IPs (supports CIDR notation)
-  };
-  accountWhitelist: {
-    enabled: boolean; // Whether account whitelist is enabled
-    accountIds: string[]; // List of whitelisted account IDs
-  };
+  ipWhitelist: string[]; // List of whitelisted IPs (supports CIDR notation)
+  accountWhitelist: string[]; // List of whitelisted account IDs
 }
 

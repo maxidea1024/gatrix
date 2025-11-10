@@ -7,6 +7,8 @@
 import db from '../config/knex';
 import logger from '../config/logger';
 import { convertDateFieldsForMySQL, convertDateFieldsFromMySQL } from '../utils/dateUtils';
+import { pubSubService } from '../services/PubSubService';
+import { serviceMaintenanceScheduler } from '../services/ServiceMaintenanceScheduler';
 
 export interface ServiceMaintenanceLocale {
   id?: number;
@@ -160,7 +162,7 @@ class ServiceMaintenanceModel {
    */
   static async upsert(data: CreateServiceMaintenanceData): Promise<ServiceMaintenance> {
     try {
-      return await db.transaction(async (trx) => {
+      const result = await db.transaction(async (trx) => {
         const { maintenanceLocales, ...mainData } = data;
 
         // Convert dates to MySQL format
@@ -172,6 +174,8 @@ class ServiceMaintenanceModel {
           .first();
 
         let id: number;
+        const wasInMaintenance = existing?.isInMaintenance ?? false;
+        const isNowInMaintenance = data.isInMaintenance;
 
         if (existing) {
           // Update existing record
@@ -219,10 +223,60 @@ class ServiceMaintenanceModel {
         const converted = convertDateFieldsFromMySQL(record, ['maintenanceStartDate', 'maintenanceEndDate', 'createdAt', 'updatedAt']);
 
         return {
-          ...converted,
-          maintenanceLocales: locales || []
+          result: {
+            ...converted,
+            maintenanceLocales: locales || []
+          },
+          wasInMaintenance,
+          isNowInMaintenance,
+          serviceType: data.serviceType
         };
       });
+
+      // Emit maintenance events after transaction completes
+      if (result.wasInMaintenance !== result.isNowInMaintenance) {
+        // Manual on/off: emit event immediately
+        const eventType = result.isNowInMaintenance ? 'maintenance.started' : 'maintenance.ended';
+        logger.info('Manual maintenance status change, emitting event', {
+          serviceType: result.serviceType,
+          eventType,
+          wasInMaintenance: result.wasInMaintenance,
+          isNowInMaintenance: result.isNowInMaintenance,
+        });
+        await pubSubService.publishEvent({
+          type: eventType,
+          data: {
+            id: result.serviceType,
+            timestamp: Date.now()
+          }
+        });
+      } else if (result.isNowInMaintenance) {
+        // Maintenance is still active (isInMaintenance flag unchanged)
+        // Check if end time has passed - this handles date modification while in maintenance
+        if (
+          data.maintenanceEndDate &&
+          serviceMaintenanceScheduler.hasMaintenanceEnded(data.maintenanceEndDate)
+        ) {
+          logger.info('Maintenance end time has passed during modification, emitting end event', {
+            serviceType: result.serviceType,
+            endDate: data.maintenanceEndDate,
+          });
+          await pubSubService.publishEvent({
+            type: 'maintenance.ended',
+            data: {
+              id: result.serviceType,
+              timestamp: Date.now()
+            }
+          });
+        }
+      }
+
+      // Reset schedule state to re-evaluate start/end times with new dates
+      // This ensures the scheduler will properly track the new schedule
+      logger.debug('Resetting schedule state for re-evaluation', { serviceType: result.serviceType });
+      serviceMaintenanceScheduler.resetScheduleState(result.serviceType);
+
+      return result.result;
     } catch (error) {
       logger.error('Error upserting service maintenance:', error);
       throw error;

@@ -5,9 +5,9 @@ export interface TriggerCondition {
   value: number;
 }
 
-export interface ParticipationReward {
-  rewardType: string;
-  itemId: string;
+export interface Reward {
+  type: string;
+  id: number;
   quantity: number;
 }
 
@@ -22,8 +22,7 @@ export interface Survey {
   surveyTitle: string;
   surveyContent?: string;
   triggerConditions: TriggerCondition[];
-  participationRewards?: ParticipationReward[] | null;
-  rewardTemplateId?: string | null;
+  participationRewards?: Reward[] | null;
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive: boolean;
@@ -36,8 +35,6 @@ export interface Survey {
   targetWorldsInverted?: boolean;
   createdBy?: number;
   updatedBy?: number;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface SurveyConfig {
@@ -52,8 +49,7 @@ export interface CreateSurveyInput {
   surveyTitle: string;
   surveyContent?: string;
   triggerConditions: TriggerCondition[];
-  participationRewards?: ParticipationReward[] | null;
-  rewardTemplateId?: string | null;
+  participationRewards?: Reward[] | null;
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive?: boolean;
@@ -73,8 +69,7 @@ export interface UpdateSurveyInput {
   surveyTitle?: string;
   surveyContent?: string;
   triggerConditions?: TriggerCondition[];
-  participationRewards?: ParticipationReward[] | null;
-  rewardTemplateId?: string | null;
+  participationRewards?: Reward[] | null;
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive?: boolean;

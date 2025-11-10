@@ -25,7 +25,7 @@ export interface ServiceInstance {
   externalAddress: string;
   internalAddress: string;
   ports: ServicePorts;
-  status: 'initializing' | 'ready' | 'shutting_down' | 'error' | 'terminated';
+  status: 'initializing' | 'ready' | 'shutting_down' | 'error' | 'terminated' | 'no-response';
   updatedAt: string;
   stats?: Record<string, any>;  // Renamed from instanceStats
   meta?: Record<string, any>;

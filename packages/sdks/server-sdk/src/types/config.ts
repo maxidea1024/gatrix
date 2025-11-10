@@ -38,7 +38,7 @@ export interface RetryConfig {
 export interface GatrixSDKConfig {
   // Required
   gatrixUrl: string; // Gatrix backend URL (e.g., https://api.gatrix.com)
-  apiToken?: string; // Server API Token (default: 'gatrix-unsecured-server-api-token' for testing)
+  apiToken: string; // Server API Token (required; use 'gatrix-unsecured-server-api-token' for testing)
   applicationName: string; // Application name
 
   // Optional - Redis (for BullMQ events)

@@ -1,49 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Chip, Typography, Skeleton, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { ParticipationReward } from '../../services/surveyService';
+import { Reward } from '../../services/surveyService';
 import { RewardTypeInfo, RewardItem } from '../../services/planningDataService';
 import rewardTemplateService from '../../services/rewardTemplateService';
 import { usePlanningData } from '../../contexts/PlanningDataContext';
 
 interface RewardDisplayProps {
-  rewards?: ParticipationReward[];
-  rewardTemplateId?: string | null;
+  rewards?: Reward[];
   maxDisplay?: number;
 }
 
 /**
  * Display component for participation rewards
  * Shows reward type and item name with quantity
- * Can display either direct rewards or rewards from a template
  */
-const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId, maxDisplay = 3 }) => {
+const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }) => {
   const { t } = useTranslation();
   const { rewardTypes, rewardLookup, isLoading: contextLoading } = usePlanningData();
   const [rewardTypeMap, setRewardTypeMap] = useState<Map<number, RewardTypeInfo>>(new Map());
   const [rewardItemsMap, setRewardItemsMap] = useState<Map<string, RewardItem>>(new Map());
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
-  const [displayRewards, setDisplayRewards] = useState<ParticipationReward[]>([]);
+  const [displayRewards, setDisplayRewards] = useState<Reward[]>([]);
 
-  // Load template rewards if rewardTemplateId is provided
+  // Set display rewards from props
   useEffect(() => {
-    const loadTemplateRewards = async () => {
-      if (rewardTemplateId) {
-        try {
-          const template = await rewardTemplateService.getRewardTemplateById(rewardTemplateId);
-          setDisplayRewards(template.rewardItems || []);
-        } catch (error) {
-          console.error('Failed to load reward template:', error);
-          setDisplayRewards([]);
-        }
-      } else {
-        setDisplayRewards(rewards || []);
-      }
-    };
-
-    loadTemplateRewards();
-  }, [rewardTemplateId, rewards]);
+    setDisplayRewards(rewards || []);
+  }, [rewards]);
 
   // Build reward type map from context
   useEffect(() => {
@@ -102,12 +86,12 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId
   }
 
   // Get reward label
-  const getRewardLabel = (reward: ParticipationReward): string => {
-    const rewardType = parseInt(reward.rewardType);
+  const getRewardLabel = (reward: Reward): string => {
+    const rewardType = parseInt(reward.type);
     const typeInfo = rewardTypeMap.get(rewardType);
 
     if (!typeInfo) {
-      return `${t('surveys.unknownReward')} (${reward.rewardType})`;
+      return `${t('surveys.unknownReward')} (${reward.type})`;
     }
 
     // Get localized type name
@@ -115,12 +99,12 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId
 
     // If has table, get item name
     if (typeInfo.hasTable) {
-      const item = rewardItemsMap.get(`${rewardType}_${reward.itemId}`);
+      const item = rewardItemsMap.get(`${rewardType}_${reward.id}`);
       if (item) {
         // Use + prefix for all rewards (unified format)
         return `${item.name} +${reward.quantity}`;
       } else {
-        return `${typeName} #${reward.itemId} +${reward.quantity}`;
+        return `${typeName} #${reward.id} +${reward.quantity}`;
       }
     } else {
       // Value-based reward (no item table) - use + prefix for experience, fame, etc.
@@ -129,12 +113,12 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId
   };
 
   // Get reward tooltip
-  const getRewardTooltip = (reward: ParticipationReward): string => {
-    const rewardType = parseInt(reward.rewardType);
+  const getRewardTooltip = (reward: Reward): string => {
+    const rewardType = parseInt(reward.type);
     const typeInfo = rewardTypeMap.get(rewardType);
 
     if (!typeInfo) {
-      return `${t('surveys.unknownReward')} (${reward.rewardType})`;
+      return `${t('surveys.unknownReward')} (${reward.type})`;
     }
 
     // Get localized type name
@@ -142,11 +126,11 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId
 
     // If has table, get item name
     if (typeInfo.hasTable) {
-      const item = rewardItemsMap.get(`${rewardType}_${reward.itemId}`);
+      const item = rewardItemsMap.get(`${rewardType}_${reward.id}`);
       if (item) {
-        return `[${typeName}] ${reward.itemId}:${item.name} +${reward.quantity}`;
+        return `[${typeName}] ${reward.id}:${item.name} +${reward.quantity}`;
       } else {
-        return `[${typeName}] ${reward.itemId}:Unknown +${reward.quantity}`;
+        return `[${typeName}] ${reward.id}:Unknown +${reward.quantity}`;
       }
     } else {
       // Value-based reward (no item table)

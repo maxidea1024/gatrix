@@ -340,6 +340,20 @@ export class PubSubService extends EventEmitter {
   }
 
   /**
+   * Publish standard event (for SDK real-time events like maintenance.started, maintenance.ended)
+   */
+  async publishEvent(event: { type: string; data: { id: number | string; timestamp: number } }): Promise<void> {
+    try {
+      const client = redisClient.getClient();
+      const eventChannel = 'events:standard';
+      await client.publish(eventChannel, JSON.stringify(event));
+      logger.debug('Standard event published to channel', { type: event.type, id: event.data.id });
+    } catch (error: any) {
+      logger.error('Failed to publish standard event:', error);
+    }
+  }
+
+  /**
    * Get queue statistics
    */
   async getQueueStats(): Promise<any> {
@@ -390,10 +404,14 @@ export class PubSubService extends EventEmitter {
       if (this.sseSubscriber) {
         try {
           await this.sseSubscriber.unsubscribe(this.SSE_CHANNEL);
-        } catch {}
+        } catch (error: any) {
+          // Ignore unsubscribe errors during shutdown
+        }
         try {
           await this.sseSubscriber.disconnect();
-        } catch {}
+        } catch (error: any) {
+          // Ignore disconnect errors during shutdown
+        }
         this.sseSubscriber = null;
       }
 

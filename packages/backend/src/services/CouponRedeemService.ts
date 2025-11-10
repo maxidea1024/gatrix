@@ -7,12 +7,11 @@ import logger from '../config/logger';
 export interface RedeemRequest {
   userId: string;
   userName: string;
-  characterId?: string;
-  worldId?: string;
-  platform?: string;
-  channel?: string;
-  subChannel?: string;
-  requestId?: string;
+  characterId: string;
+  worldId: string;
+  platform: string;
+  channel: string;
+  subChannel: string;
 }
 
 export interface RedeemResponse {
