@@ -88,6 +88,7 @@ const config = {
   serviceDiscovery: {
     heartbeatTTL: parseInt(process.env.SERVICE_DISCOVERY_HEARTBEAT_TTL || '30', 10), // Heartbeat TTL in seconds
     terminatedTTL: parseInt(process.env.SERVICE_DISCOVERY_TERMINATED_TTL || '15', 10), // Terminated service TTL in seconds (15 seconds for quick cleanup)
+    terminatedMarkerTTL: parseInt(process.env.SERVICE_DISCOVERY_TERMINATED_MARKER_TTL || '300', 10), // Terminated marker TTL in seconds (300 seconds / 5 minutes for audit trail)
   },
 };
 

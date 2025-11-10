@@ -3627,7 +3627,7 @@
     "resumeUpdates": "Resume Real-time Updates",
     "cleanup": "Clean Up Server List",
     "cleanupConfirmTitle": "Confirm Server List Cleanup",
-    "cleanupConfirmMessage": "Are you sure you want to remove terminated and error servers from the list?",
+    "cleanupConfirmMessage": "Are you sure you want to remove terminated, error, and no-response servers from the list?",
     "viewMode": {
       "list": "List View",
       "grid": "Grid View",

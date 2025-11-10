@@ -3647,7 +3647,7 @@
     "resumeUpdates": "恢复实时更新",
     "cleanup": "清理服务器列表",
     "cleanupConfirmTitle": "确认清理服务器列表",
-    "cleanupConfirmMessage": "确定要从列表中删除已终止和错误状态的服务器吗？",
+    "cleanupConfirmMessage": "确定要从列表中删除已终止、错误和无响应状态的服务器吗？",
     "viewMode": {
       "list": "列表视图",
       "grid": "网格视图",

@@ -381,7 +381,7 @@ const ServerListPage: React.FC = () => {
     localStorage.setItem('serverListViewMode', mode);
   };
 
-  // Clean up terminated and error servers
+  // Clean up terminated, error, and no-response servers
   const handleCleanupClick = () => {
     setCleanupDialogOpen(true);
   };
@@ -390,13 +390,13 @@ const ServerListPage: React.FC = () => {
     try {
       console.log('🗑️ Starting cleanup...');
 
-      // Call backend cleanup endpoint (handles all terminated/error servers)
+      // Call backend cleanup endpoint (handles all terminated/error/no-response servers)
       const result = await serviceDiscoveryService.cleanupServices();
 
       console.log(`✅ Cleanup complete: ${result.deletedCount}/${result.totalCount} servers deleted`);
 
       // Remove from frontend state (will be updated by SSE delete events)
-      setServices((prev) => prev.filter((s) => s.status !== 'terminated' && s.status !== 'error'));
+      setServices((prev) => prev.filter((s) => s.status !== 'terminated' && s.status !== 'error' && s.status !== 'no-response'));
       setCleanupDialogOpen(false);
     } catch (error) {
       console.error('❌ Cleanup failed:', error);

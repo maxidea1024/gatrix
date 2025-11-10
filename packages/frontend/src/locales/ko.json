@@ -3628,7 +3628,7 @@
     "resumeUpdates": "실시간 업데이트 재개",
     "cleanup": "서버 목록 정리",
     "cleanupConfirmTitle": "서버 목록 정리 확인",
-    "cleanupConfirmMessage": "종료됨 및 오류 상태의 서버를 목록에서 제거하시겠습니까?",
+    "cleanupConfirmMessage": "종료됨, 오류, 응답 없음 상태의 서버를 목록에서 제거하시겠습니까?",
     "viewMode": {
       "list": "리스트 뷰",
       "grid": "그리드 뷰",

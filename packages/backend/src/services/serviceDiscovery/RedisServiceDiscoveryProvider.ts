@@ -186,6 +186,15 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
           const ttl = config?.serviceDiscovery?.terminatedTTL || 15;
           const terminatedMarkerTTL = config?.serviceDiscovery?.terminatedMarkerTTL || 300; // 5 minutes for audit trail
 
+          // Validate that terminatedMarkerTTL is greater than stat TTL
+          if (terminatedMarkerTTL <= ttl) {
+            logger.warn(
+              `WARNING: terminatedMarkerTTL (${terminatedMarkerTTL}s) must be greater than terminatedTTL (${ttl}s). ` +
+              `Otherwise, terminated marker will expire before stat key, causing terminated services to be marked as no-response. ` +
+              `Please set terminatedMarkerTTL to at least ${ttl + 60}s (recommended: 300s for 5 minutes).`
+            );
+          }
+
           // Set stat key with TTL (15 seconds - service will move to inactive collection)
           await this.client.set(statKey, JSON.stringify(stat), 'EX', ttl);
 
@@ -548,9 +557,9 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
                     };
                     await this.client.hset(inactiveCollectionKey, instanceId, JSON.stringify(inactiveEntry));
 
-                    // Create a separate key for tracking inactive item expiration
+                    // Create a separate key for tracking inactive item expiration (300 seconds)
                     const inactiveItemKey = `services:${serviceType}:inactive:${instanceId}`;
-                    await this.client.set(inactiveItemKey, '1', 'EX', 15);
+                    await this.client.set(inactiveItemKey, '1', 'EX', 300);
 
                     // Publish update event to notify UI of terminated status
                     await this.publishEvent({
@@ -569,12 +578,12 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
                       updatedAt: new Date().toISOString(),
                     };
 
-                    // Store in inactive collection for 15 seconds (for audit trail)
+                    // Store in inactive collection for 300 seconds (5 minutes for audit trail)
                     await this.client.hset(inactiveCollectionKey, instanceId, JSON.stringify(inactiveEntry));
 
-                    // Create a separate key for tracking inactive item expiration
+                    // Create a separate key for tracking inactive item expiration (300 seconds)
                     const inactiveItemKey = `services:${serviceType}:inactive:${instanceId}`;
-                    await this.client.set(inactiveItemKey, '1', 'EX', 15);
+                    await this.client.set(inactiveItemKey, '1', 'EX', 300);
 
                     // Publish update event to notify UI of no-response status
                     await this.publishEvent({

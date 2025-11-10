@@ -130,15 +130,15 @@ router.get('/sse', authenticateSSE, async (req, res) => {
 router.use(authenticate as any, requireAdmin as any);
 
 /**
- * Clean up all terminated and error services
+ * Clean up all terminated, error, and no-response services
  * POST /api/v1/admin/services/cleanup
  */
 router.post('/cleanup', async (req: Request, res: Response) => {
   try {
     const services = await serviceDiscoveryService.getServices();
 
-    // Filter terminated and error services
-    const toDelete = services.filter((s) => s.status === 'terminated' || s.status === 'error');
+    // Filter terminated, error, and no-response services
+    const toDelete = services.filter((s) => s.status === 'terminated' || s.status === 'error' || s.status === 'no-response');
 
     if (toDelete.length === 0) {
       return res.json({
@@ -151,7 +151,7 @@ router.post('/cleanup', async (req: Request, res: Response) => {
       });
     }
 
-    // Delete all terminated/error services (force delete = true)
+    // Delete all terminated/error/no-response services (force delete = true)
     const results = await Promise.allSettled(
       toDelete.map((service) =>
         serviceDiscoveryService.unregister(service.instanceId, service.labels.service, true)
