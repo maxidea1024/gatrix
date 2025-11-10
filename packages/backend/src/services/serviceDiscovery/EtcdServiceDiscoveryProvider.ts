@@ -261,6 +261,12 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     }
   }
 
+  async getInactiveServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
+    // etcd doesn't have a separate inactive collection like Redis
+    // Return empty array as etcd uses TTL for automatic cleanup
+    return [];
+  }
+
   async getService(instanceId: string, serviceType: string): Promise<ServiceInstance | null> {
     const key = this.getInstanceKey(serviceType, instanceId);
 

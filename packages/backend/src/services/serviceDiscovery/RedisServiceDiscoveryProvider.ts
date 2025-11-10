@@ -385,18 +385,6 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
             instances.push(instance);
           }
         }
-
-        // Get inactive instances (no-response, terminated) from collection
-        const inactiveCollectionKey = `services:${serviceType}:inactive`;
-        const inactiveData = await this.client.hgetall(inactiveCollectionKey);
-        for (const [, value] of Object.entries(inactiveData)) {
-          try {
-            const instance = JSON.parse(value);
-            instances.push(instance);
-          } catch (error) {
-            logger.error('Failed to parse inactive instance:', error);
-          }
-        }
       } else {
         // Get all active instances by scanning meta keys
         const metaKeys = await this.client.keys('services:*:meta:*');
@@ -412,7 +400,44 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
             }
           }
         }
+      }
 
+      // Filter by serviceGroup if specified
+      if (serviceGroup) {
+        instances = instances.filter(instance => instance.labels.group === serviceGroup);
+      }
+
+      // Sort by createdAt (ascending - oldest first, newest last)
+      instances.sort((a, b) => {
+        const aTime = new Date(a.createdAt).getTime();
+        const bTime = new Date(b.createdAt).getTime();
+        return aTime - bTime;
+      });
+
+      return instances;
+    } catch (error) {
+      logger.error('Failed to get services:', error);
+      throw error;
+    }
+  }
+
+  async getInactiveServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
+    let instances: ServiceInstance[] = [];
+
+    try {
+      if (serviceType) {
+        // Get inactive instances of a specific type
+        const inactiveCollectionKey = `services:${serviceType}:inactive`;
+        const inactiveData = await this.client.hgetall(inactiveCollectionKey);
+        for (const [, value] of Object.entries(inactiveData)) {
+          try {
+            const instance = JSON.parse(value);
+            instances.push(instance);
+          } catch (error) {
+            logger.error('Failed to parse inactive instance:', error);
+          }
+        }
+      } else {
         // Get all inactive instances from all collections
         const inactiveKeys = await this.client.keys('services:*:inactive');
         for (const inactiveKey of inactiveKeys) {
@@ -442,7 +467,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
 
       return instances;
     } catch (error) {
-      logger.error('Failed to get services:', error);
+      logger.error('Failed to get inactive services:', error);
       throw error;
     }
   }

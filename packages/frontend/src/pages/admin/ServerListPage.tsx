@@ -176,7 +176,7 @@ const ServerListPage: React.FC = () => {
     return localStorage.getItem('serverListSortBy') || 'createdAt';
   });
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(() => {
-    return (localStorage.getItem('serverListSortOrder') as 'asc' | 'desc') || 'desc';
+    return (localStorage.getItem('serverListSortOrder') as 'asc' | 'desc') || 'asc';
   });
 
   // View mode state (persisted in localStorage)
@@ -251,9 +251,10 @@ const ServerListPage: React.FC = () => {
     '/admin/services',
     () => serviceDiscoveryService.getServices(),
     {
-      revalidateOnFocus: false, // Don't refetch on window focus
-      revalidateOnReconnect: false, // Don't refetch on reconnect
+      revalidateOnFocus: true, // Refetch on window focus to get latest inactive services
+      revalidateOnReconnect: true, // Refetch on reconnect
       refreshInterval: 0, // Disable auto-refresh, SSE handles real-time updates
+      dedupingInterval: 0, // Don't dedupe requests
     }
   );
 
@@ -418,11 +419,12 @@ const ServerListPage: React.FC = () => {
         t('serverList.cleanupSuccess', { count: result.deletedCount }),
         { variant: 'success' }
       );
-
-      setCleanupDialogOpen(false);
     } catch (error) {
       console.error('❌ Cleanup failed:', error);
       enqueueSnackbar(t('serverList.cleanupFailed'), { variant: 'error' });
+    } finally {
+      // Always close dialog, regardless of success or failure
+      setCleanupDialogOpen(false);
     }
   };
 
@@ -1173,6 +1175,14 @@ const ServerListPage: React.FC = () => {
                                     ))}
                                   </Box>
                                 )}
+                              </TableCell>
+                            );
+                          case 'createdAt':
+                            return (
+                              <TableCell key={column.id}>
+                                <Typography variant="body2" color="text.secondary">
+                                  {formatDateTimeDetailed(service.createdAt)}
+                                </Typography>
                               </TableCell>
                             );
                           case 'updatedAt':

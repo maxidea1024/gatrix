@@ -82,15 +82,18 @@ class TestOrchestrator {
       const scriptPath = path.join(__dirname, server.script);
 
       // Use ts-node to run TypeScript directly
-      // Use shell: true for both Windows and Unix to ensure proper signal handling
+      // stdio: ['ignore', 'inherit', 'inherit'] - ignore stdin for child, inherit stdout/stderr
+      // This allows orchestrator to receive Ctrl+C while child processes output to console
       const proc = spawn('npx', ['ts-node', scriptPath, ...server.args], {
-        stdio: 'inherit',
+        stdio: ['ignore', 'inherit', 'inherit'],
         shell: true,
-        detached: false, // Don't detach - let orchestrator manage the process
+        detached: false,
         env: {
           ...process.env,
           FORCE_COLOR: '1',
         },
+        // Explicitly handle signals
+        windowsHide: false,
       });
 
       server.process = proc;
@@ -123,17 +126,56 @@ class TestOrchestrator {
     console.log('='.repeat(80));
     console.log('');
 
+    // Ask all processes to shut down gracefully
     for (const server of this.servers) {
-      if (server.process) {
-        console.log(`[ORCHESTRATOR] Stopping ${server.name}...`);
-        // Send SIGTERM to the process
-        // Since detached: false, this will terminate the shell and the child process
-        server.process.kill('SIGTERM');
+      if (server.process && !server.process.killed && server.process.pid) {
+        console.log(`[ORCHESTRATOR] Requesting graceful stop for ${server.name}...`);
+        try {
+          if (process.platform === 'win32') {
+            // Windows: prefer SIGINT so Node handlers run; avoid taskkill in graceful phase
+            try {
+              server.process.kill('SIGINT');
+            } catch (_e) {
+              // If SIGINT fails, try a soft SIGTERM (may terminate immediately on Windows)
+              try { server.process.kill('SIGTERM'); } catch { /* noop */ }
+            }
+          } else {
+            // Unix: send SIGTERM to the process group
+            process.kill(-server.process.pid, 'SIGTERM');
+          }
+        } catch (error) {
+          console.error(`[ORCHESTRATOR] Error signaling ${server.name}:`, error);
+        }
       }
     }
 
-    // Wait for all processes to exit
-    await this.sleep(3000);
+    // Wait for graceful shutdown
+    await this.sleep(5000);
+
+    // Force kill any remaining processes
+    for (const server of this.servers) {
+      if (server.process && !server.process.killed && server.process.pid) {
+        console.log(`[ORCHESTRATOR] Force killing ${server.name}...`);
+        try {
+          if (process.platform === 'win32') {
+            const { execSync } = require('child_process');
+            try {
+              execSync(`taskkill /PID ${server.process.pid} /T /F`, {
+                stdio: 'ignore',
+                shell: 'cmd.exe',
+                windowsHide: true,
+              });
+            } catch (e) {
+              server.process.kill('SIGKILL');
+            }
+          } else {
+            process.kill(-server.process.pid, 'SIGKILL');
+          }
+        } catch (error) {
+          console.error(`[ORCHESTRATOR] Error force killing ${server.name}:`, error);
+        }
+      }
+    }
 
     console.log('');
     console.log('='.repeat(80));
@@ -153,12 +195,20 @@ const orchestrator = new TestOrchestrator();
 process.on('SIGINT', async () => {
   console.log('\nReceived SIGINT...');
   await orchestrator.stop();
+  // Close stdin to prevent PowerShell from prompting
+  if (process.stdin) {
+    process.stdin.destroy();
+  }
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
   console.log('\nReceived SIGTERM...');
   await orchestrator.stop();
+  // Close stdin to prevent PowerShell from prompting
+  if (process.stdin) {
+    process.stdin.destroy();
+  }
   process.exit(0);
 });
 

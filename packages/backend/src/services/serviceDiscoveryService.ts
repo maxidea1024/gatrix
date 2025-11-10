@@ -25,10 +25,17 @@ class ServiceDiscoveryService {
   }
 
   /**
-   * Get all services or services of a specific type and/or group (Admin monitoring)
+   * Get all active services or services of a specific type and/or group (Admin monitoring)
    */
   async getServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
     return await this.provider.getServices(serviceType, serviceGroup);
+  }
+
+  /**
+   * Get all inactive services (terminated, error, no-response) (Admin monitoring)
+   */
+  async getInactiveServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
+    return await this.provider.getInactiveServices(serviceType, serviceGroup);
   }
 
   /**

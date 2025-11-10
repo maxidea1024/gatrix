@@ -102,9 +102,14 @@ export interface IServiceDiscoveryProvider {
   updateStatus(input: UpdateServiceStatusInput, autoRegisterIfMissing?: boolean): Promise<void>;
 
   /**
-   * Get all services or services of a specific type and/or group
+   * Get all active services or services of a specific type and/or group
    */
   getServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]>;
+
+  /**
+   * Get all inactive services (terminated, error, no-response)
+   */
+  getInactiveServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]>;
 
   /**
    * Get a specific service instance
