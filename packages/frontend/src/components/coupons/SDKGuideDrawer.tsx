@@ -45,7 +45,7 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const [errorTabValue, setErrorTabValue] = useState(0);
 
   // State for API test
-  const [apiToken, setApiToken] = useState('');
+  const [apiToken, setApiToken] = useState('gatrix-unsecured-server-api-token'); // Default to unsecured server token
   const [couponCode, setCouponCode] = useState('');
   const [userId, setUserId] = useState('user123');
   const [userName, setUserName] = useState('John Doe');
@@ -246,11 +246,6 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
   };
 
   const handleTestAPI = async () => {
-    if (!apiToken.trim()) {
-      setTestError('API Token is required');
-      return;
-    }
-
     if (!couponCode.trim()) {
       setTestError('Coupon Code is required');
       return;
@@ -567,87 +562,232 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
               </Box>
               <Collapse in={expandedRequestHeaders}>
                 <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
-                  {/* Parameters */}
+                  {/* Parameters Table */}
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
                       Parameters
                     </Typography>
-                    <Stack spacing={2} sx={{ pl: 1 }}>
-                      <TextField
-                        label="API Token"
-                        type="password"
-                        value={apiToken}
-                        onChange={(e) => setApiToken(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="Enter your API token"
-                      />
-                      <TextField
-                        label="Coupon Code"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="e.g., ABC12345"
-                      />
-                      <TextField
-                        label="User ID"
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="e.g., user123"
-                      />
-                      <TextField
-                        label="User Name"
-                        value={userName}
-                        onChange={(e) => setUserName(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="e.g., John Doe"
-                      />
-                      <TextField
-                        label="Character ID"
-                        value={characterId}
-                        onChange={(e) => setCharacterId(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="e.g., char456"
-                        required
-                      />
-                      <TextField
-                        label="World ID"
-                        value={worldId}
-                        onChange={(e) => setWorldId(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="e.g., world01"
-                      />
-                      <TextField
-                        label="Platform"
-                        value={platform}
-                        onChange={(e) => setPlatform(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="e.g., ios, android, pc"
-                      />
-                      <TextField
-                        label="Channel"
-                        value={channel}
-                        onChange={(e) => setChannel(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="e.g., app_store"
-                      />
-                      <TextField
-                        label="Sub Channel"
-                        value={subChannel}
-                        onChange={(e) => setSubChannel(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="e.g., web"
-                      />
-                    </Stack>
+                    <Box sx={{
+                      border: `1px solid ${theme.palette.divider}`,
+                      borderRadius: 1,
+                      overflow: 'hidden'
+                    }}>
+                      <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0 }}>
+                        {/* Coupon Code */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          Coupon Code *
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <TextField
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value)}
+                            size="small"
+                            fullWidth
+                            placeholder="e.g., ABC12345"
+                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                          />
+                        </Box>
+
+                        {/* User ID */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          User ID
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <TextField
+                            value={userId}
+                            onChange={(e) => setUserId(e.target.value)}
+                            size="small"
+                            fullWidth
+                            placeholder="e.g., user123"
+                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                          />
+                        </Box>
+
+                        {/* User Name */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          User Name
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <TextField
+                            value={userName}
+                            onChange={(e) => setUserName(e.target.value)}
+                            size="small"
+                            fullWidth
+                            placeholder="e.g., John Doe"
+                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                          />
+                        </Box>
+
+                        {/* Character ID */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          Character ID
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <TextField
+                            value={characterId}
+                            onChange={(e) => setCharacterId(e.target.value)}
+                            size="small"
+                            fullWidth
+                            placeholder="e.g., char456"
+                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                          />
+                        </Box>
+
+                        {/* World ID */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          World ID
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <TextField
+                            value={worldId}
+                            onChange={(e) => setWorldId(e.target.value)}
+                            size="small"
+                            fullWidth
+                            placeholder="e.g., world01"
+                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                          />
+                        </Box>
+
+                        {/* Platform */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          Platform
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <TextField
+                            value={platform}
+                            onChange={(e) => setPlatform(e.target.value)}
+                            size="small"
+                            fullWidth
+                            placeholder="e.g., ios, android, pc"
+                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                          />
+                        </Box>
+
+                        {/* Channel */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          Channel
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <TextField
+                            value={channel}
+                            onChange={(e) => setChannel(e.target.value)}
+                            size="small"
+                            fullWidth
+                            placeholder="e.g., app_store, google_play"
+                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                          />
+                        </Box>
+
+                        {/* Sub Channel */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          Sub Channel
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <TextField
+                            value={subChannel}
+                            onChange={(e) => setSubChannel(e.target.value)}
+                            size="small"
+                            fullWidth
+                            placeholder="e.g., web, mobile"
+                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                          />
+                        </Box>
+                      </Box>
+                    </Box>
                   </Box>
 
                   {/* Request Headers */}

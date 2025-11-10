@@ -5,9 +5,14 @@ import { CacheService } from '../services/CacheService';
 import logger from '../config/logger';
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
 
+// Unsecured tokens for testing purposes
+const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
+const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
+
 interface SDKRequest extends Request {
   apiToken?: ApiAccessToken;
   environment?: RemoteConfigEnvironment;
+  isUnsecuredToken?: boolean; // Flag to indicate unsecured token usage
 }
 
 /**
@@ -32,6 +37,23 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
         success: false,
         message: 'API token is required'
       });
+    }
+
+    // Check for unsecured client token (for testing)
+    if (token === UNSECURED_CLIENT_TOKEN) {
+      req.isUnsecuredToken = true;
+      req.apiToken = {
+        id: 0,
+        tokenType: 'client',
+        tokenValue: UNSECURED_CLIENT_TOKEN,
+        name: 'Unsecured Client Token (Testing)',
+        isActive: true,
+        expiresAt: null,
+        environmentId: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any;
+      return next();
     }
 
     // Try to get token from cache first
@@ -198,6 +220,23 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
         success: false,
         message: 'Application name is required'
       });
+    }
+
+    // Check for unsecured server token (for testing)
+    if (apiToken === UNSECURED_SERVER_TOKEN) {
+      req.isUnsecuredToken = true;
+      req.apiToken = {
+        id: 0,
+        tokenType: 'server',
+        tokenValue: UNSECURED_SERVER_TOKEN,
+        name: 'Unsecured Server Token (Testing)',
+        isActive: true,
+        expiresAt: null,
+        environmentId: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any;
+      return next();
     }
 
     // Try to get token from cache first

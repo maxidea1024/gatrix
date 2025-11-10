@@ -148,7 +148,7 @@ router.post('/cleanup', async (req: Request, res: Response) => {
     // Delete all terminated/error services
     const results = await Promise.allSettled(
       toDelete.map((service) =>
-        serviceDiscoveryService.unregister(service.instanceId, service.type)
+        serviceDiscoveryService.unregister(service.instanceId, service.labels.service)
       )
     );
 

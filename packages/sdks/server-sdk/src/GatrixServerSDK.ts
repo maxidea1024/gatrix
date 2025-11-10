@@ -14,7 +14,6 @@ import { SurveyService } from './services/SurveyService';
 import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
 import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
-import { ServiceDiscovery } from './discovery/ServiceDiscovery';
 import { EventCallback } from './types/events';
 import {
   RedeemCouponRequest,
@@ -28,7 +27,11 @@ import {
   GetServicesParams,
 } from './types/api';
 
-export class GatrixSDK {
+/**
+ * Gatrix Server SDK
+ * Server-side SDK for game servers to interact with Gatrix backend
+ */
+export class GatrixServerSDK {
   private config: GatrixSDKConfig;
   private logger: Logger;
   private apiClient: ApiClient;
@@ -39,30 +42,34 @@ export class GatrixSDK {
   public readonly gameWorld: GameWorldService;
   public readonly popupNotice: PopupNoticeService;
   public readonly survey: SurveyService;
-  public readonly serviceDiscoveryService: ServiceDiscoveryService;
+  public readonly serviceDiscovery: ServiceDiscoveryService;
 
   // Cache and Events
   private cacheManager?: CacheManager;
   private eventListener?: EventListener;
 
-  // Service Discovery
-  private serviceDiscovery?: ServiceDiscovery;
-
   constructor(config: GatrixSDKConfig) {
-    // Validate config
-    this.validateConfig(config);
+    // Set default API token if not provided (for testing)
+    const configWithDefaults = {
+      ...config,
+      apiToken: config.apiToken || 'gatrix-unsecured-server-api-token',
+    };
 
-    this.config = config;
+    // Validate config
+    this.validateConfig(configWithDefaults);
+
+    this.config = configWithDefaults;
 
     // Initialize logger
-    this.logger = new Logger(config.logger);
+    this.logger = new Logger(configWithDefaults.logger);
 
     // Initialize API client
     this.apiClient = new ApiClient({
-      baseURL: config.gatrixUrl,
-      apiToken: config.apiToken,
-      applicationName: config.applicationName,
+      baseURL: configWithDefaults.gatrixUrl,
+      apiToken: configWithDefaults.apiToken,
+      applicationName: configWithDefaults.applicationName,
       logger: this.logger,
+      retry: configWithDefaults.retry,
     });
 
     // Initialize services
@@ -70,11 +77,12 @@ export class GatrixSDK {
     this.gameWorld = new GameWorldService(this.apiClient, this.logger);
     this.popupNotice = new PopupNoticeService(this.apiClient, this.logger);
     this.survey = new SurveyService(this.apiClient, this.logger);
-    this.serviceDiscoveryService = new ServiceDiscoveryService(this.apiClient, this.logger);
+    this.serviceDiscovery = new ServiceDiscoveryService(this.apiClient, this.logger);
 
-    this.logger.info('Gatrix SDK created', {
-      gatrixUrl: config.gatrixUrl,
-      applicationName: config.applicationName,
+    this.logger.info('Gatrix Server SDK created', {
+      gatrixUrl: configWithDefaults.gatrixUrl,
+      applicationName: configWithDefaults.applicationName,
+      apiToken: configWithDefaults.apiToken === 'gatrix-unsecured-server-api-token' ? 'unsecured (testing)' : '***',
     });
   }
 
@@ -106,7 +114,6 @@ export class GatrixSDK {
    * Initialize SDK
    * - Initialize cache
    * - Initialize event listener
-   * - Initialize service discovery
    */
   async initialize(): Promise<void> {
     if (this.initialized) {
@@ -114,7 +121,7 @@ export class GatrixSDK {
       return;
     }
 
-    this.logger.info('Initializing Gatrix SDK...');
+    this.logger.info('Initializing Gatrix Server SDK...');
 
     try {
       // Initialize cache manager
@@ -135,19 +142,9 @@ export class GatrixSDK {
         await this.eventListener.initialize();
       }
 
-      // Initialize service discovery if enabled
-      if (this.config.serviceDiscovery?.enabled) {
-        this.serviceDiscovery = new ServiceDiscovery(
-          this.config.serviceDiscovery,
-          this.config.redis,
-          this.config.etcd,
-          this.logger
-        );
-      }
-
       this.initialized = true;
 
-      this.logger.info('Gatrix SDK initialized successfully');
+      this.logger.info('Gatrix Server SDK initialized successfully');
     } catch (error: any) {
       this.logger.error('Failed to initialize SDK', { error: error.message });
       throw error;
@@ -351,108 +348,93 @@ export class GatrixSDK {
   }
 
   // ============================================================================
-  // Service Discovery Methods
+  // Service Discovery Methods (via Backend API)
   // ============================================================================
 
   /**
-   * Register this service instance
+   * Register this service instance via Backend API
    */
-  async registerService(input: RegisterServiceInput): Promise<string> {
-    if (!this.serviceDiscovery) {
-      throw createError(ErrorCode.NOT_INITIALIZED, 'Service discovery not initialized');
-    }
-
-    const instanceId = await this.serviceDiscovery.register(input);
-
-    // Set instance ID for ServiceDiscoveryService (for excludeSelf filtering)
-    this.serviceDiscoveryService.setInstanceId(instanceId);
-
-    return instanceId;
+  async registerService(input: RegisterServiceInput): Promise<{ instanceId: string; externalAddress: string }> {
+    const result = await this.serviceDiscovery.register(input);
+    return result;
   }
 
   /**
-   * Unregister this service instance
+   * Unregister this service instance via Backend API
    */
   async unregisterService(): Promise<void> {
-    if (!this.serviceDiscovery) {
-      return;
-    }
-
     await this.serviceDiscovery.unregister();
   }
 
   /**
-   * Update service status
+   * Update service status via Backend API
    */
   async updateServiceStatus(input: UpdateServiceStatusInput): Promise<void> {
-    if (!this.serviceDiscovery) {
-      throw createError(ErrorCode.NOT_INITIALIZED, 'Service discovery not initialized');
-    }
-
     await this.serviceDiscovery.updateStatus(input);
   }
 
   /**
-   * Get all services or services of a specific type
+   * Get services with filtering via Backend API
+   * @param params - Filter parameters (serviceType, group, status, labels, excludeSelf)
    */
-  async getServices(type?: string): Promise<ServiceInstance[]> {
-    if (!this.serviceDiscovery) {
-      throw createError(ErrorCode.NOT_INITIALIZED, 'Service discovery not initialized');
-    }
-
-    return await this.serviceDiscovery.getServices(type);
-  }
-
-  /**
-   * Get services with filtering
-   * @param params - Filter parameters (type, serviceGroup, status, excludeSelf)
-   */
-  async getServicesFiltered(params?: GetServicesParams): Promise<ServiceInstance[]> {
-    if (!this.serviceDiscovery) {
-      throw createError(ErrorCode.NOT_INITIALIZED, 'Service discovery not initialized');
-    }
-
-    return await this.serviceDiscovery.getServicesFiltered(params);
-  }
-
-  /**
-   * Get a specific service instance
-   */
-  async getService(instanceId: string, type: string): Promise<ServiceInstance | null> {
-    if (!this.serviceDiscovery) {
-      throw createError(ErrorCode.NOT_INITIALIZED, 'Service discovery not initialized');
-    }
-
-    return await this.serviceDiscovery.getService(instanceId, type);
-  }
-
-  /**
-   * Get services via Backend API (alternative to direct etcd/Redis access)
-   * @param params - Filter parameters (type, serviceGroup, status, excludeSelf)
-   */
-  async getServicesViaAPI(params?: GetServicesParams): Promise<ServiceInstance[]> {
-    return await this.serviceDiscoveryService.getServices(params);
+  async getServices(params?: GetServicesParams): Promise<ServiceInstance[]> {
+    return await this.serviceDiscovery.getServices(params);
   }
 
   /**
    * Get a specific service instance via Backend API
    */
-  async getServiceViaAPI(type: string, instanceId: string): Promise<ServiceInstance | null> {
-    return await this.serviceDiscoveryService.getService(type, instanceId);
+  async getService(serviceType: string, instanceId: string): Promise<ServiceInstance | null> {
+    return await this.serviceDiscovery.getService(serviceType, instanceId);
   }
 
   /**
    * Get current service instance ID
    */
   getServiceInstanceId(): string | undefined {
-    return this.serviceDiscovery?.getInstanceId();
+    return this.serviceDiscovery.getInstanceId();
   }
 
   /**
    * Get current service type
    */
   getServiceType(): string | undefined {
-    return this.serviceDiscovery?.getServiceType();
+    return this.serviceDiscovery.getServiceType();
+  }
+
+  /**
+   * Check if service type is in maintenance
+   */
+  async isServiceInMaintenance(serviceType: string): Promise<boolean> {
+    return await this.serviceDiscovery.isServiceInMaintenance(serviceType);
+  }
+
+  /**
+   * Get maintenance message for service type
+   */
+  async getServiceMaintenanceMessage(serviceType: string, lang?: 'ko' | 'en' | 'zh'): Promise<string | null> {
+    return await this.serviceDiscovery.getServiceMaintenanceMessage(serviceType, lang);
+  }
+
+  /**
+   * Get whitelists (IP and Account)
+   */
+  async getWhitelists() {
+    return await this.serviceDiscovery.getWhitelists();
+  }
+
+  /**
+   * Check if IP is whitelisted
+   */
+  async isIpWhitelisted(ip: string): Promise<boolean> {
+    return await this.serviceDiscovery.isIpWhitelisted(ip);
+  }
+
+  /**
+   * Check if account is whitelisted
+   */
+  async isAccountWhitelisted(accountId: string): Promise<boolean> {
+    return await this.serviceDiscovery.isAccountWhitelisted(accountId);
   }
 
   // ============================================================================
@@ -463,7 +445,7 @@ export class GatrixSDK {
    * Close SDK and cleanup all resources
    */
   async close(): Promise<void> {
-    this.logger.info('Closing Gatrix SDK...');
+    this.logger.info('Closing Gatrix Server SDK...');
 
     try {
       // Stop cache auto-refresh
@@ -476,18 +458,16 @@ export class GatrixSDK {
         await this.eventListener.close();
       }
 
-      // Close service discovery
-      if (this.serviceDiscovery) {
-        await this.serviceDiscovery.close();
-      }
-
       this.initialized = false;
 
-      this.logger.info('Gatrix SDK closed successfully');
+      this.logger.info('Gatrix Server SDK closed successfully');
     } catch (error: any) {
       this.logger.error('Error while closing SDK', { error: error.message });
       throw error;
     }
   }
 }
+
+// Backward compatibility: export as GatrixSDK as well
+export { GatrixServerSDK as GatrixSDK };
 

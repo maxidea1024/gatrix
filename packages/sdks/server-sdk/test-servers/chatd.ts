@@ -64,7 +64,7 @@ class ChatServer extends BaseTestServer {
       if (this.config.enableServiceDiscovery) {
         this.sdk.updateServiceStatus({
           status: 'ready',
-          meta: {
+          stats: {
             totalMessages: this.messageCount,
             activeChannels: this.channels.size,
           },
@@ -81,8 +81,12 @@ const group = process.argv[4] || 'production';
 const enableDiscovery = process.argv[5] === 'true' || false;
 
 const config: BaseServerConfig = {
-  serverType: 'chatd',
+  serviceType: 'chatd',
   serviceGroup: group,
+  customLabels: {
+    env: process.env.NODE_ENV || 'development',
+    region: 'ap-northeast-2',
+  },
   instanceName: `chatd-${instanceId}`,
   port: port,
   enableServiceDiscovery: enableDiscovery,

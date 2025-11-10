@@ -74,12 +74,10 @@ class WorldServer extends BaseTestServer {
     if (this.config.enableServiceDiscovery) {
       this.sdk.updateServiceStatus({
         status: 'ready',
-        instanceStats: {
+        stats: {
           cpuUsage: Math.random() * 100,
           memoryUsage: Math.random() * 2048,
           memoryTotal: 4096,
-        },
-        meta: {
           activePlayers: this.players.size,
           npcs: this.npcs,
         },
@@ -119,8 +117,13 @@ const group = process.argv[4] || 'kr-1';
 const enableDiscovery = process.argv[5] === 'true' || false;
 
 const config: BaseServerConfig = {
-  serverType: 'worldd',
+  serviceType: 'worldd',
   serviceGroup: group,
+  customLabels: {
+    env: process.env.NODE_ENV || 'development',
+    region: 'ap-northeast-2',
+    role: 'game-server',
+  },
   instanceName: `worldd-${group}-${instanceId}`,
   port: port,
   enableServiceDiscovery: enableDiscovery,

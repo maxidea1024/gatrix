@@ -3631,7 +3631,7 @@
       "card": "Card View"
     },
     "filters": {
-      "type": "Server Type",
+      "service": "Service Type",
       "status": "Status"
     },
     "status": {
@@ -3643,13 +3643,15 @@
     },
     "table": {
       "instanceId": "Instance ID",
-      "type": "Type",
+      "service": "Service",
+      "group": "Group",
+      "labels": "Labels",
       "hostname": "Hostname",
       "externalAddress": "External IP",
       "internalAddress": "Internal IP",
       "ports": "Ports",
       "status": "Status",
-      "instanceStats": "Instance Stats",
+      "stats": "Stats",
       "meta": "Meta Info",
       "updatedAt": "Updated At"
     }

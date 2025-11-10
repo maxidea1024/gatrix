@@ -10,8 +10,8 @@ import config from '../../config';
 import {
   IServiceDiscoveryProvider,
   ServiceInstance,
-  ServiceStatus,
   WatchCallback,
+  UpdateServiceStatusInput,
 } from '../../types/serviceDiscovery';
 
 // Dynamic import to make etcd3 optional
@@ -39,60 +39,61 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
   }
 
   async register(instance: ServiceInstance, ttlSeconds: number): Promise<void> {
-    const key = this.getInstanceKey(instance.type, instance.instanceId);
+    const serviceType = instance.labels.service;
+    const key = this.getInstanceKey(serviceType, instance.instanceId);
 
     try {
       const lease = this.client.lease(ttlSeconds);
 
       await lease.put(key).value(JSON.stringify(instance));
-      this.leases.set(`${instance.type}:${instance.instanceId}`, lease);
+      this.leases.set(`${serviceType}:${instance.instanceId}`, lease);
 
       // Auto-heartbeat
       const interval = setInterval(async () => {
         try {
           await lease.keepaliveOnce();
         } catch (error) {
-          logger.error(`Heartbeat failed for ${instance.type}:${instance.instanceId}:`, error);
+          logger.error(`Heartbeat failed for ${serviceType}:${instance.instanceId}:`, error);
         }
       }, (ttlSeconds / 2) * 1000);
 
       // Store interval for cleanup
       (lease as any)._heartbeatInterval = interval;
 
-      logger.info(`Service registered: ${instance.type}:${instance.instanceId}`);
+      logger.info(`Service registered: ${serviceType}:${instance.instanceId}`, { labels: instance.labels });
     } catch (error) {
-      logger.error(`Failed to register service ${instance.type}:${instance.instanceId}:`, error);
+      logger.error(`Failed to register service ${serviceType}:${instance.instanceId}:`, error);
       throw error;
     }
   }
 
-  async heartbeat(instanceId: string, type: string): Promise<void> {
-    const lease = this.leases.get(`${type}:${instanceId}`);
-    
+  async heartbeat(instanceId: string, serviceType: string): Promise<void> {
+    const lease = this.leases.get(`${serviceType}:${instanceId}`);
+
     if (lease) {
       try {
         await lease.keepaliveOnce();
       } catch (error) {
-        logger.error(`Heartbeat failed for ${type}:${instanceId}:`, error);
+        logger.error(`Heartbeat failed for ${serviceType}:${instanceId}:`, error);
         throw error;
       }
     } else {
-      logger.warn(`No lease found for ${type}:${instanceId}`);
+      logger.warn(`No lease found for ${serviceType}:${instanceId}`);
     }
   }
 
-  async unregister(instanceId: string, type: string): Promise<void> {
-    const key = this.getInstanceKey(type, instanceId);
-    const leaseKey = `${type}:${instanceId}`;
+  async unregister(instanceId: string, serviceType: string): Promise<void> {
+    const key = this.getInstanceKey(serviceType, instanceId);
+    const leaseKey = `${serviceType}:${instanceId}`;
     const lease = this.leases.get(leaseKey);
-    
+
     try {
       if (lease) {
         // Clear heartbeat interval
         if ((lease as any)._heartbeatInterval) {
           clearInterval((lease as any)._heartbeatInterval);
         }
-        
+
         // Revoke lease (this will delete the key)
         await lease.revoke();
         this.leases.delete(leaseKey);
@@ -100,43 +101,66 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         // Manually delete if no lease found
         await this.client.delete().key(key);
       }
-      
-      logger.info(`Service unregistered: ${type}:${instanceId}`);
+
+      logger.info(`Service unregistered: ${serviceType}:${instanceId}`);
     } catch (error) {
-      logger.error(`Failed to unregister service ${type}:${instanceId}:`, error);
+      logger.error(`Failed to unregister service ${serviceType}:${instanceId}:`, error);
       throw error;
     }
   }
 
-  async updateStatus(
-    instanceId: string,
-    type: string,
-    status: ServiceStatus,
-    instanceStats?: any,
-    meta?: Record<string, any>
-  ): Promise<void> {
-    const key = this.getInstanceKey(type, instanceId);
-    const leaseKey = `${type}:${instanceId}`;
+  async updateStatus(input: UpdateServiceStatusInput, autoRegisterIfMissing = false): Promise<void> {
+    const serviceType = input.labels.service;
+    const key = this.getInstanceKey(serviceType, input.instanceId);
+    const leaseKey = `${serviceType}:${input.instanceId}`;
     let lease = this.leases.get(leaseKey);
 
     try {
       const value = await this.client.get(key).string();
+
       if (!value) {
-        throw new Error(`Service ${type}:${instanceId} not found`);
+        if (autoRegisterIfMissing) {
+          // Auto-register: create new instance
+          const newInstance: ServiceInstance = {
+            instanceId: input.instanceId,
+            labels: input.labels,
+            hostname: '',
+            externalAddress: '',
+            internalAddress: '',
+            ports: { tcp: [], udp: [], http: [] },
+            status: input.status || 'ready',
+            updatedAt: new Date().toISOString(),
+            stats: input.stats || {},
+          };
+
+          // Create new lease with configured TTL
+          lease = this.client.lease(config.serviceDiscovery.heartbeatTTL);
+          await lease.put(key).value(JSON.stringify(newInstance));
+          this.leases.set(leaseKey, lease);
+
+          logger.info(`Service auto-registered: ${serviceType}:${input.instanceId}`);
+          return;
+        } else {
+          throw new Error(`Service ${serviceType}:${input.instanceId} not found`);
+        }
       }
 
+      // Partial merge: update only provided fields
       const instance: ServiceInstance = JSON.parse(value);
-      instance.status = status;
-      instance.updatedAt = new Date().toISOString();
-      if (instanceStats !== undefined) {
-        instance.instanceStats = instanceStats;
-      }
-      if (meta !== undefined) {
-        instance.meta = meta;
+
+      if (input.status !== undefined) {
+        instance.status = input.status;
       }
 
-      // For terminated/error servers, create a new lease with short TTL (5 minutes)
-      if (status === 'terminated' || status === 'error') {
+      if (input.stats !== undefined) {
+        // Merge stats (not replace)
+        instance.stats = { ...instance.stats, ...input.stats };
+      }
+
+      instance.updatedAt = new Date().toISOString();
+
+      // For terminated/error servers, create a new lease with configured TTL
+      if (instance.status === 'terminated' || instance.status === 'error') {
         // Revoke old lease if exists
         if (lease) {
           try {
@@ -155,7 +179,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         this.leases.set(leaseKey, newLease);
         lease = newLease;
 
-        logger.debug(`Service status updated: ${type}:${instanceId} -> ${status} (TTL: ${config.serviceDiscovery.terminatedTTL}s)`);
+        logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${instance.status} (TTL: ${config.serviceDiscovery.terminatedTTL}s)`);
       } else {
         // For other statuses, use existing lease
         if (lease) {
@@ -164,28 +188,33 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           await this.client.put(key).value(JSON.stringify(instance));
         }
 
-        logger.debug(`Service status updated: ${type}:${instanceId} -> ${status}`);
+        logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${instance.status}`);
       }
     } catch (error) {
-      logger.error(`Failed to update status for ${type}:${instanceId}:`, error);
+      logger.error(`Failed to update status for ${serviceType}:${input.instanceId}:`, error);
       throw error;
     }
   }
 
-  async getServices(type?: string): Promise<ServiceInstance[]> {
-    const instances: ServiceInstance[] = [];
-    
+  async getServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
+    let instances: ServiceInstance[] = [];
+
     try {
-      const prefix = type ? this.getTypePrefix(type) : '/services/';
+      const prefix = serviceType ? this.getTypePrefix(serviceType) : '/services/';
       const keys = await this.client.getAll().prefix(prefix).keys();
-      
+
       for (const key of keys) {
         const value = await this.client.get(key).string();
         if (value) {
           instances.push(JSON.parse(value));
         }
       }
-      
+
+      // Filter by serviceGroup if specified
+      if (serviceGroup) {
+        instances = instances.filter(instance => instance.labels.group === serviceGroup);
+      }
+
       return instances;
     } catch (error) {
       logger.error('Failed to get services:', error);
@@ -193,14 +222,14 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     }
   }
 
-  async getService(instanceId: string, type: string): Promise<ServiceInstance | null> {
-    const key = this.getInstanceKey(type, instanceId);
-    
+  async getService(instanceId: string, serviceType: string): Promise<ServiceInstance | null> {
+    const key = this.getInstanceKey(serviceType, instanceId);
+
     try {
       const value = await this.client.get(key).string();
       return value ? JSON.parse(value) : null;
     } catch (error) {
-      logger.error(`Failed to get service ${type}:${instanceId}:`, error);
+      logger.error(`Failed to get service ${serviceType}:${instanceId}:`, error);
       throw error;
     }
   }
@@ -220,22 +249,22 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       
       watcher.on('delete', (kv: any) => {
         try {
-          // Parse key to extract type and id
+          // Parse key to extract serviceType and id
           const key = kv.key.toString();
           const parts = key.split('/');
-          const type = parts[2];
+          const serviceType = parts[2];
           const id = parts[3];
-          
+
           // Emit a minimal instance object for delete events to satisfy typing
           callback({
             type: 'delete',
             instance: {
               instanceId: id,
-              type,
+              labels: { service: serviceType },
               hostname: '',
               externalAddress: '',
               internalAddress: '',
-              ports: {},
+              ports: { tcp: [], udp: [], http: [] },
               status: 'terminated',
               updatedAt: new Date().toISOString(),
             } as ServiceInstance,

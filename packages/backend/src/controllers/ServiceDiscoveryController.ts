@@ -12,13 +12,13 @@ import logger from '../config/logger';
 
 class ServiceDiscoveryController {
   /**
-   * Get all services or services of a specific type
-   * GET /api/v1/admin/services?type=chat
+   * Get all services or services of a specific type and/or group
+   * GET /api/v1/admin/services?type=chat&group=kr-1
    */
   async getServices(req: Request, res: Response) {
     try {
-      const { type } = req.query;
-      const services = await serviceDiscoveryService.getServices(type as string);
+      const { type, group } = req.query;
+      const services = await serviceDiscoveryService.getServices(type as string, group as string);
 
       res.json({
         success: true,

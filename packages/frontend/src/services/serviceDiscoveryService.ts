@@ -12,23 +12,22 @@ export interface ServicePorts {
   http?: number[];
 }
 
-export interface InstanceStats {
-  cpuUsage?: number;      // CPU usage percentage (0-100)
-  memoryUsage?: number;   // Memory usage in MB
-  memoryTotal?: number;   // Total memory in MB
+export interface ServiceLabels {
+  service: string;              // Required: Service type (e.g., 'world', 'auth')
+  group?: string;               // Optional: Service group (e.g., 'kr', 'us')
+  [key: string]: string | undefined; // Additional custom labels
 }
 
 export interface ServiceInstance {
   instanceId: string;
-  type: string;
-  serviceGroup: string;
+  labels: ServiceLabels;        // Replaces type + serviceGroup
   hostname: string;
   externalAddress: string;
   internalAddress: string;
   ports: ServicePorts;
   status: 'initializing' | 'ready' | 'shutting_down' | 'error' | 'terminated';
   updatedAt: string;
-  instanceStats?: InstanceStats;
+  stats?: Record<string, any>;  // Renamed from instanceStats
   meta?: Record<string, any>;
 }
 
@@ -42,8 +41,8 @@ class ServiceDiscoveryService {
   /**
    * Get all services or services of a specific type
    */
-  async getServices(type?: string): Promise<ServiceInstance[]> {
-    const params = type ? { type } : {};
+  async getServices(serviceType?: string): Promise<ServiceInstance[]> {
+    const params = serviceType ? { serviceType } : {};
     const response = await api.get('/admin/services', { params });
     return response.data.data;
   }
@@ -67,8 +66,8 @@ class ServiceDiscoveryService {
   /**
    * Delete a service instance
    */
-  async deleteService(type: string, instanceId: string): Promise<void> {
-    await api.delete(`/admin/services/${type}/${instanceId}`);
+  async deleteService(serviceType: string, instanceId: string): Promise<void> {
+    await api.delete(`/admin/services/${serviceType}/${instanceId}`);
   }
 
   /**

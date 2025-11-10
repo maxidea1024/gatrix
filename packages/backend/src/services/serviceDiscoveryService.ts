@@ -12,7 +12,9 @@ import {
   IServiceDiscoveryProvider,
   ServiceInstance,
   WatchCallback,
+  UpdateServiceStatusInput,
 } from '../types/serviceDiscovery';
+import config from '../config';
 
 class ServiceDiscoveryService {
   private provider: IServiceDiscoveryProvider;
@@ -23,17 +25,17 @@ class ServiceDiscoveryService {
   }
 
   /**
-   * Get all services or services of a specific type (Admin monitoring)
+   * Get all services or services of a specific type and/or group (Admin monitoring)
    */
-  async getServices(type?: string): Promise<ServiceInstance[]> {
-    return await this.provider.getServices(type);
+  async getServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
+    return await this.provider.getServices(serviceType, serviceGroup);
   }
 
   /**
    * Get a specific service instance (Admin monitoring)
    */
-  async getService(instanceId: string, type: string): Promise<ServiceInstance | null> {
-    return await this.provider.getService(instanceId, type);
+  async getService(instanceId: string, serviceType: string): Promise<ServiceInstance | null> {
+    return await this.provider.getService(instanceId, serviceType);
   }
 
   /**
@@ -44,10 +46,34 @@ class ServiceDiscoveryService {
   }
 
   /**
-   * Unregister a service instance (Admin cleanup)
+   * Register a service instance (Server SDK)
+   * Full snapshot registration
    */
-  async unregister(instanceId: string, type: string): Promise<void> {
-    await this.provider.unregister(instanceId, type);
+  async register(instance: ServiceInstance): Promise<void> {
+    const ttl = config.serviceDiscovery?.heartbeatTTL || 30;
+    await this.provider.register(instance, ttl);
+    const serviceType = instance.labels.service;
+    logger.info(`Service registered: ${serviceType}:${instance.instanceId}`, { labels: instance.labels });
+  }
+
+  /**
+   * Unregister a service instance (Server SDK or Admin cleanup)
+   */
+  async unregister(instanceId: string, serviceType: string): Promise<void> {
+    await this.provider.unregister(instanceId, serviceType);
+  }
+
+  /**
+   * Update service status (Server SDK)
+   * Partial merge update
+   */
+  async updateStatus(input: UpdateServiceStatusInput, autoRegisterIfMissing = false): Promise<void> {
+    await this.provider.updateStatus(input, autoRegisterIfMissing);
+    const serviceType = input.labels.service;
+    logger.info(`Service status updated: ${serviceType}:${input.instanceId}`, {
+      status: input.status,
+      autoRegisterIfMissing
+    });
   }
 
   /**
@@ -55,7 +81,7 @@ class ServiceDiscoveryService {
    */
   async getServiceTypes(): Promise<string[]> {
     const services = await this.getServices();
-    const types = new Set(services.map(s => s.type));
+    const types = new Set(services.map(s => s.labels.service));
     return Array.from(types).sort();
   }
 
@@ -68,15 +94,16 @@ class ServiceDiscoveryService {
     byStatus: Record<string, number>;
   }> {
     const services = await this.getServices();
-    
+
     const byType: Record<string, number> = {};
     const byStatus: Record<string, number> = {};
-    
+
     services.forEach(service => {
-      byType[service.type] = (byType[service.type] || 0) + 1;
+      const serviceType = service.labels.service;
+      byType[serviceType] = (byType[serviceType] || 0) + 1;
       byStatus[service.status] = (byStatus[service.status] || 0) + 1;
     });
-    
+
     return {
       total: services.length,
       byType,

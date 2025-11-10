@@ -42,7 +42,7 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
   const [errorTabValue, setErrorTabValue] = useState(0);
 
   // API test state
-  const [apiToken, setApiToken] = useState('');
+  const [apiToken, setApiToken] = useState('gatrix-unsecured-server-api-token'); // Default to unsecured server token
   const [appName, setAppName] = useState('MyGameApp');
   const [page, setPage] = useState('1');
   const [limit, setLimit] = useState('10');
@@ -165,11 +165,6 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
   };
 
   const handleTestAPI = async () => {
-    if (!apiToken.trim()) {
-      setTestError('API Token is required');
-      return;
-    }
-
     setTestLoading(true);
     setTestError(null);
     setTestResponse(null);
@@ -530,39 +525,70 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
                 </Box>
                 <Collapse in={expandedRequestHeaders}>
                   <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
-                    {/* API Token and App Name */}
+                    {/* Parameters Table */}
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
                         {t('gameWorlds.sdkGuide.authentication')}
                       </Typography>
-                      <Stack spacing={2} sx={{ pl: 1 }}>
-                        <TextField
-                          label={t('gameWorlds.sdkGuide.testApiToken')}
-                          type="password"
-                          value={apiToken}
-                          onChange={(e) => setApiToken(e.target.value)}
-                          size="small"
-                          fullWidth
-                          placeholder="Enter your API token"
-                        />
-                        <TextField
-                          label={t('gameWorlds.sdkGuide.testAppName')}
-                          value={appName}
-                          onChange={(e) => setAppName(e.target.value)}
-                          size="small"
-                          fullWidth
-                          placeholder="e.g., MyGameApp"
-                        />
-                        <TextField
-                          label={t('gameWorlds.sdkGuide.testLang')}
-                          value={lang}
-                          onChange={(e) => setLang(e.target.value)}
-                          size="small"
-                          fullWidth
-                          placeholder="e.g., ko, en, zh (optional)"
-                          helperText={t('gameWorlds.sdkGuide.testLangHelp')}
-                        />
-                      </Stack>
+                      <Box sx={{
+                        border: `1px solid ${theme.palette.divider}`,
+                        borderRadius: 1,
+                        overflow: 'hidden'
+                      }}>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0 }}>
+                          {/* App Name */}
+                          <Box sx={{
+                            p: 1.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 500,
+                            fontSize: '0.875rem'
+                          }}>
+                            {t('gameWorlds.sdkGuide.testAppName')}
+                          </Box>
+                          <Box sx={{
+                            p: 1,
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                            borderLeft: `1px solid ${theme.palette.divider}`
+                          }}>
+                            <TextField
+                              value={appName}
+                              onChange={(e) => setAppName(e.target.value)}
+                              size="small"
+                              fullWidth
+                              placeholder="e.g., MyGameApp"
+                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                            />
+                          </Box>
+
+                          {/* Language */}
+                          <Box sx={{
+                            p: 1.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 500,
+                            fontSize: '0.875rem'
+                          }}>
+                            {t('gameWorlds.sdkGuide.testLang')}
+                          </Box>
+                          <Box sx={{
+                            p: 1,
+                            borderLeft: `1px solid ${theme.palette.divider}`
+                          }}>
+                            <TextField
+                              value={lang}
+                              onChange={(e) => setLang(e.target.value)}
+                              size="small"
+                              fullWidth
+                              placeholder="e.g., ko, en, zh (optional)"
+                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                            />
+                          </Box>
+                        </Box>
+                      </Box>
                     </Box>
 
                     {/* Request Headers */}

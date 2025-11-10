@@ -3632,7 +3632,7 @@
       "card": "카드 뷰"
     },
     "filters": {
-      "type": "서버 타입",
+      "service": "서비스 타입",
       "status": "상태"
     },
     "status": {
@@ -3644,13 +3644,15 @@
     },
     "table": {
       "instanceId": "인스턴스 ID",
-      "type": "타입",
+      "service": "서비스",
+      "group": "그룹",
+      "labels": "레이블",
       "hostname": "호스트명",
       "externalAddress": "공인 IP",
       "internalAddress": "내부 IP",
       "ports": "포트",
       "status": "상태",
-      "instanceStats": "인스턴스 통계",
+      "stats": "통계",
       "meta": "메타 정보",
       "updatedAt": "업데이트 시간"
     }

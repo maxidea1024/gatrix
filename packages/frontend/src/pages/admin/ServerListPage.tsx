@@ -182,13 +182,15 @@ const ServerListPage: React.FC = () => {
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
     { id: 'status', labelKey: 'serverList.table.status', visible: true },
-    { id: 'type', labelKey: 'serverList.table.type', visible: true },
+    { id: 'service', labelKey: 'serverList.table.service', visible: true },
+    { id: 'group', labelKey: 'serverList.table.group', visible: true },
+    { id: 'labels', labelKey: 'serverList.table.labels', visible: true },
     { id: 'instanceId', labelKey: 'serverList.table.instanceId', visible: true },
     { id: 'hostname', labelKey: 'serverList.table.hostname', visible: true },
     { id: 'externalAddress', labelKey: 'serverList.table.externalAddress', visible: true },
     { id: 'internalAddress', labelKey: 'serverList.table.internalAddress', visible: true },
     { id: 'ports', labelKey: 'serverList.table.ports', visible: true },
-    { id: 'instanceStats', labelKey: 'serverList.table.instanceStats', visible: true },
+    { id: 'stats', labelKey: 'serverList.table.stats', visible: true },
     { id: 'meta', labelKey: 'serverList.table.meta', visible: true },
     { id: 'updatedAt', labelKey: 'serverList.table.updatedAt', visible: true },
   ];
@@ -283,7 +285,7 @@ const ServerListPage: React.FC = () => {
             // If paused, store updates in pending queue
             setPendingUpdates((prev) => {
               if (event.type === 'put') {
-                const index = prev.findIndex((s) => s.instanceId === event.data.instanceId && s.type === event.data.type);
+                const index = prev.findIndex((s) => s.instanceId === event.data.instanceId && s.labels.service === event.data.labels.service);
                 if (index >= 0) {
                   const newPending = [...prev];
                   newPending[index] = event.data;
@@ -292,7 +294,7 @@ const ServerListPage: React.FC = () => {
                   return [...prev, event.data];
                 }
               } else if (event.type === 'delete') {
-                return prev.filter((s) => !(s.instanceId === event.data.instanceId && s.type === event.data.type));
+                return prev.filter((s) => !(s.instanceId === event.data.instanceId && s.labels.service === event.data.labels.service));
               }
               return prev;
             });
@@ -300,10 +302,10 @@ const ServerListPage: React.FC = () => {
             // Not paused - apply updates immediately
             if (event.type === 'put') {
               setServices((prev) => {
-                const index = prev.findIndex((s) => s.instanceId === event.data.instanceId && s.type === event.data.type);
+                const index = prev.findIndex((s) => s.instanceId === event.data.instanceId && s.labels.service === event.data.labels.service);
                 if (index >= 0) {
                   // Update existing - highlight the updated service with status color
-                  const serviceKey = `${event.data.type}-${event.data.instanceId}`;
+                  const serviceKey = `${event.data.labels.service}-${event.data.instanceId}`;
                   setUpdatedServiceIds((prev) => new Map(prev).set(serviceKey, event.data.status));
                   setTimeout(() => {
                     setUpdatedServiceIds((prev) => {
@@ -324,7 +326,7 @@ const ServerListPage: React.FC = () => {
             } else if (event.type === 'delete') {
               // Service deleted/expired - remove from list immediately
               // Terminated services are kept for 5 minutes with TTL, so this only fires after TTL expires
-              setServices((prev) => prev.filter((s) => !(s.instanceId === event.data.instanceId && s.type === event.data.type)));
+              setServices((prev) => prev.filter((s) => !(s.instanceId === event.data.instanceId && s.labels.service === event.data.labels.service)));
             }
           }
         },
@@ -350,7 +352,7 @@ const ServerListPage: React.FC = () => {
       setServices((prev) => {
         let updated = [...prev];
         pendingUpdates.forEach((pendingService) => {
-          const index = updated.findIndex((s) => s.instanceId === pendingService.instanceId && s.type === pendingService.type);
+          const index = updated.findIndex((s) => s.instanceId === pendingService.instanceId && s.labels.service === pendingService.labels.service);
           if (index >= 0) {
             updated[index] = pendingService;
           } else {
@@ -399,8 +401,8 @@ const ServerListPage: React.FC = () => {
   // Filter configuration
   const availableFilterDefinitions: FilterDefinition[] = [
     {
-      key: 'type',
-      label: t('serverList.filters.type'),
+      key: 'service',
+      label: t('serverList.filters.service'),
       type: 'select',
       options: (serviceTypes || []).map((type) => ({ value: type, label: type })),
     },
@@ -481,16 +483,20 @@ const ServerListPage: React.FC = () => {
       const searchLower = debouncedSearchTerm.toLowerCase();
       const matchesSearch =
         service.instanceId.toLowerCase().includes(searchLower) ||
-        service.type.toLowerCase().includes(searchLower) ||
+        service.labels.service.toLowerCase().includes(searchLower) ||
+        (service.labels.group && service.labels.group.toLowerCase().includes(searchLower)) ||
         service.hostname.toLowerCase().includes(searchLower) ||
         service.externalAddress.toLowerCase().includes(searchLower) ||
-        service.internalAddress.toLowerCase().includes(searchLower);
+        service.internalAddress.toLowerCase().includes(searchLower) ||
+        Object.entries(service.labels).some(([key, value]) =>
+          value && value.toLowerCase().includes(searchLower)
+        );
       if (!matchesSearch) return false;
     }
 
     // Dynamic filters
     for (const filter of activeFilters) {
-      if (filter.key === 'type' && filter.value && service.type !== filter.value) {
+      if (filter.key === 'service' && filter.value && service.labels.service !== filter.value) {
         return false;
       }
       if (filter.key === 'status' && filter.value && service.status !== filter.value) {
@@ -503,8 +509,20 @@ const ServerListPage: React.FC = () => {
 
   // Apply sorting
   const displayServices = [...filteredServices].sort((a, b) => {
-    let aValue: any = a[sortBy as keyof ServiceInstance];
-    let bValue: any = b[sortBy as keyof ServiceInstance];
+    let aValue: any;
+    let bValue: any;
+
+    // Handle labels fields
+    if (sortBy === 'service') {
+      aValue = a.labels.service;
+      bValue = b.labels.service;
+    } else if (sortBy === 'group') {
+      aValue = a.labels.group;
+      bValue = b.labels.group;
+    } else {
+      aValue = a[sortBy as keyof ServiceInstance];
+      bValue = b[sortBy as keyof ServiceInstance];
+    }
 
     // Handle special cases
     if (sortBy === 'updatedAt') {
@@ -828,7 +846,7 @@ const ServerListPage: React.FC = () => {
                 <TableRow>
                   {columns.filter(col => col.visible).map((column) => (
                     <TableCell key={column.id}>
-                      {column.id !== 'ports' && column.id !== 'instanceStats' && column.id !== 'meta' ? (
+                      {column.id !== 'ports' && column.id !== 'stats' && column.id !== 'meta' && column.id !== 'labels' ? (
                         <TableSortLabel
                           active={sortBy === column.id}
                           direction={sortBy === column.id ? sortOrder : 'asc'}
@@ -854,7 +872,7 @@ const ServerListPage: React.FC = () => {
                   </TableRow>
                 ) : (
                   displayServices.map((service) => {
-                    const serviceKey = `${service.type}-${service.instanceId}`;
+                    const serviceKey = `${service.labels.service}-${service.instanceId}`;
                     const updatedStatus = updatedServiceIds.get(serviceKey);
                     const isUpdated = updatedStatus !== undefined;
                     // Use service.status for highlight color (current status)
@@ -888,10 +906,44 @@ const ServerListPage: React.FC = () => {
                                 </Typography>
                               </TableCell>
                             );
-                          case 'type':
+                          case 'service':
                             return (
                               <TableCell key={column.id}>
-                                {getTypeChip(service.type)}
+                                {getTypeChip(service.labels.service)}
+                              </TableCell>
+                            );
+                          case 'group':
+                            return (
+                              <TableCell key={column.id}>
+                                {service.labels.group ? (
+                                  <Chip
+                                    label={service.labels.group}
+                                    size="small"
+                                    variant="outlined"
+                                    color="primary"
+                                    sx={{ fontWeight: 600 }}
+                                  />
+                                ) : (
+                                  <Typography variant="caption" color="text.disabled">-</Typography>
+                                )}
+                              </TableCell>
+                            );
+                          case 'labels':
+                            return (
+                              <TableCell key={column.id}>
+                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                                  {Object.entries(service.labels)
+                                    .filter(([key]) => key !== 'service' && key !== 'group')
+                                    .map(([key, value]) => (
+                                      <Chip
+                                        key={key}
+                                        label={`${key}=${value}`}
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ fontSize: '0.7rem', height: '22px' }}
+                                      />
+                                    ))}
+                                </Box>
                               </TableCell>
                             );
                           case 'hostname':
@@ -961,21 +1013,16 @@ const ServerListPage: React.FC = () => {
                                 {getStatusBadge(service.status)}
                               </TableCell>
                             );
-                          case 'instanceStats':
+                          case 'stats':
                             return (
                               <TableCell key={column.id}>
-                                {service.instanceStats && (
+                                {service.stats && Object.keys(service.stats).length > 0 && (
                                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                    {service.instanceStats.cpuUsage !== undefined && (
-                                      <Typography variant="caption" color="text.secondary">
-                                        CPU: {service.instanceStats.cpuUsage}%
+                                    {Object.entries(service.stats).map(([key, value]) => (
+                                      <Typography key={key} variant="caption" color="text.secondary">
+                                        {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
                                       </Typography>
-                                    )}
-                                    {service.instanceStats.memoryUsage !== undefined && service.instanceStats.memoryTotal !== undefined && (
-                                      <Typography variant="caption" color="text.secondary">
-                                        MEM: {service.instanceStats.memoryUsage}MB / {service.instanceStats.memoryTotal}MB
-                                      </Typography>
-                                    )}
+                                    ))}
                                   </Box>
                                 )}
                               </TableCell>
@@ -1036,24 +1083,30 @@ const ServerListPage: React.FC = () => {
             </Box>
           ) : (
             displayServices.map((service) => {
-              const serviceKey = `${service.type}-${service.instanceId}`;
+              const serviceKey = `${service.labels.service}-${service.instanceId}`;
               const updatedStatus = updatedServiceIds.get(serviceKey);
               const isUpdated = updatedStatus !== undefined;
               // Use service.status for highlight color (current status)
               const highlightStatus = updatedStatus || service.status;
-              const label = `${service.type}:${service.instanceId.substring(0, 8)}... | ${service.hostname} | ${getStatusBadge(service.status).props.label}`;
+              const label = `${service.labels.service}:${service.instanceId.substring(0, 8)}... | ${service.hostname} | ${getStatusBadge(service.status).props.label}`;
               return (
                 <Tooltip key={serviceKey} title={
                   <Box>
                     <Typography variant="caption" sx={{ display: 'block' }}>ID: {service.instanceId}</Typography>
-                    <Typography variant="caption" sx={{ display: 'block' }}>Type: {service.type}</Typography>
+                    <Typography variant="caption" sx={{ display: 'block' }}>Service: {service.labels.service}</Typography>
+                    {service.labels.group && (
+                      <Typography variant="caption" sx={{ display: 'block' }}>Group: {service.labels.group}</Typography>
+                    )}
                     <Typography variant="caption" sx={{ display: 'block' }}>Hostname: {service.hostname}</Typography>
                     <Typography variant="caption" sx={{ display: 'block' }}>External: {service.externalAddress}</Typography>
                     <Typography variant="caption" sx={{ display: 'block' }}>Internal: {service.internalAddress}</Typography>
-                    {service.instanceStats && (
+                    {service.stats && Object.keys(service.stats).length > 0 && (
                       <>
-                        <Typography variant="caption" sx={{ display: 'block' }}>CPU: {service.instanceStats.cpuUsage}%</Typography>
-                        <Typography variant="caption" sx={{ display: 'block' }}>MEM: {service.instanceStats.memoryUsage}MB / {service.instanceStats.memoryTotal}MB</Typography>
+                        {Object.entries(service.stats).map(([key, value]) => (
+                          <Typography key={key} variant="caption" sx={{ display: 'block' }}>
+                            {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
+                          </Typography>
+                        ))}
                       </>
                     )}
                     <Typography variant="caption" sx={{ display: 'block' }}>Updated: {formatDateTimeDetailed(service.updatedAt)}</Typography>
@@ -1088,7 +1141,7 @@ const ServerListPage: React.FC = () => {
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
-                      {getTypeChip(service.type)}
+                      {getTypeChip(service.labels.service)}
                       {getStatusBadge(service.status)}
                     </Box>
                     <Typography variant="caption" sx={{ display: 'block', fontFamily: 'monospace' }}>
@@ -1118,7 +1171,7 @@ const ServerListPage: React.FC = () => {
             </Card>
           ) : (
             displayServices.map((service) => {
-              const serviceKey = `${service.type}-${service.instanceId}`;
+              const serviceKey = `${service.labels.service}-${service.instanceId}`;
               const updatedStatus = updatedServiceIds.get(serviceKey);
               const isUpdated = updatedStatus !== undefined;
               // Use service.status for highlight color (current status)
@@ -1144,7 +1197,18 @@ const ServerListPage: React.FC = () => {
               >
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    {getTypeChip(service.type)}
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                      {getTypeChip(service.labels.service)}
+                      {service.labels.group && (
+                        <Chip
+                          label={service.labels.group}
+                          size="small"
+                          variant="outlined"
+                          color="primary"
+                          sx={{ fontWeight: 600 }}
+                        />
+                      )}
+                    </Box>
                     {getStatusBadge(service.status)}
                   </Box>
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
@@ -1153,6 +1217,24 @@ const ServerListPage: React.FC = () => {
                   <Typography variant="body2" sx={{ fontFamily: 'monospace', mb: 1 }}>
                     {service.hostname}
                   </Typography>
+                  {/* Custom labels */}
+                  {Object.entries(service.labels)
+                    .filter(([key]) => key !== 'service' && key !== 'group')
+                    .length > 0 && (
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mb: 1 }}>
+                      {Object.entries(service.labels)
+                        .filter(([key]) => key !== 'service' && key !== 'group')
+                        .map(([key, value]) => (
+                          <Chip
+                            key={key}
+                            label={`${key}=${value}`}
+                            size="small"
+                            variant="outlined"
+                            sx={{ fontSize: '0.7rem', height: '22px' }}
+                          />
+                        ))}
+                    </Box>
+                  )}
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 2 }}>
                     <Typography variant="caption" color="text.secondary">
                       External: {service.externalAddress}
@@ -1175,14 +1257,13 @@ const ServerListPage: React.FC = () => {
                         HTTP: {service.ports.http.join(', ')}
                       </Typography>
                     )}
-                    {service.instanceStats && (
+                    {service.stats && Object.keys(service.stats).length > 0 && (
                       <>
-                        <Typography variant="caption" color="text.secondary">
-                          CPU: {service.instanceStats.cpuUsage}%
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          MEM: {service.instanceStats.memoryUsage}MB / {service.instanceStats.memoryTotal}MB
-                        </Typography>
+                        {Object.entries(service.stats).map(([key, value]) => (
+                          <Typography key={key} variant="caption" color="text.secondary">
+                            {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
+                          </Typography>
+                        ))}
                       </>
                     )}
                     {service.meta && Object.keys(service.meta).length > 0 && (

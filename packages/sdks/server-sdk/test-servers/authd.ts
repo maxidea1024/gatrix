@@ -36,7 +36,7 @@ class AuthServer extends BaseTestServer {
     if (this.config.enableServiceDiscovery) {
       this.sdk.updateServiceStatus({
         status: 'ready',
-        meta: {
+        stats: {
           activeSessions: this.userSessions.size,
         },
       }).catch(err => this.logError('Failed to update service status', err));
@@ -51,8 +51,12 @@ const group = process.argv[4] || 'production';
 const enableDiscovery = process.argv[5] === 'true' || false;
 
 const config: BaseServerConfig = {
-  serverType: 'authd',
+  serviceType: 'authd',
   serviceGroup: group,
+  customLabels: {
+    env: process.env.NODE_ENV || 'development',
+    region: 'ap-northeast-2',
+  },
   instanceName: `authd-${instanceId}`,
   port: port,
   enableServiceDiscovery: enableDiscovery,

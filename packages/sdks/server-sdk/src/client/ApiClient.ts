@@ -3,9 +3,11 @@
  */
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import { ulid } from 'ulid';
 import { Logger } from '../utils/logger';
 import { ErrorCode, createError } from '../utils/errors';
 import { ApiResponse } from '../types/api';
+import { RetryConfig } from '../types/config';
 
 export interface ApiClientConfig {
   baseURL: string;
@@ -13,14 +15,26 @@ export interface ApiClientConfig {
   applicationName: string;
   timeout?: number;
   logger?: Logger;
+  retry?: RetryConfig;
 }
+
+const DEFAULT_RETRY_CONFIG: Required<RetryConfig> = {
+  enabled: true,
+  maxRetries: 3,
+  retryDelay: 1000,
+  retryDelayMultiplier: 2,
+  maxRetryDelay: 10000,
+  retryableStatusCodes: [408, 429, 500, 502, 503, 504],
+};
 
 export class ApiClient {
   private client: AxiosInstance;
   private logger: Logger;
+  private retryConfig: Required<RetryConfig>;
 
   constructor(config: ApiClientConfig) {
     this.logger = config.logger || new Logger();
+    this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config.retry };
 
     // Create axios instance
     this.client = axios.create({
@@ -129,55 +143,159 @@ export class ApiClient {
   }
 
   /**
-   * GET request
+   * Check if error is retryable
    */
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const response: AxiosResponse<ApiResponse<T>> = await this.client.get(url, config);
-    return response.data;
+  private isRetryableError(error: AxiosError): boolean {
+    if (!this.retryConfig.enabled) {
+      return false;
+    }
+
+    // Network errors are retryable
+    if (!error.response) {
+      return true;
+    }
+
+    // Check if status code is retryable
+    const status = error.response.status;
+    return this.retryConfig.retryableStatusCodes.includes(status);
   }
 
   /**
-   * POST request
+   * Calculate retry delay with exponential backoff
+   */
+  private calculateRetryDelay(attemptNumber: number): number {
+    const delay = this.retryConfig.retryDelay * Math.pow(this.retryConfig.retryDelayMultiplier, attemptNumber);
+    return Math.min(delay, this.retryConfig.maxRetryDelay);
+  }
+
+  /**
+   * Sleep for specified milliseconds
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Execute request with retry logic
+   */
+  private async executeWithRetry<T>(
+    fn: () => Promise<AxiosResponse<ApiResponse<T>>>,
+    context: { method: string; url: string }
+  ): Promise<ApiResponse<T>> {
+    let lastError: AxiosError | undefined;
+
+    for (let attempt = 0; attempt <= this.retryConfig.maxRetries; attempt++) {
+      try {
+        const response = await fn();
+        return response.data;
+      } catch (error) {
+        lastError = error as AxiosError;
+
+        // If not retryable or last attempt, throw error
+        if (!this.isRetryableError(lastError) || attempt === this.retryConfig.maxRetries) {
+          throw error;
+        }
+
+        // Calculate delay and retry
+        const delay = this.calculateRetryDelay(attempt);
+        this.logger.warn('Request failed, retrying...', {
+          method: context.method,
+          url: context.url,
+          attempt: attempt + 1,
+          maxRetries: this.retryConfig.maxRetries,
+          retryDelay: delay,
+          error: lastError.message,
+        });
+
+        await this.sleep(delay);
+      }
+    }
+
+    // This should never happen, but TypeScript needs it
+    throw lastError;
+  }
+
+  /**
+   * GET request (with retry)
+   */
+  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return this.executeWithRetry(
+      () => this.client.get<ApiResponse<T>>(url, config),
+      { method: 'GET', url }
+    );
+  }
+
+  /**
+   * POST request (with retry and auto-generated requestId)
    */
   async post<T = any>(
     url: string,
     data?: any,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    const response: AxiosResponse<ApiResponse<T>> = await this.client.post(url, data, config);
-    return response.data;
+    // Auto-generate requestId if not provided
+    const requestData = data || {};
+    if (!requestData.requestId) {
+      requestData.requestId = ulid();
+      this.logger.debug('Auto-generated requestId', { requestId: requestData.requestId, url });
+    }
+
+    return this.executeWithRetry(
+      () => this.client.post<ApiResponse<T>>(url, requestData, config),
+      { method: 'POST', url }
+    );
   }
 
   /**
-   * PUT request
+   * PUT request (with retry and auto-generated requestId)
    */
   async put<T = any>(
     url: string,
     data?: any,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    const response: AxiosResponse<ApiResponse<T>> = await this.client.put(url, data, config);
-    return response.data;
+    // Auto-generate requestId if not provided
+    const requestData = data || {};
+    if (!requestData.requestId) {
+      requestData.requestId = ulid();
+      this.logger.debug('Auto-generated requestId', { requestId: requestData.requestId, url });
+    }
+
+    return this.executeWithRetry(
+      () => this.client.put<ApiResponse<T>>(url, requestData, config),
+      { method: 'PUT', url }
+    );
   }
 
   /**
-   * PATCH request
+   * PATCH request (with retry and auto-generated requestId)
    */
   async patch<T = any>(
     url: string,
     data?: any,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
-    const response: AxiosResponse<ApiResponse<T>> = await this.client.patch(url, data, config);
-    return response.data;
+    // Auto-generate requestId if not provided
+    const requestData = data || {};
+    if (!requestData.requestId) {
+      requestData.requestId = ulid();
+      this.logger.debug('Auto-generated requestId', { requestId: requestData.requestId, url });
+    }
+
+    return this.executeWithRetry(
+      () => this.client.patch<ApiResponse<T>>(url, requestData, config),
+      { method: 'PATCH', url }
+    );
   }
 
   /**
-   * DELETE request
+   * DELETE request (with retry)
    */
   async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const response: AxiosResponse<ApiResponse<T>> = await this.client.delete(url, config);
-    return response.data;
+    return this.executeWithRetry(
+      () => this.client.delete<ApiResponse<T>>(url, config),
+      { method: 'DELETE', url }
+    );
   }
 
   /**

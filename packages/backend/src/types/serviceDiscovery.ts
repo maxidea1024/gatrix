@@ -12,42 +12,56 @@ export interface ServicePorts {
   http?: number[];
 }
 
-export interface InstanceStats {
-  cpuUsage?: number;      // CPU usage percentage (0-100)
-  memoryUsage?: number;   // Memory usage in MB
-  memoryTotal?: number;   // Total memory in MB
+/**
+ * Service labels for categorization and filtering
+ * Common labels:
+ * - service: Service type (e.g., 'world', 'auth', 'lobby', 'chat')
+ * - group: Service group (e.g., 'kr', 'us', 'eu')
+ * - env: Environment (e.g., 'prod', 'staging', 'dev')
+ * - region: Cloud region (e.g., 'ap-northeast-2', 'us-east-1')
+ * - role: Server role (e.g., 'master', 'slave', 'worker')
+ */
+export interface ServiceLabels {
+  service: string;              // Required: Service type (e.g., 'world', 'auth', 'lobby', 'chat')
+  group?: string;               // Optional: Service group (e.g., 'kr', 'us', 'production')
+  [key: string]: string | undefined; // Additional custom labels
 }
 
 export interface ServiceInstance {
   instanceId: string;           // ULID
-  type: string;                 // world, auth, channel, chat, etc.
-  serviceGroup: string;         // Service group for grouping servers (e.g., 'kr-1', 'us-east', 'production', 'staging')
+  labels: ServiceLabels;        // Service labels for categorization
   hostname: string;             // Server hostname
-  externalAddress: string;      // Public IP address
+  externalAddress: string;      // Public IP address (auto-detected from req.ip)
   internalAddress: string;      // NIC address (internal IP)
   ports: ServicePorts;          // TCP, UDP, HTTP ports
   status: ServiceStatus;        // Current status
   updatedAt: string;            // ISO8601 timestamp
-  instanceStats?: InstanceStats; // CPU, memory usage
-  meta?: Record<string, any>;   // Custom metadata (e.g., user count)
+  stats?: Record<string, any>;  // Dynamic stats (e.g., cpuUsage, memoryUsage, userCount)
+  meta?: Record<string, any>;   // Static metadata (set at registration, immutable)
 }
 
 export interface RegisterServiceInput {
-  type: string;
-  serviceGroup: string;
+  labels: ServiceLabels;        // Service labels
   hostname: string;
-  externalAddress: string;
   internalAddress: string;
   ports: ServicePorts;
   status?: ServiceStatus;
-  instanceStats?: InstanceStats;
+  stats?: Record<string, any>;
   meta?: Record<string, any>;
+  // Note: externalAddress is auto-detected from req.ip, not sent by client
 }
 
 export interface UpdateServiceStatusInput {
-  status: ServiceStatus;
-  instanceStats?: InstanceStats;
-  meta?: Record<string, any>;
+  instanceId: string;           // Required for update
+  labels: ServiceLabels;        // Required for key generation
+  status?: ServiceStatus;       // Optional: update status
+  stats?: Record<string, any>;  // Optional: update stats (merged with existing)
+
+  // Auto-register fields (only used when autoRegisterIfMissing=true and instance doesn't exist)
+  hostname?: string;            // Required for auto-register
+  internalAddress?: string;     // Required for auto-register
+  ports?: ServicePorts;         // Required for auto-register
+  meta?: Record<string, any>;   // Optional: static metadata (only set during auto-register)
 }
 
 export interface WatchEvent {
@@ -64,40 +78,42 @@ export type WatchCallback = (event: WatchEvent) => void;
  */
 export interface IServiceDiscoveryProvider {
   /**
-   * Register a service instance
+   * Register a service instance (full snapshot)
    */
   register(instance: ServiceInstance, ttlSeconds: number): Promise<void>;
-  
+
   /**
    * Send heartbeat to keep service alive (renew TTL)
    */
-  heartbeat(instanceId: string, type: string): Promise<void>;
+  heartbeat(instanceId: string, serviceType: string): Promise<void>;
 
   /**
    * Unregister a service instance
    */
-  unregister(instanceId: string, type: string): Promise<void>;
+  unregister(instanceId: string, serviceType: string): Promise<void>;
 
   /**
-   * Update service status
+   * Update service status (partial merge)
+   * @param input - Partial update input (only changed fields)
+   * @param autoRegisterIfMissing - Auto-register if instance doesn't exist
    */
-  updateStatus(instanceId: string, type: string, status: ServiceStatus, instanceStats?: InstanceStats, meta?: Record<string, any>): Promise<void>;
-  
+  updateStatus(input: UpdateServiceStatusInput, autoRegisterIfMissing?: boolean): Promise<void>;
+
   /**
-   * Get all services or services of a specific type
+   * Get all services or services of a specific type and/or group
    */
-  getServices(type?: string): Promise<ServiceInstance[]>;
-  
+  getServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]>;
+
   /**
    * Get a specific service instance
    */
-  getService(instanceId: string, type: string): Promise<ServiceInstance | null>;
-  
+  getService(instanceId: string, serviceType: string): Promise<ServiceInstance | null>;
+
   /**
    * Watch for service changes
    */
   watch(callback: WatchCallback): Promise<void>;
-  
+
   /**
    * Close connections and cleanup
    */

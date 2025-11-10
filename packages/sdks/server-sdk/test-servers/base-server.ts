@@ -4,13 +4,14 @@
  * Common functionality for all test servers
  */
 
-import { GatrixSDK } from '../src/GatrixSDK';
-import { ServiceInstance } from '../src/types/api';
+import { GatrixServerSDK } from '../src/GatrixServerSDK';
+import { ServiceInstance, ServiceLabels } from '../src/types/api';
 import os from 'os';
 
 export interface BaseServerConfig {
-  serverType: string;
-  serviceGroup: string;
+  serviceType: string;
+  serviceGroup?: string;
+  customLabels?: Record<string, string>;
   instanceName: string;
   port: number;
   enableServiceDiscovery?: boolean;
@@ -19,7 +20,7 @@ export interface BaseServerConfig {
 }
 
 export class BaseTestServer {
-  protected sdk: GatrixSDK;
+  protected sdk: GatrixServerSDK;
   protected config: BaseServerConfig;
   protected startTime: Date;
 
@@ -28,12 +29,12 @@ export class BaseTestServer {
     this.startTime = new Date();
 
     // Create SDK instance
-    this.sdk = new GatrixSDK({
+    this.sdk = new GatrixServerSDK({
       gatrixUrl: process.env.GATRIX_URL || 'http://localhost:55000',
-      apiToken: process.env.API_TOKEN || '3569268f61a7396e494a10ddc9b08652f583ee06875c91efac56e6b6b5633bf3',
-      applicationName: config.serverType,
-      
-      // Redis for events and service discovery
+      apiToken: process.env.API_TOKEN, // Optional: defaults to 'gatrix-unsecured-server-api-token'
+      applicationName: config.serviceType,
+
+      // Redis for events
       redis: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379'),
@@ -44,16 +45,6 @@ export class BaseTestServer {
         enabled: config.enableCache !== false,
         ttl: 300,
         autoRefresh: config.enableEvents !== false, // Only auto-refresh if events are enabled
-      },
-
-      // Service discovery configuration (disabled by default for testing)
-      serviceDiscovery: config.enableServiceDiscovery === true ? {
-        enabled: true,
-        mode: 'redis',
-        ttlSeconds: 30,
-        heartbeatIntervalMs: 10000,
-      } : {
-        enabled: false,
       },
 
       // Logger configuration
@@ -130,11 +121,16 @@ export class BaseTestServer {
     const networkInterfaces = os.networkInterfaces();
     const internalIp = this.getInternalIp(networkInterfaces);
 
+    // Build labels
+    const labels: ServiceLabels = {
+      service: this.config.serviceType,
+      ...(this.config.serviceGroup && { group: this.config.serviceGroup }),
+      ...(this.config.customLabels || {}),
+    };
+
     const instanceId = await this.sdk.registerService({
-      type: this.config.serverType,
-      serviceGroup: this.config.serviceGroup,
+      labels,
       hostname: os.hostname(),
-      externalAddress: '0.0.0.0', // Would be actual public IP in production
       internalAddress: internalIp,
       ports: {
         http: [this.config.port],
@@ -259,25 +255,25 @@ export class BaseTestServer {
   protected async testServiceDiscoveryAPI(): Promise<void> {
     try {
       // Get all services
-      const allServices = await this.sdk.getServicesViaAPI();
+      const allServices = await this.sdk.getServices();
       this.log(`Service Discovery API: ${allServices.length} total services`);
 
-      // Get services by type
-      const authServices = await this.sdk.getServicesViaAPI({ type: 'authd' });
+      // Get services by service type
+      const authServices = await this.sdk.getServices({ serviceType: 'authd' });
       this.log(`  - authd: ${authServices.length} instances`);
 
-      const lobbydServices = await this.sdk.getServicesViaAPI({ type: 'lobbyd' });
+      const lobbydServices = await this.sdk.getServices({ serviceType: 'lobbyd' });
       this.log(`  - lobbyd: ${lobbydServices.length} instances`);
 
-      const chatdServices = await this.sdk.getServicesViaAPI({ type: 'chatd' });
+      const chatdServices = await this.sdk.getServices({ serviceType: 'chatd' });
       this.log(`  - chatd: ${chatdServices.length} instances`);
 
-      const worlddServices = await this.sdk.getServicesViaAPI({ type: 'worldd' });
+      const worlddServices = await this.sdk.getServices({ serviceType: 'worldd' });
       this.log(`  - worldd: ${worlddServices.length} instances`);
 
       // Get services by group
       if (worlddServices.length > 0) {
-        const groups = [...new Set(worlddServices.map(s => s.serviceGroup))];
+        const groups = [...new Set(worlddServices.map(s => s.labels.group).filter(Boolean))];
         this.log(`  - worldd groups: ${groups.join(', ')}`);
       }
     } catch (error: any) {

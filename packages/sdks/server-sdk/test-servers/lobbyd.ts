@@ -58,7 +58,7 @@ class LobbyServer extends BaseTestServer {
     if (this.config.enableServiceDiscovery) {
       this.sdk.updateServiceStatus({
         status: 'ready',
-        meta: {
+        stats: {
           activeLobbies: this.lobbies.size,
         },
       }).catch(err => this.logError('Failed to update service status', err));
@@ -73,8 +73,12 @@ const group = process.argv[4] || 'production';
 const enableDiscovery = process.argv[5] === 'true' || false;
 
 const config: BaseServerConfig = {
-  serverType: 'lobbyd',
+  serviceType: 'lobbyd',
   serviceGroup: group,
+  customLabels: {
+    env: process.env.NODE_ENV || 'development',
+    region: 'ap-northeast-2',
+  },
   instanceName: `lobbyd-${instanceId}`,
   port: port,
   enableServiceDiscovery: enableDiscovery,

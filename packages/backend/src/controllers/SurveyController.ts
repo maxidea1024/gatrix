@@ -3,6 +3,7 @@ import { SurveyService } from '../services/SurveyService';
 import { asyncHandler } from '../middleware/errorHandler';
 import { CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../types/auth';
+import { pubSubService } from '../services/PubSubService';
 
 export class SurveyController {
   /**
@@ -84,6 +85,13 @@ export class SurveyController {
 
     const survey = await SurveyService.createSurvey(surveyData);
 
+    // Publish event for SDK real-time updates
+    await pubSubService.publishNotification({
+      type: 'survey.created',
+      data: { survey },
+      targetChannels: ['survey', 'admin'],
+    });
+
     res.status(201).json({
       success: true,
       data: { survey },
@@ -110,6 +118,13 @@ export class SurveyController {
 
     const survey = await SurveyService.updateSurvey(id, updateData);
 
+    // Publish event for SDK real-time updates
+    await pubSubService.publishNotification({
+      type: 'survey.updated',
+      data: { survey },
+      targetChannels: ['survey', 'admin'],
+    });
+
     res.json({
       success: true,
       data: { survey },
@@ -129,6 +144,13 @@ export class SurveyController {
     }
 
     await SurveyService.deleteSurvey(id);
+
+    // Publish event for SDK real-time updates
+    await pubSubService.publishNotification({
+      type: 'survey.deleted',
+      data: { surveyId: id },
+      targetChannels: ['survey', 'admin'],
+    });
 
     res.json({
       success: true,

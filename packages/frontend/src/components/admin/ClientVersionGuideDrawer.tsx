@@ -56,7 +56,7 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
   const [errorTabValue, setErrorTabValue] = useState(0);
 
   // State for API test
-  const [apiToken, setApiToken] = useState('');
+  const [apiToken, setApiToken] = useState('gatrix-unsecured-client-api-token'); // Default to unsecured client token
   const [platform, setPlatform] = useState('ios');
   const [version, setVersion] = useState('1.0.0');
   const [lang, setLang] = useState('ko');
@@ -176,11 +176,6 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
   };
 
   const handleTestAPI = async () => {
-    if (!apiToken.trim()) {
-      setTestError('API Token is required');
-      return;
-    }
-
     setTestLoading(true);
     setTestError(null);
     setTestResponse(null);
@@ -640,46 +635,97 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
               </Box>
               <Collapse in={expandedRequestHeaders}>
                 <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
-                  {/* Parameters */}
+                  {/* Parameters Table */}
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
                       Parameters
                     </Typography>
-                    <Stack spacing={2} sx={{ pl: 1 }}>
-                      <TextField
-                        label="API Token"
-                        type="password"
-                        value={apiToken}
-                        onChange={(e) => setApiToken(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="Enter your API token"
-                      />
-                      <TextField
-                        label="Platform"
-                        value={platform}
-                        onChange={(e) => setPlatform(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="e.g., ios, android, pc"
-                      />
-                      <TextField
-                        label="Version"
-                        value={version}
-                        onChange={(e) => setVersion(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="e.g., 1.0.0"
-                      />
-                      <TextField
-                        label="Language (optional)"
-                        value={lang}
-                        onChange={(e) => setLang(e.target.value)}
-                        size="small"
-                        fullWidth
-                        placeholder="e.g., ko, en, zh"
-                      />
-                    </Stack>
+                    <Box sx={{
+                      border: `1px solid ${theme.palette.divider}`,
+                      borderRadius: 1,
+                      overflow: 'hidden'
+                    }}>
+                      <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0 }}>
+                        {/* Platform */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          Platform *
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <TextField
+                            value={platform}
+                            onChange={(e) => setPlatform(e.target.value)}
+                            size="small"
+                            fullWidth
+                            placeholder="e.g., ios, android, pc"
+                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                          />
+                        </Box>
+
+                        {/* Version */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          Version *
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <TextField
+                            value={version}
+                            onChange={(e) => setVersion(e.target.value)}
+                            size="small"
+                            fullWidth
+                            placeholder="e.g., 1.0.0"
+                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                          />
+                        </Box>
+
+                        {/* Language */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          Language
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <TextField
+                            value={lang}
+                            onChange={(e) => setLang(e.target.value)}
+                            size="small"
+                            fullWidth
+                            placeholder="e.g., ko, en, zh (optional)"
+                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                          />
+                        </Box>
+                      </Box>
+                    </Box>
                   </Box>
 
                   {/* Request Headers */}

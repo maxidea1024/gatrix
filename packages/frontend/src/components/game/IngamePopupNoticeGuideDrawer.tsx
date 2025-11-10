@@ -46,8 +46,8 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
 
   const [mainTabValue, setMainTabValue] = useState(0);
   const [errorTabValue, setErrorTabValue] = useState(0);
-  const [apiToken, setApiToken] = useState('');
-  const [applicationName, setApplicationName] = useState('');
+  const [apiToken, setApiToken] = useState('gatrix-unsecured-server-api-token'); // Default to unsecured server token
+  const [applicationName, setApplicationName] = useState('MyGameServer');
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
@@ -90,12 +90,6 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
   };
 
   const handleTestAPI = async () => {
-    if (!apiToken.trim()) {
-      setTestError(t('ingamePopupNotices.sdkGuideDrawer.headerApiToken') + ' ' + (t('common.isRequired') || 'is required'));
-      setExpandedResponseHeaders(true);
-      return;
-    }
-
     if (!applicationName.trim()) {
       setTestError(t('ingamePopupNotices.sdkGuideDrawer.headerAppName') + ' ' + (t('common.isRequired') || 'is required'));
       setExpandedResponseHeaders(true);
@@ -437,25 +431,38 @@ curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
                       <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
                         {t('ingamePopupNotices.sdkGuideDrawer.parameters')}
                       </Typography>
-                      <Stack spacing={2} sx={{ pl: 1 }}>
-                        <TextField
-                          label="X-Application-Name"
-                          value={applicationName}
-                          onChange={(e) => setApplicationName(e.target.value)}
-                          size="small"
-                          fullWidth
-                          placeholder={t('ingamePopupNotices.sdkGuideDrawer.headerAppName')}
-                        />
-                        <TextField
-                          label="X-API-Token"
-                          type="password"
-                          value={apiToken}
-                          onChange={(e) => setApiToken(e.target.value)}
-                          size="small"
-                          fullWidth
-                          placeholder={t('ingamePopupNotices.sdkGuideDrawer.headerApiToken')}
-                        />
-                      </Stack>
+                      <Box sx={{
+                        border: `1px solid ${theme.palette.divider}`,
+                        borderRadius: 1,
+                        overflow: 'hidden'
+                      }}>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 0 }}>
+                          {/* Application Name */}
+                          <Box sx={{
+                            p: 1.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 500,
+                            fontSize: '0.875rem'
+                          }}>
+                            X-Application-Name *
+                          </Box>
+                          <Box sx={{
+                            p: 1,
+                            borderLeft: `1px solid ${theme.palette.divider}`
+                          }}>
+                            <TextField
+                              value={applicationName}
+                              onChange={(e) => setApplicationName(e.target.value)}
+                              size="small"
+                              fullWidth
+                              placeholder="e.g., MyGameServer"
+                              sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
+                            />
+                          </Box>
+                        </Box>
+                      </Box>
                     </Box>
 
                     {Object.keys(requestHeaders).length > 0 && (

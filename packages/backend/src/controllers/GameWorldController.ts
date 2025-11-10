@@ -6,6 +6,7 @@ import { CustomError } from '../middleware/errorHandler';
 import { asyncHandler } from '../utils/asyncHandler';
 import logger from '../config/logger';
 import Joi from 'joi';
+import { pubSubService } from '../services/PubSubService';
 
 // Validation schemas
 const createGameWorldSchema = Joi.object({
@@ -209,6 +210,13 @@ export class GameWorldController {
     }
     const tags = await TagService.listTagsForEntity('game_world', world.id);
 
+    // Publish event for SDK real-time updates
+    await pubSubService.publishNotification({
+      type: 'gameworld.created',
+      data: { world: { ...world, tags } },
+      targetChannels: ['gameworld', 'admin'],
+    });
+
     res.status(201).json({
       success: true,
       data: { world: { ...world, tags } },
@@ -244,6 +252,13 @@ export class GameWorldController {
     }
     const tags = await TagService.listTagsForEntity('game_world', id);
 
+    // Publish event for SDK real-time updates
+    await pubSubService.publishNotification({
+      type: 'gameworld.updated',
+      data: { world: { ...world, tags } },
+      targetChannels: ['gameworld', 'admin'],
+    });
+
     res.json({
       success: true,
       data: { world: { ...world, tags } },
@@ -259,6 +274,13 @@ export class GameWorldController {
     }
 
     await GameWorldService.deleteGameWorld(id);
+
+    // Publish event for SDK real-time updates
+    await pubSubService.publishNotification({
+      type: 'gameworld.deleted',
+      data: { worldId: id },
+      targetChannels: ['gameworld', 'admin'],
+    });
 
     res.json({
       success: true,

@@ -5,6 +5,7 @@ import IngamePopupNoticeService, {
   UpdateIngamePopupNoticeData,
   IngamePopupNoticeFilters
 } from '../services/IngamePopupNoticeService';
+import { pubSubService } from '../services/PubSubService';
 
 // Validation schemas
 const createIngamePopupNoticeSchema = Joi.object({
@@ -163,6 +164,13 @@ class IngamePopupNoticeController {
 
       const notice = await IngamePopupNoticeService.createIngamePopupNotice(data, createdBy);
 
+      // Publish event for SDK real-time updates
+      await pubSubService.publishNotification({
+        type: 'popup.created',
+        data: { notice },
+        targetChannels: ['popup', 'admin'],
+      });
+
       res.status(201).json({
         success: true,
         notice
@@ -200,6 +208,13 @@ class IngamePopupNoticeController {
 
       const notice = await IngamePopupNoticeService.updateIngamePopupNotice(id, data, updatedBy);
 
+      // Publish event for SDK real-time updates
+      await pubSubService.publishNotification({
+        type: 'popup.updated',
+        data: { notice },
+        targetChannels: ['popup', 'admin'],
+      });
+
       res.json({
         success: true,
         notice
@@ -217,6 +232,13 @@ class IngamePopupNoticeController {
     try {
       const id = parseInt(req.params.id);
       await IngamePopupNoticeService.deleteIngamePopupNotice(id);
+
+      // Publish event for SDK real-time updates
+      await pubSubService.publishNotification({
+        type: 'popup.deleted',
+        data: { noticeId: id },
+        targetChannels: ['popup', 'admin'],
+      });
 
       res.json({
         success: true,

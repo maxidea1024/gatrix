@@ -3652,7 +3652,7 @@
       "card": "卡片视图"
     },
     "filters": {
-      "type": "服务器类型",
+      "service": "服务类型",
       "status": "状态"
     },
     "status": {
@@ -3664,13 +3664,15 @@
     },
     "table": {
       "instanceId": "实例ID",
-      "type": "类型",
+      "service": "服务",
+      "group": "组",
+      "labels": "标签",
       "hostname": "主机名",
       "externalAddress": "外部IP",
       "internalAddress": "内部IP",
       "ports": "端口",
       "status": "状态",
-      "instanceStats": "实例统计",
+      "stats": "统计",
       "meta": "元信息",
       "updatedAt": "更新时间"
     }

@@ -58,6 +58,7 @@ export interface GameWorld {
   maintenanceMessage?: string;
   displayOrder: number;
   customPayload?: Record<string, any>;
+  worldServerAddress?: string | null;
   tags?: string[];
   createdAt: string;
   updatedAt: string;
@@ -152,50 +153,85 @@ export interface ServicePorts {
   http?: number[];
 }
 
-export interface InstanceStats {
-  cpuUsage?: number; // CPU usage percentage (0-100)
-  memoryUsage?: number; // Memory usage in MB
-  memoryTotal?: number; // Total memory in MB
+/**
+ * Service labels for categorization and filtering
+ * - service: Required, service type (e.g., 'world', 'auth', 'lobby')
+ * - group: Optional, service group (e.g., 'kr', 'us', 'production')
+ * - Additional custom labels can be added (e.g., env, region, role)
+ */
+export interface ServiceLabels {
+  service: string; // Required: Service type
+  group?: string; // Optional: Service group
+  [key: string]: string | undefined; // Additional custom labels
 }
 
 export interface ServiceInstance {
   instanceId: string; // Unique instance ID (ULID)
-  type: string; // Service type (e.g., 'world', 'auth', 'channel')
-  serviceGroup: string; // Service group for grouping servers (e.g., 'kr-1', 'us-east', 'production', 'staging')
+  labels: ServiceLabels; // Service labels for categorization
   hostname: string; // Hostname
-  externalAddress: string; // External IP address
+  externalAddress: string; // External IP address (auto-detected by backend)
   internalAddress: string; // Internal IP address
   ports: ServicePorts; // Service ports
   status: ServiceStatus; // Service status
-  instanceStats?: InstanceStats; // Instance statistics
-  meta?: Record<string, any>; // Additional metadata
-  createdAt: string; // Creation timestamp
+  stats?: Record<string, any>; // Instance statistics (flexible key-value)
+  meta?: Record<string, any>; // Additional metadata (immutable after registration)
   updatedAt: string; // Last update timestamp
 }
 
+/**
+ * Register service input (full snapshot)
+ * Note:
+ * - externalAddress is auto-detected by backend from req.ip
+ * - internalAddress is optional; if omitted, the first NIC address will be used
+ */
 export interface RegisterServiceInput {
-  instanceId?: string; // Optional instance ID (auto-generated ULID if not provided)
-  type: string;
-  serviceGroup: string;
+  labels: ServiceLabels; // Service labels (required: labels.service)
   hostname: string;
-  externalAddress: string;
-  internalAddress: string;
+  internalAddress?: string; // Optional: Auto-detected from first NIC if omitted
   ports: ServicePorts;
-  status?: ServiceStatus;
-  instanceStats?: InstanceStats;
-  meta?: Record<string, any>;
+  status?: ServiceStatus; // Default: 'ready'
+  stats?: Record<string, any>; // Instance statistics
+  meta?: Record<string, any>; // Additional metadata (immutable)
 }
 
+/**
+ * Update service status input (partial merge)
+ * Only sends changed fields. Stats are merged, not replaced.
+ * Meta is not included (immutable after registration).
+ */
 export interface UpdateServiceStatusInput {
-  status: ServiceStatus;
-  instanceStats?: InstanceStats;
-  meta?: Record<string, any>;
+  status?: ServiceStatus; // Optional: Update status
+  stats?: Record<string, any>; // Optional: Merge stats
+  autoRegisterIfMissing?: boolean; // Optional: Auto-register if not found (default: false)
 }
 
+/**
+ * Get services query parameters
+ * Supports filtering by labels and status
+ */
 export interface GetServicesParams {
-  type?: string; // Filter by service type
-  serviceGroup?: string; // Filter by service group
+  serviceType?: string; // Filter by labels.service
+  serviceGroup?: string; // Filter by labels.group
   status?: ServiceStatus; // Filter by status
   excludeSelf?: boolean; // Exclude current instance (default: true)
+  labels?: Record<string, string>; // Additional label filters (e.g., { env: 'prod', region: 'ap-northeast-2' })
+}
+
+// ============================================================================
+// Whitelist Types
+// ============================================================================
+
+/**
+ * Whitelist data structure
+ */
+export interface WhitelistData {
+  ipWhitelist: {
+    enabled: boolean; // Whether IP whitelist is enabled
+    ips: string[]; // List of whitelisted IPs (supports CIDR notation)
+  };
+  accountWhitelist: {
+    enabled: boolean; // Whether account whitelist is enabled
+    accountIds: string[]; // List of whitelisted account IDs
+  };
 }
 

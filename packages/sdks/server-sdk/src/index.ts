@@ -3,7 +3,7 @@
  * Entry point
  */
 
-export { GatrixSDK } from './GatrixSDK';
+export { GatrixServerSDK, GatrixSDK } from './GatrixServerSDK';
 
 // Export types
 export * from './types';
@@ -15,5 +15,5 @@ export { GatrixSDKError, ErrorCode, createError, isGatrixSDKError } from './util
 export { Logger, LogLevel } from './utils/logger';
 
 // Default export
-export { GatrixSDK as default } from './GatrixSDK';
+export { GatrixServerSDK as default } from './GatrixServerSDK';
 

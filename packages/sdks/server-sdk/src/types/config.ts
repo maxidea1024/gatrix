@@ -9,10 +9,6 @@ export interface RedisConfig {
   db?: number;
 }
 
-export interface EtcdConfig {
-  hosts: string; // Comma-separated list of etcd hosts
-}
-
 export interface CacheConfig {
   enabled?: boolean; // Enable caching (default: true)
   ttl?: number; // Cache TTL in seconds (default: 300)
@@ -24,14 +20,16 @@ export interface LoggerConfig {
   customLogger?: (level: string, message: string, meta?: any) => void;
 }
 
-export interface ServiceDiscoveryConfig {
-  enabled?: boolean; // Enable service discovery (default: false)
-  mode?: 'redis' | 'etcd'; // Service discovery mode (default: 'redis')
-  ttlSeconds?: number; // Service heartbeat TTL in seconds (default: 30)
-  terminatedTTL?: number; // Terminated service TTL in seconds (default: 300 = 5 minutes)
-  heartbeatIntervalMs?: number; // Heartbeat interval in milliseconds (default: 10000)
-  redis?: RedisConfig; // Redis configuration for service discovery (when mode is 'redis')
-  etcd?: EtcdConfig; // etcd configuration for service discovery (when mode is 'etcd')
+/**
+ * HTTP Retry Configuration
+ */
+export interface RetryConfig {
+  enabled?: boolean; // Enable retry (default: true)
+  maxRetries?: number; // Max retry attempts (default: 3)
+  retryDelay?: number; // Initial retry delay in ms (default: 1000)
+  retryDelayMultiplier?: number; // Delay multiplier for exponential backoff (default: 2)
+  maxRetryDelay?: number; // Max retry delay in ms (default: 10000)
+  retryableStatusCodes?: number[]; // HTTP status codes to retry (default: [408, 429, 500, 502, 503, 504])
 }
 
 /**
@@ -40,14 +38,11 @@ export interface ServiceDiscoveryConfig {
 export interface GatrixSDKConfig {
   // Required
   gatrixUrl: string; // Gatrix backend URL (e.g., https://api.gatrix.com)
-  apiToken: string; // Server API Token
+  apiToken?: string; // Server API Token (default: 'gatrix-unsecured-server-api-token' for testing)
   applicationName: string; // Application name
 
   // Optional - Redis (for BullMQ events)
   redis?: RedisConfig;
-
-  // Optional - etcd (for service discovery)
-  etcd?: EtcdConfig;
 
   // Optional - Cache settings
   cache?: CacheConfig;
@@ -55,7 +50,7 @@ export interface GatrixSDKConfig {
   // Optional - Logger settings
   logger?: LoggerConfig;
 
-  // Optional - Service discovery settings
-  serviceDiscovery?: ServiceDiscoveryConfig;
+  // Optional - HTTP retry settings
+  retry?: RetryConfig;
 }
 
