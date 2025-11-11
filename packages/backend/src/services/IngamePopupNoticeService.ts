@@ -5,6 +5,7 @@ import { convertFromMySQLDateTime, convertToMySQLDateTime } from '../utils/dateU
 export interface IngamePopupNotice {
   id: number;
   isActive: boolean;
+  content: string; // Database field for admin UI
   message: string; // Actual message content (from template or direct)
   targetWorlds: string[] | null;
   targetWorldsInverted?: boolean;
@@ -19,7 +20,7 @@ export interface IngamePopupNotice {
   displayPriority: number;
   showOnce: boolean;
   startDate?: string | null;
-  endDate: string | null;
+  endDate?: string | null;
 }
 
 export interface CreateIngamePopupNoticeData {
@@ -82,10 +83,11 @@ class IngamePopupNoticeService {
     if (filters.currentlyVisible !== undefined) {
       // Filter by currently visible (isActive + within date range)
       // startDate is optional - if null, treat as immediately available
+      // endDate is optional - if null, treat as permanent (no end date)
       if (filters.currentlyVisible) {
-        whereClauses.push('isActive = 1 AND (startDate IS NULL OR startDate <= NOW()) AND endDate >= NOW()');
+        whereClauses.push('isActive = 1 AND (startDate IS NULL OR startDate <= NOW()) AND (endDate IS NULL OR endDate >= NOW())');
       } else {
-        whereClauses.push('(isActive = 0 OR (startDate IS NOT NULL AND startDate > NOW()) OR endDate < NOW())');
+        whereClauses.push('(isActive = 0 OR (startDate IS NOT NULL AND startDate > NOW()) OR (endDate IS NOT NULL AND endDate < NOW()))');
       }
     }
 
@@ -374,17 +376,10 @@ class IngamePopupNoticeService {
       return convertFromMySQLDateTime(date) || null;
     };
 
-    // Helper function to convert dates safely (must return string)
-    const convertDateRequired = (date: any): string => {
-      if (date instanceof Date) {
-        return date.toISOString();
-      }
-      return convertFromMySQLDateTime(date) || '';
-    };
-
     return {
       id: row.id,
       isActive: Boolean(row.isActive),
+      content: row.content, // Database field for admin UI
       message: row.content, // Map database 'content' field to SDK 'message' field
       targetWorlds: typeof row.targetWorlds === 'string' ? JSON.parse(row.targetWorlds) : row.targetWorlds,
       targetWorldsInverted: Boolean(row.targetWorldsInverted),
@@ -399,7 +394,7 @@ class IngamePopupNoticeService {
       displayPriority: Number(row.displayPriority) || 100,
       showOnce: Boolean(row.showOnce),
       startDate: convertDate(row.startDate),
-      endDate: convertDateRequired(row.endDate)
+      endDate: convertDate(row.endDate)
     };
   }
 

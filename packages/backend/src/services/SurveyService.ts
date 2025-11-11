@@ -1,7 +1,6 @@
-import database from '../config/database';
+import db from '../config/knex';
 import { CustomError } from '../middleware/errorHandler';
 import { ulid } from 'ulid';
-import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 export interface TriggerCondition {
   type: 'userLevel' | 'joinDays';
@@ -107,39 +106,38 @@ export class SurveyService {
     isActive?: boolean;
     search?: string;
   }): Promise<{ surveys: Survey[]; total: number; page: number; limit: number }> {
-    const pool = database.getPool();
     const page = params.page || 1;
     const limit = params.limit || 20;
     const offset = (page - 1) * limit;
 
-    const whereConditions: string[] = [];
-    const queryParams: any[] = [];
+    let query = db('g_surveys');
+    let countQuery = db('g_surveys');
 
     if (params.isActive !== undefined) {
-      whereConditions.push('isActive = ?');
-      queryParams.push(params.isActive);
+      query = query.where('isActive', params.isActive);
+      countQuery = countQuery.where('isActive', params.isActive);
     }
 
     if (params.search) {
-      whereConditions.push('(surveyTitle LIKE ? OR platformSurveyId LIKE ?)');
-      const searchPattern = `%${params.search}%`;
-      queryParams.push(searchPattern, searchPattern);
+      query = query.where(function() {
+        this.where('surveyTitle', 'like', `%${params.search}%`)
+            .orWhere('platformSurveyId', 'like', `%${params.search}%`);
+      });
+      countQuery = countQuery.where(function() {
+        this.where('surveyTitle', 'like', `%${params.search}%`)
+            .orWhere('platformSurveyId', 'like', `%${params.search}%`);
+      });
     }
 
-    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
-
     // Get total count
-    const [countRows] = await pool.execute<RowDataPacket[]>(
-      `SELECT COUNT(*) as total FROM g_surveys ${whereClause}`,
-      queryParams
-    );
-    const total = countRows[0].total;
+    const countResult = await countQuery.count('* as total').first();
+    const total = (countResult?.total as number) || 0;
 
     // Get surveys
-    const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT * FROM g_surveys ${whereClause} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
-      queryParams
-    );
+    const rows = await query
+      .orderBy('createdAt', 'desc')
+      .limit(limit)
+      .offset(offset);
 
     const surveys = rows.map(row => ({
       ...row,
@@ -180,45 +178,41 @@ export class SurveyService {
    * Get survey by ID
    */
   static async getSurveyById(id: string): Promise<Survey> {
-    const pool = database.getPool();
-    const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM g_surveys WHERE id = ?',
-      [id]
-    );
+    const row = await db('g_surveys').where('id', id).first();
 
-    if (rows.length === 0) {
+    if (!row) {
       throw new CustomError('Survey not found', 404);
     }
 
     const survey = {
-      ...rows[0],
-      triggerConditions: typeof rows[0].triggerConditions === 'string'
-        ? JSON.parse(rows[0].triggerConditions)
-        : rows[0].triggerConditions,
-      participationRewards: rows[0].participationRewards
-        ? (typeof rows[0].participationRewards === 'string'
-          ? JSON.parse(rows[0].participationRewards)
-          : rows[0].participationRewards)
+      ...row,
+      triggerConditions: typeof row.triggerConditions === 'string'
+        ? JSON.parse(row.triggerConditions)
+        : row.triggerConditions,
+      participationRewards: row.participationRewards
+        ? (typeof row.participationRewards === 'string'
+          ? JSON.parse(row.participationRewards)
+          : row.participationRewards)
         : null,
-      targetPlatforms: rows[0].targetPlatforms
-        ? (typeof rows[0].targetPlatforms === 'string'
-          ? JSON.parse(rows[0].targetPlatforms)
-          : rows[0].targetPlatforms)
+      targetPlatforms: row.targetPlatforms
+        ? (typeof row.targetPlatforms === 'string'
+          ? JSON.parse(row.targetPlatforms)
+          : row.targetPlatforms)
         : null,
-      targetChannels: rows[0].targetChannels
-        ? (typeof rows[0].targetChannels === 'string'
-          ? JSON.parse(rows[0].targetChannels)
-          : rows[0].targetChannels)
+      targetChannels: row.targetChannels
+        ? (typeof row.targetChannels === 'string'
+          ? JSON.parse(row.targetChannels)
+          : row.targetChannels)
         : null,
-      targetSubchannels: rows[0].targetSubchannels
-        ? (typeof rows[0].targetSubchannels === 'string'
-          ? JSON.parse(rows[0].targetSubchannels)
-          : rows[0].targetSubchannels)
+      targetSubchannels: row.targetSubchannels
+        ? (typeof row.targetSubchannels === 'string'
+          ? JSON.parse(row.targetSubchannels)
+          : row.targetSubchannels)
         : null,
-      targetWorlds: rows[0].targetWorlds
-        ? (typeof rows[0].targetWorlds === 'string'
-          ? JSON.parse(rows[0].targetWorlds)
-          : rows[0].targetWorlds)
+      targetWorlds: row.targetWorlds
+        ? (typeof row.targetWorlds === 'string'
+          ? JSON.parse(row.targetWorlds)
+          : row.targetWorlds)
         : null,
     } as Survey;
 
@@ -229,45 +223,41 @@ export class SurveyService {
    * Get survey by platform survey ID
    */
   static async getSurveyByPlatformId(platformSurveyId: string): Promise<Survey> {
-    const pool = database.getPool();
-    const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM g_surveys WHERE platformSurveyId = ?',
-      [platformSurveyId]
-    );
+    const row = await db('g_surveys').where('platformSurveyId', platformSurveyId).first();
 
-    if (rows.length === 0) {
+    if (!row) {
       throw new CustomError('Survey not found', 404);
     }
 
     const survey = {
-      ...rows[0],
-      triggerConditions: typeof rows[0].triggerConditions === 'string'
-        ? JSON.parse(rows[0].triggerConditions)
-        : rows[0].triggerConditions,
-      participationRewards: rows[0].participationRewards
-        ? (typeof rows[0].participationRewards === 'string'
-          ? JSON.parse(rows[0].participationRewards)
-          : rows[0].participationRewards)
+      ...row,
+      triggerConditions: typeof row.triggerConditions === 'string'
+        ? JSON.parse(row.triggerConditions)
+        : row.triggerConditions,
+      participationRewards: row.participationRewards
+        ? (typeof row.participationRewards === 'string'
+          ? JSON.parse(row.participationRewards)
+          : row.participationRewards)
         : null,
-      targetPlatforms: rows[0].targetPlatforms
-        ? (typeof rows[0].targetPlatforms === 'string'
-          ? JSON.parse(rows[0].targetPlatforms)
-          : rows[0].targetPlatforms)
+      targetPlatforms: row.targetPlatforms
+        ? (typeof row.targetPlatforms === 'string'
+          ? JSON.parse(row.targetPlatforms)
+          : row.targetPlatforms)
         : null,
-      targetChannels: rows[0].targetChannels
-        ? (typeof rows[0].targetChannels === 'string'
-          ? JSON.parse(rows[0].targetChannels)
-          : rows[0].targetChannels)
+      targetChannels: row.targetChannels
+        ? (typeof row.targetChannels === 'string'
+          ? JSON.parse(row.targetChannels)
+          : row.targetChannels)
         : null,
-      targetSubchannels: rows[0].targetSubchannels
-        ? (typeof rows[0].targetSubchannels === 'string'
-          ? JSON.parse(rows[0].targetSubchannels)
-          : rows[0].targetSubchannels)
+      targetSubchannels: row.targetSubchannels
+        ? (typeof row.targetSubchannels === 'string'
+          ? JSON.parse(row.targetSubchannels)
+          : row.targetSubchannels)
         : null,
-      targetWorlds: rows[0].targetWorlds
-        ? (typeof rows[0].targetWorlds === 'string'
-          ? JSON.parse(rows[0].targetWorlds)
-          : rows[0].targetWorlds)
+      targetWorlds: row.targetWorlds
+        ? (typeof row.targetWorlds === 'string'
+          ? JSON.parse(row.targetWorlds)
+          : row.targetWorlds)
         : null,
     } as Survey;
 
@@ -278,7 +268,6 @@ export class SurveyService {
    * Create a new survey
    */
   static async createSurvey(input: CreateSurveyInput): Promise<Survey> {
-    const pool = database.getPool();
     // Validate trigger conditions
     if (!input.triggerConditions || input.triggerConditions.length === 0) {
       throw new CustomError('At least one trigger condition is required', 400);
@@ -290,48 +279,36 @@ export class SurveyService {
     }
 
     // Check if platformSurveyId already exists
-    const [existing] = await pool.execute<RowDataPacket[]>(
-      'SELECT id FROM g_surveys WHERE platformSurveyId = ?',
-      [input.platformSurveyId]
-    );
+    const existing = await db('g_surveys').where('platformSurveyId', input.platformSurveyId).first();
 
-    if (existing.length > 0) {
+    if (existing) {
       throw new CustomError('Platform survey ID already exists', 400);
     }
 
     const id = ulid();
     const isActive = input.isActive !== undefined ? input.isActive : true;
 
-    await pool.execute(
-      `INSERT INTO g_surveys
-      (id, platformSurveyId, surveyTitle, surveyContent, triggerConditions,
-       participationRewards, rewardTemplateId, rewardMailTitle, rewardMailContent, isActive,
-       targetPlatforms, targetPlatformsInverted, targetChannels, targetChannelsInverted, targetSubchannels, targetSubchannelsInverted,
-       targetWorlds, targetWorldsInverted,
-       createdBy)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        id,
-        input.platformSurveyId,
-        input.surveyTitle,
-        input.surveyContent || null,
-        JSON.stringify(input.triggerConditions),
-        input.participationRewards ? JSON.stringify(input.participationRewards) : null,
-        input.rewardTemplateId || null,
-        input.rewardMailTitle || null,
-        input.rewardMailContent || null,
-        isActive,
-        input.targetPlatforms ? JSON.stringify(input.targetPlatforms) : null,
-        input.targetPlatformsInverted || false,
-        (input as any).targetChannels ? JSON.stringify((input as any).targetChannels) : null,
-        (input as any).targetChannelsInverted || false,
-        (input as any).targetSubchannels ? JSON.stringify((input as any).targetSubchannels) : null,
-        (input as any).targetSubchannelsInverted || false,
-        input.targetWorlds ? JSON.stringify(input.targetWorlds) : null,
-        input.targetWorldsInverted || false,
-        input.createdBy || null,
-      ]
-    );
+    await db('g_surveys').insert({
+      id,
+      platformSurveyId: input.platformSurveyId,
+      surveyTitle: input.surveyTitle,
+      surveyContent: input.surveyContent || null,
+      triggerConditions: JSON.stringify(input.triggerConditions),
+      participationRewards: input.participationRewards ? JSON.stringify(input.participationRewards) : null,
+      rewardTemplateId: input.rewardTemplateId || null,
+      rewardMailTitle: input.rewardMailTitle || null,
+      rewardMailContent: input.rewardMailContent || null,
+      isActive,
+      targetPlatforms: input.targetPlatforms ? JSON.stringify(input.targetPlatforms) : null,
+      targetPlatformsInverted: input.targetPlatformsInverted || false,
+      targetChannels: (input as any).targetChannels ? JSON.stringify((input as any).targetChannels) : null,
+      targetChannelsInverted: (input as any).targetChannelsInverted || false,
+      targetSubchannels: (input as any).targetSubchannels ? JSON.stringify((input as any).targetSubchannels) : null,
+      targetSubchannelsInverted: (input as any).targetSubchannelsInverted || false,
+      targetWorlds: input.targetWorlds ? JSON.stringify(input.targetWorlds) : null,
+      targetWorldsInverted: input.targetWorldsInverted || false,
+      createdBy: input.createdBy || null,
+    });
 
     return await this.getSurveyById(id);
   }
@@ -340,18 +317,17 @@ export class SurveyService {
    * Update a survey
    */
   static async updateSurvey(id: string, input: UpdateSurveyInput): Promise<Survey> {
-    const pool = database.getPool();
     // Check if survey exists
     await this.getSurveyById(id);
 
     // If platformSurveyId is being updated, check for duplicates
     if (input.platformSurveyId) {
-      const [existing] = await pool.execute<RowDataPacket[]>(
-        'SELECT id FROM g_surveys WHERE platformSurveyId = ? AND id != ?',
-        [input.platformSurveyId, id]
-      );
+      const existing = await db('g_surveys')
+        .where('platformSurveyId', input.platformSurveyId)
+        .whereNot('id', id)
+        .first();
 
-      if (existing.length > 0) {
+      if (existing) {
         throw new CustomError('Platform survey ID already exists', 400);
       }
     }
@@ -368,92 +344,32 @@ export class SurveyService {
       }
     }
 
-    const updates: string[] = [];
-    const values: any[] = [];
+    const updateData: any = {};
 
-    if (input.platformSurveyId !== undefined) {
-      updates.push('platformSurveyId = ?');
-      values.push(input.platformSurveyId);
-    }
-    if (input.surveyTitle !== undefined) {
-      updates.push('surveyTitle = ?');
-      values.push(input.surveyTitle);
-    }
-    if (input.surveyContent !== undefined) {
-      updates.push('surveyContent = ?');
-      values.push(input.surveyContent);
-    }
-    if (input.triggerConditions !== undefined) {
-      updates.push('triggerConditions = ?');
-      values.push(JSON.stringify(input.triggerConditions));
-    }
-    if (input.participationRewards !== undefined) {
-      updates.push('participationRewards = ?');
-      values.push(input.participationRewards ? JSON.stringify(input.participationRewards) : null);
-    }
-    if (input.rewardTemplateId !== undefined) {
-      updates.push('rewardTemplateId = ?');
-      values.push(input.rewardTemplateId || null);
-    }
-    if (input.rewardMailTitle !== undefined) {
-      updates.push('rewardMailTitle = ?');
-      values.push(input.rewardMailTitle);
-    }
-    if (input.rewardMailContent !== undefined) {
-      updates.push('rewardMailContent = ?');
-      values.push(input.rewardMailContent);
-    }
-    if (input.isActive !== undefined) {
-      updates.push('isActive = ?');
-      values.push(input.isActive);
-    }
-    if (input.targetPlatforms !== undefined) {
-      updates.push('targetPlatforms = ?');
-      values.push(input.targetPlatforms ? JSON.stringify(input.targetPlatforms) : null);
-    }
-    if (input.targetPlatformsInverted !== undefined) {
-      updates.push('targetPlatformsInverted = ?');
-      values.push(input.targetPlatformsInverted);
-    }
-    if ((input as any).targetChannels !== undefined) {
-      updates.push('targetChannels = ?');
-      values.push((input as any).targetChannels ? JSON.stringify((input as any).targetChannels) : null);
-    }
-    if ((input as any).targetChannelsInverted !== undefined) {
-      updates.push('targetChannelsInverted = ?');
-      values.push((input as any).targetChannelsInverted);
-    }
-    if ((input as any).targetSubchannels !== undefined) {
-      updates.push('targetSubchannels = ?');
-      values.push((input as any).targetSubchannels ? JSON.stringify((input as any).targetSubchannels) : null);
-    }
-    if ((input as any).targetSubchannelsInverted !== undefined) {
-      updates.push('targetSubchannelsInverted = ?');
-      values.push((input as any).targetSubchannelsInverted);
-    }
-    if (input.targetWorlds !== undefined) {
-      updates.push('targetWorlds = ?');
-      values.push(input.targetWorlds ? JSON.stringify(input.targetWorlds) : null);
-    }
-    if (input.targetWorldsInverted !== undefined) {
-      updates.push('targetWorldsInverted = ?');
-      values.push(input.targetWorldsInverted);
-    }
-    if (input.updatedBy !== undefined) {
-      updates.push('updatedBy = ?');
-      values.push(input.updatedBy);
-    }
+    if (input.platformSurveyId !== undefined) updateData.platformSurveyId = input.platformSurveyId;
+    if (input.surveyTitle !== undefined) updateData.surveyTitle = input.surveyTitle;
+    if (input.surveyContent !== undefined) updateData.surveyContent = input.surveyContent;
+    if (input.triggerConditions !== undefined) updateData.triggerConditions = JSON.stringify(input.triggerConditions);
+    if (input.participationRewards !== undefined) updateData.participationRewards = input.participationRewards ? JSON.stringify(input.participationRewards) : null;
+    if (input.rewardTemplateId !== undefined) updateData.rewardTemplateId = input.rewardTemplateId || null;
+    if (input.rewardMailTitle !== undefined) updateData.rewardMailTitle = input.rewardMailTitle;
+    if (input.rewardMailContent !== undefined) updateData.rewardMailContent = input.rewardMailContent;
+    if (input.isActive !== undefined) updateData.isActive = input.isActive;
+    if (input.targetPlatforms !== undefined) updateData.targetPlatforms = input.targetPlatforms ? JSON.stringify(input.targetPlatforms) : null;
+    if (input.targetPlatformsInverted !== undefined) updateData.targetPlatformsInverted = input.targetPlatformsInverted;
+    if ((input as any).targetChannels !== undefined) updateData.targetChannels = (input as any).targetChannels ? JSON.stringify((input as any).targetChannels) : null;
+    if ((input as any).targetChannelsInverted !== undefined) updateData.targetChannelsInverted = (input as any).targetChannelsInverted;
+    if ((input as any).targetSubchannels !== undefined) updateData.targetSubchannels = (input as any).targetSubchannels ? JSON.stringify((input as any).targetSubchannels) : null;
+    if ((input as any).targetSubchannelsInverted !== undefined) updateData.targetSubchannelsInverted = (input as any).targetSubchannelsInverted;
+    if (input.targetWorlds !== undefined) updateData.targetWorlds = input.targetWorlds ? JSON.stringify(input.targetWorlds) : null;
+    if (input.targetWorldsInverted !== undefined) updateData.targetWorldsInverted = input.targetWorldsInverted;
+    if (input.updatedBy !== undefined) updateData.updatedBy = input.updatedBy;
 
-    if (updates.length === 0) {
+    if (Object.keys(updateData).length === 0) {
       throw new CustomError('No fields to update', 400);
     }
 
-    values.push(id);
-
-    await pool.execute(
-      `UPDATE g_surveys SET ${updates.join(', ')} WHERE id = ?`,
-      values
-    );
+    await db('g_surveys').where('id', id).update(updateData);
 
     return await this.getSurveyById(id);
   }
@@ -462,13 +378,9 @@ export class SurveyService {
    * Delete a survey
    */
   static async deleteSurvey(id: string): Promise<void> {
-    const pool = database.getPool();
-    const [result] = await pool.execute<ResultSetHeader>(
-      'DELETE FROM g_surveys WHERE id = ?',
-      [id]
-    );
+    const result = await db('g_surveys').where('id', id).del();
 
-    if (result.affectedRows === 0) {
+    if (result === 0) {
       throw new CustomError('Survey not found', 404);
     }
   }
@@ -477,11 +389,8 @@ export class SurveyService {
    * Get survey configuration from g_vars
    */
   static async getSurveyConfig(): Promise<SurveyConfig> {
-    const pool = database.getPool();
-    const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT varKey, varValue FROM g_vars
-       WHERE varKey IN ('survey.baseSurveyUrl', 'survey.baseJoinedUrl', 'survey.linkCaption', 'survey.joinedSecretKey')`
-    );
+    const rows = await db('g_vars')
+      .whereIn('varKey', ['survey.baseSurveyUrl', 'survey.baseJoinedUrl', 'survey.linkCaption', 'survey.joinedSecretKey']);
 
     const config: any = {};
     rows.forEach((row: any) => {
@@ -502,7 +411,6 @@ export class SurveyService {
    * Update survey configuration in g_vars
    */
   static async updateSurveyConfig(input: Partial<SurveyConfig>): Promise<SurveyConfig> {
-    const pool = database.getPool();
     const updates: Array<{ key: string; value: string }> = [];
 
     if (input.baseSurveyUrl !== undefined) {
@@ -522,9 +430,9 @@ export class SurveyService {
       throw new CustomError('No fields to update', 400);
     }
 
-    // Update each var
+    // Update each var using raw query for ON DUPLICATE KEY UPDATE
     for (const update of updates) {
-      await pool.execute(
+      await db.raw(
         `INSERT INTO g_vars (varKey, varValue, description, createdBy)
          VALUES (?, ?, ?, 1)
          ON DUPLICATE KEY UPDATE varValue = VALUES(varValue), updatedBy = 1`,

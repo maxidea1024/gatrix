@@ -54,17 +54,17 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
   const [isActive, setIsActive] = useState(true);
   const [content, setContent] = useState('');
 
-  // Target settings
+  // Target settings - Initialize with default values to avoid controlled/uncontrolled component warnings
   const [targetPlatforms, setTargetPlatforms] = useState<string[]>([]);
-  const [targetPlatformsInverted, setTargetPlatformsInverted] = useState(false);
+  const [targetPlatformsInverted, setTargetPlatformsInverted] = useState<boolean>(false);
   const [targetChannelSubchannels, setTargetChannelSubchannels] = useState<ChannelSubchannelData[]>([]);
-  const [targetChannelSubchannelsInverted, setTargetChannelSubchannelsInverted] = useState(false);
+  const [targetChannelSubchannelsInverted, setTargetChannelSubchannelsInverted] = useState<boolean>(false);
   const [targetWorlds, setTargetWorlds] = useState<string[]>([]);
-  const [targetWorldsInverted, setTargetWorldsInverted] = useState(false);
+  const [targetWorldsInverted, setTargetWorldsInverted] = useState<boolean>(false);
 
   // User ID targeting
   const [targetUserIds, setTargetUserIds] = useState<string>('');
-  const [targetUserIdsInverted, setTargetUserIdsInverted] = useState(false);
+  const [targetUserIdsInverted, setTargetUserIdsInverted] = useState<boolean>(false);
 
   const [displayPriority, setDisplayPriority] = useState(100);
   const [showOnce, setShowOnce] = useState(false);

@@ -46,7 +46,7 @@ const updateIngamePopupNoticeSchema = Joi.object({
   displayPriority: Joi.number().integer().min(0).optional(),
   showOnce: Joi.boolean().optional(),
   startDate: Joi.string().isoDate().optional().allow(null, ''),
-  endDate: Joi.string().isoDate().optional(),
+  endDate: Joi.string().isoDate().optional().allow(null, ''),
   messageTemplateId: Joi.number().integer().positive().optional().allow(null),
   useTemplate: Joi.boolean().optional(),
   description: Joi.string().max(1000).optional().allow(null, ''),

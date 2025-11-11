@@ -52,15 +52,15 @@ export interface TargetSettingsGroupProps {
 
 const TargetSettingsGroup: React.FC<TargetSettingsGroupProps> = ({
   targetPlatforms,
-  targetPlatformsInverted,
+  targetPlatformsInverted = false,
   platforms,
   onPlatformsChange,
   targetChannelSubchannels,
-  targetChannelSubchannelsInverted,
+  targetChannelSubchannelsInverted = false,
   channels,
   onChannelsChange,
   targetWorlds,
-  targetWorldsInverted,
+  targetWorldsInverted = false,
   worlds,
   onWorldsChange,
   targetUserIds = '',
