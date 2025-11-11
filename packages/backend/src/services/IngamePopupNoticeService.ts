@@ -21,6 +21,13 @@ export interface IngamePopupNotice {
   showOnce: boolean;
   startDate?: string | null;
   endDate?: string | null;
+  messageTemplateId: number | null;
+  useTemplate: boolean;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: number;
+  updatedBy: number | null;
 }
 
 export interface CreateIngamePopupNoticeData {
@@ -360,6 +367,17 @@ class IngamePopupNoticeService {
       throw new Error('Ingame popup notice not found');
     }
 
+    // Publish SDK event for toggle
+    const { pubSubService } = await import('./PubSubService');
+    await pubSubService.publishSDKEvent({
+      type: 'popup.updated',
+      data: {
+        id: notice.id,
+        timestamp: Date.now(),
+        isActive: notice.isActive,
+      }
+    });
+
     return notice;
   }
 
@@ -374,6 +392,15 @@ class IngamePopupNoticeService {
         return date.toISOString();
       }
       return convertFromMySQLDateTime(date) || null;
+    };
+
+    // Helper function to convert dates (must return string)
+    const convertDateRequired = (date: any): string => {
+      if (!date) return new Date().toISOString();
+      if (date instanceof Date) {
+        return date.toISOString();
+      }
+      return convertFromMySQLDateTime(date) || new Date().toISOString();
     };
 
     return {
@@ -394,7 +421,14 @@ class IngamePopupNoticeService {
       displayPriority: Number(row.displayPriority) || 100,
       showOnce: Boolean(row.showOnce),
       startDate: convertDate(row.startDate),
-      endDate: convertDate(row.endDate)
+      endDate: convertDate(row.endDate),
+      messageTemplateId: row.messageTemplateId || null,
+      useTemplate: Boolean(row.useTemplate),
+      description: row.description || null,
+      createdAt: convertDateRequired(row.createdAt),
+      updatedAt: convertDateRequired(row.updatedAt),
+      createdBy: row.createdBy,
+      updatedBy: row.updatedBy || null
     };
   }
 
@@ -445,12 +479,16 @@ class IngamePopupNoticeService {
       content: row.content,
       displayPriority: row.displayPriority,
       showOnce: Boolean(row.showOnce),
-      endDate: row.endDate
     };
 
     // Only include startDate if it's not null
     if (row.startDate) {
       response.startDate = row.startDate;
+    }
+
+    // Only include endDate if it's not null
+    if (row.endDate) {
+      response.endDate = row.endDate;
     }
 
     // Add targeting fields only if they have values

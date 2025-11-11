@@ -21,6 +21,7 @@ import {
   GameWorld,
   PopupNotice,
   Survey,
+  SurveySettings,
   ServiceInstance,
   RegisterServiceInput,
   UpdateServiceStatusInput,
@@ -245,17 +246,20 @@ export class GatrixServerSDK {
   // ============================================================================
 
   /**
-   * Get surveys
+   * Get surveys with settings
    */
-  async getSurveys(): Promise<Survey[]> {
+  async getSurveys(): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
     return await this.survey.list({ isActive: true });
   }
 
   /**
-   * Get cached surveys
+   * Get cached surveys with settings
    */
-  getCachedSurveys(): Survey[] {
-    return this.survey.getCached();
+  getCachedSurveys(): { surveys: Survey[]; settings: SurveySettings | null } {
+    return {
+      surveys: this.survey.getCached(),
+      settings: this.survey.getCachedSettings(),
+    };
   }
 
   /**
@@ -270,6 +274,14 @@ export class GatrixServerSDK {
    */
   getSurveysForWorld(worldId: string): Survey[] {
     return this.survey.getSurveysForWorld(worldId);
+  }
+
+  /**
+   * Update survey settings only
+   * Called when survey settings change (e.g., survey configuration updates)
+   */
+  updateSurveySettings(newSettings: SurveySettings): void {
+    this.survey.updateSettings(newSettings);
   }
 
   // ============================================================================

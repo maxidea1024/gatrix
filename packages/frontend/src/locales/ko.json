@@ -3062,6 +3062,7 @@
     "startImmediately": "바로시작",
     "endDate": "종료일시",
     "endDateHelp": "공지가 표시되는 마지막 일시를 설정합니다 (선택사항, 미설정 시 영구 공지)",
+    "endDateNotSet": "수동종료",
     "period": "적용 기간",
     "useTemplate": "템플릿 사용",
     "useTemplateHelp": "메시지 템플릿을 사용하여 공지를 작성합니다",

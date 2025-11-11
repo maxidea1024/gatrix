@@ -90,6 +90,9 @@ export class ServiceDiscoveryService {
   /**
    * Unregister service instance via Backend API
    * POST /api/v1/server/services/unregister
+   *
+   * Note: This method does NOT retry on failure because it's called during shutdown.
+   * Retrying would delay the shutdown process unnecessarily.
    */
   async unregister(): Promise<void> {
     if (!this.instanceId || !this.labels) {
@@ -102,22 +105,31 @@ export class ServiceDiscoveryService {
       labels: this.labels,
     });
 
-    const response = await this.apiClient.post('/api/v1/server/services/unregister', {
-      instanceId: this.instanceId,
-      labels: this.labels,
-    });
+    try {
+      const response = await this.apiClient.postNoRetry('/api/v1/server/services/unregister', {
+        instanceId: this.instanceId,
+        labels: this.labels,
+      });
 
-    if (!response.success) {
-      throw new Error(response.error?.message || 'Failed to unregister service');
+      if (!response.success) {
+        throw new Error(response.error?.message || 'Failed to unregister service');
+      }
+
+      this.logger.info('Service unregistered via API', {
+        instanceId: this.instanceId,
+        labels: this.labels,
+      });
+    } catch (error) {
+      // Log error but don't throw - unregister is best-effort during shutdown
+      this.logger.warn('Failed to unregister service', {
+        instanceId: this.instanceId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      // Always clear instance ID and labels, even if unregister fails
+      this.instanceId = undefined;
+      this.labels = undefined;
     }
-
-    this.logger.info('Service unregistered via API', {
-      instanceId: this.instanceId,
-      labels: this.labels,
-    });
-
-    this.instanceId = undefined;
-    this.labels = undefined;
   }
 
   /**

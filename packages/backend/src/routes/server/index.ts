@@ -77,6 +77,7 @@ router.get('/game-worlds/:id', serverSDKAuth, ServerGameWorldController.getGameW
 router.get('/ingame-popup-notices', serverSDKAuth, IngamePopupNoticeController.getServerIngamePopupNotices);
 
 // Survey routes
+router.get('/surveys/settings', serverSDKAuth, SurveyController.getServerSurveySettings);
 router.get('/surveys', serverSDKAuth, SurveyController.getServerSurveys);
 
 // Service discovery routes

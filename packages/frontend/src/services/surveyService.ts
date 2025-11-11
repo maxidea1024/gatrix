@@ -35,6 +35,9 @@ export interface Survey {
   targetWorldsInverted?: boolean;
   createdBy?: number;
   updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  rewardTemplateId?: string | null;
 }
 
 export interface SurveyConfig {

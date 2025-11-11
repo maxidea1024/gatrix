@@ -129,6 +129,13 @@ export interface Survey {
   targetWorldsInverted?: boolean;
 }
 
+export interface SurveySettings {
+  defaultSurveyUrl: string;
+  completionUrl: string;
+  linkCaption: string;
+  verificationKey: string;
+}
+
 export interface SurveyListParams {
   // Survey list query parameters
 }

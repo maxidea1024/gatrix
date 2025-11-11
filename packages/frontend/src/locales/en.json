@@ -3062,6 +3062,7 @@
     "startImmediately": "Start Immediately",
     "endDate": "End Date",
     "endDateHelp": "Set the last date and time when the notice displays (optional, permanent if not set)",
+    "endDateNotSet": "Manual Termination",
     "period": "Period",
     "useTemplate": "Use Template",
     "useTemplateHelp": "Use a message template to create the notice",

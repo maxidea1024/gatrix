@@ -11,6 +11,10 @@ import {
   IconButton,
   Stack,
   Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import ResizableDrawer from '../common/ResizableDrawer';

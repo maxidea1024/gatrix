@@ -116,6 +116,7 @@ export class EventListener {
       'survey.created',
       'survey.updated',
       'survey.deleted',
+      'survey.settings.updated',
       'maintenance.started',
       'maintenance.ended',
     ].includes(type);
@@ -168,6 +169,19 @@ export class EventListener {
       case 'survey.deleted':
         // Remove the deleted survey from cache (immutable)
         this.cacheManager.removeSurvey(String(event.data.id));
+        break;
+
+      case 'survey.settings.updated':
+        // Refresh survey settings only when configuration changes
+        this.logger.info('Survey settings updated event received, refreshing settings', {
+          eventData: event.data,
+        });
+        try {
+          await this.cacheManager.refreshSurveySettings();
+          this.logger.info('Survey settings refreshed successfully');
+        } catch (error) {
+          this.logger.error('Failed to refresh survey settings', { error });
+        }
         break;
 
       case 'maintenance.started':

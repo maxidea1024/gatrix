@@ -56,7 +56,7 @@ export class CacheManager {
           this.logger.warn('Failed to load surveys (might require admin auth)', {
             error: error.message,
           });
-          return [];
+          return { surveys: [], settings: null };
         }),
       ]);
 
@@ -142,6 +142,13 @@ export class CacheManager {
    */
   async refreshSurveys(): Promise<void> {
     await this.surveyService.refresh({ isActive: true });
+  }
+
+  /**
+   * Refresh survey settings only
+   */
+  async refreshSurveySettings(): Promise<void> {
+    await this.surveyService.refreshSettings();
   }
 
   /**

@@ -31,7 +31,7 @@ async function main() {
 
     // Logger configuration
     logger: {
-      level: 'info',
+      level: 'debug',
     },
   });
 
@@ -122,14 +122,20 @@ async function main() {
       printCachedData();
     });
 
+    sdk.on('survey.settings.updated', (event) => {
+      console.log('[idle-server] SURVEY SETTINGS UPDATED:', event.data);
+      printCachedData();
+    });
+
     // Helper function to print cached data
     function printCachedData() {
       console.log('\n========== CACHED DATA (JSON) ==========');
 
+      const surveysData = sdk.getCachedSurveys();
       const cachedData = {
         gameWorlds: sdk.getCachedGameWorlds(),
         popupNotices: sdk.getCachedPopupNotices(),
-        surveys: sdk.getCachedSurveys(),
+        surveys: surveysData,
         timestamp: new Date().toISOString(),
       };
 

@@ -638,7 +638,7 @@ const IngamePopupNoticesPage: React.FC = () => {
                                 {notice.startDate ? formatDateTime(notice.startDate) : t('ingamePopupNotices.startImmediately')}
                               </Typography>
                               <Typography variant="caption" display="block" color="text.secondary">
-                                ~ {formatDateTime(notice.endDate)}
+                                ~ {notice.endDate ? formatDateTime(notice.endDate) : t('ingamePopupNotices.endDateNotSet')}
                               </Typography>
                             </TableCell>
                           );

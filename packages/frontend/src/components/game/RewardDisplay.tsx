@@ -7,7 +7,8 @@ import rewardTemplateService from '../../services/rewardTemplateService';
 import { usePlanningData } from '../../contexts/PlanningDataContext';
 
 interface RewardDisplayProps {
-  rewards?: Reward[];
+  rewards?: any[];
+  rewardTemplateId?: string | null;
   maxDisplay?: number;
 }
 
@@ -15,7 +16,7 @@ interface RewardDisplayProps {
  * Display component for participation rewards
  * Shows reward type and item name with quantity
  */
-const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }) => {
+const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId, maxDisplay = 3 }) => {
   const { t } = useTranslation();
   const { rewardTypes, rewardLookup, isLoading: contextLoading } = usePlanningData();
   const [rewardTypeMap, setRewardTypeMap] = useState<Map<number, RewardTypeInfo>>(new Map());
@@ -26,7 +27,19 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
 
   // Set display rewards from props
   useEffect(() => {
-    setDisplayRewards(rewards || []);
+    if (!rewards || rewards.length === 0) {
+      setDisplayRewards([]);
+      return;
+    }
+
+    // Convert from backend format (rewardType, itemId) to frontend format (type, id)
+    const convertedRewards = rewards.map((reward: any) => ({
+      type: reward.type !== undefined ? reward.type : reward.rewardType,
+      id: reward.id !== undefined ? reward.id : (reward.itemId ? parseInt(reward.itemId.split('_')[1] || reward.itemId) : 0),
+      quantity: reward.quantity,
+    }));
+
+    setDisplayRewards(convertedRewards);
   }, [rewards]);
 
   // Build reward type map from context
@@ -42,21 +55,23 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
 
   // Build reward items map from context lookup data
   useEffect(() => {
-    if (rewardLookup && displayRewards && displayRewards.length > 0) {
+    if (displayRewards && displayRewards.length > 0) {
       const itemsMap = new Map<string, RewardItem>();
 
       // Get unique reward types
-      const uniqueTypes = [...new Set(displayRewards.map(r => parseInt(r.rewardType)))];
+      const uniqueTypes = [...new Set(displayRewards.map(r => parseInt(r.type)))];
 
-      // Extract items from reward lookup data
-      uniqueTypes.forEach(rewardType => {
-        const rewardTypeData = rewardLookup[rewardType];
-        if (rewardTypeData?.items && Array.isArray(rewardTypeData.items)) {
-          rewardTypeData.items.forEach(item => {
-            itemsMap.set(`${rewardType}_${item.id}`, item);
-          });
-        }
-      });
+      // Extract items from reward lookup data if available
+      if (rewardLookup) {
+        uniqueTypes.forEach(rewardType => {
+          const rewardTypeData = rewardLookup[rewardType];
+          if (rewardTypeData?.items && Array.isArray(rewardTypeData.items)) {
+            rewardTypeData.items.forEach(item => {
+              itemsMap.set(`${rewardType}_${item.id}`, item);
+            });
+          }
+        });
+      }
 
       setRewardItemsMap(itemsMap);
       setLoading(false);

@@ -251,6 +251,34 @@ export class ApiClient {
   }
 
   /**
+   * POST request without retry (for operations like unregister that should not retry)
+   */
+  async postNoRetry<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
+    // Auto-generate requestId if not provided in headers
+    const requestConfig = config || {};
+    const headers = requestConfig.headers || {};
+
+    if (!headers['x-request-id']) {
+      headers['x-request-id'] = ulid();
+      this.logger.debug('Auto-generated requestId', { requestId: headers['x-request-id'], url });
+    }
+
+    requestConfig.headers = headers;
+
+    try {
+      const response = await this.client.post<ApiResponse<T>>(url, data, requestConfig);
+      return response.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+      throw error;
+    }
+  }
+
+  /**
    * PUT request (with retry and auto-generated requestId in header)
    */
   async put<T = any>(

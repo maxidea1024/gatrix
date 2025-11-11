@@ -16,6 +16,7 @@ export type StandardEventType =
   | 'survey.created'
   | 'survey.updated'
   | 'survey.deleted'
+  | 'survey.settings.updated'
   | 'maintenance.started'
   | 'maintenance.ended';
 

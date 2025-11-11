@@ -79,15 +79,6 @@ export class ServerGameWorldController {
             }
           }
 
-          // Add maintenanceMessage if in maintenance mode
-          if (toBoolean(world.isMaintenance)) {
-            // Get maintenance message in requested language
-            const maintenanceMessage = await GameWorldService.getMaintenanceMessage(world.id, lang);
-            if (maintenanceMessage) {
-              worldData.maintenanceMessage = maintenanceMessage;
-            }
-          }
-
           return worldData;
         })
       );
@@ -164,18 +155,29 @@ export class ServerGameWorldController {
       const tags = await TagService.listTagsForEntity('game_world', world.id);
       const tagNames = tags ? tags.map((tag: any) => tag.name) : [];
 
+      const worldData: any = {
+        id: world.id,
+        worldId: world.worldId,
+        name: world.name,
+        isMaintenance: toBoolean(world.isMaintenance),
+        displayOrder: world.displayOrder,
+        worldServerAddress: world.worldServerAddress || null,
+        customPayload: parseCustomPayload(world.customPayload),
+        tags: tagNames
+      };
+
+      // Add maintenanceMessage if in maintenance mode
+      if (toBoolean(world.isMaintenance)) {
+        const lang = (req.query.lang as string) || 'en';
+        const maintenanceMessage = await GameWorldService.getMaintenanceMessage(world.id, lang);
+        if (maintenanceMessage) {
+          worldData.maintenanceMessage = maintenanceMessage;
+        }
+      }
+
       res.json({
         success: true,
-        data: {
-          id: world.id,
-          worldId: world.worldId,
-          name: world.name,
-          isMaintenance: toBoolean(world.isMaintenance),
-          displayOrder: world.displayOrder,
-          worldServerAddress: world.worldServerAddress || null,
-          customPayload: parseCustomPayload(world.customPayload),
-          tags: tagNames
-        },
+        data: worldData,
         meta: {
           timestamp: new Date().toISOString(),
           apiVersion: '1.0.0'
@@ -238,17 +240,28 @@ export class ServerGameWorldController {
         return null;
       };
 
+      const worldData: any = {
+        id: world.id,
+        worldId: world.worldId,
+        name: world.name,
+        isMaintenance: toBoolean(world.isMaintenance),
+        displayOrder: world.displayOrder,
+        worldServerAddress: world.worldServerAddress || null,
+        customPayload: parseCustomPayload(world.customPayload)
+      };
+
+      // Add maintenanceMessage if in maintenance mode
+      if (toBoolean(world.isMaintenance)) {
+        const lang = (req.query.lang as string) || 'en';
+        const maintenanceMessage = await GameWorldService.getMaintenanceMessage(world.id, lang);
+        if (maintenanceMessage) {
+          worldData.maintenanceMessage = maintenanceMessage;
+        }
+      }
+
       res.json({
         success: true,
-        data: {
-          id: world.id,
-          worldId: world.worldId,
-          name: world.name,
-          isMaintenance: toBoolean(world.isMaintenance),
-          displayOrder: world.displayOrder,
-          worldServerAddress: world.worldServerAddress || null,
-          customPayload: parseCustomPayload(world.customPayload)
-        },
+        data: worldData,
         meta: {
           timestamp: new Date().toISOString(),
           apiVersion: '1.0.0'

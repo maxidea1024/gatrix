@@ -5,12 +5,13 @@
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
-import { Survey, SurveyListParams } from '../types/api';
+import { Survey, SurveyListParams, SurveySettings } from '../types/api';
 
 export class SurveyService {
   private apiClient: ApiClient;
   private logger: Logger;
   private cachedSurveys: Survey[] = [];
+  private cachedSettings: SurveySettings | null = null;
 
   constructor(apiClient: ApiClient, logger: Logger) {
     this.apiClient = apiClient;
@@ -18,13 +19,13 @@ export class SurveyService {
   }
 
   /**
-   * Get active surveys
+   * Get active surveys with settings
    * GET /api/v1/server/surveys
    */
-  async list(params?: SurveyListParams): Promise<Survey[]> {
+  async list(params?: SurveyListParams): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
     this.logger.debug('Fetching surveys', params);
 
-    const response = await this.apiClient.get<Survey[]>(`/api/v1/server/surveys`, {
+    const response = await this.apiClient.get<{ surveys: Survey[]; settings: SurveySettings }>(`/api/v1/server/surveys`, {
       params,
     });
 
@@ -32,12 +33,14 @@ export class SurveyService {
       throw new Error(response.error?.message || 'Failed to fetch surveys');
     }
 
-    const surveys = response.data;
+    // response.data contains { surveys, settings }
+    const { surveys, settings } = response.data;
     this.cachedSurveys = surveys;
+    this.cachedSettings = settings;
 
-    this.logger.info('Surveys fetched', { count: surveys.length });
+    this.logger.info('Surveys fetched', { count: surveys.length, hasSettings: !!settings });
 
-    return surveys;
+    return { surveys, settings };
   }
 
   /**
@@ -48,11 +51,44 @@ export class SurveyService {
   }
 
   /**
+   * Get cached survey settings
+   */
+  getCachedSettings(): SurveySettings | null {
+    return this.cachedSettings;
+  }
+
+  /**
    * Refresh cached surveys
    */
-  async refresh(params?: SurveyListParams): Promise<Survey[]> {
+  async refresh(params?: SurveyListParams): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
     this.logger.info('Refreshing surveys cache');
     return await this.list(params);
+  }
+
+  /**
+   * Refresh survey settings only
+   * GET /api/v1/server/surveys/settings
+   */
+  async refreshSettings(): Promise<SurveySettings> {
+    this.logger.info('Refreshing survey settings');
+
+    const response = await this.apiClient.get<{ settings: SurveySettings }>(`/api/v1/server/surveys/settings`);
+
+    if (!response.success || !response.data) {
+      throw new Error(response.error?.message || 'Failed to fetch survey settings');
+    }
+
+    const { settings } = response.data;
+    const oldSettings = this.cachedSettings;
+    this.cachedSettings = settings;
+
+    this.logger.info('Survey settings refreshed', {
+      oldSettings,
+      newSettings: settings,
+      changed: !this.areSettingsEqual(oldSettings, settings),
+    });
+
+    return settings;
   }
 
   /**
@@ -82,8 +118,8 @@ export class SurveyService {
 
       // Otherwise, fetch from API and add/update
       // Fetch all surveys and find the updated one
-      const surveys = await this.list();
-      const updatedSurvey = surveys.find(s => s.id === id);
+      const result = await this.list();
+      const updatedSurvey = result.surveys.find(s => s.id === id);
 
       if (!updatedSurvey) {
         this.logger.debug('Survey is no longer active, removing from cache', { id });
@@ -147,6 +183,45 @@ export class SurveyService {
       const isInTargetList = survey.targetWorlds.includes(worldId);
       return survey.targetWorldsInverted ? !isInTargetList : isInTargetList;
     });
+  }
+
+  /**
+   * Update survey settings only
+   * Called when settings change (e.g., survey configuration updates)
+   */
+  updateSettings(newSettings: SurveySettings): void {
+    const oldSettings = this.cachedSettings;
+    this.cachedSettings = newSettings;
+
+    // Check if settings actually changed
+    const settingsChanged = !this.areSettingsEqual(oldSettings, newSettings);
+
+    if (settingsChanged) {
+      this.logger.info('Survey settings updated', {
+        oldSettings,
+        newSettings,
+      });
+    } else {
+      this.logger.debug('Survey settings unchanged');
+    }
+  }
+
+  /**
+   * Check if two settings objects are equal
+   */
+  private areSettingsEqual(
+    settings1: SurveySettings | null,
+    settings2: SurveySettings | null
+  ): boolean {
+    if (!settings1 && !settings2) return true;
+    if (!settings1 || !settings2) return false;
+
+    return (
+      settings1.defaultSurveyUrl === settings2.defaultSurveyUrl &&
+      settings1.completionUrl === settings2.completionUrl &&
+      settings1.linkCaption === settings2.linkCaption &&
+      settings1.verificationKey === settings2.verificationKey
+    );
   }
 }
 

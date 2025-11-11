@@ -3095,6 +3095,7 @@
     "startImmediately": "立即开始",
     "endDate": "结束日期",
     "endDateHelp": "设置公告显示的最后日期和时间（可选，未设置时为永久公告）",
+    "endDateNotSet": "手动终止",
     "period": "应用期间",
     "useTemplate": "使用模板",
     "useTemplateHelp": "使用消息模板创建公告",
