@@ -18,9 +18,12 @@ const router = express.Router();
 // Readiness check endpoint
 router.get('/ready', (req, res) => {
   res.json({
-    status: 'ready',
-    timestamp: new Date().toISOString(),
-    service: 'gatrix-backend'
+    success: true,
+    data: {
+      status: 'ready',
+      timestamp: new Date().toISOString(),
+      service: 'gatrix-backend'
+    }
   });
 });
 

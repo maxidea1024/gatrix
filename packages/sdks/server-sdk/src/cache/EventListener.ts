@@ -17,6 +17,11 @@ export class EventListener {
   private eventListeners: EventListenerMap = {};
   private cacheManager: CacheManager;
   private readonly CHANNEL_NAME = 'gatrix-sdk-events';
+  private isConnected: boolean = false;
+  private reconnectAttempts: number = 0;
+  private readonly MAX_RECONNECT_ATTEMPTS = 60; // 30 seconds with 500ms interval
+  private readonly RECONNECT_INTERVAL = 500; // milliseconds
+  private reconnectTimer?: NodeJS.Timeout;
 
   constructor(redisConfig: RedisConfig, cacheManager: CacheManager, logger: Logger) {
     this.redisConfig = redisConfig;
@@ -25,13 +30,14 @@ export class EventListener {
   }
 
   /**
-   * Initialize event listener
+   * Initialize event listener with retry logic
    */
   async initialize(): Promise<void> {
     this.logger.info('Initializing event listener...');
 
     try {
       // Create subscriber connection for Pub/Sub
+      // Suppress ioredis debug logs
       this.subscriber = new Redis({
         host: this.redisConfig.host,
         port: this.redisConfig.port,
@@ -41,39 +47,109 @@ export class EventListener {
           const delay = Math.min(times * 50, 2000);
           return delay;
         },
+        lazyConnect: true,
+        enableReadyCheck: false,
+        enableOfflineQueue: false,
+        maxRetriesPerRequest: null,
       });
+
+      // Suppress ioredis internal logs
+      this.subscriber.on('error', (error) => {
+        // Only log actual connection errors, not retry attempts
+        if (!error.message.includes('ECONNREFUSED') && !error.message.includes('connect')) {
+          this.logger.error('Subscriber error', { error: error.message });
+        }
+        this.isConnected = false;
+        this.setupReconnect();
+      });
+
+      this.subscriber.on('close', () => {
+        this.logger.warn('Subscriber connection closed');
+        this.isConnected = false;
+        this.setupReconnect();
+      });
+
+      // Connect to Redis
+      await this.subscriber.connect();
 
       // Subscribe to SDK events channel
       await this.subscriber.subscribe(this.CHANNEL_NAME);
-      this.logger.info('Subscribed to channel', { channel: this.CHANNEL_NAME });
+      this.logger.info('Event listener connected and subscribed');
 
       // Handle incoming messages
       this.subscriber.on('message', async (channel, message) => {
-        this.logger.debug('Received message on channel', { channel, messageLength: message.length });
-
         if (channel === this.CHANNEL_NAME) {
           try {
-            this.logger.debug('Parsing event message', { message });
             const event = JSON.parse(message);
-            this.logger.info('Event parsed successfully', { type: event.type, id: event.data?.id });
+            this.logger.info('SDK Event received', { type: event.type, id: event.data?.id });
             await this.processEvent(event);
           } catch (error: any) {
-            this.logger.error('Failed to parse event message', { error: error.message, message });
+            this.logger.error('Failed to parse event message', { error: error.message });
           }
         }
       });
 
-      this.subscriber.on('subscribe', (channel, count) => {
-        this.logger.info('Subscribed to channel', { channel, subscriptionCount: count });
-      });
-
-      this.subscriber.on('error', (error) => {
-        this.logger.error('Subscriber error', { error: error.message });
-      });
-
+      this.isConnected = true;
+      this.reconnectAttempts = 0;
       this.logger.info('Event listener initialized successfully');
     } catch (error: any) {
       this.logger.error('Failed to initialize event listener', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Setup reconnection logic
+   */
+  private setupReconnect(): void {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+    }
+
+    if (this.reconnectAttempts >= this.MAX_RECONNECT_ATTEMPTS) {
+      this.logger.error('Max reconnection attempts reached. Giving up.');
+      return;
+    }
+
+    this.reconnectAttempts++;
+
+    this.reconnectTimer = setTimeout(async () => {
+      try {
+        // Close existing connection if any
+        if (this.subscriber) {
+          try {
+            this.subscriber.disconnect();
+          } catch (e) {
+            // Ignore disconnect errors
+          }
+        }
+
+        // Reinitialize connection
+        await this.initialize();
+
+        // After successful reconnection, reinitialize all cache data
+        this.logger.info('Event listener reconnected. Reinitializing cache data...');
+        await this.reinitializeCache();
+      } catch (error: any) {
+        // Silently continue on reconnection failures
+        this.setupReconnect();
+      }
+    }, this.RECONNECT_INTERVAL);
+  }
+
+  /**
+   * Reinitialize all cache data after reconnection
+   */
+  private async reinitializeCache(): Promise<void> {
+    try {
+      // Refresh all cache data
+      await this.cacheManager.refreshGameWorlds();
+      await this.cacheManager.refreshPopupNotices();
+      await this.cacheManager.refreshSurveys();
+
+      this.logger.info('Cache reinitialized after reconnection');
+    } catch (error: any) {
+      this.logger.error('Failed to reinitialize cache', { error: error.message });
       throw error;
     }
   }

@@ -8,6 +8,7 @@ import { CacheConfig } from '../types/config';
 import { GameWorldService } from '../services/GameWorldService';
 import { PopupNoticeService } from '../services/PopupNoticeService';
 import { SurveyService } from '../services/SurveyService';
+import { ApiClient } from '../client/ApiClient';
 
 export class CacheManager {
   private logger: Logger;
@@ -15,6 +16,7 @@ export class CacheManager {
   private gameWorldService: GameWorldService;
   private popupNoticeService: PopupNoticeService;
   private surveyService: SurveyService;
+  private apiClient: ApiClient;
   private refreshInterval?: NodeJS.Timeout;
 
   constructor(
@@ -22,6 +24,7 @@ export class CacheManager {
     gameWorldService: GameWorldService,
     popupNoticeService: PopupNoticeService,
     surveyService: SurveyService,
+    apiClient: ApiClient,
     logger: Logger
   ) {
     this.config = {
@@ -32,11 +35,12 @@ export class CacheManager {
     this.gameWorldService = gameWorldService;
     this.popupNoticeService = popupNoticeService;
     this.surveyService = surveyService;
+    this.apiClient = apiClient;
     this.logger = logger;
   }
 
   /**
-   * Initialize cache by loading all data
+   * Initialize cache by loading all data with retry logic
    */
   async initialize(): Promise<void> {
     if (!this.config.enabled) {
@@ -44,23 +48,21 @@ export class CacheManager {
       return;
     }
 
-    this.logger.info('Initializing cache...');
-
     try {
+      // Wait for backend to be ready with retry logic
+      await this.waitForBackendReady();
+
       // Load all data in parallel
       await Promise.all([
         this.gameWorldService.list(),
         this.popupNoticeService.list(),
         // Note: Survey endpoint might need admin auth, handle gracefully
         this.surveyService.list({ isActive: true }).catch((error) => {
-          this.logger.warn('Failed to load surveys (might require admin auth)', {
-            error: error.message,
-          });
           return { surveys: [], settings: null };
         }),
       ]);
 
-      this.logger.info('Cache initialized successfully');
+      this.logger.info('SDK cache initialized');
 
       // Setup auto-refresh if enabled
       if (this.config.autoRefresh && this.config.ttl) {
@@ -70,6 +72,47 @@ export class CacheManager {
       this.logger.error('Failed to initialize cache', { error: error.message });
       throw error;
     }
+  }
+
+  /**
+   * Wait for backend to be ready with retry logic
+   * Attempts to connect for up to 30 seconds using /api/v1/ready endpoint
+   */
+  private async waitForBackendReady(): Promise<void> {
+    const maxAttempts = 60; // 30 seconds with 500ms interval
+    const retryInterval = 500; // milliseconds
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        // Check backend ready status via dedicated endpoint
+        const response = await this.apiClient.get<{ status: string }>('/api/v1/ready');
+
+        if (response.success && response.data?.status === 'ready') {
+          this.logger.info('Backend is ready');
+          return;
+        }
+      } catch (error: any) {
+        // Silently continue on connection errors during startup
+      }
+
+      if (attempt === maxAttempts) {
+        this.logger.error('Backend is not ready after maximum attempts', {
+          attempts: maxAttempts,
+          totalTime: `${maxAttempts * retryInterval / 1000}s`,
+        });
+        throw new Error('Backend failed to become ready within timeout period');
+      }
+
+      // Wait before retrying
+      await this.sleep(retryInterval);
+    }
+  }
+
+  /**
+   * Sleep for specified milliseconds
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**

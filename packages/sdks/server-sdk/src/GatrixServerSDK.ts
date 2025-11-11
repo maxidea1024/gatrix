@@ -132,6 +132,7 @@ export class GatrixServerSDK {
         this.gameWorld,
         this.popupNotice,
         this.survey,
+        this.apiClient,
         this.logger
       );
 
