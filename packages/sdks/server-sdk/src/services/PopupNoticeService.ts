@@ -65,27 +65,49 @@ export class PopupNoticeService {
 
   /**
    * Update a single popup notice in cache (immutable)
-   * Fetches the updated notice from backend and updates only that notice in the cache
+   * If isVisible is false, removes the notice from cache (no API call needed)
+   * If isVisible is true but not in cache, fetches and adds it to cache
+   * If isVisible is true and in cache, fetches and updates it
    */
-  async updateSingleNotice(id: number): Promise<void> {
+  async updateSingleNotice(id: number, isVisible?: boolean | number): Promise<void> {
     try {
-      this.logger.debug('Updating single popup notice in cache', { id });
+      this.logger.debug('Updating single popup notice in cache', { id, isVisible });
 
+      // If isVisible is explicitly false (0 or false), just remove from cache
+      if (isVisible === false || isVisible === 0) {
+        this.logger.info('Popup notice isVisible=false, removing from cache', { id });
+        this.removeNotice(id);
+        return;
+      }
+
+      // Otherwise, fetch from API and add/update
       // Fetch all notices and find the updated one
       const notices = await this.list();
       const updatedNotice = notices.find(n => n.id === id);
 
+      // If notice is not found in active notices, it means isActive is false
+      // Remove it from cache
       if (!updatedNotice) {
-        this.logger.warn('Updated notice not found in response', { id });
+        this.logger.debug('Popup notice is no longer active, removing from cache', { id });
+        this.removeNotice(id);
         return;
       }
 
-      // Immutable update: create new array with updated notice
-      this.cachedNotices = this.cachedNotices.map(notice =>
-        notice.id === id ? updatedNotice : notice
-      );
+      // Check if notice already exists in cache
+      const existsInCache = this.cachedNotices.some(notice => notice.id === id);
 
-      this.logger.debug('Single popup notice updated in cache', { id });
+      if (existsInCache) {
+        // Immutable update: update existing notice
+        this.cachedNotices = this.cachedNotices.map(notice =>
+          notice.id === id ? updatedNotice : notice
+        );
+        this.logger.debug('Single popup notice updated in cache', { id });
+      } else {
+        // Notice not in cache but found in backend (e.g., isActive changed from false to true)
+        // Add it to cache
+        this.cachedNotices = [...this.cachedNotices, updatedNotice];
+        this.logger.debug('Single popup notice added to cache (was previously removed)', { id });
+      }
     } catch (error: any) {
       this.logger.error('Failed to update single popup notice in cache', {
         id,

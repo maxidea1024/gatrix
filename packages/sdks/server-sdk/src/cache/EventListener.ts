@@ -1,9 +1,9 @@
 /**
- * Event Listener for BullMQ
+ * Event Listener for Redis Pub/Sub
  * Listens to cache invalidation events from Gatrix backend
+ * Uses Redis Pub/Sub to ensure all SDK instances receive the same events
  */
 
-import { Worker, Job } from 'bullmq';
 import Redis from 'ioredis';
 import { Logger } from '../utils/logger';
 import { RedisConfig } from '../types/config';
@@ -13,9 +13,10 @@ import { CacheManager } from './CacheManager';
 export class EventListener {
   private logger: Logger;
   private redisConfig: RedisConfig;
-  private worker?: Worker;
+  private subscriber?: Redis;
   private eventListeners: EventListenerMap = {};
   private cacheManager: CacheManager;
+  private readonly CHANNEL_NAME = 'gatrix-sdk-events';
 
   constructor(redisConfig: RedisConfig, cacheManager: CacheManager, logger: Logger) {
     this.redisConfig = redisConfig;
@@ -30,43 +31,44 @@ export class EventListener {
     this.logger.info('Initializing event listener...');
 
     try {
-      const connection = new Redis({
+      // Create subscriber connection for Pub/Sub
+      this.subscriber = new Redis({
         host: this.redisConfig.host,
         port: this.redisConfig.port,
         password: this.redisConfig.password,
         db: this.redisConfig.db || 0,
-        maxRetriesPerRequest: null,
         retryStrategy: (times) => {
           const delay = Math.min(times * 50, 2000);
           return delay;
         },
       });
 
-      // Create worker to listen to SDK events queue
-      this.worker = new Worker(
-        'gatrix-sdk-events',
-        async (job: Job) => {
-          await this.processEvent(job);
-        },
-        {
-          connection,
-          concurrency: 5,
+      // Subscribe to SDK events channel
+      await this.subscriber.subscribe(this.CHANNEL_NAME);
+      this.logger.info('Subscribed to channel', { channel: this.CHANNEL_NAME });
+
+      // Handle incoming messages
+      this.subscriber.on('message', async (channel, message) => {
+        this.logger.debug('Received message on channel', { channel, messageLength: message.length });
+
+        if (channel === this.CHANNEL_NAME) {
+          try {
+            this.logger.debug('Parsing event message', { message });
+            const event = JSON.parse(message);
+            this.logger.info('Event parsed successfully', { type: event.type, id: event.data?.id });
+            await this.processEvent(event);
+          } catch (error: any) {
+            this.logger.error('Failed to parse event message', { error: error.message, message });
+          }
         }
-      );
-
-      this.worker.on('completed', (job) => {
-        this.logger.debug('Event processed', { jobId: job.id });
       });
 
-      this.worker.on('failed', (job, error) => {
-        this.logger.error('Event processing failed', {
-          jobId: job?.id,
-          error: error.message,
-        });
+      this.subscriber.on('subscribe', (channel, count) => {
+        this.logger.info('Subscribed to channel', { channel, subscriptionCount: count });
       });
 
-      this.worker.on('error', (error) => {
-        this.logger.error('Worker error', { error: error.message });
+      this.subscriber.on('error', (error) => {
+        this.logger.error('Subscriber error', { error: error.message });
       });
 
       this.logger.info('Event listener initialized successfully');
@@ -79,8 +81,7 @@ export class EventListener {
   /**
    * Process incoming event
    */
-  private async processEvent(job: Job): Promise<void> {
-    const event = job.data;
+  private async processEvent(event: any): Promise<void> {
 
     this.logger.debug('Processing event', { type: event.type, data: event.data });
 
@@ -130,7 +131,10 @@ export class EventListener {
       case 'gameworld.created':
       case 'gameworld.updated':
         // Update only the affected game world (immutable)
-        await this.cacheManager.updateSingleGameWorld(Number(event.data.id));
+        // Pass isVisible from event data to avoid unnecessary API calls
+        // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
+        const gameWorldIsVisible = event.data.isVisible === 0 ? false : (event.data.isVisible === 1 ? true : event.data.isVisible);
+        await this.cacheManager.updateSingleGameWorld(Number(event.data.id), gameWorldIsVisible);
         break;
 
       case 'gameworld.deleted':
@@ -141,7 +145,10 @@ export class EventListener {
       case 'popup.created':
       case 'popup.updated':
         // Update only the affected popup notice (immutable)
-        await this.cacheManager.updateSinglePopupNotice(Number(event.data.id));
+        // Pass isVisible from event data to avoid unnecessary API calls
+        // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
+        const popupIsVisible = event.data.isVisible === 0 ? false : (event.data.isVisible === 1 ? true : event.data.isVisible);
+        await this.cacheManager.updateSinglePopupNotice(Number(event.data.id), popupIsVisible);
         break;
 
       case 'popup.deleted':
@@ -152,7 +159,10 @@ export class EventListener {
       case 'survey.created':
       case 'survey.updated':
         // Update only the affected survey (immutable)
-        await this.cacheManager.updateSingleSurvey(String(event.data.id));
+        // Pass isActive from event data to avoid unnecessary API calls
+        // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
+        const surveyIsActive = event.data.isActive === 0 ? false : (event.data.isActive === 1 ? true : event.data.isActive);
+        await this.cacheManager.updateSingleSurvey(String(event.data.id), surveyIsActive);
         break;
 
       case 'survey.deleted':
@@ -248,9 +258,10 @@ export class EventListener {
   async close(): Promise<void> {
     this.logger.info('Closing event listener...');
 
-    if (this.worker) {
-      await this.worker.close();
-      this.worker = undefined;
+    if (this.subscriber) {
+      await this.subscriber.unsubscribe(this.CHANNEL_NAME);
+      await this.subscriber.quit();
+      this.subscriber = undefined;
     }
 
     this.removeAllListeners();

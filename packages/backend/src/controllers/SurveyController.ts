@@ -95,7 +95,11 @@ export class SurveyController {
     // Publish SDK event
     await pubSubService.publishSDKEvent({
       type: 'survey.created',
-      data: { id: survey.id, timestamp: Date.now() },
+      data: {
+        id: survey.id,
+        timestamp: Date.now(),
+        isActive: survey.isActive
+      },
     });
 
     res.status(201).json({
@@ -134,7 +138,11 @@ export class SurveyController {
     // Publish SDK event
     await pubSubService.publishSDKEvent({
       type: 'survey.updated',
-      data: { id: survey.id, timestamp: Date.now() },
+      data: {
+        id: survey.id,
+        timestamp: Date.now(),
+        isActive: survey.isActive
+      },
     });
 
     res.json({
@@ -194,6 +202,16 @@ export class SurveyController {
       updatedBy: authenticatedUserId,
     });
 
+    // Publish SDK event
+    await pubSubService.publishSDKEvent({
+      type: 'survey.updated',
+      data: {
+        id: survey.id,
+        timestamp: Date.now(),
+        isActive: survey.isActive
+      },
+    });
+
     res.json({
       success: true,
       data: { survey },
@@ -241,9 +259,29 @@ export class SurveyController {
       isActive: true,
     });
 
+    // Filter out fields not needed by SDK
+    const filteredSurveys = result.surveys.map((survey: any) => ({
+      id: survey.id,
+      platformSurveyId: survey.platformSurveyId,
+      surveyTitle: survey.surveyTitle,
+      surveyContent: survey.surveyContent,
+      triggerConditions: survey.triggerConditions,
+      participationRewards: survey.participationRewards,
+      rewardMailTitle: survey.rewardMailTitle,
+      rewardMailContent: survey.rewardMailContent,
+      targetPlatforms: survey.targetPlatforms,
+      targetPlatformsInverted: survey.targetPlatformsInverted,
+      targetChannels: survey.targetChannels,
+      targetChannelsInverted: survey.targetChannelsInverted,
+      targetSubchannels: survey.targetSubchannels,
+      targetSubchannelsInverted: survey.targetSubchannelsInverted,
+      targetWorlds: survey.targetWorlds,
+      targetWorldsInverted: survey.targetWorldsInverted,
+    }));
+
     res.json({
       success: true,
-      data: result.surveys,
+      data: filteredSurveys,
     });
   });
 }

@@ -371,7 +371,8 @@ export class GameWorldModel {
           }
         }
 
-        return this.findById(id);
+        // Use findByIdWith to read updated data within the same transaction
+        return this.findByIdWith(trx, id);
       });
     } catch (error) {
       logger.error('Error updating game world:', error);

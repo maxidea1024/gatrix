@@ -36,11 +36,13 @@ export class GameWorldService {
     }
 
     const worlds = response.data.worlds;
-    this.cachedWorlds = worlds;
+    // Sort by displayOrder (ascending)
+    const sortedWorlds = worlds.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+    this.cachedWorlds = sortedWorlds;
 
-    this.logger.info('Game worlds fetched', { count: worlds.length });
+    this.logger.info('Game worlds fetched', { count: sortedWorlds.length });
 
-    return worlds;
+    return sortedWorlds;
   }
 
   /**
@@ -106,21 +108,45 @@ export class GameWorldService {
 
   /**
    * Update a single game world in cache (immutable)
-   * Fetches the updated world from backend and updates only that world in the cache
+   * If isVisible is false, removes the world from cache (no API call needed)
+   * If isVisible is true but not in cache, fetches and adds it to cache
+   * If isVisible is true and in cache, fetches and updates it
    */
-  async updateSingleWorld(id: number): Promise<void> {
+  async updateSingleWorld(id: number, isVisible?: boolean | number): Promise<void> {
     try {
-      this.logger.debug('Updating single game world in cache', { id });
+      this.logger.debug('Updating single game world in cache', { id, isVisible });
+
+      // If isVisible is explicitly false (0 or false), just remove from cache
+      if (isVisible === false || isVisible === 0) {
+        this.logger.info('Game world isVisible=false, removing from cache', { id });
+        this.removeWorld(id);
+        return;
+      }
+
+      // Otherwise, fetch from API and add/update
+      // Add small delay to ensure backend transaction is committed
+      // This is necessary because the event is published immediately after the database update
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Fetch the updated world from backend
       const updatedWorld = await this.getById(id);
 
-      // Immutable update: create new array with updated world
-      this.cachedWorlds = this.cachedWorlds.map(world =>
-        world.id === id ? updatedWorld : world
-      );
+      // Check if world already exists in cache
+      const existsInCache = this.cachedWorlds.some(world => world.id === id);
 
-      this.logger.debug('Single game world updated in cache', { id });
+      if (existsInCache) {
+        // Immutable update: update existing world
+        this.cachedWorlds = this.cachedWorlds.map(world =>
+          world.id === id ? updatedWorld : world
+        );
+        this.logger.debug('Single game world updated in cache', { id });
+      } else {
+        // World not in cache but found in backend (e.g., isVisible changed from false to true)
+        // Add it to cache and re-sort by displayOrder
+        this.cachedWorlds = [...this.cachedWorlds, updatedWorld];
+        this.cachedWorlds.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+        this.logger.debug('Single game world added to cache (was previously removed)', { id });
+      }
     } catch (error: any) {
       this.logger.error('Failed to update single game world in cache', {
         id,

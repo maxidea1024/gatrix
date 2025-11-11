@@ -174,7 +174,11 @@ class IngamePopupNoticeController {
       // Publish SDK event
       await pubSubService.publishSDKEvent({
         type: 'popup.created',
-        data: { id: notice.id, timestamp: Date.now() },
+        data: {
+          id: notice.id,
+          timestamp: Date.now(),
+          isVisible: notice.isActive
+        },
       });
 
       res.status(201).json({
@@ -224,7 +228,11 @@ class IngamePopupNoticeController {
       // Publish SDK event
       await pubSubService.publishSDKEvent({
         type: 'popup.updated',
-        data: { id: notice.id, timestamp: Date.now() },
+        data: {
+          id: notice.id,
+          timestamp: Date.now(),
+          isVisible: notice.isActive
+        },
       });
 
       res.json({

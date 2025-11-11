@@ -98,7 +98,11 @@ export class GameWorldService {
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
         type: 'gameworld.created',
-        data: { id: result.id, timestamp: Date.now() },
+        data: {
+          id: result.id,
+          timestamp: Date.now(),
+          isVisible: result.isVisible
+        },
       });
 
       return result;
@@ -138,7 +142,11 @@ export class GameWorldService {
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
         type: 'gameworld.updated',
-        data: { id: updatedWorld.id, timestamp: Date.now() },
+        data: {
+          id: updatedWorld.id,
+          timestamp: Date.now(),
+          isVisible: updatedWorld.isVisible
+        },
       });
 
       return updatedWorld;
@@ -209,7 +217,11 @@ export class GameWorldService {
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
         type: 'gameworld.updated',
-        data: { id: updatedWorld.id, timestamp: Date.now() },
+        data: {
+          id: updatedWorld.id,
+          timestamp: Date.now(),
+          isVisible: updatedWorld.isVisible
+        },
       });
 
       return updatedWorld;

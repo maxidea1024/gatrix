@@ -16,6 +16,9 @@ export class Database {
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
+      supportBigNumbers: true,
+      bigNumberStrings: false,
+      decimalNumbers: true,
     });
   }
 

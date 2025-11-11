@@ -5,6 +5,36 @@ import { config } from './index';
 
 dotenv.config();
 
+// Helper function to convert MySQL BIT/TINYINT to boolean
+const convertBitToBoolean = (obj: any): any => {
+  if (obj === null || obj === undefined) return obj;
+
+  if (Array.isArray(obj)) {
+    return obj.map(convertBitToBoolean);
+  }
+
+  if (typeof obj === 'object') {
+    const converted: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      // Convert common boolean field names from 0/1 to true/false
+      if ((key === 'isVisible' || key === 'isActive' || key === 'isMaintenance' ||
+           key === 'isEnabled' || key === 'supportsMultiLanguage' || key === 'emailVerified' ||
+           key === 'showOnce' || key === 'targetPlatformsInverted' || key === 'targetChannelsInverted' ||
+           key === 'targetSubchannelsInverted' || key === 'targetWorldsInverted' || key === 'targetUserIdsInverted') &&
+          (value === 0 || value === 1)) {
+        converted[key] = value === 1;
+      } else if (typeof value === 'object') {
+        converted[key] = convertBitToBoolean(value);
+      } else {
+        converted[key] = value;
+      }
+    }
+    return converted;
+  }
+
+  return obj;
+};
+
 const knexConfig = {
   client: 'mysql2',
   connection: {
@@ -32,6 +62,9 @@ const knexConfig = {
   },
   seeds: {
     directory: './seeds',
+  },
+  postProcessResponse: (result: any) => {
+    return convertBitToBoolean(result);
   },
 };
 

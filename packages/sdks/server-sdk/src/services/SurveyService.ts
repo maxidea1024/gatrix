@@ -65,34 +65,54 @@ export class SurveyService {
 
   /**
    * Update a single survey in cache (immutable)
-   * Fetches the updated survey from backend and updates only that survey in the cache
+   * If isActive is false, removes the survey from cache (no API call needed)
+   * If isActive is true but not in cache, fetches and adds it to cache
+   * If isActive is true and in cache, fetches and updates it
    */
-  async updateSingleSurvey(id: string): Promise<void> {
+  async updateSingleSurvey(id: string, isActive?: boolean | number): Promise<void> {
     try {
-      this.logger.debug('Updating single survey in cache', { id });
+      this.logger.debug('Updating single survey in cache', { id, isActive });
 
-      // Fetch all surveys and find the updated one
-      const surveys = await this.list({ isActive: true });
-      const updatedSurvey = surveys.find(s => s.id === id);
-
-      if (!updatedSurvey) {
-        this.logger.warn('Updated survey not found in response', { id });
+      // If isActive is explicitly false (0 or false), just remove from cache
+      if (isActive === false || isActive === 0) {
+        this.logger.info('Survey isActive=false, removing from cache', { id });
+        this.removeSurvey(id);
         return;
       }
 
-      // Immutable update: create new array with updated survey
-      this.cachedSurveys = this.cachedSurveys.map(survey =>
-        survey.id === id ? updatedSurvey : survey
-      );
+      // Otherwise, fetch from API and add/update
+      // Fetch all surveys and find the updated one
+      const surveys = await this.list();
+      const updatedSurvey = surveys.find(s => s.id === id);
 
-      this.logger.debug('Single survey updated in cache', { id });
+      if (!updatedSurvey) {
+        this.logger.debug('Survey is no longer active, removing from cache', { id });
+        this.removeSurvey(id);
+        return;
+      }
+
+      // Check if survey already exists in cache
+      const existsInCache = this.cachedSurveys.some(survey => survey.id === id);
+
+      if (existsInCache) {
+        // Immutable update: update existing survey
+        this.cachedSurveys = this.cachedSurveys.map(survey =>
+          survey.id === id ? updatedSurvey : survey
+        );
+        this.logger.debug('Single survey updated in cache', { id });
+      } else {
+        // Survey not in cache but found in backend (e.g., isActive changed from false to true)
+        // Add it to cache
+        this.cachedSurveys = [...this.cachedSurveys, updatedSurvey];
+        this.logger.debug('Single survey added to cache (was previously removed)', { id });
+      }
     } catch (error: any) {
       this.logger.error('Failed to update single survey in cache', {
         id,
         error: error.message,
       });
       // If update fails, fall back to full refresh
-      await this.refresh({ isActive: true });
+      await this.refresh();
     }
   }
 

@@ -147,8 +147,8 @@ export class CacheManager {
   /**
    * Update a single game world in cache (immutable)
    */
-  async updateSingleGameWorld(id: number): Promise<void> {
-    await this.gameWorldService.updateSingleWorld(id);
+  async updateSingleGameWorld(id: number, isVisible?: boolean | number): Promise<void> {
+    await this.gameWorldService.updateSingleWorld(id, isVisible);
   }
 
   /**
@@ -161,8 +161,8 @@ export class CacheManager {
   /**
    * Update a single popup notice in cache (immutable)
    */
-  async updateSinglePopupNotice(id: number): Promise<void> {
-    await this.popupNoticeService.updateSingleNotice(id);
+  async updateSinglePopupNotice(id: number, isVisible?: boolean | number): Promise<void> {
+    await this.popupNoticeService.updateSingleNotice(id, isVisible);
   }
 
   /**
@@ -175,8 +175,8 @@ export class CacheManager {
   /**
    * Update a single survey in cache (immutable)
    */
-  async updateSingleSurvey(id: string): Promise<void> {
-    await this.surveyService.updateSingleSurvey(id);
+  async updateSingleSurvey(id: string, isActive?: boolean | number): Promise<void> {
+    await this.surveyService.updateSingleSurvey(id, isActive);
   }
 
   /**

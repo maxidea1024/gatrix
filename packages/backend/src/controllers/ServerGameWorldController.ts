@@ -60,13 +60,24 @@ export class ServerGameWorldController {
           const tagNames = tags ? tags.map((tag: any) => tag.name) : [];
 
           const worldData: any = {
+            id: world.id,
             worldId: world.worldId,
             name: world.name,
             isMaintenance: toBoolean(world.isMaintenance),
+            displayOrder: world.displayOrder,
             worldServerAddress: world.worldServerAddress || null,
             customPayload: parseCustomPayload(world.customPayload),
             tags: tagNames
           };
+
+          // Add maintenanceMessage if in maintenance mode
+          if (toBoolean(world.isMaintenance)) {
+            // Get maintenance message in requested language
+            const maintenanceMessage = await GameWorldService.getMaintenanceMessage(world.id, lang);
+            if (maintenanceMessage) {
+              worldData.maintenanceMessage = maintenanceMessage;
+            }
+          }
 
           // Add maintenanceMessage if in maintenance mode
           if (toBoolean(world.isMaintenance)) {
@@ -148,20 +159,22 @@ export class ServerGameWorldController {
         return null;
       };
 
+      // Fetch tags for the world
+      const { TagService } = await import('../services/TagService');
+      const tags = await TagService.listTagsForEntity('game_world', world.id);
+      const tagNames = tags ? tags.map((tag: any) => tag.name) : [];
+
       res.json({
         success: true,
         data: {
           id: world.id,
           worldId: world.worldId,
           name: world.name,
-          description: world.description,
-          isVisible: toBoolean(world.isVisible),
           isMaintenance: toBoolean(world.isMaintenance),
           displayOrder: world.displayOrder,
           worldServerAddress: world.worldServerAddress || null,
           customPayload: parseCustomPayload(world.customPayload),
-          createdAt: world.createdAt,
-          updatedAt: world.updatedAt
+          tags: tagNames
         },
         meta: {
           timestamp: new Date().toISOString(),
@@ -231,14 +244,10 @@ export class ServerGameWorldController {
           id: world.id,
           worldId: world.worldId,
           name: world.name,
-          description: world.description,
-          isVisible: toBoolean(world.isVisible),
           isMaintenance: toBoolean(world.isMaintenance),
           displayOrder: world.displayOrder,
           worldServerAddress: world.worldServerAddress || null,
-          customPayload: parseCustomPayload(world.customPayload),
-          createdAt: world.createdAt,
-          updatedAt: world.updatedAt
+          customPayload: parseCustomPayload(world.customPayload)
         },
         meta: {
           timestamp: new Date().toISOString(),

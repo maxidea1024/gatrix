@@ -118,17 +118,20 @@ export class PubSubService extends EventEmitter {
         }
       );
 
-      // Create SDK events queue (for real-time SDK event delivery)
-      this.sdkEventsQueue = new Queue(this.SDK_EVENTS_QUEUE_NAME, {
-        connection: redisConfig,
-        defaultJobOptions: {
-          removeOnComplete: 100,
-          removeOnFail: 50,
-          attempts: 1,
-        },
-      });
+      // [Deprecated] SDK events queue replaced with Redis Pub/Sub
+      // This ensures all SDK instances receive the same events in real-time
+      // Previously: BullMQ queue (only one worker would process each job)
+      // Now: Redis Pub/Sub (all subscribers receive the event)
+      // this.sdkEventsQueue = new Queue(this.SDK_EVENTS_QUEUE_NAME, {
+      //   connection: redisConfig,
+      //   defaultJobOptions: {
+      //     removeOnComplete: 100,
+      //     removeOnFail: 50,
+      //     attempts: 1,
+      //   },
+      // });
 
-      logger.info('SDK events queue initialized');
+      logger.info('SDK events will be published via Redis Pub/Sub');
 
       // New: Redis Pub/Sub subscriber for true broadcast to all instances
       try {
@@ -357,20 +360,45 @@ export class PubSubService extends EventEmitter {
   }
 
   /**
-   * Publish SDK event to BullMQ queue for real-time delivery to SDKs
+   * Convert MySQL 0/1 to boolean for isVisible and isActive fields
    */
-  async publishSDKEvent(event: { type: string; data: { id: number | string; timestamp: number } }): Promise<void> {
+  private convertBooleanFields(data: any): any {
+    const converted = { ...data };
+    if (converted.isVisible !== undefined) {
+      converted.isVisible = converted.isVisible === 1 || converted.isVisible === true;
+    }
+    if (converted.isActive !== undefined) {
+      converted.isActive = converted.isActive === 1 || converted.isActive === true;
+    }
+    return converted;
+  }
+
+  /**
+   * Publish SDK event to Redis Pub/Sub for real-time delivery to all SDK instances
+   * Uses Pub/Sub instead of BullMQ queue to ensure all subscribers receive the event
+   */
+  async publishSDKEvent(event: { type: string; data: { id: number | string; timestamp: number; isVisible?: boolean | number; isActive?: boolean | number } }): Promise<void> {
     try {
-      if (!this.sdkEventsQueue) {
-        logger.warn('SDK events queue not initialized');
-        return;
-      }
+      // Convert MySQL 0/1 to boolean
+      const convertedEvent = {
+        ...event,
+        data: this.convertBooleanFields(event.data)
+      };
 
-      await this.sdkEventsQueue.add('sdk-event', event, {
-        jobId: ulid(),
+      // Publish to Redis Pub/Sub channel so all SDK instances receive the event
+      const client = redisClient.getClient();
+      const eventJson = JSON.stringify(convertedEvent);
+
+      logger.info('Publishing SDK event to Pub/Sub', { type: convertedEvent.type, id: convertedEvent.data.id, channel: 'gatrix-sdk-events' });
+
+      const numSubscribers = await client.publish('gatrix-sdk-events', eventJson);
+
+      logger.info('SDK event published to Pub/Sub', {
+        type: convertedEvent.type,
+        id: convertedEvent.data.id,
+        numSubscribers,
+        messageLength: eventJson.length
       });
-
-      logger.debug('SDK event published to queue', { type: event.type, id: event.data.id });
     } catch (error: any) {
       logger.error('Failed to publish SDK event:', error);
     }

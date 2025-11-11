@@ -1,5 +1,5 @@
 /**
- * Event Types for BullMQ
+ * Event Types for SDK
  */
 
 // ============================================================================
@@ -29,25 +29,5 @@ export interface StandardEventData {
 export interface StandardEvent {
   type: StandardEventType;
   data: StandardEventData;
-}
-
-// ============================================================================
-// Custom Event Types
-// ============================================================================
-
-export interface CustomEvent {
-  type: string; // Custom event type (e.g., 'custom:player.levelup')
-  data: any; // Custom data
-  timestamp: number;
-}
-
-// ============================================================================
-// Event Listener Types
-// ============================================================================
-
-export type EventCallback = (event: StandardEvent | CustomEvent) => void | Promise<void>;
-
-export interface EventListenerMap {
-  [eventType: string]: EventCallback[];
 }
 

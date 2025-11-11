@@ -124,30 +124,17 @@ async function main() {
 
     // Helper function to print cached data
     function printCachedData() {
-      console.log('\n========== CACHED DATA ==========');
+      console.log('\n========== CACHED DATA (JSON) ==========');
 
-      // Game worlds
-      const worlds = sdk.getCachedGameWorlds();
-      console.log(`\n[Game Worlds] Total: ${worlds.length}`);
-      worlds.forEach(world => {
-        console.log(`  - ID: ${world.id}, WorldID: ${world.worldId}, Name: ${world.name}, Visible: ${world.isVisible}, Maintenance: ${world.isMaintenance}`);
-      });
+      const cachedData = {
+        gameWorlds: sdk.getCachedGameWorlds(),
+        popupNotices: sdk.getCachedPopupNotices(),
+        surveys: sdk.getCachedSurveys(),
+        timestamp: new Date().toISOString(),
+      };
 
-      // Popup notices
-      const popups = sdk.getCachedPopupNotices();
-      console.log(`\n[Popup Notices] Total: ${popups.length}`);
-      popups.forEach(popup => {
-        console.log(`  - ID: ${popup.id}, Title: ${popup.title}`);
-      });
-
-      // Surveys
-      const surveys = sdk.getCachedSurveys();
-      console.log(`\n[Surveys] Total: ${surveys.length}`);
-      surveys.forEach(survey => {
-        console.log(`  - ID: ${survey.id}, Title: ${survey.title}, Active: ${survey.isActive}`);
-      });
-
-      console.log('\n================================\n');
+      console.log(JSON.stringify(cachedData, null, 2));
+      console.log('\n========================================\n');
     }
 
     console.log('[idle-server] Idle server is running and listening to events...');
