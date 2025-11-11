@@ -13,6 +13,11 @@ const convertBitToBoolean = (obj: any): any => {
     return obj.map(convertBitToBoolean);
   }
 
+  // Skip Date objects and other special types
+  if (obj instanceof Date || obj instanceof Buffer) {
+    return obj;
+  }
+
   if (typeof obj === 'object') {
     const converted: any = {};
     for (const [key, value] of Object.entries(obj)) {
@@ -23,6 +28,9 @@ const convertBitToBoolean = (obj: any): any => {
            key === 'targetSubchannelsInverted' || key === 'targetWorldsInverted' || key === 'targetUserIdsInverted') &&
           (value === 0 || value === 1)) {
         converted[key] = value === 1;
+      } else if (value instanceof Date || value instanceof Buffer) {
+        // Preserve Date and Buffer objects as-is
+        converted[key] = value;
       } else if (typeof value === 'object') {
         converted[key] = convertBitToBoolean(value);
       } else {
