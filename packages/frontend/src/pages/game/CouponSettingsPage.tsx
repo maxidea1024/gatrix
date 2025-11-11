@@ -18,6 +18,7 @@ import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSe
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import SDKGuideDrawer from '@/components/coupons/SDKGuideDrawer';
 import RewardSelector from '@/components/game/RewardSelector';
+import RewardDisplay from '@/components/game/RewardDisplay';
 import TargetSettingsGroup, { ChannelSubchannelData } from '@/components/game/TargetSettingsGroup';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Dayjs } from 'dayjs';
@@ -382,6 +383,7 @@ const CouponSettingsPage: React.FC = () => {
     { id: 'code', labelKey: 'coupons.couponSettings.columns.code', visible: true },
     { id: 'type', labelKey: 'common.type', visible: true },
     { id: 'status', labelKey: 'common.status', visible: true },
+    { id: 'rewards', labelKey: 'surveys.participationRewards', visible: true },
     { id: 'usageRate', labelKey: 'coupons.couponSettings.columns.usageRate', visible: true },
     { id: 'start', labelKey: 'common.start', visible: true },
     { id: 'end', labelKey: 'common.end', visible: true },
@@ -1256,7 +1258,9 @@ const CouponSettingsPage: React.FC = () => {
                           case 'start':
                             return (
                               <TableCell key="start" sx={{ py: 1, px: 2 }}>
-                                <Typography variant="caption">{formatDateTime(it.startsAt)}</Typography>
+                                <Typography variant="caption">
+                                  {it.startsAt ? formatDateTime(it.startsAt) : t('coupons.couponSettings.immediateStart')}
+                                </Typography>
                               </TableCell>
                             );
                           case 'end':
@@ -1269,6 +1273,16 @@ const CouponSettingsPage: React.FC = () => {
                             return (
                               <TableCell key="createdAt" sx={{ py: 1, px: 2 }}>
                                 <Typography variant="caption">{formatDateTime((it as any).createdAt)}</Typography>
+                              </TableCell>
+                            );
+                          case 'rewards':
+                            return (
+                              <TableCell key="rewards" sx={{ py: 1, px: 2 }}>
+                                <RewardDisplay
+                                  rewards={it.rewardData || []}
+                                  rewardTemplateId={it.rewardTemplateId}
+                                  maxDisplay={3}
+                                />
                               </TableCell>
                             );
                           case 'description':

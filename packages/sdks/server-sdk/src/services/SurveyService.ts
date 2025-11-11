@@ -223,5 +223,78 @@ export class SurveyService {
       settings1.verificationKey === settings2.verificationKey
     );
   }
+
+  /**
+   * Check appropriate surveys for a user based on their conditions
+   * Filters surveys based on platform, channel, subchannel, world, and trigger conditions
+   * @param platform User's platform (e.g., 'pc', 'ios', 'android')
+   * @param channel User's channel (e.g., 'steam', 'epic')
+   * @param subChannel User's subchannel (e.g., 'pc', 'ios')
+   * @param worldId User's world ID
+   * @param userLevel User's level
+   * @param joinDays User's join days
+   * @returns Array of appropriate surveys, empty array if none match
+   */
+  checkAppropriateSurveys(
+    platform: string,
+    channel: string,
+    subChannel: string,
+    worldId: string,
+    userLevel: number,
+    joinDays: number
+  ): Survey[] {
+    return this.cachedSurveys.filter((survey) => {
+      // Check platform targeting
+      if (survey.targetPlatforms && survey.targetPlatforms.length > 0) {
+        const isInPlatformList = survey.targetPlatforms.includes(platform);
+        if (survey.targetPlatformsInverted ? isInPlatformList : !isInPlatformList) {
+          return false;
+        }
+      }
+
+      // Check channel targeting
+      if (survey.targetChannels && survey.targetChannels.length > 0) {
+        const isInChannelList = survey.targetChannels.includes(channel);
+        if (survey.targetChannelsInverted ? isInChannelList : !isInChannelList) {
+          return false;
+        }
+      }
+
+      // Check subchannel targeting (format: channel:subchannel)
+      if (survey.targetSubchannels && survey.targetSubchannels.length > 0) {
+        const subchannelKey = `${channel}:${subChannel}`;
+        const isInSubchannelList = survey.targetSubchannels.includes(subchannelKey);
+        if (survey.targetSubchannelsInverted ? isInSubchannelList : !isInSubchannelList) {
+          return false;
+        }
+      }
+
+      // Check world targeting
+      if (survey.targetWorlds && survey.targetWorlds.length > 0) {
+        const isInWorldList = survey.targetWorlds.includes(worldId);
+        if (survey.targetWorldsInverted ? isInWorldList : !isInWorldList) {
+          return false;
+        }
+      }
+
+      // Check trigger conditions
+      if (survey.triggerConditions && survey.triggerConditions.length > 0) {
+        const conditionsMet = survey.triggerConditions.every((condition) => {
+          if (condition.type === 'userLevel') {
+            return userLevel >= condition.value;
+          } else if (condition.type === 'joinDays') {
+            return joinDays >= condition.value;
+          }
+          return true;
+        });
+
+        if (!conditionsMet) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }
 }
 

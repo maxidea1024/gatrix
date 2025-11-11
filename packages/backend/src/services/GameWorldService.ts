@@ -275,6 +275,15 @@ export class GameWorldService {
       // Invalidate all game worlds cache (both public and admin)
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
       await pubSubService.invalidateKey(GAME_WORLDS.ADMIN);
+
+      // Publish event for SDK to clear entire game worlds cache
+      await pubSubService.publishSDKEvent({
+        type: 'gameworld.order_changed',
+        data: {
+          id: 0, // Dummy id for order_changed event
+          timestamp: Date.now(),
+        },
+      });
     } catch (error) {
       logger.error('Error in updateDisplayOrders service:', error);
       throw new GatrixError('Failed to update display orders', 500);

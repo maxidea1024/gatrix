@@ -56,8 +56,6 @@ import {
   Search as SearchIcon,
   Language as WorldIcon,
   Build as MaintenanceIcon,
-  KeyboardArrowUp as ArrowUpIcon,
-  KeyboardArrowDown as ArrowDownIcon,
   DragIndicator as DragIcon,
   Cancel as CancelIcon,
   Save as SaveIcon,
@@ -184,8 +182,6 @@ interface SortableRowProps {
   onDelete: (id: number) => void;
   onToggleVisibility: (worldId: number) => void;
   onToggleMaintenance: (worldId: number) => void;
-  onMoveUp: (world: GameWorld) => void;
-  onMoveDown: (world: GameWorld) => void;
   onCopy: (text: string, type: string) => void;
   onDuplicate: (world: GameWorld) => void;
 }
@@ -198,8 +194,6 @@ const SortableRow: React.FC<SortableRowProps> = ({
   onDelete,
   onToggleVisibility,
   onToggleMaintenance,
-  onMoveUp,
-  onMoveDown,
   onCopy,
   onDuplicate,
   index,
@@ -274,21 +268,6 @@ const SortableRow: React.FC<SortableRowProps> = ({
         )}
       </TableCell>
       <TableCell align="center">
-        <Tooltip title={t('gameWorlds.moveUp')}>
-          <span>
-            <IconButton size="small" onClick={() => onMoveUp(world)} disabled={index === 0}>
-              <ArrowUpIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip title={t('gameWorlds.moveDown')}>
-          <span>
-            <IconButton size="small" onClick={() => onMoveDown(world)} disabled={index === total - 1}>
-              <ArrowDownIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-
         {/* Duplicate world (copy values into new form, worldId cleared) */}
         <Tooltip title={t('common.copy')}>
           <IconButton size="small" onClick={() => onDuplicate(world)}>
@@ -1072,45 +1051,7 @@ const GameWorldsPage: React.FC = () => {
     }
   };
 
-  const handleMoveUp = async (world: GameWorld) => {
-    try {
-      // UI 기준으로 위로 이동이므로, 서버 정렬이 반대라면 moveDown을 호출해 시각적으로 위로 이동시킵니다.
-      const moved = await gameWorldService.moveDown(world.id);
-      if (moved) {
-        await loadGameWorlds();
-        // highlight recently moved row
-        setRecentlyMovedId(world.id);
-        if (highlightTimerRef.current) window.clearTimeout(highlightTimerRef.current);
-        highlightTimerRef.current = window.setTimeout(() => setRecentlyMovedId(null), 1800);
-        enqueueSnackbar(t('gameWorlds.movedUp', { name: world.name }), { variant: 'success' });
-      } else {
-        enqueueSnackbar(t('gameWorlds.alreadyTop'), { variant: 'info' });
-      }
-    } catch (error) {
-      console.error('Failed to move up:', error);
-      enqueueSnackbar(t('gameWorlds.errors.moveUpFailed'), { variant: 'error' });
-    }
-  };
 
-  const handleMoveDown = async (world: GameWorld) => {
-    try {
-      // UI 기준으로 아래로 이동이므로, 서버 정렬이 반대라면 moveUp을 호출해 시각적으로 아래로 이동시킵니다.
-      const moved = await gameWorldService.moveUp(world.id);
-      if (moved) {
-        await loadGameWorlds();
-        // highlight recently moved row
-        setRecentlyMovedId(world.id);
-        if (highlightTimerRef.current) window.clearTimeout(highlightTimerRef.current);
-        highlightTimerRef.current = window.setTimeout(() => setRecentlyMovedId(null), 1800);
-        enqueueSnackbar(t('gameWorlds.movedDown', { name: world.name }), { variant: 'success' });
-      } else {
-        enqueueSnackbar(t('gameWorlds.alreadyBottom'), { variant: 'info' });
-      }
-    } catch (error) {
-      console.error('Failed to move down:', error);
-      enqueueSnackbar(t('gameWorlds.errors.moveDownFailed'), { variant: 'error' });
-    }
-  };
 
   const handleCopy = (text: string, type: string) => {
     copyToClipboardWithNotification(
@@ -1438,8 +1379,6 @@ const GameWorldsPage: React.FC = () => {
                           onDelete={handleDeleteWorld}
                           onToggleVisibility={handleToggleVisibility}
                           onToggleMaintenance={handleToggleMaintenance}
-                          onMoveUp={handleMoveUp}
-                          onMoveDown={handleMoveDown}
                           onCopy={handleCopy}
                           onDuplicate={handleDuplicateWorld}
                         />

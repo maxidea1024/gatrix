@@ -3211,6 +3211,7 @@
         "code": "쿠폰 코드",
         "usageRate": "사용률"
       },
+      "immediateStart": "바로시작",
       "form": {
         "name": "이름",
         "description": "설명",

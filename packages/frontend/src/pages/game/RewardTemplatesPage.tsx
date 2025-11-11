@@ -42,6 +42,7 @@ import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import RewardTemplateFormDialog from '../../components/game/RewardTemplateFormDialog';
+import RewardDisplay from '../../components/game/RewardDisplay';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 
 const RewardTemplatesPage: React.FC = () => {
@@ -135,6 +136,7 @@ const RewardTemplatesPage: React.FC = () => {
     { id: 'checkbox', labelKey: '', visible: true },
     { id: 'name', labelKey: 'rewardTemplates.name', visible: true },
     { id: 'description', labelKey: 'rewardTemplates.description', visible: true },
+    { id: 'rewardItems', labelKey: 'rewardTemplates.rewardItems', visible: true },
     { id: 'tags', labelKey: 'rewardTemplates.tags', visible: true },
     { id: 'createdAt', labelKey: 'rewardTemplates.createdAt', visible: true },
     { id: 'actions', labelKey: 'common.actions', visible: true },
@@ -737,6 +739,13 @@ const RewardTemplatesPage: React.FC = () => {
                               >
                                 {template.description || '-'}
                               </Typography>
+                            </TableCell>
+                          );
+                        }
+                        if (column.id === 'rewardItems') {
+                          return (
+                            <TableCell key={column.id}>
+                              <RewardDisplay rewards={template.rewardItems} maxDisplay={3} />
                             </TableCell>
                           );
                         }

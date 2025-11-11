@@ -3198,6 +3198,7 @@
         "code": "优惠券代码",
         "usageRate": "使用率"
       },
+      "immediateStart": "立即开始",
       "form": {
         "name": "名称",
         "description": "描述",

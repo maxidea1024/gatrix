@@ -10,6 +10,7 @@ export type StandardEventType =
   | 'gameworld.created'
   | 'gameworld.updated'
   | 'gameworld.deleted'
+  | 'gameworld.order_changed'
   | 'popup.created'
   | 'popup.updated'
   | 'popup.deleted'

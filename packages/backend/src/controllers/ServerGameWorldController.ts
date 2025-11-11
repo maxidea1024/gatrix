@@ -67,7 +67,8 @@ export class ServerGameWorldController {
             displayOrder: world.displayOrder,
             worldServerAddress: world.worldServerAddress || null,
             customPayload: parseCustomPayload(world.customPayload),
-            tags: tagNames
+            tags: tagNames,
+            createdAt: world.createdAt
           };
 
           // Add maintenanceMessage if in maintenance mode
@@ -163,7 +164,8 @@ export class ServerGameWorldController {
         displayOrder: world.displayOrder,
         worldServerAddress: world.worldServerAddress || null,
         customPayload: parseCustomPayload(world.customPayload),
-        tags: tagNames
+        tags: tagNames,
+        createdAt: world.createdAt
       };
 
       // Add maintenanceMessage if in maintenance mode
@@ -247,7 +249,8 @@ export class ServerGameWorldController {
         isMaintenance: toBoolean(world.isMaintenance),
         displayOrder: world.displayOrder,
         worldServerAddress: world.worldServerAddress || null,
-        customPayload: parseCustomPayload(world.customPayload)
+        customPayload: parseCustomPayload(world.customPayload),
+        createdAt: world.createdAt
       };
 
       // Add maintenanceMessage if in maintenance mode

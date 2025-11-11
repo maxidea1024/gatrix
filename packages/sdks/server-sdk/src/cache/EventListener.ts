@@ -110,6 +110,7 @@ export class EventListener {
       'gameworld.created',
       'gameworld.updated',
       'gameworld.deleted',
+      'gameworld.order_changed',
       'popup.created',
       'popup.updated',
       'popup.deleted',
@@ -141,6 +142,16 @@ export class EventListener {
       case 'gameworld.deleted':
         // Remove the deleted game world from cache (immutable)
         this.cacheManager.removeGameWorld(Number(event.data.id));
+        break;
+
+      case 'gameworld.order_changed':
+        // Clear entire game worlds cache when order changes
+        this.logger.info('Game world order changed, clearing entire cache');
+        await this.cacheManager.refreshGameWorlds();
+        // Log cached data after refresh
+        console.log('\n========== CACHED DATA (JSON) ==========');
+        console.log(JSON.stringify(this.cacheManager, null, 2));
+        console.log('========================================\n');
         break;
 
       case 'popup.created':

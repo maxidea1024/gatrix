@@ -141,5 +141,42 @@ export class PopupNoticeService {
       return notice.targetWorlds.includes(worldId);
     });
   }
+
+  /**
+   * Get active popup notices that are currently visible
+   * Filters by isActive status and date range (startDate/endDate)
+   * Sorted by displayPriority
+   * @returns Array of active popup notices, empty array if none match
+   */
+  getActivePopupNotices(): PopupNotice[] {
+    const now = new Date();
+
+    return this.cachedNotices
+      .filter((notice) => {
+        // Must be active
+        if (!notice.isActive) {
+          return false;
+        }
+
+        // Check startDate: if set, current time must be after startDate
+        if (notice.startDate) {
+          const startDate = new Date(notice.startDate);
+          if (now < startDate) {
+            return false;
+          }
+        }
+
+        // Check endDate: if set, current time must be before endDate
+        if (notice.endDate) {
+          const endDate = new Date(notice.endDate);
+          if (now > endDate) {
+            return false;
+          }
+        }
+
+        return true;
+      })
+      .sort((a, b) => a.displayPriority - b.displayPriority);
+  }
 }
 

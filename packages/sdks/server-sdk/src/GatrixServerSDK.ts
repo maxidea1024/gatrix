@@ -241,6 +241,16 @@ export class GatrixServerSDK {
     return this.popupNotice.getNoticesForWorld(worldId);
   }
 
+  /**
+   * Get active popup notices that are currently visible
+   * Filters by isActive status and date range (startDate/endDate)
+   * Sorted by displayPriority
+   * @returns Array of active popup notices, empty array if none match
+   */
+  getActivePopupNotices(): PopupNotice[] {
+    return this.popupNotice.getActivePopupNotices();
+  }
+
   // ============================================================================
   // Survey Methods
   // ============================================================================
@@ -282,6 +292,28 @@ export class GatrixServerSDK {
    */
   updateSurveySettings(newSettings: SurveySettings): void {
     this.survey.updateSettings(newSettings);
+  }
+
+  /**
+   * Check appropriate surveys for a user based on their conditions
+   * Filters surveys based on platform, channel, subchannel, world, and trigger conditions
+   * @param platform User's platform (e.g., 'pc', 'ios', 'android')
+   * @param channel User's channel (e.g., 'steam', 'epic')
+   * @param subChannel User's subchannel (e.g., 'pc', 'ios')
+   * @param worldId User's world ID
+   * @param userLevel User's level
+   * @param joinDays User's join days
+   * @returns Array of appropriate surveys, empty array if none match
+   */
+  checkAppropriateSurveys(
+    platform: string,
+    channel: string,
+    subChannel: string,
+    worldId: string,
+    userLevel: number,
+    joinDays: number
+  ): Survey[] {
+    return this.survey.checkAppropriateSurveys(platform, channel, subChannel, worldId, userLevel, joinDays);
   }
 
   // ============================================================================

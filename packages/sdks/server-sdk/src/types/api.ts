@@ -60,6 +60,7 @@ export interface GameWorld {
   customPayload?: Record<string, any>;
   worldServerAddress: string; // Required: ip:port format (e.g., 192.168.1.100:8080)
   tags?: string[];
+  createdAt?: string;
 }
 
 export interface GameWorldListResponse {
