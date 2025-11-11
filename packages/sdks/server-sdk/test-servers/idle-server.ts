@@ -92,6 +92,10 @@ async function main() {
       printCachedData();
     });
 
+    sdk.on('gameworld.order_changed', (event) => {
+      console.log('[idle-server] GAMEWORLD ORDER CHANGED:', event.data);
+    });
+
     sdk.on('popup.created', (event) => {
       console.log('[idle-server] POPUP CREATED:', event.data);
       printCachedData();

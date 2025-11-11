@@ -159,6 +159,24 @@ export class CacheManager {
   }
 
   /**
+   * Get all cached data (game worlds, popup notices, surveys)
+   */
+  getAllCachedData(): any {
+    return {
+      gameWorlds: this.gameWorldService.getCached(),
+      popupNotices: this.popupNoticeService.getCached(),
+      surveys: this.surveyService.getCached(),
+    };
+  }
+
+  /**
+   * Get cached game worlds
+   */
+  getGameWorlds(): any[] {
+    return this.gameWorldService.getCached();
+  }
+
+  /**
    * Remove a game world from cache (immutable)
    */
   removeGameWorld(id: number): void {
