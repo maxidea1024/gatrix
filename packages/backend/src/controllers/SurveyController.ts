@@ -92,6 +92,12 @@ export class SurveyController {
       targetChannels: ['survey', 'admin'],
     });
 
+    // Publish SDK event
+    await pubSubService.publishSDKEvent({
+      type: 'survey.created',
+      data: { id: survey.id, timestamp: Date.now() },
+    });
+
     res.status(201).json({
       success: true,
       data: { survey },
@@ -125,6 +131,12 @@ export class SurveyController {
       targetChannels: ['survey', 'admin'],
     });
 
+    // Publish SDK event
+    await pubSubService.publishSDKEvent({
+      type: 'survey.updated',
+      data: { id: survey.id, timestamp: Date.now() },
+    });
+
     res.json({
       success: true,
       data: { survey },
@@ -150,6 +162,12 @@ export class SurveyController {
       type: 'survey.deleted',
       data: { surveyId: id },
       targetChannels: ['survey', 'admin'],
+    });
+
+    // Publish SDK event
+    await pubSubService.publishSDKEvent({
+      type: 'survey.deleted',
+      data: { id: parseInt(id), timestamp: Date.now() },
     });
 
     res.json({

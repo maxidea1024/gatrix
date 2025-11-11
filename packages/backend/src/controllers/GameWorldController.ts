@@ -222,6 +222,12 @@ export class GameWorldController {
       targetChannels: ['gameworld', 'admin'],
     });
 
+    // Publish SDK event
+    await pubSubService.publishSDKEvent({
+      type: 'gameworld.created',
+      data: { id: world.id, timestamp: Date.now() },
+    });
+
     res.status(201).json({
       success: true,
       data: { world: { ...world, tags } },
@@ -264,6 +270,12 @@ export class GameWorldController {
       targetChannels: ['gameworld', 'admin'],
     });
 
+    // Publish SDK event
+    await pubSubService.publishSDKEvent({
+      type: 'gameworld.updated',
+      data: { id: world.id, timestamp: Date.now() },
+    });
+
     res.json({
       success: true,
       data: { world: { ...world, tags } },
@@ -285,6 +297,12 @@ export class GameWorldController {
       type: 'gameworld.deleted',
       data: { worldId: id },
       targetChannels: ['gameworld', 'admin'],
+    });
+
+    // Publish SDK event
+    await pubSubService.publishSDKEvent({
+      type: 'gameworld.deleted',
+      data: { id, timestamp: Date.now() },
     });
 
     res.json({

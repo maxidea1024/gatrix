@@ -86,7 +86,15 @@ export class EventListener {
 
     // Handle standard events (cache invalidation)
     if (this.isStandardEvent(event.type)) {
-      await this.handleStandardEvent(event);
+      try {
+        await this.handleStandardEvent(event);
+      } catch (error: any) {
+        this.logger.error('Failed to handle standard event', {
+          type: event.type,
+          error: error.message,
+        });
+        // Continue to emit event even if cache refresh fails
+      }
     }
 
     // Emit to registered listeners
@@ -98,12 +106,17 @@ export class EventListener {
    */
   private isStandardEvent(type: string): boolean {
     return [
+      'gameworld.created',
       'gameworld.updated',
       'gameworld.deleted',
+      'popup.created',
       'popup.updated',
       'popup.deleted',
+      'survey.created',
       'survey.updated',
       'survey.deleted',
+      'maintenance.started',
+      'maintenance.ended',
     ].includes(type);
   }
 
@@ -113,31 +126,48 @@ export class EventListener {
   private async handleStandardEvent(event: StandardEvent): Promise<void> {
     this.logger.info('Handling standard event', { type: event.type, id: event.data.id });
 
-    try {
-      switch (event.type) {
-        case 'gameworld.updated':
-        case 'gameworld.deleted':
-          await this.cacheManager.refreshGameWorlds();
-          break;
+    switch (event.type) {
+      case 'gameworld.created':
+      case 'gameworld.updated':
+        // Update only the affected game world (immutable)
+        await this.cacheManager.updateSingleGameWorld(Number(event.data.id));
+        break;
 
-        case 'popup.updated':
-        case 'popup.deleted':
-          await this.cacheManager.refreshPopupNotices();
-          break;
+      case 'gameworld.deleted':
+        // Remove the deleted game world from cache (immutable)
+        this.cacheManager.removeGameWorld(Number(event.data.id));
+        break;
 
-        case 'survey.updated':
-        case 'survey.deleted':
-          await this.cacheManager.refreshSurveys();
-          break;
+      case 'popup.created':
+      case 'popup.updated':
+        // Update only the affected popup notice (immutable)
+        await this.cacheManager.updateSinglePopupNotice(Number(event.data.id));
+        break;
 
-        default:
-          this.logger.warn('Unknown standard event type', { type: event.type });
-      }
-    } catch (error: any) {
-      this.logger.error('Failed to handle standard event', {
-        type: event.type,
-        error: error.message,
-      });
+      case 'popup.deleted':
+        // Remove the deleted popup notice from cache (immutable)
+        this.cacheManager.removePopupNotice(Number(event.data.id));
+        break;
+
+      case 'survey.created':
+      case 'survey.updated':
+        // Update only the affected survey (immutable)
+        await this.cacheManager.updateSingleSurvey(String(event.data.id));
+        break;
+
+      case 'survey.deleted':
+        // Remove the deleted survey from cache (immutable)
+        this.cacheManager.removeSurvey(String(event.data.id));
+        break;
+
+      case 'maintenance.started':
+      case 'maintenance.ended':
+        // Maintenance events don't require cache refresh
+        this.logger.debug('Maintenance event received', { type: event.type });
+        break;
+
+      default:
+        this.logger.warn('Unknown standard event type', { type: event.type });
     }
   }
 

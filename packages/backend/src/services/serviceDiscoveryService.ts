@@ -90,8 +90,8 @@ class ServiceDiscoveryService {
    * Delegates to provider implementation (Redis or etcd)
    */
   async cleanupInactiveServices(): Promise<{ deletedCount: number; serviceTypes: string[] }> {
-    const services = await this.getServices();
-    const inactiveServices = services.filter((s) => s.status === 'terminated' || s.status === 'error' || s.status === 'no-response');
+    // Get inactive services (not active services)
+    const inactiveServices = await this.getInactiveServices();
 
     if (inactiveServices.length === 0) {
       return { deletedCount: 0, serviceTypes: [] };

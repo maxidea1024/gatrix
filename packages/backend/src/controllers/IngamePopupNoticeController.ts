@@ -171,6 +171,12 @@ class IngamePopupNoticeController {
         targetChannels: ['popup', 'admin'],
       });
 
+      // Publish SDK event
+      await pubSubService.publishSDKEvent({
+        type: 'popup.created',
+        data: { id: notice.id, timestamp: Date.now() },
+      });
+
       res.status(201).json({
         success: true,
         notice
@@ -215,6 +221,12 @@ class IngamePopupNoticeController {
         targetChannels: ['popup', 'admin'],
       });
 
+      // Publish SDK event
+      await pubSubService.publishSDKEvent({
+        type: 'popup.updated',
+        data: { id: notice.id, timestamp: Date.now() },
+      });
+
       res.json({
         success: true,
         notice
@@ -238,6 +250,12 @@ class IngamePopupNoticeController {
         type: 'popup.deleted',
         data: { noticeId: id },
         targetChannels: ['popup', 'admin'],
+      });
+
+      // Publish SDK event
+      await pubSubService.publishSDKEvent({
+        type: 'popup.deleted',
+        data: { id, timestamp: Date.now() },
       });
 
       res.json({

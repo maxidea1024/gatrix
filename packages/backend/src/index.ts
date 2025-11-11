@@ -76,6 +76,12 @@ const gracefulShutdown = async (signal: string) => {
       }
     }
 
+    // Clear etcd cleanup interval
+    if ((global as any).etcdCleanupInterval) {
+      clearInterval((global as any).etcdCleanupInterval);
+      if (logger) logger.info('etcd cleanup interval cleared');
+    }
+
     if (logger) {
       logger.info('Graceful shutdown completed');
     } else {
@@ -223,6 +229,35 @@ const startServer = async () => {
       logger.info('Planning data initialized successfully');
     } catch (error) {
       logger.warn('Planning data initialization failed, continuing:', error);
+    }
+
+
+    // Initialize automatic cleanup for etcd mode
+    try {
+      const serviceDiscoveryMode = process.env.SERVICE_DISCOVERY_MODE || 'redis';
+      if (serviceDiscoveryMode === 'etcd') {
+        const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
+
+        // Start automatic cleanup every 5 seconds to catch terminated services quickly
+        const cleanupInterval = setInterval(async () => {
+          try {
+            const inactiveServices = await serviceDiscoveryService.getInactiveServices();
+            logger.info(`Auto-cleanup check: Found ${inactiveServices.length} inactive services`);
+            if (inactiveServices.length > 0) {
+              logger.info(`Auto-cleanup: Found ${inactiveServices.length} inactive services, cleaning up...`);
+              await serviceDiscoveryService.cleanupInactiveServices();
+            }
+          } catch (error) {
+            logger.error('Auto-cleanup failed:', error);
+          }
+        }, 5000); // 5 seconds
+
+        // Store interval for graceful shutdown
+        (global as any).etcdCleanupInterval = cleanupInterval;
+        logger.info('etcd auto-cleanup initialized (runs every 5 seconds)');
+      }
+    } catch (error) {
+      logger.warn('etcd auto-cleanup initialization failed, continuing:', error);
     }
 
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)

@@ -250,6 +250,15 @@ class ServiceMaintenanceModel {
             timestamp: Date.now()
           }
         });
+
+        // Publish SDK event
+        await pubSubService.publishSDKEvent({
+          type: eventType,
+          data: {
+            id: result.serviceType,
+            timestamp: Date.now()
+          }
+        });
       } else if (result.isNowInMaintenance) {
         // Maintenance is still active (isInMaintenance flag unchanged)
         // Check if end time has passed - this handles date modification while in maintenance

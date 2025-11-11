@@ -89,7 +89,7 @@ export class BaseTestServer {
 
   /**
    * Handle graceful shutdown (SIGTERM/SIGINT)
-   * Update service status to 'terminated' and shut down cleanly
+   * Unregister service and shut down cleanly
    */
   private async handleGracefulShutdown(): Promise<void> {
     if (this.isShuttingDown) {
@@ -98,23 +98,25 @@ export class BaseTestServer {
     this.isShuttingDown = true;
 
     try {
-      // Update service status to 'terminated' if service discovery is enabled
+      this.log('Starting graceful shutdown...');
+
+      // Unregister service if service discovery is enabled
       if (this.config.enableServiceDiscovery) {
-        await this.sdk.updateServiceStatus({
-          status: 'terminated',
-          stats: {
-            shutdownTime: new Date().toISOString(),
-          },
-        }).catch(err => {
-          this.logError('Failed to update service status to terminated', err);
+        this.log('Unregistering service from discovery...');
+        await this.sdk.serviceDiscovery.unregister().catch(err => {
+          this.logError('Failed to unregister service', err);
         });
+        this.log('Service unregistered successfully');
       }
 
       // Graceful shutdown
+      this.log('Stopping server...');
       await this.stop();
+      this.log('Server stopped');
     } catch (shutdownError) {
       this.logError('Error during graceful shutdown', shutdownError);
     } finally {
+      this.log('Exiting process');
       process.exit(0);
     }
   }

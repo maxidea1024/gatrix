@@ -85,7 +85,7 @@ services:
       SERVICE_DISCOVERY_HEARTBEAT_TTL: ${SERVICE_DISCOVERY_HEARTBEAT_TTL:-30}
       SERVICE_DISCOVERY_TERMINATED_TTL: ${SERVICE_DISCOVERY_TERMINATED_TTL:-15}
       SERVICE_DISCOVERY_TERMINATED_MARKER_TTL: ${SERVICE_DISCOVERY_TERMINATED_MARKER_TTL:-300}
-      ETCD_HOSTS: ${ETCD_HOSTS:-http://etcd:2379}
+      ETCD_HOSTS: http://etcd:2379
     ports:
       - "0.0.0.0:${BACKEND_PORT:-55000}:5000"
       - "0.0.0.0:59229:9229" # Debug port
@@ -173,8 +173,8 @@ services:
       - --initial-cluster-state=new
       - --log-level=info
     ports:
-      - "0.0.0.0:${ETCD_PORT:-52379}:2379"
-      - "0.0.0.0:52380:2380"
+      - "127.0.0.1:52379:2379"
+      - "127.0.0.1:52380:2380"
     volumes:
       - etcd_dev_data:/etcd-data
     networks:

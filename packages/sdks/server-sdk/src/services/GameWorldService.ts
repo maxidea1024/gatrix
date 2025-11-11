@@ -105,6 +105,45 @@ export class GameWorldService {
   }
 
   /**
+   * Update a single game world in cache (immutable)
+   * Fetches the updated world from backend and updates only that world in the cache
+   */
+  async updateSingleWorld(id: number): Promise<void> {
+    try {
+      this.logger.debug('Updating single game world in cache', { id });
+
+      // Fetch the updated world from backend
+      const updatedWorld = await this.getById(id);
+
+      // Immutable update: create new array with updated world
+      this.cachedWorlds = this.cachedWorlds.map(world =>
+        world.id === id ? updatedWorld : world
+      );
+
+      this.logger.debug('Single game world updated in cache', { id });
+    } catch (error: any) {
+      this.logger.error('Failed to update single game world in cache', {
+        id,
+        error: error.message,
+      });
+      // If update fails, fall back to full refresh
+      await this.refresh();
+    }
+  }
+
+  /**
+   * Remove a game world from cache (immutable)
+   */
+  removeWorld(id: number): void {
+    this.logger.debug('Removing game world from cache', { id });
+
+    // Immutable update: create new array without the deleted world
+    this.cachedWorlds = this.cachedWorlds.filter(world => world.id !== id);
+
+    this.logger.debug('Game world removed from cache', { id });
+  }
+
+  /**
    * Check if a world is in maintenance
    */
   isWorldInMaintenance(worldId: string): boolean {

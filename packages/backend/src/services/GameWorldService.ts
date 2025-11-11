@@ -95,6 +95,12 @@ export class GameWorldService {
       // Invalidate game worlds cache
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
 
+      // Publish event for SDK real-time updates
+      await pubSubService.publishSDKEvent({
+        type: 'gameworld.created',
+        data: { id: result.id, timestamp: Date.now() },
+      });
+
       return result;
     } catch (error) {
       if (error instanceof GatrixError) {
@@ -129,6 +135,12 @@ export class GameWorldService {
       // Invalidate game worlds cache
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
 
+      // Publish event for SDK real-time updates
+      await pubSubService.publishSDKEvent({
+        type: 'gameworld.updated',
+        data: { id: updatedWorld.id, timestamp: Date.now() },
+      });
+
       return updatedWorld;
     } catch (error) {
       if (error instanceof GatrixError) {
@@ -154,6 +166,12 @@ export class GameWorldService {
 
       // Invalidate game worlds cache
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+
+      // Publish event for SDK real-time updates
+      await pubSubService.publishSDKEvent({
+        type: 'gameworld.deleted',
+        data: { id, timestamp: Date.now() },
+      });
     } catch (error) {
       if (error instanceof GatrixError) {
         throw error;
@@ -188,6 +206,12 @@ export class GameWorldService {
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
       logger.info('Cache invalidation completed');
 
+      // Publish event for SDK real-time updates
+      await pubSubService.publishSDKEvent({
+        type: 'gameworld.updated',
+        data: { id: updatedWorld.id, timestamp: Date.now() },
+      });
+
       return updatedWorld;
     } catch (error) {
       if (error instanceof GatrixError) {
@@ -215,6 +239,12 @@ export class GameWorldService {
 
       // Invalidate game worlds cache
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+
+      // Publish event for SDK real-time updates
+      await pubSubService.publishSDKEvent({
+        type: 'gameworld.updated',
+        data: { id: updatedWorld.id, timestamp: Date.now() },
+      });
 
       return updatedWorld;
     } catch (error) {

@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import { Queue, Worker, Job } from 'bullmq';
 import { createClient, RedisClientType } from 'redis';
+import { ulid } from 'ulid';
 import { config } from '../config';
 import redisClient from '../config/redis';
 import logger from '../config/logger';
@@ -32,6 +33,9 @@ export class PubSubService extends EventEmitter {
   private sseQueue: Queue | null = null;
   private sseWorker: Worker | null = null;
 
+  // SDK events queue
+  private sdkEventsQueue: Queue | null = null;
+
   // Redis Pub/Sub for SSE broadcast
   private sseSubscriber: RedisClientType | null = null;
   private readonly SSE_CHANNEL = 'sse:notifications';
@@ -39,6 +43,7 @@ export class PubSubService extends EventEmitter {
   private isConnected = false;
   private readonly QUEUE_NAME = 'cache-invalidation';
   private readonly SSE_QUEUE_NAME = 'sse-notifications';
+  private readonly SDK_EVENTS_QUEUE_NAME = 'gatrix-sdk-events';
 
   constructor() {
     super();
@@ -112,6 +117,18 @@ export class PubSubService extends EventEmitter {
           concurrency: 10,
         }
       );
+
+      // Create SDK events queue (for real-time SDK event delivery)
+      this.sdkEventsQueue = new Queue(this.SDK_EVENTS_QUEUE_NAME, {
+        connection: redisConfig,
+        defaultJobOptions: {
+          removeOnComplete: 100,
+          removeOnFail: 50,
+          attempts: 1,
+        },
+      });
+
+      logger.info('SDK events queue initialized');
 
       // New: Redis Pub/Sub subscriber for true broadcast to all instances
       try {
@@ -340,6 +357,26 @@ export class PubSubService extends EventEmitter {
   }
 
   /**
+   * Publish SDK event to BullMQ queue for real-time delivery to SDKs
+   */
+  async publishSDKEvent(event: { type: string; data: { id: number | string; timestamp: number } }): Promise<void> {
+    try {
+      if (!this.sdkEventsQueue) {
+        logger.warn('SDK events queue not initialized');
+        return;
+      }
+
+      await this.sdkEventsQueue.add('sdk-event', event, {
+        jobId: ulid(),
+      });
+
+      logger.debug('SDK event published to queue', { type: event.type, id: event.data.id });
+    } catch (error: any) {
+      logger.error('Failed to publish SDK event:', error);
+    }
+  }
+
+  /**
    * Publish standard event (for SDK real-time events like maintenance.started, maintenance.ended)
    */
   async publishEvent(event: { type: string; data: { id: number | string; timestamp: number } }): Promise<void> {
@@ -399,6 +436,10 @@ export class PubSubService extends EventEmitter {
       }
       if (this.sseQueue) {
         await this.sseQueue.close();
+      }
+
+      if (this.sdkEventsQueue) {
+        await this.sdkEventsQueue.close();
       }
 
       if (this.sseSubscriber) {

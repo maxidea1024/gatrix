@@ -7,10 +7,13 @@
 // ============================================================================
 
 export type StandardEventType =
+  | 'gameworld.created'
   | 'gameworld.updated'
   | 'gameworld.deleted'
+  | 'popup.created'
   | 'popup.updated'
   | 'popup.deleted'
+  | 'survey.created'
   | 'survey.updated'
   | 'survey.deleted'
   | 'maintenance.started'

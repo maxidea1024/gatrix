@@ -127,7 +127,6 @@ export class CacheManager {
    * Refresh game worlds cache
    */
   async refreshGameWorlds(): Promise<void> {
-    this.logger.info('Refreshing game worlds cache');
     await this.gameWorldService.refresh();
   }
 
@@ -135,7 +134,6 @@ export class CacheManager {
    * Refresh popup notices cache
    */
   async refreshPopupNotices(): Promise<void> {
-    this.logger.info('Refreshing popup notices cache');
     await this.popupNoticeService.refresh();
   }
 
@@ -143,8 +141,49 @@ export class CacheManager {
    * Refresh surveys cache
    */
   async refreshSurveys(): Promise<void> {
-    this.logger.info('Refreshing surveys cache');
     await this.surveyService.refresh({ isActive: true });
+  }
+
+  /**
+   * Update a single game world in cache (immutable)
+   */
+  async updateSingleGameWorld(id: number): Promise<void> {
+    await this.gameWorldService.updateSingleWorld(id);
+  }
+
+  /**
+   * Remove a game world from cache (immutable)
+   */
+  removeGameWorld(id: number): void {
+    this.gameWorldService.removeWorld(id);
+  }
+
+  /**
+   * Update a single popup notice in cache (immutable)
+   */
+  async updateSinglePopupNotice(id: number): Promise<void> {
+    await this.popupNoticeService.updateSingleNotice(id);
+  }
+
+  /**
+   * Remove a popup notice from cache (immutable)
+   */
+  removePopupNotice(id: number): void {
+    this.popupNoticeService.removeNotice(id);
+  }
+
+  /**
+   * Update a single survey in cache (immutable)
+   */
+  async updateSingleSurvey(id: string): Promise<void> {
+    await this.surveyService.updateSingleSurvey(id);
+  }
+
+  /**
+   * Remove a survey from cache (immutable)
+   */
+  removeSurvey(id: string): void {
+    this.surveyService.removeSurvey(id);
   }
 
   /**

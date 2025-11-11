@@ -82,18 +82,14 @@ class TestOrchestrator {
       const scriptPath = path.join(__dirname, server.script);
 
       // Use ts-node to run TypeScript directly
-      // stdio: ['ignore', 'inherit', 'inherit'] - ignore stdin for child, inherit stdout/stderr
-      // This allows orchestrator to receive Ctrl+C while child processes output to console
       const proc = spawn('npx', ['ts-node', scriptPath, ...server.args], {
-        stdio: ['ignore', 'inherit', 'inherit'],
+        stdio: 'inherit',
         shell: true,
         detached: false,
         env: {
           ...process.env,
           FORCE_COLOR: '1',
         },
-        // Explicitly handle signals
-        windowsHide: false,
       });
 
       server.process = proc;
@@ -132,12 +128,12 @@ class TestOrchestrator {
         console.log(`[ORCHESTRATOR] Requesting graceful stop for ${server.name}...`);
         try {
           if (process.platform === 'win32') {
-            // Windows: prefer SIGINT so Node handlers run; avoid taskkill in graceful phase
+            // Windows: send SIGTERM to the process
             try {
-              server.process.kill('SIGINT');
+              server.process.kill('SIGTERM');
             } catch (_e) {
-              // If SIGINT fails, try a soft SIGTERM (may terminate immediately on Windows)
-              try { server.process.kill('SIGTERM'); } catch { /* noop */ }
+              // If SIGTERM fails, try SIGINT
+              try { server.process.kill('SIGINT'); } catch { /* noop */ }
             }
           } else {
             // Unix: send SIGTERM to the process group
@@ -149,8 +145,8 @@ class TestOrchestrator {
       }
     }
 
-    // Wait for graceful shutdown
-    await this.sleep(5000);
+    // Wait for graceful shutdown (increased to 10 seconds to allow unregister API calls)
+    await this.sleep(10000);
 
     // Force kill any remaining processes
     for (const server of this.servers) {
@@ -209,6 +205,18 @@ process.on('SIGTERM', async () => {
   if (process.stdin) {
     process.stdin.destroy();
   }
+  process.exit(0);
+});
+
+// Monitor stdin for any input to trigger graceful shutdown
+if (process.stdin.isTTY) {
+  process.stdin.setRawMode(true);
+  process.stdin.resume();
+}
+
+process.stdin.on('data', async () => {
+  console.log('\nReceived input, initiating graceful shutdown...');
+  await orchestrator.stop();
   process.exit(0);
 });
 

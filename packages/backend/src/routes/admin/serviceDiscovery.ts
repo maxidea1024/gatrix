@@ -137,18 +137,19 @@ router.post('/cleanup', async (req: Request, res: Response) => {
   try {
     logger.info('🗑️ Starting server cleanup...');
 
-    const services = await serviceDiscoveryService.getServices();
-    logger.info(`📊 Total services: ${services.length}`);
+    // Get inactive services (terminated, error, no-response)
+    const inactiveServices = await serviceDiscoveryService.getInactiveServices();
+    logger.info(`📊 Total inactive services: ${inactiveServices.length}`);
 
-    // Filter terminated, error, and no-response services
-    const toDelete = services.filter((s) => s.status === 'terminated' || s.status === 'error' || s.status === 'no-response');
-    logger.info(`🎯 Services to delete: ${toDelete.length}`, {
-      terminated: toDelete.filter(s => s.status === 'terminated').length,
-      error: toDelete.filter(s => s.status === 'error').length,
-      noResponse: toDelete.filter(s => s.status === 'no-response').length,
-    });
+    // Count by status
+    const statusCounts = {
+      terminated: inactiveServices.filter(s => s.status === 'terminated').length,
+      error: inactiveServices.filter(s => s.status === 'error').length,
+      noResponse: inactiveServices.filter(s => s.status === 'no-response').length,
+    };
+    logger.info(`🎯 Services to delete: ${inactiveServices.length}`, statusCounts);
 
-    if (toDelete.length === 0) {
+    if (inactiveServices.length === 0) {
       logger.info('✅ No services to clean up');
       return res.json({
         success: true,
@@ -167,7 +168,7 @@ router.post('/cleanup', async (req: Request, res: Response) => {
       success: true,
       data: {
         deletedCount: result.deletedCount,
-        totalCount: toDelete.length,
+        totalCount: inactiveServices.length,
       },
       message: `Cleanup completed: ${result.deletedCount} services deleted`,
     });

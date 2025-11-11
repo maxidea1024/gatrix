@@ -34,8 +34,18 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       throw new Error('etcd3 module is not installed. Install with: npm install etcd3');
     }
 
-    this.client = new Etcd3({ hosts });
-    logger.info(`EtcdServiceDiscoveryProvider initialized with hosts: ${hosts}`);
+    // Parse hosts string and convert to etcd3 format
+    // Input: "http://etcd:2379" or "http://etcd:2379,http://etcd2:2379"
+    // etcd3 expects hosts as array of strings like "etcd:2379"
+    const hostArray = hosts.split(',').map(h => {
+      const trimmed = h.trim();
+      // Remove protocol if present
+      const withoutProtocol = trimmed.replace(/^https?:\/\//, '');
+      return withoutProtocol;
+    });
+
+    this.client = new Etcd3({ hosts: hostArray });
+    logger.info(`EtcdServiceDiscoveryProvider initialized with hosts: ${JSON.stringify(hostArray)}`);
   }
 
   async register(instance: ServiceInstance, ttlSeconds: number): Promise<void> {
@@ -114,22 +124,57 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
         logger.info(`Service deleted permanently: ${serviceType}:${instanceId}`);
       } else {
-        // Graceful unregister: mark as terminated (etcd doesn't support TTL update, so just delete)
-        if (lease) {
-          // Clear heartbeat interval
-          if ((lease as any)._heartbeatInterval) {
-            clearInterval((lease as any)._heartbeatInterval);
+        // Graceful unregister: mark as terminated with short TTL
+        // First, get the current service data
+        const currentValue = await this.client.get(key).string();
+        if (currentValue) {
+          try {
+            const serviceData = JSON.parse(currentValue);
+
+            // Update status to terminated
+            serviceData.status = 'terminated';
+            serviceData.updatedAt = new Date().toISOString();
+
+            // Clear old lease and heartbeat
+            if (lease) {
+              if ((lease as any)._heartbeatInterval) {
+                clearInterval((lease as any)._heartbeatInterval);
+              }
+              await lease.revoke();
+              this.leases.delete(leaseKey);
+            }
+
+            // Create new lease with short TTL (15 seconds for quick cleanup)
+            const terminatedTTL = 15;
+            const newLease = this.client.lease(terminatedTTL);
+            await newLease.put(key).value(JSON.stringify(serviceData));
+            this.leases.set(leaseKey, newLease);
+
+            logger.info(`Service marked as terminated: ${serviceType}:${instanceId} (will be cleaned up in ${terminatedTTL}s)`);
+          } catch (parseError) {
+            logger.warn(`Failed to parse service data for ${serviceType}:${instanceId}, deleting instead:`, parseError);
+            // Fallback to deletion if parsing fails
+            if (lease) {
+              if ((lease as any)._heartbeatInterval) {
+                clearInterval((lease as any)._heartbeatInterval);
+              }
+              await lease.revoke();
+              this.leases.delete(leaseKey);
+            } else {
+              await this.client.delete().key(key);
+            }
           }
-
-          // Revoke lease (this will delete the key)
-          await lease.revoke();
-          this.leases.delete(leaseKey);
         } else {
-          // Manually delete if no lease found
-          await this.client.delete().key(key);
+          // Service not found, just clean up lease
+          if (lease) {
+            if ((lease as any)._heartbeatInterval) {
+              clearInterval((lease as any)._heartbeatInterval);
+            }
+            await lease.revoke();
+            this.leases.delete(leaseKey);
+          }
+          logger.warn(`Service not found for graceful unregister: ${serviceType}:${instanceId}`);
         }
-
-        logger.info(`Service unregistered: ${serviceType}:${instanceId}`);
       }
     } catch (error) {
       logger.error(`Failed to unregister service ${serviceType}:${instanceId}:`, error);
@@ -262,9 +307,43 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
   }
 
   async getInactiveServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
-    // etcd doesn't have a separate inactive collection like Redis
-    // Return empty array as etcd uses TTL for automatic cleanup
-    return [];
+    // In etcd mode, we need to check all services including those with terminated status
+    // because getServices() only returns active services
+    const inactiveServices: ServiceInstance[] = [];
+
+    try {
+      // Get all services from etcd with prefix
+      const prefix = '/services/';
+      const services = await this.client.getAll().prefix(prefix).strings();
+      logger.info(`getInactiveServices: Found ${Object.keys(services).length} total services in etcd`);
+
+      for (const [key, value] of Object.entries(services)) {
+        try {
+          const service = JSON.parse(value as string);
+
+          // Filter by status
+          if (service.status === 'terminated' || service.status === 'error' || service.status === 'no-response') {
+            // Filter by serviceType if provided
+            if (serviceType && service.labels?.service !== serviceType) {
+              continue;
+            }
+            // Filter by serviceGroup if provided
+            if (serviceGroup && service.labels?.group !== serviceGroup) {
+              continue;
+            }
+            logger.info(`getInactiveServices: Found inactive service ${service.labels?.service}:${service.instanceId} with status=${service.status}`);
+            inactiveServices.push(service);
+          }
+        } catch (parseError) {
+          logger.warn(`Failed to parse service data from key ${key}:`, parseError);
+        }
+      }
+
+      return inactiveServices;
+    } catch (error) {
+      logger.error('Failed to get inactive services from etcd:', error);
+      return [];
+    }
   }
 
   async getService(instanceId: string, serviceType: string): Promise<ServiceInstance | null> {

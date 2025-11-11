@@ -426,28 +426,57 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
 
     try {
       if (serviceType) {
-        // Get inactive instances of a specific type
-        const inactiveCollectionKey = `services:${serviceType}:inactive`;
-        const inactiveData = await this.client.hgetall(inactiveCollectionKey);
-        for (const [, value] of Object.entries(inactiveData)) {
-          try {
-            const instance = JSON.parse(value);
-            instances.push(instance);
-          } catch (error) {
-            logger.error('Failed to parse inactive instance:', error);
+        // Get meta keys for this service type
+        const metaKeys = await this.client.keys(`services:${serviceType}:meta:*`);
+        for (const metaKey of metaKeys) {
+          const parts = metaKey.split(':');
+          if (parts.length === 4) {
+            const instanceId = parts[3];
+            const statKey = this.getStatKey(serviceType, instanceId);
+
+            // Check if stat key exists
+            const statExists = await this.client.exists(statKey);
+            if (!statExists) {
+              // Stat key doesn't exist, so this is an inactive service
+              try {
+                const metaValue = await this.client.get(metaKey);
+                if (metaValue) {
+                  const instance = JSON.parse(metaValue);
+                  instance.status = 'terminated';
+                  instance.updatedAt = new Date().toISOString();
+                  instances.push(instance);
+                }
+              } catch (error) {
+                logger.error('Failed to parse inactive instance:', error);
+              }
+            }
           }
         }
       } else {
-        // Get all inactive instances from all collections
-        const inactiveKeys = await this.client.keys('services:*:inactive');
-        for (const inactiveKey of inactiveKeys) {
-          const inactiveData = await this.client.hgetall(inactiveKey);
-          for (const [, value] of Object.entries(inactiveData)) {
-            try {
-              const instance = JSON.parse(value);
-              instances.push(instance);
-            } catch (error) {
-              logger.error('Failed to parse inactive instance:', error);
+        // Get all meta keys
+        const metaKeys = await this.client.keys('services:*:meta:*');
+        for (const metaKey of metaKeys) {
+          const parts = metaKey.split(':');
+          if (parts.length === 4) {
+            const serviceTypeFromKey = parts[1];
+            const instanceId = parts[3];
+            const statKey = this.getStatKey(serviceTypeFromKey, instanceId);
+
+            // Check if stat key exists
+            const statExists = await this.client.exists(statKey);
+            if (!statExists) {
+              // Stat key doesn't exist, so this is an inactive service
+              try {
+                const metaValue = await this.client.get(metaKey);
+                if (metaValue) {
+                  const instance = JSON.parse(metaValue);
+                  instance.status = 'terminated';
+                  instance.updatedAt = new Date().toISOString();
+                  instances.push(instance);
+                }
+              } catch (error) {
+                logger.error('Failed to parse inactive instance:', error);
+              }
             }
           }
         }
@@ -484,12 +513,13 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         return null; // Service not found
       }
 
+      // If stat key doesn't exist, service is not active (was cleaned up)
+      if (!statValue) {
+        return null;
+      }
+
       const meta = JSON.parse(metaValue);
-      const stat = statValue ? JSON.parse(statValue) : {
-        status: 'terminated', // If stat is missing, assume terminated
-        updatedAt: new Date().toISOString(),
-        stats: {},
-      };
+      const stat = JSON.parse(statValue);
 
       // Merge meta + stat
       return { ...meta, ...stat };
