@@ -1,12 +1,13 @@
 /**
  * Base Test Server
- * 
+ *
  * Common functionality for all test servers
  */
 
-import { GatrixServerSDK } from '../src/GatrixServerSDK';
+import { GatrixServerSDK, getLogger } from '../src/index';
 import { ServiceInstance, ServiceLabels } from '../src/types/api';
 import os from 'os';
+import { Logger } from '../src/utils/logger';
 
 export interface BaseServerConfig {
   serviceType: string;
@@ -23,11 +24,13 @@ export class BaseTestServer {
   protected sdk: GatrixServerSDK;
   protected config: BaseServerConfig;
   protected startTime: Date;
+  protected logger: Logger;
   private isShuttingDown: boolean = false;
 
   constructor(config: BaseServerConfig) {
     this.config = config;
     this.startTime = new Date();
+    this.logger = getLogger(config.instanceName.toUpperCase());
 
     // Create SDK instance
     this.sdk = new GatrixServerSDK({
@@ -54,7 +57,7 @@ export class BaseTestServer {
       },
     });
 
-    this.log('Server instance created');
+    this.logger.info('Server instance created');
 
     // Setup global error handlers
     this.setupErrorHandlers();
@@ -334,16 +337,14 @@ export class BaseTestServer {
    * Log message
    */
   protected log(message: string): void {
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] [${this.config.instanceName}] ${message}`);
+    this.logger.info(message);
   }
 
   /**
    * Log error
    */
   protected logError(message: string, error: any): void {
-    const timestamp = new Date().toISOString();
-    console.error(`[${timestamp}] [${this.config.instanceName}] ERROR: ${message}`, error);
+    this.logger.error(message, { error });
   }
 
   /**

@@ -23,6 +23,7 @@ export class Logger {
   private colorEnabled: boolean;
   private timeOffset: number; // Time offset in hours
   private timestampFormat: 'iso8601' | 'local'; // Timestamp format
+  private category?: string; // Category for logging
 
   private readonly levels: Record<LogLevel, number> = {
     debug: 0,
@@ -31,11 +32,12 @@ export class Logger {
     error: 3,
   };
 
-  constructor(config?: LoggerConfig) {
+  constructor(config?: LoggerConfig, category?: string) {
     this.level = config?.level || 'info';
     this.customLogger = config?.customLogger;
     this.timeOffset = config?.timeOffset ?? 0; // Default: UTC (0 offset)
     this.timestampFormat = config?.timestampFormat ?? 'iso8601'; // Default: ISO8601
+    this.category = category;
     // Enable colors by default, disable if running in non-TTY environment
     this.colorEnabled = process.stdout?.isTTY !== false;
   }
@@ -71,10 +73,11 @@ export class Logger {
 
   private formatMessage(level: LogLevel, message: string, meta?: any): string {
     const timestamp = this.getFormattedTimestamp();
+    const category = this.category || 'GatrixServerSDK';
 
     if (!this.colorEnabled || this.customLogger) {
       // Plain text format when colors are disabled or custom logger is used
-      return `[${timestamp}] [${level.toUpperCase()}] [GatrixServerSDK] ${message}`;
+      return `[${timestamp}] [${level.toUpperCase()}] [${category}] ${message}`;
     }
 
     // Colored format
@@ -83,7 +86,7 @@ export class Logger {
     const coloredTimestamp = `${COLORS.timestamp}${timestamp}${COLORS.reset}`;
     const coloredBracket = COLORS.bracket;
 
-    return `${coloredBracket}[${coloredTimestamp}] [${coloredLevel}${coloredBracket}] [GatrixServerSDK]${COLORS.reset} ${message}`;
+    return `${coloredBracket}[${coloredTimestamp}] [${coloredLevel}${coloredBracket}] [${category}]${COLORS.reset} ${message}`;
   }
 
   debug(message: string, meta?: any): void {
@@ -177,5 +180,26 @@ export class Logger {
   getTimestampFormat(): 'iso8601' | 'local' {
     return this.timestampFormat;
   }
+
+  /**
+   * Get category name
+   */
+  getCategory(): string | undefined {
+    return this.category;
+  }
+
+  /**
+   * Set category name
+   */
+  setCategory(category: string): void {
+    this.category = category;
+  }
+}
+
+/**
+ * Factory function to create a logger with a specific category
+ */
+export function getLogger(category: string, config?: LoggerConfig): Logger {
+  return new Logger(config, category);
 }
 

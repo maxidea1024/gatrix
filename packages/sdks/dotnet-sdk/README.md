@@ -127,6 +127,39 @@ config.Logger.TimeOffset = 9; // +09:00 (Korea)
 config.Logger.TimestampFormat = TimestampFormat.Local;
 ```
 
+### Category-Based Logger
+
+The SDK supports category-based logging for better module identification. When using dependency injection, the logger is automatically created with the "GatrixServerSDK" category:
+
+```csharp
+// The logger is automatically injected with category "GatrixServerSDK"
+var logger = provider.GetRequiredService<GatrixLogger>();
+
+logger.Info("Service initialized");
+logger.Warn("Warning message");
+logger.Error("Error occurred", new { error = "Details" });
+
+// Output examples:
+// [2025-11-12 10:48:10.454] [INFO] [GatrixServerSDK] Service initialized
+// [2025-11-12 10:48:11.123] [WARN] [GatrixServerSDK] Warning message
+// [2025-11-12 10:48:12.456] [ERROR] [GatrixServerSDK] Error occurred: { error = "Details" }
+```
+
+For custom categories, create a new logger instance:
+
+```csharp
+using Gatrix.ServerSDK.Utils;
+
+var msLogger = provider.GetRequiredService<ILogger<GatrixLogger>>();
+var loggerConfig = provider.GetRequiredService<LoggerConfig>();
+
+// Create logger with custom category
+var customLogger = new GatrixLogger(msLogger, loggerConfig, "MY-SERVICE");
+
+customLogger.Info("Custom service message");
+// Output: [2025-11-12 10:48:10.454] [INFO] [MY-SERVICE] Custom service message
+```
+
 ## Usage
 
 ### Get Data
@@ -170,6 +203,51 @@ sdk.On("*", async (event) =>
 // Unregister listener
 sdk.Off("gameworld.updated", handler);
 ```
+
+### Service Discovery
+
+Register your service instance with the backend:
+
+```csharp
+var response = await sdk.RegisterServiceAsync(new RegisterServiceInput
+{
+    Labels = new ServiceLabels
+    {
+        Service = "game-server",
+        Group = "kr-1",
+        CustomLabels = new Dictionary<string, object>
+        {
+            { "env", "production" },
+            { "region", "ap-northeast-2" }
+        }
+    },
+    Hostname = "game-server-1", // Optional: auto-detected from Environment.MachineName if omitted
+    InternalAddress = "10.0.0.1", // Optional: auto-detected from first NIC if omitted
+    Ports = new ServicePorts
+    {
+        Tcp = new[] { 7777 },
+        Http = new[] { 8080 }
+    },
+    Status = "ready",
+    Stats = new Dictionary<string, object>
+    {
+        { "cpuUsage", 45.5 },
+        { "memoryUsage", 2048 }
+    },
+    Meta = new Dictionary<string, object>
+    {
+        { "capacity", 1000 }
+    }
+});
+
+Console.WriteLine($"Service registered: {response.InstanceId}");
+Console.WriteLine($"External address: {response.ExternalAddress}");
+```
+
+**Notes:**
+- `hostname` is optional; if omitted, `Environment.MachineName` will be used
+- `internalAddress` is optional; if omitted, the first non-internal IPv4 address will be used
+- `externalAddress` is auto-detected by the backend from the request IP
 
 ## License
 

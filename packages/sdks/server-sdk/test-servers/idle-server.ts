@@ -5,11 +5,13 @@
  * No business logic, just event monitoring
  */
 
-import { GatrixServerSDK } from '../src/GatrixServerSDK';
+import { GatrixServerSDK, getLogger } from '../src/index';
 import os from 'os';
 
+const logger = getLogger('IDLE-SERVER');
+
 async function main() {
-  console.log('[idle-server] Starting Idle Server...');
+  logger.info('Starting Idle Server...');
 
   const sdk = new GatrixServerSDK({
     gatrixUrl: process.env.GATRIX_URL || 'http://localhost:55000',
@@ -38,12 +40,12 @@ async function main() {
   });
 
   try {
-    console.log('[idle-server] Initializing SDK...');
+    logger.info('Initializing SDK...');
     await sdk.initialize();
-    console.log('[idle-server] SDK initialized successfully');
+    logger.info('SDK initialized successfully');
 
     // Register service
-    console.log('[idle-server] Registering service...');
+    logger.info('Registering service...');
     const internalIp = Object.values(os.networkInterfaces())
       .flat()
       .find(addr => addr?.family === 'IPv4' && !addr.internal)?.address || 'localhost';
@@ -64,15 +66,14 @@ async function main() {
         startTime: new Date().toISOString(),
       },
     });
-    console.log(`[idle-server] Service registered with ID: ${instanceId}`);
-    console.log(`[idle-server] External address: ${externalAddress}`);
+    logger.info('Service registered with ID', { instanceId, externalAddress });
 
     // Listen to SDK events
-    console.log('[idle-server] Setting up event listeners...');
+    logger.info('Setting up event listeners...');
 
     // Listen to all events
     sdk.on('*', (event) => {
-      console.log('[idle-server] EVENT received:', {
+      logger.info('EVENT received', {
         type: event.type,
         timestamp: new Date().toISOString(),
         data: event.data,
@@ -81,64 +82,62 @@ async function main() {
 
     // Listen to specific events
     sdk.on('gameworld.created', (event) => {
-      console.log('[idle-server] GAMEWORLD CREATED:', event.data);
+      logger.info('GAMEWORLD CREATED', event.data);
       printCachedData();
     });
 
     sdk.on('gameworld.updated', (event) => {
-      console.log('[idle-server] GAMEWORLD UPDATED:', event.data);
+      logger.info('GAMEWORLD UPDATED', event.data);
       printCachedData();
     });
 
     sdk.on('gameworld.deleted', (event) => {
-      console.log('[idle-server] GAMEWORLD DELETED:', event.data);
+      logger.info('GAMEWORLD DELETED', event.data);
       printCachedData();
     });
 
     sdk.on('gameworld.order_changed', (event) => {
-      console.log('[idle-server] GAMEWORLD ORDER CHANGED:', event.data);
+      logger.info('GAMEWORLD ORDER CHANGED', event.data);
       printCachedData();
     });
 
     sdk.on('popup.created', (event) => {
-      console.log('[idle-server] POPUP CREATED:', event.data);
+      logger.info('POPUP CREATED', event.data);
       printCachedData();
     });
 
     sdk.on('popup.updated', (event) => {
-      console.log('[idle-server] POPUP UPDATED:', event.data);
+      logger.info('POPUP UPDATED', event.data);
       printCachedData();
     });
 
     sdk.on('popup.deleted', (event) => {
-      console.log('[idle-server] POPUP DELETED:', event.data);
+      logger.info('POPUP DELETED', event.data);
       printCachedData();
     });
 
     sdk.on('survey.created', (event) => {
-      console.log('[idle-server] SURVEY CREATED:', event.data);
+      logger.info('SURVEY CREATED', event.data);
       printCachedData();
     });
 
     sdk.on('survey.updated', (event) => {
-      console.log('[idle-server] SURVEY UPDATED:', event.data);
+      logger.info('SURVEY UPDATED', event.data);
       printCachedData();
     });
 
     sdk.on('survey.deleted', (event) => {
-      console.log('[idle-server] SURVEY DELETED:', event.data);
+      logger.info('SURVEY DELETED', event.data);
       printCachedData();
     });
 
     sdk.on('survey.settings.updated', (event) => {
-      console.log('[idle-server] SURVEY SETTINGS UPDATED:', event.data);
+      logger.info('SURVEY SETTINGS UPDATED', event.data);
       printCachedData();
     });
 
     // Helper function to print cached data
     function printCachedData() {
-      console.log('\n========== CACHED DATA (JSON) ==========');
-
       const surveysData = sdk.getCachedSurveys();
       const cachedData = {
         gameWorlds: sdk.getCachedGameWorlds(),
@@ -147,37 +146,36 @@ async function main() {
         timestamp: new Date().toISOString(),
       };
 
-      console.log(JSON.stringify(cachedData, null, 2));
-      console.log('\n========================================\n');
+      logger.info('CACHED DATA', cachedData);
     }
 
-    console.log('[idle-server] Idle server is running and listening to events...');
-    console.log('[idle-server] Press Ctrl+C to stop');
+    logger.info('Idle server is running and listening to events...');
+    logger.info('Press Ctrl+C to stop');
 
     // Handle graceful shutdown
     process.on('SIGTERM', async () => {
-      console.log('[idle-server] Received SIGTERM, shutting down gracefully...');
+      logger.info('Received SIGTERM, shutting down gracefully...');
       await handleShutdown();
     });
 
     process.on('SIGINT', async () => {
-      console.log('[idle-server] Received SIGINT, shutting down gracefully...');
+      logger.info('Received SIGINT, shutting down gracefully...');
       await handleShutdown();
     });
 
     async function handleShutdown() {
       try {
-        console.log('[idle-server] Unregistering service...');
+        logger.info('Unregistering service...');
         await sdk.serviceDiscovery.unregister();
-        console.log('[idle-server] Service unregistered');
+        logger.info('Service unregistered');
         process.exit(0);
       } catch (error) {
-        console.error('[idle-server] Error during shutdown:', error);
+        logger.error('Error during shutdown', { error });
         process.exit(1);
       }
     }
   } catch (error) {
-    console.error('[idle-server] Fatal error:', error);
+    logger.error('Fatal error', { error });
     process.exit(1);
   }
 }

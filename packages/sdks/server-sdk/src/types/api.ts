@@ -182,11 +182,12 @@ export interface ServiceInstance {
  * Register service input (full snapshot)
  * Note:
  * - externalAddress is auto-detected by backend from req.ip
+ * - hostname is optional; if omitted, os.hostname() will be used
  * - internalAddress is optional; if omitted, the first NIC address will be used
  */
 export interface RegisterServiceInput {
   labels: ServiceLabels; // Service labels (required: labels.service)
-  hostname: string;
+  hostname?: string; // Optional: Auto-detected from os.hostname() if omitted
   internalAddress?: string; // Optional: Auto-detected from first NIC if omitted
   ports: ServicePorts;
   status?: ServiceStatus; // Default: 'ready'

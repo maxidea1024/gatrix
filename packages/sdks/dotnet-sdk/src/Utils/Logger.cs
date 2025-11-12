@@ -10,11 +10,13 @@ public class GatrixLogger
 {
     private readonly ILogger<GatrixLogger> _logger;
     private readonly LoggerConfig _config;
+    private readonly string _category;
 
-    public GatrixLogger(ILogger<GatrixLogger> logger, LoggerConfig config)
+    public GatrixLogger(ILogger<GatrixLogger> logger, LoggerConfig config, string category = "GatrixServerSDK")
     {
         _logger = logger;
         _config = config;
+        _category = category;
     }
 
     /// <summary>
@@ -40,7 +42,7 @@ public class GatrixLogger
     private string FormatMessage(string level, string message)
     {
         var timestamp = GetFormattedTimestamp();
-        return $"[{timestamp}] [{level}] [GatrixServerSDK] {message}";
+        return $"[{timestamp}] [{level}] [{_category}] {message}";
     }
 
     /// <summary>
@@ -146,6 +148,14 @@ public class GatrixLogger
     public TimestampFormat GetTimestampFormat()
     {
         return _config.TimestampFormat;
+    }
+
+    /// <summary>
+    /// Get category name
+    /// </summary>
+    public string GetCategory()
+    {
+        return _category;
     }
 }
 

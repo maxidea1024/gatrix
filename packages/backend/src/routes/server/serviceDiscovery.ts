@@ -56,7 +56,12 @@ router.post('/register', serverSDKAuth, async (req: any, res: any) => {
     const instanceId = ulid();
 
     // Auto-detect external address from request IP
-    const externalAddress = req.ip || req.connection.remoteAddress || '0.0.0.0';
+    let externalAddress = req.ip || req.connection.remoteAddress || '0.0.0.0';
+
+    // Remove "::ffff:" prefix from IPv4-mapped IPv6 addresses
+    if (externalAddress.startsWith('::ffff:')) {
+      externalAddress = externalAddress.substring(7);
+    }
 
     // Create service instance (full snapshot)
     const now = new Date().toISOString();
@@ -89,7 +94,7 @@ router.post('/register', serverSDKAuth, async (req: any, res: any) => {
 
     res.json({
       success: true,
-      data: { instanceId, externalAddress },
+      data: { instanceId, hostname, externalAddress },
     });
   } catch (error: any) {
     logger.error('Failed to register service:', error);

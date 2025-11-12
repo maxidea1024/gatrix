@@ -296,9 +296,16 @@ export class EventListener {
       listenerCount: allListeners.length,
     });
 
+    // Convert to SdkEvent format (timestamp as ISO8601 string)
+    const sdkEvent = {
+      type: event.type,
+      data: event.data,
+      timestamp: new Date().toISOString(),
+    };
+
     for (const listener of allListeners) {
       try {
-        await listener(event);
+        await listener(sdkEvent);
       } catch (error: any) {
         this.logger.error('Event listener error', {
           type: event.type,
@@ -310,8 +317,9 @@ export class EventListener {
 
   /**
    * Register event listener
+   * Returns a function to unregister the listener
    */
-  on(eventType: string, callback: EventCallback): void {
+  on(eventType: string, callback: EventCallback): () => void {
     if (!this.eventListeners[eventType]) {
       this.eventListeners[eventType] = [];
     }
@@ -319,6 +327,11 @@ export class EventListener {
     this.eventListeners[eventType].push(callback);
 
     this.logger.debug('Event listener registered', { eventType });
+
+    // Return a function to unregister this specific listener
+    return () => {
+      this.off(eventType, callback);
+    };
   }
 
   /**

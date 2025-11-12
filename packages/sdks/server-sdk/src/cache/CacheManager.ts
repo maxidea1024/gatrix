@@ -18,6 +18,7 @@ export class CacheManager {
   private surveyService: SurveyService;
   private apiClient: ApiClient;
   private refreshInterval?: NodeJS.Timeout;
+  private refreshCallbacks: Array<(type: string, data: any) => void> = [];
 
   constructor(
     config: CacheConfig,
@@ -37,6 +38,32 @@ export class CacheManager {
     this.surveyService = surveyService;
     this.apiClient = apiClient;
     this.logger = logger;
+  }
+
+  /**
+   * Register callback for cache refresh events
+   * Returns a function to unregister the callback
+   */
+  onRefresh(callback: (type: string, data: any) => void): () => void {
+    this.refreshCallbacks.push(callback);
+
+    // Return a function to unregister this specific callback
+    return () => {
+      this.refreshCallbacks = this.refreshCallbacks.filter((cb) => cb !== callback);
+    };
+  }
+
+  /**
+   * Emit refresh event to all registered callbacks
+   */
+  private emitRefreshEvent(type: string, data: any): void {
+    for (const callback of this.refreshCallbacks) {
+      try {
+        callback(type, data);
+      } catch (error: any) {
+        this.logger.error('Error in refresh callback', { error: error.message });
+      }
+    }
   }
 
   /**
@@ -160,6 +187,14 @@ export class CacheManager {
       ]);
 
       this.logger.info('All caches refreshed successfully');
+
+      // Emit refresh events for polling method
+      if (this.config.refreshMethod === 'polling') {
+        this.emitRefreshEvent('cache.refreshed', {
+          timestamp: new Date().toISOString(),
+          types: ['gameworld', 'popup', 'survey'],
+        });
+      }
     } catch (error: any) {
       this.logger.error('Failed to refresh caches', { error: error.message });
       throw error;

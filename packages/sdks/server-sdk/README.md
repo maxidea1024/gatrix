@@ -410,7 +410,7 @@ const { instanceId, externalAddress } = await sdk.registerService({
     env: 'production',      // Optional: custom labels
     region: 'ap-northeast-2',
   },
-  hostname: 'game-server-1',
+  hostname: 'game-server-1', // Optional: auto-detected from os.hostname() if omitted
   internalAddress: '10.0.0.1', // Optional: auto-detected from first NIC if omitted
   ports: {
     tcp: [7777],
@@ -543,8 +543,9 @@ The SDK includes a built-in logger with support for custom timestamp formats and
 ### Basic Logger Usage
 
 ```typescript
-import { Logger } from '@gatrix/server-sdk';
+import { Logger, getLogger } from '@gatrix/server-sdk';
 
+// Create logger with default category
 const logger = new Logger({
   level: 'info', // 'debug' | 'info' | 'warn' | 'error'
 });
@@ -552,6 +553,41 @@ const logger = new Logger({
 logger.info('Application started');
 logger.warn('This is a warning', { code: 'WARN_001' });
 logger.error('An error occurred', { error: 'Details' });
+```
+
+### Category-Based Logger
+
+For better log organization and module identification, use the `getLogger()` factory function to create loggers with specific categories:
+
+```typescript
+import { getLogger } from '@gatrix/server-sdk';
+
+// Create logger with custom category
+const logger = getLogger('MY-SERVICE');
+
+logger.info('Service initialized');
+logger.warn('Warning message');
+logger.error('Error occurred', { error: 'Details' });
+
+// Output examples:
+// [2025-11-12T10:48:10.454Z] [INFO] [MY-SERVICE] Service initialized
+// [2025-11-12T10:48:11.123Z] [WARN] [MY-SERVICE] Warning message
+// [2025-11-12T10:48:12.456Z] [ERROR] [MY-SERVICE] Error occurred: { error: 'Details' }
+```
+
+### Category Logger with Configuration
+
+```typescript
+import { getLogger } from '@gatrix/server-sdk';
+
+const logger = getLogger('CACHE-MANAGER', {
+  level: 'debug',
+  timeOffset: 9, // +09:00 (Korea)
+  timestampFormat: 'local',
+});
+
+logger.debug('Cache refresh started');
+logger.info('Cache updated', { count: 42 });
 ```
 
 ### Timestamp Formatting

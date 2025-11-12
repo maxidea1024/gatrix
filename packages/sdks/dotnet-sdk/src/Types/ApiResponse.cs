@@ -105,12 +105,72 @@ public class Survey
 }
 
 /// <summary>
+/// Service ports configuration
+/// </summary>
+public class ServicePorts
+{
+    [JsonPropertyName("tcp")]
+    public int[]? Tcp { get; set; }
+
+    [JsonPropertyName("udp")]
+    public int[]? Udp { get; set; }
+
+    [JsonPropertyName("http")]
+    public int[]? Http { get; set; }
+}
+
+/// <summary>
+/// Service labels for categorization
+/// </summary>
+public class ServiceLabels
+{
+    [JsonPropertyName("service")]
+    public required string Service { get; set; }
+
+    [JsonPropertyName("group")]
+    public string? Group { get; set; }
+
+    [JsonExtensionData]
+    public Dictionary<string, object>? CustomLabels { get; set; }
+}
+
+/// <summary>
+/// Service registration input
+/// </summary>
+public class RegisterServiceInput
+{
+    [JsonPropertyName("labels")]
+    public required ServiceLabels Labels { get; set; }
+
+    [JsonPropertyName("hostname")]
+    public string? Hostname { get; set; }
+
+    [JsonPropertyName("internalAddress")]
+    public string? InternalAddress { get; set; }
+
+    [JsonPropertyName("ports")]
+    public required ServicePorts Ports { get; set; }
+
+    [JsonPropertyName("status")]
+    public string? Status { get; set; }
+
+    [JsonPropertyName("stats")]
+    public Dictionary<string, object>? Stats { get; set; }
+
+    [JsonPropertyName("meta")]
+    public Dictionary<string, object>? Meta { get; set; }
+}
+
+/// <summary>
 /// Service registration response
 /// </summary>
 public class ServiceRegistrationResponse
 {
     [JsonPropertyName("instanceId")]
     public required string InstanceId { get; set; }
+
+    [JsonPropertyName("hostname")]
+    public required string Hostname { get; set; }
 
     [JsonPropertyName("externalAddress")]
     public required string ExternalAddress { get; set; }

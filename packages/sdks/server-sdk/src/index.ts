@@ -12,7 +12,7 @@ export * from './types';
 export { GatrixSDKError, ErrorCode, createError, isGatrixSDKError } from './utils/errors';
 
 // Export logger
-export { Logger, LogLevel } from './utils/logger';
+export { Logger, LogLevel, getLogger } from './utils/logger';
 
 // Default export
 export { GatrixServerSDK as default } from './GatrixServerSDK';

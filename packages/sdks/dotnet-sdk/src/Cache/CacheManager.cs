@@ -13,6 +13,7 @@ public class CacheManager
     private readonly ApiClient _apiClient;
     private readonly GatrixLogger _logger;
     private Timer? _refreshTimer;
+    private readonly List<Action<string, object>> _refreshCallbacks = [];
 
     private List<GameWorld> _gameWorlds = [];
     private List<PopupNotice> _popupNotices = [];
@@ -23,6 +24,32 @@ public class CacheManager
         _config = config;
         _apiClient = apiClient;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Register callback for cache refresh events
+    /// </summary>
+    public void OnRefresh(Action<string, object> callback)
+    {
+        _refreshCallbacks.Add(callback);
+    }
+
+    /// <summary>
+    /// Emit refresh event to all registered callbacks
+    /// </summary>
+    private void EmitRefreshEvent(string type, object data)
+    {
+        foreach (var callback in _refreshCallbacks)
+        {
+            try
+            {
+                callback(type, data);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Error in refresh callback", new { error = ex.Message });
+            }
+        }
     }
 
     /// <summary>
@@ -148,6 +175,16 @@ public class CacheManager
             );
 
             _logger.Info("All caches refreshed successfully");
+
+            // Emit refresh events for polling method
+            if (_config.RefreshMethod == CacheRefreshMethod.Polling)
+            {
+                EmitRefreshEvent("cache.refreshed", new
+                {
+                    timestamp = DateTime.UtcNow.ToString("O"),
+                    types = new[] { "gameworld", "popup", "survey" }
+                });
+            }
         }
         catch (Exception ex)
         {

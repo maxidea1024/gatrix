@@ -24,8 +24,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(config.Cache);
         services.AddSingleton(config.Retry);
 
-        // Register logger
-        services.AddSingleton<GatrixLogger>();
+        // Register logger with category
+        services.AddSingleton<GatrixLogger>(provider =>
+        {
+            var msLogger = provider.GetRequiredService<ILogger<GatrixLogger>>();
+            return new GatrixLogger(msLogger, config.Logger, "GatrixServerSDK");
+        });
 
         // Register HTTP client with base address
         services.AddHttpClient<ApiClient>()

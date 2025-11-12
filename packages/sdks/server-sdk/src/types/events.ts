@@ -44,10 +44,20 @@ export interface CustomEvent {
 }
 
 // ============================================================================
+// SDK Event Types (for SDK event listeners)
+// ============================================================================
+
+export interface SdkEvent {
+  type: string;
+  data: any;
+  timestamp: string; // ISO8601 format
+}
+
+// ============================================================================
 // Event Listener Types
 // ============================================================================
 
-export type EventCallback = (event: StandardEvent | CustomEvent) => void | Promise<void>;
+export type EventCallback = (event: SdkEvent) => void | Promise<void>;
 
 export interface EventListenerMap {
   [eventType: string]: EventCallback[];

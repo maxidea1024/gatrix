@@ -3,6 +3,7 @@
  * Provides service discovery operations via Backend API
  */
 
+import os from 'os';
 import { Logger } from '../utils/logger';
 import { ApiClient } from '../client/ApiClient';
 import { ServiceInstance, GetServicesParams, RegisterServiceInput, UpdateServiceStatusInput, WhitelistData, ServiceLabels } from '../types/api';
@@ -53,18 +54,20 @@ export class ServiceDiscoveryService {
    *
    * Note:
    * - externalAddress is auto-detected by backend from req.ip
+   * - hostname is auto-detected from os.hostname() if omitted
    * - internalAddress is auto-detected from first NIC if omitted
    */
-  async register(input: RegisterServiceInput): Promise<{ instanceId: string; externalAddress: string }> {
-    // Auto-detect internalAddress if not provided
+  async register(input: RegisterServiceInput): Promise<{ instanceId: string; hostname: string; externalAddress: string }> {
+    // Auto-detect hostname and internalAddress if not provided
     const registrationInput = {
       ...input,
+      hostname: input.hostname || os.hostname(),
       internalAddress: input.internalAddress || getFirstNicAddress()
     };
 
     this.logger.debug('Registering service via API', registrationInput);
 
-    const response = await this.apiClient.post<{ instanceId: string; externalAddress: string }>(
+    const response = await this.apiClient.post<{ instanceId: string; hostname: string; externalAddress: string }>(
       '/api/v1/server/services/register',
       registrationInput
     );
@@ -73,18 +76,18 @@ export class ServiceDiscoveryService {
       throw new Error(response.error?.message || 'Failed to register service');
     }
 
-    const { instanceId, externalAddress } = response.data;
+    const { instanceId, hostname, externalAddress } = response.data;
     this.instanceId = instanceId;
     this.labels = input.labels;
 
     this.logger.info('Service registered via API', {
       instanceId,
       labels: input.labels,
-      internalAddress: registrationInput.internalAddress,
+      hostname,
       externalAddress
     });
 
-    return { instanceId, externalAddress };
+    return { instanceId, hostname, externalAddress };
   }
 
   /**

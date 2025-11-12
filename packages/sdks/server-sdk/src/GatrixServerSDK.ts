@@ -372,25 +372,56 @@ export class GatrixServerSDK {
 
   /**
    * Register event listener
+   * Works with both event-based and polling refresh methods
+   * Returns a function to unregister the listener
    */
-  on(eventType: string, callback: EventCallback): void {
-    if (!this.eventListener) {
-      this.logger.warn('Event listener not initialized. Events will not be received.');
-      return;
+  on(eventType: string, callback: EventCallback): () => void {
+    const refreshMethod = this.config.cache?.refreshMethod ?? 'polling';
+
+    // For event-based refresh, use EventListener
+    if (refreshMethod === 'event') {
+      if (!this.eventListener) {
+        this.logger.warn('Event listener not initialized. Events will not be received.');
+        return () => {}; // Return no-op function
+      }
+      return this.eventListener.on(eventType, callback);
+    }
+    // For polling refresh, register callback with CacheManager
+    else if (refreshMethod === 'polling') {
+      if (!this.cacheManager) {
+        this.logger.warn('Cache manager not initialized.');
+        return () => {}; // Return no-op function
+      }
+      const unsubscribe = this.cacheManager.onRefresh((type: string, data: any) => {
+        // Convert cache refresh events to SDK events
+        callback({
+          type: type,
+          data: data,
+          timestamp: new Date().toISOString(),
+        });
+      });
+      return unsubscribe;
     }
 
-    this.eventListener.on(eventType, callback);
+    return () => {}; // Return no-op function as fallback
   }
 
   /**
    * Unregister event listener
    */
   off(eventType: string, callback: EventCallback): void {
-    if (!this.eventListener) {
-      return;
-    }
+    const refreshMethod = this.config.cache?.refreshMethod ?? 'polling';
 
-    this.eventListener.off(eventType, callback);
+    // For event-based refresh, use EventListener
+    if (refreshMethod === 'event') {
+      if (!this.eventListener) {
+        return;
+      }
+      this.eventListener.off(eventType, callback);
+    }
+    // For polling refresh, we don't have a way to unregister specific callbacks
+    // This is a limitation of the current implementation
+    // Consider using a callback registry if this becomes important
   }
 
   // ============================================================================
@@ -400,7 +431,7 @@ export class GatrixServerSDK {
   /**
    * Register this service instance via Backend API
    */
-  async registerService(input: RegisterServiceInput): Promise<{ instanceId: string; externalAddress: string }> {
+  async registerService(input: RegisterServiceInput): Promise<{ instanceId: string; hostname: string; externalAddress: string }> {
     const result = await this.serviceDiscovery.register(input);
     return result;
   }
