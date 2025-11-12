@@ -15,20 +15,26 @@ const router = Router();
  *   get:
  *     tags: [ClientSDK]
  *     summary: Test client SDK authentication
- *     description: Requires API token and application name. Use either Authorization: Bearer <token> or X-API-Token header, and X-Application-Name header.
+ *     description: |
+ *       Requires API token and application name.
+ *       Use either Authorization: Bearer <token> or X-API-Token header, and X-Application-Name header.
  *     parameters:
  *       - in: header
  *         name: Authorization
  *         required: false
- *         schema: { type: string, example: "Bearer <API_TOKEN>" }
+ *         schema:
+ *           type: string
+ *           example: "Bearer <API_TOKEN>"
  *       - in: header
  *         name: X-API-Token
  *         required: false
- *         schema: { type: string }
+ *         schema:
+ *           type: string
  *       - in: header
  *         name: X-Application-Name
  *         required: true
- *         schema: { type: string }
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Authenticated successfully
