@@ -41,7 +41,7 @@ export const initMetrics = (app: FastifyInstance): void => {
     register.registerMetric(requestBytesTotal);
     register.registerMetric(responseBytesTotal);
 
-    app.addHook('onRequest', (req, _reply, done) => {
+    app.addHook('onRequest', (req, reply, done) => {
       (req as any)._metrics_start = process.hrtime.bigint();
       // Capture socket I/O counters at request start
       const sock: any = (req as any).raw?.socket;
@@ -49,6 +49,32 @@ export const initMetrics = (app: FastifyInstance): void => {
         read: typeof sock?.bytesRead === 'number' ? sock.bytesRead : 0,
         written: typeof sock?.bytesWritten === 'number' ? sock.bytesWritten : 0,
       };
+
+      // Wrap raw ServerResponse write/end to capture actual outbound bytes
+      const res: any = reply.raw;
+      const originalWrite = (res.write as any).bind(res);
+      const originalEnd = (res.end as any).bind(res);
+      let _metrics_written_acc = 0;
+      const countChunk = (chunk: any, encoding?: any): number => {
+        try {
+          if (!chunk) return 0;
+          if (Buffer.isBuffer(chunk)) return chunk.length;
+          if (typeof chunk === 'string') return Buffer.byteLength(chunk, encoding || 'utf8');
+        } catch (_) {
+          // ignore
+        }
+        return 0;
+      };
+      res.write = function (chunk: any, encoding?: any, cb?: any) {
+        _metrics_written_acc += countChunk(chunk, encoding);
+        return originalWrite(chunk as any, encoding as any, cb);
+      } as any;
+      res.end = function (chunk?: any, encoding?: any, cb?: any) {
+        _metrics_written_acc += countChunk(chunk, encoding);
+        return originalEnd(chunk as any, encoding as any, cb);
+      } as any;
+      (req as any)._metrics_written_getter = () => _metrics_written_acc;
+
       done();
     });
 
@@ -77,17 +103,23 @@ export const initMetrics = (app: FastifyInstance): void => {
             const delta = endRead - ioPrev.read;
             if (Number.isFinite(delta) && delta > 0) reqBytes = delta;
           }
-          // Response bytes: prefer Content-Length header, otherwise socket delta
-          const resCL: any = reply.getHeader('content-length');
+          // Response bytes: prefer measured written bytes, then Content-Length, otherwise socket delta
           let resBytes = 0;
-          if (typeof resCL === 'number') resBytes = resCL;
-          else if (typeof resCL === 'string') {
-            const parsed = parseInt(resCL, 10);
-            if (!Number.isNaN(parsed)) resBytes = parsed;
-          }
-          if (resBytes === 0 && ioPrev) {
-            const delta = endWritten - ioPrev.written;
-            if (Number.isFinite(delta) && delta > 0) resBytes = delta;
+          const getWritten = (req as any)._metrics_written_getter as undefined | (() => number);
+          const measured = typeof getWritten === 'function' ? Number(getWritten()) : 0;
+          if (Number.isFinite(measured) && measured > 0) {
+            resBytes = measured;
+          } else {
+            const resCL: any = reply.getHeader('content-length');
+            if (typeof resCL === 'number') resBytes = resCL;
+            else if (typeof resCL === 'string') {
+              const parsed = parseInt(resCL, 10);
+              if (!Number.isNaN(parsed)) resBytes = parsed;
+            }
+            if (resBytes === 0 && ioPrev) {
+              const delta = endWritten - ioPrev.written;
+              if (Number.isFinite(delta) && delta > 0) resBytes = delta;
+            }
           }
           requestBytesTotal.labels(...labels).inc(reqBytes);
           responseBytesTotal.labels(...labels).inc(resBytes);

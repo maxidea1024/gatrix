@@ -57,6 +57,33 @@ export const initMetrics = (app: express.Application): void => {
         written: typeof sock?.bytesWritten === 'number' ? sock.bytesWritten : 0,
       };
       (res as any)._metrics_io_start = ioStart;
+
+      // Wrap write/end to measure actual outbound bytes written (post-compression)
+      const originalWrite = (res.write as any).bind(res);
+      const originalEnd = (res.end as any).bind(res);
+      let _metrics_written_acc = 0;
+      const countChunk = (chunk: any, encoding?: any): number => {
+        try {
+          if (!chunk) return 0;
+          if (Buffer.isBuffer(chunk)) return chunk.length;
+          if (typeof chunk === 'string') return Buffer.byteLength(chunk, encoding || 'utf8');
+        } catch (_) {
+          // ignore
+        }
+        return 0;
+      };
+      (res as any).write = function (chunk: any, encoding?: any, cb?: any) {
+        _metrics_written_acc += countChunk(chunk, encoding);
+        return originalWrite(chunk as any, encoding as any, cb);
+      } as any;
+      (res as any).end = function (chunk?: any, encoding?: any, cb?: any) {
+        _metrics_written_acc += countChunk(chunk, encoding);
+        return originalEnd(chunk as any, encoding as any, cb);
+      } as any;
+
+      let _metrics_bytes_recorded = false; // guard to avoid double counting when using compression/keep-alive
+
+
       res.on('finish', () => {
         try {
           const end = process.hrtime.bigint();
@@ -81,24 +108,53 @@ export const initMetrics = (app: express.Application): void => {
             const delta = endRead - ioPrev.read;
             if (Number.isFinite(delta) && delta > 0) reqBytes = delta;
           }
-          // Response bytes: prefer Content-Length header, otherwise socket delta
-          const resCL: any = res.getHeader('content-length');
+          // Response bytes: prefer measured written bytes, then Content-Length, otherwise socket delta
           let resBytes = 0;
-          if (typeof resCL === 'number') resBytes = resCL;
-          else if (typeof resCL === 'string') {
-            const parsed = parseInt(resCL, 10);
-            if (!Number.isNaN(parsed)) resBytes = parsed;
+          if (_metrics_written_acc > 0) {
+            resBytes = _metrics_written_acc;
+          } else {
+            const resCL: any = res.getHeader('content-length');
+            if (typeof resCL === 'number') resBytes = resCL;
+            else if (typeof resCL === 'string') {
+              const parsed = parseInt(resCL, 10);
+              if (!Number.isNaN(parsed)) resBytes = parsed;
+            }
+            if (resBytes === 0 && ioPrev) {
+              const delta = endWritten - ioPrev.written;
+              if (Number.isFinite(delta) && delta > 0) resBytes = delta;
+            }
           }
-          if (resBytes === 0 && ioPrev) {
-            const delta = endWritten - ioPrev.written;
-            if (Number.isFinite(delta) && delta > 0) resBytes = delta;
-          }
-          requestBytesTotal.labels(...labels).inc(reqBytes);
-          responseBytesTotal.labels(...labels).inc(resBytes);
+          // Always inc to ensure series is created even when bytes are 0; only set recorded flag if > 0
+          requestBytesTotal.labels(...labels).inc(Math.max(0, reqBytes));
+          if (reqBytes > 0) { _metrics_bytes_recorded = true; }
+          responseBytesTotal.labels(...labels).inc(Math.max(0, resBytes));
+          if (resBytes > 0) { _metrics_bytes_recorded = true; }
         } catch (_) {
           // swallow metrics errors
         }
       });
+
+      // Fallback: when using compression + keep-alive, socket.bytesWritten may update after 'finish'
+      res.on('close', () => {
+        try {
+          if (_metrics_bytes_recorded) return;
+          const sockNow: any = (req as any).socket;
+          const ioPrev = (res as any)._metrics_io_start as { read: number; written: number } | undefined;
+          const route = (req as any).route?.path || (req as any).originalUrl?.split('?')[0] || 'unknown';
+          const labels = [req.method, String(res.statusCode), route] as const;
+          if (ioPrev) {
+            const endRead = typeof sockNow?.bytesRead === 'number' ? sockNow.bytesRead : 0;
+            const endWritten = typeof sockNow?.bytesWritten === 'number' ? sockNow.bytesWritten : 0;
+            const dReq = endRead - ioPrev.read;
+            const dRes = endWritten - ioPrev.written;
+            if (Number.isFinite(dReq) && dReq > 0) { requestBytesTotal.labels(...labels).inc(dReq); _metrics_bytes_recorded = true; }
+            if (Number.isFinite(dRes) && dRes > 0) { responseBytesTotal.labels(...labels).inc(dRes); _metrics_bytes_recorded = true; }
+          }
+        } catch (_) {
+          // swallow metrics errors
+        }
+      });
+
       next();
     });
 
