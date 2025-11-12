@@ -45,6 +45,43 @@ services:
       interval: 30s
       start_period: 10s
 
+  # MySQL Exporter for Prometheus metrics
+  mysql-exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: gatrix-mysql-exporter-dev
+    restart: unless-stopped
+    environment:
+      MYSQLD_EXPORTER_PASSWORD: "${DB_ROOT_PASSWORD:-rootpassword}"
+    command:
+      - "--config.my-cnf=/etc/mysql/.my.cnf"
+    volumes:
+      - ./docker/mysql/exporter/.my.cnf:/etc/mysql/.my.cnf:ro
+    ports:
+      - "0.0.0.0:59104:9104"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - gatrix-dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:9104/metrics"]
+      timeout: 10s
+      retries: 3
+      interval: 30s
+      start_period: 10s
+
+  # Redis Exporter for Prometheus metrics
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: gatrix-redis-exporter-dev
+    restart: unless-stopped
+    environment:
+      REDIS_ADDR: "redis:6379"
+    ports:
+      - "0.0.0.0:59121:9121"
+    networks:
+      - gatrix-dev-network
+
   # Backend API for development (with hot reload)
   backend-dev:
     build:
@@ -398,6 +435,10 @@ services:
       event-lens-dev:
         condition: service_started
       chat-server-dev:
+        condition: service_started
+      mysql-exporter:
+        condition: service_healthy
+      redis-exporter:
         condition: service_started
     networks:
       - gatrix-dev-network

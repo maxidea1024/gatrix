@@ -25,22 +25,46 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId
   const [showAll, setShowAll] = useState(false);
   const [displayRewards, setDisplayRewards] = useState<Reward[]>([]);
 
-  // Set display rewards from props
+  // Set display rewards from props or load from template
   useEffect(() => {
-    if (!rewards || rewards.length === 0) {
-      setDisplayRewards([]);
-      return;
-    }
+    const loadRewards = async () => {
+      try {
+        // If rewards are provided, use them
+        if (rewards && rewards.length > 0) {
+          // Convert from backend format (rewardType, itemId) to frontend format (type, id)
+          const convertedRewards = rewards.map((reward: any) => ({
+            type: reward.type !== undefined ? reward.type : reward.rewardType,
+            id: reward.id !== undefined ? reward.id : (reward.itemId ? parseInt(reward.itemId.split('_')[1] || reward.itemId) : 0),
+            quantity: reward.quantity,
+          }));
+          setDisplayRewards(convertedRewards);
+          return;
+        }
 
-    // Convert from backend format (rewardType, itemId) to frontend format (type, id)
-    const convertedRewards = rewards.map((reward: any) => ({
-      type: reward.type !== undefined ? reward.type : reward.rewardType,
-      id: reward.id !== undefined ? reward.id : (reward.itemId ? parseInt(reward.itemId.split('_')[1] || reward.itemId) : 0),
-      quantity: reward.quantity,
-    }));
+        // If no rewards but rewardTemplateId is provided, load from template
+        if (rewardTemplateId) {
+          const template = await rewardTemplateService.getRewardTemplateById(rewardTemplateId);
+          if (template && template.rewardItems && Array.isArray(template.rewardItems)) {
+            const convertedRewards = template.rewardItems.map((item: any) => ({
+              type: item.rewardType || item.type || 0,
+              id: item.itemId || item.id || 0,
+              quantity: item.quantity || 0,
+            }));
+            setDisplayRewards(convertedRewards);
+          } else {
+            setDisplayRewards([]);
+          }
+        } else {
+          setDisplayRewards([]);
+        }
+      } catch (error) {
+        console.error('Failed to load rewards:', error);
+        setDisplayRewards([]);
+      }
+    };
 
-    setDisplayRewards(convertedRewards);
-  }, [rewards]);
+    loadRewards();
+  }, [rewards, rewardTemplateId]);
 
   // Build reward type map from context
   useEffect(() => {

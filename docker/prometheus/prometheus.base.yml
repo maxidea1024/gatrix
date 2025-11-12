@@ -27,3 +27,36 @@ scrape_configs:
       - source_labels: [metrics_path]
         target_label: __metrics_path__
 
+  # MySQL Exporter
+  - job_name: 'mysql'
+    static_configs:
+      - targets: ['mysql-exporter:9104']
+        labels:
+          service: mysql
+          instance: mysql
+
+  # Redis Exporter
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+        labels:
+          service: redis
+          instance: redis
+
+  # ClickHouse Metrics (native Prometheus endpoint)
+  - job_name: 'clickhouse'
+    static_configs:
+      - targets: ['clickhouse:8123']
+        labels:
+          service: clickhouse
+          instance: clickhouse
+    metrics_path: '/metrics'
+
+  # Prometheus Self-Monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: prometheus
+          instance: prometheus
+
