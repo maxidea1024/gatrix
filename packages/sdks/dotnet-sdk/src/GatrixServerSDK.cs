@@ -71,6 +71,7 @@ public class GatrixServerSDK : IAsyncDisposable
             }
 
             _logger.Info("GatrixServerSDK closed successfully");
+            _logger.Info("SDK가 종료되었습니다.");
         }
         catch (Exception ex)
         {
@@ -163,6 +164,7 @@ public class GatrixServerSDK : IAsyncDisposable
             instanceId = response.Data.InstanceId,
             labels = input.Labels,
             hostname = response.Data.Hostname,
+            internalAddress = internalAddress,
             externalAddress = response.Data.ExternalAddress
         });
 
@@ -210,8 +212,9 @@ public class GatrixServerSDK : IAsyncDisposable
     /// <summary>
     /// Register event listener
     /// Works with both event-based and polling refresh methods
+    /// Returns a function to unregister the listener
     /// </summary>
-    public void On(string eventType, Func<SdkEvent, Task> callback)
+    public Action On(string eventType, Func<SdkEvent, Task> callback)
     {
         var refreshMethod = _config.Cache?.RefreshMethod ?? CacheRefreshMethod.Polling;
 
@@ -223,7 +226,7 @@ public class GatrixServerSDK : IAsyncDisposable
                 throw new InvalidOperationException("Event listener not initialized. Ensure Redis is configured and refreshMethod is set to 'event'.");
             }
 
-            _eventListener.On(eventType, callback);
+            return _eventListener.On(eventType, callback);
         }
         // For polling refresh, register callback with CacheManager
         else if (refreshMethod == CacheRefreshMethod.Polling)
@@ -233,7 +236,7 @@ public class GatrixServerSDK : IAsyncDisposable
                 throw new InvalidOperationException("Cache manager not initialized.");
             }
 
-            _cacheManager.OnRefresh((type, data) =>
+            var unsubscribe = _cacheManager.OnRefresh((type, data) =>
             {
                 // Convert cache refresh events to SDK events
                 var sdkEvent = new SdkEvent
@@ -244,7 +247,10 @@ public class GatrixServerSDK : IAsyncDisposable
                 };
                 callback(sdkEvent).GetAwaiter().GetResult();
             });
+            return unsubscribe;
         }
+
+        return () => { }; // Return no-op function as fallback
     }
 
     /// <summary>

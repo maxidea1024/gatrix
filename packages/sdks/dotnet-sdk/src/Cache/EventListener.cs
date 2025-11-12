@@ -126,8 +126,9 @@ public class EventListener
 
     /// <summary>
     /// Register event listener
+    /// Returns a function to unregister the listener
     /// </summary>
-    public void On(string eventType, Func<SdkEvent, Task> callback)
+    public Action On(string eventType, Func<SdkEvent, Task> callback)
     {
         if (!_eventListeners.ContainsKey(eventType))
         {
@@ -135,6 +136,9 @@ public class EventListener
         }
 
         _eventListeners[eventType].Add(callback);
+
+        // Return a function to unregister this specific listener
+        return () => Off(eventType, callback);
     }
 
     /// <summary>

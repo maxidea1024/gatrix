@@ -57,17 +57,20 @@ export class ServiceDiscoveryService {
    * - hostname is auto-detected from os.hostname() if omitted
    * - internalAddress is auto-detected from first NIC if omitted
    */
-  async register(input: RegisterServiceInput): Promise<{ instanceId: string; hostname: string; externalAddress: string }> {
+  async register(input: RegisterServiceInput): Promise<{ instanceId: string; hostname: string; internalAddress: string; externalAddress: string }> {
     // Auto-detect hostname and internalAddress if not provided
+    const internalAddress = input.internalAddress || getFirstNicAddress();
+    const hostname = input.hostname || os.hostname();
+
     const registrationInput = {
       ...input,
-      hostname: input.hostname || os.hostname(),
-      internalAddress: input.internalAddress || getFirstNicAddress()
+      hostname,
+      internalAddress
     };
 
     this.logger.debug('Registering service via API', registrationInput);
 
-    const response = await this.apiClient.post<{ instanceId: string; hostname: string; externalAddress: string }>(
+    const response = await this.apiClient.post<{ instanceId: string; hostname: string; internalAddress: string; externalAddress: string }>(
       '/api/v1/server/services/register',
       registrationInput
     );
@@ -76,7 +79,7 @@ export class ServiceDiscoveryService {
       throw new Error(response.error?.message || 'Failed to register service');
     }
 
-    const { instanceId, hostname, externalAddress } = response.data;
+    const { instanceId, externalAddress } = response.data;
     this.instanceId = instanceId;
     this.labels = input.labels;
 
@@ -84,10 +87,11 @@ export class ServiceDiscoveryService {
       instanceId,
       labels: input.labels,
       hostname,
+      internalAddress,
       externalAddress
     });
 
-    return { instanceId, hostname, externalAddress };
+    return { instanceId, hostname, internalAddress, externalAddress };
   }
 
   /**

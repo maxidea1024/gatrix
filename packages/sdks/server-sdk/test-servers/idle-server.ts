@@ -50,7 +50,7 @@ async function main() {
       .flat()
       .find(addr => addr?.family === 'IPv4' && !addr.internal)?.address || 'localhost';
 
-    const { instanceId, externalAddress } = await sdk.registerService({
+    const { instanceId, hostname, internalAddress, externalAddress } = await sdk.registerService({
       labels: {
         service: 'idle',
         group: 'development',
@@ -66,7 +66,7 @@ async function main() {
         startTime: new Date().toISOString(),
       },
     });
-    logger.info('Service registered with ID', { instanceId, externalAddress });
+    logger.info('Service registered with ID', { instanceId, hostname, internalAddress, externalAddress });
 
     // Listen to SDK events
     logger.info('Setting up event listeners...');

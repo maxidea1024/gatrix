@@ -28,10 +28,17 @@ public class CacheManager
 
     /// <summary>
     /// Register callback for cache refresh events
+    /// Returns a function to unregister the callback
     /// </summary>
-    public void OnRefresh(Action<string, object> callback)
+    public Action OnRefresh(Action<string, object> callback)
     {
         _refreshCallbacks.Add(callback);
+
+        // Return a function to unregister this specific callback
+        return () =>
+        {
+            _refreshCallbacks.Remove(callback);
+        };
     }
 
     /// <summary>

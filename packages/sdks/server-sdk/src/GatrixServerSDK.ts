@@ -431,7 +431,7 @@ export class GatrixServerSDK {
   /**
    * Register this service instance via Backend API
    */
-  async registerService(input: RegisterServiceInput): Promise<{ instanceId: string; hostname: string; externalAddress: string }> {
+  async registerService(input: RegisterServiceInput): Promise<{ instanceId: string; hostname: string; internalAddress: string; externalAddress: string }> {
     const result = await this.serviceDiscovery.register(input);
     return result;
   }
@@ -538,6 +538,7 @@ export class GatrixServerSDK {
       this.initialized = false;
 
       this.logger.info('GatrixServerSDK closed successfully');
+      this.logger.info('SDK가 종료되었습니다.');
     } catch (error: any) {
       this.logger.error('Error while closing SDK', { error: error.message });
       throw error;
