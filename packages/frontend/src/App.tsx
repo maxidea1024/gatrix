@@ -83,6 +83,7 @@ import SystemConsolePage from './pages/admin/SystemConsolePage';
 import RealtimeEventsPage from './pages/admin/RealtimeEventsPage';
 import ServerListPage from './pages/admin/ServerListPage';
 import OpenApiPage from './pages/admin/OpenApiPage';
+import GrafanaDashboardPage from './pages/admin/GrafanaDashboardPage';
 import EventLensProjectsPage from './pages/admin/EventLensProjectsPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
@@ -389,6 +390,7 @@ const AppContent: React.FC = () => {
                               <Route path="api-tokens" element={<ApiTokensPage />} />
                               <Route path="console" element={<SystemConsolePage />} />
                               <Route path="server-list" element={<ServerListPage />} />
+                              <Route path="grafana-dashboard" element={<GrafanaDashboardPage />} />
                               <Route path="open-api" element={<OpenApiPage />} />
                               <Route path="event-lens/projects" element={<EventLensProjectsPage />} />
                             </Routes>

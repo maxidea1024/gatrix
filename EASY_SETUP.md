@@ -254,6 +254,29 @@ sudo systemctl start docker
 - Open Docker Desktop application
 - Wait for it to fully start
 
+### Grafana Dashboard iframe Embedding Issue
+
+If you see the error: `Refused to display 'http://localhost:54000/' in a frame because it set 'X-Frame-Options' to 'deny'`
+
+This occurs when Grafana's security settings prevent iframe embedding. To fix this:
+
+1. **Update docker-compose.dev.yml** - Add these environment variables to the Grafana service:
+   ```yaml
+   environment:
+     GF_SECURITY_ALLOW_EMBEDDING: "true"
+     GF_SECURITY_COOKIE_SAMESITE: "Lax"
+   ```
+
+2. **Restart Docker containers:**
+   ```bash
+   docker-compose -f docker-compose.dev.yml down
+   docker-compose -f docker-compose.dev.yml up -d
+   ```
+
+3. **Refresh your browser** and navigate to **Admin Panel > Monitoring > Grafana Dashboard**
+
+The Grafana dashboard should now load successfully within the iframe.
+
 ### Need Help?
 
 Refer to the main [README.md](README.md) for more detailed information and advanced configuration options.
