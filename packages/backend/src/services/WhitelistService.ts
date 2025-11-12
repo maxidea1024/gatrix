@@ -1,6 +1,7 @@
 import { WhitelistModel, Whitelist, CreateWhitelistData, UpdateWhitelistData, WhitelistFilters, WhitelistListResponse } from '../models/AccountWhitelist';
 import { CustomError } from '../middleware/errorHandler';
 import logger from '../config/logger';
+import { pubSubService } from './PubSubService';
 
 export interface BulkCreateEntry {
   nickname: string;
@@ -61,11 +62,15 @@ export class WhitelistService {
       });
 
       // Publish whitelist.updated event for SDK real-time updates
-      const pubSubService = require('./PubSubService').default;
-      await pubSubService.publishSDKEvent({
-        type: 'whitelist.updated',
-        data: { id: whitelist.id, timestamp: Date.now() },
-      });
+      try {
+        await pubSubService.publishSDKEvent({
+          type: 'whitelist.updated',
+          data: { id: whitelist.id, timestamp: Date.now() },
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish whitelist.updated event:', eventError);
+        // Don't throw - event publishing failure shouldn't fail the request
+      }
 
       return whitelist;
     } catch (error) {
@@ -104,11 +109,15 @@ export class WhitelistService {
       });
 
       // Publish whitelist.updated event for SDK real-time updates
-      const pubSubService = require('./PubSubService').default;
-      await pubSubService.publishSDKEvent({
-        type: 'whitelist.updated',
-        data: { id: updated.id, timestamp: Date.now() },
-      });
+      try {
+        await pubSubService.publishSDKEvent({
+          type: 'whitelist.updated',
+          data: { id: updated.id, timestamp: Date.now() },
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish whitelist.updated event:', eventError);
+        // Don't throw - event publishing failure shouldn't fail the request
+      }
 
       return updated;
     } catch (error) {
@@ -139,11 +148,15 @@ export class WhitelistService {
       });
 
       // Publish whitelist.updated event for SDK real-time updates
-      const pubSubService = require('./PubSubService').default;
-      await pubSubService.publishSDKEvent({
-        type: 'whitelist.updated',
-        data: { id, timestamp: Date.now() },
-      });
+      try {
+        await pubSubService.publishSDKEvent({
+          type: 'whitelist.updated',
+          data: { id, timestamp: Date.now() },
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish whitelist.updated event:', eventError);
+        // Don't throw - event publishing failure shouldn't fail the request
+      }
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
@@ -193,14 +206,8 @@ export class WhitelistService {
         createdBy,
       });
 
-      // Publish whitelist.updated event for SDK real-time updates
-      if (createdCount > 0) {
-        const pubSubService = require('./PubSubService').default;
-        await pubSubService.publishSDKEvent({
-          type: 'whitelist.updated',
-          data: { timestamp: Date.now() },
-        });
-      }
+      // Note: Individual whitelist.updated events are published for each created entry
+      // via createWhitelist method, so no need to publish a bulk event here
 
       return createdCount;
     } catch (error) {

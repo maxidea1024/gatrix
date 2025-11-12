@@ -9,6 +9,7 @@ import {
 import { CustomError } from '../middleware/errorHandler';
 import { normalizeIPOrCIDR, isValidIPOrCIDR } from '../utils/ipValidation';
 import logger from '../config/logger';
+import { pubSubService } from './PubSubService';
 
 // CIDR 매칭 함수
 function ipMatchesCIDR(ip: string, cidr: string): boolean {
@@ -130,7 +131,6 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        const pubSubService = require('./PubSubService').default;
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
           data: { id: created.id, timestamp: Date.now() },
@@ -206,7 +206,6 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        const pubSubService = require('./PubSubService').default;
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
           data: { id: updated.id, timestamp: Date.now() },
@@ -247,7 +246,6 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        const pubSubService = require('./PubSubService').default;
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
           data: { id, timestamp: Date.now() },
@@ -289,7 +287,6 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
-        const pubSubService = require('./PubSubService').default;
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
           data: { id: updated.id, timestamp: Date.now() },
@@ -393,19 +390,8 @@ export class IpWhitelistService {
         createdBy,
       });
 
-      // Publish whitelist.updated event for SDK real-time updates (once for all entries)
-      if (createdCount > 0) {
-        try {
-          const pubSubService = require('./PubSubService').default;
-          await pubSubService.publishSDKEvent({
-            type: 'whitelist.updated',
-            data: { timestamp: Date.now() },
-          });
-        } catch (eventError) {
-          logger.warn('Failed to publish whitelist.updated event:', eventError);
-          // Don't throw - event publishing failure shouldn't fail the request
-        }
-      }
+      // Note: Individual whitelist.updated events are published for each created entry
+      // via createIpWhitelist method, so no need to publish a bulk event here
 
       return createdCount;
     } catch (error) {
