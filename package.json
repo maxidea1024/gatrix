@@ -1,8 +1,8 @@
 {
   "name": "gatrix",
   "version": "1.0.0",
-  "description": "Gatrix for UWO - Online Game Platform Management System",
-  "license": "MIT",
+  "description": "Gatrix - Online Game Platform Management System",
+  "license": "Proprietary",
   "private": true,
   "workspaces": [
     "packages/*"
