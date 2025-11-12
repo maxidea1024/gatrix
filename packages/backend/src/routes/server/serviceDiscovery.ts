@@ -50,21 +50,11 @@ export const getWhitelistsHandler = async (req: any, res: any) => {
     const ipWhitelist = activeIpWhitelists.map((ip: any) => ({
       id: ip.id,
       ipAddress: ip.ipAddress,
-      description: ip.description,
-      validFrom: ip.startDate,
-      validUntil: ip.endDate,
-      createdAt: ip.createdAt,
-      updatedAt: ip.updatedAt,
     }));
 
     const accountWhitelist = activeAccountWhitelists.map((account: any) => ({
       id: account.id,
       accountId: account.accountId,
-      description: account.description,
-      validFrom: account.startDate,
-      validUntil: account.endDate,
-      createdAt: account.createdAt,
-      updatedAt: account.updatedAt,
     }));
 
     res.json({

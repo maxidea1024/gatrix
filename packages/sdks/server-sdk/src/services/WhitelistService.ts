@@ -9,22 +9,11 @@ import { Logger } from '../utils/logger';
 export interface IpWhitelistEntry {
   id: number;
   ipAddress: string;
-  cidr?: string;
-  description?: string;
-  validFrom?: string;
-  validUntil?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface AccountWhitelistEntry {
   id: number;
   accountId: string;
-  description?: string;
-  validFrom?: string;
-  validUntil?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface WhitelistData {
@@ -106,19 +95,10 @@ export class WhitelistService {
 
   /**
    * Check if IP is whitelisted (supports CIDR notation)
+   * Note: Backend already filters for enabled and valid entries
    */
   isIpWhitelisted(ip: string): boolean {
-    const now = new Date();
-
     return this.cachedWhitelist.ipWhitelist.some((entry) => {
-      // Check validity period
-      if (entry.validFrom && new Date(entry.validFrom) > now) {
-        return false;
-      }
-      if (entry.validUntil && new Date(entry.validUntil) < now) {
-        return false;
-      }
-
       // Check exact IP match
       if (entry.ipAddress === ip) {
         return true;
@@ -189,19 +169,10 @@ export class WhitelistService {
 
   /**
    * Check if account is whitelisted
+   * Note: Backend already filters for enabled and valid entries
    */
   isAccountWhitelisted(accountId: string): boolean {
-    const now = new Date();
-
     return this.cachedWhitelist.accountWhitelist.some((entry) => {
-      // Check validity period
-      if (entry.validFrom && new Date(entry.validFrom) > now) {
-        return false;
-      }
-      if (entry.validUntil && new Date(entry.validUntil) < now) {
-        return false;
-      }
-
       return entry.accountId === accountId;
     });
   }

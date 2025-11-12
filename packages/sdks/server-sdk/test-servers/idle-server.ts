@@ -7,8 +7,24 @@
 
 import { GatrixServerSDK, getLogger } from '../src/index';
 import * as os from 'os';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const logger = getLogger('IDLE-SERVER');
+
+// Create logs directory if it doesn't exist
+const logsDir = path.join(__dirname, '../../..', 'logs');
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir, { recursive: true });
+}
+
+// Helper function to write full JSON to file
+function writeFullCachedData(data: any): void {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const filename = path.join(logsDir, `cached-data-${timestamp}.json`);
+  fs.writeFileSync(filename, JSON.stringify(data, null, 2), 'utf-8');
+  logger.info(`Full cached data written to: ${filename}`);
+}
 
 async function main() {
   logger.info('Starting Idle Server...');
@@ -43,6 +59,17 @@ async function main() {
     logger.info('Initializing SDK...');
     await sdk.initialize();
     logger.info('SDK initialized successfully');
+
+    // Write initial cached data to file
+    const surveysData = sdk.getCachedSurveys();
+    const initialCachedData = {
+      gameWorlds: sdk.getCachedGameWorlds(),
+      popupNotices: sdk.getCachedPopupNotices(),
+      surveys: surveysData,
+      whitelists: sdk.whitelist.getCached(),
+      timestamp: new Date().toISOString(),
+    };
+    writeFullCachedData(initialCachedData);
 
     // Register service
     logger.info('Registering service...');
@@ -136,6 +163,11 @@ async function main() {
       printCachedData();
     });
 
+    sdk.on('whitelist.updated', (event) => {
+      logger.info('WHITELIST UPDATED', event.data);
+      printCachedData();
+    });
+
     // Helper function to print cached data
     function printCachedData() {
       const surveysData = sdk.getCachedSurveys();
@@ -143,10 +175,12 @@ async function main() {
         gameWorlds: sdk.getCachedGameWorlds(),
         popupNotices: sdk.getCachedPopupNotices(),
         surveys: surveysData,
+        whitelists: sdk.whitelist.getCached(),
         timestamp: new Date().toISOString(),
       };
 
-      logger.info('CACHED DATA', cachedData);
+      logger.info('CACHED DATA', JSON.stringify(cachedData, null, 2));
+      writeFullCachedData(cachedData);
     }
 
     logger.info('Idle server is running and listening to events...');

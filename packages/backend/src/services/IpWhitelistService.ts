@@ -129,11 +129,16 @@ export class IpWhitelistService {
       });
 
       // Publish whitelist.updated event for SDK real-time updates
-      const pubSubService = require('./PubSubService').default;
-      await pubSubService.publishSDKEvent({
-        type: 'whitelist.updated',
-        data: { id: created.id, timestamp: Date.now() },
-      });
+      try {
+        const pubSubService = require('./PubSubService').default;
+        await pubSubService.publishSDKEvent({
+          type: 'whitelist.updated',
+          data: { id: created.id, timestamp: Date.now() },
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish whitelist.updated event:', eventError);
+        // Don't throw - event publishing failure shouldn't fail the request
+      }
 
       return created;
     } catch (error) {
@@ -200,11 +205,16 @@ export class IpWhitelistService {
       });
 
       // Publish whitelist.updated event for SDK real-time updates
-      const pubSubService = require('./PubSubService').default;
-      await pubSubService.publishSDKEvent({
-        type: 'whitelist.updated',
-        data: { id: updated.id, timestamp: Date.now() },
-      });
+      try {
+        const pubSubService = require('./PubSubService').default;
+        await pubSubService.publishSDKEvent({
+          type: 'whitelist.updated',
+          data: { id: updated.id, timestamp: Date.now() },
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish whitelist.updated event:', eventError);
+        // Don't throw - event publishing failure shouldn't fail the request
+      }
 
       return updated;
     } catch (error) {
@@ -236,11 +246,16 @@ export class IpWhitelistService {
       });
 
       // Publish whitelist.updated event for SDK real-time updates
-      const pubSubService = require('./PubSubService').default;
-      await pubSubService.publishSDKEvent({
-        type: 'whitelist.updated',
-        data: { id, timestamp: Date.now() },
-      });
+      try {
+        const pubSubService = require('./PubSubService').default;
+        await pubSubService.publishSDKEvent({
+          type: 'whitelist.updated',
+          data: { id, timestamp: Date.now() },
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish whitelist.updated event:', eventError);
+        // Don't throw - event publishing failure shouldn't fail the request
+      }
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
@@ -273,11 +288,16 @@ export class IpWhitelistService {
       });
 
       // Publish whitelist.updated event for SDK real-time updates
-      const pubSubService = require('./PubSubService').default;
-      await pubSubService.publishSDKEvent({
-        type: 'whitelist.updated',
-        data: { id: updated.id, timestamp: Date.now() },
-      });
+      try {
+        const pubSubService = require('./PubSubService').default;
+        await pubSubService.publishSDKEvent({
+          type: 'whitelist.updated',
+          data: { id: updated.id, timestamp: Date.now() },
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish whitelist.updated event:', eventError);
+        // Don't throw - event publishing failure shouldn't fail the request
+      }
 
       return updated;
     } catch (error) {
@@ -375,11 +395,16 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates (once for all entries)
       if (createdCount > 0) {
-        const pubSubService = require('./PubSubService').default;
-        await pubSubService.publishSDKEvent({
-          type: 'whitelist.updated',
-          data: { timestamp: Date.now() },
-        });
+        try {
+          const pubSubService = require('./PubSubService').default;
+          await pubSubService.publishSDKEvent({
+            type: 'whitelist.updated',
+            data: { timestamp: Date.now() },
+          });
+        } catch (eventError) {
+          logger.warn('Failed to publish whitelist.updated event:', eventError);
+          // Don't throw - event publishing failure shouldn't fail the request
+        }
       }
 
       return createdCount;
