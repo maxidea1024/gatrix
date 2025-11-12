@@ -249,15 +249,30 @@ Refer to the main [README.md](README.md) for more detailed information and advan
 
 If you need to regenerate the `.env` file:
 
-**For Linux/Mac:**
+**For Development (Linux/Mac):**
 ```bash
 ./setup-env.sh localhost development --force
 ```
 
-**For Windows (PowerShell):**
+**For Development (Windows PowerShell):**
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -Force
 ```
+
+**For Production (Linux/Mac):**
+```bash
+./setup-env.sh example.com production --force
+```
+
+**For Production (Windows PowerShell):**
+```powershell
+.\setup-env.ps1 -HostAddress example.com -Environment production -Force
+```
+
+This will:
+- Backup the existing `.env` file (`.env.backup.TIMESTAMP`)
+- Generate new encryption keys
+- Regenerate the configuration file
 
 ---
 
