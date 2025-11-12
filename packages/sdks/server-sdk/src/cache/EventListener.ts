@@ -375,6 +375,28 @@ export class EventListener {
   }
 
   /**
+   * Publish an event to all SDK instances via Redis Pub/Sub
+   * Used for custom events from game servers
+   */
+  async publishEvent(event: StandardEvent | CustomEvent): Promise<void> {
+    if (!this.subscriber) {
+      throw new Error('Event listener not initialized');
+    }
+
+    try {
+      const message = JSON.stringify(event);
+      await this.subscriber.publish(this.CHANNEL_NAME, message);
+      this.logger.debug('Event published', { type: event.type });
+    } catch (error: any) {
+      this.logger.error('Failed to publish event', {
+        type: event.type,
+        error: error.message,
+      });
+      throw error;
+    }
+  }
+
+  /**
    * Close event listener and cleanup
    */
   async close(): Promise<void> {

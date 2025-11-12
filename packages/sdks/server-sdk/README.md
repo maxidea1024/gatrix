@@ -149,12 +149,12 @@ const result = await sdk.redeemCoupon({
   code: 'COUPON123',
   userId: 'user-123',
   userName: 'John Doe',
-  characterId: 'char-456',
+  characterId: 'char-456', // optional
   worldId: 'world-1', // optional
   platform: 'pc', // optional
   channel: 'steam', // optional
   subChannel: 'global', // optional
-  requestId: 'unique-request-id', // optional, for idempotency
+  // Note: requestId is automatically generated internally for idempotency
 });
 
 console.log('Reward:', result.reward);
@@ -392,17 +392,43 @@ sdk.on('maintenance.started', async (event) => {
 });
 ```
 
+#### Publish Custom Events
+
+You can publish custom events from your game server to all SDK instances via Redis Pub/Sub:
+
+```typescript
+// Publish a custom player level up event
+await sdk.publishCustomEvent('player.levelup', {
+  playerId: 'player-123',
+  newLevel: 50,
+  characterName: 'Hero',
+  timestamp: Date.now(), // optional, auto-generated if not provided
+});
+
+// Publish a custom achievement event
+await sdk.publishCustomEvent('achievement.unlocked', {
+  playerId: 'player-123',
+  achievementId: 'ach-001',
+  achievementName: 'First Victory',
+});
+
+// Note: Event type is automatically prefixed with 'custom:' if not already
+// So 'player.levelup' becomes 'custom:player.levelup'
+```
+
 #### Listen to Custom Events
 
-You can also listen to custom events published by your application:
+You can listen to custom events published by your application:
 
 ```typescript
 sdk.on('custom:player.levelup', async (event) => {
   console.log('Player leveled up:', event.data);
+  // event.data contains: { playerId, newLevel, characterName, timestamp }
 });
 
 sdk.on('custom:achievement.unlocked', async (event) => {
   console.log('Achievement unlocked:', event.data);
+  // event.data contains: { playerId, achievementId, achievementName, timestamp }
 });
 ```
 

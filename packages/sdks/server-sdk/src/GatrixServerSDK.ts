@@ -545,6 +545,59 @@ export class GatrixServerSDK {
   }
 
   // ============================================================================
+  // Event Publishing Methods
+  // ============================================================================
+
+  /**
+   * Publish a custom event to all SDK instances via Redis Pub/Sub
+   * Custom events are prefixed with 'custom:' to distinguish from standard events
+   *
+   * @param eventType - Event type (will be prefixed with 'custom:' if not already)
+   * @param data - Event data (any JSON-serializable object)
+   *
+   * @example
+   * ```typescript
+   * // Publish a custom player level up event
+   * await sdk.publishCustomEvent('player.levelup', {
+   *   playerId: 'player-123',
+   *   newLevel: 50,
+   *   timestamp: Date.now(),
+   * });
+   *
+   * // Listen to the custom event
+   * sdk.on('custom:player.levelup', (event) => {
+   *   console.log('Player leveled up:', event.data);
+   * });
+   * ```
+   */
+  async publishCustomEvent(eventType: string, data: Record<string, any>): Promise<void> {
+    if (!this.eventListener) {
+      this.logger.warn('Event listener not initialized, custom event not published');
+      return;
+    }
+
+    // Ensure event type is prefixed with 'custom:'
+    const prefixedEventType = eventType.startsWith('custom:') ? eventType : `custom:${eventType}`;
+
+    try {
+      const timestamp = data.timestamp || Date.now();
+      await this.eventListener.publishEvent({
+        type: prefixedEventType,
+        data,
+        timestamp,
+      });
+
+      this.logger.debug('Custom event published', { type: prefixedEventType });
+    } catch (error: any) {
+      this.logger.error('Failed to publish custom event', {
+        type: prefixedEventType,
+        error: error.message,
+      });
+      throw error;
+    }
+  }
+
+  // ============================================================================
   // Cleanup Methods
   // ============================================================================
 
