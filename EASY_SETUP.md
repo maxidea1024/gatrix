@@ -7,7 +7,7 @@ Get Gatrix up and running in just a few minutes!
 Before you start, make sure you have the following installed:
 
 - **Docker** and **Docker Compose**
-- **Node.js** (v16 or higher)
+- **Node.js** (v22 LTS or higher)
 - **Yarn** (v1.22 or higher)
 
 ### Installing Docker

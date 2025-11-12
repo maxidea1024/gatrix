@@ -38,8 +38,8 @@ command_exists() {
 check_node_version() {
     if command_exists node; then
         NODE_VERSION=$(node --version | cut -d'v' -f2)
-        REQUIRED_VERSION="18.0.0"
-        
+        REQUIRED_VERSION="22.0.0"
+
         if [ "$(printf '%s\n' "$REQUIRED_VERSION" "$NODE_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
             print_success "Node.js version $NODE_VERSION is compatible"
             return 0
@@ -94,7 +94,7 @@ PREREQUISITES_OK=true
 
 if ! check_node_version; then
     PREREQUISITES_OK=false
-    print_warning "Please install Node.js 18 or later: https://nodejs.org/"
+    print_warning "Please install Node.js 22 or later: https://nodejs.org/"
 fi
 
 if ! check_yarn; then

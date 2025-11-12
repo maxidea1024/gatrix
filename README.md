@@ -206,7 +206,7 @@ gatrix/
 
 ### Prerequisites
 
-- **Node.js 20+** (Required for latest dependencies)
+- **Node.js 22 LTS** (Required for latest dependencies)
 - **MySQL 8.0+**
 - **Redis 7.0+**
 - **ClickHouse 24+** (for Event Lens analytics)

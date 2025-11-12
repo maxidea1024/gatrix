@@ -27,7 +27,7 @@ Gatrix is a modern, full-stack platform that provides robust user management, au
 
 Before you begin, ensure you have the following installed:
 
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above
+- [Node.js](https://nodejs.org/en/download/) version 22 LTS or above
 - [MySQL](https://dev.mysql.com/downloads/) version 8.0 or above
 - [Redis](https://redis.io/download) version 6.0 or above
 
