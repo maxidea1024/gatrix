@@ -361,12 +361,14 @@ This provides real-time monitoring of:
 
 When running with `yarn docker:dev`, additional tools are available:
 
-- **Adminer** (Database Management): http://localhost:58080
-- **Redis Commander** (Redis Management): http://localhost:58081
 - **Frontend**: http://localhost:53000
 - **Backend API**: http://localhost:55000
 - **Chat Server**: http://localhost:53001
 - **Event Lens**: http://localhost:53002
+- **Adminer** (Database Management): http://localhost:58080
+- **Redis Commander** (Redis Management): http://localhost:58081
+- **Prometheus** (Metrics Collection): http://localhost:59091
+- **Grafana** (Monitoring Dashboard): http://localhost:54000
 
 (All ports use internal port + 50000 offset)
 
@@ -675,9 +677,11 @@ The Docker setup includes:
 | Chat Server | 3001 | 53001 | WebSocket Server | Both |
 | Event Lens | 3002 | 53002 | Analytics API | Both |
 | ClickHouse | 8123, 9000 | 58123, 59000 | Analytics DB | Both |
+| Prometheus | 9090 | 59091 | Metrics Collection | Both |
+| Grafana | 3000 | 54000 | Monitoring Dashboard | Both |
 | Adminer | 8080 | 58080 | DB Management | Dev only |
 | Redis Commander | 8081 | 58081 | Redis Management | Dev only |
-| Metrics (Chat) | 9090 | 59090 | Prometheus Metrics | Both |
+| Chat Metrics | 9090 | 59090 | Chat Server Metrics | Both |
 | Debug (Backend) | 9229 | 59229 | Node.js Debugger | Dev only |
 
 **Notes:**
