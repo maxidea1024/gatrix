@@ -555,12 +555,12 @@ const whitelists = sdk.getCachedWhitelists();
 console.log('IP Whitelist:', whitelists.ipWhitelist);
 console.log('Account Whitelist:', whitelists.accountWhitelist);
 
-// Check if IP is whitelisted (uses cached data)
-const isIpAllowed = whitelists.ipWhitelist.some(entry => entry.ipAddress === '192.168.1.100');
+// Check if IP is whitelisted (uses cached data with CIDR support)
+const isIpAllowed = sdk.whitelist.isIpWhitelisted('192.168.1.100');
 console.log('IP allowed:', isIpAllowed);
 
 // Check if account is whitelisted (uses cached data)
-const isAccountAllowed = whitelists.accountWhitelist.some(entry => entry.accountId === 'account123');
+const isAccountAllowed = sdk.whitelist.isAccountWhitelisted('account123');
 console.log('Account allowed:', isAccountAllowed);
 ```
 
@@ -586,11 +586,13 @@ sdk.on('whitelist.updated', async (event) => {
 ```
 
 **Whitelist Features:**
-- IP whitelist supports exact IP matching (CIDR support coming soon)
+- IP whitelist supports both exact IP matching and CIDR notation (e.g., `192.168.1.0/24`)
+- Automatic CIDR range validation for IP whitelisting
 - Time-based validity with `validFrom` and `validUntil` dates
 - Automatic filtering of expired entries
 - Real-time updates via Redis PubSub events
 - Automatic cache refresh on `whitelist.updated` events
+- Efficient cached lookups without API calls
 
 ## Logger Configuration
 
@@ -788,12 +790,17 @@ const sdk = new GatrixServerSDK({
 import { GatrixSDKError, ErrorCode, isGatrixSDKError } from '@gatrix/server-sdk';
 
 try {
-  await sdk.redeemCoupon({
-    code: 'INVALID',
+  const result = await sdk.redeemCoupon({
+    code: 'INVALID_COUPON_CODE',
     userId: 'user-123',
-    userName: 'John',
+    userName: 'John Doe',
     characterId: 'char-456',
+    worldId: 'world-1',
+    platform: 'pc',
+    channel: 'steam',
+    subChannel: 'global',
   });
+  console.log('Coupon redeemed successfully:', result);
 } catch (error) {
   if (isGatrixSDKError(error)) {
     console.error('SDK Error:', error.code, error.message);
