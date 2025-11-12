@@ -2207,6 +2207,7 @@
     "jobs": "작업 관리",
     "queueMonitor": "큐 모니터",
     "console": "시스템 콘솔",
+    "monitoring": "모니터링",
     "grafana": "Grafana 대시보드",
 
     "realtimeEvents": "실시간 이벤트",

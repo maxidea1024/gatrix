@@ -84,8 +84,11 @@ export const adminPanelMenuItems: MenuItem[] = [
   { text: 'sidebar.serverManagement', icon: <DnsIcon />, adminOnly: true, children: [
     { text: 'sidebar.serverList', icon: <ServerIcon />, path: '/admin/server-list', adminOnly: true },
   ] },
-  { text: 'sidebar.console', icon: <TerminalIcon />, path: '/admin/console', adminOnly: true },
+  { text: 'sidebar.monitoring', icon: <MonitorIcon />, adminOnly: true, children: [
+    { text: 'sidebar.grafana', icon: <MonitorIcon />, path: '', adminOnly: true },
+  ] },
   { text: 'sidebar.openApi', icon: <ApiIcon />, path: '/admin/open-api', adminOnly: true },
+  { text: 'sidebar.console', icon: <TerminalIcon />, path: '/admin/console', adminOnly: true },
 ];
 
 // 게임관리 메뉴
@@ -135,16 +138,28 @@ export const getMenuCategories = (isAdmin: boolean): MenuCategory[] => {
   const grafanaUrl: string = (import.meta.env.VITE_GRAFANA_URL as string) || `${window.location.protocol}//${window.location.hostname}:54000`;
 
   if (isAdmin) {
+    // Update Grafana URL in adminPanelMenuItems
+    const adminPanelItemsWithGrafana = adminPanelMenuItems.map(item => {
+      if (item.text === 'sidebar.monitoring' && item.children) {
+        return {
+          ...item,
+          children: item.children.map(child =>
+            child.text === 'sidebar.grafana'
+              ? { ...child, path: grafanaUrl, divider: true }
+              : child
+          ),
+        };
+      }
+      return item;
+    });
+
     categories.push(
       {
         id: 'admin-panel',
         text: 'sidebar.adminPanel',
         icon: <AdminPanelSettings />,
         adminOnly: true,
-        children: [
-          ...adminPanelMenuItems,
-          { text: 'sidebar.grafana', icon: <MonitorIcon />, path: grafanaUrl, adminOnly: true, divider: true },
-        ],
+        children: adminPanelItemsWithGrafana,
       },
       {
         id: 'game-management',
