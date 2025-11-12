@@ -17,6 +17,14 @@ import { pubSubService } from '../../services/PubSubService';
 const router = express.Router();
 
 /**
+ * Get whitelists (IP and Account)
+ * GET /api/v1/server/services/whitelists
+ *
+ * Returns enabled whitelists for server-side validation
+ */
+router.get('/whitelists', serverSDKAuth, getWhitelistsHandler);
+
+/**
  * Register service instance (full snapshot)
  * POST /api/v1/server/services/register
  *
@@ -422,13 +430,16 @@ router.get('/maintenance/:serviceType/message', serverSDKAuth, async (req: any, 
   }
 });
 
+export default router;
+
 /**
  * Get whitelists (IP and Account)
  * GET /api/v1/server/whitelists
  *
  * Returns enabled whitelists for server-side validation
+ * Exported as a separate handler for use in both /services/whitelists and /whitelists paths
  */
-router.get('/whitelists', serverSDKAuth, async (req: any, res: any) => {
+export const getWhitelistsHandler = async (req: any, res: any) => {
   try {
     // Get all enabled IP whitelists
     const ipWhitelistsResult = await IpWhitelistModel.findAll(1, 10000, { isEnabled: true });
@@ -451,21 +462,32 @@ router.get('/whitelists', serverSDKAuth, async (req: any, res: any) => {
       return true;
     });
 
-    // Extract IP addresses and account IDs
-    const ipAddresses = activeIpWhitelists.map((ip: any) => ip.ipAddress);
-    const accountIds = activeAccountWhitelists.map((account: any) => account.accountId);
+    // Format response to match SDK expectations
+    const ipWhitelist = activeIpWhitelists.map((ip: any) => ({
+      id: ip.id,
+      ipAddress: ip.ipAddress,
+      description: ip.description,
+      validFrom: ip.startDate,
+      validUntil: ip.endDate,
+      createdAt: ip.createdAt,
+      updatedAt: ip.updatedAt,
+    }));
+
+    const accountWhitelist = activeAccountWhitelists.map((account: any) => ({
+      id: account.id,
+      accountId: account.accountId,
+      description: account.description,
+      validFrom: account.startDate,
+      validUntil: account.endDate,
+      createdAt: account.createdAt,
+      updatedAt: account.updatedAt,
+    }));
 
     res.json({
       success: true,
       data: {
-        ipWhitelist: {
-          enabled: ipAddresses.length > 0,
-          ips: ipAddresses,
-        },
-        accountWhitelist: {
-          enabled: accountIds.length > 0,
-          accountIds: accountIds,
-        },
+        ipWhitelist,
+        accountWhitelist,
       },
     });
   } catch (error: any) {
@@ -475,7 +497,5 @@ router.get('/whitelists', serverSDKAuth, async (req: any, res: any) => {
       error: error.message || 'Failed to get whitelists',
     });
   }
-});
-
-export default router;
+};
 
