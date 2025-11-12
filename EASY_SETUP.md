@@ -274,6 +274,106 @@ This will:
 - Generate new encryption keys
 - Regenerate the configuration file
 
+## Complete Reset (Start from Scratch)
+
+If you need to completely reset the application and start fresh:
+
+### Step 1: Stop and Remove All Containers
+
+**For Development:**
+```bash
+docker-compose -f docker-compose.dev.yml down -v
+```
+
+**For Production:**
+```bash
+docker-compose -f docker-compose.yml down -v
+```
+
+The `-v` flag removes all volumes (databases, caches, etc.).
+
+### Step 2: Remove Docker Images (Optional)
+
+If you want to rebuild everything from scratch:
+
+**For Development:**
+```bash
+docker-compose -f docker-compose.dev.yml down -v --rmi all
+```
+
+**For Production:**
+```bash
+docker-compose -f docker-compose.yml down -v --rmi all
+```
+
+### Step 3: Delete Configuration File
+
+```bash
+rm .env
+```
+
+Or backup it first:
+```bash
+mv .env .env.old
+```
+
+### Step 4: Start Fresh
+
+Follow the **Quick Start** section from the beginning:
+
+1. Generate new configuration:
+   ```bash
+   # Development
+   ./setup-env.sh localhost development
+
+   # Production
+   ./setup-env.sh example.com production
+   ```
+
+2. Build Docker environment:
+   ```bash
+   # Development
+   docker-compose -f docker-compose.dev.yml build
+
+   # Production
+   docker-compose -f docker-compose.yml build
+   ```
+
+3. Start services:
+   ```bash
+   # Development
+   docker-compose -f docker-compose.dev.yml up -d
+
+   # Production
+   docker-compose -f docker-compose.yml up -d
+   ```
+
+4. Verify installation:
+   ```bash
+   # Development
+   docker-compose -f docker-compose.dev.yml ps
+
+   # Production
+   docker-compose -f docker-compose.yml ps
+   ```
+
+### What Gets Reset
+
+- ✅ All Docker containers
+- ✅ All volumes (databases, Redis cache)
+- ✅ All Docker images (if using `--rmi all`)
+- ✅ Configuration file (`.env`)
+
+### What Doesn't Get Reset
+
+- ❌ Source code files
+- ❌ Backup files (`.env.backup.*`)
+- ❌ Local git history
+
+### Warning
+
+**This is a destructive operation!** All data in the databases and caches will be permanently deleted. Make sure to backup any important data before proceeding.
+
 ---
 
 **Happy coding! 🚀**
