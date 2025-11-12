@@ -45,7 +45,7 @@ export class BaseTestServer {
       cache: {
         enabled: config.enableCache !== false,
         ttl: 300,
-        autoRefresh: config.enableEvents !== false, // Only auto-refresh if events are enabled
+        refreshMethod: config.enableEvents ? 'event' : 'polling', // 'event' if events enabled, 'polling' otherwise
       },
 
       // Logger configuration

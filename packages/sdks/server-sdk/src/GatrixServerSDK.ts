@@ -138,8 +138,9 @@ export class GatrixServerSDK {
 
       await this.cacheManager.initialize();
 
-      // Initialize event listener if Redis config is provided
-      if (this.config.redis && cacheConfig.autoRefresh !== false) {
+      // Initialize event listener only if using event-based refresh method
+      const refreshMethod = cacheConfig.refreshMethod ?? 'polling';
+      if (this.config.redis && refreshMethod === 'event') {
         this.eventListener = new EventListener(this.config.redis, this.cacheManager, this.logger);
         await this.eventListener.initialize();
       }

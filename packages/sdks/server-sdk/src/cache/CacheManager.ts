@@ -30,7 +30,7 @@ export class CacheManager {
     this.config = {
       enabled: config.enabled !== false,
       ttl: config.ttl || 300,
-      autoRefresh: config.autoRefresh !== false,
+      refreshMethod: config.refreshMethod ?? 'polling', // Default: polling
     };
     this.gameWorldService = gameWorldService;
     this.popupNoticeService = popupNoticeService;
@@ -64,8 +64,8 @@ export class CacheManager {
 
       this.logger.info('SDK cache initialized');
 
-      // Setup auto-refresh if enabled
-      if (this.config.autoRefresh && this.config.ttl) {
+      // Setup auto-refresh if using polling method
+      if (this.config.refreshMethod === 'polling' && this.config.ttl) {
         this.startAutoRefresh();
       }
     } catch (error: any) {

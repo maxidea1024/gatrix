@@ -12,7 +12,7 @@ export interface RedisConfig {
 export interface CacheConfig {
   enabled?: boolean; // Enable caching (default: true)
   ttl?: number; // Cache TTL in seconds (default: 300)
-  autoRefresh?: boolean; // Auto refresh cache on events (default: true)
+  refreshMethod?: 'polling' | 'event' | 'manual'; // Cache refresh method. 'polling': periodic refresh, 'event': real-time via Redis PubSub, 'manual': manual refresh only (default: 'polling')
 }
 
 export interface LoggerConfig {

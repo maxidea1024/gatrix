@@ -26,7 +26,7 @@ async function main() {
     cache: {
       enabled: true,
       ttl: 300,
-      autoRefresh: true,
+      refreshMethod: 'event', // Use event-based refresh (requires Redis)
     },
 
     // Logger configuration

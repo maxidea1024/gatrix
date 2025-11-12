@@ -112,7 +112,7 @@ const sdk = new GatrixServerSDK({
   cache: {
     enabled: true,
     ttl: 300, // seconds
-    autoRefresh: true,
+    refreshMethod: 'polling', // 'polling' | 'event' | 'manual'. Default: 'polling'
   },
 
   // Optional - Logger
@@ -266,6 +266,70 @@ console.log('Surveys for world-1:', surveys);
 
 ### Cache Management
 
+#### Cache Refresh Methods
+
+The SDK supports three cache refresh methods:
+
+**1. Polling (Default)**
+- Periodically refreshes cache at fixed intervals
+- No Redis required
+- Suitable for applications that don't need real-time updates
+
+```typescript
+const sdk = new GatrixServerSDK({
+  gatrixUrl: 'https://api.gatrix.com',
+  apiToken: 'your-token',
+  applicationName: 'your-app',
+  cache: {
+    enabled: true,
+    ttl: 300, // Refresh every 300 seconds
+    refreshMethod: 'polling', // Default method
+  },
+  // Redis NOT required for polling
+});
+```
+
+**2. Event-Based (Real-time)**
+- Refreshes cache immediately when backend sends events
+- Requires Redis for PubSub
+- Suitable for applications that need real-time updates
+
+```typescript
+const sdk = new GatrixServerSDK({
+  gatrixUrl: 'https://api.gatrix.com',
+  apiToken: 'your-token',
+  applicationName: 'your-app',
+  redis: {
+    host: 'localhost',
+    port: 6379,
+  },
+  cache: {
+    enabled: true,
+    ttl: 300, // Fallback polling interval if events fail
+    refreshMethod: 'event', // Event-based refresh
+  },
+});
+```
+
+**3. Manual**
+- No automatic cache refresh
+- Manual refresh only via `sdk.refreshCache()`
+
+```typescript
+const sdk = new GatrixServerSDK({
+  gatrixUrl: 'https://api.gatrix.com',
+  apiToken: 'your-token',
+  applicationName: 'your-app',
+  cache: {
+    enabled: true,
+    refreshMethod: 'manual', // Manual refresh only
+  },
+});
+
+// Manual refresh when needed
+await sdk.refreshCache();
+```
+
 #### Refresh All Caches
 
 ```typescript
@@ -281,6 +345,10 @@ await sdk.refreshSurveysCache();
 ```
 
 ### Event Handling
+
+⚠️ **Note:** Event handling requires:
+- Redis configured in SDK
+- `autoRefresh: 'event'` in cache configuration
 
 #### Listen to Standard Events
 
