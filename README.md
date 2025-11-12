@@ -211,6 +211,7 @@ gatrix/
 - **Redis 7.0+**
 - **ClickHouse 24+** (for Event Lens analytics)
 - **Yarn 1.22+** (Package manager)
+- **Docker & Docker Compose** (for containerized development)
 
 ### Installation
 
@@ -218,23 +219,31 @@ gatrix/
 
 2. **Auto-generate `.env` file** (Recommended):
 
-   **Windows (PowerShell):**
+   **Basic Setup (Development):**
    ```powershell
+   # Windows
    .\setup-env.ps1 -HostAddress localhost -Environment development
-   ```
 
-   **Linux/Mac (Bash):**
-   ```bash
+   # Linux/Mac
    ./setup-env.sh localhost development
    ```
 
-   **With custom language (optional, default: ko):**
+   **With Custom Language (optional, default: ko):**
    ```powershell
-   # Windows
+   # Windows - English
    .\setup-env.ps1 -HostAddress localhost -Environment development -DefaultLanguage en
 
+   # Linux/Mac - Chinese
+   ./setup-env.sh localhost development zh
+   ```
+
+   **With Custom Admin Password (optional, default: admin123):**
+   ```powershell
+   # Windows
+   .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "MySecurePassword123"
+
    # Linux/Mac
-   ./setup-env.sh localhost development en
+   ./setup-env.sh localhost development ko --admin-password "MySecurePassword123"
    ```
 
    **For Production:**
@@ -246,7 +255,7 @@ gatrix/
    ./setup-env.sh example.com production
    ```
 
-   **Force overwrite existing .env file:**
+   **Force Overwrite Existing .env File:**
    ```powershell
    # Windows
    .\setup-env.ps1 -HostAddress localhost -Environment development -Force
@@ -255,12 +264,22 @@ gatrix/
    ./setup-env.sh localhost development --force
    ```
 
+   **Complete Example with All Options:**
+   ```powershell
+   # Windows
+   .\setup-env.ps1 -HostAddress example.com -Environment production -DefaultLanguage en -AdminPassword "SecurePass123" -Force
+
+   # Linux/Mac
+   ./setup-env.sh example.com production en --admin-password "SecurePass123" --force
+   ```
+
    The script will:
    - Check if `.env` file already exists (will not overwrite without -Force flag)
    - Generate secure JWT_SECRET (32 chars), SESSION_SECRET (20 chars), and JWT_REFRESH_SECRET (32 chars)
    - Configure database and Redis hosts for Docker environment
    - Set appropriate CORS and logging settings based on environment
-   - Set default language (default: Korean)
+   - Set default language (default: Korean - ko, en, zh supported)
+   - Set admin password (default: admin123)
    - Backup existing `.env` file if present (when using -Force flag)
 
 3. **Manual setup** (Alternative):
@@ -534,19 +553,6 @@ yarn reset
 yarn db:reset
 ```
 
-### Translation Management
-```bash
-# Check translation completeness
-yarn check-translations
-
-# Various translation utility scripts
-node scripts/add-missing-keys.js
-node scripts/complete-ko-translations.js
-node scripts/complete-zh-translations.js
-node scripts/fix-translations.js
-node scripts/rebuild-locales.js
-```
-
 ### Docker Operations
 ```bash
 # Production Docker setup
@@ -655,19 +661,27 @@ The Docker setup includes:
 
 ### Service Ports
 
-| Service | Port | Description | Environment |
-|---------|------|-------------|-------------|
-| MySQL | 3306 | Database | Both |
-| Redis | 6379 | Cache & Queue | Both |
-| Backend | 5000 | API Server | Both |
-| Frontend | 3000 (dev) / 80 (prod) | Web UI | Both |
-| Chat Server | 3001 | WebSocket Server | Both |
-| Event Lens | 3002 | Analytics API | Both |
-| ClickHouse | 8123, 9000 | Analytics DB | Both |
-| Adminer | 8080 | DB Management | Dev only |
-| Redis Commander | 8081 | Redis Management | Dev only |
-| Metrics (Chat) | 9090 | Prometheus Metrics | Both |
-| Debug (Backend) | 9229 | Node.js Debugger | Dev only |
+**Port Offset Strategy**: To avoid port conflicts, the application uses a +50000 offset for external ports in development environments.
+
+| Service | Internal Port | External Port (Dev) | External Port (Prod) | Description | Environment |
+|---------|---------------|-------------------|-------------------|-------------|-------------|
+| MySQL | 3306 | 53306 | 3306 | Database | Both |
+| Redis | 6379 | 56379 | 6379 | Cache & Queue | Both |
+| Backend | 5000 | 55000 | 5000 | API Server | Both |
+| Frontend | 3000 | 53000 | 80 | Web UI | Both |
+| Chat Server | 3001 | 53001 | 3001 | WebSocket Server | Both |
+| Event Lens | 3002 | 53002 | 3002 | Analytics API | Both |
+| ClickHouse | 8123, 9000 | 58123, 59000 | 8123, 9000 | Analytics DB | Both |
+| Adminer | 8080 | 58080 | N/A | DB Management | Dev only |
+| Redis Commander | 8081 | 58081 | N/A | Redis Management | Dev only |
+| Metrics (Chat) | 9090 | 59090 | 9090 | Prometheus Metrics | Both |
+| Debug (Backend) | 9229 | 59229 | N/A | Node.js Debugger | Dev only |
+
+**Notes:**
+- **Internal Port**: Port used inside Docker containers (always the same)
+- **External Port (Dev)**: Port exposed on your local machine when running `docker-compose.dev.yml`
+- **External Port (Prod)**: Port exposed when running `docker-compose.yml` (production)
+- **Example**: To access the frontend in development, use `http://localhost:53000` (internal 3000 + 50000 offset)
 
 ## Documentation
 
@@ -729,19 +743,8 @@ http://localhost:3000
   - Maintenance Mode
   - Tagging System
 
-#### Writing Translations
-
-To add or update translations:
-
-```bash
-# Generate translation files
-npm run docs:write-translations
-
-# Edit translation files in:
-# docs/i18n/ko/docusaurus-plugin-content-docs/current/
-# docs/i18n/zh-Hans/docusaurus-plugin-content-docs/current/
-```
-
 ## License
 
-MIT License
+Gatrix is proprietary software owned and maintained by the Gatrix Team. All rights reserved.
+
+For licensing inquiries, please contact the Gatrix Team.

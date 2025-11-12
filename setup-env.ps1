@@ -15,6 +15,9 @@
 .PARAMETER DefaultLanguage
     Default language (ko, en, zh, etc., default: ko)
 
+.PARAMETER AdminPassword
+    Admin password (optional, default: admin123)
+
 .PARAMETER Force
     Force overwrite existing .env file
 
@@ -22,6 +25,7 @@
     .\setup-env.ps1 -HostAddress localhost -Environment development
     .\setup-env.ps1 -HostAddress 192.168.1.100 -Environment production -Force
     .\setup-env.ps1 -HostAddress example.com -Environment production -DefaultLanguage en
+    .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "MySecurePassword123"
 
 .NOTES
     Requires Windows PowerShell 5.0 or higher
@@ -35,8 +39,11 @@ param(
     [ValidateSet("development", "production")]
     [string]$Environment = "development",
 
-    [Parameter(Mandatory=$false, HelpMessage="Default language (ko, en, etc.)")]
+    [Parameter(Mandatory=$false, HelpMessage="Default language (ko, en, zh, etc.)")]
     [string]$DefaultLanguage = "ko",
+
+    [Parameter(Mandatory=$false, HelpMessage="Admin password (default: admin123)")]
+    [string]$AdminPassword = "admin123",
 
     [Parameter(Mandatory=$false, HelpMessage="Force overwrite existing .env file")]
     [switch]$Force
@@ -210,6 +217,8 @@ function Create-EnvFile {
             $newLines += "VITE_DEFAULT_LANGUAGE=$DefaultLanguage"
         } elseif ($line -match "^DEFAULT_LANGUAGE=") {
             $newLines += "DEFAULT_LANGUAGE=$DefaultLanguage"
+        } elseif ($line -match "^ADMIN_PASSWORD=") {
+            $newLines += "ADMIN_PASSWORD=$AdminPassword"
         } else {
             $newLines += $line
         }
@@ -235,6 +244,7 @@ function Print-Summary {
     Write-Host "  - ENVIRONMENT: $Environment"
     Write-Host "  - NODE_ENV: $Environment"
     Write-Host "  - DEFAULT_LANGUAGE: $DefaultLanguage"
+    Write-Host "  - ADMIN_PASSWORD: $AdminPassword"
     Write-Host "  - JWT_SECRET: [auto-generated] (32 chars)"
     Write-Host "  - SESSION_SECRET: [auto-generated] (20 chars)"
     Write-Host "  - JWT_REFRESH_SECRET: [auto-generated] (32 chars)"
@@ -254,7 +264,6 @@ function Print-Summary {
     Write-Host "  - GOOGLE_CLIENT_SECRET"
     Write-Host "  - GITHUB_CLIENT_ID"
     Write-Host "  - GITHUB_CLIENT_SECRET"
-    Write-Host "  - ADMIN_PASSWORD"
     Write-Host ""
     Write-Host "[NEXT STEPS]" -ForegroundColor Cyan
     Write-Host "  1. Review and update the .env file with your settings"

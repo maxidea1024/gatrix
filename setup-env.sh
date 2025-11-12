@@ -7,13 +7,15 @@
 # Encryption keys are securely auto-generated, only host address is required.
 #
 # Usage:
-#   ./setup-env.sh [HOST] [ENVIRONMENT] [LANGUAGE]
+#   ./setup-env.sh [HOST] [ENVIRONMENT] [LANGUAGE] [OPTIONS]
 #
 # Examples:
 #   ./setup-env.sh localhost development
 #   ./setup-env.sh 192.168.1.100 production
 #   ./setup-env.sh example.com production en
 #   ./setup-env.sh localhost development --force
+#   ./setup-env.sh localhost development ko --admin-password "MySecurePassword123"
+#   ./setup-env.sh example.com production en --admin-password "SecurePass123" --force
 #
 ################################################################################
 
@@ -170,6 +172,9 @@ create_env_file() {
   sed -i.bak "s|^VITE_DEFAULT_LANGUAGE=.*|VITE_DEFAULT_LANGUAGE=$DEFAULT_LANGUAGE|" "$ENV_FILE"
   sed -i.bak "s|^DEFAULT_LANGUAGE=.*|DEFAULT_LANGUAGE=$DEFAULT_LANGUAGE|" "$ENV_FILE"
 
+  # Replace admin password
+  sed -i.bak "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=$ADMIN_PASSWORD|" "$ENV_FILE"
+
   # Replace secrets
   sed -i.bak "s|^JWT_SECRET=.*|JWT_SECRET=$JWT_SECRET|" "$ENV_FILE"
   sed -i.bak "s|^SESSION_SECRET=.*|SESSION_SECRET=$SESSION_SECRET|" "$ENV_FILE"
@@ -196,6 +201,7 @@ print_summary() {
   echo "  - ENVIRONMENT: $ENVIRONMENT"
   echo "  - NODE_ENV: $ENVIRONMENT"
   echo "  - DEFAULT_LANGUAGE: $DEFAULT_LANGUAGE"
+  echo "  - ADMIN_PASSWORD: $ADMIN_PASSWORD"
   echo "  - JWT_SECRET: [auto-generated] (32 chars)"
   echo "  - SESSION_SECRET: [auto-generated] (20 chars)"
   echo "  - JWT_REFRESH_SECRET: [auto-generated] (32 chars)"
@@ -215,7 +221,6 @@ print_summary() {
   echo "  - GOOGLE_CLIENT_SECRET"
   echo "  - GITHUB_CLIENT_ID"
   echo "  - GITHUB_CLIENT_SECRET"
-  echo "  - ADMIN_PASSWORD"
   echo ""
   echo -e "${BLUE}[NEXT STEPS]${NC}"
   echo "  1. Review and update the .env file with your settings"
@@ -244,13 +249,22 @@ main() {
   HOST="$1"
   ENVIRONMENT="$2"
   DEFAULT_LANGUAGE="${3:-ko}"
+  ADMIN_PASSWORD="admin123"
   FORCE=false
 
-  # Check for --force flag
-  for arg in "$@"; do
+  # Parse optional arguments
+  i=4
+  while [ $i -le $# ]; do
+    arg="${!i}"
     if [ "$arg" = "--force" ]; then
       FORCE=true
+    elif [ "$arg" = "--admin-password" ]; then
+      i=$((i + 1))
+      ADMIN_PASSWORD="${!i}"
+    elif [[ "$arg" == --admin-password=* ]]; then
+      ADMIN_PASSWORD="${arg#*=}"
     fi
+    i=$((i + 1))
   done
 
   validate_inputs

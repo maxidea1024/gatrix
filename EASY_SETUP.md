@@ -96,10 +96,23 @@ Run the setup script to automatically generate the `.env` file with secure encry
 .\setup-env.ps1 -HostAddress example.com -Environment production
 ```
 
+**With Custom Admin Password (Optional):**
+
+**Linux/Mac:**
+```bash
+./setup-env.sh localhost development ko --admin-password "MySecurePassword123"
+```
+
+**Windows PowerShell:**
+```powershell
+.\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "MySecurePassword123"
+```
+
 The script will:
 - Generate secure encryption keys automatically
 - Configure database and Redis for Docker
-- Set up default language (Korean)
+- Set up default language (Korean, or specified language)
+- Set admin password (default: admin123, or custom if provided)
 - Create a backup if `.env` already exists
 - Automatically select the correct docker-compose file based on environment
 
@@ -269,9 +282,22 @@ If you need to regenerate the `.env` file:
 .\setup-env.ps1 -HostAddress example.com -Environment production -Force
 ```
 
+**With Custom Admin Password:**
+
+**Linux/Mac:**
+```bash
+./setup-env.sh localhost development ko --admin-password "NewPassword123" --force
+```
+
+**Windows PowerShell:**
+```powershell
+.\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "NewPassword123" -Force
+```
+
 This will:
 - Backup the existing `.env` file (`.env.backup.TIMESTAMP`)
 - Generate new encryption keys
+- Set new admin password (if provided)
 - Regenerate the configuration file
 
 ## Complete Reset (Start from Scratch)
