@@ -18,6 +18,8 @@ export interface CacheConfig {
 export interface LoggerConfig {
   level?: 'debug' | 'info' | 'warn' | 'error';
   customLogger?: (level: string, message: string, meta?: any) => void;
+  timeOffset?: number; // Time offset in hours (e.g., 9 for +09:00). Default: 0 (UTC)
+  timestampFormat?: 'iso8601' | 'local'; // Timestamp format. Default: 'iso8601'
 }
 
 /**
@@ -25,7 +27,7 @@ export interface LoggerConfig {
  */
 export interface RetryConfig {
   enabled?: boolean; // Enable retry (default: true)
-  maxRetries?: number; // Max retry attempts (default: 3)
+  maxRetries?: number; // Max retry attempts. -1 for infinite retries (default: 10)
   retryDelay?: number; // Initial retry delay in ms (default: 1000)
   retryDelayMultiplier?: number; // Delay multiplier for exponential backoff (default: 2)
   maxRetryDelay?: number; // Max retry delay in ms (default: 10000)

@@ -1,5 +1,5 @@
 /**
- * Gatrix Server SDK
+ * GatrixServerSDK
  * Main SDK class that integrates all services
  */
 
@@ -29,7 +29,7 @@ import {
 } from './types/api';
 
 /**
- * Gatrix Server SDK
+ * GatrixServerSDK
  * Server-side SDK for game servers to interact with Gatrix backend
  */
 export class GatrixServerSDK {
@@ -80,7 +80,7 @@ export class GatrixServerSDK {
     this.survey = new SurveyService(this.apiClient, this.logger);
     this.serviceDiscovery = new ServiceDiscoveryService(this.apiClient, this.logger);
 
-    this.logger.info('Gatrix Server SDK created', {
+    this.logger.info('GatrixServerSDK created', {
       gatrixUrl: configWithDefaults.gatrixUrl,
       applicationName: configWithDefaults.applicationName,
       apiToken: configWithDefaults.apiToken === 'gatrix-unsecured-server-api-token' ? 'unsecured (testing)' : '***',
@@ -122,7 +122,7 @@ export class GatrixServerSDK {
       return;
     }
 
-    this.logger.info('Initializing Gatrix Server SDK...');
+    this.logger.info('Initializing GatrixServerSDK...');
 
     try {
       // Initialize cache manager
@@ -146,7 +146,7 @@ export class GatrixServerSDK {
 
       this.initialized = true;
 
-      this.logger.info('Gatrix Server SDK initialized successfully');
+      this.logger.info('GatrixServerSDK initialized successfully');
     } catch (error: any) {
       this.logger.error('Failed to initialize SDK', { error: error.message });
       throw error;
@@ -490,7 +490,7 @@ export class GatrixServerSDK {
    * Close SDK and cleanup all resources
    */
   async close(): Promise<void> {
-    this.logger.info('Closing Gatrix Server SDK...');
+    this.logger.info('Closing GatrixServerSDK...');
 
     try {
       // Stop cache auto-refresh
@@ -505,7 +505,7 @@ export class GatrixServerSDK {
 
       this.initialized = false;
 
-      this.logger.info('Gatrix Server SDK closed successfully');
+      this.logger.info('GatrixServerSDK closed successfully');
     } catch (error: any) {
       this.logger.error('Error while closing SDK', { error: error.message });
       throw error;

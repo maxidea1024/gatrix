@@ -20,10 +20,10 @@ export interface ApiClientConfig {
 
 const DEFAULT_RETRY_CONFIG: Required<RetryConfig> = {
   enabled: true,
-  maxRetries: 3,
-  retryDelay: 1000,
-  retryDelayMultiplier: 2,
-  maxRetryDelay: 10000,
+  maxRetries: 10,
+  retryDelay: 2000, // Initial delay: 2 seconds
+  retryDelayMultiplier: 2, // Exponential backoff: 2s -> 4s -> 8s -> 16s -> 32s -> 60s (max)
+  maxRetryDelay: 60000, // Max delay: 60 seconds
   retryableStatusCodes: [408, 429, 500, 502, 503, 504],
 };
 
@@ -177,14 +177,17 @@ export class ApiClient {
 
   /**
    * Execute request with retry logic
+   * Supports infinite retries when maxRetries is -1
    */
   private async executeWithRetry<T>(
     fn: () => Promise<AxiosResponse<ApiResponse<T>>>,
     context: { method: string; url: string }
   ): Promise<ApiResponse<T>> {
     let lastError: AxiosError | undefined;
+    const isInfiniteRetry = this.retryConfig.maxRetries === -1;
+    const maxAttempts = isInfiniteRetry ? Number.MAX_SAFE_INTEGER : this.retryConfig.maxRetries;
 
-    for (let attempt = 0; attempt <= this.retryConfig.maxRetries; attempt++) {
+    for (let attempt = 0; attempt <= maxAttempts; attempt++) {
       try {
         const response = await fn();
         return response.data;
@@ -192,7 +195,7 @@ export class ApiClient {
         lastError = error as AxiosError;
 
         // If not retryable or last attempt, throw error
-        if (!this.isRetryableError(lastError) || attempt === this.retryConfig.maxRetries) {
+        if (!this.isRetryableError(lastError) || attempt === maxAttempts) {
           throw error;
         }
 
@@ -202,7 +205,7 @@ export class ApiClient {
           method: context.method,
           url: context.url,
           attempt: attempt + 1,
-          maxRetries: this.retryConfig.maxRetries,
+          maxRetries: isInfiniteRetry ? 'infinite' : this.retryConfig.maxRetries,
           retryDelay: delay,
           error: lastError.message,
         });

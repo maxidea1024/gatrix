@@ -6,7 +6,7 @@ Gatrix Server-side SDK for Node.js - Provides easy access to Gatrix backend APIs
 
 - 🚀 **Easy to use** - Simple API for common operations
 - 📦 **Caching** - Built-in caching with automatic refresh
-- 🔔 **Event handling** - Real-time cache updates via BullMQ
+- 🔔 **Event handling** - Real-time cache updates via Redis PubSub
 - 🔍 **Service discovery** - Backend API-based service discovery
 - 📝 **TypeScript** - Full TypeScript support with type definitions
 - ✅ **Tested** - Comprehensive test coverage
@@ -118,10 +118,22 @@ const sdk = new GatrixServerSDK({
   // Optional - Logger
   logger: {
     level: 'info', // 'debug' | 'info' | 'warn' | 'error'
+    timeOffset: 9, // Time offset in hours (e.g., 9 for +09:00). Default: 0 (UTC)
+    timestampFormat: 'local', // 'iso8601' | 'local'. Default: 'iso8601'
     customLogger: (level, message, meta) => {
       // Custom logger implementation
       console.log(`[${level}] ${message}`, meta);
     },
+  },
+
+  // Optional - HTTP Retry
+  retry: {
+    enabled: true, // Enable retry (default: true)
+    maxRetries: 10, // Max retry attempts. -1 for infinite retries (default: 10)
+    retryDelay: 2000, // Initial retry delay in ms (default: 2000)
+    retryDelayMultiplier: 2, // Delay multiplier for exponential backoff (default: 2)
+    maxRetryDelay: 60000, // Max retry delay in ms (default: 60000)
+    retryableStatusCodes: [408, 429, 500, 502, 503, 504], // HTTP status codes to retry
   },
 });
 ```
@@ -456,6 +468,160 @@ console.log('Account allowed:', isAccountAllowed);
 - Time-based validity with `validFrom` and `validUntil` dates
 - Automatic filtering of expired entries
 
+## Logger Configuration
+
+The SDK includes a built-in logger with support for custom timestamp formats and time offsets.
+
+### Basic Logger Usage
+
+```typescript
+import { Logger } from '@gatrix/server-sdk';
+
+const logger = new Logger({
+  level: 'info', // 'debug' | 'info' | 'warn' | 'error'
+});
+
+logger.info('Application started');
+logger.warn('This is a warning', { code: 'WARN_001' });
+logger.error('An error occurred', { error: 'Details' });
+```
+
+### Timestamp Formatting
+
+#### ISO8601 Format (Default)
+
+```typescript
+const logger = new Logger({
+  level: 'info',
+  timeOffset: 9, // +09:00 (Korea)
+  timestampFormat: 'iso8601', // Default
+});
+
+// Output: [2025-11-12T10:48:10.454Z] [INFO] [GatrixServerSDK] Message
+```
+
+#### Local Time Format
+
+```typescript
+const logger = new Logger({
+  level: 'info',
+  timeOffset: 9, // +09:00 (Korea)
+  timestampFormat: 'local',
+});
+
+// Output: [2025-11-12 10:48:10.454] [INFO] [GatrixServerSDK] Message
+```
+
+### Time Offset Examples
+
+```typescript
+// UTC (Default)
+const logger = new Logger({ timeOffset: 0 });
+
+// Korea (+09:00)
+const logger = new Logger({ timeOffset: 9 });
+
+// US Eastern (-05:00)
+const logger = new Logger({ timeOffset: -5 });
+
+// India (+05:30)
+const logger = new Logger({ timeOffset: 5.5 });
+```
+
+### Custom Logger
+
+```typescript
+const logger = new Logger({
+  level: 'info',
+  customLogger: (level, message, meta) => {
+    // Your custom logging implementation
+    console.log(`[${level.toUpperCase()}] ${message}`, meta);
+  },
+});
+```
+
+### Runtime Logger Configuration
+
+```typescript
+const logger = new Logger({ level: 'info' });
+
+// Change timestamp format at runtime
+logger.setTimestampFormat('local');
+
+// Change time offset at runtime
+logger.setTimeOffset(9);
+
+// Get current settings
+console.log('Format:', logger.getTimestampFormat());
+console.log('Offset:', logger.getTimeOffset());
+```
+
+## HTTP Retry Configuration
+
+The SDK includes automatic retry logic with exponential backoff for failed HTTP requests.
+
+### Default Retry Behavior
+
+By default, the SDK retries failed requests up to 10 times with exponential backoff:
+
+```typescript
+const sdk = new GatrixServerSDK({
+  gatrixUrl: 'https://api.gatrix.com',
+  apiToken: 'your-token',
+  applicationName: 'your-app',
+  // Default retry config (no need to specify)
+  retry: {
+    enabled: true,
+    maxRetries: 10,
+    retryDelay: 2000, // 2 seconds
+    retryDelayMultiplier: 2,
+    maxRetryDelay: 60000, // 60 seconds
+    retryableStatusCodes: [408, 429, 500, 502, 503, 504],
+  },
+});
+```
+
+### Retry Delay Pattern
+
+With default settings, retry delays follow this pattern:
+- 1st retry: 2 seconds
+- 2nd retry: 4 seconds
+- 3rd retry: 8 seconds
+- 4th retry: 16 seconds
+- 5th retry: 32 seconds
+- 6th+ retries: 60 seconds (max)
+
+### Custom Retry Configuration
+
+```typescript
+const sdk = new GatrixServerSDK({
+  gatrixUrl: 'https://api.gatrix.com',
+  apiToken: 'your-token',
+  applicationName: 'your-app',
+  retry: {
+    enabled: true,
+    maxRetries: -1, // Infinite retries
+    retryDelay: 1000, // 1 second
+    retryDelayMultiplier: 1.5,
+    maxRetryDelay: 30000, // 30 seconds
+    retryableStatusCodes: [408, 429, 500, 502, 503, 504],
+  },
+});
+```
+
+### Disable Retries
+
+```typescript
+const sdk = new GatrixServerSDK({
+  gatrixUrl: 'https://api.gatrix.com',
+  apiToken: 'your-token',
+  applicationName: 'your-app',
+  retry: {
+    enabled: false,
+  },
+});
+```
+
 ## Error Handling
 
 ```typescript
@@ -500,6 +666,15 @@ Service discovery is now handled entirely by the Backend API. The SDK no longer 
 - ✅ **Before**: SDK connected directly to Redis/etcd for service discovery
 - ✅ **Now**: SDK uses Backend API for all service discovery operations
 - ✅ **Benefit**: Simplified configuration, no need for Redis/etcd credentials in game servers
+
+### Event Handling Changes
+
+Event handling now uses Redis PubSub instead of BullMQ:
+
+- ✅ **Before**: Events were processed via BullMQ queues
+- ✅ **Now**: Events are handled via Redis PubSub for real-time updates
+- ✅ **Benefit**: Simpler setup, lower latency, no queue persistence overhead
+- ✅ **Migration**: No code changes needed, just ensure Redis is configured for event handling
 
 ## License
 

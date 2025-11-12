@@ -31,7 +31,9 @@ async function main() {
 
     // Logger configuration
     logger: {
-      level: 'debug',
+      level: 'info',
+      timeOffset: 9,
+      timestampFormat: 'local',
     },
   });
 
@@ -46,7 +48,7 @@ async function main() {
       .flat()
       .find(addr => addr?.family === 'IPv4' && !addr.internal)?.address || 'localhost';
 
-    const instanceId = await sdk.registerService({
+    const { instanceId, externalAddress } = await sdk.registerService({
       labels: {
         service: 'idle',
         group: 'development',
@@ -63,6 +65,7 @@ async function main() {
       },
     });
     console.log(`[idle-server] Service registered with ID: ${instanceId}`);
+    console.log(`[idle-server] External address: ${externalAddress}`);
 
     // Listen to SDK events
     console.log('[idle-server] Setting up event listeners...');
@@ -94,6 +97,7 @@ async function main() {
 
     sdk.on('gameworld.order_changed', (event) => {
       console.log('[idle-server] GAMEWORLD ORDER CHANGED:', event.data);
+      printCachedData();
     });
 
     sdk.on('popup.created', (event) => {

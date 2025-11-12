@@ -1,5 +1,5 @@
 /**
- * Gatrix Server SDK
+ * GatrixServerSDK
  * Entry point
  */
 

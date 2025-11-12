@@ -50,7 +50,7 @@ npm run test:orchestrator
 - ✅ SDK initialization
 - ✅ Service discovery registration
 - ✅ Cache loading (game worlds, popups, surveys)
-- ✅ Event listening (BullMQ)
+- ✅ Event listening (Redis PubSub)
 - ✅ Heartbeat mechanism
 - ✅ Multiple instances of same service type
 - ✅ Different service groups

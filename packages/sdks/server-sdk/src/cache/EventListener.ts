@@ -224,11 +224,6 @@ export class EventListener {
         // Clear entire game worlds cache when order changes
         this.logger.info('Game world order changed, clearing entire cache');
         await this.cacheManager.refreshGameWorlds();
-        // Log all cached data after refresh
-        const allCachedData = this.cacheManager.getAllCachedData();
-        console.log('\n========== CACHED DATA (JSON) ==========');
-        console.log(JSON.stringify(allCachedData, null, 2));
-        console.log('========================================\n');
         break;
 
       case 'popup.created':
