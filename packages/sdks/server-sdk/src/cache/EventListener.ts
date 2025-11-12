@@ -196,6 +196,7 @@ export class EventListener {
       'survey.settings.updated',
       'maintenance.started',
       'maintenance.ended',
+      'whitelist.updated',
     ].includes(type);
   }
 
@@ -271,6 +272,17 @@ export class EventListener {
       case 'maintenance.ended':
         // Maintenance events don't require cache refresh
         this.logger.debug('Maintenance event received', { type: event.type });
+        break;
+
+      case 'whitelist.updated':
+        // Refresh whitelist cache when whitelist is updated
+        this.logger.info('Whitelist updated event received, refreshing whitelist cache');
+        try {
+          await this.cacheManager.refreshWhitelists();
+          this.logger.info('Whitelist cache refreshed successfully');
+        } catch (error) {
+          this.logger.error('Failed to refresh whitelist cache', { error });
+        }
         break;
 
       default:

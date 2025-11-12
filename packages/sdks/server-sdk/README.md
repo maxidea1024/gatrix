@@ -369,6 +369,7 @@ The SDK supports the following standard events that are automatically published 
 | `survey.settings.updated` | Survey settings changed | `{ id, timestamp }` | ✅ Surveys cache |
 | `maintenance.started` | Maintenance mode activated | `{ id, timestamp }` | ✅ Game worlds cache |
 | `maintenance.ended` | Maintenance mode deactivated | `{ id, timestamp }` | ✅ Game worlds cache |
+| `whitelist.updated` | IP or Account whitelist modified | `{ id, timestamp }` | ✅ Whitelists cache |
 
 #### Listen to Standard Events
 
@@ -544,27 +545,52 @@ if (isInMaintenance) {
 
 #### Whitelist Management
 
-Retrieve IP and Account whitelists:
+The SDK provides both cached and real-time whitelist access:
+
+**Get Cached Whitelists (Recommended for performance):**
 
 ```typescript
-// Get all whitelists
-const whitelists = await sdk.getWhitelists();
+// Get cached whitelists (no API call)
+const whitelists = sdk.getCachedWhitelists();
 console.log('IP Whitelist:', whitelists.ipWhitelist);
 console.log('Account Whitelist:', whitelists.accountWhitelist);
 
-// Check if IP is whitelisted
-const isIpAllowed = await sdk.isIpWhitelisted('192.168.1.100');
+// Check if IP is whitelisted (uses cached data)
+const isIpAllowed = whitelists.ipWhitelist.some(entry => entry.ipAddress === '192.168.1.100');
 console.log('IP allowed:', isIpAllowed);
 
-// Check if account is whitelisted
-const isAccountAllowed = await sdk.isAccountWhitelisted('account123');
+// Check if account is whitelisted (uses cached data)
+const isAccountAllowed = whitelists.accountWhitelist.some(entry => entry.accountId === 'account123');
 console.log('Account allowed:', isAccountAllowed);
 ```
 
+**Refresh Whitelist Cache:**
+
+```typescript
+// Manually refresh whitelist cache
+await sdk.refreshWhitelistCache();
+console.log('Whitelist cache refreshed');
+```
+
+**Real-time Whitelist Updates (Event-based):**
+
+When using event-based cache refresh with Redis, whitelists are automatically updated when the backend publishes `whitelist.updated` events:
+
+```typescript
+sdk.on('whitelist.updated', async (event) => {
+  console.log('Whitelist updated:', event.data);
+  // Cache is automatically refreshed
+  const whitelists = sdk.getCachedWhitelists();
+  console.log('Updated whitelists:', whitelists);
+});
+```
+
 **Whitelist Features:**
-- IP whitelist supports CIDR notation (e.g., `192.168.1.0/24`)
+- IP whitelist supports exact IP matching (CIDR support coming soon)
 - Time-based validity with `validFrom` and `validUntil` dates
 - Automatic filtering of expired entries
+- Real-time updates via Redis PubSub events
+- Automatic cache refresh on `whitelist.updated` events
 
 ## Logger Configuration
 

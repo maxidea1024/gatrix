@@ -19,7 +19,8 @@ export type StandardEventType =
   | 'survey.deleted'
   | 'survey.settings.updated'
   | 'maintenance.started'
-  | 'maintenance.ended';
+  | 'maintenance.ended'
+  | 'whitelist.updated';
 
 export interface StandardEventData {
   id: number | string;

@@ -128,6 +128,13 @@ export class IpWhitelistService {
         createdBy: created.createdBy,
       });
 
+      // Publish whitelist.updated event for SDK real-time updates
+      const pubSubService = require('./PubSubService').default;
+      await pubSubService.publishSDKEvent({
+        type: 'whitelist.updated',
+        data: { id: created.id, timestamp: Date.now() },
+      });
+
       return created;
     } catch (error) {
       if (error instanceof CustomError) {
@@ -192,6 +199,13 @@ export class IpWhitelistService {
         updatedBy: updated.updatedBy,
       });
 
+      // Publish whitelist.updated event for SDK real-time updates
+      const pubSubService = require('./PubSubService').default;
+      await pubSubService.publishSDKEvent({
+        type: 'whitelist.updated',
+        data: { id: updated.id, timestamp: Date.now() },
+      });
+
       return updated;
     } catch (error) {
       if (error instanceof CustomError) {
@@ -219,6 +233,13 @@ export class IpWhitelistService {
         id,
         ipAddress: existing.ipAddress,
         purpose: existing.purpose,
+      });
+
+      // Publish whitelist.updated event for SDK real-time updates
+      const pubSubService = require('./PubSubService').default;
+      await pubSubService.publishSDKEvent({
+        type: 'whitelist.updated',
+        data: { id, timestamp: Date.now() },
       });
     } catch (error) {
       if (error instanceof CustomError) {
@@ -249,6 +270,13 @@ export class IpWhitelistService {
         ipAddress: updated.ipAddress,
         isEnabled: updated.isEnabled,
         updatedBy,
+      });
+
+      // Publish whitelist.updated event for SDK real-time updates
+      const pubSubService = require('./PubSubService').default;
+      await pubSubService.publishSDKEvent({
+        type: 'whitelist.updated',
+        data: { id: updated.id, timestamp: Date.now() },
       });
 
       return updated;
@@ -344,6 +372,15 @@ export class IpWhitelistService {
         errorCount: errors.length,
         createdBy,
       });
+
+      // Publish whitelist.updated event for SDK real-time updates (once for all entries)
+      if (createdCount > 0) {
+        const pubSubService = require('./PubSubService').default;
+        await pubSubService.publishSDKEvent({
+          type: 'whitelist.updated',
+          data: { timestamp: Date.now() },
+        });
+      }
 
       return createdCount;
     } catch (error) {

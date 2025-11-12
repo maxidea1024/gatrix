@@ -60,6 +60,13 @@ export class WhitelistService {
         createdBy: whitelist.createdBy,
       });
 
+      // Publish whitelist.updated event for SDK real-time updates
+      const pubSubService = require('./PubSubService').default;
+      await pubSubService.publishSDKEvent({
+        type: 'whitelist.updated',
+        data: { id: whitelist.id, timestamp: Date.now() },
+      });
+
       return whitelist;
     } catch (error) {
       if (error instanceof CustomError) {
@@ -81,7 +88,7 @@ export class WhitelistService {
       // Validate dates if provided
       const startDate = data.startDate !== undefined ? data.startDate : existing.startDate;
       const endDate = data.endDate !== undefined ? data.endDate : existing.endDate;
-      
+
       if (startDate && endDate && startDate > endDate) {
         throw new CustomError('Start date cannot be after end date', 400);
       }
@@ -94,6 +101,13 @@ export class WhitelistService {
       logger.info('Whitelist entry updated successfully:', {
         id: updated.id,
         accountId: updated.accountId,
+      });
+
+      // Publish whitelist.updated event for SDK real-time updates
+      const pubSubService = require('./PubSubService').default;
+      await pubSubService.publishSDKEvent({
+        type: 'whitelist.updated',
+        data: { id: updated.id, timestamp: Date.now() },
       });
 
       return updated;
@@ -122,6 +136,13 @@ export class WhitelistService {
       logger.info('Whitelist entry deleted successfully:', {
         id,
         accountId: existing.accountId,
+      });
+
+      // Publish whitelist.updated event for SDK real-time updates
+      const pubSubService = require('./PubSubService').default;
+      await pubSubService.publishSDKEvent({
+        type: 'whitelist.updated',
+        data: { id, timestamp: Date.now() },
       });
     } catch (error) {
       if (error instanceof CustomError) {
@@ -171,6 +192,15 @@ export class WhitelistService {
         createdCount,
         createdBy,
       });
+
+      // Publish whitelist.updated event for SDK real-time updates
+      if (createdCount > 0) {
+        const pubSubService = require('./PubSubService').default;
+        await pubSubService.publishSDKEvent({
+          type: 'whitelist.updated',
+          data: { timestamp: Date.now() },
+        });
+      }
 
       return createdCount;
     } catch (error) {

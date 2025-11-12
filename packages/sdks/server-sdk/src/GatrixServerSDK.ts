@@ -11,6 +11,7 @@ import { CouponService } from './services/CouponService';
 import { GameWorldService } from './services/GameWorldService';
 import { PopupNoticeService } from './services/PopupNoticeService';
 import { SurveyService } from './services/SurveyService';
+import { WhitelistService } from './services/WhitelistService';
 import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
 import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
@@ -43,6 +44,7 @@ export class GatrixServerSDK {
   public readonly gameWorld: GameWorldService;
   public readonly popupNotice: PopupNoticeService;
   public readonly survey: SurveyService;
+  public readonly whitelist: WhitelistService;
   public readonly serviceDiscovery: ServiceDiscoveryService;
 
   // Cache and Events
@@ -78,6 +80,7 @@ export class GatrixServerSDK {
     this.gameWorld = new GameWorldService(this.apiClient, this.logger);
     this.popupNotice = new PopupNoticeService(this.apiClient, this.logger);
     this.survey = new SurveyService(this.apiClient, this.logger);
+    this.whitelist = new WhitelistService(this.apiClient, this.logger);
     this.serviceDiscovery = new ServiceDiscoveryService(this.apiClient, this.logger);
 
     this.logger.info('GatrixServerSDK created', {
@@ -132,6 +135,7 @@ export class GatrixServerSDK {
         this.gameWorld,
         this.popupNotice,
         this.survey,
+        this.whitelist,
         this.apiClient,
         this.logger
       );
@@ -512,6 +516,32 @@ export class GatrixServerSDK {
    */
   async isAccountWhitelisted(accountId: string): Promise<boolean> {
     return await this.serviceDiscovery.isAccountWhitelisted(accountId);
+  }
+
+  // ============================================================================
+  // Whitelist Cache Methods
+  // ============================================================================
+
+  /**
+   * Get cached whitelists (IP and Account)
+   * Returns cached data without making API call
+   */
+  getCachedWhitelists() {
+    if (!this.cacheManager) {
+      this.logger.warn('Cache manager not initialized');
+      return { ipWhitelist: [], accountWhitelist: [] };
+    }
+    return this.cacheManager.getCachedWhitelists();
+  }
+
+  /**
+   * Refresh whitelist cache
+   */
+  async refreshWhitelistCache(): Promise<void> {
+    if (!this.cacheManager) {
+      throw createError(ErrorCode.INVALID_CONFIG, 'Cache manager not initialized');
+    }
+    await this.cacheManager.refreshWhitelists();
   }
 
   // ============================================================================

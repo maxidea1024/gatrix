@@ -8,6 +8,7 @@ import { CacheConfig } from '../types/config';
 import { GameWorldService } from '../services/GameWorldService';
 import { PopupNoticeService } from '../services/PopupNoticeService';
 import { SurveyService } from '../services/SurveyService';
+import { WhitelistService } from '../services/WhitelistService';
 import { ApiClient } from '../client/ApiClient';
 
 export class CacheManager {
@@ -16,6 +17,7 @@ export class CacheManager {
   private gameWorldService: GameWorldService;
   private popupNoticeService: PopupNoticeService;
   private surveyService: SurveyService;
+  private whitelistService: WhitelistService;
   private apiClient: ApiClient;
   private refreshInterval?: NodeJS.Timeout;
   private refreshCallbacks: Array<(type: string, data: any) => void> = [];
@@ -25,6 +27,7 @@ export class CacheManager {
     gameWorldService: GameWorldService,
     popupNoticeService: PopupNoticeService,
     surveyService: SurveyService,
+    whitelistService: WhitelistService,
     apiClient: ApiClient,
     logger: Logger
   ) {
@@ -36,6 +39,7 @@ export class CacheManager {
     this.gameWorldService = gameWorldService;
     this.popupNoticeService = popupNoticeService;
     this.surveyService = surveyService;
+    this.whitelistService = whitelistService;
     this.apiClient = apiClient;
     this.logger = logger;
   }
@@ -86,6 +90,10 @@ export class CacheManager {
         // Note: Survey endpoint might need admin auth, handle gracefully
         this.surveyService.list({ isActive: true }).catch((error) => {
           return { surveys: [], settings: null };
+        }),
+        this.whitelistService.list().catch((error) => {
+          this.logger.warn('Failed to load whitelists', { error: error.message });
+          return { ipWhitelist: [], accountWhitelist: [] };
         }),
       ]);
 
@@ -184,6 +192,9 @@ export class CacheManager {
         this.surveyService.refresh({ isActive: true }).catch((error) => {
           this.logger.warn('Failed to refresh surveys', { error: error.message });
         }),
+        this.whitelistService.refresh().catch((error) => {
+          this.logger.warn('Failed to refresh whitelists', { error: error.message });
+        }),
       ]);
 
       this.logger.info('All caches refreshed successfully');
@@ -192,7 +203,7 @@ export class CacheManager {
       if (this.config.refreshMethod === 'polling') {
         this.emitRefreshEvent('cache.refreshed', {
           timestamp: new Date().toISOString(),
-          types: ['gameworld', 'popup', 'survey'],
+          types: ['gameworld', 'popup', 'survey', 'whitelist'],
         });
       }
     } catch (error: any) {
@@ -290,6 +301,21 @@ export class CacheManager {
   }
 
   /**
+   * Refresh whitelist cache only
+   */
+  async refreshWhitelists(): Promise<void> {
+    this.logger.info('Refreshing whitelist cache...');
+    await this.whitelistService.refresh();
+  }
+
+  /**
+   * Get cached whitelists
+   */
+  getCachedWhitelists() {
+    return this.whitelistService.getCached();
+  }
+
+  /**
    * Clear all caches
    */
   clear(): void {
@@ -297,6 +323,7 @@ export class CacheManager {
     this.gameWorldService.updateCache([]);
     this.popupNoticeService.updateCache([]);
     this.surveyService.updateCache([]);
+    this.whitelistService.updateCache({ ipWhitelist: [], accountWhitelist: [] });
   }
 
   /**
