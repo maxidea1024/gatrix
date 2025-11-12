@@ -1,6 +1,6 @@
 # Gatrix - Online Game Platform Management System
 
-A comprehensive online game platform management system built with TypeScript, React, MUI, and Express.js. Gatrix provides robust user management, authentication, and administrative features for online gaming platforms, specifically designed for UWO (Uncharted Waters Online) game management.
+A comprehensive online game platform management system built with TypeScript, React, MUI, and Express.js. Gatrix provides robust user management, authentication, and administrative features for online gaming platforms, enabling efficient management and operation of multiplayer online games.
 
 ## Features
 
@@ -215,11 +215,60 @@ gatrix/
 ### Installation
 
 1. Clone the repository
-2. Copy environment variables:
+
+2. **Auto-generate `.env` file** (Recommended):
+
+   **Windows (PowerShell):**
+   ```powershell
+   .\setup-env.ps1 -HostAddress localhost -Environment development
+   ```
+
+   **Linux/Mac (Bash):**
+   ```bash
+   ./setup-env.sh localhost development
+   ```
+
+   **With custom language (optional, default: ko):**
+   ```powershell
+   # Windows
+   .\setup-env.ps1 -HostAddress localhost -Environment development -DefaultLanguage en
+
+   # Linux/Mac
+   ./setup-env.sh localhost development en
+   ```
+
+   **For Production:**
+   ```powershell
+   # Windows
+   .\setup-env.ps1 -HostAddress example.com -Environment production
+
+   # Linux/Mac
+   ./setup-env.sh example.com production
+   ```
+
+   **Force overwrite existing .env file:**
+   ```powershell
+   # Windows
+   .\setup-env.ps1 -HostAddress localhost -Environment development -Force
+
+   # Linux/Mac
+   ./setup-env.sh localhost development --force
+   ```
+
+   The script will:
+   - Check if `.env` file already exists (will not overwrite without -Force flag)
+   - Generate secure JWT_SECRET (32 chars), SESSION_SECRET (20 chars), and JWT_REFRESH_SECRET (32 chars)
+   - Configure database and Redis hosts for Docker environment
+   - Set appropriate CORS and logging settings based on environment
+   - Set default language (default: Korean)
+   - Backup existing `.env` file if present (when using -Force flag)
+
+3. **Manual setup** (Alternative):
    ```bash
    cp .env.example .env
    ```
-3. Update the `.env` file with your configuration
+   Then update the `.env` file with your configuration
+
 4. Install dependencies:
    ```bash
    yarn install
@@ -418,7 +467,7 @@ SSH_PRIVATE_KEY_PATH=/path/to/private/key
 ## Default Admin Account
 
 The system creates a default admin account on first run:
-- Email: Configurable via ADMIN_EMAIL environment variable (default: admin@example.com)
+- Email: Configurable via ADMIN_EMAIL environment variable (default: admin@gatrix.com)
 - Password: Configurable via ADMIN_PASSWORD environment variable (default: admin123)
 - Name: Configurable via ADMIN_NAME environment variable (default: Administrator)
 
