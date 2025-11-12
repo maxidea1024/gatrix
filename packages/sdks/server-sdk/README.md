@@ -348,7 +348,27 @@ await sdk.refreshSurveysCache();
 
 ⚠️ **Note:** Event handling requires:
 - Redis configured in SDK
-- `autoRefresh: 'event'` in cache configuration
+- `refreshMethod: 'event'` in cache configuration
+
+#### Standard Events
+
+The SDK supports the following standard events that are automatically published by the Gatrix backend:
+
+| Event Type | Trigger | Data | Auto-Refresh |
+|---|---|---|---|
+| `gameworld.created` | New game world created | `{ id, timestamp }` | ✅ Game worlds cache |
+| `gameworld.updated` | Game world modified | `{ id, timestamp, isVisible }` | ✅ Game worlds cache |
+| `gameworld.deleted` | Game world deleted | `{ id, timestamp }` | ✅ Game worlds cache |
+| `gameworld.order_changed` | Game world display order changed | `{ id, timestamp }` | ✅ Game worlds cache |
+| `popup.created` | New popup notice created | `{ id, timestamp }` | ✅ Popup notices cache |
+| `popup.updated` | Popup notice modified | `{ id, timestamp, isVisible }` | ✅ Popup notices cache |
+| `popup.deleted` | Popup notice deleted | `{ id, timestamp }` | ✅ Popup notices cache |
+| `survey.created` | New survey created | `{ id, timestamp }` | ✅ Surveys cache |
+| `survey.updated` | Survey modified | `{ id, timestamp, isActive }` | ✅ Surveys cache |
+| `survey.deleted` | Survey deleted | `{ id, timestamp }` | ✅ Surveys cache |
+| `survey.settings.updated` | Survey settings changed | `{ id, timestamp }` | ✅ Surveys cache |
+| `maintenance.started` | Maintenance mode activated | `{ id, timestamp }` | ✅ Game worlds cache |
+| `maintenance.ended` | Maintenance mode deactivated | `{ id, timestamp }` | ✅ Game worlds cache |
 
 #### Listen to Standard Events
 
@@ -365,13 +385,23 @@ sdk.on('popup.updated', async (event) => {
 sdk.on('survey.updated', async (event) => {
   console.log('Survey updated:', event.data);
 });
+
+sdk.on('maintenance.started', async (event) => {
+  console.log('Maintenance started for world:', event.data.id);
+});
 ```
 
 #### Listen to Custom Events
 
+You can also listen to custom events published by your application:
+
 ```typescript
 sdk.on('custom:player.levelup', async (event) => {
   console.log('Player leveled up:', event.data);
+});
+
+sdk.on('custom:achievement.unlocked', async (event) => {
+  console.log('Achievement unlocked:', event.data);
 });
 ```
 
@@ -749,38 +779,7 @@ try {
 }
 ```
 
-## Migration from GatrixSDK to GatrixServerSDK
-
-The SDK has been renamed from `GatrixSDK` to `GatrixServerSDK` to emphasize that it's a server-side SDK. The old name is still available for backward compatibility:
-
-```typescript
-// New (recommended)
-import { GatrixServerSDK } from '@gatrix/server-sdk';
-const sdk = new GatrixServerSDK({ ... });
-
-// Old (still works)
-import { GatrixSDK } from '@gatrix/server-sdk';
-const sdk = new GatrixSDK({ ... });
-```
-
-### Service Discovery Changes
-
-Service discovery is now handled entirely by the Backend API. The SDK no longer connects directly to Redis or etcd:
-
-- ✅ **Before**: SDK connected directly to Redis/etcd for service discovery
-- ✅ **Now**: SDK uses Backend API for all service discovery operations
-- ✅ **Benefit**: Simplified configuration, no need for Redis/etcd credentials in game servers
-
-### Event Handling Changes
-
-Event handling now uses Redis PubSub instead of BullMQ:
-
-- ✅ **Before**: Events were processed via BullMQ queues
-- ✅ **Now**: Events are handled via Redis PubSub for real-time updates
-- ✅ **Benefit**: Simpler setup, lower latency, no queue persistence overhead
-- ✅ **Migration**: No code changes needed, just ensure Redis is configured for event handling
-
 ## License
 
-MIT
+Proprietary - Gatrix Team
 
