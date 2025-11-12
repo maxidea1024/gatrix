@@ -1,0 +1,12 @@
+apiVersion: 1
+
+# Provision Prometheus as the default data source
+# This file is loaded by Grafana on startup
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true

@@ -132,6 +132,8 @@ export const getMenuCategories = (isAdmin: boolean): MenuCategory[] => {
     },
   ];
 
+  const grafanaUrl: string = (import.meta.env.VITE_GRAFANA_URL as string) || `${window.location.protocol}//${window.location.hostname}:54000`;
+
   if (isAdmin) {
     categories.push(
       {
@@ -139,7 +141,10 @@ export const getMenuCategories = (isAdmin: boolean): MenuCategory[] => {
         text: 'sidebar.adminPanel',
         icon: <AdminPanelSettings />,
         adminOnly: true,
-        children: adminPanelMenuItems,
+        children: [
+          ...adminPanelMenuItems,
+          { text: 'sidebar.grafana', icon: <MonitorIcon />, path: grafanaUrl, adminOnly: true, divider: true },
+        ],
       },
       {
         id: 'game-management',

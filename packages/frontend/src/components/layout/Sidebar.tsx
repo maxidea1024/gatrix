@@ -114,6 +114,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
 
   const handleItemClick = (item: NavItem) => {
     if (item.path) {
+      // Open external links in a new tab
+      if (/^https?:\/\//i.test(item.path)) {
+        window.open(item.path, '_blank', 'noopener,noreferrer');
+        onClose();
+        return;
+      }
       navigate(item.path);
       onClose(); // Close sidebar on mobile after navigation
     } else if (item.children) {
@@ -300,6 +306,11 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
 
   const handleItemClick = (item: NavItem) => {
     if (item.path) {
+      // Open external links in a new tab
+      if (/^https?:\/\//i.test(item.path)) {
+        window.open(item.path, '_blank', 'noopener,noreferrer');
+        return;
+      }
       navigate(item.path);
     } else if (item.children) {
       setExpandedItems(prev =>

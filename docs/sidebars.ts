@@ -36,6 +36,22 @@ const sidebars: SidebarsConfig = {
       items: [
         'features/job-management',
         'features/game-worlds',
+        'features/monitoring',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Deployment',
+      items: [
+        'deployment/docker',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Optimization',
+      items: [
+        'optimization/database',
+        'optimization/caching',
       ],
     },
     {

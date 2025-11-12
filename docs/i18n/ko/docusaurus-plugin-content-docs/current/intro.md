@@ -79,7 +79,7 @@ npm run dev
 
 ## 다음 단계
 
-- 📖 [API 문서 읽기](./api/client-api.md)
-- 🔧 [캐시 시스템 알아보기](./backend/cache-keys.md)
-- 🚀 [작업 관리 탐색하기](./features/job-management.md)
-- 🌍 [게임 월드 구성하기](./features/game-worlds.md)
+- 📖 [API 문서 읽기](/docs/api/client-api)
+- 🔧 [캐시 시스템 알아보기](/docs/backend/cache-keys)
+- 🚀 [작업 관리 탐색하기](/docs/features/job-management)
+- 🌍 [게임 월드 구성하기](/docs/features/game-worlds)

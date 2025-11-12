@@ -90,6 +90,12 @@ const config = {
     terminatedTTL: parseInt(process.env.SERVICE_DISCOVERY_TERMINATED_TTL || '15', 10), // Terminated service TTL in seconds (15 seconds for quick cleanup)
     terminatedMarkerTTL: parseInt(process.env.SERVICE_DISCOVERY_TERMINATED_MARKER_TTL || '300', 10), // Terminated marker TTL in seconds (300 seconds / 5 minutes for audit trail)
   },
+
+  // Monitoring configuration
+  monitoring: {
+    enabled: String(process.env.MONITORING_ENABLED || '').toLowerCase() === 'true',
+    metricsPath: process.env.METRICS_PATH || '/metrics',
+  },
 };
 
 // Validate required environment variables

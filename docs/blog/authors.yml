@@ -6,7 +6,7 @@ gatrix-team:
   page: true
   socials:
     github: motifgames
-    email: support@gatrix.com
+    email: mailto:support@gatrix.com
 
 motif-games:
   name: Motif Games
@@ -17,4 +17,4 @@ motif-games:
   socials:
     github: motifgames
     website: https://motifgames.com
-    email: contact@motifgames.com
+    email: mailto:contact@motifgames.com

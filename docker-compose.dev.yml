@@ -77,6 +77,8 @@ services:
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       DISABLE_X_POWERED_BY: true
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
+      MONITORING_ENABLED: "true"
+
       # Chat Server Integration
       CHAT_SERVER_URL: http://chat-server-dev:3001
       CHAT_SERVER_API_TOKEN: ${CHAT_SERVER_API_TOKEN:-gatrix-api-d58e8c748ac604b8020526904558251a0604000f8a5898a1b5e28b99aee9ed79}
@@ -95,7 +97,9 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - gatrix-dev-network
+      gatrix-dev-network:
+        aliases:
+          - backend
     volumes:
       - .:/app
       - /app/node_modules
@@ -241,6 +245,8 @@ services:
       WORKER_BATCH_SIZE: ${WORKER_BATCH_SIZE:-1000}
       WORKER_BATCH_TIMEOUT: ${WORKER_BATCH_TIMEOUT:-5000}
       WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-10}
+      MONITORING_ENABLED: "true"
+
     ports:
       - "0.0.0.0:${EVENT_LENS_PORT:-53002}:3002"
     depends_on:
@@ -251,7 +257,9 @@ services:
       clickhouse:
         condition: service_healthy
     networks:
-      - gatrix-dev-network
+      gatrix-dev-network:
+        aliases:
+          - event-lens
     volumes:
       - .:/app
       - /app/node_modules
@@ -360,13 +368,62 @@ services:
       backend-dev:
         condition: service_started
     networks:
-      - gatrix-dev-network
+      gatrix-dev-network:
+        aliases:
+          - chat-server
     volumes:
       - .:/app
       - /app/node_modules
       - chat_server_dev_uploads:/app/packages/chat-server/uploads
       - chat_server_dev_logs:/app/packages/chat-server/logs
     command: yarn workspace @gatrix/chat-server dev
+  # Prometheus - Monitoring (development)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: gatrix-prometheus-dev
+    restart: unless-stopped
+    environment:
+      PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
+      PROM_RETENTION_TIME: ${PROM_RETENTION_TIME:-14d}
+    ports:
+      - "0.0.0.0:${PROMETHEUS_PORT:-59091}:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
+      - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro
+      - prometheus_dev_data:/prometheus
+    entrypoint: ["/bin/sh", "/docker/prometheus/entrypoint.sh"]
+    depends_on:
+      backend-dev:
+        condition: service_started
+      event-lens-dev:
+        condition: service_started
+      chat-server-dev:
+        condition: service_started
+    networks:
+      - gatrix-dev-network
+
+  # Grafana - Dashboards (development)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: gatrix-grafana-dev
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "0.0.0.0:${GRAFANA_PORT:-54000}:3000"
+    volumes:
+      - grafana_dev_data:/var/lib/grafana
+      - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./docker/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      prometheus:
+        condition: service_started
+    networks:
+      - gatrix-dev-network
+
 
 volumes:
   mysql_dev_data:
@@ -385,6 +442,11 @@ volumes:
     driver: local
   chat_server_dev_logs:
     driver: local
+  prometheus_dev_data:
+    driver: local
+  grafana_dev_data:
+    driver: local
+
 
 networks:
   gatrix-dev-network:

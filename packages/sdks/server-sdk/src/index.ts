@@ -14,6 +14,9 @@ export { GatrixSDKError, ErrorCode, createError, isGatrixSDKError } from './util
 // Export logger
 export { Logger, LogLevel, getLogger } from './utils/logger';
 
+// Export metrics helpers
+export { attachExpressMetrics, attachFastifyMetrics } from './utils/metrics';
+
 // Default export
 export { GatrixServerSDK as default } from './GatrixServerSDK';
 

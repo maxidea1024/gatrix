@@ -84,4 +84,4 @@ The application will be available at:
 - 🔧 [Learn about the Cache System](./backend/cache-keys.md)
 - 🚀 [Explore Job Management](./features/job-management.md)
 - 🌍 [Configure Game Worlds](./features/game-worlds.md)
-- 💬 [Set up Chat Server](../packages/chat-server/README.md)
+- 💬 [Set up Chat Server](https://github.com/motifgames/gatrix/blob/main/packages/chat-server/README.md)

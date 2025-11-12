@@ -8,6 +8,8 @@ import trackRoutes from './routes/track';
 import insightsRoutes from './routes/insights';
 import logger from './utils/logger';
 
+import { initMetrics } from './services/MetricsService';
+
 export async function createApp(): Promise<FastifyInstance> {
   const app = Fastify({
     logger: false, // Winston 사용
@@ -36,9 +38,12 @@ export async function createApp(): Promise<FastifyInstance> {
     redis: await import('./config/redis').then(m => m.redis),
   });
 
+  // Monitoring metrics (no-op if disabled)
+  initMetrics(app);
+
   // Health Check
   app.get('/health', async () => {
-    return { 
+    return {
       status: 'ok',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),

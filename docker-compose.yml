@@ -72,6 +72,8 @@ services:
       DISABLE_X_POWERED_BY: true
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
       DISABLE_RATE_LIMIT: true
+      MONITORING_ENABLED: ${MONITORING_ENABLED:-true}
+
       # Chat Server Integration
       CHAT_SERVER_URL: http://chat-server:53001
       # Service Discovery
@@ -137,6 +139,8 @@ services:
       MYSQL_USER: ${DB_USER:-gatrix_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
       LOG_LEVEL: ${EVENT_LENS_LOG_LEVEL:-info}
+      MONITORING_ENABLED: ${MONITORING_ENABLED:-true}
+
     ports:
       - "${EVENT_LENS_PORT:-53002}:3002"
     depends_on:
@@ -263,6 +267,53 @@ services:
       interval: 10s
       start_period: 60s
 
+  # Prometheus - Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: gatrix-prometheus
+    restart: unless-stopped
+    environment:
+      PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
+      PROM_RETENTION_TIME: ${PROM_RETENTION_TIME:-14d}
+    ports:
+      - "${PROMETHEUS_PORT:-59091}:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
+      - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro
+      - prometheus_data:/prometheus
+    entrypoint: ["/bin/sh", "/docker/prometheus/entrypoint.sh"]
+    depends_on:
+      backend:
+        condition: service_healthy
+      event-lens:
+        condition: service_healthy
+      chat-server:
+        condition: service_started
+    networks:
+      - gatrix-network
+
+  # Grafana - Dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: gatrix-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "${GRAFANA_PORT:-54000}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./docker/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      prometheus:
+        condition: service_started
+    networks:
+      - gatrix-network
+
   # Frontend (Nginx)
   frontend:
     build:
@@ -340,6 +391,11 @@ volumes:
     driver: local
   etcd_data:
     driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
 
 networks:
   gatrix-network:

@@ -2,6 +2,7 @@ import express from 'express';
 import uploadRoutes from './upload';
 import invitationRoutes from './invitations';
 import serviceNoticeRoutes from './serviceNotices';
+import monitoringRoutes from './monitoring';
 
 const router = express.Router();
 
@@ -9,6 +10,7 @@ const router = express.Router();
 router.use('/upload', uploadRoutes);
 router.use('/invitations', invitationRoutes);
 router.use('/service-notices', serviceNoticeRoutes);
+router.use('/monitoring', monitoringRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

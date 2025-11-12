@@ -1,6 +1,6 @@
 ---
 slug: performance-optimization-guide
-title: Gatrix 성능 최적화 완전 가이드: 초고속 게임 플랫폼 구축하기
+title: "Gatrix 성능 최적화 완전 가이드: 초고속 게임 플랫폼 구축하기"
 authors: [gatrix-team]
 tags: [gatrix, performance, optimization, tips]
 ---

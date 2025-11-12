@@ -1,6 +1,6 @@
 ---
 slug: mastering-job-management-system
-title: Gatrix 작업 관리 시스템 완전 가이드: 자동화의 새로운 차원
+title: "Gatrix 작업 관리 시스템 완전 가이드: 자동화의 새로운 차원"
 authors: [gatrix-team]
 tags: [gatrix, jobs, tutorial, features]
 ---

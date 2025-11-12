@@ -1,0 +1,37 @@
+{
+  "uid": "gatrix-overview",
+  "title": "Gatrix Overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "tags": ["gatrix"],
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Targets Up",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "up",
+          "legendFormat": "{{instance}} ({{job}})",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true
+        }
+      },
+      "gridPos": {"x": 0, "y": 0, "w": 24, "h": 8}
+    }
+  ]
+}
+

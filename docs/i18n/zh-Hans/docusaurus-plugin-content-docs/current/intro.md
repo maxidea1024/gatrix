@@ -79,7 +79,7 @@ npm run dev
 
 ## 下一步
 
-- 📖 [阅读 API 文档](./api/client-api.md)
-- 🔧 [了解缓存系统](./backend/cache-keys.md)
-- 🚀 [探索作业管理](./features/job-management.md)
-- 🌍 [配置游戏世界](./features/game-worlds.md)
+- 📖 [阅读 API 文档](/docs/api/client-api)
+- 🔧 [了解缓存系统](/docs/backend/cache-keys)
+- 🚀 [探索作业管理](/docs/features/job-management)
+- 🌍 [配置游戏世界](/docs/features/game-worlds)

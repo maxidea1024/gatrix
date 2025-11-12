@@ -2251,6 +2251,8 @@
     "jobs": "作业管理",
     "queueMonitor": "队列监控",
     "console": "系统控制台",
+    "grafana": "Grafana 仪表盘",
+
     "realtimeEvents": "实时事件",
     "itemRewards": "道具奖励",
     "serviceNotices": "服务公告",

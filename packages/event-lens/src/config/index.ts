@@ -56,6 +56,12 @@ export const config = {
   geoip: {
     databasePath: process.env.GEOIP_DATABASE_PATH || './data/GeoLite2-City.mmdb',
   },
+
+  // Monitoring
+  monitoring: {
+    enabled: String(process.env.MONITORING_ENABLED || '').toLowerCase() === 'true',
+    metricsPath: process.env.METRICS_PATH || '/metrics',
+  },
 };
 
 export default config;

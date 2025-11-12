@@ -2207,6 +2207,8 @@
     "jobs": "Job Management",
     "queueMonitor": "Queue Monitor",
     "console": "System Console",
+    "grafana": "Grafana Dashboard",
+
     "realtimeEvents": "Realtime Events",
     "itemRewards": "Item Rewards",
     "serviceNotices": "Service Notices",

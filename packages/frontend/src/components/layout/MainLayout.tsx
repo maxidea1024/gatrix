@@ -296,6 +296,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     });
   };
 
+  // Open external http(s) links in new tab; otherwise navigate within SPA
+  const openOrNavigate = (path: string) => {
+    if (/^https?:\/\//i.test(path)) {
+      window.open(path, '_blank', 'noopener,noreferrer');
+    } else {
+      navigate(path);
+    }
+  };
+
   const renderMenuItem = (item: any, index: any) => {
     // 서브메뉴가 있는 경우
     if (item.children) {
@@ -379,7 +388,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     arrow
                   >
                     <ListItemButton
-                      onClick={() => navigate(child.path)}
+                      onClick={() => openOrNavigate(child.path)}
                       sx={{
                         pl: 0,
                         pr: 0,
@@ -420,7 +429,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   return (
                     <ListItemButton
                       key={childIndex}
-                      onClick={() => navigate(child.path)}
+                      onClick={() => openOrNavigate(child.path)}
                       sx={{
                         pl: 2,
                         pr: 2,
@@ -463,7 +472,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const menuButton = (
       <ListItemButton
         key={index}
-        onClick={() => navigate(item.path)}
+        onClick={() => openOrNavigate(item.path)}
         sx={{
           color: isActive ? theme.palette.text.primary : theme.palette.text.secondary,
           backgroundColor: isActive ? `${theme.palette.primary.main}20` : 'transparent',

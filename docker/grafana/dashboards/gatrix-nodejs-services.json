@@ -1,0 +1,239 @@
+{
+  "uid": "gatrix-nodejs-services",
+  "title": "Gatrix Node.js Services",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "tags": ["gatrix", "nodejs"],
+  "templating": {
+    "list": [
+      {
+        "name": "service",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({__name__=~\"http_request_duration_seconds_count|process_resident_memory_bytes\"}, service)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "topN",
+        "type": "custom",
+        "query": "5,10,20",
+        "current": { "text": "10", "value": "10", "selected": true }
+      },
+      {
+        "name": "window",
+        "type": "custom",
+        "query": "1m,5m,15m,30m,1h",
+        "current": { "text": "5m", "value": "5m", "selected": true }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Requests per second (by route)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "sum by (route)(rate(http_request_duration_seconds_count{service=~\"$service\"}[$window]))", "refId": "A" }
+      ],
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Requests per second (total)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "sum(rate(http_request_duration_seconds_count{service=~\"$service\"}[$window]))", "refId": "A" }
+      ],
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "HTTP p95 latency (aggregate)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum by (le)(rate(http_request_duration_seconds_bucket{service=~\"$service\"}[$window])))", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "HTTP p95 latency (by route)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum by (le, route)(rate(http_request_duration_seconds_bucket{service=~\"$service\"}[$window])))", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "HTTP 5xx rate (total)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "sum(rate(http_request_duration_seconds_count{status_code=~\"5..\", service=~\"$service\"}[$window]))", "refId": "A" }
+      ],
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "HTTP 5xx rate (by route)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "sum by (route)(rate(http_request_duration_seconds_count{status_code=~\"5..\", service=~\"$service\"}[$window]))", "refId": "A" }
+      ],
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "RSS Memory",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "sum(process_resident_memory_bytes{service=~\"$service\"})", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "gridPos": { "x": 0, "y": 24, "w": 8, "h": 8 }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Heap Used",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "sum(nodejs_heap_size_used_bytes{service=~\"$service\"})", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "gridPos": { "x": 8, "y": 24, "w": 8, "h": 8 }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Event Loop Lag",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "max(nodejs_eventloop_lag_seconds{service=~\"$service\"})", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "gridPos": { "x": 16, "y": 24, "w": 8, "h": 8 }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "GC p95 (by kind)",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum by (le,kind)(rate(nodejs_gc_duration_seconds_bucket{service=~\"$service\"}[$window])))", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "gridPos": { "x": 0, "y": 32, "w": 12, "h": 8 }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "CPU user seconds rate",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "sum(rate(process_cpu_user_seconds_total{service=~\"$service\"}[$window]))", "refId": "A" }
+      ],
+      "gridPos": { "x": 12, "y": 32, "w": 12, "h": 8 }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Inbound bytes/s",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "sum by (service)(rate(http_request_bytes_in_total{service=~\"$service\"}[$window]))", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "Bps" } },
+      "gridPos": { "x": 0, "y": 40, "w": 12, "h": 8 }
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Outbound bytes/s",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "sum by (service)(rate(http_response_bytes_out_total{service=~\"$service\"}[$window]))", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "Bps" } },
+      "gridPos": { "x": 12, "y": 40, "w": 12, "h": 8 }
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Top routes by RPS",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "topk($topN, sum by (service, route)(rate(http_request_duration_seconds_count{service=~\"$service\"}[$window])))", "refId": "A" }
+      ],
+      "gridPos": { "x": 0, "y": 48, "w": 8, "h": 8 }
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "Top methods by RPS",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "topk($topN, sum by (service, method)(rate(http_request_duration_seconds_count{service=~\"$service\"}[$window])))", "refId": "A" }
+      ],
+      "gridPos": { "x": 8, "y": 48, "w": 8, "h": 8 }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Top routes by p95 latency",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "topk($topN, histogram_quantile(0.95, sum by (le, service, route)(rate(http_request_duration_seconds_bucket{service=~\"$service\"}[$window]))))", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "gridPos": { "x": 16, "y": 48, "w": 8, "h": 8 }
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Top routes by 5xx rate",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "topk($topN, sum by (service, route)(rate(http_request_duration_seconds_count{status_code=~\"5..\", service=~\"$service\"}[$window])))", "refId": "A" }
+      ],
+      "gridPos": { "x": 0, "y": 56, "w": 8, "h": 8 }
+    },
+    {
+      "id": 18,
+      "type": "timeseries",
+      "title": "Top routes by outbound bytes/s",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "topk($topN, sum by (service, route)(rate(http_response_bytes_out_total{service=~\"$service\"}[$window])))", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "Bps" } },
+      "gridPos": { "x": 8, "y": 56, "w": 8, "h": 8 }
+    },
+    {
+      "id": 19,
+      "type": "timeseries",
+      "title": "Top routes by inbound bytes/s",
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "topk($topN, sum by (service, route)(rate(http_request_bytes_in_total{service=~\"$service\"}[$window])))", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "Bps" } },
+      "gridPos": { "x": 16, "y": 56, "w": 8, "h": 8 }
+    }
+  ]
+}
+
