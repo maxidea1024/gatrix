@@ -9,13 +9,19 @@
 # Usage:
 #   ./setup-env.sh [HOST] [ENVIRONMENT] [LANGUAGE] [OPTIONS]
 #
+# Options:
+#   --force              Overwrite existing .env file
+#   --nobackup           Do not create backup file when overwriting
+#   --admin-password     Set custom admin password
+#
 # Examples:
 #   ./setup-env.sh localhost development
 #   ./setup-env.sh 192.168.1.100 production
 #   ./setup-env.sh example.com production en
 #   ./setup-env.sh localhost development --force
+#   ./setup-env.sh localhost development ko --nobackup
 #   ./setup-env.sh localhost development ko --admin-password "MySecurePassword123"
-#   ./setup-env.sh example.com production en --admin-password "SecurePass123" --force
+#   ./setup-env.sh example.com production en --admin-password "SecurePass123" --force --nobackup
 #
 ################################################################################
 
@@ -127,11 +133,15 @@ check_existing_env() {
       exit 1
     fi
 
-    # Backup existing file before overwriting
-    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-    BACKUP_FILE="$PROJECT_ROOT/.env.backup.$TIMESTAMP"
-    cp "$ENV_FILE" "$BACKUP_FILE"
-    print_warning "Existing .env file backed up: $BACKUP_FILE"
+    # Backup existing file before overwriting (unless --nobackup is specified)
+    if [ "$NOBACKUP" = false ]; then
+      TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+      BACKUP_FILE="$PROJECT_ROOT/.env.backup.$TIMESTAMP"
+      cp "$ENV_FILE" "$BACKUP_FILE"
+      print_warning "Existing .env file backed up: $BACKUP_FILE"
+    else
+      print_info "Skipping backup (--nobackup flag used)"
+    fi
   fi
 }
 
@@ -251,6 +261,7 @@ main() {
   DEFAULT_LANGUAGE="${3:-ko}"
   ADMIN_PASSWORD="admin123"
   FORCE=false
+  NOBACKUP=false
 
   # Parse optional arguments
   i=4
@@ -258,6 +269,8 @@ main() {
     arg="${!i}"
     if [ "$arg" = "--force" ]; then
       FORCE=true
+    elif [ "$arg" = "--nobackup" ]; then
+      NOBACKUP=true
     elif [ "$arg" = "--admin-password" ]; then
       i=$((i + 1))
       ADMIN_PASSWORD="${!i}"

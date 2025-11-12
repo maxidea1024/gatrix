@@ -22,8 +22,8 @@ const DEFAULT_RETRY_CONFIG: Required<RetryConfig> = {
   enabled: true,
   maxRetries: 10,
   retryDelay: 2000, // Initial delay: 2 seconds
-  retryDelayMultiplier: 2, // Exponential backoff: 2s -> 4s -> 8s -> 16s -> 32s -> 60s (max)
-  maxRetryDelay: 60000, // Max delay: 60 seconds
+  retryDelayMultiplier: 2, // Exponential backoff: 2s -> 4s -> 8s -> 10s (max)
+  maxRetryDelay: 10000, // Max delay: 10 seconds
   retryableStatusCodes: [408, 429, 500, 502, 503, 504],
 };
 

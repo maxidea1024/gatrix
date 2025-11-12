@@ -133,9 +133,9 @@ public class RetryConfig
     public int RetryDelayMultiplier { get; set; } = 2;
 
     /// <summary>
-    /// Max retry delay in milliseconds (default: 60000)
+    /// Max retry delay in milliseconds (default: 10000)
     /// </summary>
-    public int MaxRetryDelay { get; set; } = 60000;
+    public int MaxRetryDelay { get; set; } = 10000;
 
     /// <summary>
     /// HTTP status codes to retry

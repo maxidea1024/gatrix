@@ -3,7 +3,7 @@
  * Provides service discovery operations via Backend API
  */
 
-import os from 'os';
+import * as os from 'os';
 import { Logger } from '../utils/logger';
 import { ApiClient } from '../client/ApiClient';
 import { ServiceInstance, GetServicesParams, RegisterServiceInput, UpdateServiceStatusInput, WhitelistData, ServiceLabels } from '../types/api';

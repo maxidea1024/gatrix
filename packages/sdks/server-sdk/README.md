@@ -132,7 +132,7 @@ const sdk = new GatrixServerSDK({
     maxRetries: 10, // Max retry attempts. -1 for infinite retries (default: 10)
     retryDelay: 2000, // Initial retry delay in ms (default: 2000)
     retryDelayMultiplier: 2, // Delay multiplier for exponential backoff (default: 2)
-    maxRetryDelay: 60000, // Max retry delay in ms (default: 60000)
+    maxRetryDelay: 10000, // Max retry delay in ms (default: 10000)
     retryableStatusCodes: [408, 429, 500, 502, 503, 504], // HTTP status codes to retry
   },
 });
@@ -763,7 +763,7 @@ const sdk = new GatrixServerSDK({
     maxRetries: 10,
     retryDelay: 2000, // 2 seconds
     retryDelayMultiplier: 2,
-    maxRetryDelay: 60000, // 60 seconds
+    maxRetryDelay: 10000, // 10 seconds
     retryableStatusCodes: [408, 429, 500, 502, 503, 504],
   },
 });
@@ -775,9 +775,7 @@ With default settings, retry delays follow this pattern:
 - 1st retry: 2 seconds
 - 2nd retry: 4 seconds
 - 3rd retry: 8 seconds
-- 4th retry: 16 seconds
-- 5th retry: 32 seconds
-- 6th+ retries: 60 seconds (max)
+- 4th+ retries: 10 seconds (max)
 
 ### Custom Retry Configuration
 

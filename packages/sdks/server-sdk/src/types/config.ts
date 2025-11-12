@@ -28,7 +28,7 @@ export interface LoggerConfig {
 export interface RetryConfig {
   enabled?: boolean; // Enable retry (default: true)
   maxRetries?: number; // Max retry attempts. -1 for infinite retries (default: 10)
-  retryDelay?: number; // Initial retry delay in ms (default: 1000)
+  retryDelay?: number; // Initial retry delay in ms (default: 2000)
   retryDelayMultiplier?: number; // Delay multiplier for exponential backoff (default: 2)
   maxRetryDelay?: number; // Max retry delay in ms (default: 10000)
   retryableStatusCodes?: number[]; // HTTP status codes to retry (default: [408, 429, 500, 502, 503, 504])

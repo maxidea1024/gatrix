@@ -21,11 +21,15 @@
 .PARAMETER Force
     Force overwrite existing .env file
 
+.PARAMETER NoBackup
+    Do not create backup file when overwriting
+
 .EXAMPLE
     .\setup-env.ps1 -HostAddress localhost -Environment development
     .\setup-env.ps1 -HostAddress 192.168.1.100 -Environment production -Force
     .\setup-env.ps1 -HostAddress example.com -Environment production -DefaultLanguage en
     .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "MySecurePassword123"
+    .\setup-env.ps1 -HostAddress localhost -Environment development -Force -NoBackup
 
 .NOTES
     Requires Windows PowerShell 5.0 or higher
@@ -46,7 +50,10 @@ param(
     [string]$AdminPassword = "admin123",
 
     [Parameter(Mandatory=$false, HelpMessage="Force overwrite existing .env file")]
-    [switch]$Force
+    [switch]$Force,
+
+    [Parameter(Mandatory=$false, HelpMessage="Do not create backup file when overwriting")]
+    [switch]$NoBackup
 )
 
 # Set UTF-8 encoding for proper emoji and special character display
@@ -150,12 +157,17 @@ function Check-ExistingEnv {
             exit 1
         }
 
-        # Backup existing file before overwriting
-        $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-        $backupFile = "$ProjectRoot\.env.backup.$timestamp"
-        Copy-Item $EnvFile $backupFile
-        Write-Warning-Custom "Existing .env file backed up: $backupFile"
-        return $backupFile
+        # Backup existing file before overwriting (unless -NoBackup is specified)
+        if (-not $NoBackup) {
+            $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+            $backupFile = "$ProjectRoot\.env.backup.$timestamp"
+            Copy-Item $EnvFile $backupFile
+            Write-Warning-Custom "Existing .env file backed up: $backupFile"
+            return $backupFile
+        } else {
+            Write-Info "Skipping backup (-NoBackup flag used)"
+            return $null
+        }
     }
     return $null
 }

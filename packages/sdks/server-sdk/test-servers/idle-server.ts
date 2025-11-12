@@ -6,7 +6,7 @@
  */
 
 import { GatrixServerSDK, getLogger } from '../src/index';
-import os from 'os';
+import * as os from 'os';
 
 const logger = getLogger('IDLE-SERVER');
 

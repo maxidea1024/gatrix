@@ -1,4 +1,4 @@
-import os from 'os';
+import * as os from 'os';
 
 /**
  * Get the first non-internal IPv4 address from network interfaces

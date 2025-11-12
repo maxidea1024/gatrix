@@ -6,7 +6,7 @@
 
 import { GatrixServerSDK, getLogger } from '../src/index';
 import { ServiceInstance, ServiceLabels } from '../src/types/api';
-import os from 'os';
+import * as os from 'os';
 import { Logger } from '../src/utils/logger';
 
 export interface BaseServerConfig {

@@ -4,6 +4,8 @@ import { ApiResponse } from '@/types';
 class ApiService {
   private api: AxiosInstance;
   private accessToken: string | null = null;
+  private refreshAttempts: Map<string, number> = new Map(); // Track refresh attempts per token
+  private readonly MAX_REFRESH_ATTEMPTS = 1; // Only try refresh once per token
 
   constructor() {
     // Use relative path for API calls by default. Runtime config can override.
@@ -108,6 +110,7 @@ class ApiService {
         if (error.response?.status === 401 && !originalRequest._retry) {
           // Don't retry if this is already a refresh request
           if (originalRequest.url?.includes('/auth/refresh')) {
+            console.warn('[ApiService] Token refresh failed with 401 - JWT Secret may have changed');
             this.clearTokens();
             if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
               window.location.href = '/login';
@@ -134,7 +137,22 @@ class ApiService {
             return Promise.reject(error);
           }
 
+          // Check if we've already attempted to refresh this token
+          const tokenKey = this.accessToken.substring(0, 20);
+          const attemptCount = this.refreshAttempts.get(tokenKey) || 0;
+
+          if (attemptCount >= this.MAX_REFRESH_ATTEMPTS) {
+            console.warn('[ApiService] Max refresh attempts reached - JWT Secret may have changed');
+            this.clearTokens();
+            this.refreshAttempts.delete(tokenKey);
+            if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+              window.location.href = '/login';
+            }
+            return Promise.reject(error);
+          }
+
           originalRequest._retry = true;
+          this.refreshAttempts.set(tokenKey, attemptCount + 1);
 
           try {
             // Try to refresh token
@@ -144,6 +162,7 @@ class ApiService {
             const { accessToken } = refreshResponse.data;
 
             this.setAccessToken(accessToken);
+            this.refreshAttempts.delete(tokenKey); // Clear attempt counter on success
 
             // Ensure the new token is set in the original request
             if (!originalRequest.headers) {
@@ -153,8 +172,10 @@ class ApiService {
 
             return this.api(originalRequest);
           } catch (refreshError) {
-            // Refresh failed, redirect to login
+            // Refresh failed - JWT Secret may have changed
+            console.warn('[ApiService] Token refresh failed - clearing auth data and redirecting to login');
             this.clearTokens();
+            this.refreshAttempts.delete(tokenKey);
             if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
               window.location.href = '/login';
             }
@@ -204,6 +225,7 @@ class ApiService {
 
   clearTokens() {
     this.accessToken = null;
+    this.refreshAttempts.clear(); // Clear all refresh attempt counters
   }
 
   // Generic request method
