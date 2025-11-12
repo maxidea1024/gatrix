@@ -119,10 +119,72 @@ export class WhitelistService {
         return false;
       }
 
-      // Check IP match (simple exact match for now)
-      // TODO: Implement CIDR matching if needed
-      return entry.ipAddress === ip;
+      // Check exact IP match
+      if (entry.ipAddress === ip) {
+        return true;
+      }
+
+      // Check CIDR match if ipAddress contains CIDR notation
+      if (entry.ipAddress.includes('/')) {
+        return this.isIpInCIDR(ip, entry.ipAddress);
+      }
+
+      return false;
     });
+  }
+
+  /**
+   * Check if IP is within CIDR range
+   * Supports IPv4 CIDR notation (e.g., 192.168.1.0/24)
+   */
+  private isIpInCIDR(ip: string, cidr: string): boolean {
+    try {
+      const [cidrIp, cidrMask] = cidr.split('/');
+      const mask = parseInt(cidrMask, 10);
+
+      if (isNaN(mask) || mask < 0 || mask > 32) {
+        this.logger.warn('Invalid CIDR mask', { cidr });
+        return false;
+      }
+
+      // Convert IP strings to 32-bit integers
+      const ipNum = this.ipToNumber(ip);
+      const cidrIpNum = this.ipToNumber(cidrIp);
+
+      if (ipNum === null || cidrIpNum === null) {
+        return false;
+      }
+
+      // Calculate network mask
+      const maskBits = (0xffffffff << (32 - mask)) >>> 0;
+
+      // Check if IP is in CIDR range
+      return (ipNum & maskBits) === (cidrIpNum & maskBits);
+    } catch (error) {
+      this.logger.warn('Error checking CIDR', { ip, cidr, error });
+      return false;
+    }
+  }
+
+  /**
+   * Convert IP address string to 32-bit number
+   */
+  private ipToNumber(ip: string): number | null {
+    const parts = ip.split('.');
+    if (parts.length !== 4) {
+      return null;
+    }
+
+    let num = 0;
+    for (let i = 0; i < 4; i++) {
+      const part = parseInt(parts[i], 10);
+      if (isNaN(part) || part < 0 || part > 255) {
+        return null;
+      }
+      num = (num << 8) + part;
+    }
+
+    return num >>> 0; // Convert to unsigned 32-bit integer
   }
 
   /**

@@ -258,6 +258,87 @@ sudo systemctl start docker
 
 Refer to the main [README.md](README.md) for more detailed information and advanced configuration options.
 
+## Jenkins Setup (CI/CD Pipeline)
+
+For automated builds and deployments, you can set up Jenkins with the provided setup scripts.
+
+### Prerequisites for Jenkins
+
+- Jenkins server installed and running
+- Git plugin installed in Jenkins
+- Node.js 22 LTS installed on Jenkins agent/server
+- Docker installed on Jenkins agent/server (for Docker builds)
+
+### Using Jenkins Setup Scripts
+
+The project includes Jenkins setup scripts in the `scripts/` directory:
+
+**For Linux/Mac:**
+```bash
+./scripts/setup.sh
+```
+
+**For Windows PowerShell:**
+```powershell
+.\scripts\setup.ps1
+```
+
+These scripts will:
+- Verify Node.js 22 LTS is installed
+- Install required dependencies
+- Configure environment variables
+- Set up database connections
+- Initialize the application
+
+### Jenkins Pipeline Configuration
+
+1. **Create a new Pipeline job in Jenkins**
+2. **Configure Git repository:**
+   - Repository URL: Your Git repository URL
+   - Branch: `main` (or your default branch)
+
+3. **Pipeline script:**
+   ```groovy
+   pipeline {
+     agent any
+
+     stages {
+       stage('Setup') {
+         steps {
+           sh './scripts/setup.sh'
+         }
+       }
+
+       stage('Build') {
+         steps {
+           sh 'yarn build'
+         }
+       }
+
+       stage('Test') {
+         steps {
+           sh 'yarn test'
+         }
+       }
+
+       stage('Deploy') {
+         steps {
+           sh 'docker-compose -f docker-compose.yml up -d'
+         }
+       }
+     }
+   }
+   ```
+
+4. **Configure webhooks** (optional):
+   - Set up GitHub/GitLab webhooks to trigger builds automatically on push
+
+### Troubleshooting Jenkins Setup
+
+- **Node.js not found:** Ensure Node.js 22 LTS is installed on the Jenkins agent
+- **Permission denied:** Make sure scripts have execute permissions: `chmod +x scripts/setup.sh`
+- **Docker not available:** Install Docker on the Jenkins agent or use Docker-in-Docker
+
 ## Force Overwrite Configuration
 
 If you need to regenerate the `.env` file:
