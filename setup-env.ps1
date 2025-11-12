@@ -229,6 +229,12 @@ function Create-EnvFile {
             $newLines += "VITE_DEFAULT_LANGUAGE=$DefaultLanguage"
         } elseif ($line -match "^DEFAULT_LANGUAGE=") {
             $newLines += "DEFAULT_LANGUAGE=$DefaultLanguage"
+        } elseif ($line -match "^VITE_GRAFANA_URL=") {
+            if ($Environment -eq "development") {
+                $newLines += "VITE_GRAFANA_URL=http://localhost:54000"
+            } else {
+                $newLines += "VITE_GRAFANA_URL=http://$HostAddress`:54000"
+            }
         } elseif ($line -match "^ADMIN_PASSWORD=") {
             $newLines += "ADMIN_PASSWORD=$AdminPassword"
         } else {

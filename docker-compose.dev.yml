@@ -157,6 +157,7 @@ services:
       VITE_API_URL: ${VITE_API_URL:-/api/v1}
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
+      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:54000}
     ports:
       - "0.0.0.0:${FRONTEND_PORT:-53000}:3000"
     depends_on:

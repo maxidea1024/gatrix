@@ -1,17 +1,21 @@
 import React, { useMemo } from 'react';
 import { Box } from '@mui/material';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export const GrafanaDashboardPage: React.FC = () => {
+  const { isDark } = useTheme();
+
   const grafanaUrl = useMemo(() => {
     const url = ((import.meta.env as any).VITE_GRAFANA_URL as string) || `${window.location.protocol}//${window.location.hostname}:54000`;
     return url;
   }, []);
 
   const iframeUrl = useMemo(() => {
-    // Grafana public dashboard URL format
-    // You can customize this based on your dashboard ID
-    return `${grafanaUrl}/d/000000001/home?orgId=1&kiosk=tv`;
-  }, [grafanaUrl]);
+    // Grafana home page with theme parameter
+    // theme=dark or theme=light
+    const theme = isDark ? 'dark' : 'light';
+    return `${grafanaUrl}/?kiosk=tv&theme=${theme}`;
+  }, [grafanaUrl, isDark]);
 
   return (
     <Box
@@ -22,6 +26,7 @@ export const GrafanaDashboardPage: React.FC = () => {
       }}
     >
       <iframe
+        key={iframeUrl}
         src={iframeUrl}
         style={{
           width: '100%',

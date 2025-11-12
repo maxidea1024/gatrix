@@ -182,6 +182,13 @@ create_env_file() {
   sed -i.bak "s|^VITE_DEFAULT_LANGUAGE=.*|VITE_DEFAULT_LANGUAGE=$DEFAULT_LANGUAGE|" "$ENV_FILE"
   sed -i.bak "s|^DEFAULT_LANGUAGE=.*|DEFAULT_LANGUAGE=$DEFAULT_LANGUAGE|" "$ENV_FILE"
 
+  # Set Grafana URL based on environment
+  if [ "$ENVIRONMENT" = "development" ]; then
+    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=http://localhost:54000|" "$ENV_FILE"
+  else
+    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=http://$HOST:54000|" "$ENV_FILE"
+  fi
+
   # Replace admin password
   sed -i.bak "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=$ADMIN_PASSWORD|" "$ENV_FILE"
 

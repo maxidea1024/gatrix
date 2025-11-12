@@ -178,7 +178,24 @@ https://example.com:53000
 
 ## Next Steps
 
-1. **Update OAuth Credentials** (Optional):
+1. **Configure Grafana URL** (Optional):
+   - Edit `.env` file
+   - Update `VITE_GRAFANA_URL` to match your Grafana server address
+   - Default: `http://localhost:54000`
+   - For remote deployment: `http://your-grafana-server:54000`
+   - Restart services:
+
+   **Development:**
+   ```bash
+   docker-compose -f docker-compose.dev.yml restart frontend-dev
+   ```
+
+   **Production:**
+   ```bash
+   docker-compose -f docker-compose.yml restart frontend
+   ```
+
+2. **Update OAuth Credentials** (Optional):
    - Edit `.env` file
    - Add your Google and GitHub OAuth credentials
    - Restart services:
