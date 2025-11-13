@@ -68,20 +68,21 @@ export class GatrixServerSDK {
     // Initialize logger
     this.logger = new Logger(configWithDefaults.logger);
 
-    // Initialize API client
+    // Initialize metrics first
+    this.metrics = new SdkMetrics({
+      enabled: configWithDefaults.metrics?.enabled !== false,
+      applicationName: configWithDefaults.applicationName,
+      registry: configWithDefaults.metrics?.registry,
+    });
+
+    // Initialize API client (inject metrics for HTTP instrumentation)
     this.apiClient = new ApiClient({
       baseURL: configWithDefaults.gatrixUrl,
       apiToken: configWithDefaults.apiToken,
       applicationName: configWithDefaults.applicationName,
       logger: this.logger,
       retry: configWithDefaults.retry,
-    });
-
-    // Initialize metrics
-    this.metrics = new SdkMetrics({
-      enabled: configWithDefaults.metrics?.enabled !== false,
-      applicationName: configWithDefaults.applicationName,
-      registry: configWithDefaults.metrics?.registry,
+      metrics: this.metrics,
     });
 
     // Initialize services
