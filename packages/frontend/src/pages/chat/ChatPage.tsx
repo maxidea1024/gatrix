@@ -129,6 +129,9 @@ const ChatPageContent: React.FC = () => {
   useEffect(() => { latestWidthRef.current = threadWidth; }, [threadWidth]);
   const didForceReloadRef = useRef(false);
 
+  // Deduplicate error toasts within a short window
+  const lastErrorRef = useRef<{ msg: string; ts: number } | null>(null);
+
 
   function onMouseMoveThreadResizer(e: MouseEvent) {
     if (!isResizingRef.current) return;
