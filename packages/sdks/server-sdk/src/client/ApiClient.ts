@@ -54,6 +54,9 @@ export class ApiClient {
     // Request interceptor
     this.client.interceptors.request.use(
       (requestConfig) => {
+        // Record start time for latency metrics
+        (requestConfig as any).__sdkStartTime = process.hrtime.bigint();
+
         this.logger.debug('API Request', {
           method: requestConfig.method?.toUpperCase(),
           url: requestConfig.url,
@@ -74,9 +77,41 @@ export class ApiClient {
           status: response.status,
           url: response.config.url,
         });
+
+        // Observe HTTP duration and increment counters
+        try {
+          const started = (response.config as any).__sdkStartTime as bigint | undefined;
+          if (started && this.metrics) {
+            const elapsed = Number(process.hrtime.bigint() - started) / 1e9;
+            const method = response.config.method?.toUpperCase() || 'GET';
+            const route = response.config.url || 'unknown';
+            // Use SDK metrics generic error counter and custom HTTP helpers if present
+            this.metrics.observeHttpDuration?.(method, route, response.status, elapsed);
+            this.metrics.incHttpRequestsTotal?.(method, route, response.status);
+          }
+        } catch {
+          // ignore metrics failures
+        }
+
         return response;
       },
       (error: AxiosError) => {
+        try {
+          const cfg = error.config as any;
+          const started = cfg?.__sdkStartTime as bigint | undefined;
+          if (started && this.metrics) {
+            const elapsed = Number(process.hrtime.bigint() - started) / 1e9;
+            const method = (cfg?.method?.toUpperCase?.() as string) || 'GET';
+            const route = (cfg?.url as string) || 'unknown';
+            const status = error.response?.status || 0;
+            this.metrics.observeHttpDuration?.(method, route, status, elapsed);
+            this.metrics.incHttpRequestsTotal?.(method, route, status);
+            this.metrics.incError('http', 'request');
+          }
+        } catch {
+          // ignore metrics failures
+        }
+
         this.handleError(error);
         return Promise.reject(error);
       }
