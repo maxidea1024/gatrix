@@ -98,18 +98,19 @@ export class UserService {
         // Use transaction for each batch
         await db.transaction(async (trx) => {
           for (const userData of batch) {
+            const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
             const userToSave: UserData = {
               id: userData.id,
               username: userData.username,
               name: userData.name || userData.username,
               email: userData.email || userData.username,
               avatarUrl: userData.avatarUrl || undefined,
-              status: userData.status || 'offline',
+              status: userData.status || 'active',
               chatStatus: userData.chatStatus || 'offline',
               customStatus: userData.customStatus || undefined,
-              lastActivityAt: userData.lastActivityAt || new Date().toISOString(),
-              createdAt: userData.createdAt || new Date().toISOString(),
-              updatedAt: new Date().toISOString()
+              lastActivityAt: userData.lastActivityAt ? new Date(userData.lastActivityAt).toISOString().slice(0, 19).replace('T', ' ') : now,
+              createdAt: userData.createdAt ? new Date(userData.createdAt).toISOString().slice(0, 19).replace('T', ' ') : now,
+              updatedAt: now
             };
 
             const existingUser = await trx('chat_users').where('id', userData.id).first();
@@ -209,7 +210,7 @@ export class UserService {
       };
 
       if (status !== undefined) {
-        updates.status = status;
+        updates.chatStatus = status;
       }
 
       if (customStatus !== undefined) {

@@ -2414,6 +2414,7 @@
     },
     "channels": "Channels",
     "createChannel": "Create Channel",
+    "creating": "正在创建...",
     "createChannelSubtitle": "Create a new channel to communicate with your team",
     "searchChannels": "Search channels...",
     "noChannelsFound": "No channels found",

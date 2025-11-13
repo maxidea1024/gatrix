@@ -81,6 +81,7 @@ export class ChannelModel {
   // 채널 생성
   static async create(data: CreateChannelData, createdBy: number): Promise<ChannelType> {
     const channelData = {
+      channelName: data.name, // legacy column for backward compatibility
       name: data.name,
       description: data.description,
       type: data.type,

@@ -2370,6 +2370,7 @@
     },
     "channels": "Channels",
     "createChannel": "Create Channel",
+    "creating": "Creating...",
     "createChannelSubtitle": "Create a new channel to communicate with your team",
     "searchChannels": "Search channels...",
     "noChannelsFound": "No channels found",

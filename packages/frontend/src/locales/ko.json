@@ -2370,6 +2370,7 @@
     },
     "channels": "채널",
     "createChannel": "채널 만들기",
+    "creating": "채널을 생성하는 중...",
     "createChannelSubtitle": "새로운 채널을 만들어 팀과 소통하세요",
     "searchChannels": "채널 검색...",
     "noChannelsFound": "채널을 찾을 수 없습니다",
