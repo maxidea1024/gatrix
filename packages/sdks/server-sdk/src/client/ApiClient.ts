@@ -38,6 +38,7 @@ export class ApiClient {
   constructor(config: ApiClientConfig) {
     this.logger = config.logger || new Logger();
     this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config.retry };
+    this.metrics = config.metrics;
 
     // Create axios instance
     this.client = axios.create({
