@@ -8,6 +8,9 @@ const router = Router();
 router.use(authenticate);
 
 // 사용자 동기화 (백엔드에서 프록시로 호출)
+// 동기화 라우트 별칭 (백엔드의 /upsert 호출과 호환)
+router.post('/upsert', UserController.upsertUser);
+
 router.post('/sync-user', UserController.upsertUser);
 
 // 여러 사용자 일괄 동기화 (관리자용)

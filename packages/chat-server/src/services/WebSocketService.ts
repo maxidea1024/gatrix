@@ -10,9 +10,9 @@ import { getMetrics } from './MetricsService';
 import { CacheService } from './CacheService';
 import { UserService } from './UserService';
 import { createLogger } from '../config/logger';
+import { SocketUser, WebSocketEvent } from '../types/chat';
 
 const logger = createLogger('WebSocketService');
-import { SocketUser, WebSocketEvent } from '../types/chat';
 
 export class WebSocketService {
   private io: SocketIOServer;
@@ -550,7 +550,7 @@ export class WebSocketService {
       metrics.activeChannels.set({ server_id: this.serverId }, channelCounts.size);
     }
     if (metrics.websocketConnections) {
-      metrics.websocketConnections.set({ server_id: this.serverId, type: 'websocket' }, connectedCount);
+      metrics.websocketConnections.set({ server_id: this.serverId, transport: 'websocket' }, connectedCount);
     }
   }
 

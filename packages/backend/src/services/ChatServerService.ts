@@ -32,17 +32,19 @@ export class ChatServerService {
   private static instance: ChatServerService;
   private axiosInstance: AxiosInstance;
   private apiToken: string;
+  private serviceToken: string;
 
   private constructor() {
     // 설정에서 API 토큰 가져오기
     this.apiToken = config.chatServer.apiToken;
+    this.serviceToken = (config.chatServer as any).serviceToken || 'gatrix-backend-service-token-default-key-change-in-production';
 
     this.axiosInstance = axios.create({
       baseURL: config.chatServer.url,
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Token': this.apiToken,
+        'X-API-Token': this.serviceToken, // Backend -> Chat Server 특수 토큰 사용
       },
     });
 

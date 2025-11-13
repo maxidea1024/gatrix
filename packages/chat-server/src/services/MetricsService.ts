@@ -1,10 +1,11 @@
-const promClient = require('prom-client');
-const { register, collectDefaultMetrics, Counter, Histogram, Gauge } = promClient;
 import type express from 'express';
 import { config } from '../config';
 import { createLogger } from '../config/logger';
 import os from 'os';
-import { ulid } from 'ulid';
+import { randomUUID } from 'crypto';
+import * as promClient from 'prom-client';
+
+const { register, collectDefaultMetrics, Counter, Histogram, Gauge } = promClient;
 
 const logger = createLogger('MetricsService');
 
@@ -21,7 +22,7 @@ export const initMetrics = (app: express.Application): void => {
 
     // Get instance information
     const hostname = `${os.hostname()}:${process.pid}`;
-    const instanceId = ulid();
+    const instanceId = randomUUID();
 
     // Get primary IP address (first non-loopback IPv4)
     const interfaces = os.networkInterfaces();

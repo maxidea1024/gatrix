@@ -117,8 +117,9 @@ services:
       MONITORING_ENABLED: "true"
 
       # Chat Server Integration
-      CHAT_SERVER_URL: http://chat-server-dev:3001
+      CHAT_SERVER_URL: http://chat-server-dev:5100
       CHAT_SERVER_API_TOKEN: ${CHAT_SERVER_API_TOKEN:-gatrix-api-d58e8c748ac604b8020526904558251a0604000f8a5898a1b5e28b99aee9ed79}
+      BACKEND_SERVICE_TOKEN: ${BACKEND_SERVICE_TOKEN:-gatrix-backend-service-token-default-key-change-in-production}
       # Service Discovery
       SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-etcd}
       SERVICE_DISCOVERY_HEARTBEAT_TTL: ${SERVICE_DISCOVERY_HEARTBEAT_TTL:-30}
@@ -375,10 +376,12 @@ services:
       # Service Discovery
       GATRIX_URL: http://backend-dev:5000
       API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
+      # Backend Service Token (for Backend -> Chat Server communication)
+      BACKEND_SERVICE_TOKEN: ${BACKEND_SERVICE_TOKEN:-gatrix-backend-service-token-default-key-change-in-production}
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-debug}
     ports:
-      - "0.0.0.0:${CHAT_PORT:-55100}:5100"
+      - "0.0.0.0:${CHAT_PORT:-5100}:5100"
     depends_on:
       mysql:
         condition: service_healthy

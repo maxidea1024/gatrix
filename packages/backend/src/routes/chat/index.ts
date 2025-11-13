@@ -23,7 +23,8 @@ router.use(upload.any() as any);
 // 채팅서버 설정
 const CHAT_SERVER_URL = process.env.CHAT_SERVER_URL || 'http://localhost:5100';
 const CHAT_API_BASE = `${CHAT_SERVER_URL}/api/v1`;
-const CHAT_SERVER_API_TOKEN = process.env.CHAT_SERVER_API_TOKEN || 'gatrix-api-d58e8c748ac604b8020526904558251a0604000f8a5898a1b5e28b99aee9eed79';
+// Backend -> Chat Server 특수 토큰 사용 (데이터베이스에서 가져오지 않는 미리 약속된 값)
+const BACKEND_SERVICE_TOKEN = process.env.BACKEND_SERVICE_TOKEN || 'gatrix-backend-service-token-default-key-change-in-production';
 const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
 // 모든 채팅 라우트에 인증 필요 (디버깅 로깅 추가)
@@ -117,10 +118,9 @@ const proxyOptions = {
   onProxyReq: (proxyReq: any, req: express.Request) => {
     logger.info(`🚀 PROXY MIDDLEWARE REACHED! ${req.method} ${req.url}`);
 
-    // Chat Server API 토큰 추가 (가장 중요!)
-    const CHAT_SERVER_API_TOKEN = process.env.CHAT_SERVER_API_TOKEN || 'gatrix-api-180c05eb58db26b863481f5d54e657a218b54da5bfb388e9278a7eb733227aec';
-    proxyReq.setHeader(HEADERS.X_API_TOKEN, CHAT_SERVER_API_TOKEN);
-    logger.info(`✅ Adding Chat Server API Token: ${CHAT_SERVER_API_TOKEN.substring(0, 20)}...`);
+    // Backend -> Chat Server 특수 토큰 추가 (가장 중요!)
+    proxyReq.setHeader(HEADERS.X_API_TOKEN, BACKEND_SERVICE_TOKEN);
+    logger.info(`✅ Adding Backend Service Token: ${BACKEND_SERVICE_TOKEN.substring(0, 20)}...`);
 
     // 사용자 정보 헤더 추가 (Chat Server에서 사용)
     logger.info(`🔍 Proxy request user check:`, {
@@ -234,7 +234,7 @@ router.use('/', async (req, res, next) => {
       method: req.method,
       url: targetUrl,
       headers: {
-        'X-API-Token': CHAT_SERVER_API_TOKEN,
+        'X-API-Token': BACKEND_SERVICE_TOKEN,
         'X-User-ID': (req.user as any)?.id?.toString() || '3',
         'Content-Type': 'application/json'
       },

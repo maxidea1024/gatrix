@@ -25,7 +25,7 @@ module.exports = {
       password: process.env.DB_PASSWORD || 'password',
       database: process.env.DB_NAME || 'gatrix_chat',
       charset: 'utf8mb4',
-      timezone: 'UTC',
+      timezone: '+00:00',
     },
     pool: {
       min: 2,
@@ -49,7 +49,7 @@ module.exports = {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       charset: 'utf8mb4',
-      timezone: 'UTC',
+      timezone: '+00:00',
     },
     pool: {
       min: 5,
@@ -73,7 +73,7 @@ module.exports = {
       password: process.env.CHAT_DB_PASSWORD || process.env.DB_PASSWORD,
       database: process.env.CHAT_DB_NAME || 'gatrix_chat',
       charset: 'utf8mb4',
-      timezone: 'UTC',
+      timezone: '+00:00',
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     },
     pool: {

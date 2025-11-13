@@ -82,6 +82,7 @@ const config = {
   chatServer: {
     url: process.env.CHAT_SERVER_URL || 'http://localhost:5100',
     apiToken: process.env.CHAT_SERVER_API_TOKEN || 'gatrix-api-default-token',
+    serviceToken: process.env.BACKEND_SERVICE_TOKEN || 'gatrix-backend-service-token-default-key-change-in-production',
   },
 
   // Service Discovery configuration

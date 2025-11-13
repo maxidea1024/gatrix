@@ -2,7 +2,9 @@ import { config } from './config';
 import { createLogger } from './config/logger';
 import ChatServerApp from './app';
 
+console.log('Step 0: imports completed');
 const logger = createLogger('ChatServer');
+console.log('Step 0d: logger created');
 
 // Set server ID for clustering
 if (!process.env.SERVER_ID) {
@@ -22,14 +24,17 @@ async function startServer(): Promise<void> {
 
     console.log('Step 2: Creating app...');
     const app = new ChatServerApp();
+    console.log('Step 2 completed: App created successfully');
 
     console.log('Step 3: Starting app...');
-    await app.start();
+    const startResult = await app.start();
+    console.log('Step 3 completed: App started successfully', startResult);
 
     console.log('=== CHAT SERVER STARTED ===');
 
   } catch (error) {
     console.error('=== STARTUP ERROR ===', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     logger.error('Error during server startup:', error);
     process.exit(1);
   }

@@ -8,15 +8,14 @@ import { config } from './config';
 import { createLogger } from './config/logger';
 import { requestLogger } from './middleware/requestLogger';
 import { ALLOWED_HEADERS } from './constants/headers';
-
-const logger = createLogger('ChatServerApp');
 import { WebSocketService } from './services/WebSocketService';
 import { initMetrics } from './services/MetricsService';
-
 import { redisManager } from './config/redis';
 import { ApiTokenService } from './services/ApiTokenService';
 import { databaseManager } from './config/database';
 import apiRoutes from './routes';
+
+const logger = createLogger('ChatServerApp');
 
 class ChatServerApp {
   private app: express.Application;
@@ -288,7 +287,7 @@ class ChatServerApp {
           let chatServerInstanceId: string | null = null;
           try {
             const os = await import('os');
-            const { ulid } = await import('ulid');
+            const { randomUUID } = await import('crypto');
 
             // Get primary IP address (first non-loopback IPv4)
             const interfaces = os.networkInterfaces();
@@ -311,7 +310,7 @@ class ChatServerApp {
             const backendUrl = process.env.GATRIX_URL || 'http://localhost:55000';
             const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
 
-            chatServerInstanceId = ulid();
+            chatServerInstanceId = randomUUID();
             const chatServerInstance = {
               instanceId: chatServerInstanceId,
               labels: {
