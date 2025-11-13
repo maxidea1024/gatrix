@@ -17,6 +17,7 @@ export interface ApiClientConfig {
   timeout?: number;
   logger?: Logger;
   retry?: RetryConfig;
+  metrics?: SdkMetrics; // Optional SDK metrics collector
 }
 
 const DEFAULT_RETRY_CONFIG: Required<RetryConfig> = {
