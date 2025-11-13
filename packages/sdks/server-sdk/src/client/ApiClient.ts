@@ -8,6 +8,7 @@ import { Logger } from '../utils/logger';
 import { ErrorCode, createError } from '../utils/errors';
 import { ApiResponse } from '../types/api';
 import { RetryConfig } from '../types/config';
+import { SdkMetrics } from '../utils/sdkMetrics';
 
 export interface ApiClientConfig {
   baseURL: string;

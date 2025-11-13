@@ -16,6 +16,7 @@ import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
 import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
 import { EventCallback } from './types/events';
+import { SdkMetrics } from './utils/sdkMetrics';
 import {
   RedeemCouponRequest,
   RedeemCouponResponse,
@@ -50,6 +51,7 @@ export class GatrixServerSDK {
   // Cache and Events
   private cacheManager?: CacheManager;
   private eventListener?: EventListener;
+  private metrics?: SdkMetrics;
 
   constructor(config: GatrixSDKConfig) {
     // Set default API token if not provided (for testing)
@@ -73,6 +75,13 @@ export class GatrixServerSDK {
       applicationName: configWithDefaults.applicationName,
       logger: this.logger,
       retry: configWithDefaults.retry,
+    });
+
+    // Initialize metrics
+    this.metrics = new SdkMetrics({
+      enabled: configWithDefaults.metrics?.enabled !== false,
+      applicationName: configWithDefaults.applicationName,
+      registry: configWithDefaults.metrics?.registry,
     });
 
     // Initialize services
@@ -150,7 +159,8 @@ export class GatrixServerSDK {
         this.survey,
         this.whitelist,
         this.apiClient,
-        this.logger
+        this.logger,
+        this.metrics
       );
 
       await this.cacheManager.initialize();
@@ -158,7 +168,7 @@ export class GatrixServerSDK {
       // Initialize event listener only if using event-based refresh method
       const refreshMethod = cacheConfig.refreshMethod ?? 'polling';
       if (this.config.redis && refreshMethod === 'event') {
-        this.eventListener = new EventListener(this.config.redis, this.cacheManager, this.logger);
+        this.eventListener = new EventListener(this.config.redis, this.cacheManager, this.logger, this.metrics);
         await this.eventListener.initialize();
       }
 
@@ -508,6 +518,16 @@ export class GatrixServerSDK {
    */
   async getServiceMaintenanceMessage(serviceType: string, lang?: 'ko' | 'en' | 'zh'): Promise<string | null> {
     return await this.serviceDiscovery.getServiceMaintenanceMessage(serviceType, lang);
+  }
+
+  /**
+   * Get prom-client Registry used by SDK metrics (if enabled)
+   * Useful to expose a single /metrics endpoint that includes SDK + HTTP metrics
+   */
+  getMetricsRegistry(): any | undefined {
+    // Return underlying registry from SdkMetrics
+    // Note: typed as any to avoid hard dependency on prom-client types
+    return this.metrics?.getRegistry();
   }
 
   /**

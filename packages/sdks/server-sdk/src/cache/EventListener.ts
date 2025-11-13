@@ -9,6 +9,7 @@ import { Logger } from '../utils/logger';
 import { RedisConfig } from '../types/config';
 import { StandardEvent, CustomEvent, EventCallback, EventListenerMap } from '../types/events';
 import { CacheManager } from './CacheManager';
+import { SdkMetrics } from '../utils/sdkMetrics';
 
 export class EventListener {
   private logger: Logger;
@@ -18,15 +19,17 @@ export class EventListener {
   private cacheManager: CacheManager;
   private readonly CHANNEL_NAME = 'gatrix-sdk-events';
   private isConnected: boolean = false;
+  private metrics?: SdkMetrics;
   private reconnectAttempts: number = 0;
   private readonly MAX_RECONNECT_ATTEMPTS = 60; // 30 seconds with 500ms interval
   private readonly RECONNECT_INTERVAL = 500; // milliseconds
   private reconnectTimer?: NodeJS.Timeout;
 
-  constructor(redisConfig: RedisConfig, cacheManager: CacheManager, logger: Logger) {
+  constructor(redisConfig: RedisConfig, cacheManager: CacheManager, logger: Logger, metrics?: SdkMetrics) {
     this.redisConfig = redisConfig;
     this.cacheManager = cacheManager;
     this.logger = logger;
+    this.metrics = metrics;
   }
 
   /**
@@ -66,12 +69,14 @@ export class EventListener {
         // Mark as disconnected but do not attempt manual reconnect here
         // ioredis will handle reconnection automatically with retryStrategy
         this.isConnected = false;
+        try { this.metrics?.setRedisConnected(false); } catch (_) {}
       });
 
       this.subscriber.on('close', () => {
         this.logger.warn('Subscriber connection closed');
         // Mark as disconnected; rely on ioredis auto-reconnect
         this.isConnected = false;
+        try { this.metrics?.setRedisConnected(false); } catch (_) {}
       });
 
       // Log reconnection attempts and refresh cache once reconnected
@@ -83,6 +88,7 @@ export class EventListener {
         if (!this.isConnected) {
           this.isConnected = true;
           this.logger.info('Subscriber reconnected and ready');
+          try { this.metrics?.setRedisConnected(true); this.metrics?.incRedisReconnect(); } catch (_) {}
           try {
             await this.reinitializeCache();
           } catch {
@@ -94,6 +100,7 @@ export class EventListener {
 
       // Connect to Redis
       await this.subscriber.connect();
+      try { this.metrics?.setRedisConnected(true); } catch (_) {}
 
       // Subscribe to SDK events channel
       await this.subscriber.subscribe(this.CHANNEL_NAME);
@@ -105,6 +112,7 @@ export class EventListener {
           try {
             const event = JSON.parse(message);
             this.logger.info('SDK Event received', { type: event.type, id: event.data?.id });
+            try { this.metrics?.incEventReceived(event.type); } catch (_) {}
             await this.processEvent(event);
           } catch (error: any) {
             this.logger.error('Failed to parse event message', { error: error.message });
@@ -410,6 +418,7 @@ export class EventListener {
       const message = JSON.stringify(event);
       await this.subscriber.publish(this.CHANNEL_NAME, message);
       this.logger.debug('Event published', { type: event.type });
+      try { this.metrics?.incEventPublished(event.type); } catch (_) {}
     } catch (error: any) {
       this.logger.error('Failed to publish event', {
         type: event.type,

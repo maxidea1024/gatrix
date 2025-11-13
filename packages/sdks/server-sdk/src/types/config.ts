@@ -23,6 +23,15 @@ export interface LoggerConfig {
 }
 
 /**
+ * Metrics Configuration
+ */
+export interface MetricsConfig {
+  enabled?: boolean; // Enable SDK internal metrics (default: true)
+  // Use 'any' to avoid hard dependency on prom-client types
+  registry?: any; // Optional custom prom-client Registry to register metrics into
+}
+
+/**
  * HTTP Retry Configuration
  */
 export interface RetryConfig {
@@ -54,5 +63,8 @@ export interface GatrixSDKConfig {
 
   // Optional - HTTP retry settings
   retry?: RetryConfig;
+
+  // Optional - Metrics settings
+  metrics?: MetricsConfig;
 }
 

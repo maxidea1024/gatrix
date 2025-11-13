@@ -7,6 +7,9 @@ export type ExpressMetricsOptions = {
   enabled?: boolean;
   metricsPath?: string;
   histogramBuckets?: number[];
+  // Optional custom registry to register metrics into
+  // If not provided, a new Registry will be created internally
+  registry?: any;
 };
 
 export type FastifyMetricsOptions = ExpressMetricsOptions;
@@ -19,7 +22,7 @@ export function attachExpressMetrics(app: any, opts: ExpressMetricsOptions = {})
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const promClient = require('prom-client');
-    const register = new promClient.Registry();
+    const register = opts.registry || new promClient.Registry();
     promClient.collectDefaultMetrics({ register });
 
     const buckets = opts.histogramBuckets || [0.005, 0.01, 0.05, 0.1, 0.3, 1, 3, 5, 10];
@@ -62,7 +65,7 @@ export function attachFastifyMetrics(app: any, opts: FastifyMetricsOptions = {})
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const promClient = require('prom-client');
-    const register = new promClient.Registry();
+    const register = opts.registry || new promClient.Registry();
     promClient.collectDefaultMetrics({ register });
 
     const buckets = opts.histogramBuckets || [0.005, 0.01, 0.05, 0.1, 0.3, 1, 3, 5, 10];

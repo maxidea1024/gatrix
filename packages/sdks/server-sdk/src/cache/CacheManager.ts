@@ -10,6 +10,7 @@ import { PopupNoticeService } from '../services/PopupNoticeService';
 import { SurveyService } from '../services/SurveyService';
 import { WhitelistService } from '../services/WhitelistService';
 import { ApiClient } from '../client/ApiClient';
+import { SdkMetrics } from '../utils/sdkMetrics';
 
 export class CacheManager {
   private logger: Logger;
@@ -21,6 +22,7 @@ export class CacheManager {
   private apiClient: ApiClient;
   private refreshInterval?: NodeJS.Timeout;
   private refreshCallbacks: Array<(type: string, data: any) => void> = [];
+  private metrics?: SdkMetrics;
 
   constructor(
     config: CacheConfig,
@@ -29,7 +31,8 @@ export class CacheManager {
     surveyService: SurveyService,
     whitelistService: WhitelistService,
     apiClient: ApiClient,
-    logger: Logger
+    logger: Logger,
+    metrics?: SdkMetrics
   ) {
     this.config = {
       enabled: config.enabled !== false,
@@ -42,6 +45,7 @@ export class CacheManager {
     this.whitelistService = whitelistService;
     this.apiClient = apiClient;
     this.logger = logger;
+    this.metrics = metrics;
   }
 
   /**
@@ -185,6 +189,7 @@ export class CacheManager {
   async refreshAll(): Promise<void> {
     this.logger.info('Refreshing all caches...');
 
+    const start = process.hrtime.bigint();
     try {
       await Promise.all([
         this.gameWorldService.refresh(),
@@ -197,6 +202,13 @@ export class CacheManager {
         }),
       ]);
 
+      try {
+        const duration = Number(process.hrtime.bigint() - start) / 1e9;
+        this.metrics?.incRefresh('all');
+        this.metrics?.observeRefresh('all', duration);
+        this.metrics?.setLastRefresh('all');
+      } catch (_) {}
+
       this.logger.info('All caches refreshed successfully');
 
       // Emit refresh events for polling method
@@ -208,6 +220,7 @@ export class CacheManager {
       }
     } catch (error: any) {
       this.logger.error('Failed to refresh caches', { error: error.message });
+      try { this.metrics?.incError('cache', 'refreshAll'); } catch (_) {}
       throw error;
     }
   }
@@ -216,21 +229,42 @@ export class CacheManager {
    * Refresh game worlds cache
    */
   async refreshGameWorlds(): Promise<void> {
+    const start = process.hrtime.bigint();
     await this.gameWorldService.refresh();
+    try {
+      const duration = Number(process.hrtime.bigint() - start) / 1e9;
+      this.metrics?.incRefresh('gameworlds');
+      this.metrics?.observeRefresh('gameworlds', duration);
+      this.metrics?.setLastRefresh('gameworlds');
+    } catch (_) {}
   }
 
   /**
    * Refresh popup notices cache
    */
   async refreshPopupNotices(): Promise<void> {
+    const start = process.hrtime.bigint();
     await this.popupNoticeService.refresh();
+    try {
+      const duration = Number(process.hrtime.bigint() - start) / 1e9;
+      this.metrics?.incRefresh('popups');
+      this.metrics?.observeRefresh('popups', duration);
+      this.metrics?.setLastRefresh('popups');
+    } catch (_) {}
   }
 
   /**
    * Refresh surveys cache
    */
   async refreshSurveys(): Promise<void> {
+    const start = process.hrtime.bigint();
     await this.surveyService.refresh({ isActive: true });
+    try {
+      const duration = Number(process.hrtime.bigint() - start) / 1e9;
+      this.metrics?.incRefresh('surveys');
+      this.metrics?.observeRefresh('surveys', duration);
+      this.metrics?.setLastRefresh('surveys');
+    } catch (_) {}
   }
 
   /**
@@ -305,7 +339,14 @@ export class CacheManager {
    */
   async refreshWhitelists(): Promise<void> {
     this.logger.info('Refreshing whitelist cache...');
+    const start = process.hrtime.bigint();
     await this.whitelistService.refresh();
+    try {
+      const duration = Number(process.hrtime.bigint() - start) / 1e9;
+      this.metrics?.incRefresh('whitelists');
+      this.metrics?.observeRefresh('whitelists', duration);
+      this.metrics?.setLastRefresh('whitelists');
+    } catch (_) {}
   }
 
   /**

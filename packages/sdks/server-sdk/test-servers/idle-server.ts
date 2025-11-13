@@ -5,12 +5,10 @@
  * No business logic, just event monitoring
  */
 
-import { GatrixServerSDK, getLogger } from '../src/index';
-import * as os from 'os';
+import { GatrixServerSDK, getLogger, attachExpressMetrics } from '../src/index';
 import * as fs from 'fs';
 import * as path from 'path';
 import express from 'express';
-import { ulid } from 'ulid';
 
 const logger = getLogger('IDLE-SERVER');
 
@@ -20,56 +18,6 @@ if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
 
-// Initialize metrics
-function initMetrics(app: express.Application): void {
-  try {
-    const promClient = require('prom-client');
-    const register = new promClient.Registry();
-
-    // Get instance information
-    const hostname = `${os.hostname()}:${process.pid}`;
-    const instanceId = ulid();
-
-    // Get primary IP address (first non-loopback IPv4)
-    const interfaces = os.networkInterfaces();
-    let ip = 'unknown';
-    for (const name of Object.keys(interfaces)) {
-      const iface = interfaces[name];
-      if (iface) {
-        for (const addr of iface) {
-          if (addr.family === 'IPv4' && !addr.internal) {
-            ip = addr.address;
-            break;
-          }
-        }
-        if (ip !== 'unknown') break;
-      }
-    }
-
-    // Set default labels with instance information
-    register.setDefaultLabels({
-      service: 'idle-server',
-      instanceId,
-      hostname,
-      ip,
-    });
-
-    // Collect default metrics (CPU, memory, etc.)
-    promClient.collectDefaultMetrics({ register });
-
-    // Metrics endpoint
-    const metricsPath = '/metrics';
-    app.get(metricsPath, async (_req, reply) => {
-      const body = await register.metrics();
-      reply.set('Content-Type', register.contentType);
-      reply.send(body);
-    });
-
-    logger.info('Metrics initialized', { metricsPath, instanceId, hostname, ip });
-  } catch (err) {
-    logger.error('Metrics initialization failed', { error: err });
-  }
-}
 
 // Helper function to write full JSON to file
 function writeFullCachedData(data: any): void {
@@ -86,14 +34,7 @@ async function main() {
   const app = express();
   const metricsPort = parseInt(process.env.METRICS_PORT || '9999');
 
-  // Initialize metrics
-  initMetrics(app);
-
-  // Start metrics server
-  app.listen(metricsPort, () => {
-    logger.info(`Metrics server listening on port ${metricsPort}`);
-  });
-
+  // SDK will provide its Registry for HTTP metrics to merge into
   const sdk = new GatrixServerSDK({
     gatrixUrl: process.env.GATRIX_URL || 'http://localhost:55000',
     apiToken: process.env.API_TOKEN || 'gatrix-unsecured-server-api-token',
@@ -124,6 +65,12 @@ async function main() {
     logger.info('Initializing SDK...');
     await sdk.initialize();
     logger.info('SDK initialized successfully');
+
+    // Attach HTTP metrics and start server
+    attachExpressMetrics(app, { enabled: true, metricsPath: '/metrics', registry: sdk.getMetricsRegistry?.() });
+    app.listen(metricsPort, () => {
+      logger.info(`Metrics server listening on port ${metricsPort}`);
+    });
 
     // Write initial cached data to file
     const surveysData = sdk.getCachedSurveys();
