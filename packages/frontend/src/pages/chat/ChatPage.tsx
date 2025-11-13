@@ -210,18 +210,27 @@ const ChatPageContent: React.FC = () => {
     // Channels are loaded in ChatContext when WebSocket connects
   }, []);
 
-  // Handle errors with enqueueSnackbar
+  // Handle errors with enqueueSnackbar (deduplicated)
   useEffect(() => {
-    if (state.error) {
-      // Translate error message if it's a known error
-      let errorMessage = state.error;
-      if (state.error === 'Failed to load channels') {
-        errorMessage = t('chat.loadChannelsFailed');
-      }
+    if (!state.error) return;
 
-      enqueueSnackbar(errorMessage, { variant: 'error' });
-      actions.clearError();
+    // Translate error message if it's a known error key we standardize
+    let errorMessage = state.error;
+    if (state.error === 'Failed to load channels') {
+      errorMessage = t('chat.loadChannelsFailed');
     }
+
+    const now = Date.now();
+    const prev = lastErrorRef.current;
+    if (prev && prev.msg === errorMessage && (now - prev.ts) < 1200) {
+      // Skip duplicate within 1.2s window
+      actions.clearError();
+      return;
+    }
+    lastErrorRef.current = { msg: errorMessage, ts: now };
+
+    enqueueSnackbar(errorMessage, { variant: 'error' });
+    actions.clearError();
   }, [state.error, t, enqueueSnackbar, actions]);
 
 
