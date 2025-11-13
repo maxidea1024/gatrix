@@ -24,6 +24,10 @@ export class SdkMetrics {
   private redisReconnectsCounter: any | undefined;
   private errorsCounter: any | undefined;
 
+  // HTTP client metrics
+  private httpRequestsCounter: any | undefined;
+  private httpRequestDuration: any | undefined;
+
   constructor(opts: SdkMetricsOptions = {}) {
     this.enabled = opts.enabled !== false;
 
@@ -94,6 +98,22 @@ export class SdkMetrics {
         name: 'sdk_errors_total',
         help: 'Total number of SDK errors',
         labelNames: ['scope', 'op'],
+        registers: [this.registry],
+      });
+
+      // HTTP client metrics
+      this.httpRequestsCounter = new promClient.Counter({
+        name: 'sdk_http_requests_total',
+        help: 'Total number of HTTP requests made by the SDK ApiClient',
+        labelNames: ['method', 'route', 'status'],
+        registers: [this.registry],
+      });
+
+      this.httpRequestDuration = new promClient.Histogram({
+        name: 'sdk_http_request_duration_seconds',
+        help: 'Duration of HTTP requests made by the SDK ApiClient in seconds',
+        labelNames: ['method', 'route', 'status'],
+        buckets: [0.05, 0.1, 0.3, 1, 3, 5, 10],
         registers: [this.registry],
       });
     } catch (_) {
