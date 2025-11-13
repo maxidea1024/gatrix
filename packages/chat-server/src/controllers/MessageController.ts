@@ -213,9 +213,9 @@ export class MessageController {
         return;
       }
 
-      // 채널 멤버십 확인
-      const isMember = await ChannelModel.isMember(channelId, userId);
-      if (!isMember) {
+      // 채널 접근 권한 확인 (public 채널은 멤버십 없이 접근 가능)
+      const hasAccess = await ChannelModel.hasAccess(channelId, userId);
+      if (!hasAccess) {
         res.status(403).json({
           success: false,
           error: 'Access denied to this channel',
