@@ -33,6 +33,7 @@ export class ApiClient {
   private client: AxiosInstance;
   private logger: Logger;
   private retryConfig: Required<RetryConfig>;
+  private metrics?: SdkMetrics;
 
   constructor(config: ApiClientConfig) {
     this.logger = config.logger || new Logger();
