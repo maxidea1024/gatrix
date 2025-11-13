@@ -188,19 +188,6 @@ docker-compose -f docker-compose.dev.yml up -d frontend-dev
 - **Dependencies**: MySQL, Redis, ClickHouse
 - **Volumes**: `event_lens_logs` - Log files
 
-### Development Tools (dev only)
-
-#### Adminer (Port: 8080)
-- **Image**: `adminer:latest`
-- **Purpose**: Database management UI
-- **Access**: http://localhost:8080
-- **Default Server**: mysql
-
-#### Redis Commander (Port: 8081)
-- **Image**: `rediscommander/redis-commander:latest`
-- **Purpose**: Redis management UI
-- **Access**: http://localhost:8081
-
 ## 🔧 Configuration
 
 ### Environment Variables

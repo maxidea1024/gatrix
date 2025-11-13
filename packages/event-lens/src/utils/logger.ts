@@ -15,7 +15,11 @@ const consoleFormat = winston.format.combine(
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
     let msg = `${timestamp} [${level}]: ${message}`;
     if (Object.keys(meta).length > 0) {
-      msg += ` ${JSON.stringify(meta)}`;
+      try {
+        msg += ` ${JSON.stringify(meta)}`;
+      } catch (error) {
+        msg += ` [Object could not be serialized]`;
+      }
     }
     return msg;
   })

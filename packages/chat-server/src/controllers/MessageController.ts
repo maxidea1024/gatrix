@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { MessageModel } from '../models/Message';
 import { ChannelModel } from '../models/Channel';
 import { CreateMessageData, UpdateMessageData, SearchQuery } from '../types/chat';
-import { metricsService } from '../services/MetricsService';
+import { getMetrics } from '../services/MetricsService';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('MessageController');
@@ -121,8 +121,14 @@ export class MessageController {
         }
       }
 
-      metricsService.recordMessage(data.channelId.toString(), data.contentType || 'text');
-      metricsService.recordMessageLatency('message_create', latency);
+      const metrics = getMetrics((req as any).app);
+      const serverId = process.env.SERVER_ID || 'unknown';
+      if (metrics.messagesPerSecond) {
+        metrics.messagesPerSecond.inc({ server_id: serverId, channel_id: data.channelId.toString(), message_type: data.contentType || 'text' });
+      }
+      if (metrics.messageLatency) {
+        metrics.messageLatency.observe({ server_id: serverId, operation: 'message_create' }, latency);
+      }
 
       res.status(201).json({
         success: true,
@@ -610,8 +616,14 @@ export class MessageController {
       const message = await MessageModel.create(data, userId);
       const latency = (Date.now() - startTime) / 1000;
 
-      metricsService.recordMessage(channelId.toString(), data.contentType || 'text');
-      metricsService.recordMessageLatency('message_create', latency);
+      const metrics = getMetrics((req as any).app);
+      const serverId = process.env.SERVER_ID || 'unknown';
+      if (metrics.messagesPerSecond) {
+        metrics.messagesPerSecond.inc({ server_id: serverId, channel_id: channelId.toString(), message_type: data.contentType || 'text' });
+      }
+      if (metrics.messageLatency) {
+        metrics.messageLatency.observe({ server_id: serverId, operation: 'message_create' }, latency);
+      }
 
       res.status(201).json({
         success: true,

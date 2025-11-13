@@ -212,7 +212,7 @@ function Create-EnvFile {
                 $newLines += "CORS_ORIGIN=https://$HostAddress`:53000"
             }
         } elseif ($line -match "^CHAT_SERVER_URL=") {
-            $newLines += "CHAT_SERVER_URL=http://chat-server:53001"
+            $newLines += "CHAT_SERVER_URL=http://chat-server:5100"
         } elseif ($line -match "^LOG_LEVEL=") {
             if ($Environment -eq "development") {
                 $newLines += "LOG_LEVEL=debug"

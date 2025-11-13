@@ -82,6 +82,12 @@ const gracefulShutdown = async (signal: string) => {
       if (logger) logger.info('etcd cleanup interval cleared');
     }
 
+    // Clear backend heartbeat interval
+    if ((global as any).backendHeartbeatInterval) {
+      clearInterval((global as any).backendHeartbeatInterval);
+      if (logger) logger.info('Backend heartbeat interval cleared');
+    }
+
     if (logger) {
       logger.info('Graceful shutdown completed');
     } else {
@@ -231,6 +237,70 @@ const startServer = async () => {
       logger.warn('Planning data initialization failed, continuing:', error);
     }
 
+
+    // Register Backend service to Service Discovery
+    let backendInstanceId: string | null = null;
+    try {
+      const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
+      const os = await import('os');
+      const { ulid } = await import('ulid');
+
+      // Get primary IP address (first non-loopback IPv4)
+      const interfaces = os.networkInterfaces();
+      let internalIp = 'localhost';
+      for (const name of Object.keys(interfaces)) {
+        const iface = interfaces[name];
+        if (iface) {
+          for (const addr of iface) {
+            if (addr.family === 'IPv4' && !addr.internal) {
+              internalIp = addr.address;
+              break;
+            }
+          }
+          if (internalIp !== 'localhost') break;
+        }
+      }
+
+      backendInstanceId = ulid();
+      const backendInstance = {
+        instanceId: backendInstanceId,
+        labels: {
+          service: 'backend',
+          group: 'development',
+        },
+        hostname: os.hostname(),
+        externalAddress: internalIp,
+        internalAddress: internalIp,
+        ports: {
+          http: [config.port],
+        },
+        status: 'ready' as const,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        meta: {
+          instanceName: 'backend-1',
+          startTime: new Date().toISOString(),
+        },
+      };
+
+      await serviceDiscoveryService.register(backendInstance);
+      logger.info('Backend service registered to Service Discovery', { instanceId: backendInstanceId });
+
+      // Start heartbeat to keep service alive
+      const heartbeatInterval = setInterval(async () => {
+        try {
+          const provider = (await import('./services/serviceDiscovery/ServiceDiscoveryFactory')).ServiceDiscoveryFactory.getInstance();
+          await provider.heartbeat(backendInstanceId!, 'backend');
+        } catch (error) {
+          logger.warn('Backend heartbeat failed:', error);
+        }
+      }, 10000); // Send heartbeat every 10 seconds
+
+      // Store interval for graceful shutdown
+      (global as any).backendHeartbeatInterval = heartbeatInterval;
+    } catch (error) {
+      logger.warn('Backend service registration failed, continuing:', error);
+    }
 
     // Initialize automatic cleanup for etcd mode
     try {

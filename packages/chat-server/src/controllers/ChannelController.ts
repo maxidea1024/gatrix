@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { ChannelModel } from '../models/Channel';
 import { MessageModel } from '../models/Message';
 import { CreateChannelData, UpdateChannelData } from '../types/chat';
-import { metricsService } from '../services/MetricsService';
+import { getMetrics } from '../services/MetricsService';
 import logger from '../config/logger';
 
 export class ChannelController {
@@ -25,7 +25,10 @@ export class ChannelController {
       const channel = await ChannelModel.create(data, userId);
       const latency = (Date.now() - startTime) / 1000;
 
-      metricsService.recordMessageLatency('channel_create', latency);
+      const metrics = getMetrics((req as any).app);
+      if (metrics.messageLatency) {
+        metrics.messageLatency.observe({ server_id: process.env.SERVER_ID || 'unknown', operation: 'channel_create' }, latency);
+      }
 
       res.status(201).json({
         success: true,

@@ -9,6 +9,36 @@
   "templating": {
     "list": [
       {
+        "name": "instanceId",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({__name__=~\"http_request_duration_seconds_count|process_resident_memory_bytes\"}, instanceId)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "hostname",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({__name__=~\"http_request_duration_seconds_count|process_resident_memory_bytes\"}, hostname)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "ip",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({__name__=~\"http_request_duration_seconds_count|process_resident_memory_bytes\"}, ip)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
         "name": "service",
         "type": "query",
         "datasource": "Prometheus",
@@ -39,7 +69,7 @@
       "title": "Requests per second (by route)",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum by (route)(rate(http_request_duration_seconds_count{service=~\"$service\"}[$window]))", "refId": "A" }
+        { "expr": "sum by (route)(rate(http_request_duration_seconds_count{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window]))", "refId": "A" }
       ],
       "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
     },
@@ -49,7 +79,7 @@
       "title": "Requests per second (total)",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum(rate(http_request_duration_seconds_count{service=~\"$service\"}[$window]))", "refId": "A" }
+        { "expr": "sum(rate(http_request_duration_seconds_count{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window]))", "refId": "A" }
       ],
       "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
     },
@@ -59,7 +89,7 @@
       "title": "HTTP p95 latency (aggregate)",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "histogram_quantile(0.95, sum by (le)(rate(http_request_duration_seconds_bucket{service=~\"$service\"}[$window])))", "refId": "A" }
+        { "expr": "histogram_quantile(0.95, sum by (le)(rate(http_request_duration_seconds_bucket{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window])))", "refId": "A" }
       ],
       "fieldConfig": { "defaults": { "unit": "s" } },
       "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 }
@@ -70,7 +100,7 @@
       "title": "HTTP p95 latency (by route)",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "histogram_quantile(0.95, sum by (le, route)(rate(http_request_duration_seconds_bucket{service=~\"$service\"}[$window])))", "refId": "A" }
+        { "expr": "histogram_quantile(0.95, sum by (le, route)(rate(http_request_duration_seconds_bucket{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window])))", "refId": "A" }
       ],
       "fieldConfig": { "defaults": { "unit": "s" } },
       "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 }
@@ -81,7 +111,7 @@
       "title": "HTTP 5xx rate (total)",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum(rate(http_request_duration_seconds_count{status_code=~\"5..\", service=~\"$service\"}[$window]))", "refId": "A" }
+        { "expr": "sum(rate(http_request_duration_seconds_count{status_code=~\"5..\", service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window]))", "refId": "A" }
       ],
       "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 }
     },
@@ -91,7 +121,7 @@
       "title": "HTTP 5xx rate (by route)",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum by (route)(rate(http_request_duration_seconds_count{status_code=~\"5..\", service=~\"$service\"}[$window]))", "refId": "A" }
+        { "expr": "sum by (route)(rate(http_request_duration_seconds_count{status_code=~\"5..\", service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window]))", "refId": "A" }
       ],
       "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 }
     },
@@ -101,7 +131,7 @@
       "title": "RSS Memory",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum(process_resident_memory_bytes{service=~\"$service\"})", "refId": "A" }
+        { "expr": "sum(process_resident_memory_bytes{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"})", "refId": "A" }
       ],
       "fieldConfig": { "defaults": { "unit": "bytes" } },
       "gridPos": { "x": 0, "y": 24, "w": 8, "h": 8 }
@@ -112,7 +142,7 @@
       "title": "Heap Used",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum(nodejs_heap_size_used_bytes{service=~\"$service\"})", "refId": "A" }
+        { "expr": "sum(nodejs_heap_size_used_bytes{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"})", "refId": "A" }
       ],
       "fieldConfig": { "defaults": { "unit": "bytes" } },
       "gridPos": { "x": 8, "y": 24, "w": 8, "h": 8 }
@@ -123,7 +153,7 @@
       "title": "Event Loop Lag",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "max(nodejs_eventloop_lag_seconds{service=~\"$service\"})", "refId": "A" }
+        { "expr": "max(nodejs_eventloop_lag_seconds{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"})", "refId": "A" }
       ],
       "fieldConfig": { "defaults": { "unit": "s" } },
       "gridPos": { "x": 16, "y": 24, "w": 8, "h": 8 }
@@ -134,7 +164,7 @@
       "title": "GC p95 (by kind)",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "histogram_quantile(0.95, sum by (le,kind)(rate(nodejs_gc_duration_seconds_bucket{service=~\"$service\"}[$window])))", "refId": "A" }
+        { "expr": "histogram_quantile(0.95, sum by (le,kind)(rate(nodejs_gc_duration_seconds_bucket{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window])))", "refId": "A" }
       ],
       "fieldConfig": { "defaults": { "unit": "s" } },
       "gridPos": { "x": 0, "y": 32, "w": 12, "h": 8 }
@@ -145,7 +175,7 @@
       "title": "CPU user seconds rate",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum(rate(process_cpu_user_seconds_total{service=~\"$service\"}[$window]))", "refId": "A" }
+        { "expr": "sum(rate(process_cpu_user_seconds_total{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window]))", "refId": "A" }
       ],
       "gridPos": { "x": 12, "y": 32, "w": 12, "h": 8 }
     },
@@ -155,7 +185,7 @@
       "title": "Inbound bytes/s",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum by (service)(rate(http_request_bytes_in_total{service=~\"$service\"}[$window]))", "refId": "A" }
+        { "expr": "sum by (service)(rate(http_request_bytes_in_total{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window]))", "refId": "A" }
       ],
       "fieldConfig": { "defaults": { "unit": "Bps" } },
       "gridPos": { "x": 0, "y": 40, "w": 12, "h": 8 }
@@ -166,7 +196,7 @@
       "title": "Outbound bytes/s",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "sum by (service)(rate(http_response_bytes_out_total{service=~\"$service\"}[$window]))", "refId": "A" }
+        { "expr": "sum by (service)(rate(http_response_bytes_out_total{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window]))", "refId": "A" }
       ],
       "fieldConfig": { "defaults": { "unit": "Bps" } },
       "gridPos": { "x": 12, "y": 40, "w": 12, "h": 8 }
@@ -177,7 +207,7 @@
       "title": "Top routes by RPS",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "topk($topN, sum by (service, route)(rate(http_request_duration_seconds_count{service=~\"$service\"}[$window])))", "refId": "A" }
+        { "expr": "topk($topN, sum by (service, route)(rate(http_request_duration_seconds_count{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window])))", "refId": "A" }
       ],
       "gridPos": { "x": 0, "y": 48, "w": 8, "h": 8 }
     },
@@ -187,7 +217,7 @@
       "title": "Top methods by RPS",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "topk($topN, sum by (service, method)(rate(http_request_duration_seconds_count{service=~\"$service\"}[$window])))", "refId": "A" }
+        { "expr": "topk($topN, sum by (service, method)(rate(http_request_duration_seconds_count{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window])))", "refId": "A" }
       ],
       "gridPos": { "x": 8, "y": 48, "w": 8, "h": 8 }
     },
@@ -197,7 +227,7 @@
       "title": "Top routes by p95 latency",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "topk($topN, histogram_quantile(0.95, sum by (le, service, route)(rate(http_request_duration_seconds_bucket{service=~\"$service\"}[$window]))))", "refId": "A" }
+        { "expr": "topk($topN, histogram_quantile(0.95, sum by (le, service, route)(rate(http_request_duration_seconds_bucket{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window]))))", "refId": "A" }
       ],
       "fieldConfig": { "defaults": { "unit": "s" } },
       "gridPos": { "x": 16, "y": 48, "w": 8, "h": 8 }
@@ -208,7 +238,7 @@
       "title": "Top routes by 5xx rate",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "topk($topN, sum by (service, route)(rate(http_request_duration_seconds_count{status_code=~\"5..\", service=~\"$service\"}[$window])))", "refId": "A" }
+        { "expr": "topk($topN, sum by (service, route)(rate(http_request_duration_seconds_count{status_code=~\"5..\", service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window])))", "refId": "A" }
       ],
       "gridPos": { "x": 0, "y": 56, "w": 8, "h": 8 }
     },
@@ -218,7 +248,7 @@
       "title": "Top routes by outbound bytes/s",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "topk($topN, sum by (service, route)(rate(http_response_bytes_out_total{service=~\"$service\"}[$window])))", "refId": "A" }
+        { "expr": "topk($topN, sum by (service, route)(rate(http_response_bytes_out_total{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window])))", "refId": "A" }
       ],
       "fieldConfig": { "defaults": { "unit": "Bps" } },
       "gridPos": { "x": 8, "y": 56, "w": 8, "h": 8 }
@@ -229,7 +259,7 @@
       "title": "Top routes by inbound bytes/s",
       "datasource": "Prometheus",
       "targets": [
-        { "expr": "topk($topN, sum by (service, route)(rate(http_request_bytes_in_total{service=~\"$service\"}[$window])))", "refId": "A" }
+        { "expr": "topk($topN, sum by (service, route)(rate(http_request_bytes_in_total{service=~\"$service\", instanceId=~\"$instanceId\", hostname=~\"$hostname\", ip=~\"$ip\"}[$window])))", "refId": "A" }
       ],
       "fieldConfig": { "defaults": { "unit": "Bps" } },
       "gridPos": { "x": 16, "y": 56, "w": 8, "h": 8 }

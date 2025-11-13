@@ -5,7 +5,7 @@ import logger from '../config/logger';
 const router = express.Router();
 
 // Event Lens 서버 URL
-const EVENT_LENS_URL = process.env.EVENT_LENS_URL || 'http://localhost:3002';
+const EVENT_LENS_URL = process.env.EVENT_LENS_URL || 'http://localhost:5200';
 
 // Event Lens Proxy
 router.use('/', createProxyMiddleware({

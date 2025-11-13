@@ -2,10 +2,11 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import http from 'http';
 import jwt from 'jsonwebtoken';
+import express from 'express';
 import { config } from '../config';
 import { redisManager } from '../config/redis';
 import BroadcastService from './BroadcastService';
-import { metricsService } from './MetricsService';
+import { getMetrics } from './MetricsService';
 import { CacheService } from './CacheService';
 import { UserService } from './UserService';
 import { createLogger } from '../config/logger';
@@ -19,8 +20,10 @@ export class WebSocketService {
   private connectedUsers: Map<string, SocketUser> = new Map();
   private userSockets: Map<number, Set<string>> = new Map(); // userId -> socketIds
   private serverId: string;
+  private app: express.Application;
 
-  constructor(server: http.Server) {
+  constructor(server: http.Server, app: express.Application) {
+    this.app = app;
     this.serverId = process.env.SERVER_ID || `chat-server-${process.pid}`;
     
     this.io = new SocketIOServer(server, {
@@ -186,7 +189,10 @@ export class WebSocketService {
       });
 
       // 메트릭스 업데이트
-      metricsService.setConnectedUsers(this.connectedUsers.size);
+      const metrics = getMetrics(this.app);
+      if (metrics.connectedUsers) {
+        metrics.connectedUsers.set({ server_id: this.serverId }, this.connectedUsers.size);
+      }
 
     } catch (error) {
       logger.error(`Error handling connection for user ${userId}:`, error);
@@ -389,7 +395,10 @@ export class WebSocketService {
       );
 
       // 메트릭스 기록
-      metricsService.recordMessage(data.channelId.toString(), data.contentType || 'text');
+      const metrics = getMetrics(this.app);
+      if (metrics.messagesPerSecond) {
+        metrics.messagesPerSecond.inc({ server_id: this.serverId, channel_id: data.channelId.toString(), message_type: data.contentType || 'text' });
+      }
 
       socket.emit('message_sent', { messageId: savedMessage.id });
     } catch (error) {
@@ -503,8 +512,11 @@ export class WebSocketService {
     }
 
     // 메트릭스 업데이트
-    metricsService.setConnectedUsers(this.connectedUsers.size);
-    
+    const metrics = getMetrics(this.app);
+    if (metrics.connectedUsers) {
+      metrics.connectedUsers.set({ server_id: this.serverId }, this.connectedUsers.size);
+    }
+
     logger.info(`User ${socketUser.userId} disconnected: ${reason}`);
   }
 
@@ -530,9 +542,16 @@ export class WebSocketService {
       }
     }
 
-    metricsService.setConnectedUsers(connectedCount);
-    metricsService.setActiveChannels(channelCounts.size);
-    metricsService.setWebSocketConnections('websocket', connectedCount);
+    const metrics = getMetrics(this.app);
+    if (metrics.connectedUsers) {
+      metrics.connectedUsers.set({ server_id: this.serverId }, connectedCount);
+    }
+    if (metrics.activeChannels) {
+      metrics.activeChannels.set({ server_id: this.serverId }, channelCounts.size);
+    }
+    if (metrics.websocketConnections) {
+      metrics.websocketConnections.set({ server_id: this.serverId, type: 'websocket' }, connectedCount);
+    }
   }
 
   private cleanupStaleConnections(): void {

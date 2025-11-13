@@ -14,6 +14,8 @@ export class ServiceDiscoveryService {
   private logger: Logger;
   private instanceId?: string;
   private labels?: ServiceLabels;
+  private heartbeatInterval?: NodeJS.Timeout;
+  private heartbeatIntervalMs: number = 15000; // 15 seconds (half of default 30s TTL)
 
   constructor(apiClient: ApiClient, logger: Logger) {
     this.apiClient = apiClient;
@@ -91,6 +93,9 @@ export class ServiceDiscoveryService {
       externalAddress
     });
 
+    // Start heartbeat to keep service alive in Redis
+    this.startHeartbeat();
+
     return { instanceId, hostname, internalAddress, externalAddress };
   }
 
@@ -106,6 +111,9 @@ export class ServiceDiscoveryService {
       this.logger.warn('No service instance to unregister');
       return;
     }
+
+    // Stop heartbeat first
+    this.stopHeartbeat();
 
     this.logger.debug('Unregistering service via API', {
       instanceId: this.instanceId,
@@ -387,6 +395,59 @@ export class ServiceDiscoveryService {
     }
 
     return whitelists.accountWhitelist.accountIds.includes(accountId);
+  }
+
+  /**
+   * Start automatic heartbeat to keep service alive in Redis
+   * Sends heartbeat every 15 seconds (half of default 30s TTL)
+   */
+  private startHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      this.logger.warn('Heartbeat already running');
+      return;
+    }
+
+    this.heartbeatInterval = setInterval(async () => {
+      try {
+        if (!this.instanceId || !this.labels) {
+          this.stopHeartbeat();
+          return;
+        }
+
+        await this.updateStatus({
+          status: 'ready',
+          autoRegisterIfMissing: false,
+        });
+
+        this.logger.debug('Heartbeat sent', {
+          instanceId: this.instanceId,
+          service: this.labels.service,
+        });
+      } catch (error) {
+        this.logger.warn('Heartbeat failed', {
+          instanceId: this.instanceId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }, this.heartbeatIntervalMs);
+
+    this.logger.info('Heartbeat started', {
+      instanceId: this.instanceId,
+      intervalMs: this.heartbeatIntervalMs,
+    });
+  }
+
+  /**
+   * Stop automatic heartbeat
+   */
+  private stopHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = undefined;
+      this.logger.info('Heartbeat stopped', {
+        instanceId: this.instanceId,
+      });
+    }
   }
 }
 

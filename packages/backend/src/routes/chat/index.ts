@@ -21,7 +21,7 @@ const upload = multer({
 router.use(upload.any() as any);
 
 // 채팅서버 설정
-const CHAT_SERVER_URL = process.env.CHAT_SERVER_URL || 'http://localhost:3001';
+const CHAT_SERVER_URL = process.env.CHAT_SERVER_URL || 'http://localhost:5100';
 const CHAT_API_BASE = `${CHAT_SERVER_URL}/api/v1`;
 const CHAT_SERVER_API_TOKEN = process.env.CHAT_SERVER_API_TOKEN || 'gatrix-api-d58e8c748ac604b8020526904558251a0604000f8a5898a1b5e28b99aee9eed79';
 const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';

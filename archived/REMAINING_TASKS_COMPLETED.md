@@ -88,7 +88,6 @@
 
 ```
 NAME                           STATUS
-gatrix-adminer-dev             Up (healthy)
 gatrix-backend-dev             Up (healthy)  ✅ 문제 해결!
 gatrix-chat-server-dev         Up (healthy)  ✅ 문제 해결!
 gatrix-clickhouse-dev          Up (healthy)
@@ -96,7 +95,6 @@ gatrix-event-lens-dev          Up (healthy)
 gatrix-event-lens-worker-dev   Up (healthy)
 gatrix-frontend-dev            Up (healthy)
 gatrix-mysql-dev               Up (healthy)
-gatrix-redis-commander-dev     Up (healthy)
 gatrix-redis-dev               Up (healthy)
 ```
 

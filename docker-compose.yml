@@ -112,7 +112,7 @@ services:
       MONITORING_ENABLED: ${MONITORING_ENABLED:-true}
 
       # Chat Server Integration
-      CHAT_SERVER_URL: http://chat-server:53001
+      CHAT_SERVER_URL: http://chat-server:5100
       # Service Discovery
       SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-redis}
       ETCD_HOSTS: ${ETCD_HOSTS:-http://etcd:52379}
@@ -163,7 +163,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}
-      PORT: 3002
+      PORT: 5200
       CLICKHOUSE_HOST: clickhouse
       CLICKHOUSE_PORT: 8123
       CLICKHOUSE_DATABASE: event_lens
@@ -179,7 +179,7 @@ services:
       MONITORING_ENABLED: ${MONITORING_ENABLED:-true}
 
     ports:
-      - "${EVENT_LENS_PORT:-53002}:3002"
+      - "${EVENT_LENS_PORT:-55200}:5200"
     depends_on:
       mysql:
         condition: service_healthy
@@ -192,7 +192,7 @@ services:
     volumes:
       - event_lens_logs:/app/logs
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3002/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:5200/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       timeout: 10s
       retries: 5
       interval: 30s
@@ -246,7 +246,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}
-      PORT: 3001
+      PORT: 5100
       HOST: 0.0.0.0
       # Database
       DB_HOST: mysql
@@ -283,8 +283,7 @@ services:
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-info}
     ports:
-      - "${CHAT_PORT:-53001}:3001"
-      - "${CHAT_METRICS_PORT:-59090}:9090"
+      - "${CHAT_PORT:-55100}:5100"
     depends_on:
       mysql:
         condition: service_healthy
@@ -298,7 +297,7 @@ services:
       - chat_server_uploads:/app/uploads
       - chat_server_logs:/app/logs
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:5100/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
       timeout: 10s
       retries: 10
       interval: 10s
@@ -310,10 +309,11 @@ services:
     container_name: gatrix-prometheus
     restart: unless-stopped
     environment:
+      NODE_ENV: ${NODE_ENV:-production}
       PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
       PROM_RETENTION_TIME: ${PROM_RETENTION_TIME:-14d}
     ports:
-      - "${PROMETHEUS_PORT:-59091}:9090"
+      - "${PROMETHEUS_PORT:-59090}:9090"
     volumes:
       - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
       - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro

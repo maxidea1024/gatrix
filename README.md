@@ -363,11 +363,9 @@ When running with `yarn docker:dev`, additional tools are available:
 
 - **Frontend**: http://localhost:53000
 - **Backend API**: http://localhost:55000
-- **Chat Server**: http://localhost:53001
-- **Event Lens**: http://localhost:53002
-- **Adminer** (Database Management): http://localhost:58080
-- **Redis Commander** (Redis Management): http://localhost:58081
-- **Prometheus** (Metrics Collection): http://localhost:59091
+- **Chat Server**: http://localhost:55100
+- **Event Lens**: http://localhost:55200
+- **Prometheus** (Metrics Collection): http://localhost:59090
 - **Grafana** (Monitoring Dashboard): http://localhost:54000
 
 (All ports use internal port + 50000 offset)
@@ -649,10 +647,6 @@ The Docker setup includes:
 - **Event Lens**: Analytics server and worker (Node 20)
 - **Chat Server**: Real-time messaging with Socket.IO (Node 20)
 
-**Development Tools (dev environment only):**
-- **Adminer**: Database management UI
-- **Redis Commander**: Redis management UI
-
 **Production Only:**
 - **Nginx**: Reverse proxy and load balancer
 
@@ -674,14 +668,11 @@ The Docker setup includes:
 | Redis | 6379 | 56379 | Cache & Queue | Both |
 | Backend | 5000 | 55000 | API Server | Both |
 | Frontend | 3000 | 53000 | Web UI | Both |
-| Chat Server | 3001 | 53001 | WebSocket Server | Both |
-| Event Lens | 3002 | 53002 | Analytics API | Both |
+| Chat Server | 5100 | 55100 | WebSocket Server | Both |
+| Event Lens | 5200 | 55200 | Analytics API | Both |
 | ClickHouse | 8123, 9000 | 58123, 59000 | Analytics DB | Both |
-| Prometheus | 9090 | 59091 | Metrics Collection | Both |
+| Prometheus | 9090 | 59090 | Metrics Collection | Both |
 | Grafana | 3000 | 54000 | Monitoring Dashboard | Both |
-| Adminer | 8080 | 58080 | DB Management | Dev only |
-| Redis Commander | 8081 | 58081 | Redis Management | Dev only |
-| Chat Metrics | 9090 | 59090 | Chat Server Metrics | Both |
 | Debug (Backend) | 9229 | 59229 | Node.js Debugger | Dev only |
 
 **Notes:**

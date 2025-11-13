@@ -62,7 +62,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "redis_connected_clients{job=\"redis\"}",
+          "expr": "redis_connected_clients{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "",
           "refId": "A"
         }
@@ -114,7 +114,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "redis_memory_used_bytes{job=\"redis\"}",
+          "expr": "redis_memory_used_bytes{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "",
           "refId": "A"
         }
@@ -166,7 +166,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "redis_db_keys{job=\"redis\",db=\"0\"}",
+          "expr": "redis_db_keys{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\", db=\"0\"}",
           "legendFormat": "",
           "refId": "A"
         }
@@ -218,7 +218,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "rate(redis_commands_processed_total{job=\"redis\"}[1m])",
+          "expr": "rate(redis_commands_processed_total{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "",
           "refId": "A"
         }
@@ -294,17 +294,17 @@
       },
       "targets": [
         {
-          "expr": "redis_memory_used_bytes{job=\"redis\"}",
+          "expr": "redis_memory_used_bytes{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Used Memory",
           "refId": "A"
         },
         {
-          "expr": "redis_memory_max_bytes{job=\"redis\"}",
+          "expr": "redis_memory_max_bytes{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Max Memory",
           "refId": "B"
         },
         {
-          "expr": "redis_memory_used_rss_bytes{job=\"redis\"}",
+          "expr": "redis_memory_used_rss_bytes{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "RSS Memory",
           "refId": "C"
         }
@@ -380,12 +380,12 @@
       },
       "targets": [
         {
-          "expr": "redis_connected_clients{job=\"redis\"}",
+          "expr": "redis_connected_clients{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Connected Clients",
           "refId": "A"
         },
         {
-          "expr": "redis_blocked_clients{job=\"redis\"}",
+          "expr": "redis_blocked_clients{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Blocked Clients",
           "refId": "B"
         }
@@ -461,7 +461,7 @@
       },
       "targets": [
         {
-          "expr": "rate(redis_commands_processed_total{job=\"redis\"}[1m])",
+          "expr": "rate(redis_commands_processed_total{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Commands/sec",
           "refId": "A"
         }
@@ -537,12 +537,12 @@
       },
       "targets": [
         {
-          "expr": "rate(redis_keyspace_hits_total{job=\"redis\"}[1m])",
+          "expr": "rate(redis_keyspace_hits_total{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Hits/sec",
           "refId": "A"
         },
         {
-          "expr": "rate(redis_keyspace_misses_total{job=\"redis\"}[1m])",
+          "expr": "rate(redis_keyspace_misses_total{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Misses/sec",
           "refId": "B"
         }
@@ -618,7 +618,7 @@
       },
       "targets": [
         {
-          "expr": "redis_db_keys{job=\"redis\"}",
+          "expr": "redis_db_keys{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "DB {{db}} Keys",
           "refId": "A"
         }
@@ -694,12 +694,12 @@
       },
       "targets": [
         {
-          "expr": "rate(redis_net_input_bytes_total{job=\"redis\"}[1m])",
+          "expr": "rate(redis_net_input_bytes_total{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Input Bytes/sec",
           "refId": "A"
         },
         {
-          "expr": "rate(redis_net_output_bytes_total{job=\"redis\"}[1m])",
+          "expr": "rate(redis_net_output_bytes_total{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Output Bytes/sec",
           "refId": "B"
         }
@@ -775,12 +775,12 @@
       },
       "targets": [
         {
-          "expr": "redis_evicted_keys_total{job=\"redis\"}",
+          "expr": "redis_evicted_keys_total{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Evicted Keys",
           "refId": "A"
         },
         {
-          "expr": "redis_expired_keys_total{job=\"redis\"}",
+          "expr": "redis_expired_keys_total{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Expired Keys",
           "refId": "B"
         }
@@ -856,12 +856,12 @@
       },
       "targets": [
         {
-          "expr": "redis_total_connections_received_total{job=\"redis\"}",
+          "expr": "redis_total_connections_received_total{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Total Connections",
           "refId": "A"
         },
         {
-          "expr": "redis_total_commands_processed_total{job=\"redis\"}",
+          "expr": "redis_total_commands_processed_total{job=\"redis\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Total Commands",
           "refId": "B"
         }
@@ -875,7 +875,38 @@
   "style": "dark",
   "tags": ["redis", "cache", "database"],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "name": "instance",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({job=\"redis\"}, instance)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "hostname",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({job=\"redis\"}, hostname)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "ip",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({job=\"redis\"}, ip)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      }
+    ]
   },
   "time": {
     "from": "now-1h",

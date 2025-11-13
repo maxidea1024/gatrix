@@ -6,7 +6,7 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 export const config = {
   // Server
-  port: parseInt(process.env.PORT || '3002', 10),
+  port: parseInt(process.env.PORT || '5200', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
   logLevel: process.env.LOG_LEVEL || 'info',
 

@@ -8,10 +8,9 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets:
-          - backend:5000
-          - event-lens:3002
-      - targets:
-          - chat-server:9090
+          - backend__SERVICE_SUFFIX__:5000
+          - event-lens__SERVICE_SUFFIX__:5200
+          - chat-server__SERVICE_SUFFIX__:5100
         labels:
           service: chat
 
@@ -20,7 +19,7 @@ scrape_configs:
     metrics_path: /metrics
     scheme: http
     http_sd_configs:
-      - url: http://backend:5000/api/v1/public/monitoring/prometheus/targets
+      - url: http://backend__SERVICE_SUFFIX__:5000/api/v1/public/monitoring/prometheus/targets
         refresh_interval: 30s
     relabel_configs:
       # Respect metrics_path from target labels if provided

@@ -169,34 +169,6 @@ services:
       - /app/node_modules
     command: yarn workspace @gatrix/frontend dev
 
-  # Adminer for database management
-  adminer:
-    image: adminer:latest
-    container_name: gatrix-adminer-dev
-    restart: unless-stopped
-    ports:
-      - "0.0.0.0:58080:8080"
-    depends_on:
-      - mysql
-    networks:
-      - gatrix-dev-network
-    environment:
-      ADMINER_DEFAULT_SERVER: mysql
-
-  # Redis Commander for Redis management
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    container_name: gatrix-redis-commander-dev
-    restart: unless-stopped
-    ports:
-      - "0.0.0.0:58081:8081"
-    depends_on:
-      - redis
-    networks:
-      - gatrix-dev-network
-    environment:
-      REDIS_HOSTS: local:redis:6379
-
   # etcd for service discovery (optional)
   etcd:
     image: quay.io/coreos/etcd:v3.5.12
@@ -264,13 +236,16 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: development
-      PORT: 3002
+      PORT: 5200
       LOG_LEVEL: ${EVENT_LENS_LOG_LEVEL:-debug}
       CLICKHOUSE_HOST: clickhouse
       CLICKHOUSE_PORT: 8123
       CLICKHOUSE_DATABASE: event_lens
       CLICKHOUSE_USERNAME: default
       CLICKHOUSE_PASSWORD: ""
+      # Service Discovery
+      GATRIX_URL: http://backend-dev:5000
+      API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ""
@@ -286,14 +261,14 @@ services:
       MONITORING_ENABLED: "true"
 
     ports:
-      - "0.0.0.0:${EVENT_LENS_PORT:-53002}:3002"
+      - "0.0.0.0:${EVENT_LENS_PORT:-55200}:5200"
     depends_on:
       mysql:
-        condition: service_healthy
+        condition: service_started
       redis:
-        condition: service_healthy
+        condition: service_started
       clickhouse:
-        condition: service_healthy
+        condition: service_started
     networks:
       gatrix-dev-network:
         aliases:
@@ -303,6 +278,8 @@ services:
       - /app/node_modules
       - event_lens_dev_logs:/app/packages/event-lens/logs
     command: yarn workspace @gatrix/event-lens dev
+    healthcheck:
+      disable: true
 
   # Event Lens Worker for development (with hot reload)
   event-lens-worker-dev:
@@ -340,7 +317,7 @@ services:
       clickhouse:
         condition: service_healthy
       event-lens-dev:
-        condition: service_healthy
+        condition: service_started
     networks:
       - gatrix-dev-network
     volumes:
@@ -359,7 +336,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: development
-      PORT: 3001
+      PORT: 5100
       HOST: 0.0.0.0
       # Database
       DB_HOST: mysql
@@ -389,15 +366,16 @@ services:
       WS_MAX_CONNECTIONS: 1000
       # Monitoring
       MONITORING_ENABLED: true
-      METRICS_PORT: 9090
       # Gatrix Integration
       GATRIX_API_URL: http://backend-dev:5000
       GATRIX_API_SECRET: ${GATRIX_API_SECRET:-dev-shared-secret}
+      # Service Discovery
+      GATRIX_URL: http://backend-dev:5000
+      API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-debug}
     ports:
-      - "0.0.0.0:${CHAT_PORT:-53001}:3001"
-      - "0.0.0.0:59090:9090" # Metrics port
+      - "0.0.0.0:${CHAT_PORT:-55100}:5100"
     depends_on:
       mysql:
         condition: service_healthy
@@ -421,10 +399,11 @@ services:
     container_name: gatrix-prometheus-dev
     restart: unless-stopped
     environment:
+      NODE_ENV: development
       PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
       PROM_RETENTION_TIME: ${PROM_RETENTION_TIME:-14d}
     ports:
-      - "0.0.0.0:${PROMETHEUS_PORT:-59091}:9090"
+      - "0.0.0.0:${PROMETHEUS_PORT:-59090}:9090"
     volumes:
       - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
       - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro

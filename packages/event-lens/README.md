@@ -92,7 +92,7 @@ npm run start:worker
 이벤트 추적
 
 ```bash
-curl -X POST http://localhost:3002/track \
+curl -X POST http://localhost:5200/track \
   -H "event-lens-client-id: YOUR_CLIENT_ID" \
   -H "event-lens-client-secret: YOUR_CLIENT_SECRET" \
   -H "Content-Type: application/json" \
@@ -114,7 +114,7 @@ curl -X POST http://localhost:3002/track \
 배치 이벤트 추적 (최대 100개)
 
 ```bash
-curl -X POST http://localhost:3002/track/batch \
+curl -X POST http://localhost:5200/track/batch \
   -H "event-lens-client-id: YOUR_CLIENT_ID" \
   -H "event-lens-client-secret: YOUR_CLIENT_SECRET" \
   -H "Content-Type: application/json" \
@@ -138,7 +138,7 @@ curl -X POST http://localhost:3002/track/batch \
 기본 메트릭 조회
 
 ```bash
-curl "http://localhost:3002/insights/project-123/metrics?startDate=2024-01-01&endDate=2024-01-31" \
+curl "http://localhost:5200/insights/project-123/metrics?startDate=2024-01-01&endDate=2024-01-31" \
   -H "event-lens-client-id: YOUR_CLIENT_ID" \
   -H "event-lens-client-secret: YOUR_CLIENT_SECRET"
 ```
@@ -147,7 +147,7 @@ curl "http://localhost:3002/insights/project-123/metrics?startDate=2024-01-01&en
 시계열 데이터
 
 ```bash
-curl "http://localhost:3002/insights/project-123/timeseries?startDate=2024-01-01&endDate=2024-01-31&interval=day" \
+curl "http://localhost:5200/insights/project-123/timeseries?startDate=2024-01-01&endDate=2024-01-31&interval=day" \
   -H "event-lens-client-id: YOUR_CLIENT_ID" \
   -H "event-lens-client-secret: YOUR_CLIENT_SECRET"
 ```
@@ -156,7 +156,7 @@ curl "http://localhost:3002/insights/project-123/timeseries?startDate=2024-01-01
 실시간 방문자
 
 ```bash
-curl "http://localhost:3002/insights/project-123/live" \
+curl "http://localhost:5200/insights/project-123/live" \
   -H "event-lens-client-id: YOUR_CLIENT_ID" \
   -H "event-lens-client-secret: YOUR_CLIENT_SECRET"
 ```
@@ -165,7 +165,7 @@ curl "http://localhost:3002/insights/project-123/live" \
 퍼널 분석
 
 ```bash
-curl -X POST "http://localhost:3002/insights/project-123/funnel" \
+curl -X POST "http://localhost:5200/insights/project-123/funnel" \
   -H "event-lens-client-id: YOUR_CLIENT_ID" \
   -H "event-lens-client-secret: YOUR_CLIENT_SECRET" \
   -H "Content-Type: application/json" \
@@ -180,7 +180,7 @@ curl -X POST "http://localhost:3002/insights/project-123/funnel" \
 리텐션 분석
 
 ```bash
-curl "http://localhost:3002/insights/project-123/retention?startDate=2024-01-01&endDate=2024-01-31&period=day" \
+curl "http://localhost:5200/insights/project-123/retention?startDate=2024-01-01&endDate=2024-01-31&period=day" \
   -H "event-lens-client-id: YOUR_CLIENT_ID" \
   -H "event-lens-client-secret: YOUR_CLIENT_SECRET"
 ```
@@ -226,7 +226,7 @@ packages/event-lens/
 docker build -t event-lens .
 
 # 컨테이너 실행
-docker run -p 3002:3002 --env-file .env event-lens
+docker run -p 5200:5200 --env-file .env event-lens
 ```
 
 ## 📝 라이선스

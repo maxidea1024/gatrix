@@ -339,12 +339,12 @@ export class ChatWebSocketService {
     // Runtime-injected config (for production docker/nginx)
     const runtimeUrl = (window as any)?.ENV?.VITE_CHAT_SERVER_URL as string | undefined;
     if (env.PROD) {
-      return runtimeUrl || (env.VITE_CHAT_SERVER_URL as string) || `${location.protocol === 'https:' ? 'https' : 'http'}://${location.hostname}:3001`;
+      return runtimeUrl || (env.VITE_CHAT_SERVER_URL as string) || `${location.protocol === 'https:' ? 'https' : 'http'}://${location.hostname}:5100`;
     }
 
     // Development: use the current host/IP so other machines can connect
     const protocol = location.protocol === 'https:' ? 'https' : 'http';
-    return `${protocol}://${location.hostname}:3001`;
+    return `${protocol}://${location.hostname}:5100`;
   }
 
   private reconnect(): void {

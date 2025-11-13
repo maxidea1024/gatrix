@@ -153,7 +153,7 @@ chmod +x scripts/deploy.sh
 ```bash
 # 서버 설정
 NODE_ENV=production
-PORT=3001
+PORT=5100
 HOST=0.0.0.0
 
 # 데이터베이스

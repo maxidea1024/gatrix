@@ -1,5 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import config from '../config';
+import os from 'os';
+import { ulid } from 'ulid';
 
 /**
  * MetricsService for Event Lens (Fastify)
@@ -16,7 +18,33 @@ export const initMetrics = (app: FastifyInstance): void => {
     const promClient = require('prom-client');
 
     const register = new promClient.Registry();
-    register.setDefaultLabels({ service: 'event-lens' });
+
+    // Get instance information
+    const hostname = `${os.hostname()}:${process.pid}`;
+    const instanceId = ulid();
+
+    // Get primary IP address (first non-loopback IPv4)
+    const interfaces = os.networkInterfaces();
+    let ip = 'unknown';
+    for (const name of Object.keys(interfaces)) {
+      const iface = interfaces[name];
+      if (iface) {
+        for (const addr of iface) {
+          if (addr.family === 'IPv4' && !addr.internal) {
+            ip = addr.address;
+            break;
+          }
+        }
+        if (ip !== 'unknown') break;
+      }
+    }
+
+    register.setDefaultLabels({
+      service: 'event-lens',
+      instanceId,
+      hostname,
+      ip
+    });
     promClient.collectDefaultMetrics({ register });
 
     const httpRequestDuration = new promClient.Histogram({

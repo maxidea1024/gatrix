@@ -11,7 +11,7 @@ import { ALLOWED_HEADERS } from './constants/headers';
 
 const logger = createLogger('ChatServerApp');
 import { WebSocketService } from './services/WebSocketService';
-import { metricsService } from './services/MetricsService';
+import { initMetrics } from './services/MetricsService';
 
 import { redisManager } from './config/redis';
 import { ApiTokenService } from './services/ApiTokenService';
@@ -65,6 +65,9 @@ class ChatServerApp {
 
     // Request logging
     this.app.use(requestLogger);
+
+    // Initialize metrics (attaches /metrics endpoint)
+    initMetrics(this.app);
 
     // Health check middleware
     this.app.use('/health', (req, res) => {
@@ -218,15 +221,9 @@ class ChatServerApp {
       logger.info('Chat server running in standalone mode');
 
       // Initialize WebSocket service
-      this.webSocketService = new WebSocketService(this.server);
+      this.webSocketService = new WebSocketService(this.server, this.app);
       this.io = this.webSocketService.getIO();
       logger.info('WebSocket service initialized');
-
-      // Start metrics service
-      if (config.monitoring.enabled) {
-        metricsService.start();
-        logger.info('Metrics service started');
-      }
 
       logger.info('Chat server initialization completed');
     } catch (error) {
@@ -275,7 +272,7 @@ class ChatServerApp {
 
       // Start listening - wrap in Promise to ensure it completes
       return new Promise<void>((resolve, reject) => {
-        this.server.listen(config.port, config.host, () => {
+        this.server.listen(config.port, config.host, async () => {
           logger.info(`Chat server running on ${config.host}:${config.port}`, {
             environment: config.nodeEnv,
             serverId: process.env.SERVER_ID || 'unknown',
@@ -284,7 +281,102 @@ class ChatServerApp {
           });
 
           if (config.monitoring.enabled) {
-            logger.info(`Metrics available at http://${config.host}:${config.monitoring.metricsPort}/metrics`);
+            logger.info(`Metrics available at http://${config.host}:${config.port}/metrics`);
+          }
+
+          // Register Chat Server service to Service Discovery
+          let chatServerInstanceId: string | null = null;
+          try {
+            const os = await import('os');
+            const { ulid } = await import('ulid');
+
+            // Get primary IP address (first non-loopback IPv4)
+            const interfaces = os.networkInterfaces();
+            let internalIp = 'localhost';
+            for (const name of Object.keys(interfaces)) {
+              const iface = interfaces[name];
+              if (iface) {
+                for (const addr of iface) {
+                  if (addr.family === 'IPv4' && !addr.internal) {
+                    internalIp = addr.address;
+                    break;
+                  }
+                }
+                if (internalIp !== 'localhost') break;
+              }
+            }
+
+            // Import axios for HTTP request
+            const axios = await import('axios');
+            const backendUrl = process.env.GATRIX_URL || 'http://localhost:55000';
+            const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
+
+            chatServerInstanceId = ulid();
+            const chatServerInstance = {
+              instanceId: chatServerInstanceId,
+              labels: {
+                service: 'chat',
+                group: 'development',
+              },
+              hostname: os.hostname(),
+              internalAddress: internalIp,
+              ports: {
+                http: [config.port],
+              },
+              status: 'ready' as const,
+              meta: {
+                instanceName: 'chat-server-1',
+                startTime: new Date().toISOString(),
+              },
+            };
+
+            try {
+              await axios.default.post(
+                `${backendUrl}/api/v1/server/services/register`,
+                chatServerInstance,
+                {
+                  headers: {
+                    'X-API-Token': apiToken,
+                    'X-Application-Name': 'chat-server',
+                  },
+                }
+              );
+              logger.info('Chat Server service registered to Service Discovery', { instanceId: chatServerInstanceId });
+            } catch (regError: any) {
+              const regErrorMsg = regError?.response?.status ? `HTTP ${regError.response.status}` : (regError instanceof Error ? regError.message : 'Unknown error');
+              logger.warn('Chat Server service registration failed:', regErrorMsg);
+            }
+
+            // Start heartbeat to keep service alive
+            const heartbeatInterval = setInterval(async () => {
+              try {
+                await axios.default.post(
+                  `${backendUrl}/api/v1/server/services/status`,
+                  {
+                    instanceId: chatServerInstanceId,
+                    labels: {
+                      service: 'chat',
+                      group: 'development',
+                    },
+                    status: 'ready',
+                  },
+                  {
+                    headers: {
+                      'X-API-Token': apiToken,
+                      'X-Application-Name': 'chat-server',
+                    },
+                  }
+                );
+              } catch (error: any) {
+                const hbErrorMsg = error?.response?.status ? `HTTP ${error.response.status}` : (error instanceof Error ? error.message : 'Unknown error');
+                logger.warn('Chat Server heartbeat failed:', hbErrorMsg);
+              }
+            }, 10000); // Send heartbeat every 10 seconds
+
+            // Store interval for graceful shutdown
+            (global as any).chatServerHeartbeatInterval = heartbeatInterval;
+          } catch (error: any) {
+            logger.warn('Chat Server service registration failed, continuing:', error instanceof Error ? error.message : String(error));
           }
 
           resolve();
@@ -303,6 +395,12 @@ class ChatServerApp {
     logger.info(`Received ${signal}. Starting graceful shutdown...`);
 
     try {
+      // Clear heartbeat interval
+      if ((global as any).chatServerHeartbeatInterval) {
+        clearInterval((global as any).chatServerHeartbeatInterval);
+        logger.info('Chat Server heartbeat interval cleared');
+      }
+
       // Stop accepting new connections
       this.server.close(() => {
         logger.info('HTTP server closed');
@@ -316,12 +414,6 @@ class ChatServerApp {
       if (this.webSocketService) {
         await this.webSocketService.shutdown();
         logger.info('WebSocket service shutdown completed');
-      }
-
-      // Stop metrics service
-      if (config.monitoring.enabled) {
-        await metricsService.stop();
-        logger.info('Metrics service stopped');
       }
 
       // Close database connections

@@ -61,7 +61,7 @@ RUN mkdir -p logs uploads && chown -R chatserver:nodejs logs uploads
 USER chatserver
 
 # Expose port
-EXPOSE 3001
+EXPOSE 5100
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \

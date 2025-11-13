@@ -80,7 +80,7 @@ const config = {
 
   // Chat Server configuration
   chatServer: {
-    url: process.env.CHAT_SERVER_URL || 'http://localhost:3001',
+    url: process.env.CHAT_SERVER_URL || 'http://localhost:5100',
     apiToken: process.env.CHAT_SERVER_API_TOKEN || 'gatrix-api-default-token',
   },
 

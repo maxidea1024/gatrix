@@ -1,5 +1,7 @@
 import type express from 'express';
 import config from '../config';
+import AppInstance from '../utils/AppInstance';
+import os from 'os';
 
 /**
  * MetricsService for Backend (Express)
@@ -22,7 +24,34 @@ export const initMetrics = (app: express.Application): void => {
     const promClient = require('prom-client');
 
     const register = new promClient.Registry();
-    register.setDefaultLabels({ service: 'backend' });
+
+    // Get instance information
+    const appInstance = AppInstance.getInstance();
+    const hostname = `${os.hostname()}:${process.pid}`;
+    const instanceId = appInstance.instanceId;
+
+    // Get primary IP address (first non-loopback IPv4)
+    const interfaces = os.networkInterfaces();
+    let ip = 'unknown';
+    for (const name of Object.keys(interfaces)) {
+      const iface = interfaces[name];
+      if (iface) {
+        for (const addr of iface) {
+          if (addr.family === 'IPv4' && !addr.internal) {
+            ip = addr.address;
+            break;
+          }
+        }
+        if (ip !== 'unknown') break;
+      }
+    }
+
+    register.setDefaultLabels({
+      service: 'backend',
+      instanceId,
+      hostname,
+      ip
+    });
     promClient.collectDefaultMetrics({ register });
 
     const httpRequestDuration = new promClient.Histogram({

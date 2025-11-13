@@ -11,10 +11,8 @@ export const GrafanaDashboardPage: React.FC = () => {
   }, []);
 
   const iframeUrl = useMemo(() => {
-    // Grafana home page with theme parameter
-    // theme=dark or theme=light
     const theme = isDark ? 'dark' : 'light';
-    return `${grafanaUrl}/?kiosk=tv&theme=${theme}`;
+    return `${grafanaUrl}/d/gatrix-overview?kiosk=tv&theme=${theme}`;
   }, [grafanaUrl, isDark]);
 
   return (

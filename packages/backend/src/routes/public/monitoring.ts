@@ -17,17 +17,17 @@ router.get('/prometheus/targets', async (_req, res) => {
     for (const s of services) {
       const serviceType = s.labels.service || 'unknown';
       // Choose port for metrics
-      // - chat server exposes metrics on 9090
-      // - backend/event-lens will expose /metrics on their main HTTP ports by default
+      // All services expose /metrics on their main HTTP ports
       let port = 80;
       let metricsPath = '/metrics';
       if (serviceType === 'chat') {
-        port = 9090;
-        metricsPath = '/metrics';
+        port = (s.ports.http && s.ports.http[0]) || 5100;
       } else if (serviceType === 'backend') {
         port = (s.ports.http && s.ports.http[0]) || 5000;
       } else if (serviceType === 'event-lens') {
-        port = (s.ports.http && s.ports.http[0]) || 3002;
+        port = (s.ports.http && s.ports.http[0]) || 5200;
+      } else if (serviceType === 'idle') {
+        port = (s.ports.http && s.ports.http[0]) || 9999;
       } else {
         port = (s.ports.http && s.ports.http[0]) || 80;
       }
@@ -46,7 +46,7 @@ router.get('/prometheus/targets', async (_req, res) => {
 
     // Static fallback: ensure chat-server metrics are present at least
     groups.push({
-      targets: ['chat-server:9090'],
+      targets: ['chat-server:5100'],
       labels: { service: 'chat', metrics_path: '/metrics' },
     });
 

@@ -62,7 +62,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "mysql_global_status_threads_connected{job=\"mysql\"}",
+          "expr": "mysql_global_status_threads_connected{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "",
           "refId": "A"
         }
@@ -114,7 +114,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "mysql_global_status_questions{job=\"mysql\"}",
+          "expr": "mysql_global_status_questions{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "",
           "refId": "A"
         }
@@ -166,7 +166,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "mysql_global_status_slow_queries{job=\"mysql\"}",
+          "expr": "mysql_global_status_slow_queries{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "",
           "refId": "A"
         }
@@ -218,7 +218,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "mysql_global_status_bytes_received{job=\"mysql\"}",
+          "expr": "mysql_global_status_bytes_received{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "",
           "refId": "A"
         }
@@ -294,12 +294,12 @@
       },
       "targets": [
         {
-          "expr": "rate(mysql_global_status_questions{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_questions{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Queries/sec",
           "refId": "A"
         },
         {
-          "expr": "rate(mysql_global_status_slow_queries{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_slow_queries{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Slow Queries/sec",
           "refId": "B"
         }
@@ -375,17 +375,17 @@
       },
       "targets": [
         {
-          "expr": "mysql_global_status_threads_connected{job=\"mysql\"}",
+          "expr": "mysql_global_status_threads_connected{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Connected",
           "refId": "A"
         },
         {
-          "expr": "mysql_global_status_threads_running{job=\"mysql\"}",
+          "expr": "mysql_global_status_threads_running{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Running",
           "refId": "B"
         },
         {
-          "expr": "mysql_global_variables_max_connections{job=\"mysql\"}",
+          "expr": "mysql_global_variables_max_connections{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Max Connections",
           "refId": "C"
         }
@@ -461,17 +461,17 @@
       },
       "targets": [
         {
-          "expr": "mysql_global_status_innodb_buffer_pool_bytes_data{job=\"mysql\"}",
+          "expr": "mysql_global_status_innodb_buffer_pool_bytes_data{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Data",
           "refId": "A"
         },
         {
-          "expr": "mysql_global_status_innodb_buffer_pool_bytes_free{job=\"mysql\"}",
+          "expr": "mysql_global_status_innodb_buffer_pool_bytes_free{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Free",
           "refId": "B"
         },
         {
-          "expr": "mysql_global_variables_innodb_buffer_pool_size{job=\"mysql\"}",
+          "expr": "mysql_global_variables_innodb_buffer_pool_size{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Total Size",
           "refId": "C"
         }
@@ -547,12 +547,12 @@
       },
       "targets": [
         {
-          "expr": "rate(mysql_global_status_innodb_buffer_pool_read_requests{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_innodb_buffer_pool_read_requests{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Read Requests/sec",
           "refId": "A"
         },
         {
-          "expr": "rate(mysql_global_status_innodb_buffer_pool_reads{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_innodb_buffer_pool_reads{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Disk Reads/sec",
           "refId": "B"
         }
@@ -628,12 +628,12 @@
       },
       "targets": [
         {
-          "expr": "rate(mysql_global_status_bytes_received{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_bytes_received{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Received/sec",
           "refId": "A"
         },
         {
-          "expr": "rate(mysql_global_status_bytes_sent{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_bytes_sent{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Sent/sec",
           "refId": "B"
         }
@@ -709,12 +709,12 @@
       },
       "targets": [
         {
-          "expr": "rate(mysql_global_status_select_scan{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_select_scan{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Full Table Scans/sec",
           "refId": "A"
         },
         {
-          "expr": "rate(mysql_global_status_select_range{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_select_range{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Range Scans/sec",
           "refId": "B"
         }
@@ -790,22 +790,22 @@
       },
       "targets": [
         {
-          "expr": "rate(mysql_global_status_com_select{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_com_select{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "SELECT/sec",
           "refId": "A"
         },
         {
-          "expr": "rate(mysql_global_status_com_insert{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_com_insert{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "INSERT/sec",
           "refId": "B"
         },
         {
-          "expr": "rate(mysql_global_status_com_update{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_com_update{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "UPDATE/sec",
           "refId": "C"
         },
         {
-          "expr": "rate(mysql_global_status_com_delete{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_com_delete{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "DELETE/sec",
           "refId": "D"
         }
@@ -881,22 +881,22 @@
       },
       "targets": [
         {
-          "expr": "rate(mysql_global_status_innodb_rows_read{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_innodb_rows_read{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Rows Read/sec",
           "refId": "A"
         },
         {
-          "expr": "rate(mysql_global_status_innodb_rows_inserted{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_innodb_rows_inserted{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Rows Inserted/sec",
           "refId": "B"
         },
         {
-          "expr": "rate(mysql_global_status_innodb_rows_updated{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_innodb_rows_updated{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Rows Updated/sec",
           "refId": "C"
         },
         {
-          "expr": "rate(mysql_global_status_innodb_rows_deleted{job=\"mysql\"}[1m])",
+          "expr": "rate(mysql_global_status_innodb_rows_deleted{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[1m])",
           "legendFormat": "Rows Deleted/sec",
           "refId": "D"
         }
@@ -972,12 +972,12 @@
       },
       "targets": [
         {
-          "expr": "mysql_global_status_innodb_log_waits{job=\"mysql\"}",
+          "expr": "mysql_global_status_innodb_log_waits{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Log Waits",
           "refId": "A"
         },
         {
-          "expr": "mysql_global_status_innodb_os_log_fsyncs{job=\"mysql\"}",
+          "expr": "mysql_global_status_innodb_os_log_fsyncs{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "OS Log FSyncs",
           "refId": "B"
         }
@@ -1053,12 +1053,12 @@
       },
       "targets": [
         {
-          "expr": "mysql_global_status_table_locks_immediate{job=\"mysql\"}",
+          "expr": "mysql_global_status_table_locks_immediate{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Immediate Locks",
           "refId": "A"
         },
         {
-          "expr": "mysql_global_status_table_locks_waited{job=\"mysql\"}",
+          "expr": "mysql_global_status_table_locks_waited{job=\"mysql\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
           "legendFormat": "Waited Locks",
           "refId": "B"
         }
@@ -1072,7 +1072,38 @@
   "style": "dark",
   "tags": ["mysql", "database", "relational"],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "name": "instance",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({job=\"mysql\"}, instance)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "hostname",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({job=\"mysql\"}, hostname)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "ip",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({job=\"mysql\"}, ip)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      }
+    ]
   },
   "time": {
     "from": "now-1h",
