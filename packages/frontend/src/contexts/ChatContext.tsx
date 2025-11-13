@@ -954,7 +954,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const incremental = await ChatService.getMessages({
             channelId,
             limit: 20, // 최신 20개만 확인
-            after: latestCachedMessage.id // 마지막 캐시된 메시지 이후만
+            after: latestCachedMessage.id?.toString() // 마지막 캐시된 메시지 이후만 (string)
           });
 
           if (incremental.messages.length > 0) {
@@ -1082,12 +1082,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       apiService.setAccessToken(token);
 
       console.log('🔄 Loading users from API...');
-      const response = await ChatService.getUsers();
-      console.log('🔍 Raw API response:', response);
-
-      // Handle both array response and object response with users property
-      const users = Array.isArray(response) ? response : (response.users || response.data || []);
-      console.log('🔍 Processed users array:', users, 'Length:', users.length);
+      const users = await ChatService.getUsers();
+      console.log('✅ Users loaded:', users.length);
 
       if (Array.isArray(users)) {
         dispatch({ type: 'SET_USERS', payload: users });
