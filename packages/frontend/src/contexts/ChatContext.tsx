@@ -502,6 +502,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const markAsReadRequestsRef = useRef<Set<string>>(new Set());
   // 채널별 최초 새로고침 여부 (캐시 → 서버 메타데이터 동기화)
   const refreshedChannelsRef = useRef<Set<number>>(new Set());
+  // Track in-flight message loads to avoid duplicate concurrent fetches per channel
+  const loadingMessagesRef = useRef<Set<number>>(new Set());
+
 
   // Helper function to find channel ID for a message
   const findChannelIdForMessage = (messageId: number): number | null => {
@@ -920,6 +923,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Load messages for a channel - 깜빡임 방지를 위해 로딩 상태 설정 제거
   const loadMessages = useCallback(async (channelId: number, forceReload = false) => {
+    // Prevent concurrent loads for the same channel
+    if (loadingMessagesRef.current.has(channelId)) {
+      console.log('⏳ loadMessages already in progress, skipping:', channelId);
+      return;
+    }
+    loadingMessagesRef.current.add(channelId);
     try {
       console.log('🔄 loadMessages called for channel:', channelId, 'forceReload:', forceReload);
       console.log('📊 Current messages state:', state.messages);
@@ -990,6 +999,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       console.error('Failed to load messages for channel', channelId, ':', error);
       dispatch({ type: 'SET_ERROR', payload: error.message || t('chat.loadMessagesFailed') });
+    } finally {
+      loadingMessagesRef.current.delete(channelId);
     }
   }, [state.messages, t]);
 
