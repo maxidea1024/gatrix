@@ -1401,6 +1401,8 @@
     "login": "Login",
     "loginFailed": "Login failed",
     "loginSuccess": "Login successful",
+    "loginRequired": "Login is required.",
+
     "invitation": {
       "checking": "Checking invitation link...",
       "receivedTitle": "You have been invited to a team!",
@@ -2398,6 +2400,8 @@
     "channelCreated": "Channel created successfully",
     "createChannelFailed": "Failed to create channel",
     "loadChannelsFailed": "Failed to load channels",
+    "loadMessagesFailed": "Failed to load messages",
+
     "noMessages": "No messages yet",
     "startConversation": "Start the conversation by sending a message!",
     "typeMessage": "Type a message...",

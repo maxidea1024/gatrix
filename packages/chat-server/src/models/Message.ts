@@ -138,7 +138,7 @@ export class MessageModel {
         'u.avatarUrl as userAvatarUrl',
         'u.email as userEmail'
       ])
-      .leftJoin('chat_users as u', 'm.userId', 'u.gatrixUserId')
+      .leftJoin('chat_users as u', 'm.userId', 'u.id')
       .where({ 'm.id': id, 'm.isDeleted': false })
       .first();
 
@@ -163,7 +163,7 @@ export class MessageModel {
           'ru.avatarUrl as replyUserAvatarUrl',
           'ru.email as replyUserEmail'
         ])
-        .leftJoin('chat_users as ru', 'rm.userId', 'ru.gatrixUserId')
+        .leftJoin('chat_users as ru', 'rm.userId', 'ru.id')
         .where({ 'rm.id': result.replyToMessageId, 'rm.isDeleted': false })
         .first();
 
@@ -234,9 +234,9 @@ export class MessageModel {
         this.knex.raw('(SELECT COUNT(*) FROM chat_messages WHERE threadId = m.id AND isDeleted = false) as threadCount'),
         this.knex.raw('(SELECT MAX(createdAt) FROM chat_messages WHERE threadId = m.id AND isDeleted = false) as lastThreadMessageAt')
       ])
-      .leftJoin('chat_users as u', 'm.userId', 'u.gatrixUserId')
+      .leftJoin('chat_users as u', 'm.userId', 'u.id')
       .leftJoin('chat_messages as rm', 'm.replyToMessageId', 'rm.id')
-      .leftJoin('chat_users as ru', 'rm.userId', 'ru.gatrixUserId')
+      .leftJoin('chat_users as ru', 'rm.userId', 'ru.id')
       .orderBy('m.createdAt', 'desc');
 
     const limit = options.limit || 50;
@@ -459,7 +459,7 @@ export class MessageModel {
         'u.name as userName',
         'u.avatarUrl as userAvatarUrl',
       ])
-      .leftJoin('chat_users as u', 'm.userId', 'u.gatrixUserId')
+      .leftJoin('chat_users as u', 'm.userId', 'u.id')
       .where({ 'm.threadId': threadId, 'm.isDeleted': false });
 
     // 페이지네이션
@@ -544,7 +544,7 @@ export class MessageModel {
         'u.name as userName',
         'u.avatarUrl as userAvatarUrl',
       ])
-      .leftJoin('chat_users as u', 'r.userId', 'u.gatrixUserId')
+      .leftJoin('chat_users as u', 'r.userId', 'u.id')
       .where('r.messageId', messageId)
       .orderBy('r.createdAt', 'asc');
 
@@ -575,7 +575,7 @@ export class MessageModel {
         'u.name as userName',
         'u.avatarUrl as userAvatarUrl',
       ])
-      .leftJoin('chat_users as u', 'r.userId', 'u.gatrixUserId')
+      .leftJoin('chat_users as u', 'r.userId', 'u.id')
       .whereIn('r.messageId', messageIds);
 
     console.log('🔍 Raw reactions query result:', {

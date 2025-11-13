@@ -194,10 +194,10 @@ router.use('/', async (req, res, next) => {
     // 채팅서버로 직접 요청
     const axios = require('axios');
 
-    // URL 매핑: /sync-user -> /users/sync-user
+    // URL 매핑: /sync-user -> /users/upsert (Chat Server 컨트롤러에 맞춤)
     let targetPath = req.url;
     if (targetPath === '/sync-user') {
-      targetPath = '/users/sync-user';
+      targetPath = '/users/upsert';
     }
 
     const targetUrl = `${CHAT_API_BASE}${targetPath}`;

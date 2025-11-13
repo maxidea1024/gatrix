@@ -989,9 +989,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       refreshedChannelsRef.current.add(channelId);
     } catch (error: any) {
       console.error('Failed to load messages for channel', channelId, ':', error);
-      dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load messages' });
+      dispatch({ type: 'SET_ERROR', payload: error.message || t('chat.loadMessagesFailed') });
     }
-  }, [state.messages]);
+  }, [state.messages, t]);
 
   // REFRESH_CHANNELS 액션 처리
   useEffect(() => {
@@ -1100,7 +1100,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = localStorage.getItem('accessToken');
       if (!token) {
         console.error('No authentication token found in localStorage');
-        enqueueSnackbar('로그인이 필요합니다', { variant: 'error' });
+        enqueueSnackbar(t('auth.loginRequired'), { variant: 'error' });
         return;
       }
 
@@ -1162,15 +1162,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const lastChannel = channels.find(c => c.id === parseInt(lastChannelId));
         if (lastChannel) {
           console.log('Auto-selecting last channel:', lastChannel.name, 'ID:', lastChannel.id);
-          // 직접 dispatch를 사용하여 채널 선택
+          // 채널 선택 + 메시지 로딩 + WS join
           dispatch({ type: 'SET_CURRENT_CHANNEL', payload: lastChannel.id });
+          localStorage.setItem('lastChannelId', lastChannel.id.toString());
+          // Force initial load to avoid empty message state on first mount
+          loadMessages(lastChannel.id, true);
+          wsService.joinChannel(lastChannel.id);
 
-          // 메시지 로딩을 위해 setTimeout으로 다음 틱에 실행
-          setTimeout(() => {
-            // 항상 채널 진입 시 최신 메타데이터 확보를 위해 로딩 시도
-            loadMessages(lastChannel.id);
-            wsService.joinChannel(lastChannel.id);
-          }, 0);
         }
       }
     } catch (error: any) {
@@ -1205,8 +1203,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // 채널이 실제로 변경된 경우에만 메시지 로딩 - 깜빡임 방지를 위해 setTimeout 제거
         if (previousChannelId !== channelId) {
           console.log('✅ Channel changed from', previousChannelId, 'to', channelId, '- loading messages');
-          // 즉시 메시지 로딩하여 깜빡임 방지
-          loadMessages(channelId);
+          // Force reload to ensure fresh messages when switching channels
+          loadMessages(channelId, true);
         } else {
           console.log('⏭️ Same channel selected, skipping message load');
         }
@@ -1464,10 +1462,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadPendingInvitationsCount: loadPendingInvitationsCount,
   };
 
-  // Select channel (used for auto-selection)
-  const selectChannel = async (channelId: number) => {
-    actions.setCurrentChannel(channelId);
-  };
 
   // 디버깅을 위해 전역에 노출
   React.useEffect(() => {

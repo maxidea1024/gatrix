@@ -221,13 +221,6 @@ const ChatPageContent: React.FC = () => {
     }
   }, [state.error, t, enqueueSnackbar, actions]);
 
-  // 페이지 재진입 시 현재 채널 메시지를 강제 새로고침하여 스레드 메타데이터 보장
-  useEffect(() => {
-    if (state.currentChannelId && !didForceReloadRef.current) {
-      didForceReloadRef.current = true;
-      actions.loadMessages(state.currentChannelId, true);
-    }
-  }, [state.currentChannelId]);
 
   // Auto-join channel when selected
   const [joinedChannels, setJoinedChannels] = useState<Set<number>>(new Set());

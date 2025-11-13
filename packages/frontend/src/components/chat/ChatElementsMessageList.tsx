@@ -708,16 +708,6 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     };
   }, [theme.palette.mode]);
 
-  // Load messages when channel changes - 깜빡임 방지를 위해 조건 완화
-  useEffect(() => {
-    if (channelId) {
-      // 메시지가 없거나 다른 채널의 메시지인 경우에만 로드
-      const currentMessages = messages || [];
-      if (currentMessages.length === 0) {
-        actions.loadMessages(channelId);
-      }
-    }
-  }, [channelId]); // messages.length 의존성 제거
 
   // handleSendMessage와 handleKeyPress는 AdvancedMessageInput에서 처리됨
 

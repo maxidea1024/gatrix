@@ -321,11 +321,12 @@ export interface ChatContextType {
     startTyping: (channelId: number, threadId?: number) => void;
     stopTyping: (channelId: number, threadId?: number) => void;
     searchMessages: (query: string, channelId?: number) => Promise<Message[]>;
-    loadMessages: (channelId: number) => Promise<void>;
+    loadMessages: (channelId: number, forceReload?: boolean) => Promise<void>;
     loadMoreMessages: (channelId: number) => Promise<void>;
     uploadFile: (file: File, channelId: number) => Promise<MessageAttachment>;
     inviteUser: (channelId: number, userId: number, message?: string) => Promise<void>;
     loadPendingInvitationsCount: () => Promise<void>;
+    getThreadMessages: (threadId: number) => Promise<Message[]>;
     clearError: () => void;
   };
 }

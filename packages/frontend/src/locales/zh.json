@@ -1452,6 +1452,8 @@
     "login": "登录",
     "loginFailed": "登录失败",
     "loginSuccess": "登录成功",
+    "loginRequired": "需要登录。",
+
     "invitation": {
       "checking": "Checking invitation link...",
       "receivedTitle": "You have been invited to a team!",
@@ -2442,6 +2444,8 @@
     "channelCreated": "Channel created successfully",
     "createChannelFailed": "Failed to create channel",
     "loadChannelsFailed": "Failed to load channels",
+    "loadMessagesFailed": "无法加载消息",
+
     "noMessages": "No messages yet",
     "startConversation": "Start the conversation by sending a message!",
     "typeMessage": "Type a message...",
