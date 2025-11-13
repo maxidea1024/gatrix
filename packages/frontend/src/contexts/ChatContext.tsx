@@ -653,19 +653,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         wsService.on('connection_lost', () => {
           console.log('WebSocket connection lost');
           dispatch({ type: 'SET_CONNECTED', payload: false });
-          enqueueSnackbar(t('chat.connectionLost'), { variant: 'warning' });
+          dispatch({ type: 'SET_ERROR', payload: t('chat.connectionLost') });
         });
 
         wsService.on('connection_error', (event) => {
           console.error('WebSocket connection error:', event);
           dispatch({ type: 'SET_CONNECTED', payload: false });
-          enqueueSnackbar(t('chat.connectionError'), { variant: 'error' });
+          dispatch({ type: 'SET_ERROR', payload: t('chat.connectionError') });
         });
 
         wsService.on('connection_failed', (event) => {
           console.error('WebSocket connection failed permanently:', event);
           dispatch({ type: 'SET_CONNECTED', payload: false });
-          enqueueSnackbar(t('chat.serviceUnavailable'), { variant: 'error' });
+          dispatch({ type: 'SET_ERROR', payload: t('chat.serviceUnavailable') });
         });
 
         wsService.on('authentication_failed', async (event) => {
@@ -685,7 +685,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           } catch (refreshError) {
             console.error('❌ Token refresh failed:', refreshError);
-            enqueueSnackbar(t('chat.authenticationFailed'), { variant: 'error' });
+            dispatch({ type: 'SET_ERROR', payload: t('chat.authenticationFailed') });
           }
         });
 
@@ -1107,7 +1107,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = localStorage.getItem('accessToken');
       if (!token) {
         console.error('No authentication token found in localStorage');
-        enqueueSnackbar(t('auth.loginRequired'), { variant: 'error' });
+        dispatch({ type: 'SET_ERROR', payload: t('auth.loginRequired') });
         return;
       }
 
@@ -1121,7 +1121,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'SET_CONNECTED', payload: true });
     } catch (error) {
       console.error('❌ Failed to connect to chat WebSocket:', error);
-      enqueueSnackbar(t('chat.connectionFailed'), { variant: 'error' });
+      dispatch({ type: 'SET_ERROR', payload: t('chat.connectionFailed') });
     }
   }, [enqueueSnackbar, t]);
 
@@ -1195,6 +1195,25 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       finishLoading();
     }
   }, [connectWebSocket, loadMessages, loadUsers, loadPendingInvitationsCount]);
+  // Debounced loader for channel switch (prevent burst loads)
+  const debouncedLoadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scheduleLoadMessages = useCallback((cid: number) => {
+    if (debouncedLoadTimerRef.current) {
+      clearTimeout(debouncedLoadTimerRef.current as any);
+    }
+    debouncedLoadTimerRef.current = setTimeout(() => {
+      loadMessages(cid, true);
+    }, 200);
+  }, [loadMessages]);
+
+  useEffect(() => {
+    return () => {
+      if (debouncedLoadTimerRef.current) {
+        clearTimeout(debouncedLoadTimerRef.current as any);
+      }
+    };
+  }, []);
+
 
   // Actions
   const actions: ChatContextType['actions'] = {
@@ -1210,8 +1229,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // 채널이 실제로 변경된 경우에만 메시지 로딩 - 깜빡임 방지를 위해 setTimeout 제거
         if (previousChannelId !== channelId) {
           console.log('✅ Channel changed from', previousChannelId, 'to', channelId, '- loading messages');
-          // Force reload to ensure fresh messages when switching channels
-          loadMessages(channelId, true);
+          // Force reload via debounced scheduler to prevent burst loads
+          scheduleLoadMessages(channelId);
         } else {
           console.log('⏭️ Same channel selected, skipping message load');
         }
