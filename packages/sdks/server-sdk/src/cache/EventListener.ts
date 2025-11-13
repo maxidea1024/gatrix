@@ -49,9 +49,13 @@ export class EventListener {
         },
         lazyConnect: true,
         enableReadyCheck: false,
-        enableOfflineQueue: false,
+        // Keep commands during disconnects so we don't throw 'Connection is closed'
+        enableOfflineQueue: true,
         maxRetriesPerRequest: null,
+        // Ensure automatic re-subscription after reconnect
+        autoResubscribe: true,
       });
+
 
       // Suppress ioredis internal logs
       this.subscriber.on('error', (error) => {
@@ -59,15 +63,34 @@ export class EventListener {
         if (!error.message.includes('ECONNREFUSED') && !error.message.includes('connect')) {
           this.logger.error('Subscriber error', { error: error.message });
         }
+        // Mark as disconnected but do not attempt manual reconnect here
+        // ioredis will handle reconnection automatically with retryStrategy
         this.isConnected = false;
-        this.setupReconnect();
       });
 
       this.subscriber.on('close', () => {
         this.logger.warn('Subscriber connection closed');
+        // Mark as disconnected; rely on ioredis auto-reconnect
         this.isConnected = false;
-        this.setupReconnect();
       });
+
+      // Log reconnection attempts and refresh cache once reconnected
+      this.subscriber.on('reconnecting', (time: number) => {
+        this.logger.warn('Subscriber reconnecting...', { delay: time });
+      });
+
+      this.subscriber.on('ready', async () => {
+        if (!this.isConnected) {
+          this.isConnected = true;
+          this.logger.info('Subscriber reconnected and ready');
+          try {
+            await this.reinitializeCache();
+          } catch {
+            // Errors are already logged inside reinitializeCache
+          }
+        }
+      });
+
 
       // Connect to Redis
       await this.subscriber.connect();

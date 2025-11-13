@@ -126,6 +126,19 @@ export class GatrixServerSDK {
     }
 
     this.logger.info('Initializing GatrixServerSDK...');
+    // Log effective configuration at startup for visibility
+    this.logger.info('SDK configuration', {
+      refreshMethod: this.config.cache?.refreshMethod ?? 'polling',
+      cache: {
+        enabled: this.config.cache?.enabled !== false,
+        ttl: this.config.cache?.ttl ?? 300,
+      },
+      redis: this.config.redis
+        ? { host: this.config.redis.host, port: this.config.redis.port, db: this.config.redis.db ?? 0 }
+        : 'disabled',
+      retry: this.config.retry ?? 'default',
+    });
+
 
     try {
       // Initialize cache manager

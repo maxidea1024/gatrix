@@ -235,6 +235,12 @@ function Create-EnvFile {
             } else {
                 $newLines += "VITE_GRAFANA_URL=http://$HostAddress`:54000"
             }
+        } elseif ($line -match "^VITE_BULL_BOARD_URL=") {
+            if ($Environment -eq "development") {
+                $newLines += "VITE_BULL_BOARD_URL=http://localhost:53000/bull-board"
+            } else {
+                $newLines += "VITE_BULL_BOARD_URL=http://$HostAddress`:55000/bull-board"
+            }
         } elseif ($line -match "^ADMIN_PASSWORD=") {
             $newLines += "ADMIN_PASSWORD=$AdminPassword"
         } else {

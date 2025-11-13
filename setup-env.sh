@@ -189,6 +189,14 @@ create_env_file() {
     sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=http://$HOST:54000|" "$ENV_FILE"
   fi
 
+  # Set Bull Board URL based on environment
+  if [ "$ENVIRONMENT" = "development" ]; then
+    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=http://localhost:53000/bull-board|" "$ENV_FILE"
+  else
+    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=http://$HOST:55000/bull-board|" "$ENV_FILE"
+  fi
+
+
   # Replace admin password
   sed -i.bak "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=$ADMIN_PASSWORD|" "$ENV_FILE"
 

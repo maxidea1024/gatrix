@@ -30,7 +30,7 @@ const QueueMonitorPage: React.FC = () => {
   }
 
   // BullMQ Dashboard 경로
-  const bullboardUrl = `${window.location.protocol}//${window.location.host}/bull-board`;
+  const bullboardUrl = ((import.meta.env as any).VITE_BULL_BOARD_URL as string) || `${window.location.protocol}//${window.location.host}/bull-board`;
 
   return (
     <Box sx={{ p: 3 }}>
