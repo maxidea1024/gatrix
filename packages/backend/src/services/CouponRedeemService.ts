@@ -169,7 +169,45 @@ export class CouponRedeemService {
         [setting.id]
       );
 
-      // 11. Commit transaction (all changes including cache update are atomic)
+      // 11. Check if all coupons are now used and auto-disable if needed
+      // For SPECIAL type: check if usedCount >= maxTotalUses
+      // For NORMAL type: check if usedCount >= generatedCount
+      let shouldAutoDisable = false;
+      if (setting.type === 'SPECIAL' && setting.maxTotalUses && setting.maxTotalUses > 0) {
+        // For SPECIAL: check if we just reached maxTotalUses
+        const newUsedCount = (setting.usedCount || 0) + 1;
+        if (newUsedCount >= setting.maxTotalUses) {
+          shouldAutoDisable = true;
+        }
+      } else if (setting.type === 'NORMAL') {
+        // For NORMAL: check if we just used the last issued code
+        const newUsedCount = (setting.usedCount || 0) + 1;
+        const totalIssued = setting.generatedCount || setting.issuedCount || 0;
+        if (totalIssued > 0 && newUsedCount >= totalIssued) {
+          shouldAutoDisable = true;
+        }
+      }
+
+      if (shouldAutoDisable) {
+        await connection.execute(
+          `UPDATE g_coupon_settings
+           SET status = 'DISABLED',
+               disabledBy = 'system',
+               disabledAt = NOW(),
+               disabledReason = 'All coupons have been used'
+           WHERE id = ?`,
+          [setting.id]
+        );
+        logger.info('Coupon setting auto-disabled (all used)', {
+          settingId: setting.id,
+          type: setting.type,
+          usedCount: (setting.usedCount || 0) + 1,
+          maxTotalUses: setting.maxTotalUses,
+          generatedCount: setting.generatedCount,
+        });
+      }
+
+      // 12. Commit transaction (all changes including cache update are atomic)
       await connection.commit();
 
       logger.info('Coupon redeemed successfully', {

@@ -30,6 +30,7 @@ export interface CouponSetting {
   generationStatus?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
   generatedCount?: number;
   totalCount?: number;
+  disabledReason?: string | null;
   issuedCount?: number; // Actual issued code count from g_coupons table
   usedCount?: number; // Number of times the coupon has been used
 }

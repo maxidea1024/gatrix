@@ -16,7 +16,7 @@ router.post('/',
   auditLog({
     action: 'whitelist_create',
     resourceType: 'whitelist',
-    // ?�이?�리?�트 ?�성 ?�에??ID가 ?�직 ?�으므�?getResourceId ?�거
+    // ?�이?�리?�트 ?�성 ?�에??ID가 ?�직 ?�으므�?getResourceId ?�거
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
@@ -43,6 +43,18 @@ router.delete('/:id',
   WhitelistController.deleteWhitelist
 );
 
+router.patch('/:id/toggle',
+  auditLog({
+    action: 'whitelist_toggle',
+    resourceType: 'whitelist',
+    getResourceId: (req) => req.params?.id,
+    getNewValues: (req, res: any) => ({
+      isEnabled: res?.data?.isEnabled,
+    }),
+  }) as any,
+  WhitelistController.toggleWhitelistStatus
+);
+
 // Bulk operations
 router.post('/bulk',
   auditLog({
@@ -53,9 +65,9 @@ router.post('/bulk',
   WhitelistController.bulkCreateWhitelists
 );
 
-// ?�이?�리?�트 ?�스???�우??router.post('/test', WhitelistController.testWhitelist);
+// ?�이?�리?�트 ?�스???�우??router.post('/test', WhitelistController.testWhitelist);
 
-// ?�그 관???�우??(관리자�?
+// ?�그 관???�우??(관리자�?
 router.get('/:id/tags', requireAdmin as any, WhitelistController.getTags);
 router.put('/:id/tags', requireAdmin as any, WhitelistController.setTags);
 

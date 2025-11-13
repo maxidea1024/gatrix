@@ -67,7 +67,25 @@ export default defineConfig({
     port: 3000,
     watch: {
       usePolling: true, // Required for Docker on Windows/WSL
-      interval: 100,
+      interval: 1000, // Increased from 100ms to 1000ms to reduce unnecessary reloads
+      ignored: (path: string) => {
+        // Ignore common non-source directories and files
+        const ignoredPatterns = [
+          'node_modules',
+          '.git',
+          'dist',
+          'build',
+          '.next',
+          'logs',
+          '.log',
+          'tmp',
+          '.DS_Store',
+          '.vite',
+          'coverage',
+          '.turbo',
+        ];
+        return ignoredPatterns.some(pattern => path.includes(pattern));
+      },
     },
     // Let Vite infer the HMR host from the page URL so LAN clients use the correct IP
     hmr: {

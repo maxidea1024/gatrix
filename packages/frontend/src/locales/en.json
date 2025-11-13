@@ -1047,6 +1047,11 @@
       "deleteTitle": "Delete Account Whitelist Entry",
       "import": "Import"
     },
+    "enable": "Enable",
+    "disable": "Disable",
+    "statusEnabledSuccess": "Whitelist entry has been enabled",
+    "statusDisabledSuccess": "Whitelist entry has been disabled",
+    "toggleStatusFailed": "Failed to toggle whitelist status",
     "errors": {
       "bulkCreateFailed": "Failed to bulk create entries",
       "deleteFailed": "Failed to delete whitelist entry",
@@ -3286,6 +3291,7 @@
         "targetUserIdsPlaceholder": "user123\\nuser456\\nuser789"
       },
       "allUsed": "All Used",
+      "expired": "Expired",
       "deleteConfirmTitle": "Confirm Deletion",
       "deleteConfirmMessage": "Are you sure you want to delete '{{name}}'? This action cannot be undone.",
       "deleteSuccess": "Coupon has been deleted.",

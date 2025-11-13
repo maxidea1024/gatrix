@@ -48,6 +48,8 @@ import {
   Upload as UploadIcon,
   Refresh as RefreshIcon,
   Cancel as CancelIcon,
+  Block as BlockIcon,
+  CheckCircle as CheckCircleIcon,
   Close as CloseIcon,
   Save as SaveIcon,
   ContentCopy as ContentCopyIcon,
@@ -259,6 +261,29 @@ const WhitelistPage: React.FC = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
     // selectedWhitelist는 다이얼로그가 닫힐 때까지 유지
+  };
+
+  // Toggle whitelist status
+  const handleToggleStatus = async () => {
+    if (!selectedWhitelist) return;
+
+    try {
+      setLoading(true);
+      await WhitelistService.toggleWhitelistStatus(selectedWhitelist.id);
+      enqueueSnackbar(
+        selectedWhitelist.isEnabled
+          ? t('whitelist.statusDisabledSuccess')
+          : t('whitelist.statusEnabledSuccess'),
+        { variant: 'success' }
+      );
+      handleMenuClose();
+      loadWhitelists();
+    } catch (error) {
+      console.error('Failed to toggle whitelist status:', error);
+      enqueueSnackbar(t('whitelist.toggleStatusFailed'), { variant: 'error' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 복사 기능
@@ -643,6 +668,19 @@ const WhitelistPage: React.FC = () => {
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
               >
+                <MenuItem onClick={handleToggleStatus}>
+                  {selectedWhitelist?.isEnabled ? (
+                    <>
+                      <BlockIcon sx={{ mr: 1 }} />
+                      {t('whitelist.disable')}
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircleIcon sx={{ mr: 1 }} />
+                      {t('whitelist.enable')}
+                    </>
+                  )}
+                </MenuItem>
                 <MenuItem onClick={handleEdit}>
                   <EditIcon sx={{ mr: 1 }} />
                   {t('common.edit')}

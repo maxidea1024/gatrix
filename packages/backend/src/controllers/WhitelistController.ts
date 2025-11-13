@@ -235,6 +235,21 @@ export class WhitelistController {
     });
   });
 
+  static toggleWhitelistStatus = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const id = parseInt(req.params.id);
+
+    if (isNaN(id)) {
+      throw new CustomError('Invalid whitelist ID', 400);
+    }
+
+    const updated = await WhitelistService.toggleWhitelistStatus(id, (req.user as any).userId);
+
+    res.json({
+      success: true,
+      data: updated,
+    });
+  });
+
   // 화이트리스트 테스트
   static testWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { error, value } = testWhitelistSchema.validate(req.body);

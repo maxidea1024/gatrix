@@ -176,6 +176,16 @@ export class WhitelistService {
     await apiService.delete(`/admin/whitelist/${id}`);
   }
 
+  static async toggleWhitelistStatus(id: number): Promise<Whitelist> {
+    const response = await apiService.patch<{ success: boolean; data: Whitelist }>(`/admin/whitelist/${id}/toggle`);
+
+    if (response?.success && response?.data) {
+      return response.data;
+    }
+
+    throw new Error('Failed to toggle whitelist status');
+  }
+
   static async bulkCreateWhitelists(entries: BulkCreateEntry[]): Promise<{ createdCount: number; requestedCount: number }> {
     const response = await apiService.post<{ success: boolean; data: { createdCount: number; requestedCount: number } }>('/admin/whitelist/bulk', { entries });
 

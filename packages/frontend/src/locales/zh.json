@@ -1098,6 +1098,11 @@
       "deleteTitle": "删除账户白名单条目",
       "import": "导入"
     },
+    "enable": "启用",
+    "disable": "禁用",
+    "statusEnabledSuccess": "白名单条目已启用",
+    "statusDisabledSuccess": "白名单条目已禁用",
+    "toggleStatusFailed": "切换白名单状态失败",
     "errors": {
       "bulkCreateFailed": "账户白名单批量创建失败",
       "deleteFailed": "账户白名单删除失败",
@@ -3294,6 +3299,8 @@
         "used": "已使用的优惠券",
         "unused": "未使用的优惠券"
       },
+      "allUsed": "全部已使用",
+      "expired": "已过期",
       "sdkGuideDrawer": {
         "title": "优惠券兑换 API 集成指南",
         "subtitle": "了解如何从客户端调用优惠券兑换 API。",

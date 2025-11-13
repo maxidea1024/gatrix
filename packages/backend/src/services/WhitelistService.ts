@@ -219,6 +219,53 @@ export class WhitelistService {
     }
   }
 
+  /**
+   * Toggle enabled status of account whitelist entry
+   */
+  static async toggleWhitelistStatus(id: number, updatedBy: number): Promise<Whitelist> {
+    try {
+      const existing = await WhitelistModel.findById(id);
+      if (!existing) {
+        throw new CustomError('Account whitelist entry not found', 404);
+      }
+
+      const updated = await WhitelistModel.update(id, {
+        isEnabled: !existing.isEnabled,
+        updatedBy,
+      });
+
+      if (!updated) {
+        throw new CustomError('Failed to update whitelist entry', 500);
+      }
+
+      logger.info('Account whitelist status toggled:', {
+        id: updated.id,
+        accountId: updated.accountId,
+        isEnabled: updated.isEnabled,
+        updatedBy,
+      });
+
+      // Publish whitelist.updated event for SDK real-time updates
+      try {
+        await pubSubService.publishSDKEvent({
+          type: 'whitelist.updated',
+          data: { id: updated.id, timestamp: Date.now() },
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish whitelist.updated event:', eventError);
+        // Don't throw - event publishing failure shouldn't fail the request
+      }
+
+      return updated;
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      logger.error('Error toggling account whitelist status:', error);
+      throw new CustomError('Failed to toggle account whitelist status', 500);
+    }
+  }
+
   static async testWhitelist(accountId?: string, ipAddress?: string): Promise<{
     isAllowed: boolean;
     matchedRules: Array<{

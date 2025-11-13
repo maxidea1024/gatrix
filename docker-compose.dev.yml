@@ -165,8 +165,11 @@ services:
     networks:
       - gatrix-dev-network
     volumes:
+      # Mount entire project but exclude dist folder to prevent unnecessary reloads
       - .:/app
       - /app/node_modules
+      # Exclude dist folder from watch to prevent HMR triggers from build artifacts
+      - /app/packages/frontend/dist
     command: yarn workspace @gatrix/frontend dev
 
   # etcd for service discovery (optional)

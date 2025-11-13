@@ -1047,6 +1047,11 @@
       "deleteTitle": "계정 화이트리스트 삭제",
       "import": "가져오기"
     },
+    "enable": "활성화",
+    "disable": "비활성화",
+    "statusEnabledSuccess": "화이트리스트가 활성화되었습니다",
+    "statusDisabledSuccess": "화이트리스트가 비활성화되었습니다",
+    "toggleStatusFailed": "화이트리스트 상태 변경에 실패했습니다",
     "errors": {
       "bulkCreateFailed": "일괄 생성에 실패했습니다",
       "deleteFailed": "화이트리스트 삭제에 실패했습니다",
@@ -3286,6 +3291,7 @@
         "targetUserIdsPlaceholder": "user123\\nuser456\\nuser789"
       },
       "allUsed": "모두사용",
+      "expired": "종료됨",
       "deleteConfirmTitle": "쿠폰 삭제 확인",
       "deleteConfirmMessage": "'{{name}}' 쿠폰을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
       "deleteSuccess": "쿠폰이 삭제되었습니다.",

@@ -1155,25 +1155,18 @@ const CouponSettingsPage: React.FC = () => {
                               </TableCell>
                             );
                           case 'status': {
-                            // Check if coupon is fully used
+                            // Display status based on actual database status and disabled reason
                             let displayLabel = it.status === 'ACTIVE' ? t('common.active') : it.status === 'DISABLED' ? t('common.disabled') : t('status.deleted');
                             let displayColor: 'success' | 'default' | 'warning' | 'error' = it.status === 'ACTIVE' ? 'success' : it.status === 'DISABLED' ? 'default' : 'warning';
 
-                            // Check if all coupons are used
-                            if (it.status === 'ACTIVE') {
-                              if (it.type === 'SPECIAL') {
-                                // For SPECIAL: check if maxTotalUses is set and all are used
-                                if (it.maxTotalUses && it.maxTotalUses > 0 && (it.usedCount || 0) >= it.maxTotalUses) {
-                                  displayLabel = t('coupons.couponSettings.allUsed');
-                                  displayColor = 'error';
-                                }
-                              } else {
-                                // For NORMAL: check if all issued codes are used
-                                const totalIssued = it.generatedCount || it.issuedCount || 0;
-                                if (totalIssued > 0 && (it.usedCount || 0) >= totalIssued) {
-                                  displayLabel = t('coupons.couponSettings.allUsed');
-                                  displayColor = 'error';
-                                }
+                            // If disabled, check the reason
+                            if (it.status === 'DISABLED') {
+                              if (it.disabledReason === 'All coupons have been used') {
+                                displayLabel = t('coupons.couponSettings.allUsed');
+                                displayColor = 'error';
+                              } else if (it.disabledReason === 'Expired by scheduler') {
+                                displayLabel = t('coupons.couponSettings.expired');
+                                displayColor = 'warning';
                               }
                             }
 
