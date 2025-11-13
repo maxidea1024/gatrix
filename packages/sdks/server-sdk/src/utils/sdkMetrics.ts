@@ -156,5 +156,14 @@ export class SdkMetrics {
   incError(scope: string, op: string = 'unknown'): void {
     try { this.errorsCounter?.labels(scope, op).inc(); } catch (_) {}
   }
+
+  // HTTP helpers
+  incHttpRequestsTotal(method: string, route: string, status: number | string): void {
+    try { this.httpRequestsCounter?.labels(method, route, String(status)).inc(); } catch (_) {}
+  }
+
+  observeHttpDuration(method: string, route: string, status: number | string, durationSeconds: number): void {
+    try { this.httpRequestDuration?.labels(method, route, String(status)).observe(durationSeconds); } catch (_) {}
+  }
 }
 
