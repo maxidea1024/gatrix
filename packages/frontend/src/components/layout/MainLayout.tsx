@@ -179,6 +179,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Maintenance status timer - updates UI when maintenance starts/ends
   useEffect(() => {
+    // Always clear existing timer first
+    if (maintenanceTimerRef.current) {
+      clearTimeout(maintenanceTimerRef.current);
+      maintenanceTimerRef.current = null;
+    }
+
     const updateMaintenanceStatus = () => {
       const newStatus = computeMaintenanceStatus(maintenanceStatus.isMaintenance, maintenanceStatus.detail);
       if (newStatus !== maintenanceStatus.status) {
@@ -187,6 +193,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
 
     // Check if we need to set up a timer
+    // Timer is only needed if:
+    // 1. Maintenance is enabled (isMaintenance = true)
+    // 2. There's maintenance detail with time constraints
+    // 3. Start time is in the future OR end time is in the future
     const needsTimer = maintenanceStatus.isMaintenance && maintenanceStatus.detail && (
       (maintenanceStatus.detail.startsAt && new Date(maintenanceStatus.detail.startsAt) > new Date()) ||
       (maintenanceStatus.detail.endsAt && new Date(maintenanceStatus.detail.endsAt) > new Date())
@@ -220,6 +230,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       }
     }
 
+    // Cleanup: clear timer when dependencies change or component unmounts
+    // This ensures timer is stopped when:
+    // - Maintenance is manually stopped (isMaintenance becomes false)
+    // - Maintenance detail is updated
+    // - Status changes
     return () => {
       if (maintenanceTimerRef.current) {
         clearTimeout(maintenanceTimerRef.current);

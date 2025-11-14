@@ -96,7 +96,8 @@ const MaintenancePage: React.FC = () => {
       const status = computeMaintenanceStatus(isUnderMaintenance, detail);
       setMaintenanceStatus(status);
       setCurrentMaintenanceDetail(detail);
-      // 점검 중일 때만 기존 설정을 불러옴
+      // Load existing settings if maintenance is configured (active, scheduled, or inactive with detail)
+      // This includes: active maintenance, scheduled maintenance (future), and past maintenance with settings
       if (detail && isUnderMaintenance) {
         setType(detail.type);
         setStartsAt(detail.startsAt ? dayjs.utc(detail.startsAt).tz(getStoredTimezone()) : null);
@@ -108,14 +109,14 @@ const MaintenancePage: React.FC = () => {
         if (detail.localeMessages?.zh) d.push({ lang: 'zh', message: detail.localeMessages.zh });
         setLocales(d as any);
       } else {
-        // 점검 중이 아니면 깨끗한 상태로 시작
+        // No maintenance configured - start with clean state
         setType('regular');
         setStartsAt(null);
         setEndsAt(null);
         setBaseMsg('');
         setLocales([]);
 
-        // 점검 중이 아닐 때 기본 메시지 입력 필드에 포커스
+        // Focus on message input field when no maintenance is configured
         setTimeout(() => {
           messageInputRef.current?.focus();
         }, 100);

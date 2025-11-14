@@ -15,44 +15,16 @@ export interface MaintenancePayload {
 const KEY = 'isMaintenance';
 const KEY_DETAIL = 'maintenanceDetail';
 
-function computeActive(isFlag: string | null, detail: any): boolean {
-  if (isFlag !== 'true') return false;
-  if (!detail) return isFlag === 'true';
-  const now = new Date();
-  const startsAt = detail.startsAt ? new Date(detail.startsAt) : null;
-  const endsAt = detail.endsAt ? new Date(detail.endsAt) : null;
-  if (startsAt && now < startsAt) return false;
-  if (endsAt && now > endsAt) return false;
-  return true;
-}
-
-// Compute maintenance status: 'inactive' | 'scheduled' | 'active'
-function computeMaintenanceStatus(isFlag: string | null, detail: any): 'inactive' | 'scheduled' | 'active' {
-  if (isFlag !== 'true') return 'inactive';
-  if (!detail) return 'inactive';
-
-  const now = new Date();
-  const startsAt = detail.startsAt ? new Date(detail.startsAt) : null;
-  const endsAt = detail.endsAt ? new Date(detail.endsAt) : null;
-
-  // If start time is in the future, it's scheduled
-  if (startsAt && now < startsAt) return 'scheduled';
-
-  // If end time is in the past, it's inactive
-  if (endsAt && now > endsAt) return 'inactive';
-
-  // Otherwise, it's active
-  return 'active';
-}
-
 export class MaintenanceController {
   static async getStatus(_req: Request, res: Response, next: NextFunction) {
     try {
       const is = await VarsModel.get(KEY);
       const detailRaw = await VarsModel.get(KEY_DETAIL);
       const detail = detailRaw ? JSON.parse(detailRaw) : null;
-      const isUnderMaintenance = computeActive(is, detail);
-      res.json({ success: true, data: { isUnderMaintenance, ...(isUnderMaintenance && detail ? { detail } : {}) } });
+      // Return the actual isMaintenance flag value (not computed active status)
+      // Frontend will compute the status (active/scheduled/inactive) based on current time
+      const isMaintenance = is === 'true';
+      res.json({ success: true, data: { isUnderMaintenance: isMaintenance, ...(isMaintenance && detail ? { detail } : {}) } });
     } catch (e) { next(e); }
   }
 
