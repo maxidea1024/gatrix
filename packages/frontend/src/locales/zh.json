@@ -3777,5 +3777,11 @@
     "adminDescription": "在管理员面板中使用的 API。需要管理员权限，通过 JWT 令牌进行身份验证。",
     "serverSdkDescription": "在游戏服务器中使用的 API。通过 X-API-Token 标头进行身份验证，提供活跃游戏世界的信息。",
     "clientSdkDescription": "在游戏客户端中使用的 API。通过 X-API-Token 标头进行身份验证，提供客户端配置信息。"
+  },
+  "grafanaDashboard": {
+    "tabs": {
+      "overview": "概览",
+      "sdkMetrics": "SDK 指标"
+    }
   }
 }

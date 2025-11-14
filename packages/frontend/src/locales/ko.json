@@ -3757,5 +3757,11 @@
     "adminDescription": "관리자 패널에서 사용되는 API입니다. 관리자 권한이 필요하며, JWT 토큰을 통해 인증됩니다.",
     "serverSdkDescription": "게임 서버에서 사용되는 API입니다. X-API-Token 헤더를 통해 인증되며, 활성화된 게임월드 정보를 제공합니다.",
     "clientSdkDescription": "게임 클라이언트에서 사용되는 API입니다. X-API-Token 헤더를 통해 인증되며, 클라이언트 설정 정보를 제공합니다."
+  },
+  "grafanaDashboard": {
+    "tabs": {
+      "overview": "개요",
+      "sdkMetrics": "SDK 메트릭"
+    }
   }
 }

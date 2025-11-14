@@ -3756,5 +3756,11 @@
     "adminDescription": "API used in the admin panel. Requires admin privileges and is authenticated via JWT token.",
     "serverSdkDescription": "API used in game servers. Authenticated via X-API-Token header and provides information about active game worlds.",
     "clientSdkDescription": "API used in game clients. Authenticated via X-API-Token header and provides client configuration information."
+  },
+  "grafanaDashboard": {
+    "tabs": {
+      "overview": "Overview",
+      "sdkMetrics": "SDK Metrics"
+    }
   }
 }

@@ -1,19 +1,62 @@
-import React, { useMemo } from 'react';
-import { Box } from '@mui/material';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Box, Tabs, Tab } from '@mui/material';
+import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
+
+type DashboardKey = 'overview' | 'sdkMetrics';
+
+interface DashboardDefinition {
+  key: DashboardKey;
+  uid: string;
+}
+
+const dashboards: DashboardDefinition[] = [
+  { key: 'overview', uid: 'gatrix-overview' },
+  { key: 'sdkMetrics', uid: 'gatrix-sdk-metrics' },
+];
 
 export const GrafanaDashboardPage: React.FC = () => {
   const { isDark } = useTheme();
+  const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [selectedDashboard, setSelectedDashboard] = useState<DashboardKey>(() => {
+    const param = searchParams.get('dashboard');
+    if (param === 'sdkMetrics') {
+      return 'sdkMetrics';
+    }
+    return 'overview';
+  });
+
+  useEffect(() => {
+    const param = searchParams.get('dashboard');
+    if (param === 'overview' || param === 'sdkMetrics') {
+      setSelectedDashboard(param);
+    }
+  }, [searchParams]);
 
   const grafanaUrl = useMemo(() => {
     const url = ((import.meta.env as any).VITE_GRAFANA_URL as string) || `${window.location.protocol}//${window.location.hostname}:54000`;
     return url;
   }, []);
 
+  const currentDashboard = useMemo(
+    () => dashboards.find((item) => item.key === selectedDashboard) ?? dashboards[0],
+    [selectedDashboard],
+  );
+
   const iframeUrl = useMemo(() => {
     const theme = isDark ? 'dark' : 'light';
-    return `${grafanaUrl}/d/gatrix-overview?kiosk=tv&theme=${theme}`;
-  }, [grafanaUrl, isDark]);
+    return `${grafanaUrl}/d/${currentDashboard.uid}?kiosk=tv&theme=${theme}`;
+  }, [grafanaUrl, isDark, currentDashboard.uid]);
+
+  const handleChangeTab = (_event: React.SyntheticEvent, value: DashboardKey) => {
+    setSelectedDashboard(value);
+    const next = new URLSearchParams(searchParams);
+    next.set('dashboard', value);
+    setSearchParams(next, { replace: true });
+  };
 
   return (
     <Box
@@ -21,24 +64,40 @@ export const GrafanaDashboardPage: React.FC = () => {
         width: '100%',
         height: 'calc(100vh - 64px)',
         overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      <iframe
-        key={iframeUrl}
-        src={iframeUrl}
-        style={{
-          width: '100%',
-          height: '100%',
-          border: 'none',
-          display: 'block',
-        }}
-        title="Grafana Dashboard"
-        allowFullScreen
-        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
-      />
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs
+          value={selectedDashboard}
+          onChange={handleChangeTab}
+          aria-label="Grafana dashboards"
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{ minHeight: 48, '& .MuiTab-root': { textTransform: 'none', fontWeight: 500 } }}
+        >
+          <Tab value="overview" label={t('grafanaDashboard.tabs.overview')} />
+          <Tab value="sdkMetrics" label={t('grafanaDashboard.tabs.sdkMetrics')} />
+        </Tabs>
+      </Box>
+      <Box sx={{ flex: 1 }}>
+        <iframe
+          key={iframeUrl}
+          src={iframeUrl}
+          style={{
+            width: '100%',
+            height: '100%',
+            border: 'none',
+            display: 'block',
+          }}
+          title={t('sidebar.grafana')}
+          allowFullScreen
+          sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+        />
+      </Box>
     </Box>
   );
 };
 
 export default GrafanaDashboardPage;
-

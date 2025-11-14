@@ -170,6 +170,16 @@
       "fieldConfig": {"defaults": {"unit": "percent"}},
       "options": {"legend": {"showLegend": true, "placement": "bottom"}},
       "gridPos": {"x": 12, "y": 20, "w": 12, "h": 8}
+    },
+    {
+      "id": 11,
+      "type": "text",
+      "title": "SDK & Service Dashboards",
+      "options": {
+        "mode": "markdown",
+        "content": "### SDK & Service Dashboards\n\n- [SDK Metrics](/d/gatrix-sdk-metrics)\n- [Node.js Services](/d/gatrix-nodejs-services)\n- [Infrastructure Services](/d/gatrix-infrastructure-services)\n- [MySQL](/d/gatrix-mysql)\n- [Redis](/d/gatrix-redis)\n- [Prometheus](/d/gatrix-prometheus)"
+      },
+      "gridPos": {"x": 0, "y": 28, "w": 24, "h": 6}
     }
   ]
 }
