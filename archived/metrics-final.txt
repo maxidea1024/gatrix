@@ -1,0 +1,351 @@
+# HELP sdk_cache_refresh_total Total number of cache refresh operations
+# TYPE sdk_cache_refresh_total counter
+sdk_cache_refresh_total{target="gameworlds",sdk="gatrix-server-sdk",application="idle"} 2
+sdk_cache_refresh_total{target="popups",sdk="gatrix-server-sdk",application="idle"} 2
+sdk_cache_refresh_total{target="surveys",sdk="gatrix-server-sdk",application="idle"} 2
+
+# HELP sdk_cache_refresh_duration_seconds Duration of cache refresh operations in seconds
+# TYPE sdk_cache_refresh_duration_seconds histogram
+sdk_cache_refresh_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",target="gameworlds"} 1
+sdk_cache_refresh_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",target="gameworlds"} 1
+sdk_cache_refresh_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",target="gameworlds"} 1
+sdk_cache_refresh_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",target="gameworlds"} 1
+sdk_cache_refresh_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",target="gameworlds"} 1
+sdk_cache_refresh_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",target="gameworlds"} 1
+sdk_cache_refresh_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",target="gameworlds"} 1
+sdk_cache_refresh_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",target="gameworlds"} 2
+sdk_cache_refresh_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",target="gameworlds"} 84.1858905
+sdk_cache_refresh_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",target="gameworlds"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",target="popups"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",target="popups"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",target="popups"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",target="popups"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",target="popups"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",target="popups"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",target="popups"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",target="popups"} 2
+sdk_cache_refresh_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",target="popups"} 0.0213833
+sdk_cache_refresh_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",target="popups"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",target="surveys"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",target="surveys"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",target="surveys"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",target="surveys"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",target="surveys"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",target="surveys"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",target="surveys"} 2
+sdk_cache_refresh_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",target="surveys"} 2
+sdk_cache_refresh_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",target="surveys"} 0.021765899999999998
+sdk_cache_refresh_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",target="surveys"} 2
+
+# HELP sdk_cache_last_refresh_timestamp_seconds Unix timestamp of the last successful cache refresh
+# TYPE sdk_cache_last_refresh_timestamp_seconds gauge
+sdk_cache_last_refresh_timestamp_seconds{target="gameworlds",sdk="gatrix-server-sdk",application="idle"} 1763083634
+sdk_cache_last_refresh_timestamp_seconds{target="popups",sdk="gatrix-server-sdk",application="idle"} 1763083634
+sdk_cache_last_refresh_timestamp_seconds{target="surveys",sdk="gatrix-server-sdk",application="idle"} 1763083634
+
+# HELP sdk_events_received_total Total number of SDK events received
+# TYPE sdk_events_received_total counter
+
+# HELP sdk_events_published_total Total number of SDK events published
+# TYPE sdk_events_published_total counter
+
+# HELP sdk_redis_connected Redis connection state (1 connected, 0 disconnected)
+# TYPE sdk_redis_connected gauge
+sdk_redis_connected{sdk="gatrix-server-sdk",application="idle"} 1
+
+# HELP sdk_redis_reconnect_total Total number of Redis reconnect occurrences
+# TYPE sdk_redis_reconnect_total counter
+sdk_redis_reconnect_total{sdk="gatrix-server-sdk",application="idle"} 6
+
+# HELP sdk_errors_total Total number of SDK errors
+# TYPE sdk_errors_total counter
+sdk_errors_total{scope="http",op="request",sdk="gatrix-server-sdk",application="idle"} 101
+
+# HELP sdk_http_requests_total Total number of HTTP requests made by the SDK ApiClient
+# TYPE sdk_http_requests_total counter
+sdk_http_requests_total{method="GET",route="/api/v1/ready",status="200",sdk="gatrix-server-sdk",application="idle"} 1
+sdk_http_requests_total{method="GET",route="/api/v1/server/game-worlds",status="200",sdk="gatrix-server-sdk",application="idle"} 3
+sdk_http_requests_total{method="GET",route="/api/v1/server/ingame-popup-notices",status="200",sdk="gatrix-server-sdk",application="idle"} 3
+sdk_http_requests_total{method="GET",route="/api/v1/server/surveys",status="200",sdk="gatrix-server-sdk",application="idle"} 3
+sdk_http_requests_total{method="GET",route="/api/v1/server/whitelists",status="200",sdk="gatrix-server-sdk",application="idle"} 1
+sdk_http_requests_total{method="POST",route="/api/v1/server/services/register",status="200",sdk="gatrix-server-sdk",application="idle"} 1
+sdk_http_requests_total{method="POST",route="/api/v1/server/services/status",status="200",sdk="gatrix-server-sdk",application="idle"} 5
+sdk_http_requests_total{method="GET",route="/api/v1/server/game-worlds",status="0",sdk="gatrix-server-sdk",application="idle"} 54
+sdk_http_requests_total{method="POST",route="/api/v1/server/services/status",status="0",sdk="gatrix-server-sdk",application="idle"} 47
+
+# HELP sdk_http_request_duration_seconds Duration of HTTP requests made by the SDK ApiClient in seconds
+# TYPE sdk_http_request_duration_seconds histogram
+sdk_http_request_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/ready",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/ready",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/ready",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/ready",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/ready",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/ready",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/ready",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/ready",status="200"} 1
+sdk_http_request_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/ready",status="200"} 0.0253065
+sdk_http_request_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/ready",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="200"} 3
+sdk_http_request_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="200"} 0.0813019
+sdk_http_request_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/ingame-popup-notices",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/ingame-popup-notices",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/ingame-popup-notices",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/ingame-popup-notices",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/ingame-popup-notices",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/ingame-popup-notices",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/ingame-popup-notices",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/ingame-popup-notices",status="200"} 3
+sdk_http_request_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/ingame-popup-notices",status="200"} 0.0648358
+sdk_http_request_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/ingame-popup-notices",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/surveys",status="200"} 2
+sdk_http_request_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/surveys",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/surveys",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/surveys",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/surveys",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/surveys",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/surveys",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/surveys",status="200"} 3
+sdk_http_request_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/surveys",status="200"} 0.0713908
+sdk_http_request_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/surveys",status="200"} 3
+sdk_http_request_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/whitelists",status="200"} 0
+sdk_http_request_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/whitelists",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/whitelists",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/whitelists",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/whitelists",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/whitelists",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/whitelists",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/whitelists",status="200"} 1
+sdk_http_request_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/whitelists",status="200"} 0.0524692
+sdk_http_request_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/whitelists",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/register",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/register",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/register",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/register",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/register",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/register",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/register",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/register",status="200"} 1
+sdk_http_request_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/register",status="200"} 0.0151702
+sdk_http_request_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/register",status="200"} 1
+sdk_http_request_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="200"} 5
+sdk_http_request_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="200"} 5
+sdk_http_request_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="200"} 5
+sdk_http_request_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="200"} 5
+sdk_http_request_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="200"} 5
+sdk_http_request_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="200"} 5
+sdk_http_request_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="200"} 5
+sdk_http_request_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="200"} 5
+sdk_http_request_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="200"} 0.04112299999999999
+sdk_http_request_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="200"} 5
+sdk_http_request_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="0"} 54
+sdk_http_request_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="0"} 54
+sdk_http_request_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="0"} 54
+sdk_http_request_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="0"} 54
+sdk_http_request_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="0"} 54
+sdk_http_request_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="0"} 54
+sdk_http_request_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="0"} 54
+sdk_http_request_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="0"} 54
+sdk_http_request_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="0"} 0.24913160000000006
+sdk_http_request_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",method="GET",route="/api/v1/server/game-worlds",status="0"} 54
+sdk_http_request_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="0"} 46
+sdk_http_request_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="0"} 47
+sdk_http_request_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="0"} 47
+sdk_http_request_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="0"} 47
+sdk_http_request_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="0"} 47
+sdk_http_request_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="0"} 47
+sdk_http_request_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="0"} 47
+sdk_http_request_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="0"} 47
+sdk_http_request_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="0"} 0.3725259999999999
+sdk_http_request_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",method="POST",route="/api/v1/server/services/status",status="0"} 47
+
+# HELP process_cpu_user_seconds_total Total user CPU time spent in seconds.
+# TYPE process_cpu_user_seconds_total counter
+process_cpu_user_seconds_total{sdk="gatrix-server-sdk",application="idle"} 1.156
+
+# HELP process_cpu_system_seconds_total Total system CPU time spent in seconds.
+# TYPE process_cpu_system_seconds_total counter
+process_cpu_system_seconds_total{sdk="gatrix-server-sdk",application="idle"} 0.23399999999999999
+
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total{sdk="gatrix-server-sdk",application="idle"} 1.3900000000000001
+
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds{sdk="gatrix-server-sdk",application="idle"} 1763083488
+
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes{sdk="gatrix-server-sdk",application="idle"} 191565824
+
+# HELP nodejs_eventloop_lag_seconds Lag of event loop in seconds.
+# TYPE nodejs_eventloop_lag_seconds gauge
+nodejs_eventloop_lag_seconds{sdk="gatrix-server-sdk",application="idle"} 0.0020637
+
+# HELP nodejs_eventloop_lag_min_seconds The minimum recorded event loop delay.
+# TYPE nodejs_eventloop_lag_min_seconds gauge
+nodejs_eventloop_lag_min_seconds{sdk="gatrix-server-sdk",application="idle"} 0.014123008
+
+# HELP nodejs_eventloop_lag_max_seconds The maximum recorded event loop delay.
+# TYPE nodejs_eventloop_lag_max_seconds gauge
+nodejs_eventloop_lag_max_seconds{sdk="gatrix-server-sdk",application="idle"} 0.017268735
+
+# HELP nodejs_eventloop_lag_mean_seconds The mean of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_mean_seconds gauge
+nodejs_eventloop_lag_mean_seconds{sdk="gatrix-server-sdk",application="idle"} 0.015613528527629233
+
+# HELP nodejs_eventloop_lag_stddev_seconds The standard deviation of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_stddev_seconds gauge
+nodejs_eventloop_lag_stddev_seconds{sdk="gatrix-server-sdk",application="idle"} 0.00040487771105505836
+
+# HELP nodejs_eventloop_lag_p50_seconds The 50th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p50_seconds gauge
+nodejs_eventloop_lag_p50_seconds{sdk="gatrix-server-sdk",application="idle"} 0.015597567
+
+# HELP nodejs_eventloop_lag_p90_seconds The 90th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p90_seconds gauge
+nodejs_eventloop_lag_p90_seconds{sdk="gatrix-server-sdk",application="idle"} 0.016138239
+
+# HELP nodejs_eventloop_lag_p99_seconds The 99th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p99_seconds gauge
+nodejs_eventloop_lag_p99_seconds{sdk="gatrix-server-sdk",application="idle"} 0.016547839
+
+# HELP nodejs_active_resources Number of active resources that are currently keeping the event loop alive, grouped by async resource type.
+# TYPE nodejs_active_resources gauge
+nodejs_active_resources{type="TTYWrap",sdk="gatrix-server-sdk",application="idle"} 2
+nodejs_active_resources{type="TCPServerWrap",sdk="gatrix-server-sdk",application="idle"} 1
+nodejs_active_resources{type="TCPSocketWrap",sdk="gatrix-server-sdk",application="idle"} 6
+nodejs_active_resources{type="Timeout",sdk="gatrix-server-sdk",application="idle"} 5
+nodejs_active_resources{type="Immediate",sdk="gatrix-server-sdk",application="idle"} 1
+
+# HELP nodejs_active_resources_total Total number of active resources.
+# TYPE nodejs_active_resources_total gauge
+nodejs_active_resources_total{sdk="gatrix-server-sdk",application="idle"} 15
+
+# HELP nodejs_active_handles Number of active libuv handles grouped by handle type. Every handle type is C++ class name.
+# TYPE nodejs_active_handles gauge
+nodejs_active_handles{type="WriteStream",sdk="gatrix-server-sdk",application="idle"} 2
+nodejs_active_handles{type="Server",sdk="gatrix-server-sdk",application="idle"} 1
+nodejs_active_handles{type="Socket",sdk="gatrix-server-sdk",application="idle"} 6
+
+# HELP nodejs_active_handles_total Total number of active handles.
+# TYPE nodejs_active_handles_total gauge
+nodejs_active_handles_total{sdk="gatrix-server-sdk",application="idle"} 9
+
+# HELP nodejs_active_requests Number of active libuv requests grouped by request type. Every request type is C++ class name.
+# TYPE nodejs_active_requests gauge
+
+# HELP nodejs_active_requests_total Total number of active requests.
+# TYPE nodejs_active_requests_total gauge
+nodejs_active_requests_total{sdk="gatrix-server-sdk",application="idle"} 0
+
+# HELP nodejs_heap_size_total_bytes Process heap size from Node.js in bytes.
+# TYPE nodejs_heap_size_total_bytes gauge
+nodejs_heap_size_total_bytes{sdk="gatrix-server-sdk",application="idle"} 140042240
+
+# HELP nodejs_heap_size_used_bytes Process heap size used from Node.js in bytes.
+# TYPE nodejs_heap_size_used_bytes gauge
+nodejs_heap_size_used_bytes{sdk="gatrix-server-sdk",application="idle"} 134405256
+
+# HELP nodejs_external_memory_bytes Node.js external memory size in bytes.
+# TYPE nodejs_external_memory_bytes gauge
+nodejs_external_memory_bytes{sdk="gatrix-server-sdk",application="idle"} 9165491
+
+# HELP nodejs_heap_space_size_total_bytes Process heap space size total from Node.js in bytes.
+# TYPE nodejs_heap_space_size_total_bytes gauge
+nodejs_heap_space_size_total_bytes{space="read_only",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_total_bytes{space="new",sdk="gatrix-server-sdk",application="idle"} 1048576
+nodejs_heap_space_size_total_bytes{space="old",sdk="gatrix-server-sdk",application="idle"} 114323456
+nodejs_heap_space_size_total_bytes{space="code",sdk="gatrix-server-sdk",application="idle"} 6029312
+nodejs_heap_space_size_total_bytes{space="shared",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_total_bytes{space="trusted",sdk="gatrix-server-sdk",application="idle"} 5267456
+nodejs_heap_space_size_total_bytes{space="new_large_object",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_total_bytes{space="large_object",sdk="gatrix-server-sdk",application="idle"} 12754944
+nodejs_heap_space_size_total_bytes{space="code_large_object",sdk="gatrix-server-sdk",application="idle"} 155648
+nodejs_heap_space_size_total_bytes{space="shared_large_object",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_total_bytes{space="trusted_large_object",sdk="gatrix-server-sdk",application="idle"} 462848
+
+# HELP nodejs_heap_space_size_used_bytes Process heap space size used from Node.js in bytes.
+# TYPE nodejs_heap_space_size_used_bytes gauge
+nodejs_heap_space_size_used_bytes{space="read_only",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_used_bytes{space="new",sdk="gatrix-server-sdk",application="idle"} 605648
+nodejs_heap_space_size_used_bytes{space="old",sdk="gatrix-server-sdk",application="idle"} 110225288
+nodejs_heap_space_size_used_bytes{space="code",sdk="gatrix-server-sdk",application="idle"} 5526784
+nodejs_heap_space_size_used_bytes{space="shared",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_used_bytes{space="trusted",sdk="gatrix-server-sdk",application="idle"} 4828448
+nodejs_heap_space_size_used_bytes{space="new_large_object",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_used_bytes{space="large_object",sdk="gatrix-server-sdk",application="idle"} 12636120
+nodejs_heap_space_size_used_bytes{space="code_large_object",sdk="gatrix-server-sdk",application="idle"} 138304
+nodejs_heap_space_size_used_bytes{space="shared_large_object",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_used_bytes{space="trusted_large_object",sdk="gatrix-server-sdk",application="idle"} 448480
+
+# HELP nodejs_heap_space_size_available_bytes Process heap space size available from Node.js in bytes.
+# TYPE nodejs_heap_space_size_available_bytes gauge
+nodejs_heap_space_size_available_bytes{space="read_only",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_available_bytes{space="new",sdk="gatrix-server-sdk",application="idle"} 425264
+nodejs_heap_space_size_available_bytes{space="old",sdk="gatrix-server-sdk",application="idle"} 2095800
+nodejs_heap_space_size_available_bytes{space="code",sdk="gatrix-server-sdk",application="idle"} 124960
+nodejs_heap_space_size_available_bytes{space="shared",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_available_bytes{space="trusted",sdk="gatrix-server-sdk",application="idle"} 345688
+nodejs_heap_space_size_available_bytes{space="new_large_object",sdk="gatrix-server-sdk",application="idle"} 1048576
+nodejs_heap_space_size_available_bytes{space="large_object",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_available_bytes{space="code_large_object",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_available_bytes{space="shared_large_object",sdk="gatrix-server-sdk",application="idle"} 0
+nodejs_heap_space_size_available_bytes{space="trusted_large_object",sdk="gatrix-server-sdk",application="idle"} 0
+
+# HELP nodejs_version_info Node.js version info.
+# TYPE nodejs_version_info gauge
+nodejs_version_info{version="v22.16.0",major="22",minor="16",patch="0",sdk="gatrix-server-sdk",application="idle"} 1
+
+# HELP nodejs_gc_duration_seconds Garbage collection duration by kind, one of major, minor, incremental or weakcb.
+# TYPE nodejs_gc_duration_seconds histogram
+nodejs_gc_duration_seconds_bucket{le="0.001",sdk="gatrix-server-sdk",application="idle",kind="incremental"} 3
+nodejs_gc_duration_seconds_bucket{le="0.01",sdk="gatrix-server-sdk",application="idle",kind="incremental"} 3
+nodejs_gc_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",kind="incremental"} 3
+nodejs_gc_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",kind="incremental"} 3
+nodejs_gc_duration_seconds_bucket{le="2",sdk="gatrix-server-sdk",application="idle",kind="incremental"} 3
+nodejs_gc_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",kind="incremental"} 3
+nodejs_gc_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",kind="incremental"} 3
+nodejs_gc_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",kind="incremental"} 0.0012160999961197377
+nodejs_gc_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",kind="incremental"} 3
+nodejs_gc_duration_seconds_bucket{le="0.001",sdk="gatrix-server-sdk",application="idle",kind="major"} 0
+nodejs_gc_duration_seconds_bucket{le="0.01",sdk="gatrix-server-sdk",application="idle",kind="major"} 3
+nodejs_gc_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",kind="major"} 3
+nodejs_gc_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",kind="major"} 3
+nodejs_gc_duration_seconds_bucket{le="2",sdk="gatrix-server-sdk",application="idle",kind="major"} 3
+nodejs_gc_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",kind="major"} 3
+nodejs_gc_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",kind="major"} 3
+nodejs_gc_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",kind="major"} 0.015405000001192092
+nodejs_gc_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",kind="major"} 3
+nodejs_gc_duration_seconds_bucket{le="0.001",sdk="gatrix-server-sdk",application="idle",kind="minor"} 55
+nodejs_gc_duration_seconds_bucket{le="0.01",sdk="gatrix-server-sdk",application="idle",kind="minor"} 55
+nodejs_gc_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",kind="minor"} 55
+nodejs_gc_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",kind="minor"} 55
+nodejs_gc_duration_seconds_bucket{le="2",sdk="gatrix-server-sdk",application="idle",kind="minor"} 55
+nodejs_gc_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",kind="minor"} 55
+nodejs_gc_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",kind="minor"} 55
+nodejs_gc_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",kind="minor"} 0.028891600012779226
+nodejs_gc_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",kind="minor"} 55
+
+# HELP http_request_duration_seconds Duration of HTTP requests in seconds
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{le="0.005",sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 11
+http_request_duration_seconds_bucket{le="0.01",sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 11
+http_request_duration_seconds_bucket{le="0.05",sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 11
+http_request_duration_seconds_bucket{le="0.1",sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 11
+http_request_duration_seconds_bucket{le="0.3",sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 11
+http_request_duration_seconds_bucket{le="1",sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 11
+http_request_duration_seconds_bucket{le="3",sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 11
+http_request_duration_seconds_bucket{le="5",sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 11
+http_request_duration_seconds_bucket{le="10",sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 11
+http_request_duration_seconds_bucket{le="+Inf",sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 11
+http_request_duration_seconds_sum{sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 0.02513
+http_request_duration_seconds_count{sdk="gatrix-server-sdk",application="idle",method="GET",status_code="200",route="/metrics"} 11

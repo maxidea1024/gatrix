@@ -1,0 +1,143 @@
+{
+  "uid": "gatrix-sdk-metrics",
+  "title": "Gatrix SDK Metrics",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "tags": ["gatrix", "sdk"],
+  "templating": {
+    "list": [
+      {
+        "name": "application",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(sdk_cache_refresh_total, application)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "window",
+        "type": "interval",
+        "label": "Window",
+        "query": "5m,10m,30m,1h",
+        "current": {"text": "5m", "value": "5m"}
+      }
+    ]
+  },
+  "time": {"from": "now-1h", "to": "now"},
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "SDK HTTP Requests per second (by route)",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum by (route, status) (rate(sdk_http_requests_total{application=~\"$application\"}[$window]))",
+          "legendFormat": "{{route}} [{{status}}]",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "SDK HTTP Error Rate",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(sdk_http_requests_total{status!=\"200\",application=~\"$application\"}[$window])) / sum(rate(sdk_http_requests_total{application=~\"$application\"}[$window]))",
+          "legendFormat": "error rate",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "SDK HTTP Latency P95",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(sdk_http_request_duration_seconds_bucket{application=~\"$application\"}[$window])))",
+          "legendFormat": "p95 latency",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Cache Refreshes (increase over window)",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum by (target) (increase(sdk_cache_refresh_total{application=~\"$application\"}[$window]))",
+          "legendFormat": "{{target}}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8}
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Redis Connected",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "max(sdk_redis_connected{application=~\"$application\"})",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 16, "w": 4, "h": 4}
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Redis Reconnects",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(increase(sdk_redis_reconnect_total{application=~\"$application\"}[$window]))",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 4, "y": 16, "w": 4, "h": 4}
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "SDK Errors",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(increase(sdk_errors_total{application=~\"$application\"}[$window]))",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 8, "y": 16, "w": 4, "h": 4}
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "/metrics HTTP Latency P95",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{route=\"/metrics\",application=~\"$application\"}[$window])))",
+          "legendFormat": "p95 /metrics",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 12, "y": 20, "w": 12, "h": 8}
+    }
+  ]
+}
+
