@@ -80,6 +80,9 @@ import CrashEventsPage from './pages/admin/CrashEventsPage';
 import ChatPage from './pages/chat/ChatPage';
 import MailboxPage from './pages/mailbox/MailboxPage';
 import SystemConsolePage from './pages/admin/SystemConsolePage';
+import LogsPage from './pages/monitoring/LogsPage';
+import AlertsPage from './pages/monitoring/AlertsPage';
+
 import RealtimeEventsPage from './pages/admin/RealtimeEventsPage';
 import ServerListPage from './pages/admin/ServerListPage';
 import OpenApiPage from './pages/admin/OpenApiPage';
@@ -397,6 +400,25 @@ const AppContent: React.FC = () => {
                           </MainLayout>
                         </ProtectedRoute>
                       } />
+
+
+                      {/* Monitoring Routes */}
+                      <Route path="/monitoring/logs" element={
+                        <ProtectedRoute requiredRoles={['admin']}>
+                          <MainLayout>
+                            <LogsPage />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      }
+                      />
+                      <Route path="/monitoring/alerts" element={
+                        <ProtectedRoute requiredRoles={['admin']}>
+                          <MainLayout>
+                            <AlertsPage />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      }
+                      />
 
                       {/* Game Routes */}
                       <Route path="/game/*" element={

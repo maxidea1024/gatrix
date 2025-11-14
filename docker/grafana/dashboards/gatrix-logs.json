@@ -1,0 +1,167 @@
+{
+  "uid": "gatrix-logs",
+  "title": "Gatrix Logs",
+  "tags": ["gatrix", "logs"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "style": "dark",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "service",
+        "type": "query",
+        "datasource": "Loki",
+        "label": "Service",
+        "query": {
+          "queryType": "label_values",
+          "label": "service"
+        },
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true
+      },
+      {
+        "name": "level",
+        "type": "query",
+        "datasource": "Loki",
+        "label": "Level",
+        "query": {
+          "queryType": "label_values",
+          "label": "level"
+        },
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true
+      },
+      {
+        "name": "hostname",
+        "type": "query",
+        "datasource": "Loki",
+        "label": "Hostname",
+        "query": "label_values(hostname)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true
+      },
+      {
+        "name": "search",
+        "type": "textbox",
+        "label": "Search (message, url, method, etc.)",
+        "query": ""
+      },
+      {
+        "name": "ip",
+        "type": "textbox",
+        "label": "IP Address",
+        "query": ""
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Log volume by level",
+      "datasource": "Loki",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (level) (count_over_time({job=\"gatrix\", service=~\"$service\", level=~\"$level\"} | json | hostname=~\"$hostname\" | ip=~\"(?i).*$ip.*\" | line_format \"{{.}}\" |~ \"(?i).*$search.*\" [1m]))",
+          "queryType": "range",
+          "legendFormat": "{{level}}",
+          "step": "15s"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 70,
+            "gradientMode": "none",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "error" },
+            "properties": [
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "warn" },
+            "properties": [
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "info" },
+            "properties": [
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "debug" },
+            "properties": [
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "placement": "bottom",
+          "displayMode": "list"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 0 }
+    },
+    {
+      "type": "logs",
+      "title": "Logs",
+      "id": 1,
+      "gridPos": { "h": 18, "w": 24, "x": 0, "y": 6 },
+      "datasource": "Loki",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{job=\"gatrix\", service=~\"$service\", level=~\"$level\"} | json | json responseBody=\"responseBody\", queryParams=\"queryParams\" | hostname=~\"$hostname\" | ip=~\"(?i).*$ip.*\" | line_format \"[{{.level}}] [{{.service}}] {{.message}}\" |~ \"(?i).*$search.*\"",
+          "queryType": "range"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": false,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    }
+  ]
+}
+

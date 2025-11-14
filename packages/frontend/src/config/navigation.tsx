@@ -86,6 +86,8 @@ export const adminPanelMenuItems: MenuItem[] = [
   ] },
   { text: 'sidebar.monitoring', icon: <MonitorIcon />, adminOnly: true, children: [
     { text: 'sidebar.grafana', icon: <MonitorIcon />, path: '/admin/grafana-dashboard', adminOnly: true },
+    { text: 'sidebar.logs', icon: <MonitorIcon />, path: '/monitoring/logs', adminOnly: true },
+    { text: 'sidebar.alerts', icon: <NotificationsIcon />, path: '/monitoring/alerts', adminOnly: true },
   ] },
   { text: 'sidebar.openApi', icon: <ApiIcon />, path: '/admin/open-api', adminOnly: true },
   { text: 'sidebar.console', icon: <TerminalIcon />, path: '/admin/console', adminOnly: true },

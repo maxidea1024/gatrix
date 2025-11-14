@@ -1,12 +1,32 @@
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
+import os from 'os';
 
 const logDir = process.env.LOG_DIR || 'logs';
 const logLevel = process.env.LOG_LEVEL || 'info';
+const logFormat = process.env.LOG_FORMAT || '';
+const nodeEnv = process.env.NODE_ENV || 'development';
+const serviceName = process.env.LOG_SERVICE_NAME || 'gatrix-chat-server';
+const monitoringEnabled = process.env.MONITORING_ENABLED === 'true' || process.env.MONITORING_ENABLED === '1';
+const hostname = os.hostname();
 
-// Custom format for console output
-const consoleFormat = winston.format.combine(
+const useJsonFormat = logFormat ? logFormat === 'json' : monitoringEnabled || nodeEnv !== 'development';
+
+// Add base service metadata to all log entries
+const serviceFormat = winston.format((info) => {
+  if (!info.service) {
+    info.service = serviceName;
+  }
+  if (!info.hostname) {
+    info.hostname = hostname;
+  }
+  return info;
+});
+
+// Pretty console format (for human readable logs)
+const consolePrettyFormat = winston.format.combine(
+  serviceFormat(),
   winston.format.colorize({ all: true }),
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
@@ -23,19 +43,23 @@ const consoleFormat = winston.format.combine(
   })
 );
 
-// Custom format for file output
-const fileFormat = winston.format.combine(
+// JSON format for Loki / file logs
+const jsonFormat = winston.format.combine(
+  serviceFormat(),
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
   winston.format.json()
 );
+
+// File format always JSON
+const fileFormat = jsonFormat;
 
 // Create transports
 const transports: winston.transport[] = [
   // Console transport
   new winston.transports.Console({
     level: logLevel,
-    format: consoleFormat,
+    format: useJsonFormat ? jsonFormat : consolePrettyFormat,
   }),
 ];
 
@@ -70,20 +94,19 @@ if (process.env.NODE_ENV === 'production' || process.env.LOG_DIR) {
 // Create logger instance
 const logger = winston.createLogger({
   level: logLevel,
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.errors({ stack: true })
-  ),
+  defaultMeta: {
+    service: serviceName,
+  },
   transports,
   // Handle uncaught exceptions and rejections
   exceptionHandlers: [
     new winston.transports.Console({
-      format: consoleFormat,
+      format: useJsonFormat ? jsonFormat : consolePrettyFormat,
     }),
   ],
   rejectionHandlers: [
     new winston.transports.Console({
-      format: consoleFormat,
+      format: useJsonFormat ? jsonFormat : consolePrettyFormat,
     }),
   ],
 });
@@ -121,8 +144,9 @@ const createLogger = (category: string): winston.Logger => {
     return loggers.get(category)!;
   }
 
-  // Custom format for category-based logging
-  const categoryFormat = winston.format.combine(
+  // Pretty format for category-based logging
+  const categoryPrettyFormat = winston.format.combine(
+    serviceFormat(),
     winston.format.colorize({ all: true }),
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.printf(({ timestamp, level, message, ...meta }) => {
@@ -141,38 +165,54 @@ const createLogger = (category: string): winston.Logger => {
     })
   );
 
+  // JSON format for category-based logging
+  const categoryJsonFormat = winston.format.combine(
+    serviceFormat(),
+    winston.format((info) => {
+      if (!info.category) {
+        info.category = category;
+      }
+      return info;
+    })(),
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  );
+
   const categoryLogger = winston.createLogger({
     level: logLevel,
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.errors({ stack: true })
-    ),
+    defaultMeta: {
+      service: serviceName,
+      category,
+    },
     transports: [
       // Console transport with category format
       new winston.transports.Console({
         level: logLevel,
-        format: categoryFormat,
+        format: useJsonFormat ? categoryJsonFormat : categoryPrettyFormat,
       }),
       // Add file transports only in production or when LOG_DIR is specified
-      ...(process.env.NODE_ENV === 'production' || process.env.LOG_DIR ? [
-        new DailyRotateFile({
-          filename: path.join(logDir, 'chat-error-%DATE%.log'),
-          datePattern: 'YYYY-MM-DD',
-          level: 'error',
-          format: fileFormat,
-          maxSize: '20m',
-          maxFiles: '14d',
-          zippedArchive: true,
-        }),
-        new DailyRotateFile({
-          filename: path.join(logDir, 'chat-combined-%DATE%.log'),
-          datePattern: 'YYYY-MM-DD',
-          format: fileFormat,
-          maxSize: '20m',
-          maxFiles: '14d',
-          zippedArchive: true,
-        })
-      ] : [])
+      ...(process.env.NODE_ENV === 'production' || process.env.LOG_DIR
+        ? [
+            new DailyRotateFile({
+              filename: path.join(logDir, 'chat-error-%DATE%.log'),
+              datePattern: 'YYYY-MM-DD',
+              level: 'error',
+              format: fileFormat,
+              maxSize: '20m',
+              maxFiles: '14d',
+              zippedArchive: true,
+            }),
+            new DailyRotateFile({
+              filename: path.join(logDir, 'chat-combined-%DATE%.log'),
+              datePattern: 'YYYY-MM-DD',
+              format: fileFormat,
+              maxSize: '20m',
+              maxFiles: '14d',
+              zippedArchive: true,
+            }),
+          ]
+        : []),
     ],
   });
 

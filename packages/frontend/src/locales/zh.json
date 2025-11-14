@@ -1,4 +1,18 @@
 {
+  "sidebar.logs": "服务日志",
+  "sidebar.alerts": "监控告警",
+  "monitoring.logs.title": "服务日志",
+  "monitoring.logs.subtitle": "可以通过 Grafana 日志仪表盘查看从 Gatrix 服务收集的日志数据。",
+  "monitoring.alerts.title": "监控告警",
+  "monitoring.alerts.subtitle": "在这里可以统一查看和管理由指标和日志产生的告警信息。",
+  "monitoring.alerts.loadFailed": "加载监控告警列表失败。",
+  "monitoring.alerts.fields.name": "告警名称",
+  "monitoring.alerts.fields.severity": "严重程度",
+  "monitoring.alerts.fields.status": "状态",
+  "monitoring.alerts.fields.message": "消息",
+  "monitoring.alerts.fields.startsAt": "开始时间",
+  "monitoring.alerts.fields.endsAt": "结束时间",
+
   "notifications": {
     "maintenance": {
       "started": "服务维护已开始",
@@ -1974,7 +1988,18 @@
     "systemStatus": "System Status",
     "totalUsers": "Total Users",
     "unknown": "Unknown",
-    "userWelcome": "Access your profile and view your account information."
+    "userWelcome": "Access your profile and view your account information.",
+    "monitoringOverview": "监控概览",
+    "monitoringActiveAlerts": "进行中的告警",
+    "monitoringActiveAlertsDesc": "查看当前系统正在触发的告警数量。",
+    "monitoringTotalAlerts": "告警总数",
+    "monitoringTotalAlertsDesc": "查看监控系统中保存的所有历史告警数量。",
+    "monitoringLogsCardTitle": "查看服务日志",
+    "monitoringLogsCardDesc": "直接打开后端和基础设施服务的集中日志仪表盘。",
+    "monitoringAlertsCardTitle": "管理监控告警",
+    "monitoringAlertsCardDesc": "跳转到监控告警页面，查看并管理告警状态。",
+    "monitoringGrafanaCardTitle": "打开 Grafana 仪表盘",
+    "monitoringGrafanaCardDesc": "以全屏方式打开 Grafana 监控仪表盘，查看详细指标。"
   },
   "div": "div",
   "errors": {
@@ -2259,7 +2284,7 @@
     "queueMonitor": "队列监控",
     "console": "系统控制台",
     "monitoring": "监控",
-    "grafana": "Grafana 仪表盘",
+    "grafana": "监控",
 
     "realtimeEvents": "实时事件",
     "itemRewards": "道具奖励",

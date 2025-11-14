@@ -90,6 +90,8 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-backend
       PORT: 5000
       DB_HOST: mysql
       DB_PORT: 3306
@@ -163,6 +165,8 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-event-lens
       PORT: 5200
       CLICKHOUSE_HOST: clickhouse
       CLICKHOUSE_PORT: 8123
@@ -208,6 +212,8 @@ services:
     command: ["node", "packages/event-lens/dist/worker.js"]
     environment:
       NODE_ENV: ${NODE_ENV:-production}
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-event-lens-worker
       CLICKHOUSE_HOST: clickhouse
       CLICKHOUSE_PORT: 8123
       CLICKHOUSE_DATABASE: event_lens
@@ -246,6 +252,8 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-chat-server
       PORT: 5100
       HOST: 0.0.0.0
       # Database

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -21,10 +21,13 @@ import {
   PersonAdd,
   Security,
   TrendingUp,
+  Notifications as NotificationsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStats } from '@/hooks/useSWR';
+import api from '@/services/api';
+import { useNavigate } from 'react-router-dom';
 
 // Stats card component
 interface StatsCardProps {
@@ -66,6 +69,14 @@ const DashboardPage: React.FC = () => {
   const { user, isAdmin } = useAuth();
   const { data: statsData, error: statsError, isLoading: statsLoading } = useUserStats();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const isAdminUser = isAdmin();
+
+  const [alertsSummary, setAlertsSummary] = useState<{ total: number; firing: number }>({
+    total: 0,
+    firing: 0,
+  });
+  const [alertsSummaryLoading, setAlertsSummaryLoading] = useState(false);
 
   const stats = statsData?.stats || {
     total: 0,
@@ -74,6 +85,55 @@ const DashboardPage: React.FC = () => {
     suspended: 0,
     admins: 0,
   };
+
+  useEffect(() => {
+    if (!isAdminUser) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadAlertsSummary = async () => {
+      try {
+        setAlertsSummaryLoading(true);
+
+        const [totalRes, firingRes] = await Promise.all([
+          api.get('/admin/monitoring/alerts', {
+            params: { page: 1, limit: 1 },
+          }),
+          api.get('/admin/monitoring/alerts', {
+            params: { page: 1, limit: 1, status: 'firing' },
+          }),
+        ]);
+
+        if (!isMounted) {
+          return;
+        }
+
+        const totalData = totalRes?.data;
+        const firingData = firingRes?.data;
+
+        setAlertsSummary({
+          total: totalData?.pagination?.total || 0,
+          firing: firingData?.pagination?.total || 0,
+        });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to load monitoring alerts summary', error);
+      } finally {
+        if (isMounted) {
+          setAlertsSummaryLoading(false);
+        }
+      }
+    };
+
+    loadAlertsSummary();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAdminUser]);
+
 
   return (
     <Box sx={{ p: 3 }}>
@@ -84,7 +144,7 @@ const DashboardPage: React.FC = () => {
               {t('dashboard.welcomeBack', { name: user?.name })}
             </Typography>
             <Typography variant="body1" sx={{ opacity: 0.9 }}>
-              {isAdmin() 
+              {isAdminUser
                 ? t('dashboard.adminWelcome')
                 : t('dashboard.userWelcome')
               }
@@ -112,12 +172,12 @@ const DashboardPage: React.FC = () => {
         </Paper>
 
         {/* Stats Section - Only for Admins */}
-        {isAdmin() && (
+        {isAdminUser && (
           <>
             <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
               {t('dashboard.systemOverview')}
             </Typography>
-            
+
             {statsLoading ? (
               <Typography>{t('common.loading')}</Typography>
             ) : statsError ? (
@@ -159,6 +219,67 @@ const DashboardPage: React.FC = () => {
                 </Grid>
               </Grid>
             )}
+
+            <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
+              {t('dashboard.monitoringOverview')}
+            </Typography>
+
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <StatsCard
+                  title={t('dashboard.monitoringActiveAlerts')}
+                  value={alertsSummaryLoading ? '...' : alertsSummary.firing}
+                  icon={<NotificationsIcon />}
+                  color="error"
+                  subtitle={t('dashboard.monitoringActiveAlertsDesc')}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <StatsCard
+                  title={t('dashboard.monitoringTotalAlerts')}
+                  value={alertsSummaryLoading ? '...' : alertsSummary.total}
+                  icon={<AssessmentIcon />}
+                  color="primary"
+                  subtitle={t('dashboard.monitoringTotalAlertsDesc')}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Card sx={{ height: '100%', cursor: 'pointer' }} onClick={() => navigate('/monitoring/logs')}>
+                  <CardContent>
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                      {t('dashboard.monitoringLogsCardTitle')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('dashboard.monitoringLogsCardDesc')}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Card sx={{ height: '100%', cursor: 'pointer' }} onClick={() => navigate('/monitoring/alerts')}>
+                  <CardContent>
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                      {t('dashboard.monitoringAlertsCardTitle')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('dashboard.monitoringAlertsCardDesc')}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Card sx={{ height: '100%', cursor: 'pointer' }} onClick={() => navigate('/admin/grafana-dashboard')}>
+                  <CardContent>
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                      {t('dashboard.monitoringGrafanaCardTitle')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('dashboard.monitoringGrafanaCardDesc')}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
           </>
         )}
 
@@ -192,7 +313,7 @@ const DashboardPage: React.FC = () => {
             </Card>
           </Grid>
 
-          {isAdmin() && (
+          {isAdminUser && (
             <Grid size={{ xs: 12, md: 6 }}>
               <Card>
                 <CardContent>

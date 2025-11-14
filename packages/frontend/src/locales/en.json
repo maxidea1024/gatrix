@@ -1,4 +1,18 @@
 {
+  "sidebar.logs": "Service Logs",
+  "sidebar.alerts": "Monitoring Alerts",
+  "monitoring.logs.title": "Service logs",
+  "monitoring.logs.subtitle": "Log data collected from Gatrix services is visualized through the Grafana logs dashboard.",
+  "monitoring.alerts.title": "Monitoring alerts",
+  "monitoring.alerts.subtitle": "Alerts generated from metrics and logs are collected and managed here.",
+  "monitoring.alerts.loadFailed": "Failed to load monitoring alerts.",
+  "monitoring.alerts.fields.name": "Alert name",
+  "monitoring.alerts.fields.severity": "Severity",
+  "monitoring.alerts.fields.status": "Status",
+  "monitoring.alerts.fields.message": "Message",
+  "monitoring.alerts.fields.startsAt": "Starts at",
+  "monitoring.alerts.fields.endsAt": "Ends at",
+
   "notifications": {
     "maintenance": {
       "started": "Service maintenance started",
@@ -1930,7 +1944,18 @@
     "systemStatus": "System Status",
     "totalUsers": "Total Users",
     "unknown": "Unknown",
-    "userWelcome": "Access your profile and view your account information."
+    "userWelcome": "Access your profile and view your account information.",
+    "monitoringOverview": "Monitoring overview",
+    "monitoringActiveAlerts": "Active alerts",
+    "monitoringActiveAlertsDesc": "Number of alerts currently firing in the system.",
+    "monitoringTotalAlerts": "Total alerts",
+    "monitoringTotalAlertsDesc": "Total number of alerts stored from monitoring history.",
+    "monitoringLogsCardTitle": "View service logs",
+    "monitoringLogsCardDesc": "Open the centralized logs dashboard for backend and infrastructure services.",
+    "monitoringAlertsCardTitle": "View monitoring alerts",
+    "monitoringAlertsCardDesc": "Go to the monitoring alerts page to review and manage alert status.",
+    "monitoringGrafanaCardTitle": "Open Grafana dashboards",
+    "monitoringGrafanaCardDesc": "Open the Grafana monitoring dashboards in a full-screen view."
   },
   "div": "div",
   "errors": {
@@ -2215,7 +2240,7 @@
     "queueMonitor": "Queue Monitor",
     "console": "System Console",
     "monitoring": "Monitoring",
-    "grafana": "Grafana Dashboard",
+    "grafana": "Monitoring",
 
     "realtimeEvents": "Realtime Events",
     "itemRewards": "Item Rewards",

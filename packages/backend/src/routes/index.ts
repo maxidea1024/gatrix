@@ -5,6 +5,7 @@ import { authLimiter } from '../middleware/rateLimiter';
 import clientRoutes from './client';
 import serverRoutes from './server';
 import adminRoutes from './admin';
+import { MonitoringAlertController } from '../controllers/MonitoringAlertController';
 import authRoutes from './auth';
 import publicRoutes from './public';
 // chatRoutes are handled directly in app.ts before body parsing
@@ -26,6 +27,10 @@ router.get('/ready', (req, res) => {
     }
   });
 });
+
+// Public webhook endpoint for Grafana alert notifications
+router.post('/monitoring/alerts', MonitoringAlertController.receiveAlert as any);
+
 
 // Mount all route modules
 router.use('/client', clientRoutes);

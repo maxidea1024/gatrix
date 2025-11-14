@@ -1,4 +1,18 @@
 {
+  "sidebar.logs": "서비스 로그",
+  "sidebar.alerts": "모니터링 알림",
+  "monitoring.logs.title": "서비스 로그",
+  "monitoring.logs.subtitle": "Gatrix 서비스에서 수집된 로그를 Grafana 로그 대시보드를 통해 확인할 수 있습니다.",
+  "monitoring.alerts.title": "모니터링 알림",
+  "monitoring.alerts.subtitle": "메트릭과 로그로부터 생성된 알림 내역을 한 곳에서 확인하고 관리할 수 있습니다.",
+  "monitoring.alerts.loadFailed": "모니터링 알림 목록을 불러오지 못했습니다.",
+  "monitoring.alerts.fields.name": "알림 이름",
+  "monitoring.alerts.fields.severity": "심각도",
+  "monitoring.alerts.fields.status": "상태",
+  "monitoring.alerts.fields.message": "메시지",
+  "monitoring.alerts.fields.startsAt": "시작 시각",
+  "monitoring.alerts.fields.endsAt": "종료 시각",
+
   "notifications": {
     "maintenance": {
       "started": "서비스 점검이 시작되었습니다",
@@ -1930,7 +1944,18 @@
     "systemStatus": "시스템 상태",
     "totalUsers": "총 사용자 수",
     "unknown": "알 수 없음",
-    "userWelcome": "사용자 대시보드에 오신 것을 환영합니다"
+    "userWelcome": "사용자 대시보드에 오신 것을 환영합니다",
+    "monitoringOverview": "모니터링 요약",
+    "monitoringActiveAlerts": "진행 중인 알림",
+    "monitoringActiveAlertsDesc": "현재 시스템에서 발생 중인 알림 건수를 확인할 수 있습니다.",
+    "monitoringTotalAlerts": "전체 알림",
+    "monitoringTotalAlertsDesc": "모니터링 시스템에 저장된 전체 알림 건수를 확인할 수 있습니다.",
+    "monitoringLogsCardTitle": "서비스 로그 보기",
+    "monitoringLogsCardDesc": "백엔드 및 인프라 서비스에서 수집된 중앙 로그 대시보드를 바로 확인할 수 있습니다.",
+    "monitoringAlertsCardTitle": "모니터링 알림 관리",
+    "monitoringAlertsCardDesc": "모니터링 알림 목록 페이지로 이동하여 알림 상태를 확인하고 관리할 수 있습니다.",
+    "monitoringGrafanaCardTitle": "Grafana 대시보드 열기",
+    "monitoringGrafanaCardDesc": "Grafana 모니터링 대시보드를 전체 화면으로 열어 상세 지표를 확인할 수 있습니다."
   },
   "div": "구분",
   "errors": {
@@ -2215,7 +2240,7 @@
     "queueMonitor": "큐 모니터",
     "console": "시스템 콘솔",
     "monitoring": "모니터링",
-    "grafana": "Grafana 대시보드",
+    "grafana": "모니터링",
 
     "realtimeEvents": "실시간 이벤트",
     "itemRewards": "지급 아이템 관리",

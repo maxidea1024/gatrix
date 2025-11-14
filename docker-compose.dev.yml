@@ -33,7 +33,7 @@ services:
     # Used for detecting TTL expiration of service stat keys
     command: redis-server --appendonly yes --notify-keyspace-events Ex
     ports:
-      - "0.0.0.0:${REDIS_PORT:-56379}:6379"
+      - "0.0.0.0:${REDIS_HOST_PORT:-56379}:6379"
     volumes:
       - redis_dev_data:/data
     networks:
@@ -92,6 +92,9 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: development
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-backend
+      MONITORING_ENABLED: "true"
       PORT: 5000
       DB_HOST: mysql
       DB_PORT: 3306
@@ -114,7 +117,6 @@ services:
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       DISABLE_X_POWERED_BY: true
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
-      MONITORING_ENABLED: "true"
 
       # Chat Server Integration
       CHAT_SERVER_URL: http://chat-server-dev:5100
@@ -242,6 +244,9 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: development
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-event-lens
+      MONITORING_ENABLED: "true"
       PORT: 5200
       LOG_LEVEL: ${EVENT_LENS_LOG_LEVEL:-debug}
       CLICKHOUSE_HOST: clickhouse
@@ -264,7 +269,6 @@ services:
       WORKER_BATCH_SIZE: ${WORKER_BATCH_SIZE:-1000}
       WORKER_BATCH_TIMEOUT: ${WORKER_BATCH_TIMEOUT:-5000}
       WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-10}
-      MONITORING_ENABLED: "true"
 
     ports:
       - "0.0.0.0:${EVENT_LENS_PORT:-55200}:5200"
@@ -297,6 +301,9 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: development
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-event-lens-worker
+      MONITORING_ENABLED: "true"
       LOG_LEVEL: ${EVENT_LENS_LOG_LEVEL:-debug}
       CLICKHOUSE_HOST: clickhouse
       CLICKHOUSE_PORT: 8123
@@ -342,6 +349,9 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: development
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-chat-server
+      MONITORING_ENABLED: "true"
       PORT: 5100
       HOST: 0.0.0.0
       # Database
@@ -370,8 +380,6 @@ services:
       USE_MESSAGE_PACK: false
       BROADCAST_COMPRESSION: false
       WS_MAX_CONNECTIONS: 1000
-      # Monitoring
-      MONITORING_ENABLED: true
       # Gatrix Integration
       GATRIX_API_URL: http://backend-dev:5000
       GATRIX_API_SECRET: ${GATRIX_API_SECRET:-dev-shared-secret}
@@ -383,7 +391,7 @@ services:
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-debug}
     ports:
-      - "0.0.0.0:${CHAT_PORT:-5100}:5100"
+      - "0.0.0.0:${CHAT_HOST_PORT:-55100}:5100"
     depends_on:
       mysql:
         condition: service_healthy
@@ -401,6 +409,41 @@ services:
       - chat_server_dev_uploads:/app/packages/chat-server/uploads
       - chat_server_dev_logs:/app/packages/chat-server/logs
     command: yarn workspace @gatrix/chat-server dev
+
+  # Loki - Log aggregation (development)
+  loki:
+    image: grafana/loki:latest
+    container_name: gatrix-loki-dev
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:${LOKI_PORT:-53100}:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki_dev_data:/loki
+    networks:
+      - gatrix-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3100/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Fluent Bit - Log forwarder to Loki (development)
+  fluent-bit:
+    image: fluent/fluent-bit:latest
+    container_name: gatrix-fluent-bit-dev
+    restart: unless-stopped
+    volumes:
+      - ./docker/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      loki:
+        condition: service_started
+    networks:
+      - gatrix-dev-network
+
   # Prometheus - Monitoring (development)
   prometheus:
     image: prom/prometheus:latest
@@ -476,6 +519,8 @@ volumes:
   prometheus_dev_data:
     driver: local
   grafana_dev_data:
+    driver: local
+  loki_dev_data:
     driver: local
 
 

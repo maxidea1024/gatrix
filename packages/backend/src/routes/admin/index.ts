@@ -33,6 +33,8 @@ import planningDataRoutes from './planningData';
 import couponSettingsRoutes from './couponSettings';
 import serviceDiscoveryRoutes from './serviceDiscovery';
 
+import monitoringAlertRoutes from './monitoringAlerts';
+
 const router = express.Router();
 
 // Mount routes with SSE endpoints first (before authentication middleware)
@@ -71,6 +73,8 @@ router.use('/surveys', surveyRoutes);
 router.use('/reward-templates', rewardTemplateRoutes);
 router.use('/service-notices', serviceNoticeRoutes);
 router.use('/ingame-popup-notices', ingamePopupNoticeRoutes);
+router.use('/monitoring/alerts', monitoringAlertRoutes);
+
 router.use('/planning-data', planningDataRoutes);
 router.use('/coupon-settings', couponSettingsRoutes);
 
