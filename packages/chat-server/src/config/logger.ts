@@ -65,16 +65,6 @@ const serviceFormat = winston.format((info) => {
   return info;
 });
 
-// Normalize level field for JSON logs to avoid Grafana auto-coloring
-const normalizeLevelFormat = winston.format((info) => {
-  if (info.level) {
-    (info as any).logLevel = info.level;
-    delete (info as any).level;
-  }
-  return info;
-});
-
-
 // Pretty console format (for human readable logs)
 const consolePrettyFormat = winston.format.combine(
   serviceFormat(),
@@ -96,7 +86,6 @@ const consolePrettyFormat = winston.format.combine(
 // JSON format for Loki / file logs
 const jsonFormat = winston.format.combine(
   serviceFormat(),
-  normalizeLevelFormat(),
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
   winston.format.json()
@@ -224,7 +213,6 @@ const createLogger = (category: string): winston.Logger => {
       }
       return info;
     })(),
-    normalizeLevelFormat(),
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.errors({ stack: true }),
     winston.format.json()

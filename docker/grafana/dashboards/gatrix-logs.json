@@ -86,9 +86,9 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (level) (count_over_time({job=\"gatrix\", service=~\"$service\", level=~\"$level\", internalIp=~\"$internalIp\", externalIp=~\"$externalIp\"} | json | hostname=~\"$hostname\" | line_format \"{{.}}\" |~ \"(?i).*$search.*\" [1m]))",
+          "expr": "sum by (logLevel) (count_over_time({job=\"gatrix\", service=~\"$service\", internalIp=~\"$internalIp\", externalIp=~\"$externalIp\"} | json | logLevel=~\"$level\" | hostname=~\"$hostname\" | label_format logLevel=\"{{.logLevel}}\" | line_format \"{{.}}\" |~ \"(?i).*$search.*\" [1m]))",
           "queryType": "range",
-          "legendFormat": "{{level}}",
+          "legendFormat": "{{logLevel}}",
           "step": "15s"
         }
       ],
@@ -161,15 +161,19 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "{job=\"gatrix\", service=~\"$service\", level=~\"$level\", internalIp=~\"$internalIp\", externalIp=~\"$externalIp\"} | json | json responseBody=\"responseBody\", queryParams=\"queryParams\" | hostname=~\"$hostname\" | line_format \"[{{.level | ToUpper}}] [{{.service}}] {{.message}}\" | label_format level=\"\" |~ \"(?i).*$search.*\"",
+          "expr": "{job=\"gatrix\", service=~\"$service\", internalIp=~\"$internalIp\", externalIp=~\"$externalIp\"} | json | json responseBody=\"responseBody\", queryParams=\"queryParams\" | level=~\"$level\" | hostname=~\"$hostname\" | line_format `[{{.service}}] {{.message}}` |~ \"(?i).*$search.*\"",
           "queryType": "range"
         }
       ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "options": {
         "showTime": true,
         "showLabels": false,
         "showCommonLabels": false,
-        "wrapLogMessage": false,
+        "wrapLogMessage": true,
         "prettifyLogMessage": false,
         "enableLogDetails": true,
         "dedupStrategy": "none",

@@ -6,26 +6,9 @@
  */
 
 import { GatrixServerSDK, getLogger, attachExpressMetrics } from '../src/index';
-import * as fs from 'fs';
-import * as path from 'path';
 import express from 'express';
 
 const logger = getLogger('IDLE-SERVER');
-
-// Create logs directory if it doesn't exist
-const logsDir = path.join(__dirname, '../../..', 'logs');
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
-}
-
-
-// Helper function to write full JSON to file
-function writeFullCachedData(data: any): void {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const filename = path.join(logsDir, `cached-data-${timestamp}.json`);
-  fs.writeFileSync(filename, JSON.stringify(data, null, 2), 'utf-8');
-  logger.info(`Full cached data written to: ${filename}`);
-}
 
 async function main() {
   logger.info('Starting Idle Server...');
@@ -71,17 +54,6 @@ async function main() {
     app.listen(metricsPort, () => {
       logger.info(`Metrics server listening on port ${metricsPort}`);
     });
-
-    // Write initial cached data to file
-    const surveysData = sdk.getCachedSurveys();
-    const initialCachedData = {
-      gameWorlds: sdk.getCachedGameWorlds(),
-      popupNotices: sdk.getCachedPopupNotices(),
-      surveys: surveysData,
-      whitelists: sdk.whitelist.getCached(),
-      timestamp: new Date().toISOString(),
-    };
-    writeFullCachedData(initialCachedData);
 
     // Register service
     logger.info('Registering service...');
