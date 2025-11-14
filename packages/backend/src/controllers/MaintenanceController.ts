@@ -26,6 +26,25 @@ function computeActive(isFlag: string | null, detail: any): boolean {
   return true;
 }
 
+// Compute maintenance status: 'inactive' | 'scheduled' | 'active'
+function computeMaintenanceStatus(isFlag: string | null, detail: any): 'inactive' | 'scheduled' | 'active' {
+  if (isFlag !== 'true') return 'inactive';
+  if (!detail) return 'inactive';
+
+  const now = new Date();
+  const startsAt = detail.startsAt ? new Date(detail.startsAt) : null;
+  const endsAt = detail.endsAt ? new Date(detail.endsAt) : null;
+
+  // If start time is in the future, it's scheduled
+  if (startsAt && now < startsAt) return 'scheduled';
+
+  // If end time is in the past, it's inactive
+  if (endsAt && now > endsAt) return 'inactive';
+
+  // Otherwise, it's active
+  return 'active';
+}
+
 export class MaintenanceController {
   static async getStatus(_req: Request, res: Response, next: NextFunction) {
     try {
@@ -50,16 +69,20 @@ export class MaintenanceController {
         // Validate time settings
         const startsAt = payload.startsAt ? new Date(payload.startsAt) : null;
         const endsAt = payload.endsAt ? new Date(payload.endsAt) : null;
+        const now = new Date();
+
+        logger.info(`[Maintenance Validation] startsAt: ${startsAt}, endsAt: ${endsAt}, now: ${now}`);
 
         // If both times are set, endsAt must be after startsAt
         if (startsAt && endsAt && endsAt <= startsAt) {
+          logger.warn(`[Maintenance Validation] End time must be after start time. endsAt: ${endsAt}, startsAt: ${startsAt}`);
           return res.status(400).json({ success: false, message: 'End time must be after start time.' });
         }
 
         // If only endsAt is set, it must be in the future
         if (!startsAt && endsAt) {
-          const now = new Date();
           if (endsAt <= now) {
+            logger.warn(`[Maintenance Validation] End time must be in the future. endsAt: ${endsAt}, now: ${now}`);
             return res.status(400).json({ success: false, message: 'End time must be in the future.' });
           }
         }
@@ -80,7 +103,9 @@ export class MaintenanceController {
       }
       await VarsModel.set(KEY_DETAIL, JSON.stringify(detail), userId);
 
-      const isUnderMaintenance = computeActive(payload.isMaintenance ? 'true' : 'false', detail);
+      // Return true if maintenance is being set (regardless of whether it's currently active)
+      // The actual active status will be computed by computeActive() when needed
+      const isUnderMaintenance = payload.isMaintenance;
 
       // Publish maintenance.settings.updated event to SDK
       await pubSubService.publishEvent({

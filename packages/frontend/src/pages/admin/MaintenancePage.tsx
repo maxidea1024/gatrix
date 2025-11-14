@@ -25,6 +25,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import { formatDateTimeDetailed, getStoredTimezone } from '@/utils/dateFormat';
+import { computeMaintenanceStatus, getMaintenanceStatusDisplay, MaintenanceStatusType } from '@/utils/maintenanceStatusUtils';
 
 const MaintenancePage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -47,6 +48,7 @@ const MaintenancePage: React.FC = () => {
 
   // Status
   const [isMaintenance, setIsMaintenance] = useState(false);
+  const [maintenanceStatus, setMaintenanceStatus] = useState<MaintenanceStatusType>('inactive');
   const [currentMaintenanceDetail, setCurrentMaintenanceDetail] = useState<any>(null);
   const [type, setType] = useState<MaintenanceType>('regular');
   const [startsAt, setStartsAt] = useState<Dayjs | null>(null);
@@ -91,6 +93,8 @@ const MaintenancePage: React.FC = () => {
     maintenanceService.getStatus().then(({ isUnderMaintenance, detail }) => {
       if (updatedBySSE.current) return; // keep SSE-updated status
       setIsMaintenance(isUnderMaintenance);
+      const status = computeMaintenanceStatus(isUnderMaintenance, detail);
+      setMaintenanceStatus(status);
       setCurrentMaintenanceDetail(detail);
       // 점검 중일 때만 기존 설정을 불러옴
       if (detail && isUnderMaintenance) {
@@ -134,6 +138,8 @@ const MaintenancePage: React.FC = () => {
         const { isUnderMaintenance, detail } = event.data || {};
         updatedBySSE.current = true;
         setIsMaintenance(!!isUnderMaintenance);
+        const status = computeMaintenanceStatus(!!isUnderMaintenance, detail);
+        setMaintenanceStatus(status);
         setCurrentMaintenanceDetail(detail);
         // 점검 중일 때만 기존 설정을 불러옴 (SSE)
         if (detail && !!isUnderMaintenance) {
@@ -142,9 +148,9 @@ const MaintenancePage: React.FC = () => {
           setEndsAt(detail.endsAt ? dayjs.utc(detail.endsAt).tz(getStoredTimezone()) : null);
           setBaseMsg(detail.message || '');
           const d: any[] = [];
-          if (detail.messages?.ko) d.push({ lang: 'ko', message: detail.messages.ko });
-          if (detail.messages?.en) d.push({ lang: 'en', message: detail.messages.en });
-          if (detail.messages?.zh) d.push({ lang: 'zh', message: detail.messages.zh });
+          if (detail.localeMessages?.ko) d.push({ lang: 'ko', message: detail.localeMessages.ko });
+          if (detail.localeMessages?.en) d.push({ lang: 'en', message: detail.localeMessages.en });
+          if (detail.localeMessages?.zh) d.push({ lang: 'zh', message: detail.localeMessages.zh });
           setLocales(d as any);
         } else {
           // 점검 중이 아니면 깨끗한 상태로 초기화
@@ -214,8 +220,8 @@ const MaintenancePage: React.FC = () => {
       const result: any = {
         isMaintenance: true,
         type,
-        startsAt: startsAt ? startsAt.toISOString() : null,
-        endsAt: endsAt ? endsAt.toISOString() : null,
+        startsAt: startsAt ? startsAt.format() : null,
+        endsAt: endsAt ? endsAt.format() : null,
         message: tpl?.defaultMessage || undefined,
       };
       // Only include localeMessages if multi-language is supported
@@ -230,8 +236,8 @@ const MaintenancePage: React.FC = () => {
     })() : {
       isMaintenance: true,
       type,
-      startsAt: startsAt ? startsAt.toISOString() : null,
-      endsAt: endsAt ? endsAt.toISOString() : null,
+      startsAt: startsAt ? startsAt.format() : null,
+      endsAt: endsAt ? endsAt.format() : null,
       message: baseMsg || undefined,
       ...(supportsMultiLanguage && locales.length > 0 ? { localeMessages: Object.fromEntries(locales.map(l => [l.lang, l.message])) } : {}),
     };
@@ -283,8 +289,8 @@ const MaintenancePage: React.FC = () => {
     })() : {
       isMaintenance: true,
       type,
-      startsAt: startsAt ? startsAt.toISOString() : null,
-      endsAt: endsAt ? endsAt.toISOString() : null,
+      startsAt: startsAt ? startsAt.format() : null,
+      endsAt: endsAt ? endsAt.format() : null,
       kickExistingPlayers,
       kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
       message: baseMsg || undefined,
@@ -332,9 +338,24 @@ const MaintenancePage: React.FC = () => {
               <Stack spacing={2} sx={{ mt: 1 }}>
               {isMaintenance && !editMode ? (
                 <>
-                  <Typography variant="subtitle1" color="error" sx={{ fontWeight: 600, mb: 2 }}>
-                    {t('maintenance.statusOn')}
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: getMaintenanceStatusDisplay(maintenanceStatus).color }}>
+                      {getMaintenanceStatusDisplay(maintenanceStatus).icon} {t(getMaintenanceStatusDisplay(maintenanceStatus).label)}
+                    </Typography>
+                    <Box component="span" sx={{
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: 1,
+                      backgroundColor: getMaintenanceStatusDisplay(maintenanceStatus).bgColor,
+                      color: getMaintenanceStatusDisplay(maintenanceStatus).color,
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold'
+                    }}>
+                      {maintenanceStatus === 'active' && t('maintenance.statusActive')}
+                      {maintenanceStatus === 'scheduled' && t('maintenance.statusScheduled')}
+                      {maintenanceStatus === 'inactive' && t('maintenance.statusInactive')}
+                    </Box>
+                  </Box>
 
                   {/* Current Maintenance Summary */}
                   <Box sx={{

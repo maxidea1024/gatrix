@@ -96,6 +96,7 @@ import { tagService, Tag } from '@/services/tagService';
 import { GameWorld, CreateGameWorldData, GameWorldMaintenanceLocale } from '../../types/gameWorld';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import { computeMaintenanceStatus, getMaintenanceStatusDisplay, MaintenanceStatusType } from '@/utils/maintenanceStatusUtils';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import translationService from '../../services/translationService';
@@ -1175,17 +1176,23 @@ const GameWorldsPage: React.FC = () => {
             sx={{ cursor: 'pointer' }}
           />
         );
-      case 'isMaintenance':
+      case 'isMaintenance': {
+        const maintenanceStatus = computeMaintenanceStatus(world.isMaintenance, {
+          startsAt: world.maintenanceStartDate,
+          endsAt: world.maintenanceEndDate,
+        } as any);
+        const statusDisplay = getMaintenanceStatusDisplay(maintenanceStatus);
         return (
           <Chip
-            label={world.isMaintenance ? t('gameWorlds.maintenance') : t('gameWorlds.normal')}
+            label={maintenanceStatus === 'active' ? t('gameWorlds.maintenance') : maintenanceStatus === 'scheduled' ? t('maintenance.statusScheduled') : t('gameWorlds.normal')}
             size="small"
-            color={world.isMaintenance ? 'warning' : 'success'}
-            icon={world.isMaintenance ? <MaintenanceIcon /> : undefined}
+            color={maintenanceStatus === 'active' ? 'warning' : maintenanceStatus === 'scheduled' ? 'info' : 'success'}
+            icon={maintenanceStatus === 'active' ? <MaintenanceIcon /> : undefined}
             onClick={() => handleToggleMaintenance(world.id)}
             sx={{ cursor: 'pointer' }}
           />
         );
+      }
       case 'tags':
         return (
           <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>

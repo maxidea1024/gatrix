@@ -7,7 +7,8 @@ export interface MaintenanceDetail {
   startsAt?: string | null; // ISO
   endsAt: string | null; // ISO
   message?: string; // default message
-  messages?: { ko?: string; en?: string; zh?: string }; // per-language overrides
+  messages?: { ko?: string; en?: string; zh?: string }; // per-language overrides (deprecated, use localeMessages)
+  localeMessages?: { ko?: string; en?: string; zh?: string }; // per-language overrides
   updatedAt?: string;
   updatedBy?: {
     id: number;

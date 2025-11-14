@@ -198,6 +198,25 @@ export class GameWorldController {
 
     const { tagIds, ...worldValue } = value as any;
 
+    // Validate time settings
+    if (worldValue.isMaintenance) {
+      const startsAt = worldValue.maintenanceStartDate ? new Date(worldValue.maintenanceStartDate) : null;
+      const endsAt = worldValue.maintenanceEndDate ? new Date(worldValue.maintenanceEndDate) : null;
+      const now = new Date();
+
+      // If both times are set, endsAt must be after startsAt
+      if (startsAt && endsAt && endsAt <= startsAt) {
+        throw new CustomError('End time must be after start time.', 400);
+      }
+
+      // If only endsAt is set, it must be in the future
+      if (!startsAt && endsAt) {
+        if (endsAt <= now) {
+          throw new CustomError('End time must be in the future.', 400);
+        }
+      }
+    }
+
     // Resolve authenticated user id from middleware (supports both payload and loaded user)
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
     if (!authenticatedUserId) {
@@ -249,6 +268,25 @@ export class GameWorldController {
     }
 
     const { tagIds, ...updateValue } = value as any;
+
+    // Validate time settings
+    if (updateValue.isMaintenance) {
+      const startsAt = updateValue.maintenanceStartDate ? new Date(updateValue.maintenanceStartDate) : null;
+      const endsAt = updateValue.maintenanceEndDate ? new Date(updateValue.maintenanceEndDate) : null;
+      const now = new Date();
+
+      // If both times are set, endsAt must be after startsAt
+      if (startsAt && endsAt && endsAt <= startsAt) {
+        throw new CustomError('End time must be after start time.', 400);
+      }
+
+      // If only endsAt is set, it must be in the future
+      if (!startsAt && endsAt) {
+        if (endsAt <= now) {
+          throw new CustomError('End time must be in the future.', 400);
+        }
+      }
+    }
 
     // Add updatedBy from authenticated user session
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
@@ -355,6 +393,25 @@ export class GameWorldController {
     const { error, value } = updateMaintenanceSchema.validate(req.body);
     if (error) {
       throw new CustomError(error.details[0].message, 400);
+    }
+
+    // Validate time settings
+    if (value.isMaintenance) {
+      const startsAt = value.maintenanceStartDate ? new Date(value.maintenanceStartDate) : null;
+      const endsAt = value.maintenanceEndDate ? new Date(value.maintenanceEndDate) : null;
+      const now = new Date();
+
+      // If both times are set, endsAt must be after startsAt
+      if (startsAt && endsAt && endsAt <= startsAt) {
+        throw new CustomError('End time must be after start time.', 400);
+      }
+
+      // If only endsAt is set, it must be in the future
+      if (!startsAt && endsAt) {
+        if (endsAt <= now) {
+          throw new CustomError('End time must be in the future.', 400);
+        }
+      }
     }
 
     // Add updatedBy from authenticated user session

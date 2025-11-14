@@ -84,6 +84,7 @@ import TimezoneSelector from '../common/TimezoneSelector';
 import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { computeMaintenanceStatus, getMaintenanceStatusDisplay, MaintenanceStatusType } from '@/utils/maintenanceStatusUtils';
 import moment from 'moment';
 import { getMenuCategories } from '@/config/navigation';
 import mailService from '@/services/mailService';
@@ -144,10 +145,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [unreadMailCount, setUnreadMailCount] = useState(0);
 
   // Maintenance banner state
-  const [maintenanceStatus, setMaintenanceStatus] = useState<{ active: boolean; detail: MaintenanceDetail | null }>({ active: false, detail: null });
-  const prevMaintenanceRef = useRef<{ active: boolean; updatedAt?: string | null } | null>(null);
+  const [maintenanceStatus, setMaintenanceStatus] = useState<{ isMaintenance: boolean; status: MaintenanceStatusType; detail: MaintenanceDetail | null }>({ isMaintenance: false, status: 'inactive', detail: null });
+  const prevMaintenanceRef = useRef<{ isMaintenance: boolean; status: MaintenanceStatusType; updatedAt?: string | null } | null>(null);
   // If SSE already updated the status, avoid overwriting with initial fetch result
   const maintenanceUpdatedBySSE = useRef(false);
+  const maintenanceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initial load
   useEffect(() => {
@@ -155,14 +157,76 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     maintenanceService.getStatus().then(({ isUnderMaintenance, detail }) => {
       if (cancelled) return;
       if (maintenanceUpdatedBySSE.current) return; // keep SSE-updated status
-      setMaintenanceStatus({ active: !!isUnderMaintenance, detail: detail || null });
+      const status = computeMaintenanceStatus(!!isUnderMaintenance, detail);
+      setMaintenanceStatus({ isMaintenance: !!isUnderMaintenance, status, detail: detail || null });
     }).catch(() => {
       if (cancelled) return;
       if (maintenanceUpdatedBySSE.current) return;
-      setMaintenanceStatus({ active: false, detail: null });
+      setMaintenanceStatus({ isMaintenance: false, status: 'inactive', detail: null });
     });
     return () => { cancelled = true; };
   }, []);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (maintenanceTimerRef.current) {
+        clearTimeout(maintenanceTimerRef.current);
+        maintenanceTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  // Maintenance status timer - updates UI when maintenance starts/ends
+  useEffect(() => {
+    const updateMaintenanceStatus = () => {
+      const newStatus = computeMaintenanceStatus(maintenanceStatus.isMaintenance, maintenanceStatus.detail);
+      if (newStatus !== maintenanceStatus.status) {
+        setMaintenanceStatus(prev => ({ ...prev, status: newStatus }));
+      }
+    };
+
+    // Check if we need to set up a timer
+    const needsTimer = maintenanceStatus.isMaintenance && maintenanceStatus.detail && (
+      (maintenanceStatus.detail.startsAt && new Date(maintenanceStatus.detail.startsAt) > new Date()) ||
+      (maintenanceStatus.detail.endsAt && new Date(maintenanceStatus.detail.endsAt) > new Date())
+    );
+
+    if (needsTimer) {
+      // Calculate next update time (when maintenance starts or ends)
+      const now = new Date();
+      const startsAt = maintenanceStatus.detail.startsAt ? new Date(maintenanceStatus.detail.startsAt) : null;
+      const endsAt = maintenanceStatus.detail.endsAt ? new Date(maintenanceStatus.detail.endsAt) : null;
+
+      let nextUpdateTime: Date | null = null;
+
+      // If maintenance hasn't started yet, update when it starts
+      if (startsAt && now < startsAt) {
+        nextUpdateTime = startsAt;
+      }
+      // If maintenance is active and has an end time, update when it ends
+      else if (endsAt && now < endsAt) {
+        nextUpdateTime = endsAt;
+      }
+
+      if (nextUpdateTime) {
+        const timeUntilUpdate = nextUpdateTime.getTime() - now.getTime();
+        // Add 1 second buffer to ensure the status has actually changed
+        const timerDelay = Math.max(1000, timeUntilUpdate + 1000);
+
+        maintenanceTimerRef.current = setTimeout(() => {
+          updateMaintenanceStatus();
+        }, timerDelay);
+      }
+    }
+
+    return () => {
+      if (maintenanceTimerRef.current) {
+        clearTimeout(maintenanceTimerRef.current);
+        maintenanceTimerRef.current = null;
+      }
+    };
+  }, [maintenanceStatus.isMaintenance, maintenanceStatus.detail, maintenanceStatus.status]);
 
   // SSE updates - 백엔드 연결 실패 시 적절히 처리
   const sseConnection = useSSENotifications({
@@ -176,20 +240,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
         // Toast: started / stopped / updated
         const prev = prevMaintenanceRef.current;
-        const nextActive = !!isUnderMaintenance;
+        const nextIsMaintenance = !!isUnderMaintenance;
+        const nextStatus = computeMaintenanceStatus(nextIsMaintenance, detail);
         const nextUpdatedAt = detail?.updatedAt || null;
         if (prev) {
-          if (prev.active !== nextActive) {
-            enqueueSnackbar(nextActive ? t('notifications.maintenance.started') : t('notifications.maintenance.stopped'), {
-              variant: nextActive ? 'warning' : 'success'
+          if (prev.isMaintenance !== nextIsMaintenance) {
+            enqueueSnackbar(nextIsMaintenance ? t('notifications.maintenance.started') : t('notifications.maintenance.stopped'), {
+              variant: nextIsMaintenance ? 'warning' : 'success'
             });
-          } else if (nextActive && prev.updatedAt !== nextUpdatedAt) {
+          } else if (nextIsMaintenance && prev.updatedAt !== nextUpdatedAt) {
             enqueueSnackbar(t('notifications.maintenance.updated'), { variant: 'info' });
           }
         }
-        prevMaintenanceRef.current = { active: nextActive, updatedAt: nextUpdatedAt };
+        prevMaintenanceRef.current = { isMaintenance: nextIsMaintenance, status: nextStatus, updatedAt: nextUpdatedAt };
 
-        setMaintenanceStatus({ active: nextActive, detail: detail || null });
+        setMaintenanceStatus({ isMaintenance: nextIsMaintenance, status: nextStatus, detail: detail || null });
       } else if (event.type === 'invitation_created' || event.type === 'invitation_deleted') {
         // 초대링크 이벤트를 다른 컴포넌트에 전달
         window.dispatchEvent(new CustomEvent('invitation-change', { detail: event }));
@@ -1007,7 +1072,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             </Box>
 
             {/* 점검 배너 - AppBar 내부 */}
-            {maintenanceStatus.active && (
+            {maintenanceStatus.isMaintenance && (
               <Tooltip
                 title={
                   <Box sx={{ p: 1.5, minWidth: 300 }}>
@@ -1023,12 +1088,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         px: 1,
                         py: 0.25,
                         borderRadius: 1,
-                        backgroundColor: maintenanceStatus.active ? '#ff6b6b' : '#ffa726',
+                        backgroundColor: getMaintenanceStatusDisplay(maintenanceStatus.status).color,
                         color: 'white',
                         fontSize: '0.75rem',
                         fontWeight: 'bold'
                       }}>
-                        {maintenanceStatus.active ? t('maintenance.statusActive') : t('maintenance.statusScheduled')}
+                        {t(getMaintenanceStatusDisplay(maintenanceStatus.status).label)}
                       </Box>
                     </Typography>
 
@@ -1146,15 +1211,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     <Typography variant="body2" sx={{
                       fontWeight: 700,
                       fontSize: '0.8rem',
-                      color: '#ff6b6b',
+                      color: getMaintenanceStatusDisplay(maintenanceStatus.status).color,
                     }}>
-                      🔧 {t('common.maintenance.bannerActive')}
+                      {getMaintenanceStatusDisplay(maintenanceStatus.status).icon} {t(getMaintenanceStatusDisplay(maintenanceStatus.status).label)}
                     </Typography>
                     {maintenanceStatus.detail?.type && (
                       <Typography variant="body2" sx={{
                         fontSize: '0.7rem',
-                        backgroundColor: 'rgba(244, 67, 54, 0.2)',
-                        color: '#ff6b6b',
+                        backgroundColor: getMaintenanceStatusDisplay(maintenanceStatus.status).bgColor,
+                        color: getMaintenanceStatusDisplay(maintenanceStatus.status).color,
                         px: 1,
                         py: 0.25,
                         borderRadius: 1,
@@ -1201,7 +1266,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             )}
 
             {/* 점검 배너 우측 구분선 */}
-            {maintenanceStatus.active && (
+            {maintenanceStatus.isMaintenance && (
               <Box
                 sx={{
                   width: '1px',
