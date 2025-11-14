@@ -26,7 +26,7 @@ async function main() {
     // Redis for events
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
+      port: parseInt(process.env.REDIS_PORT || '56379'),
     },
 
     // Cache configuration
@@ -161,7 +161,6 @@ async function main() {
       };
 
       logger.info('CACHED DATA', JSON.stringify(cachedData, null, 2));
-      writeFullCachedData(cachedData);
     }
 
     logger.info('Idle server is running and listening to events...');

@@ -18,6 +18,9 @@ COPY packages/frontend/package.json ./packages/frontend/
 # Install all dependencies (including dev dependencies)
 RUN yarn install --frozen-lockfile
 
+# Rebuild esbuild to fix binary version mismatch
+RUN cd /app/packages/frontend && npm rebuild esbuild
+
 # Copy source code
 COPY packages/frontend ./packages/frontend
 

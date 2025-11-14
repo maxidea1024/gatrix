@@ -7,6 +7,9 @@ import https from 'https'
 // Force platform for WSL compatibility
 process.env.ROLLUP_BINARY_PATH = process.env.ROLLUP_BINARY_PATH || '';
 
+// Use esbuild-wasm for better compatibility
+process.env.ESBUILD_BINARY_PATH = process.env.ESBUILD_BINARY_PATH || '';
+
 // Determine backend URL based on environment
 // In Docker: use service name 'backend-dev'
 // In local: use 'localhost'
@@ -45,10 +48,6 @@ console.log(`🔧 Vite proxy configuration:`, {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  esbuild: {
-    // Use esbuild-wasm for WSL compatibility
-    target: 'es2020',
-  },
   plugins: [react()],
   resolve: {
     alias: {

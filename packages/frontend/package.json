@@ -95,7 +95,7 @@
     "@vitejs/plugin-react": "^4.0.0",
     "@vitest/ui": "^1.0.4",
     "cypress": "^13.6.1",
-    "esbuild-wasm": "^0.21.5",
+    "esbuild-wasm": "^0.27.0",
     "eslint": "^8.55.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
