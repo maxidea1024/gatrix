@@ -96,41 +96,41 @@ async function start() {
           }
         );
         logger.info('Event-Lens service registered to Service Discovery', { instanceId: eventLensInstanceId });
+
+        // Start heartbeat to keep service alive (only if registration succeeded)
+        const heartbeatInterval = setInterval(async () => {
+          try {
+            await axios.default.post(
+              `${backendUrl}/api/v1/server/services/status`,
+              {
+                instanceId: eventLensInstanceId,
+                labels: {
+                  service: 'event-lens',
+                  group: 'development',
+                },
+                status: 'ready',
+              },
+              {
+                headers: {
+                  'X-API-Token': apiToken,
+                  'X-Application-Name': 'event-lens',
+                },
+              }
+            );
+          } catch (error: any) {
+            const hbErrorMsg = error?.response?.status ? `HTTP ${error.response.status}` : (error instanceof Error ? error.message : 'Unknown error');
+            logger.warn('Event-Lens heartbeat failed', { error: hbErrorMsg });
+          }
+        }, 10000); // Send heartbeat every 10 seconds
+
+        // Store interval for graceful shutdown
+        (global as any).eventLensHeartbeatInterval = heartbeatInterval;
       } catch (regError: any) {
         const regErrorMsg = regError?.response?.status ? `HTTP ${regError.response.status}` : (regError instanceof Error ? regError.message : 'Unknown error');
-        logger.warn('Event-Lens service registration failed:', regErrorMsg);
+        logger.warn('Event-Lens service registration failed, continuing', { error: regErrorMsg });
       }
-
-      // Start heartbeat to keep service alive
-      const heartbeatInterval = setInterval(async () => {
-        try {
-          await axios.default.post(
-            `${backendUrl}/api/v1/server/services/status`,
-            {
-              instanceId: eventLensInstanceId,
-              labels: {
-                service: 'event-lens',
-                group: 'development',
-              },
-              status: 'ready',
-            },
-            {
-              headers: {
-                'X-API-Token': apiToken,
-                'X-Application-Name': 'event-lens',
-              },
-            }
-          );
-        } catch (error: any) {
-          const hbErrorMsg = error?.response?.status ? `HTTP ${error.response.status}` : (error instanceof Error ? error.message : 'Unknown error');
-          logger.warn('Event-Lens heartbeat failed:', hbErrorMsg);
-        }
-      }, 10000); // Send heartbeat every 10 seconds
-
-      // Store interval for graceful shutdown
-      (global as any).eventLensHeartbeatInterval = heartbeatInterval;
     } catch (error: any) {
-      logger.warn('Event-Lens service registration failed, continuing:', error instanceof Error ? error.message : String(error));
+      logger.warn('Event-Lens service registration setup failed, continuing', { error: error instanceof Error ? error.message : String(error) });
     }
 
     // Graceful Shutdown

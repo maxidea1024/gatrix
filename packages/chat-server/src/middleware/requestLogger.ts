@@ -16,7 +16,7 @@ export const requestLogger = (req: RequestWithStartTime, res: Response, next: Ne
   const requestLogData: any = {
     method: req.method,
     url: req.originalUrl || req.url,
-    ip: req.ip,
+    externalIp: req.ip,
     userAgent: req.get('User-Agent'),
     contentType: req.get('Content-Type'),
     contentLength: req.get('Content-Length'),

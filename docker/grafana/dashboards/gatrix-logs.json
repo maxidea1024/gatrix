@@ -50,15 +50,29 @@
         "multi": true
       },
       {
+        "name": "internalIp",
+        "type": "query",
+        "datasource": "Loki",
+        "label": "Internal IP",
+        "query": "label_values(internalIp)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true
+      },
+      {
+        "name": "externalIp",
+        "type": "query",
+        "datasource": "Loki",
+        "label": "External IP",
+        "query": "label_values(externalIp)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true
+      },
+      {
         "name": "search",
         "type": "textbox",
         "label": "Search (message, url, method, etc.)",
-        "query": ""
-      },
-      {
-        "name": "ip",
-        "type": "textbox",
-        "label": "IP Address",
         "query": ""
       }
     ]
@@ -72,7 +86,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (level) (count_over_time({job=\"gatrix\", service=~\"$service\", level=~\"$level\"} | json | hostname=~\"$hostname\" | ip=~\"(?i).*$ip.*\" | line_format \"{{.}}\" |~ \"(?i).*$search.*\" [1m]))",
+          "expr": "sum by (level) (count_over_time({job=\"gatrix\", service=~\"$service\", level=~\"$level\", internalIp=~\"$internalIp\", externalIp=~\"$externalIp\"} | json | hostname=~\"$hostname\" | line_format \"{{.}}\" |~ \"(?i).*$search.*\" [1m]))",
           "queryType": "range",
           "legendFormat": "{{level}}",
           "step": "15s"
@@ -147,7 +161,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "{job=\"gatrix\", service=~\"$service\", level=~\"$level\"} | json | json responseBody=\"responseBody\", queryParams=\"queryParams\" | hostname=~\"$hostname\" | ip=~\"(?i).*$ip.*\" | line_format \"[{{.level}}] [{{.service}}] {{.message}}\" |~ \"(?i).*$search.*\"",
+          "expr": "{job=\"gatrix\", service=~\"$service\", level=~\"$level\", internalIp=~\"$internalIp\", externalIp=~\"$externalIp\"} | json | json responseBody=\"responseBody\", queryParams=\"queryParams\" | hostname=~\"$hostname\" | line_format \"[{{.level | ToUpper}}] [{{.service}}] {{.message}}\" | label_format level=\"\" |~ \"(?i).*$search.*\"",
           "queryType": "range"
         }
       ],

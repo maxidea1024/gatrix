@@ -96,10 +96,12 @@ async function migrate() {
         const statements = sql
           .split(';')
           .map(s => s.trim())
-          .filter(s => s.length > 0);
+          .filter(s => s.length > 0 && !s.startsWith('--') && !s.startsWith('/*'));
 
         for (const statement of statements) {
-          await client.exec({ query: statement });
+          if (statement) {
+            await client.exec({ query: statement });
+          }
         }
 
         console.log(`✅ ${file} completed`);

@@ -292,14 +292,14 @@ const startServer = async () => {
           const provider = (await import('./services/serviceDiscovery/ServiceDiscoveryFactory')).ServiceDiscoveryFactory.getInstance();
           await provider.heartbeat(backendInstanceId!, 'backend');
         } catch (error) {
-          logger.warn('Backend heartbeat failed:', error);
+          logger.warn('Backend heartbeat failed', { error: error instanceof Error ? error.message : String(error) });
         }
       }, 10000); // Send heartbeat every 10 seconds
 
       // Store interval for graceful shutdown
       (global as any).backendHeartbeatInterval = heartbeatInterval;
     } catch (error) {
-      logger.warn('Backend service registration failed, continuing:', error);
+      logger.warn('Backend service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });
     }
 
     // Initialize automatic cleanup for etcd mode

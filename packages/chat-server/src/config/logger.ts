@@ -13,6 +13,44 @@ const hostname = os.hostname();
 
 const useJsonFormat = logFormat ? logFormat === 'json' : monitoringEnabled || nodeEnv !== 'development';
 
+/**
+ * Get the first non-internal IPv4 address from network interfaces
+ * Falls back to first internal IPv4 address if no external address is found
+ */
+function getInternalIp(): string {
+  const interfaces = os.networkInterfaces();
+
+  // First pass: Look for non-internal IPv4 addresses
+  for (const name of Object.keys(interfaces)) {
+    const iface = interfaces[name];
+    if (!iface) continue;
+
+    for (const addr of iface) {
+      // Skip non-IPv4 and internal addresses
+      if (addr.family === 'IPv4' && !addr.internal) {
+        return addr.address;
+      }
+    }
+  }
+
+  // Second pass: Fall back to internal IPv4 addresses (e.g., 127.0.0.1)
+  for (const name of Object.keys(interfaces)) {
+    const iface = interfaces[name];
+    if (!iface) continue;
+
+    for (const addr of iface) {
+      if (addr.family === 'IPv4') {
+        return addr.address;
+      }
+    }
+  }
+
+  // Ultimate fallback
+  return '127.0.0.1';
+}
+
+const internalIp = getInternalIp();
+
 // Add base service metadata to all log entries
 const serviceFormat = winston.format((info) => {
   if (!info.service) {
@@ -21,13 +59,25 @@ const serviceFormat = winston.format((info) => {
   if (!info.hostname) {
     info.hostname = hostname;
   }
+  if (!info.internalIp) {
+    info.internalIp = internalIp;
+  }
   return info;
 });
+
+// Normalize level field for JSON logs to avoid Grafana auto-coloring
+const normalizeLevelFormat = winston.format((info) => {
+  if (info.level) {
+    (info as any).logLevel = info.level;
+    delete (info as any).level;
+  }
+  return info;
+});
+
 
 // Pretty console format (for human readable logs)
 const consolePrettyFormat = winston.format.combine(
   serviceFormat(),
-  winston.format.colorize({ all: true }),
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
     let metaStr = '';
@@ -46,6 +96,7 @@ const consolePrettyFormat = winston.format.combine(
 // JSON format for Loki / file logs
 const jsonFormat = winston.format.combine(
   serviceFormat(),
+  normalizeLevelFormat(),
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
   winston.format.json()
@@ -147,7 +198,6 @@ const createLogger = (category: string): winston.Logger => {
   // Pretty format for category-based logging
   const categoryPrettyFormat = winston.format.combine(
     serviceFormat(),
-    winston.format.colorize({ all: true }),
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.printf(({ timestamp, level, message, ...meta }) => {
       let metaStr = '';
@@ -174,6 +224,7 @@ const createLogger = (category: string): winston.Logger => {
       }
       return info;
     })(),
+    normalizeLevelFormat(),
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.errors({ stack: true }),
     winston.format.json()

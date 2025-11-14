@@ -98,7 +98,7 @@ router.get('/whitelists', serverSDKAuth, getWhitelistsHandler);
  */
 router.post('/register', serverSDKAuth, async (req: any, res: any) => {
   try {
-    const { labels, hostname, internalAddress, ports, status, stats, meta } = req.body;
+    const { instanceId: providedInstanceId, labels, hostname, internalAddress, ports, status, stats, meta } = req.body;
 
     // Validate required fields
     if (!labels || !labels.service) {
@@ -115,8 +115,8 @@ router.post('/register', serverSDKAuth, async (req: any, res: any) => {
       });
     }
 
-    // Generate instance ID
-    const instanceId = ulid();
+    // Use provided instance ID or generate a new one
+    const instanceId = providedInstanceId || ulid();
 
     // Auto-detect external address from request IP
     let externalAddress = req.ip || req.connection.remoteAddress || '0.0.0.0';
