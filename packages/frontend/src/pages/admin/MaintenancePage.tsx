@@ -99,9 +99,9 @@ const MaintenancePage: React.FC = () => {
         setEndsAt(detail.endsAt ? dayjs.utc(detail.endsAt).tz(getStoredTimezone()) : null);
         setBaseMsg(detail.message || '');
         const d: any[] = [];
-        if (detail.messages?.ko) d.push({ lang: 'ko', message: detail.messages.ko });
-        if (detail.messages?.en) d.push({ lang: 'en', message: detail.messages.en });
-        if (detail.messages?.zh) d.push({ lang: 'zh', message: detail.messages.zh });
+        if (detail.localeMessages?.ko) d.push({ lang: 'ko', message: detail.localeMessages.ko });
+        if (detail.localeMessages?.en) d.push({ lang: 'en', message: detail.localeMessages.en });
+        if (detail.localeMessages?.zh) d.push({ lang: 'zh', message: detail.localeMessages.zh });
         setLocales(d as any);
       } else {
         // 점검 중이 아니면 깨끗한 상태로 시작
@@ -211,25 +211,29 @@ const MaintenancePage: React.FC = () => {
     }
     const payload = inputMode === 'template' ? (() => {
       const tpl = tpls.find(t => t.id === selectedTplId);
-      return {
+      const result: any = {
         isMaintenance: true,
         type,
         startsAt: startsAt ? startsAt.toISOString() : null,
         endsAt: endsAt ? endsAt.toISOString() : null,
         message: tpl?.defaultMessage || undefined,
-        messages: {
+      };
+      // Only include localeMessages if multi-language is supported
+      if (tpl?.supportsMultiLanguage) {
+        result.localeMessages = {
           ko: tpl?.locales?.find(l=>l.lang==='ko')?.message || undefined,
           en: tpl?.locales?.find(l=>l.lang==='en')?.message || undefined,
           zh: tpl?.locales?.find(l=>l.lang==='zh')?.message || undefined,
-        }
-      };
+        };
+      }
+      return result;
     })() : {
       isMaintenance: true,
       type,
       startsAt: startsAt ? startsAt.toISOString() : null,
       endsAt: endsAt ? endsAt.toISOString() : null,
       message: baseMsg || undefined,
-      messages: Object.fromEntries(locales.map(l => [l.lang, l.message])) as any,
+      ...(supportsMultiLanguage && locales.length > 0 ? { localeMessages: Object.fromEntries(locales.map(l => [l.lang, l.message])) } : {}),
     };
 
     const response = await maintenanceService.setStatus(payload as any);
@@ -237,7 +241,7 @@ const MaintenancePage: React.FC = () => {
 
     if (!isUnderMaintenance) {
       // 점검이 시작되지 않은 경우 경고
-      alert(t('maintenance.startFailedWarning'));
+      enqueueSnackbar(t('maintenance.startFailedWarning'), { variant: 'warning' });
       return;
     }
 
@@ -258,7 +262,7 @@ const MaintenancePage: React.FC = () => {
 
     const payload = inputMode === 'template' ? (() => {
       const tpl = tpls.find(t => t.id === selectedTplId);
-      return {
+      const result: any = {
         isMaintenance: true,
         type,
         startsAt: startsAt ? startsAt.toISOString() : null,
@@ -266,12 +270,16 @@ const MaintenancePage: React.FC = () => {
         kickExistingPlayers,
         kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
         message: tpl?.defaultMessage || undefined,
-        messages: {
+      };
+      // Only include localeMessages if multi-language is supported
+      if (tpl?.supportsMultiLanguage) {
+        result.localeMessages = {
           ko: tpl?.locales?.find(l=>l.lang==='ko')?.message || undefined,
           en: tpl?.locales?.find(l=>l.lang==='en')?.message || undefined,
           zh: tpl?.locales?.find(l=>l.lang==='zh')?.message || undefined,
-        }
-      };
+        };
+      }
+      return result;
     })() : {
       isMaintenance: true,
       type,
@@ -280,7 +288,7 @@ const MaintenancePage: React.FC = () => {
       kickExistingPlayers,
       kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
       message: baseMsg || undefined,
-      messages: Object.fromEntries(locales.map(l => [l.lang, l.message])) as any,
+      ...(supportsMultiLanguage && locales.length > 0 ? { localeMessages: Object.fromEntries(locales.map(l => [l.lang, l.message])) } : {}),
     };
 
     const result = await maintenanceService.setStatus(payload);

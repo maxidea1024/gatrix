@@ -7,7 +7,7 @@
 import Redis from 'ioredis';
 import { Logger } from '../utils/logger';
 import { RedisConfig } from '../types/config';
-import { StandardEvent, CustomEvent, EventCallback, EventListenerMap } from '../types/events';
+import { StandardEvent, CustomEvent, EventCallback, EventListenerMap, SdkEvent } from '../types/events';
 import { CacheManager } from './CacheManager';
 import { SdkMetrics } from '../utils/sdkMetrics';
 
@@ -87,7 +87,7 @@ export class EventListener {
       this.subscriber.on('ready', async () => {
         if (!this.isConnected) {
           this.isConnected = true;
-          this.logger.info('Subscriber reconnected and ready');
+          this.logger.info('✅ Redis connection restored successfully');
           try { this.metrics?.setRedisConnected(true); this.metrics?.incRedisReconnect(); } catch (_) {}
           try {
             await this.reinitializeCache();
@@ -159,7 +159,7 @@ export class EventListener {
         await this.initialize();
 
         // After successful reconnection, reinitialize all cache data
-        this.logger.info('Event listener reconnected. Reinitializing cache data...');
+        this.logger.info('✅ Event listener reconnected. Reinitializing cache data...');
         await this.reinitializeCache();
       } catch (error: any) {
         // Silently continue on reconnection failures
@@ -225,8 +225,7 @@ export class EventListener {
       'survey.updated',
       'survey.deleted',
       'survey.settings.updated',
-      'maintenance.started',
-      'maintenance.ended',
+      'maintenance.settings.updated',
       'whitelist.updated',
     ].includes(type);
   }
@@ -299,12 +298,6 @@ export class EventListener {
         }
         break;
 
-      case 'maintenance.started':
-      case 'maintenance.ended':
-        // Maintenance events don't require cache refresh
-        this.logger.debug('Maintenance event received', { type: event.type });
-        break;
-
       case 'whitelist.updated':
         // Refresh whitelist cache when whitelist is updated
         this.logger.info('Whitelist updated event received, refreshing whitelist cache');
@@ -313,6 +306,17 @@ export class EventListener {
           this.logger.info('Whitelist cache refreshed successfully');
         } catch (error) {
           this.logger.error('Failed to refresh whitelist cache', { error });
+        }
+        break;
+
+      case 'maintenance.settings.updated':
+        // Refresh maintenance cache when maintenance settings are updated
+        this.logger.info('Maintenance settings updated event received, refreshing maintenance cache');
+        try {
+          await this.cacheManager.refreshMaintenance();
+          this.logger.info('Maintenance cache refreshed successfully');
+        } catch (error) {
+          this.logger.error('Failed to refresh maintenance cache', { error });
         }
         break;
 
@@ -426,6 +430,59 @@ export class EventListener {
       });
       throw error;
     }
+  }
+
+
+
+
+
+  /**
+   * Check if service is currently in maintenance
+   */
+  private isInMaintenance(maintenance: any): boolean {
+    if (!maintenance || !maintenance.isMaintenance) {
+      return false;
+    }
+
+    // If no dates provided, maintenance is active
+    if (!maintenance.maintenanceStartDate && !maintenance.maintenanceEndDate) {
+      return true;
+    }
+
+    const now = new Date();
+
+    // Check start date
+    if (maintenance.maintenanceStartDate) {
+      const startDate = new Date(maintenance.maintenanceStartDate);
+      if (now < startDate) {
+        return false; // Not started yet
+      }
+    }
+
+    // Check end date
+    if (maintenance.maintenanceEndDate) {
+      const endDate = new Date(maintenance.maintenanceEndDate);
+      if (now > endDate) {
+        return false; // Already ended
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Emit virtual event to registered listeners
+   */
+  private emitVirtualEvent(type: string, data: any): void {
+    const event: CustomEvent = {
+      type,
+      data,
+      timestamp: Date.now(),
+    };
+
+    this.emitEvent(event).catch((error: any) => {
+      this.logger.error('Failed to emit virtual event', { type, error: error.message });
+    });
   }
 
   /**

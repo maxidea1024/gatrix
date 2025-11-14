@@ -377,7 +377,7 @@ export class PubSubService extends EventEmitter {
    * Publish SDK event to Redis Pub/Sub for real-time delivery to all SDK instances
    * Uses Pub/Sub instead of BullMQ queue to ensure all subscribers receive the event
    */
-  async publishSDKEvent(event: { type: string; data: { id: number | string; timestamp: number; isVisible?: boolean | number; isActive?: boolean | number } }): Promise<void> {
+  async publishSDKEvent(event: { type: string; data: Record<string, any> }): Promise<void> {
     try {
       // Convert MySQL 0/1 to boolean
       const convertedEvent = {
@@ -410,9 +410,9 @@ export class PubSubService extends EventEmitter {
   async publishEvent(event: { type: string; data: { id: number | string; timestamp: number } }): Promise<void> {
     try {
       const client = redisClient.getClient();
-      const eventChannel = 'events:standard';
+      const eventChannel = 'gatrix-sdk-events';
       await client.publish(eventChannel, JSON.stringify(event));
-      logger.debug('Standard event published to channel', { type: event.type, id: event.data.id });
+      logger.info('Standard event published to SDK channel', { type: event.type, id: event.data.id, channel: eventChannel });
     } catch (error: any) {
       logger.error('Failed to publish standard event:', error);
     }

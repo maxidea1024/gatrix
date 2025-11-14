@@ -13,15 +13,11 @@ export interface SDKRequest extends Request {
 export class ServerGameWorldController {
   /**
    * Get game worlds list
-   * GET /api/v1/server/game-worlds?lang=ko
-   * Returns all visible game worlds sorted by displayOrder with tags
-   * Optional query parameter: lang (for maintenance message localization)
+   * GET /api/v1/server/game-worlds
+   * Returns all visible game worlds sorted by displayOrder with tags and all maintenance messages
    */
   static async getGameWorlds(req: SDKRequest, res: Response) {
     try {
-      // Get optional lang parameter for maintenance message localization
-      const lang = (req.query.lang as string) || 'en';
-
       // Helper function to convert MySQL BOOLEAN (0/1) to boolean
       const toBoolean = (value: any): boolean => {
         if (typeof value === 'boolean') return value;
@@ -71,12 +67,23 @@ export class ServerGameWorldController {
             createdAt: world.createdAt
           };
 
-          // Add maintenanceMessage if in maintenance mode
+          // Add maintenance info if in maintenance mode
           if (toBoolean(world.isMaintenance)) {
-            // Get maintenance message in requested language
-            const maintenanceMessage = await GameWorldService.getMaintenanceMessage(world.id, lang);
-            if (maintenanceMessage) {
-              worldData.maintenanceMessage = maintenanceMessage;
+            if (world.maintenanceStartDate) {
+              worldData.maintenanceStartDate = world.maintenanceStartDate;
+            }
+            if (world.maintenanceEndDate) {
+              worldData.maintenanceEndDate = world.maintenanceEndDate;
+            }
+            if (world.maintenanceMessage) {
+              worldData.maintenanceMessage = world.maintenanceMessage;
+            }
+            // Include all maintenance locales if they exist
+            if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
+              worldData.maintenanceLocales = world.maintenanceLocales.map((locale: any) => ({
+                lang: locale.lang,
+                message: locale.message,
+              }));
             }
           }
 
@@ -84,7 +91,7 @@ export class ServerGameWorldController {
         })
       );
 
-      logger.info(`Server SDK: Retrieved ${worldsWithTags.length} visible game worlds (lang: ${lang})`);
+      logger.info(`Server SDK: Retrieved ${worldsWithTags.length} visible game worlds`);
 
       // Return response
       res.json({
@@ -168,12 +175,23 @@ export class ServerGameWorldController {
         createdAt: world.createdAt
       };
 
-      // Add maintenanceMessage if in maintenance mode
+      // Add maintenance info if in maintenance mode
       if (toBoolean(world.isMaintenance)) {
-        const lang = (req.query.lang as string) || 'en';
-        const maintenanceMessage = await GameWorldService.getMaintenanceMessage(world.id, lang);
-        if (maintenanceMessage) {
-          worldData.maintenanceMessage = maintenanceMessage;
+        if (world.maintenanceStartDate) {
+          worldData.maintenanceStartDate = world.maintenanceStartDate;
+        }
+        if (world.maintenanceEndDate) {
+          worldData.maintenanceEndDate = world.maintenanceEndDate;
+        }
+        if (world.maintenanceMessage) {
+          worldData.maintenanceMessage = world.maintenanceMessage;
+        }
+        // Include all maintenance locales if they exist
+        if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
+          worldData.maintenanceLocales = world.maintenanceLocales.map((locale: any) => ({
+            lang: locale.lang,
+            message: locale.message,
+          }));
         }
       }
 
@@ -253,12 +271,23 @@ export class ServerGameWorldController {
         createdAt: world.createdAt
       };
 
-      // Add maintenanceMessage if in maintenance mode
+      // Add maintenance info if in maintenance mode
       if (toBoolean(world.isMaintenance)) {
-        const lang = (req.query.lang as string) || 'en';
-        const maintenanceMessage = await GameWorldService.getMaintenanceMessage(world.id, lang);
-        if (maintenanceMessage) {
-          worldData.maintenanceMessage = maintenanceMessage;
+        if (world.maintenanceStartDate) {
+          worldData.maintenanceStartDate = world.maintenanceStartDate;
+        }
+        if (world.maintenanceEndDate) {
+          worldData.maintenanceEndDate = world.maintenanceEndDate;
+        }
+        if (world.maintenanceMessage) {
+          worldData.maintenanceMessage = world.maintenanceMessage;
+        }
+        // Include all maintenance locales if they exist
+        if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
+          worldData.maintenanceLocales = world.maintenanceLocales.map((locale: any) => ({
+            lang: locale.lang,
+            message: locale.message,
+          }));
         }
       }
 

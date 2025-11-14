@@ -10,6 +10,7 @@ import { CouponRedeemController } from '../../controllers/CouponRedeemController
 import ServerGameWorldController from '../../controllers/ServerGameWorldController';
 import IngamePopupNoticeController from '../../controllers/IngamePopupNoticeController';
 import { SurveyController } from '../../controllers/SurveyController';
+import { MaintenanceController } from '../../controllers/MaintenanceController';
 import serviceDiscoveryRoutes, { getWhitelistsHandler } from './serviceDiscovery';
 
 const router = express.Router();
@@ -82,6 +83,9 @@ router.get('/surveys', serverSDKAuth, SurveyController.getServerSurveys);
 
 // Whitelist routes
 router.get('/whitelists', serverSDKAuth, getWhitelistsHandler);
+
+// Maintenance routes
+router.get('/maintenance', serverSDKAuth, MaintenanceController.getStatus as any);
 
 // Service discovery routes
 router.use('/services', serviceDiscoveryRoutes);

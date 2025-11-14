@@ -104,30 +104,15 @@ const SurveysPage: React.FC = () => {
   });
 
   // Extract filter values from activeFilters
-  const isActiveFilter = useMemo(() => {
-    const filter = activeFilters.find(f => f.key === 'isActive');
-    return filter?.value;
-  }, [activeFilters]);
-
   const conditionTypeFilter = useMemo(() => {
     const filter = activeFilters.find(f => f.key === 'conditionType');
     return filter?.value;
   }, [activeFilters]);
 
-  const isActiveFilterString = useMemo(() => JSON.stringify(isActiveFilter), [isActiveFilter]);
   const conditionTypeFilterString = useMemo(() => JSON.stringify(conditionTypeFilter), [conditionTypeFilter]);
 
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = [
-    {
-      key: 'isActive',
-      label: t('surveys.status'),
-      type: 'select',
-      options: [
-        { value: 'true', label: t('common.active') },
-        { value: 'false', label: t('common.inactive') },
-      ],
-    },
     {
       key: 'conditionType',
       label: t('surveys.conditionType'),
@@ -148,11 +133,6 @@ const SurveysPage: React.FC = () => {
       const filters: any = {
         search: debouncedSearchTerm || undefined,
       };
-
-      // Apply active filters
-      if (isActiveFilter !== undefined && isActiveFilter !== '') {
-        filters.isActive = isActiveFilter === 'true';
-      }
 
       if (conditionTypeFilter && Array.isArray(conditionTypeFilter) && conditionTypeFilter.length > 0) {
         filters.conditionType = conditionTypeFilter;
@@ -186,7 +166,7 @@ const SurveysPage: React.FC = () => {
 
   useEffect(() => {
     loadSurveys();
-  }, [page, rowsPerPage, debouncedSearchTerm, isActiveFilterString, conditionTypeFilterString]);
+  }, [page, rowsPerPage, debouncedSearchTerm, conditionTypeFilterString]);
 
   // Filter handlers
   const handleFilterAdd = (filter: ActiveFilter) => {

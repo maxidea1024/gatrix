@@ -19,16 +19,13 @@ export class GameWorldService {
 
   /**
    * Get all game worlds
-   * GET /api/v1/server/game-worlds?lang=ko
+   * GET /api/v1/server/game-worlds
    */
-  async list(lang: string = 'en'): Promise<GameWorld[]> {
-    this.logger.debug('Fetching game worlds', { lang });
+  async list(): Promise<GameWorld[]> {
+    this.logger.debug('Fetching game worlds');
 
     const response = await this.apiClient.get<GameWorldListResponse>(
-      `/api/v1/server/game-worlds`,
-      {
-        params: { lang },
-      }
+      `/api/v1/server/game-worlds`
     );
 
     if (!response.success || !response.data) {
@@ -93,9 +90,9 @@ export class GameWorldService {
   /**
    * Refresh cached game worlds
    */
-  async refresh(lang: string = 'en'): Promise<GameWorld[]> {
+  async refresh(): Promise<GameWorld[]> {
     this.logger.info('Refreshing game worlds cache');
-    return await this.list(lang);
+    return await this.list();
   }
 
   /**
@@ -178,11 +175,25 @@ export class GameWorldService {
   }
 
   /**
-   * Get maintenance message for a world
+   * Get maintenance message for a world with language support
+   * Falls back to default message if language not found
    */
-  getMaintenanceMessage(worldId: string): string | undefined {
+  getMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
     const world = this.cachedWorlds.find((w) => w.worldId === worldId);
-    return world?.maintenanceMessage;
+    if (!world || !world.isMaintenance) {
+      return null;
+    }
+
+    // Try to find localized message
+    if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
+      const locale = world.maintenanceLocales.find((l: any) => l.lang === lang);
+      if (locale) {
+        return locale.message;
+      }
+    }
+
+    // Fallback to default message
+    return world.maintenanceMessage || null;
   }
 }
 

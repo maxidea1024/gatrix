@@ -2268,6 +2268,7 @@
     "clientVersions": "客户端版本",
     "gameWorlds": "游戏世界",
     "maintenance": "服务维护",
+    "serviceMaintenances": "服务维护管理",
     "maintenanceTemplates": "消息模板",
     "scheduleManagement": "计划管理",
     "scheduler": "计划",

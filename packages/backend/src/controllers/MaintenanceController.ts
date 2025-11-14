@@ -8,8 +8,8 @@ export interface MaintenancePayload {
   type?: 'regular' | 'emergency';
   startsAt?: string | null; // ISO string (optional)
   endsAt?: string | null; // ISO string (optional)
-  message?: string; // default message
-  messages?: { ko?: string; en?: string; zh?: string };
+  message: string; // default message (required when isMaintenance is true)
+  localeMessages?: { ko?: string; en?: string; zh?: string };
 }
 
 const KEY = 'isMaintenance';
@@ -33,7 +33,7 @@ export class MaintenanceController {
       const detailRaw = await VarsModel.get(KEY_DETAIL);
       const detail = detailRaw ? JSON.parse(detailRaw) : null;
       const isUnderMaintenance = computeActive(is, detail);
-      res.json({ success: true, data: { isUnderMaintenance, detail } });
+      res.json({ success: true, data: { isUnderMaintenance, ...(isUnderMaintenance && detail ? { detail } : {}) } });
     } catch (e) { next(e); }
   }
 
@@ -41,49 +41,66 @@ export class MaintenanceController {
     try {
       const payload = req.body as MaintenancePayload;
 
-      // Validate: when starting maintenance, a message must be provided (default or any locale)
+      // Validate: when starting maintenance, default message must be provided
       if (payload.isMaintenance) {
-        const hasDefault = !!(payload.message && payload.message.trim());
-        const hasLocales = !!payload.messages && Object.values(payload.messages).some((v) => !!(v && (v as string).trim()));
-        if (!hasDefault && !hasLocales) {
+        if (!payload.message || !payload.message.trim()) {
           return res.status(400).json({ success: false, message: 'Maintenance message is required to start maintenance.' });
+        }
+
+        // Validate time settings
+        const startsAt = payload.startsAt ? new Date(payload.startsAt) : null;
+        const endsAt = payload.endsAt ? new Date(payload.endsAt) : null;
+
+        // If both times are set, endsAt must be after startsAt
+        if (startsAt && endsAt && endsAt <= startsAt) {
+          return res.status(400).json({ success: false, message: 'End time must be after start time.' });
+        }
+
+        // If only endsAt is set, it must be in the future
+        if (!startsAt && endsAt) {
+          const now = new Date();
+          if (endsAt <= now) {
+            return res.status(400).json({ success: false, message: 'End time must be in the future.' });
+          }
         }
       }
 
       const userId = (req as any).user?.userId || (req as any).user?.id;
-      const user = (req as any).user;
       await VarsModel.set(KEY, payload.isMaintenance ? 'true' : 'false', userId);
-      const detail = {
+
+      const detail: any = {
         type: payload.type || 'regular',
         startsAt: payload.startsAt || null,
         endsAt: payload.endsAt || null,
-        message: payload.message || '',
-        messages: payload.messages || {},
-        updatedAt: new Date().toISOString(),
-        updatedBy: user ? {
-          id: userId,
-          name: user.name || user.email || 'Unknown',
-          email: user.email || 'unknown@example.com'
-        } : null,
+        message: payload.message,
       };
+      // Only include localeMessages if provided
+      if (payload.localeMessages && Object.keys(payload.localeMessages).length > 0) {
+        detail.localeMessages = payload.localeMessages;
+      }
       await VarsModel.set(KEY_DETAIL, JSON.stringify(detail), userId);
 
       const isUnderMaintenance = computeActive(payload.isMaintenance ? 'true' : 'false', detail);
 
+      // Publish maintenance.settings.updated event to SDK
+      await pubSubService.publishEvent({
+        type: 'maintenance.settings.updated',
+        data: { id: 'maintenance', timestamp: Date.now() }
+      });
+
       // Broadcast via PubSub so all instances fan-out to their SSE clients
       await pubSubService.publishNotification({
         type: 'maintenance_status_change',
-        data: { isUnderMaintenance, detail },
+        data: { isUnderMaintenance, ...(isUnderMaintenance && detail ? { detail } : {}) },
         targetChannels: ['admin', 'general']
       });
-      const sentCount = 0; // fan-out happens asynchronously per instance
 
-      logger.info(`Maintenance status change notification sent to ${sentCount} clients`, {
+      logger.info(`Maintenance settings updated and event published`, {
         isUnderMaintenance,
         targetChannels: ['admin', 'general']
       });
 
-      res.json({ success: true, message: 'Maintenance setting updated', data: { isUnderMaintenance, detail } });
+      res.json({ success: true, message: 'Maintenance setting updated', data: { isUnderMaintenance, ...(isUnderMaintenance && detail ? { detail } : {}) } });
     } catch (e) { next(e); }
   }
 

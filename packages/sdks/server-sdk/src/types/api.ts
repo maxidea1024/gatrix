@@ -56,6 +56,7 @@ export interface GameWorld {
   name: string;
   isMaintenance: boolean;
   maintenanceMessage?: string;
+  maintenanceLocales?: Array<{ lang: string; message: string }>;
   displayOrder: number;
   customPayload?: Record<string, any>;
   worldServerAddress: string; // Required: ip:port format (e.g., 192.168.1.100:8080)

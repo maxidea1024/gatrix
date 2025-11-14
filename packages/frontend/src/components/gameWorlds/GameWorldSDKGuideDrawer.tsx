@@ -46,7 +46,6 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
   const [appName, setAppName] = useState('MyGameApp');
   const [page, setPage] = useState('1');
   const [limit, setLimit] = useState('10');
-  const [lang, setLang] = useState('');
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
@@ -64,10 +63,9 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
     try {
       const saved = localStorage.getItem('gameWorldSDKGuide_testInputs');
       if (saved) {
-        const { apiToken: savedToken, appName: savedAppName, lang: savedLang } = JSON.parse(saved);
+        const { apiToken: savedToken, appName: savedAppName } = JSON.parse(saved);
         if (savedToken) setApiToken(savedToken);
         if (savedAppName) setAppName(savedAppName);
-        if (savedLang) setLang(savedLang);
       }
     } catch (error) {
       // Silently ignore localStorage errors
@@ -80,17 +78,15 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
       localStorage.setItem('gameWorldSDKGuide_testInputs', JSON.stringify({
         apiToken,
         appName,
-        lang,
       }));
     } catch (error) {
       // Silently ignore localStorage errors
     }
-  }, [apiToken, appName, lang]);
+  }, [apiToken, appName]);
 
   // curl example code
   const curlExample = `# Get Game Worlds List API Example
-# Optional: Add ?lang=ko for Korean maintenance messages (ko, en, zh supported)
-curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
+curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
   -H "X-API-Token: your-api-token-here"`;
@@ -178,10 +174,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
     const startTime = performance.now();
 
     try {
-      let url = `/api/v1/server/game-worlds`;
-      if (lang.trim()) {
-        url += `?lang=${encodeURIComponent(lang)}`;
-      }
+      const url = `/api/v1/server/game-worlds`;
 
       const response = await fetch(
         url,

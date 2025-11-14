@@ -207,8 +207,8 @@ export class GatrixServerSDK {
   /**
    * Get all game worlds
    */
-  async getGameWorlds(lang: string = 'en'): Promise<GameWorld[]> {
-    return await this.gameWorld.list(lang);
+  async getGameWorlds(): Promise<GameWorld[]> {
+    return await this.gameWorld.list();
   }
 
   /**
@@ -242,8 +242,23 @@ export class GatrixServerSDK {
   /**
    * Get maintenance message for a world
    */
-  getMaintenanceMessage(worldId: string): string | undefined {
-    return this.gameWorld.getMaintenanceMessage(worldId);
+  getMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
+    return this.gameWorld.getMaintenanceMessage(worldId, lang);
+  }
+
+  /**
+   * Get global maintenance status
+   */
+  async getMaintenanceStatus() {
+    const response = await this.apiClient.get('/api/v1/server/maintenance');
+    return response.data;
+  }
+
+  /**
+   * Get cached global maintenance status
+   */
+  getCachedMaintenanceStatus() {
+    return this.cacheManager?.getCachedMaintenance();
   }
 
   // ============================================================================
@@ -505,20 +520,6 @@ export class GatrixServerSDK {
    */
   getServiceType(): string | undefined {
     return this.serviceDiscovery.getServiceType();
-  }
-
-  /**
-   * Check if service type is in maintenance
-   */
-  async isServiceInMaintenance(serviceType: string): Promise<boolean> {
-    return await this.serviceDiscovery.isServiceInMaintenance(serviceType);
-  }
-
-  /**
-   * Get maintenance message for service type
-   */
-  async getServiceMaintenanceMessage(serviceType: string, lang?: 'ko' | 'en' | 'zh'): Promise<string | null> {
-    return await this.serviceDiscovery.getServiceMaintenanceMessage(serviceType, lang);
   }
 
   /**

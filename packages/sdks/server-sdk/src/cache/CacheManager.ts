@@ -12,6 +12,19 @@ import { WhitelistService } from '../services/WhitelistService';
 import { ApiClient } from '../client/ApiClient';
 import { SdkMetrics } from '../utils/sdkMetrics';
 
+export interface MaintenanceDetail {
+  type: 'regular' | 'emergency';
+  startsAt: string | null;
+  endsAt: string | null;
+  message: string;
+  localeMessages?: { ko?: string; en?: string; zh?: string };
+}
+
+export interface MaintenanceStatus {
+  isUnderMaintenance: boolean;
+  detail: MaintenanceDetail | null;
+}
+
 export class CacheManager {
   private logger: Logger;
   private config: CacheConfig;
@@ -23,6 +36,7 @@ export class CacheManager {
   private refreshInterval?: NodeJS.Timeout;
   private refreshCallbacks: Array<(type: string, data: any) => void> = [];
   private metrics?: SdkMetrics;
+  private cachedMaintenance: MaintenanceStatus | null = null;
 
   constructor(
     config: CacheConfig,
@@ -98,6 +112,9 @@ export class CacheManager {
         this.whitelistService.list().catch((error) => {
           this.logger.warn('Failed to load whitelists', { error: error.message });
           return { ipWhitelist: [], accountWhitelist: [] };
+        }),
+        this.refreshMaintenance().catch((error) => {
+          this.logger.warn('Failed to load maintenance status', { error: error.message });
         }),
       ]);
 
@@ -200,6 +217,9 @@ export class CacheManager {
         this.whitelistService.refresh().catch((error) => {
           this.logger.warn('Failed to refresh whitelists', { error: error.message });
         }),
+        this.refreshMaintenance().catch((error) => {
+          this.logger.warn('Failed to refresh maintenance', { error: error.message });
+        }),
       ]);
 
       try {
@@ -215,7 +235,7 @@ export class CacheManager {
       if (this.config.refreshMethod === 'polling') {
         this.emitRefreshEvent('cache.refreshed', {
           timestamp: new Date().toISOString(),
-          types: ['gameworld', 'popup', 'survey', 'whitelist'],
+          types: ['gameworld', 'popup', 'survey', 'whitelist', 'maintenance'],
         });
       }
     } catch (error: any) {
@@ -354,6 +374,36 @@ export class CacheManager {
    */
   getCachedWhitelists() {
     return this.whitelistService.getCached();
+  }
+
+  /**
+   * Refresh maintenance status
+   */
+  async refreshMaintenance(): Promise<void> {
+    this.logger.info('Refreshing maintenance cache...');
+    const start = process.hrtime.bigint();
+    try {
+      const response = await this.apiClient.get<MaintenanceStatus>('/api/v1/server/maintenance');
+      if (response.success && response.data) {
+        this.cachedMaintenance = response.data;
+        this.emitRefreshEvent('maintenance', response.data);
+      }
+      const duration = Number(process.hrtime.bigint() - start) / 1e9;
+      try {
+        this.metrics?.incRefresh('maintenance');
+        this.metrics?.observeRefresh('maintenance', duration);
+        this.metrics?.setLastRefresh('maintenance');
+      } catch (_) {}
+    } catch (error: any) {
+      this.logger.warn('Failed to refresh maintenance status', { error: error.message });
+    }
+  }
+
+  /**
+   * Get cached maintenance status
+   */
+  getCachedMaintenance(): MaintenanceStatus | null {
+    return this.cachedMaintenance;
   }
 
   /**

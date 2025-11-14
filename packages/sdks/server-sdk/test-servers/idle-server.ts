@@ -149,6 +149,21 @@ async function main() {
       printCachedData();
     });
 
+    sdk.on('maintenance.settings.updated', (event) => {
+      logger.info('MAINTENANCE SETTINGS UPDATED', event.data);
+      printCachedData();
+    });
+
+    sdk.on('maintenance.started', (event) => {
+      logger.info('MAINTENANCE STARTED', event.data);
+      printCachedData();
+    });
+
+    sdk.on('maintenance.ended', (event) => {
+      logger.info('MAINTENANCE ENDED', event.data);
+      printCachedData();
+    });
+
     // Helper function to print cached data
     function printCachedData() {
       const surveysData = sdk.getCachedSurveys();
@@ -157,6 +172,7 @@ async function main() {
         popupNotices: sdk.getCachedPopupNotices(),
         surveys: surveysData,
         whitelists: sdk.whitelist.getCached(),
+        maintenance: sdk.getCachedMaintenanceStatus(),
         timestamp: new Date().toISOString(),
       };
 

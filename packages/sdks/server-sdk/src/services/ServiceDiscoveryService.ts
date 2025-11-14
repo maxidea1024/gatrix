@@ -276,62 +276,6 @@ export class ServiceDiscoveryService {
   }
 
   /**
-   * Check if service type is in maintenance
-   * GET /api/v1/server/services/maintenance/:serviceType
-   */
-  async isServiceInMaintenance(serviceType: string): Promise<boolean> {
-    this.logger.debug('Checking maintenance status via API', { serviceType });
-
-    const response = await this.apiClient.get<{ serviceType: string; isInMaintenance: boolean }>(
-      `/api/v1/server/services/maintenance/${serviceType}`
-    );
-
-    if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to check maintenance status');
-    }
-
-    this.logger.info('Maintenance status checked via API', {
-      serviceType,
-      isInMaintenance: response.data.isInMaintenance
-    });
-
-    return response.data.isInMaintenance;
-  }
-
-  /**
-   * Get maintenance message for service type
-   * GET /api/v1/server/services/maintenance/:serviceType/message?lang=ko
-   */
-  async getServiceMaintenanceMessage(serviceType: string, lang?: 'ko' | 'en' | 'zh'): Promise<string | null> {
-    this.logger.debug('Fetching maintenance message via API', { serviceType, lang });
-
-    const params: any = {};
-    if (lang) {
-      params.lang = lang;
-    }
-
-    const response = await this.apiClient.get<{
-      serviceType: string;
-      isInMaintenance: boolean;
-      message: string | null;
-      startTime?: string;
-      endTime?: string;
-    }>(`/api/v1/server/services/maintenance/${serviceType}/message`, { params });
-
-    if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to get maintenance message');
-    }
-
-    this.logger.info('Maintenance message fetched via API', {
-      serviceType,
-      isInMaintenance: response.data.isInMaintenance,
-      hasMessage: !!response.data.message
-    });
-
-    return response.data.message;
-  }
-
-  /**
    * Get whitelists (IP and Account)
    * GET /api/v1/server/whitelists
    */

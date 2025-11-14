@@ -32,7 +32,6 @@ import ingamePopupNoticeRoutes from './ingamePopupNotices';
 import planningDataRoutes from './planningData';
 import couponSettingsRoutes from './couponSettings';
 import serviceDiscoveryRoutes from './serviceDiscovery';
-
 import monitoringAlertRoutes from './monitoringAlerts';
 
 const router = express.Router();

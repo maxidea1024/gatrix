@@ -66,6 +66,7 @@ import WhitelistPage from './pages/admin/WhitelistPage';
 import ClientVersionsPage from './pages/admin/ClientVersionsPage';
 import AuditLogsPage from './pages/admin/AuditLogsPage';
 import MaintenancePage from './pages/admin/MaintenancePage';
+import ServiceMaintenancesPage from './pages/admin/ServiceMaintenancesPage';
 import MessageTemplatesPage from './pages/admin/MessageTemplatesPage';
 import SchedulerPage from './pages/admin/SchedulerPage';
 

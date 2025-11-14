@@ -7,7 +7,6 @@
 import express from 'express';
 import { serverSDKAuth } from '../../middleware/apiTokenAuth';
 import serviceDiscoveryService from '../../services/serviceDiscoveryService';
-import ServiceMaintenanceModel from '../../models/ServiceMaintenance';
 import { IpWhitelistModel } from '../../models/IpWhitelist';
 import { WhitelistModel } from '../../models/AccountWhitelist';
 import logger from '../../config/logger';
@@ -366,121 +365,6 @@ router.get('/:serviceType/:instanceId', serverSDKAuth, async (req: any, res: any
     res.status(500).json({
       success: false,
       error: error.message || 'Failed to get service',
-    });
-  }
-});
-
-/**
- * Check if service type is in maintenance
- * GET /api/v1/server/services/maintenance/:serviceType
- */
-router.get('/maintenance/:serviceType', serverSDKAuth, async (req: any, res: any) => {
-  try {
-    const { serviceType } = req.params;
-
-    if (!serviceType) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'serviceType is required' },
-      });
-    }
-
-    const isInMaintenance = await ServiceMaintenanceModel.isInMaintenance(serviceType);
-
-    res.json({
-      success: true,
-      data: {
-        serviceType,
-        isInMaintenance,
-      },
-    });
-  } catch (error: any) {
-    logger.error('Failed to check maintenance status:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to check maintenance status',
-    });
-  }
-});
-
-/**
- * Get maintenance message for service type
- * GET /api/v1/server/services/maintenance/:serviceType/message?lang=ko
- */
-router.get('/maintenance/:serviceType/message', serverSDKAuth, async (req: any, res: any) => {
-  try {
-    const { serviceType } = req.params;
-    const { lang } = req.query;
-
-    if (!serviceType) {
-      return res.status(400).json({
-        success: false,
-        error: { message: 'serviceType is required' },
-      });
-    }
-
-    const maintenance = await ServiceMaintenanceModel.getByServiceType(serviceType);
-
-    if (!maintenance || !maintenance.isInMaintenance) {
-      return res.json({
-        success: true,
-        data: {
-          serviceType,
-          isInMaintenance: false,
-          message: null,
-        },
-      });
-    }
-
-    // Check time-based maintenance
-    const now = new Date();
-    if (maintenance.maintenanceStartDate && new Date(maintenance.maintenanceStartDate) > now) {
-      return res.json({
-        success: true,
-        data: {
-          serviceType,
-          isInMaintenance: false,
-          message: null,
-        },
-      });
-    }
-    if (maintenance.maintenanceEndDate && new Date(maintenance.maintenanceEndDate) < now) {
-      return res.json({
-        success: true,
-        data: {
-          serviceType,
-          isInMaintenance: false,
-          message: null,
-        },
-      });
-    }
-
-    // Get localized message
-    let message = maintenance.maintenanceMessage;
-    if (maintenance.supportsMultiLanguage && maintenance.maintenanceLocales && lang) {
-      const locale = maintenance.maintenanceLocales.find(l => l.lang === lang);
-      if (locale) {
-        message = locale.message;
-      } else if (maintenance.maintenanceLocales.length > 0) {
-        message = maintenance.maintenanceLocales[0].message;
-      }
-    }
-
-    res.json({
-      success: true,
-      data: {
-        serviceType,
-        isInMaintenance: true,
-        message,
-        startTime: maintenance.maintenanceStartDate,
-        endTime: maintenance.maintenanceEndDate,
-      },
-    });
-  } catch (error: any) {
-    logger.error('Failed to get maintenance message:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to get maintenance message',
     });
   }
 });
