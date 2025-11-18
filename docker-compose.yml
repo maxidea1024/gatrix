@@ -375,7 +375,7 @@ services:
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
       VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:54000}
-      VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:55000/bull-board}
+      VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:53000/bull-board}
 
     ports:
       - "${FRONTEND_PORT:-53000}:80"

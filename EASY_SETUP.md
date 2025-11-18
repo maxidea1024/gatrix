@@ -88,33 +88,71 @@ Run the setup script to automatically generate the `.env` file with secure encry
 
 **For Production (Linux/Mac):**
 ```bash
+# English (default)
 ./setup-env.sh example.com production
+
+# Chinese (for China deployment)
+./setup-env.sh example.cn production zh
 ```
 
 **For Production (Windows PowerShell):**
 ```powershell
+# English (default)
 .\setup-env.ps1 -HostAddress example.com -Environment production
+
+# Chinese (for China deployment)
+.\setup-env.ps1 -HostAddress example.cn -Environment production -DefaultLanguage zh
 ```
 
-**With Custom Admin Password (Optional):**
+**With Custom Options:**
 
-**Linux/Mac:**
+**Custom Admin Password (Linux/Mac):**
 ```bash
 ./setup-env.sh localhost development ko --admin-password "MySecurePassword123"
 ```
 
-**Windows PowerShell:**
+**Custom Admin Password (Windows PowerShell):**
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "MySecurePassword123"
+```
+
+**Custom Protocol (Linux/Mac):**
+```bash
+# Use HTTPS in development
+./setup-env.sh localhost development ko --protocol https
+
+# Use HTTP in production (for testing)
+./setup-env.sh example.com production en --protocol http
+
+# Chinese language for China deployment
+./setup-env.sh example.cn production zh --protocol http
+```
+
+**Custom Protocol (Windows PowerShell):**
+```powershell
+# Use HTTPS in development
+.\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https
+
+# Use HTTP in production (for testing)
+.\setup-env.ps1 -HostAddress example.com -Environment production -Protocol http
+
+# Chinese language for China deployment
+.\setup-env.ps1 -HostAddress example.cn -Environment production -DefaultLanguage zh -Protocol http
 ```
 
 The script will:
 - Generate secure encryption keys automatically
 - Configure database and Redis for Docker
-- Set up default language (Korean, or specified language)
+- Set up default language (Korean `ko`, English `en`, or Chinese `zh`)
 - Set admin password (default: admin123, or custom if provided)
+- Set protocol (default: http for development, https for production)
 - Create a backup if `.env` already exists
 - Automatically select the correct docker-compose file based on environment
+
+**Supported Languages:**
+- `ko` - Korean (한국어) - Default for development
+- `en` - English - Default for production
+- `zh` - Chinese (中文) - For China deployment
 
 ### Step 2: Build Docker Environment
 
@@ -165,10 +203,16 @@ Open your browser and navigate to:
 http://localhost:53000
 ```
 
-**Production:**
+**Production (HTTPS - default):**
 ```
 https://example.com:53000
 ```
+
+**Production (HTTP - if configured with --protocol http):**
+```
+http://example.com:53000
+```
+
 (Replace `example.com` with your actual domain)
 
 ## Default Credentials
@@ -342,8 +386,30 @@ These scripts will:
    pipeline {
      agent any
 
+     environment {
+       // Set your production host address
+       HOST_ADDRESS = 'example.com'
+       ENVIRONMENT = 'production'
+       PROTOCOL = 'http' // or 'https' for secure connection
+       DEFAULT_LANGUAGE = 'en' // ko, en, or zh
+       ADMIN_PASSWORD = credentials('gatrix-admin-password') // Store in Jenkins credentials
+     }
+
      stages {
-       stage('Setup') {
+       stage('Generate Configuration') {
+         steps {
+           sh '''
+             # Generate .env file with production settings
+             ./setup-env.sh ${HOST_ADDRESS} ${ENVIRONMENT} ${DEFAULT_LANGUAGE} \
+               --admin-password "${ADMIN_PASSWORD}" \
+               --protocol ${PROTOCOL} \
+               --force \
+               --nobackup
+           '''
+         }
+       }
+
+       stage('Setup Dependencies') {
          steps {
            sh './scripts/setup.sh'
          }
@@ -363,21 +429,97 @@ These scripts will:
 
        stage('Deploy') {
          steps {
-           sh 'docker-compose -f docker-compose.yml up -d'
+           sh 'docker-compose -f docker-compose.yml up -d --build'
          }
+       }
+     }
+
+     post {
+       success {
+         echo 'Deployment successful!'
+       }
+       failure {
+         echo 'Deployment failed!'
        }
      }
    }
    ```
 
-4. **Configure webhooks** (optional):
+4. **Configure Jenkins Credentials:**
+   - Go to Jenkins > Credentials > System > Global credentials
+   - Add a new "Secret text" credential:
+     - ID: `gatrix-admin-password`
+     - Secret: Your admin password
+     - Description: Gatrix Admin Password
+
+5. **Configure webhooks** (optional):
    - Set up GitHub/GitLab webhooks to trigger builds automatically on push
+
+### Important Notes for Jenkins
+
+- **Environment Variables:** Configure these in the pipeline script:
+  - `HOST_ADDRESS`: Your production domain (e.g., `example.com`)
+  - `ENVIRONMENT`: `development` or `production`
+  - `PROTOCOL`: `http` (default) or `https` (for secure connection)
+  - `DEFAULT_LANGUAGE`: `ko`, `en`, or `zh`
+  - `ADMIN_PASSWORD`: Stored in Jenkins credentials (see step 4)
+
+- **Admin Password:** Store the admin password in Jenkins credentials for security
+- **Force Flag:** The `--force` flag overwrites existing `.env` file on each build
+- **NoBackup Flag:** The `--nobackup` flag prevents creating backup files in CI/CD environment
+
+### Example Configurations
+
+**Production with HTTP (default):**
+```groovy
+environment {
+  HOST_ADDRESS = 'example.com'
+  ENVIRONMENT = 'production'
+  PROTOCOL = 'http'
+  DEFAULT_LANGUAGE = 'en'
+  ADMIN_PASSWORD = credentials('gatrix-admin-password')
+}
+```
+
+**Production with HTTPS (secure):**
+```groovy
+environment {
+  HOST_ADDRESS = 'example.com'
+  ENVIRONMENT = 'production'
+  PROTOCOL = 'https'
+  DEFAULT_LANGUAGE = 'en'
+  ADMIN_PASSWORD = credentials('gatrix-admin-password')
+}
+```
+
+**Production for China (Chinese language):**
+```groovy
+environment {
+  HOST_ADDRESS = 'example.cn'
+  ENVIRONMENT = 'production'
+  PROTOCOL = 'http'
+  DEFAULT_LANGUAGE = 'zh'
+  ADMIN_PASSWORD = credentials('gatrix-admin-password')
+}
+```
+
+**Development (Korean):**
+```groovy
+environment {
+  HOST_ADDRESS = 'dev.example.com'
+  ENVIRONMENT = 'development'
+  PROTOCOL = 'http'
+  DEFAULT_LANGUAGE = 'ko'
+  ADMIN_PASSWORD = credentials('gatrix-admin-password')
+}
+```
 
 ### Troubleshooting Jenkins Setup
 
 - **Node.js not found:** Ensure Node.js 22 LTS is installed on the Jenkins agent
-- **Permission denied:** Make sure scripts have execute permissions: `chmod +x scripts/setup.sh`
+- **Permission denied:** Make sure scripts have execute permissions: `chmod +x setup-env.sh scripts/setup.sh`
 - **Docker not available:** Install Docker on the Jenkins agent or use Docker-in-Docker
+- **.env file issues:** Check Jenkins console output for setup-env.sh errors
 
 ## Force Overwrite Configuration
 
@@ -403,22 +545,41 @@ If you need to regenerate the `.env` file:
 .\setup-env.ps1 -HostAddress example.com -Environment production -Force
 ```
 
-**With Custom Admin Password:**
+**With Custom Options:**
 
-**Linux/Mac:**
+**Custom Admin Password (Linux/Mac):**
 ```bash
 ./setup-env.sh localhost development ko --admin-password "NewPassword123" --force
 ```
 
-**Windows PowerShell:**
+**Custom Admin Password (Windows PowerShell):**
 ```powershell
 .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "NewPassword123" -Force
+```
+
+**Custom Protocol (Linux/Mac):**
+```bash
+# HTTPS with Korean
+./setup-env.sh localhost development ko --protocol https --force
+
+# HTTP with Chinese
+./setup-env.sh example.cn production zh --protocol http --force
+```
+
+**Custom Protocol (Windows PowerShell):**
+```powershell
+# HTTPS with Korean
+.\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https -Force
+
+# HTTP with Chinese
+.\setup-env.ps1 -HostAddress example.cn -Environment production -DefaultLanguage zh -Protocol http -Force
 ```
 
 This will:
 - Backup the existing `.env` file (`.env.backup.TIMESTAMP`)
 - Generate new encryption keys
 - Set new admin password (if provided)
+- Set protocol (if provided)
 - Regenerate the configuration file
 
 ## Complete Reset (Start from Scratch)
@@ -470,11 +631,14 @@ Follow the **Quick Start** section from the beginning:
 
 1. Generate new configuration:
    ```bash
-   # Development
+   # Development (Korean)
    ./setup-env.sh localhost development
 
-   # Production
+   # Production (English)
    ./setup-env.sh example.com production
+
+   # Production (Chinese for China)
+   ./setup-env.sh example.cn production zh
    ```
 
 2. Build Docker environment:

@@ -235,15 +235,15 @@ function Create-EnvFile {
             $newLines += "DEFAULT_LANGUAGE=$DefaultLanguage"
         } elseif ($line -match "^VITE_GRAFANA_URL=") {
             if ($Environment -eq "development") {
-                $newLines += "VITE_GRAFANA_URL=http://localhost:54000"
+                $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://localhost:54000"
             } else {
                 $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:54000"
             }
         } elseif ($line -match "^VITE_BULL_BOARD_URL=") {
             if ($Environment -eq "development") {
-                $newLines += "VITE_BULL_BOARD_URL=http://localhost:53000/bull-board"
+                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://localhost:53000/bull-board"
             } else {
-                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress`:55000/bull-board"
+                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress`:53000/bull-board"
             }
         } elseif ($line -match "^ADMIN_PASSWORD=") {
             $newLines += "ADMIN_PASSWORD=$AdminPassword"
