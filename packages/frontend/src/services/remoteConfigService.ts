@@ -40,7 +40,7 @@ export interface DeployRequest {
   templateId?: number;
   environmentId?: number;
   changeDescription?: string;
-  changes: any[];
+  changes?: any[];
 }
 
 class RemoteConfigService {
@@ -55,7 +55,7 @@ class RemoteConfigService {
       });
 
       // Transform template version data to deployment history format
-      const deployments = response.data.data.versions.map((version: any) => ({
+      const deployments = response.data.versions.map((version: any) => ({
         id: version.id.toString(),
         version: version.version,
         environmentId: 1, // Default environment for now
@@ -72,10 +72,10 @@ class RemoteConfigService {
 
       return {
         deployments,
-        totalCount: response.data.data.total || deployments.length,
-        page: response.data.data.page || page,
-        limit: response.data.data.limit || limit,
-        totalPages: response.data.data.totalPages || Math.ceil((response.data.data.total || deployments.length) / limit)
+        totalCount: response.data.total || deployments.length,
+        page: response.data.page || page,
+        limit: response.data.limit || limit,
+        totalPages: response.data.totalPages || Math.ceil((response.data.total || deployments.length) / limit)
       };
     } catch (error) {
       console.error('Failed to fetch deployment history from template versions:', error);
@@ -224,11 +224,11 @@ class RemoteConfigService {
     try {
       const response = await api.get('/admin/remote-config/template');
 
-      if (!response.data.success) {
-        throw new Error(response.data.error?.message || 'Failed to get template');
+      if (!response.success) {
+        throw new Error(response.error?.message || 'Failed to get template');
       }
 
-      return response.data.data.templateData;
+      return response.data.templateData;
     } catch (error) {
       console.error('Error getting template:', error);
       throw error;
@@ -244,8 +244,8 @@ class RemoteConfigService {
         templateData
       });
 
-      if (!response.data.success) {
-        throw new Error(response.data.error?.message || 'Failed to update template');
+      if (!response.success) {
+        throw new Error(response.error?.message || 'Failed to update template');
       }
     } catch (error) {
       console.error('Error updating template:', error);
@@ -265,11 +265,11 @@ class RemoteConfigService {
         description
       });
 
-      if (!response.data.success) {
-        throw new Error(response.data.error?.message || 'Failed to add parameter');
+      if (!response.success) {
+        throw new Error(response.error?.message || 'Failed to add parameter');
       }
 
-      return response.data.data.parameter;
+      return response.data.parameter;
     } catch (error) {
       console.error('Error adding parameter:', error);
       throw error;
@@ -287,11 +287,11 @@ class RemoteConfigService {
         description
       });
 
-      if (!response.data.success) {
-        throw new Error(response.data.error?.message || 'Failed to update parameter');
+      if (!response.success) {
+        throw new Error(response.error?.message || 'Failed to update parameter');
       }
 
-      return response.data.data.parameter;
+      return response.data.parameter;
     } catch (error) {
       console.error('Error updating parameter:', error);
       throw error;
@@ -305,8 +305,8 @@ class RemoteConfigService {
     try {
       const response = await api.delete(`/admin/remote-config/parameter/${key}`);
 
-      if (!response.data.success) {
-        throw new Error(response.data.error?.message || 'Failed to delete parameter');
+      if (!response.success) {
+        throw new Error(response.error?.message || 'Failed to delete parameter');
       }
     } catch (error) {
       console.error('Error deleting parameter:', error);
