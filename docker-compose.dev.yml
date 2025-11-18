@@ -50,12 +50,9 @@ services:
     image: prom/mysqld-exporter:latest
     container_name: gatrix-mysql-exporter-dev
     restart: unless-stopped
-    environment:
-      MYSQLD_EXPORTER_PASSWORD: "${DB_ROOT_PASSWORD:-rootpassword}"
     command:
-      - "--config.my-cnf=/etc/mysql/.my.cnf"
-    volumes:
-      - ./docker/mysql/exporter/.my.cnf:/etc/mysql/.my.cnf:ro
+      - "--mysqld.username=root:${DB_ROOT_PASSWORD:-gatrix_rootpassword}"
+      - "--mysqld.address=mysql:3306"
     ports:
       - "0.0.0.0:59104:9104"
     depends_on:

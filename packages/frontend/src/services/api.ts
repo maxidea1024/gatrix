@@ -112,6 +112,11 @@ class ApiService {
           if (originalRequest.url?.includes('/auth/refresh')) {
             console.warn('[ApiService] Token refresh failed with 401 - JWT Secret may have changed');
             this.clearTokens();
+            // Clear localStorage to prevent infinite loop
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('user');
+              localStorage.removeItem('accessToken');
+            }
             if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
               window.location.href = '/login';
             }
@@ -131,6 +136,11 @@ class ApiService {
           // If we don't have an access token at all, avoid refresh storm and go to login directly
           if (!this.accessToken) {
             this.clearTokens();
+            // Clear localStorage to prevent infinite loop
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('user');
+              localStorage.removeItem('accessToken');
+            }
             if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
               window.location.href = '/login';
             }
@@ -145,6 +155,11 @@ class ApiService {
             console.warn('[ApiService] Max refresh attempts reached - JWT Secret may have changed');
             this.clearTokens();
             this.refreshAttempts.delete(tokenKey);
+            // Clear localStorage to prevent infinite loop
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('user');
+              localStorage.removeItem('accessToken');
+            }
             if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
               window.location.href = '/login';
             }
@@ -176,6 +191,11 @@ class ApiService {
             console.warn('[ApiService] Token refresh failed - clearing auth data and redirecting to login');
             this.clearTokens();
             this.refreshAttempts.delete(tokenKey);
+            // Clear localStorage to prevent infinite loop
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('user');
+              localStorage.removeItem('accessToken');
+            }
             if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
               window.location.href = '/login';
             }

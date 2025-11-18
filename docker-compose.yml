@@ -49,12 +49,9 @@ services:
     image: prom/mysqld-exporter:latest
     container_name: gatrix-mysql-exporter
     restart: unless-stopped
-    environment:
-      MYSQLD_EXPORTER_PASSWORD: "${DB_ROOT_PASSWORD:-rootpassword}"
     command:
-      - "--config.my-cnf=/etc/mysql/.my.cnf"
-    volumes:
-      - ./docker/mysql/exporter/.my.cnf:/etc/mysql/.my.cnf:ro
+      - "--mysqld.username=root:${DB_ROOT_PASSWORD:-gatrix_rootpassword}"
+      - "--mysqld.address=mysql:3306"
     ports:
       - "59104:9104"
     depends_on:
@@ -311,6 +308,40 @@ services:
       interval: 10s
       start_period: 60s
 
+  # Loki - Log aggregation
+  loki:
+    image: grafana/loki:latest
+    container_name: gatrix-loki
+    restart: unless-stopped
+    ports:
+      - "${LOKI_PORT:-53100}:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    networks:
+      - gatrix-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3100/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Fluent Bit - Log forwarder to Loki
+  fluent-bit:
+    image: fluent/fluent-bit:latest
+    container_name: gatrix-fluent-bit
+    restart: unless-stopped
+    volumes:
+      - ./docker/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      loki:
+        condition: service_started
+    networks:
+      - gatrix-network
+
   # Prometheus - Monitoring
   prometheus:
     image: prom/prometheus:latest
@@ -350,6 +381,8 @@ services:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
       GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_SECURITY_COOKIE_SAMESITE: "Lax"
     ports:
       - "${GRAFANA_PORT:-54000}:3000"
     volumes:
@@ -446,6 +479,8 @@ volumes:
   prometheus_data:
     driver: local
   grafana_data:
+    driver: local
+  loki_data:
     driver: local
 
 
