@@ -121,6 +121,9 @@ export default defineConfig({
         secure: false,
         agent: httpAgent,
         ws: true,
+        // Ensure all Bull Board paths are proxied, including static resources
+        rewrite: undefined, // Don't rewrite the path
+        bypass: undefined, // Don't bypass any requests
       },
     },
   },

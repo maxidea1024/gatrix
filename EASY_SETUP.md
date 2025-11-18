@@ -205,15 +205,17 @@ http://localhost:53000
 
 **Production (HTTPS - default):**
 ```
-https://example.com:53000
+https://example.com
 ```
 
 **Production (HTTP - if configured with --protocol http):**
 ```
-http://example.com:53000
+http://example.com
 ```
 
 (Replace `example.com` with your actual domain)
+
+**Important:** In production, standard ports (HTTP: 80, HTTPS: 443) are used, so port numbers are not included in URLs. Your cloud load balancer forwards 443 → 53000.
 
 ## Default Credentials
 
@@ -222,11 +224,62 @@ http://example.com:53000
 
 ## Next Steps
 
-1. **Configure Grafana URL** (Optional):
+1. **Configure Cloud Load Balancer** (Production):
+
+   In production, you need to configure your cloud load balancer to handle HTTPS and forward to internal ports.
+
+   **Port Forwarding Setup:**
+   ```
+   External HTTPS 443 → Internal 53000 (Frontend + Bull Board)
+   External HTTPS 443/grafana → Internal 54000 (Grafana)
+   ```
+
+   **Important:**
+   - Only Grafana requires separate port (54000) forwarding
+   - Bull Board uses the same port as Frontend (53000) - no separate forwarding needed
+
+   **Tencent Cloud CLB Example:**
+   - Listener: HTTPS:443 (with SSL certificate)
+   - Forwarding Rule 1: URL = `/grafana*` → Backend Server: CVM:54000 (Grafana only)
+   - Forwarding Rule 2: URL = `/*` → Backend Server: CVM:53000 (Frontend + Bull Board)
+   - X-Forwarded-For: Enabled
+   - Note: `/bull-board` path is handled by Rule 2 (no separate rule needed)
+
+   **AWS Application Load Balancer Example:**
+   - Listener: HTTPS:443 (with SSL certificate)
+   - Rule 1: Path = `/grafana*` → Target Group: EC2:54000 (Grafana only)
+   - Rule 2: Path = `/*` → Target Group: EC2:53000 (Frontend + Bull Board)
+   - Note: `/bull-board` path is handled by Rule 2 (no separate rule needed)
+
+   **Nginx Reverse Proxy Example:**
+   ```nginx
+   server {
+       listen 443 ssl http2;
+       server_name example.com;
+
+       ssl_certificate /path/to/cert.pem;
+       ssl_certificate_key /path/to/key.pem;
+
+       # Grafana (separate port forwarding)
+       location /grafana/ {
+           proxy_pass http://localhost:54000/;
+           proxy_set_header X-Forwarded-Proto https;
+       }
+
+       # Frontend + Bull Board (same port)
+       # /bull-board path is handled by Frontend Nginx
+       location / {
+           proxy_pass http://localhost:53000;
+           proxy_set_header X-Forwarded-Proto https;
+       }
+   }
+   ```
+
+2. **Configure Grafana URL** (Development):
    - Edit `.env` file
    - Update `VITE_GRAFANA_URL` to match your Grafana server address
-   - Default: `http://localhost:54000`
-   - For remote deployment: `http://your-grafana-server:54000`
+   - Development default: `http://localhost:54000`
+   - Production: `https://example.com/grafana` (auto-configured)
    - Restart services:
 
    **Development:**
@@ -239,7 +292,7 @@ http://example.com:53000
    docker-compose -f docker-compose.yml restart frontend
    ```
 
-2. **Update OAuth Credentials** (Optional):
+3. **Update OAuth Credentials** (Optional):
    - Edit `.env` file
    - Add your Google and GitHub OAuth credentials
    - Restart services:
@@ -254,7 +307,7 @@ http://example.com:53000
    docker-compose -f docker-compose.yml restart
    ```
 
-2. **View Logs**:
+4. **View Logs**:
 
    **Development:**
    ```bash
@@ -266,7 +319,7 @@ http://example.com:53000
    docker-compose -f docker-compose.yml logs -f backend
    ```
 
-3. **Stop Services**:
+5. **Stop Services**:
 
    **Development:**
    ```bash

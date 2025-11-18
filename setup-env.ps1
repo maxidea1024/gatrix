@@ -13,7 +13,7 @@
     Execution environment (development or production, default: development)
 
 .PARAMETER DefaultLanguage
-    Default language (ko, en, zh, etc., default: ko)
+    Default language (ko, en, zh, etc., default: zh)
 
 .PARAMETER AdminPassword
     Admin password (optional, default: admin123)
@@ -30,7 +30,7 @@
 .EXAMPLE
     .\setup-env.ps1 -HostAddress localhost -Environment development
     .\setup-env.ps1 -HostAddress 192.168.1.100 -Environment production -Force
-    .\setup-env.ps1 -HostAddress example.com -Environment production -DefaultLanguage en
+    .\setup-env.ps1 -HostAddress example.cn -Environment production -DefaultLanguage zh
     .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "MySecurePassword123"
     .\setup-env.ps1 -HostAddress localhost -Environment development -Force -NoBackup
     .\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https
@@ -48,7 +48,7 @@ param(
     [string]$Environment = "development",
 
     [Parameter(Mandatory=$false, HelpMessage="Default language (ko, en, zh, etc.)")]
-    [string]$DefaultLanguage = "ko",
+    [string]$DefaultLanguage = "zh",
 
     [Parameter(Mandatory=$false, HelpMessage="Admin password (default: admin123)")]
     [string]$AdminPassword = "admin123",
@@ -216,7 +216,21 @@ function Create-EnvFile {
             # Host port is configured separately in docker-compose.yml via REDIS_HOST_PORT
             $newLines += "REDIS_PORT=6379"
         } elseif ($line -match "^CORS_ORIGIN=") {
-            $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress`:53000"
+            # In production with standard ports (80/443), omit port number
+            # In development, include port number and use HOST address (not localhost)
+            if ($Environment -eq "development") {
+                $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress`:53000"
+            } else {
+                $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress"
+            }
+        } elseif ($line -match "^FRONTEND_URL=") {
+            # In production with standard ports (80/443), omit port number
+            # In development, include port number and use HOST address (not localhost)
+            if ($Environment -eq "development") {
+                $newLines += "FRONTEND_URL=$($script:ProtocolToUse)://$HostAddress`:53000"
+            } else {
+                $newLines += "FRONTEND_URL=$($script:ProtocolToUse)://$HostAddress"
+            }
         } elseif ($line -match "^CHAT_SERVER_URL=") {
             $newLines += "CHAT_SERVER_URL=http://chat-server:5100"
         } elseif ($line -match "^LOG_LEVEL=") {
@@ -237,15 +251,19 @@ function Create-EnvFile {
             $newLines += "DEFAULT_LANGUAGE=$DefaultLanguage"
         } elseif ($line -match "^VITE_GRAFANA_URL=") {
             if ($Environment -eq "development") {
-                $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://localhost:54000"
-            } else {
+                # Development: include port number, use HOST address (not localhost)
                 $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:54000"
+            } else {
+                # Production: Grafana accessed via /grafana subpath (handled by load balancer)
+                $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress/grafana"
             }
         } elseif ($line -match "^VITE_BULL_BOARD_URL=") {
             if ($Environment -eq "development") {
-                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://localhost:53000/bull-board"
-            } else {
+                # Development: include port number, use HOST address (not localhost)
                 $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress`:53000/bull-board"
+            } else {
+                # Production: Bull Board accessed via /bull-board subpath
+                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress/bull-board"
             }
         } elseif ($line -match "^ADMIN_PASSWORD=") {
             $newLines += "ADMIN_PASSWORD=$AdminPassword"
@@ -301,11 +319,14 @@ function Print-Summary {
 
     if ($Environment -eq "development") {
         Write-Host "  2. Start Docker services: docker-compose -f docker-compose.dev.yml up -d"
+        Write-Host "  3. Access the application: $($script:ProtocolToUse)://$HostAddress`:53000"
     } else {
         Write-Host "  2. Start Docker services: docker-compose -f docker-compose.yml up -d"
+        Write-Host "  3. Access the application: $($script:ProtocolToUse)://$HostAddress"
+        Write-Host "  4. Configure your load balancer to forward:"
+        Write-Host "     - HTTPS 443 → 53000 (Frontend)"
+        Write-Host "     - HTTPS 443/grafana → 54000 (Grafana, optional)"
     }
-
-    Write-Host "  3. Access the application: $($script:ProtocolToUse)://$HostAddress`:53000"
     Write-Host ""
 }
 

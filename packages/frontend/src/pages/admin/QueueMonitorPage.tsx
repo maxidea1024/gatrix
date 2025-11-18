@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Typography, Card, CardContent, Alert, CircularProgress } from '@mui/material';
 import { Monitor as MonitorIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -29,8 +29,14 @@ const QueueMonitorPage: React.FC = () => {
     );
   }
 
-  // BullMQ Dashboard 경로
-  const bullboardUrl = ((import.meta.env as any).VITE_BULL_BOARD_URL as string) || `${window.location.protocol}//${window.location.host}/bull-board`;
+  // BullMQ Dashboard URL
+  const bullboardUrl = useMemo(() => {
+    const isDevelopment = import.meta.env.DEV || window.location.port === '53000';
+    if (isDevelopment) {
+      return `${window.location.protocol}//${window.location.hostname}:55000/bull-board`;
+    }
+    return `${window.location.protocol}//${window.location.host}/bull-board`;
+  }, []);
 
   return (
     <Box sx={{ p: 3 }}>

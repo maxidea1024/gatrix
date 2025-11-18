@@ -207,15 +207,17 @@ http://localhost:53000
 
 **프로덕션 (HTTPS - 기본값):**
 ```
-https://example.com:53000
+https://example.com
 ```
 
 **프로덕션 (HTTP - --protocol http로 설정한 경우):**
 ```
-http://example.com:53000
+http://example.com
 ```
 
 (`example.com`을 실제 도메인으로 변경하세요)
+
+**중요:** 프로덕션 환경에서는 표준 포트(HTTP: 80, HTTPS: 443)를 사용하므로 URL에 포트 번호가 포함되지 않습니다. 클라우드 로드 밸런서가 443 → 53000으로 포워딩합니다.
 
 ## 기본 인증 정보
 
@@ -224,11 +226,62 @@ http://example.com:53000
 
 ## 다음 단계
 
-1. **Grafana URL 설정** (선택사항):
+1. **클라우드 로드 밸런서 설정** (프로덕션 환경):
+
+   프로덕션 환경에서는 클라우드 로드 밸런서를 통해 HTTPS를 처리하고 내부 포트로 포워딩해야 합니다.
+
+   **포트 포워딩 설정:**
+   ```
+   외부 HTTPS 443 → 내부 53000 (Frontend + Bull Board)
+   외부 HTTPS 443/grafana → 내부 54000 (Grafana)
+   ```
+
+   **중요:**
+   - Grafana만 별도 포트(54000) 포워딩 필요
+   - Bull Board는 Frontend(53000)와 동일 포트 사용 - 별도 포워딩 불필요
+
+   **텐센트 클라우드 CLB 예시:**
+   - 리스너: HTTPS:443 (SSL 인증서 연결)
+   - 전달 규칙 1: URL = `/grafana*` → 백엔드 서버: CVM:54000 (Grafana 전용)
+   - 전달 규칙 2: URL = `/*` → 백엔드 서버: CVM:53000 (Frontend + Bull Board)
+   - X-Forwarded-For: 활성화
+   - 참고: `/bull-board` 경로는 규칙 2로 처리됨 (별도 규칙 불필요)
+
+   **AWS Application Load Balancer 예시:**
+   - Listener: HTTPS:443 (SSL 인증서 연결)
+   - Rule 1: Path = `/grafana*` → Target Group: EC2:54000 (Grafana 전용)
+   - Rule 2: Path = `/*` → Target Group: EC2:53000 (Frontend + Bull Board)
+   - 참고: `/bull-board` 경로는 Rule 2로 처리됨 (별도 규칙 불필요)
+
+   **Nginx Reverse Proxy 예시:**
+   ```nginx
+   server {
+       listen 443 ssl http2;
+       server_name example.com;
+
+       ssl_certificate /path/to/cert.pem;
+       ssl_certificate_key /path/to/key.pem;
+
+       # Grafana (별도 포트 포워딩)
+       location /grafana/ {
+           proxy_pass http://localhost:54000/;
+           proxy_set_header X-Forwarded-Proto https;
+       }
+
+       # Frontend + Bull Board (동일 포트)
+       # /bull-board 경로는 Frontend Nginx에서 처리됨
+       location / {
+           proxy_pass http://localhost:53000;
+           proxy_set_header X-Forwarded-Proto https;
+       }
+   }
+   ```
+
+2. **Grafana URL 설정** (개발 환경):
    - `.env` 파일 편집
    - `VITE_GRAFANA_URL`을 Grafana 서버 주소에 맞게 업데이트
-   - 기본값: `http://localhost:54000`
-   - 원격 배포의 경우: `http://your-grafana-server:54000`
+   - 개발 환경 기본값: `http://localhost:54000`
+   - 프로덕션 환경: `https://example.com/grafana` (자동 설정됨)
    - 서비스 재시작:
 
    **개발 환경:**
@@ -241,7 +294,7 @@ http://example.com:53000
    docker-compose -f docker-compose.yml restart frontend
    ```
 
-2. **OAuth 인증 정보 업데이트** (선택사항):
+3. **OAuth 인증 정보 업데이트** (선택사항):
    - `.env` 파일 편집
    - Google 및 GitHub OAuth 인증 정보 추가
    - 서비스 재시작:
@@ -256,7 +309,7 @@ http://example.com:53000
    docker-compose -f docker-compose.yml restart
    ```
 
-3. **로그 확인**:
+4. **로그 확인**:
 
    **개발 환경:**
    ```bash
@@ -268,7 +321,7 @@ http://example.com:53000
    docker-compose -f docker-compose.yml logs -f backend
    ```
 
-4. **서비스 중지**:
+5. **서비스 중지**:
 
    **개발 환경:**
    ```bash

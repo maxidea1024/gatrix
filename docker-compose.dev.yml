@@ -10,7 +10,7 @@ services:
       MYSQL_USER: ${DB_USER:-gatrix_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
     ports:
-      - "0.0.0.0:${DB_PORT:-53306}:3306"
+      - "0.0.0.0:${MYSQL_HOST_PORT:-53306}:3306"
     volumes:
       - mysql_dev_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
@@ -211,8 +211,8 @@ services:
     container_name: gatrix-clickhouse-dev
     restart: unless-stopped
     ports:
-      - "0.0.0.0:${CLICKHOUSE_PORT:-58123}:8123"
-      - "0.0.0.0:59000:9000"
+      - "0.0.0.0:${CLICKHOUSE_HTTP_PORT:-58123}:8123"
+      - "0.0.0.0:${CLICKHOUSE_NATIVE_PORT:-59000}:9000"
     volumes:
       - clickhouse_dev_data:/var/lib/clickhouse
     networks:
@@ -388,7 +388,7 @@ services:
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-debug}
     ports:
-      - "0.0.0.0:${CHAT_HOST_PORT:-55100}:5100"
+      - "0.0.0.0:${CHAT_PORT:-55100}:5100"
     depends_on:
       mysql:
         condition: service_healthy

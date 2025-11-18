@@ -37,8 +37,14 @@ export const GrafanaDashboardPage: React.FC = () => {
   }, [searchParams]);
 
   const grafanaUrl = useMemo(() => {
-    const url = ((import.meta.env as any).VITE_GRAFANA_URL as string) || `${window.location.protocol}//${window.location.hostname}:54000`;
-    return url;
+    // In development, Grafana runs on port 54000
+    // In production, Grafana is accessed via /grafana subpath
+    const isDevelopment = import.meta.env.DEV || window.location.port === '53000';
+    if (isDevelopment) {
+      return `${window.location.protocol}//${window.location.hostname}:54000`;
+    } else {
+      return `${window.location.protocol}//${window.location.host}/grafana`;
+    }
   }, []);
 
   const currentDashboard = useMemo(

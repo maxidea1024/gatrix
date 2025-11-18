@@ -18,12 +18,12 @@
 # Examples:
 #   ./setup-env.sh localhost development
 #   ./setup-env.sh 192.168.1.100 production
-#   ./setup-env.sh example.com production en
+#   ./setup-env.sh example.cn production zh
 #   ./setup-env.sh localhost development --force
-#   ./setup-env.sh localhost development ko --nobackup
-#   ./setup-env.sh localhost development ko --admin-password "MySecurePassword123"
-#   ./setup-env.sh example.com production en --admin-password "SecurePass123" --force --nobackup
-#   ./setup-env.sh localhost development ko --protocol https
+#   ./setup-env.sh localhost development zh --nobackup
+#   ./setup-env.sh localhost development zh --admin-password "MySecurePassword123"
+#   ./setup-env.sh example.cn production zh --admin-password "SecurePass123" --force --nobackup
+#   ./setup-env.sh localhost development zh --protocol https
 #
 ################################################################################
 
@@ -80,8 +80,8 @@ validate_inputs() {
     echo "Examples:"
     echo "  $0 localhost development"
     echo "  $0 192.168.1.100 production"
-    echo "  $0 example.com production en"
-    echo "  $0 localhost development ko --force"
+    echo "  $0 example.cn production zh"
+    echo "  $0 localhost development zh --force"
     exit 1
   fi
 
@@ -169,8 +169,19 @@ create_env_file() {
   sed -i.bak "s|^REDIS_HOST=.*|REDIS_HOST=redis|" "$ENV_FILE"
   sed -i.bak "s|^REDIS_PORT=.*|REDIS_PORT=6379|" "$ENV_FILE"
 
-  # Set CORS_ORIGIN based on protocol
-  sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=$PROTOCOL://$HOST:53000|" "$ENV_FILE"
+  # Set CORS_ORIGIN and FRONTEND_URL based on protocol and environment
+  # In production with standard ports (80/443), omit port number
+  # In development or non-standard ports, include port number
+  if [ "$ENVIRONMENT" = "development" ]; then
+    # Development: include port number, use HOST address (not localhost)
+    # This allows access from other machines in the development team
+    sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=$PROTOCOL://$HOST:53000|" "$ENV_FILE"
+    sed -i.bak "s|^FRONTEND_URL=.*|FRONTEND_URL=$PROTOCOL://$HOST:53000|" "$ENV_FILE"
+  else
+    # Production: use standard HTTPS port (443), no port number in URL
+    sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=$PROTOCOL://$HOST|" "$ENV_FILE"
+    sed -i.bak "s|^FRONTEND_URL=.*|FRONTEND_URL=$PROTOCOL://$HOST|" "$ENV_FILE"
+  fi
 
   # Set LOG_LEVEL based on environment
   if [ "$ENVIRONMENT" = "development" ]; then
@@ -186,17 +197,22 @@ create_env_file() {
   sed -i.bak "s|^DEFAULT_LANGUAGE=.*|DEFAULT_LANGUAGE=$DEFAULT_LANGUAGE|" "$ENV_FILE"
 
   # Set Grafana URL based on environment
+  # In production, Grafana is typically accessed through a subpath or subdomain
   if [ "$ENVIRONMENT" = "development" ]; then
-    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://localhost:54000|" "$ENV_FILE"
-  else
+    # Development: include port number, use HOST address (not localhost)
     sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST:54000|" "$ENV_FILE"
+  else
+    # Production: Grafana accessed via /grafana subpath (handled by load balancer)
+    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST/grafana|" "$ENV_FILE"
   fi
 
   # Set Bull Board URL based on environment
   if [ "$ENVIRONMENT" = "development" ]; then
-    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://localhost:53000/bull-board|" "$ENV_FILE"
-  else
+    # Development: include port number, use HOST address (not localhost)
     sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://$HOST:53000/bull-board|" "$ENV_FILE"
+  else
+    # Production: Bull Board accessed via /bull-board subpath
+    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://$HOST/bull-board|" "$ENV_FILE"
   fi
 
 
@@ -256,11 +272,14 @@ print_summary() {
 
   if [ "$ENVIRONMENT" = "development" ]; then
     echo "  2. Start Docker services: docker-compose -f docker-compose.dev.yml up -d"
+    echo "  3. Access the application: $PROTOCOL://$HOST:53000"
   else
     echo "  2. Start Docker services: docker-compose -f docker-compose.yml up -d"
+    echo "  3. Access the application: $PROTOCOL://$HOST"
+    echo "  4. Configure your load balancer to forward:"
+    echo "     - HTTPS 443 → 53000 (Frontend)"
+    echo "     - HTTPS 443/grafana → 54000 (Grafana, optional)"
   fi
-
-  echo "  3. Access the application: $PROTOCOL://$HOST:53000"
   echo ""
 }
 
@@ -277,7 +296,7 @@ main() {
 
   HOST="$1"
   ENVIRONMENT="$2"
-  DEFAULT_LANGUAGE="${3:-ko}"
+  DEFAULT_LANGUAGE="${3:-zh}"
   ADMIN_PASSWORD="admin123"
   PROTOCOL=""
   FORCE=false

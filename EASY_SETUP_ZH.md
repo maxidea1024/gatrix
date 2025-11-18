@@ -208,15 +208,17 @@ http://localhost:53000
 
 **生产环境（HTTPS - 默认）：**
 ```
-https://example.com:53000
+https://example.com
 ```
 
 **生产环境（HTTP - 如果使用 --protocol http 配置）：**
 ```
-http://example.com:53000
+http://example.com
 ```
 
 （将 `example.com` 替换为您的实际域名）
+
+**重要：** 在生产环境中，使用标准端口（HTTP: 80，HTTPS: 443），因此 URL 中不包含端口号。云负载均衡器将 443 转发到 53000。
 
 ## 默认凭据
 
@@ -225,11 +227,62 @@ http://example.com:53000
 
 ## 后续步骤
 
-1. **配置 Grafana URL**（可选）：
+1. **配置云负载均衡器**（生产环境）：
+
+   在生产环境中，您需要配置云负载均衡器来处理 HTTPS 并转发到内部端口。
+
+   **端口转发设置：**
+   ```
+   外部 HTTPS 443 → 内部 53000（前端 + Bull Board）
+   外部 HTTPS 443/grafana → 内部 54000（Grafana）
+   ```
+
+   **重要：**
+   - 仅 Grafana 需要单独的端口（54000）转发
+   - Bull Board 使用与前端相同的端口（53000）- 无需单独转发
+
+   **腾讯云 CLB 示例：**
+   - 监听器：HTTPS:443（附加 SSL 证书）
+   - 转发规则 1：URL = `/grafana*` → 后端服务器：CVM:54000（仅 Grafana）
+   - 转发规则 2：URL = `/*` → 后端服务器：CVM:53000（前端 + Bull Board）
+   - X-Forwarded-For：启用
+   - 注意：`/bull-board` 路径由规则 2 处理（无需单独规则）
+
+   **AWS Application Load Balancer 示例：**
+   - 监听器：HTTPS:443（附加 SSL 证书）
+   - 规则 1：路径 = `/grafana*` → 目标组：EC2:54000（仅 Grafana）
+   - 规则 2：路径 = `/*` → 目标组：EC2:53000（前端 + Bull Board）
+   - 注意：`/bull-board` 路径由规则 2 处理（无需单独规则）
+
+   **Nginx 反向代理示例：**
+   ```nginx
+   server {
+       listen 443 ssl http2;
+       server_name example.com;
+
+       ssl_certificate /path/to/cert.pem;
+       ssl_certificate_key /path/to/key.pem;
+
+       # Grafana（单独端口转发）
+       location /grafana/ {
+           proxy_pass http://localhost:54000/;
+           proxy_set_header X-Forwarded-Proto https;
+       }
+
+       # 前端 + Bull Board（相同端口）
+       # /bull-board 路径由前端 Nginx 处理
+       location / {
+           proxy_pass http://localhost:53000;
+           proxy_set_header X-Forwarded-Proto https;
+       }
+   }
+   ```
+
+2. **配置 Grafana URL**（开发环境）：
    - 编辑 `.env` 文件
    - 更新 `VITE_GRAFANA_URL` 以匹配您的 Grafana 服务器地址
-   - 默认值：`http://localhost:54000`
-   - 远程部署：`http://your-grafana-server:54000`
+   - 开发环境默认值：`http://localhost:54000`
+   - 生产环境：`https://example.com/grafana`（自动配置）
    - 重启服务：
 
    **开发环境：**
@@ -242,7 +295,7 @@ http://example.com:53000
    docker-compose -f docker-compose.yml restart frontend
    ```
 
-2. **更新 OAuth 凭据**（可选）：
+3. **更新 OAuth 凭据**（可选）：
    - 编辑 `.env` 文件
    - 添加您的 Google 和 GitHub OAuth 凭据
    - 重启服务：
@@ -257,7 +310,7 @@ http://example.com:53000
    docker-compose -f docker-compose.yml restart
    ```
 
-3. **查看日志**：
+4. **查看日志**：
 
    **开发环境：**
    ```bash
@@ -269,7 +322,7 @@ http://example.com:53000
    docker-compose -f docker-compose.yml logs -f backend
    ```
 
-4. **停止服务**：
+5. **停止服务**：
 
    **开发环境：**
    ```bash
