@@ -419,32 +419,129 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
   }
 
   /**
+   * Detect services that stopped sending heartbeats and mark them as no-response.
+   * Detection is based on updatedAt vs configured heartbeat TTL.
+   */
+  async detectNoResponseServices(): Promise<void> {
+    try {
+      const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
+      const now = Date.now();
+
+      // Get all services (active + inactive)
+      const allServices = await this.getServices();
+
+      for (const service of allServices) {
+        try {
+          // Skip already inactive services
+          if (service.status === 'terminated' || service.status === 'error' || service.status === 'no-response') {
+            continue;
+          }
+
+          if (!service.updatedAt) {
+            continue;
+          }
+
+          const updatedAtMs = new Date(service.updatedAt).getTime();
+          if (!updatedAtMs || Number.isNaN(updatedAtMs)) {
+            continue;
+          }
+
+          const diffSeconds = (now - updatedAtMs) / 1000;
+          if (diffSeconds <= heartbeatTTL) {
+            continue;
+          }
+
+          const leaseKey = `${service.labels.service}:${service.instanceId}`;
+          const key = this.getInstanceKey(service.labels.service, service.instanceId);
+
+          logger.warn(
+            `Service no-response detected (no heartbeat for ${diffSeconds.toFixed(
+              1,
+            )}s): ${service.labels.service}:${service.instanceId}`,
+          );
+
+          // Mark as no-response
+          service.status = 'no-response';
+          service.updatedAt = new Date(now).toISOString();
+
+          const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
+
+          // Best-effort: switch the key to a new lease with terminated TTL
+          const existingLease = this.leases.get(leaseKey);
+          if (existingLease) {
+            try {
+              await existingLease.revoke();
+            } catch (error) {
+              logger.warn(`Failed to revoke old lease for ${leaseKey} while marking no-response:`, error);
+            }
+          }
+
+          const newLease = this.client.lease(terminatedTTL);
+          await newLease.put(key).value(JSON.stringify(service));
+          this.leases.set(leaseKey, newLease);
+
+          logger.info(
+            `Service marked as no-response: ${service.labels.service}:${service.instanceId} (TTL: ${terminatedTTL}s)`,
+          );
+        } catch (error) {
+          logger.error(
+            `Failed to process service for no-response detection: ${service.labels.service}:${service.instanceId}`,
+            error,
+          );
+        }
+      }
+    } catch (error) {
+      logger.error('Failed to detect no-response services:', error);
+    }
+  }
+
+  /**
    * Clean up all inactive services (terminated, error, no-response)
-   * For etcd, this deletes all services with terminated/error/no-response status
+   * Only delete services that have been inactive longer than terminated TTL.
    */
   async cleanupInactiveServices(serviceTypes: string[]): Promise<{ deletedCount: number; serviceTypes: string[] }> {
     let totalDeletedCount = 0;
 
     try {
-      // Get all services and filter by status
-      const allServices = await this.getServices();
-      const inactiveServices = allServices.filter(
-        (s) => s.status === 'terminated' || s.status === 'error' || s.status === 'no-response'
-      );
+      const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
+      const now = Date.now();
 
-      // Delete each inactive service
+      // Get all services and filter by status + age
+      const allServices = await this.getServices();
+      const inactiveServices = allServices.filter((s) => {
+        if (s.status !== 'terminated' && s.status !== 'error' && s.status !== 'no-response') {
+          return false;
+        }
+
+        if (!s.updatedAt) {
+          // If we do not have updatedAt, be conservative and delete
+          return true;
+        }
+
+        const updatedAtMs = new Date(s.updatedAt).getTime();
+        if (!updatedAtMs || Number.isNaN(updatedAtMs)) {
+          return true;
+        }
+
+        const diffSeconds = (now - updatedAtMs) / 1000;
+        return diffSeconds >= terminatedTTL;
+      });
+
+      // Delete each old inactive service
       for (const service of inactiveServices) {
         try {
           const key = this.getInstanceKey(service.labels.service, service.instanceId);
           await this.client.delete().key(key).exec();
           totalDeletedCount++;
-          logger.info(`🗑️ Deleted service from etcd: ${service.labels.service}:${service.instanceId}`);
+          logger.info(`🗑️ Deleted inactive service from etcd: ${service.labels.service}:${service.instanceId}`);
         } catch (error) {
           logger.error(`Failed to delete service ${service.labels.service}:${service.instanceId}:`, error);
         }
       }
 
-      logger.info(`✅ Cleanup completed: ${totalDeletedCount} inactive services deleted from etcd`);
+      logger.info(
+        `✅ Cleanup completed: ${totalDeletedCount} inactive services deleted from etcd (older than ${terminatedTTL}s)`,
+      );
       return { deletedCount: totalDeletedCount, serviceTypes };
     } catch (error) {
       logger.error('Failed to cleanup inactive services:', error);

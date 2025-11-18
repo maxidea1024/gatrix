@@ -123,6 +123,12 @@ export interface IServiceDiscoveryProvider {
   watch(callback: WatchCallback): Promise<() => void>;
 
   /**
+   * Detect services with expired leases and mark them as no-response
+   * (etcd only - Redis uses keyspace notifications)
+   */
+  detectNoResponseServices?(): Promise<void>;
+
+  /**
    * Clean up all inactive services (terminated, error, no-response)
    * @param serviceTypes - Array of service types to clean up
    * @returns Object with deletedCount and serviceTypes

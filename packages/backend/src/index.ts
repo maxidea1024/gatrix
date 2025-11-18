@@ -315,9 +315,15 @@ const startServer = async () => {
         });
         logger.info('Redis Service Discovery watch initialized (keyspace notifications enabled)');
       } else if (serviceDiscoveryMode === 'etcd') {
-        // Start automatic cleanup every 5 seconds to catch terminated services quickly
+        // Start automatic monitoring every 5 seconds
+        // 1. Detect no-response services (lease expired but still in etcd)
+        // 2. Cleanup old inactive services (terminated/error/no-response > 300s)
         const cleanupInterval = setInterval(async () => {
           try {
+            // Detect and mark no-response services
+            await serviceDiscoveryService.detectNoResponseServices();
+
+            // Cleanup old inactive services
             const inactiveServices = await serviceDiscoveryService.getInactiveServices();
             logger.info(`Auto-cleanup check: Found ${inactiveServices.length} inactive services`);
             if (inactiveServices.length > 0) {

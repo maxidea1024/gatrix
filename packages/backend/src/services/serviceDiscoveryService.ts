@@ -86,6 +86,16 @@ class ServiceDiscoveryService {
   }
 
   /**
+   * Detect services with expired leases and mark them as no-response
+   * (etcd only - Redis uses keyspace notifications)
+   */
+  async detectNoResponseServices(): Promise<void> {
+    if (this.provider.detectNoResponseServices) {
+      await this.provider.detectNoResponseServices();
+    }
+  }
+
+  /**
    * Clean up all inactive services (terminated, error, no-response)
    * Delegates to provider implementation (Redis or etcd)
    */
@@ -98,7 +108,7 @@ class ServiceDiscoveryService {
     }
 
     // Get unique service types
-    const serviceTypes = Array.from(new Set(inactiveServices.map(s => s.labels.service)));
+    const serviceTypes = Array.from(new Set(inactiveServices.map((s) => s.labels.service)));
 
     // Call provider's cleanup method
     return await this.provider.cleanupInactiveServices(serviceTypes);
