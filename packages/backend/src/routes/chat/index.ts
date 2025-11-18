@@ -206,7 +206,7 @@ router.use('/', async (req, res, next) => {
 
     // 사용자 동기화 요청인 경우 사용자 정보 추가
     let requestData = req.body;
-    if (targetPath === '/users/sync-user' && req.user) {
+    if ((targetPath === '/users/upsert' || targetPath === '/users/sync-user') && req.user) {
       const user = req.user as any;
 
       // DB에서 최신 사용자 정보 조회 (avatarUrl 포함)

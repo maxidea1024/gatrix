@@ -339,12 +339,19 @@ export class ChatWebSocketService {
     // Runtime-injected config (for production docker/nginx)
     const runtimeUrl = (window as any)?.ENV?.VITE_CHAT_SERVER_URL as string | undefined;
     if (env.PROD) {
+      // Keep existing production fallback (5100) to match original docker-compose.prod mapping
       return runtimeUrl || (env.VITE_CHAT_SERVER_URL as string) || `${location.protocol === 'https:' ? 'https' : 'http'}://${location.hostname}:5100`;
     }
 
-    // Development: use the current host/IP so other machines can connect
+    // Development: allow overriding via VITE_CHAT_SERVER_URL, otherwise use current host with chat dev port
+    const devUrl = (env.VITE_CHAT_SERVER_URL as string) || runtimeUrl;
+    if (devUrl) {
+      return devUrl;
+    }
+
     const protocol = location.protocol === 'https:' ? 'https' : 'http';
-    return `${protocol}://${location.hostname}:5100`;
+    const port = env.VITE_CHAT_SERVER_PORT || '55100';
+    return `${protocol}://${location.hostname}:${port}`;
   }
 
   private reconnect(): void {
