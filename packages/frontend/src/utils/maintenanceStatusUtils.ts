@@ -8,6 +8,8 @@ export interface MaintenanceDetail {
   endsAt?: string | null;
   message?: string;
   localeMessages?: { ko?: string; en?: string; zh?: string };
+  kickExistingPlayers?: boolean;
+  kickDelayMinutes?: number;
 }
 
 /**

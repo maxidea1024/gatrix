@@ -18,6 +18,9 @@
 .PARAMETER AdminPassword
     Admin password (optional, default: admin123)
 
+.PARAMETER Protocol
+    Protocol (http or https, default: http for dev, https for prod)
+
 .PARAMETER Force
     Force overwrite existing .env file
 
@@ -30,6 +33,7 @@
     .\setup-env.ps1 -HostAddress example.com -Environment production -DefaultLanguage en
     .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "MySecurePassword123"
     .\setup-env.ps1 -HostAddress localhost -Environment development -Force -NoBackup
+    .\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https
 
 .NOTES
     Requires Windows PowerShell 5.0 or higher
@@ -48,6 +52,10 @@ param(
 
     [Parameter(Mandatory=$false, HelpMessage="Admin password (default: admin123)")]
     [string]$AdminPassword = "admin123",
+
+    [Parameter(Mandatory=$false, HelpMessage="Protocol (http or https, default: http for dev, https for prod)")]
+    [ValidateSet("http", "https")]
+    [string]$Protocol = "",
 
     [Parameter(Mandatory=$false, HelpMessage="Force overwrite existing .env file")]
     [switch]$Force,
@@ -206,11 +214,7 @@ function Create-EnvFile {
         } elseif ($line -match "^REDIS_PORT=") {
             $newLines += "REDIS_PORT=6379"
         } elseif ($line -match "^CORS_ORIGIN=") {
-            if ($Environment -eq "development") {
-                $newLines += "CORS_ORIGIN=http://$HostAddress`:53000"
-            } else {
-                $newLines += "CORS_ORIGIN=https://$HostAddress`:53000"
-            }
+            $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress`:53000"
         } elseif ($line -match "^CHAT_SERVER_URL=") {
             $newLines += "CHAT_SERVER_URL=http://chat-server:5100"
         } elseif ($line -match "^LOG_LEVEL=") {
@@ -233,13 +237,13 @@ function Create-EnvFile {
             if ($Environment -eq "development") {
                 $newLines += "VITE_GRAFANA_URL=http://localhost:54000"
             } else {
-                $newLines += "VITE_GRAFANA_URL=http://$HostAddress`:54000"
+                $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:54000"
             }
         } elseif ($line -match "^VITE_BULL_BOARD_URL=") {
             if ($Environment -eq "development") {
                 $newLines += "VITE_BULL_BOARD_URL=http://localhost:53000/bull-board"
             } else {
-                $newLines += "VITE_BULL_BOARD_URL=http://$HostAddress`:55000/bull-board"
+                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress`:55000/bull-board"
             }
         } elseif ($line -match "^ADMIN_PASSWORD=") {
             $newLines += "ADMIN_PASSWORD=$AdminPassword"
@@ -265,6 +269,7 @@ function Print-Summary {
     Write-Host ""
     Write-Host "[CONFIGURATION]" -ForegroundColor Cyan
     Write-Host "  - HOST: $HostAddress"
+    Write-Host "  - PROTOCOL: $($script:ProtocolToUse)"
     Write-Host "  - ENVIRONMENT: $Environment"
     Write-Host "  - NODE_ENV: $Environment"
     Write-Host "  - DEFAULT_LANGUAGE: $DefaultLanguage"
@@ -298,7 +303,7 @@ function Print-Summary {
         Write-Host "  2. Start Docker services: docker-compose -f docker-compose.yml up -d"
     }
 
-    Write-Host "  3. Access the application: http://$HostAddress`:53000"
+    Write-Host "  3. Access the application: $($script:ProtocolToUse)://$HostAddress`:53000"
     Write-Host ""
 }
 
@@ -311,6 +316,17 @@ Write-Host "============================================================" -Foreg
 Write-Host "Gatrix .env Auto-Generation Script" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""
+
+# Set default protocol based on environment if not specified
+if ([string]::IsNullOrWhiteSpace($Protocol)) {
+    if ($Environment -eq "development") {
+        $script:ProtocolToUse = "http"
+    } else {
+        $script:ProtocolToUse = "https"
+    }
+} else {
+    $script:ProtocolToUse = $Protocol
+}
 
 Validate-Inputs
 $backupFile = Check-ExistingEnv

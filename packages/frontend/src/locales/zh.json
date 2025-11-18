@@ -939,6 +939,7 @@
     "directInput": "直接输入",
     "startsAt": "开始时间",
     "endsAt": "结束时间",
+    "now": "现在",
     "messageSource": "消息来源",
     "perLanguageMessage": "按语言维护消息",
     "selectTemplate": "选择模板",
@@ -1787,6 +1788,7 @@
       "sinceDescription": "选择开始日期。结束日期为今天。",
       "lastDescription": "从下面的选项中选择时间段。"
     },
+    "accept": "确认",
     "apply": "应用",
     "delete": "删除",
     "description": "描述",

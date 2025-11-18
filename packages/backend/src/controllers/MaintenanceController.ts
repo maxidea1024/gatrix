@@ -10,6 +10,8 @@ export interface MaintenancePayload {
   endsAt?: string | null; // ISO string (optional)
   message: string; // default message (required when isMaintenance is true)
   localeMessages?: { ko?: string; en?: string; zh?: string };
+  kickExistingPlayers?: boolean;
+  kickDelayMinutes?: number;
 }
 
 const KEY = 'isMaintenance';
@@ -72,6 +74,13 @@ export class MaintenanceController {
       // Only include localeMessages if provided
       if (payload.localeMessages && Object.keys(payload.localeMessages).length > 0) {
         detail.localeMessages = payload.localeMessages;
+      }
+      // Include kick options if provided
+      if (payload.kickExistingPlayers !== undefined) {
+        detail.kickExistingPlayers = payload.kickExistingPlayers;
+      }
+      if (payload.kickDelayMinutes !== undefined) {
+        detail.kickDelayMinutes = payload.kickDelayMinutes;
       }
       await VarsModel.set(KEY_DETAIL, JSON.stringify(detail), userId);
 

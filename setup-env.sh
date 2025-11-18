@@ -13,6 +13,7 @@
 #   --force              Overwrite existing .env file
 #   --nobackup           Do not create backup file when overwriting
 #   --admin-password     Set custom admin password
+#   --protocol           Set protocol (http or https, default: http for dev, https for prod)
 #
 # Examples:
 #   ./setup-env.sh localhost development
@@ -22,6 +23,7 @@
 #   ./setup-env.sh localhost development ko --nobackup
 #   ./setup-env.sh localhost development ko --admin-password "MySecurePassword123"
 #   ./setup-env.sh example.com production en --admin-password "SecurePass123" --force --nobackup
+#   ./setup-env.sh localhost development ko --protocol https
 #
 ################################################################################
 
@@ -167,12 +169,13 @@ create_env_file() {
   sed -i.bak "s|^REDIS_HOST=.*|REDIS_HOST=redis|" "$ENV_FILE"
   sed -i.bak "s|^REDIS_PORT=.*|REDIS_PORT=6379|" "$ENV_FILE"
 
-  # Set CORS_ORIGIN based on environment
+  # Set CORS_ORIGIN based on protocol
+  sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=$PROTOCOL://$HOST:53000|" "$ENV_FILE"
+
+  # Set LOG_LEVEL based on environment
   if [ "$ENVIRONMENT" = "development" ]; then
-    sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=http://$HOST:53000|" "$ENV_FILE"
     sed -i.bak "s|^LOG_LEVEL=.*|LOG_LEVEL=debug|" "$ENV_FILE"
   else
-    sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=https://$HOST:53000|" "$ENV_FILE"
     sed -i.bak "s|^LOG_LEVEL=.*|LOG_LEVEL=info|" "$ENV_FILE"
   fi
 
@@ -186,14 +189,14 @@ create_env_file() {
   if [ "$ENVIRONMENT" = "development" ]; then
     sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=http://localhost:54000|" "$ENV_FILE"
   else
-    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=http://$HOST:54000|" "$ENV_FILE"
+    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST:54000|" "$ENV_FILE"
   fi
 
   # Set Bull Board URL based on environment
   if [ "$ENVIRONMENT" = "development" ]; then
     sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=http://localhost:53000/bull-board|" "$ENV_FILE"
   else
-    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=http://$HOST:55000/bull-board|" "$ENV_FILE"
+    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://$HOST:55000/bull-board|" "$ENV_FILE"
   fi
 
 
@@ -223,6 +226,7 @@ print_summary() {
   echo ""
   echo -e "${BLUE}[CONFIGURATION]${NC}"
   echo "  - HOST: $HOST"
+  echo "  - PROTOCOL: $PROTOCOL"
   echo "  - ENVIRONMENT: $ENVIRONMENT"
   echo "  - NODE_ENV: $ENVIRONMENT"
   echo "  - DEFAULT_LANGUAGE: $DEFAULT_LANGUAGE"
@@ -256,7 +260,7 @@ print_summary() {
     echo "  2. Start Docker services: docker-compose -f docker-compose.yml up -d"
   fi
 
-  echo "  3. Access the application: http://$HOST:53000"
+  echo "  3. Access the application: $PROTOCOL://$HOST:53000"
   echo ""
 }
 
@@ -275,6 +279,7 @@ main() {
   ENVIRONMENT="$2"
   DEFAULT_LANGUAGE="${3:-ko}"
   ADMIN_PASSWORD="admin123"
+  PROTOCOL=""
   FORCE=false
   NOBACKUP=false
 
@@ -291,9 +296,29 @@ main() {
       ADMIN_PASSWORD="${!i}"
     elif [[ "$arg" == --admin-password=* ]]; then
       ADMIN_PASSWORD="${arg#*=}"
+    elif [ "$arg" = "--protocol" ]; then
+      i=$((i + 1))
+      PROTOCOL="${!i}"
+    elif [[ "$arg" == --protocol=* ]]; then
+      PROTOCOL="${arg#*=}"
     fi
     i=$((i + 1))
   done
+
+  # Set default protocol based on environment if not specified
+  if [ -z "$PROTOCOL" ]; then
+    if [ "$ENVIRONMENT" = "development" ]; then
+      PROTOCOL="http"
+    else
+      PROTOCOL="https"
+    fi
+  fi
+
+  # Validate protocol
+  if [ "$PROTOCOL" != "http" ] && [ "$PROTOCOL" != "https" ]; then
+    print_error "Protocol must be 'http' or 'https'."
+    exit 1
+  fi
 
   validate_inputs
   check_existing_env

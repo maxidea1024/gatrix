@@ -295,6 +295,75 @@
     .error {
       color: #d32f2f;
     }
+
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        max-height: 30%;
+        border-right: none;
+        border-bottom: 1px solid #4A3D32;
+      }
+
+      .container {
+        flex-direction: column;
+      }
+
+      .content {
+        height: auto;
+        flex: 1;
+      }
+
+      .content-header {
+        padding: 16px;
+        min-height: 60px;
+      }
+
+      .content-title {
+        font-size: 1.2rem;
+      }
+
+      .content-body {
+        padding: 16px;
+      }
+
+      .content-text {
+        font-size: 0.9rem;
+      }
+
+      .notice-item {
+        padding: 10px 16px;
+        min-height: 70px;
+      }
+
+      .notice-item-title {
+        font-size: 0.9rem;
+      }
+
+      .notice-item-date {
+        font-size: 0.7rem;
+      }
+    }
+
+    /* Very small mobile devices */
+    @media (max-width: 480px) {
+      .content-title {
+        font-size: 1.1rem;
+      }
+
+      .content-text {
+        font-size: 0.85rem;
+      }
+
+      .content-body {
+        padding: 12px;
+      }
+
+      .content-header {
+        padding: 12px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -350,24 +419,75 @@
       }, false);
     }
 
-    // Load read notices from localStorage
-    function loadReadNotices() {
+    // Check if localStorage is available
+    function isLocalStorageAvailable() {
       try {
-        const stored = localStorage.getItem(READ_NOTICES_KEY);
-        if (stored) {
-          readNotices = new Set(JSON.parse(stored));
-        }
-      } catch (error) {
-        console.error('Failed to load read notices:', error);
+        const test = '__localStorage_test__';
+        localStorage.setItem(test, test);
+        localStorage.removeItem(test);
+        return true;
+      } catch (e) {
+        return false;
       }
     }
 
-    // Save read notices to localStorage
+    // Cookie helper functions
+    function setCookie(name, value, days) {
+      const expires = days ? '; expires=' + new Date(Date.now() + days * 864e5).toUTCString() : '';
+      document.cookie = name + '=' + encodeURIComponent(value) + expires + '; path=/; SameSite=Lax';
+    }
+
+    function getCookie(name) {
+      const nameEQ = name + '=';
+      const ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+      }
+      return null;
+    }
+
+    // Load read notices from localStorage or cookie
+    function loadReadNotices() {
+      try {
+        let stored = null;
+
+        // Try localStorage first
+        if (isLocalStorageAvailable()) {
+          stored = localStorage.getItem(READ_NOTICES_KEY);
+          console.log('[ReadStatus] Using localStorage');
+        } else {
+          // Fallback to cookie
+          stored = getCookie(READ_NOTICES_KEY);
+          console.log('[ReadStatus] localStorage not available, using cookie');
+        }
+
+        if (stored) {
+          readNotices = new Set(JSON.parse(stored));
+          console.log('[ReadStatus] Loaded read notices:', Array.from(readNotices));
+        }
+      } catch (error) {
+        console.error('[ReadStatus] Failed to load read notices:', error);
+      }
+    }
+
+    // Save read notices to localStorage or cookie
     function saveReadNotices() {
       try {
-        localStorage.setItem(READ_NOTICES_KEY, JSON.stringify(Array.from(readNotices)));
+        const data = JSON.stringify(Array.from(readNotices));
+
+        // Try localStorage first
+        if (isLocalStorageAvailable()) {
+          localStorage.setItem(READ_NOTICES_KEY, data);
+          console.log('[ReadStatus] Saved to localStorage:', Array.from(readNotices));
+        } else {
+          // Fallback to cookie (expires in 365 days)
+          setCookie(READ_NOTICES_KEY, data, 365);
+          console.log('[ReadStatus] Saved to cookie:', Array.from(readNotices));
+        }
       } catch (error) {
-        console.error('Failed to save read notices:', error);
+        console.error('[ReadStatus] Failed to save read notices:', error);
       }
     }
 

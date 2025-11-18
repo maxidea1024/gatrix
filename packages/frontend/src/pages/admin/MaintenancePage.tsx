@@ -103,6 +103,8 @@ const MaintenancePage: React.FC = () => {
         setStartsAt(detail.startsAt ? dayjs.utc(detail.startsAt).tz(getStoredTimezone()) : null);
         setEndsAt(detail.endsAt ? dayjs.utc(detail.endsAt).tz(getStoredTimezone()) : null);
         setBaseMsg(detail.message || '');
+        setKickExistingPlayers(detail.kickExistingPlayers || false);
+        setKickDelayMinutes(detail.kickDelayMinutes || 5);
         const d: any[] = [];
         if (detail.localeMessages?.ko) d.push({ lang: 'ko', message: detail.localeMessages.ko });
         if (detail.localeMessages?.en) d.push({ lang: 'en', message: detail.localeMessages.en });
@@ -148,6 +150,8 @@ const MaintenancePage: React.FC = () => {
           setStartsAt(detail.startsAt ? dayjs.utc(detail.startsAt).tz(getStoredTimezone()) : null);
           setEndsAt(detail.endsAt ? dayjs.utc(detail.endsAt).tz(getStoredTimezone()) : null);
           setBaseMsg(detail.message || '');
+          setKickExistingPlayers(detail.kickExistingPlayers || false);
+          setKickDelayMinutes(detail.kickDelayMinutes || 5);
           const d: any[] = [];
           if (detail.localeMessages?.ko) d.push({ lang: 'ko', message: detail.localeMessages.ko });
           if (detail.localeMessages?.en) d.push({ lang: 'en', message: detail.localeMessages.en });
@@ -223,6 +227,8 @@ const MaintenancePage: React.FC = () => {
         type,
         startsAt: startsAt ? startsAt.format() : null,
         endsAt: endsAt ? endsAt.format() : null,
+        kickExistingPlayers,
+        kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
         message: tpl?.defaultMessage || undefined,
       };
       // Only include localeMessages if multi-language is supported
@@ -239,6 +245,8 @@ const MaintenancePage: React.FC = () => {
       type,
       startsAt: startsAt ? startsAt.format() : null,
       endsAt: endsAt ? endsAt.format() : null,
+      kickExistingPlayers,
+      kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
       message: baseMsg || undefined,
       ...(supportsMultiLanguage && locales.length > 0 ? { localeMessages: Object.fromEntries(locales.map(l => [l.lang, l.message])) } : {}),
     };
@@ -311,7 +319,7 @@ const MaintenancePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3, transition:'background-color 0.2s ease', backgroundColor: (theme)=> isMaintenance ? alpha(theme.palette.error.light, 0.08) : alpha(theme.palette.success.light, 0.06) }}>
+    <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <BuildIcon sx={{ fontSize: 32, color: 'primary.main' }} />
@@ -343,19 +351,6 @@ const MaintenancePage: React.FC = () => {
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, color: getMaintenanceStatusDisplay(maintenanceStatus).color }}>
                       {getMaintenanceStatusDisplay(maintenanceStatus).icon} {t(getMaintenanceStatusDisplay(maintenanceStatus).label)}
                     </Typography>
-                    <Box component="span" sx={{
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: 1,
-                      backgroundColor: getMaintenanceStatusDisplay(maintenanceStatus).bgColor,
-                      color: getMaintenanceStatusDisplay(maintenanceStatus).color,
-                      fontSize: '0.75rem',
-                      fontWeight: 'bold'
-                    }}>
-                      {maintenanceStatus === 'active' && t('maintenance.statusActive')}
-                      {maintenanceStatus === 'scheduled' && t('maintenance.statusScheduled')}
-                      {maintenanceStatus === 'inactive' && t('maintenance.statusInactive')}
-                    </Box>
                   </Box>
 
                   {/* Current Maintenance Summary */}
@@ -493,6 +488,26 @@ const MaintenancePage: React.FC = () => {
                             </Box>
                           </Box>
                         )}
+
+                        {/* 강제종료 옵션 */}
+                        <Box component="tr">
+                          <Box component="td" sx={{
+                            fontWeight: 500,
+                            fontSize: '0.875rem',
+                            width: '140px',
+                            verticalAlign: 'top',
+                            pr: 2
+                          }}>
+                            {t('maintenance.kickExistingPlayers')}:
+                          </Box>
+                          <Box component="td" sx={{
+                            fontSize: '0.875rem',
+                            verticalAlign: 'top',
+                            color: kickExistingPlayers ? 'warning.main' : 'success.main'
+                          }}>
+                            {kickExistingPlayers ? `${t('common.yes')} (${kickDelayMinutes}${t('maintenance.minutesUnit')})` : t('common.no')}
+                          </Box>
+                        </Box>
 
                         {/* 설정자 정보 */}
                         {currentMaintenanceDetail?.updatedBy && (
@@ -992,52 +1007,25 @@ const MaintenancePage: React.FC = () => {
                     </Box>
                   )}
 
-                  {confirmMode === 'start' && (
-                    <>
-                      <Box component="tr">
-                        <Box component="td" sx={{
-                          fontWeight: 500,
-                          fontSize: '0.875rem',
-                          width: '140px',
-                          verticalAlign: 'top',
-                          pr: 2
-                        }}>
-                          {t('maintenance.kickExistingPlayers')}:
-                        </Box>
-                        <Box component="td" sx={{
-                          fontSize: '0.875rem',
-                          verticalAlign: 'top',
-                          color: kickExistingPlayers ? 'warning.main' : 'success.main'
-                        }}>
-                          {kickExistingPlayers ? t('common.yes') : t('common.no')}
-                        </Box>
-                      </Box>
-
-                      {kickExistingPlayers && (
-                        <Box component="tr">
-                          <Box component="td" sx={{
-                            fontWeight: 500,
-                            fontSize: '0.875rem',
-                            width: '140px',
-                            verticalAlign: 'top',
-                            pr: 2
-                          }}>
-                            {t('maintenance.kickDelayMinutes')}:
-                          </Box>
-                          <Box component="td" sx={{
-                            fontSize: '0.875rem',
-                            verticalAlign: 'top',
-                            color: 'warning.main'
-                          }}>
-                            {kickDelayMinutes === 0
-                              ? t('maintenance.kickDelayImmediate')
-                              : t('maintenance.kickDelayMinutesValue', { minutes: kickDelayMinutes })
-                            }
-                          </Box>
-                        </Box>
-                      )}
-                    </>
-                  )}
+                  {/* 강제종료 옵션 */}
+                  <Box component="tr">
+                    <Box component="td" sx={{
+                      fontWeight: 500,
+                      fontSize: '0.875rem',
+                      width: '140px',
+                      verticalAlign: 'top',
+                      pr: 2
+                    }}>
+                      {t('maintenance.kickExistingPlayers')}:
+                    </Box>
+                    <Box component="td" sx={{
+                      fontSize: '0.875rem',
+                      verticalAlign: 'top',
+                      color: kickExistingPlayers ? 'warning.main' : 'success.main'
+                    }}>
+                      {kickExistingPlayers ? `${t('common.yes')} (${kickDelayMinutes}${t('maintenance.minutesUnit')})` : t('common.no')}
+                    </Box>
+                  </Box>
 
                   {(baseMsg || (inputMode === 'template' && selectedTpl?.defaultMessage)) && (
                     <Box component="tr">

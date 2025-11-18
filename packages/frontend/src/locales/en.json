@@ -888,6 +888,7 @@
     "directInput": "Direct Input",
     "startsAt": "Start Time",
     "endsAt": "End Time",
+    "now": "Now",
     "messageSource": "Message Source",
     "perLanguageMessage": "Language-specific Maintenance Messages",
     "selectTemplate": "Select Template",
@@ -1743,6 +1744,7 @@
       "sinceDescription": "Select a start date. End date will be today.",
       "lastDescription": "Select a time period from the options below."
     },
+    "accept": "Accept",
     "apply": "Apply",
     "delete": "Delete",
     "description": "description",

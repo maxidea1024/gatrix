@@ -9,6 +9,8 @@ export interface MaintenanceDetail {
   message?: string; // default message
   messages?: { ko?: string; en?: string; zh?: string }; // per-language overrides (deprecated, use localeMessages)
   localeMessages?: { ko?: string; en?: string; zh?: string }; // per-language overrides
+  kickExistingPlayers?: boolean;
+  kickDelayMinutes?: number;
   updatedAt?: string;
   updatedBy?: {
     id: number;

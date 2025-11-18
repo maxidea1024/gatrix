@@ -61,25 +61,77 @@ const getCategoryIcon = (category: string) => {
   }
 };
 
-// Get read status from localStorage
+// Check if localStorage is available
+const isLocalStorageAvailable = (): boolean => {
+  try {
+    const test = '__localStorage_test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+// Cookie helper functions
+const setCookie = (name: string, value: string, days: number) => {
+  const expires = days ? `; expires=${new Date(Date.now() + days * 864e5).toUTCString()}` : '';
+  document.cookie = `${name}=${encodeURIComponent(value)}${expires}; path=/; SameSite=Lax`;
+};
+
+const getCookie = (name: string): string | null => {
+  const nameEQ = `${name}=`;
+  const ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+  }
+  return null;
+};
+
+// Get read status from localStorage or cookie
 const getReadNotices = (): Set<number> => {
   try {
-    const stored = localStorage.getItem(READ_NOTICES_KEY);
+    let stored: string | null = null;
+
+    // Try localStorage first
+    if (isLocalStorageAvailable()) {
+      stored = localStorage.getItem(READ_NOTICES_KEY);
+      console.log('[ReadStatus] Using localStorage');
+    } else {
+      // Fallback to cookie
+      stored = getCookie(READ_NOTICES_KEY);
+      console.log('[ReadStatus] localStorage not available, using cookie');
+    }
+
     if (stored) {
-      return new Set(JSON.parse(stored));
+      const readIds = new Set(JSON.parse(stored));
+      console.log('[ReadStatus] Loaded read notices:', Array.from(readIds));
+      return readIds;
     }
   } catch (error) {
-    console.error('Failed to load read notices:', error);
+    console.error('[ReadStatus] Failed to load read notices:', error);
   }
   return new Set();
 };
 
-// Save read status to localStorage
+// Save read status to localStorage or cookie
 const saveReadNotices = (readNotices: Set<number>) => {
   try {
-    localStorage.setItem(READ_NOTICES_KEY, JSON.stringify(Array.from(readNotices)));
+    const data = JSON.stringify(Array.from(readNotices));
+
+    // Try localStorage first
+    if (isLocalStorageAvailable()) {
+      localStorage.setItem(READ_NOTICES_KEY, data);
+      console.log('[ReadStatus] Saved to localStorage:', Array.from(readNotices));
+    } else {
+      // Fallback to cookie (expires in 365 days)
+      setCookie(READ_NOTICES_KEY, data, 365);
+      console.log('[ReadStatus] Saved to cookie:', Array.from(readNotices));
+    }
   } catch (error) {
-    console.error('Failed to save read notices:', error);
+    console.error('[ReadStatus] Failed to save read notices:', error);
   }
 };
 
