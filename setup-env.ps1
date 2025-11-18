@@ -212,6 +212,8 @@ function Create-EnvFile {
         } elseif ($line -match "^REDIS_HOST=") {
             $newLines += "REDIS_HOST=redis"
         } elseif ($line -match "^REDIS_PORT=") {
+            # REDIS_PORT is the internal Docker port (6379), not the host port
+            # Host port is configured separately in docker-compose.yml via REDIS_HOST_PORT
             $newLines += "REDIS_PORT=6379"
         } elseif ($line -match "^CORS_ORIGIN=") {
             $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress`:53000"
