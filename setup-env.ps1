@@ -21,6 +21,9 @@
 .PARAMETER Protocol
     Protocol (http or https, default: http for dev, https for prod)
 
+.PARAMETER ServiceDiscoveryMode
+    Service Discovery mode (etcd or redis, default: etcd)
+
 .PARAMETER Force
     Force overwrite existing .env file
 
@@ -34,6 +37,7 @@
     .\setup-env.ps1 -HostAddress localhost -Environment development -AdminPassword "MySecurePassword123"
     .\setup-env.ps1 -HostAddress localhost -Environment development -Force -NoBackup
     .\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https
+    .\setup-env.ps1 -HostAddress localhost -Environment development -ServiceDiscoveryMode redis
 
 .NOTES
     Requires Windows PowerShell 5.0 or higher
@@ -56,6 +60,10 @@ param(
     [Parameter(Mandatory=$false, HelpMessage="Protocol (http or https, default: http for dev, https for prod)")]
     [ValidateSet("http", "https")]
     [string]$Protocol = "",
+
+    [Parameter(Mandatory=$false, HelpMessage="Service Discovery mode (etcd or redis, default: etcd)")]
+    [ValidateSet("etcd", "redis")]
+    [string]$ServiceDiscoveryMode = "etcd",
 
     [Parameter(Mandatory=$false, HelpMessage="Force overwrite existing .env file")]
     [switch]$Force,
@@ -267,6 +275,8 @@ function Create-EnvFile {
             }
         } elseif ($line -match "^ADMIN_PASSWORD=") {
             $newLines += "ADMIN_PASSWORD=$AdminPassword"
+        } elseif ($line -match "^SERVICE_DISCOVERY_MODE=") {
+            $newLines += "SERVICE_DISCOVERY_MODE=$ServiceDiscoveryMode"
         } else {
             $newLines += $line
         }
@@ -294,6 +304,7 @@ function Print-Summary {
     Write-Host "  - NODE_ENV: $Environment"
     Write-Host "  - DEFAULT_LANGUAGE: $DefaultLanguage"
     Write-Host "  - ADMIN_PASSWORD: $AdminPassword"
+    Write-Host "  - SERVICE_DISCOVERY_MODE: $ServiceDiscoveryMode"
     Write-Host "  - JWT_SECRET: [auto-generated] (32 chars)"
     Write-Host "  - SESSION_SECRET: [auto-generated] (20 chars)"
     Write-Host "  - JWT_REFRESH_SECRET: [auto-generated] (32 chars)"

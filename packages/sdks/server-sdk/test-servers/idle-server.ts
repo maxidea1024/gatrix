@@ -16,6 +16,7 @@ async function main() {
   // Initialize Express app for metrics
   const app = express();
   const metricsPort = parseInt(process.env.METRICS_PORT || '9999');
+  const instanceName = process.env.INSTANCE_NAME || 'idle-1';
 
   // SDK will provide its Registry for HTTP metrics to merge into
   const sdk = new GatrixServerSDK({
@@ -66,11 +67,11 @@ async function main() {
       // hostname: os.hostname(),
       // internalAddress: internalIp,
       ports: {
-        http: [9999],
+        http: [metricsPort],
       },
       status: 'ready',
       meta: {
-        instanceName: 'idle-1',
+        instanceName,
         startTime: new Date().toISOString(),
       },
     });

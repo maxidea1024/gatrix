@@ -66,17 +66,8 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       await lease.put(key).value(JSON.stringify(instanceData));
       this.leases.set(`${serviceType}:${instance.instanceId}`, lease);
 
-      // Auto-heartbeat
-      const interval = setInterval(async () => {
-        try {
-          await lease.keepaliveOnce();
-        } catch (error) {
-          logger.error(`Heartbeat failed for ${serviceType}:${instance.instanceId}:`, error);
-        }
-      }, (ttlSeconds / 2) * 1000);
-
-      // Store interval for cleanup
-      (lease as any)._heartbeatInterval = interval;
+      // Note: No auto-heartbeat here. SDK/client is responsible for sending heartbeat via /api/v1/server/services/status
+      // which will call the heartbeat() method below to renew the lease.
 
       logger.info(`Service registered: ${serviceType}:${instance.instanceId}`, { labels: instance.labels });
     } catch (error) {
@@ -86,9 +77,27 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
   }
 
   async heartbeat(instanceId: string, serviceType: string): Promise<void> {
+    const key = this.getInstanceKey(serviceType, instanceId);
     const lease = this.leases.get(`${serviceType}:${instanceId}`);
 
     if (lease) {
+      // Check if service is in inactive state
+      try {
+        const value = await this.client.get(key).string();
+        if (value) {
+          const instance: ServiceInstance = JSON.parse(value);
+          if (instance.status === 'terminated' || instance.status === 'error' || instance.status === 'no-response') {
+            logger.warn(
+              `Ignoring heartbeat for inactive service: ${serviceType}:${instanceId} (current status: ${instance.status})`,
+            );
+            return;
+          }
+        }
+      } catch (error) {
+        logger.warn(`Failed to check service status for heartbeat: ${serviceType}:${instanceId}`, error);
+      }
+
+      // Renew lease
       try {
         await lease.keepaliveOnce();
       } catch (error) {
@@ -109,11 +118,6 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       if (forceDelete) {
         // Force delete: immediately remove the key
         if (lease) {
-          // Clear heartbeat interval
-          if ((lease as any)._heartbeatInterval) {
-            clearInterval((lease as any)._heartbeatInterval);
-          }
-
           // Revoke lease (this will delete the key)
           await lease.revoke();
           this.leases.delete(leaseKey);
@@ -124,7 +128,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
         logger.info(`Service deleted permanently: ${serviceType}:${instanceId}`);
       } else {
-        // Graceful unregister: mark as terminated with short TTL
+        // Graceful unregister: mark as terminated with configured TTL
         // First, get the current service data
         const currentValue = await this.client.get(key).string();
         if (currentValue) {
@@ -135,17 +139,14 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
             serviceData.status = 'terminated';
             serviceData.updatedAt = new Date().toISOString();
 
-            // Clear old lease and heartbeat
+            // Clear old lease
             if (lease) {
-              if ((lease as any)._heartbeatInterval) {
-                clearInterval((lease as any)._heartbeatInterval);
-              }
               await lease.revoke();
               this.leases.delete(leaseKey);
             }
 
-            // Create new lease with short TTL (15 seconds for quick cleanup)
-            const terminatedTTL = 15;
+            // Create new lease with configured TTL
+            const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
             const newLease = this.client.lease(terminatedTTL);
             await newLease.put(key).value(JSON.stringify(serviceData));
             this.leases.set(leaseKey, newLease);
@@ -155,9 +156,6 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
             logger.warn(`Failed to parse service data for ${serviceType}:${instanceId}, deleting instead:`, parseError);
             // Fallback to deletion if parsing fails
             if (lease) {
-              if ((lease as any)._heartbeatInterval) {
-                clearInterval((lease as any)._heartbeatInterval);
-              }
               await lease.revoke();
               this.leases.delete(leaseKey);
             } else {
@@ -167,9 +165,6 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         } else {
           // Service not found, just clean up lease
           if (lease) {
-            if ((lease as any)._heartbeatInterval) {
-              clearInterval((lease as any)._heartbeatInterval);
-            }
             await lease.revoke();
             this.leases.delete(leaseKey);
           }
@@ -224,6 +219,14 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       // Partial merge: update only provided fields
       const instance: ServiceInstance = JSON.parse(value);
 
+      // Ignore updates for inactive services (terminated, error, no-response)
+      if (instance.status === 'terminated' || instance.status === 'error' || instance.status === 'no-response') {
+        logger.warn(
+          `Ignoring updateStatus for inactive service: ${serviceType}:${input.instanceId} (current status: ${instance.status})`,
+        );
+        return;
+      }
+
       if (input.status !== undefined) {
         instance.status = input.status;
       }
@@ -240,9 +243,6 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         // Revoke old lease if exists
         if (lease) {
           try {
-            if ((lease as any)._heartbeatInterval) {
-              clearInterval((lease as any)._heartbeatInterval);
-            }
             await lease.revoke();
           } catch (error) {
             logger.warn(`Failed to revoke old lease for ${leaseKey}:`, error);

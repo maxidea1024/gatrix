@@ -140,6 +140,24 @@ docker-compose --version
 .\setup-env.ps1 -HostAddress example.cn -Environment production -DefaultLanguage zh -Protocol http
 ```
 
+**Service Discovery 모드 지정 (Linux/Mac):**
+```bash
+# Redis 모드 사용
+./setup-env.sh localhost development ko --service-discovery-mode redis
+
+# etcd 모드 사용 (기본값)
+./setup-env.sh localhost development ko --service-discovery-mode etcd
+```
+
+**Service Discovery 모드 지정 (Windows PowerShell):**
+```powershell
+# Redis 모드 사용
+.\setup-env.ps1 -HostAddress localhost -Environment development -ServiceDiscoveryMode redis
+
+# etcd 모드 사용 (기본값)
+.\setup-env.ps1 -HostAddress localhost -Environment development -ServiceDiscoveryMode etcd
+```
+
 
 
 스크립트는 다음을 수행합니다:
@@ -148,6 +166,7 @@ docker-compose --version
 - 기본 언어 설정 (한국어 `ko`, 영어 `en`, 중국어 `zh`)
 - 관리자 비밀번호 설정 (기본값: admin123, 또는 사용자 지정)
 - 프로토콜 설정 (기본값: 개발 환경은 http, 프로덕션은 https)
+- Service Discovery 모드 설정 (기본값: etcd, 옵션: redis)
 - `.env` 파일이 이미 존재하면 백업 생성
 - 환경에 따라 올바른 docker-compose 파일 자동 선택
 

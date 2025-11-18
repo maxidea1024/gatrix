@@ -119,9 +119,26 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
     const statKey = this.getStatKey(serviceType, instanceId);
 
     try {
+      // Check if service is marked as terminated
+      const terminatedMarkerKey = `services:${serviceType}:terminated:${instanceId}`;
+      const isTerminated = await this.client.exists(terminatedMarkerKey);
+      if (isTerminated) {
+        logger.warn(`Ignoring heartbeat for ${serviceType}:${instanceId} - service is marked as terminated`);
+        return;
+      }
+
       const value = await this.client.get(statKey);
       if (value) {
         const stat = JSON.parse(value);
+
+        // Ignore heartbeat for inactive services
+        if (stat.status === 'terminated' || stat.status === 'error' || stat.status === 'no-response') {
+          logger.warn(
+            `Ignoring heartbeat for inactive service: ${serviceType}:${instanceId} (current status: ${stat.status})`,
+          );
+          return;
+        }
+
         stat.updatedAt = new Date().toISOString();
 
         // Renew TTL with configured heartbeat TTL (not based on remaining TTL)
@@ -619,7 +636,18 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
                 // Check if this service was marked as terminated (explicit unregister)
                 const isTerminated = await this.client.exists(terminatedMarkerKey);
 
-                const instance = this.trackedServices.get(trackedKey);
+                // Try to get instance from trackedServices first, then from Redis meta key
+                let instance = this.trackedServices.get(trackedKey);
+                if (!instance) {
+                  // Service not in trackedServices, try to get from Redis meta key
+                  const metaKey = this.getMetaKey(serviceType, instanceId);
+                  const metaValue = await this.client.get(metaKey);
+                  if (metaValue) {
+                    instance = JSON.parse(metaValue);
+                    logger.debug(`Retrieved service from meta key: ${serviceType}:${instanceId}`);
+                  }
+                }
+
                 if (instance) {
                   if (isTerminated) {
                     // Explicit termination: clean up marker
@@ -670,6 +698,13 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
 
                     logger.info(`Service no-response (heartbeat timeout): ${serviceType}:${instanceId}`);
                   }
+
+                  // Delete meta key after processing
+                  const metaKey = this.getMetaKey(serviceType, instanceId);
+                  await this.client.del(metaKey);
+                  logger.debug(`Deleted meta key: ${metaKey}`);
+                } else {
+                  logger.warn(`Service not found in trackedServices or Redis meta: ${serviceType}:${instanceId}`);
                 }
               }
             }

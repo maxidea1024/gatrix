@@ -302,12 +302,19 @@ const startServer = async () => {
       logger.warn('Backend service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });
     }
 
-    // Initialize automatic cleanup for etcd mode
+    // Initialize Service Discovery watch (for Redis keyspace notifications)
     try {
       const serviceDiscoveryMode = process.env.SERVICE_DISCOVERY_MODE || 'redis';
-      if (serviceDiscoveryMode === 'etcd') {
-        const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
+      const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
 
+      if (serviceDiscoveryMode === 'redis') {
+        // Start watching for Redis keyspace notifications (TTL expiration)
+        // This is required for automatic cleanup of expired services
+        await serviceDiscoveryService.watchServices((event) => {
+          logger.debug(`Service Discovery event: ${event.type} ${event.instance.labels.service}:${event.instance.instanceId}`);
+        });
+        logger.info('Redis Service Discovery watch initialized (keyspace notifications enabled)');
+      } else if (serviceDiscoveryMode === 'etcd') {
         // Start automatic cleanup every 5 seconds to catch terminated services quickly
         const cleanupInterval = setInterval(async () => {
           try {
@@ -327,7 +334,7 @@ const startServer = async () => {
         logger.info('etcd auto-cleanup initialized (runs every 5 seconds)');
       }
     } catch (error) {
-      logger.warn('etcd auto-cleanup initialization failed, continuing:', error);
+      logger.warn('Service Discovery initialization failed, continuing:', error);
     }
 
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)

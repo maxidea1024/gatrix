@@ -10,10 +10,11 @@
 #   ./setup-env.sh [HOST] [ENVIRONMENT] [LANGUAGE] [OPTIONS]
 #
 # Options:
-#   --force              Overwrite existing .env file
-#   --nobackup           Do not create backup file when overwriting
-#   --admin-password     Set custom admin password
-#   --protocol           Set protocol (http or https, default: http for dev, https for prod)
+#   --force                    Overwrite existing .env file
+#   --nobackup                 Do not create backup file when overwriting
+#   --admin-password           Set custom admin password
+#   --protocol                 Set protocol (http or https, default: http for dev, https for prod)
+#   --service-discovery-mode   Set service discovery mode (etcd or redis, default: etcd)
 #
 # Examples:
 #   ./setup-env.sh localhost development
@@ -24,6 +25,7 @@
 #   ./setup-env.sh localhost development zh --admin-password "MySecurePassword123"
 #   ./setup-env.sh example.cn production zh --admin-password "SecurePass123" --force --nobackup
 #   ./setup-env.sh localhost development zh --protocol https
+#   ./setup-env.sh localhost development zh --service-discovery-mode redis
 #
 ################################################################################
 
@@ -219,6 +221,9 @@ create_env_file() {
   # Replace admin password
   sed -i.bak "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=$ADMIN_PASSWORD|" "$ENV_FILE"
 
+  # Replace service discovery mode
+  sed -i.bak "s|^SERVICE_DISCOVERY_MODE=.*|SERVICE_DISCOVERY_MODE=$SERVICE_DISCOVERY_MODE|" "$ENV_FILE"
+
   # Replace secrets
   sed -i.bak "s|^JWT_SECRET=.*|JWT_SECRET=$JWT_SECRET|" "$ENV_FILE"
   sed -i.bak "s|^SESSION_SECRET=.*|SESSION_SECRET=$SESSION_SECRET|" "$ENV_FILE"
@@ -247,6 +252,7 @@ print_summary() {
   echo "  - NODE_ENV: $ENVIRONMENT"
   echo "  - DEFAULT_LANGUAGE: $DEFAULT_LANGUAGE"
   echo "  - ADMIN_PASSWORD: $ADMIN_PASSWORD"
+  echo "  - SERVICE_DISCOVERY_MODE: $SERVICE_DISCOVERY_MODE"
   echo "  - JWT_SECRET: [auto-generated] (32 chars)"
   echo "  - SESSION_SECRET: [auto-generated] (20 chars)"
   echo "  - JWT_REFRESH_SECRET: [auto-generated] (32 chars)"
@@ -299,6 +305,7 @@ main() {
   DEFAULT_LANGUAGE="${3:-zh}"
   ADMIN_PASSWORD="admin123"
   PROTOCOL=""
+  SERVICE_DISCOVERY_MODE="etcd"
   FORCE=false
   NOBACKUP=false
 
@@ -320,6 +327,11 @@ main() {
       PROTOCOL="${!i}"
     elif [[ "$arg" == --protocol=* ]]; then
       PROTOCOL="${arg#*=}"
+    elif [ "$arg" = "--service-discovery-mode" ]; then
+      i=$((i + 1))
+      SERVICE_DISCOVERY_MODE="${!i}"
+    elif [[ "$arg" == --service-discovery-mode=* ]]; then
+      SERVICE_DISCOVERY_MODE="${arg#*=}"
     fi
     i=$((i + 1))
   done
@@ -336,6 +348,12 @@ main() {
   # Validate protocol
   if [ "$PROTOCOL" != "http" ] && [ "$PROTOCOL" != "https" ]; then
     print_error "Protocol must be 'http' or 'https'."
+    exit 1
+  fi
+
+  # Validate service discovery mode
+  if [ "$SERVICE_DISCOVERY_MODE" != "etcd" ] && [ "$SERVICE_DISCOVERY_MODE" != "redis" ]; then
+    print_error "Service discovery mode must be 'etcd' or 'redis'."
     exit 1
   fi
 
