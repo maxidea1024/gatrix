@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import VarsModel from '../models/Vars';
 import { pubSubService } from '../services/PubSubService';
 import logger from '../config/logger';
+import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
+import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 
 export interface MaintenancePayload {
   isMaintenance: boolean;
@@ -18,16 +20,32 @@ const KEY = 'isMaintenance';
 const KEY_DETAIL = 'maintenanceDetail';
 
 export class MaintenanceController {
-  static async getStatus(_req: Request, res: Response, next: NextFunction) {
+  static async getStatus(req: Request, res: Response, next: NextFunction) {
     try {
-      const is = await VarsModel.get(KEY);
-      const detailRaw = await VarsModel.get(KEY_DETAIL);
-      const detail = detailRaw ? JSON.parse(detailRaw) : null;
-      // Return the actual isMaintenance flag value (not computed active status)
-      // Frontend will compute the status (active/scheduled/inactive) based on current time
-      const isMaintenance = is === 'true';
-      res.json({ success: true, data: { isUnderMaintenance: isMaintenance, ...(isMaintenance && detail ? { detail } : {}) } });
-    } catch (e) { next(e); }
+      await respondWithEtagCache(res, {
+        cacheKey: SERVER_SDK_ETAG.MAINTENANCE,
+        ttlMs: DEFAULT_CONFIG.MAINTENANCE_TTL,
+        requestEtag: req.headers['if-none-match'],
+        buildPayload: async () => {
+          const is = await VarsModel.get(KEY);
+          const detailRaw = await VarsModel.get(KEY_DETAIL);
+          const detail = detailRaw ? JSON.parse(detailRaw) : null;
+          // Return the actual isMaintenance flag value (not computed active status)
+          // Frontend will compute the status (active/scheduled/inactive) based on current time
+          const isMaintenance = is === 'true';
+
+          return {
+            success: true,
+            data: {
+              isUnderMaintenance: isMaintenance,
+              ...(isMaintenance && detail ? { detail } : {}),
+            },
+          };
+        },
+      });
+    } catch (e) {
+      next(e);
+    }
   }
 
   static async setStatus(req: Request, res: Response, next: NextFunction) {
@@ -83,6 +101,8 @@ export class MaintenanceController {
         detail.kickDelayMinutes = payload.kickDelayMinutes;
       }
       await VarsModel.set(KEY_DETAIL, JSON.stringify(detail), userId);
+
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.MAINTENANCE);
 
       // Return true if maintenance is being set (regardless of whether it's currently active)
       // The actual active status will be computed by computeActive() when needed

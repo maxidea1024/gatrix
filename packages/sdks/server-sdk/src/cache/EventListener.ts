@@ -7,7 +7,7 @@
 import Redis from 'ioredis';
 import { Logger } from '../utils/logger';
 import { RedisConfig } from '../types/config';
-import { StandardEvent, CustomEvent, EventCallback, EventListenerMap, SdkEvent } from '../types/events';
+import { StandardEvent, CustomEvent, EventCallback, EventListenerMap } from '../types/events';
 import { CacheManager } from './CacheManager';
 import { SdkMetrics } from '../utils/sdkMetrics';
 
@@ -150,7 +150,7 @@ export class EventListener {
         if (this.subscriber) {
           try {
             this.subscriber.disconnect();
-          } catch (e) {
+          } catch (_e) {
             // Ignore disconnect errors
           }
         }
@@ -161,7 +161,7 @@ export class EventListener {
         // After successful reconnection, reinitialize all cache data
         this.logger.info('✅ Event listener reconnected. Reinitializing cache data...');
         await this.reinitializeCache();
-      } catch (error: any) {
+      } catch (_error: any) {
         // Silently continue on reconnection failures
         this.setupReconnect();
       }

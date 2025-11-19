@@ -9,17 +9,15 @@ router.get('/prometheus/targets', async (_req, res) => {
   try {
     const services = await serviceDiscoveryService.getServices();
 
-    // Build discovered targets grouped by service type
+    // Build discovered targets with per-instance labels (service, instanceId, hostname, ip)
     const groups: Array<{ targets: string[]; labels?: Record<string, string> }> = [];
-
-    const byService: Record<string, { targets: string[]; labels: Record<string, string> }> = {};
 
     for (const s of services) {
       const serviceType = s.labels.service || 'unknown';
       // Choose port for metrics
       // All services expose /metrics on their main HTTP ports
       let port = 80;
-      let metricsPath = '/metrics';
+      const metricsPath = '/metrics';
       if (serviceType === 'chat') {
         port = (s.ports.http && s.ports.http[0]) || 5100;
       } else if (serviceType === 'backend') {
@@ -33,16 +31,32 @@ router.get('/prometheus/targets', async (_req, res) => {
       }
 
       const target = `${s.internalAddress}:${port}`;
-      if (!byService[serviceType]) {
-        byService[serviceType] = {
-          targets: [],
-          labels: { service: serviceType, metrics_path: metricsPath },
-        };
-      }
-      byService[serviceType].targets.push(target);
-    }
+      const labels: Record<string, string> = {
+        service: serviceType,
+        metrics_path: metricsPath,
+      };
 
-    Object.values(byService).forEach(group => groups.push(group));
+      if (s.instanceId) {
+        labels.instanceId = s.instanceId;
+      }
+      if (s.hostname) {
+        labels.hostname = s.hostname;
+      }
+      if (s.internalAddress) {
+        labels.ip = s.internalAddress;
+      }
+      if (s.externalAddress) {
+        labels.externalIp = s.externalAddress;
+      }
+      if (s.labels.group) {
+        labels.group = s.labels.group;
+      }
+
+      groups.push({
+        targets: [target],
+        labels,
+      });
+    }
 
     // Static fallback: ensure chat-server metrics are present at least
     groups.push({

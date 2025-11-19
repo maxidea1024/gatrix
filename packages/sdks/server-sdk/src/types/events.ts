@@ -69,4 +69,3 @@ export type EventCallback = (event: SdkEvent) => void | Promise<void>;
 export interface EventListenerMap {
   [eventType: string]: EventCallback[];
 }
-

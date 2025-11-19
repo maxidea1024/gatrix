@@ -12,6 +12,8 @@ import { WhitelistModel } from '../../models/AccountWhitelist';
 import logger from '../../config/logger';
 import { ulid } from 'ulid';
 import { pubSubService } from '../../services/PubSubService';
+import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../../constants/cacheKeys';
+import { respondWithEtagCache } from '../../utils/serverSdkEtagCache';
 
 const router = express.Router();
 
@@ -24,43 +26,50 @@ const router = express.Router();
  */
 export const getWhitelistsHandler = async (req: any, res: any) => {
   try {
-    // Get all enabled IP whitelists
-    const ipWhitelistsResult = await IpWhitelistModel.findAll(1, 10000, { isEnabled: true });
-    const now = new Date();
+    await respondWithEtagCache(res, {
+      cacheKey: SERVER_SDK_ETAG.WHITELISTS,
+      ttlMs: DEFAULT_CONFIG.WHITELIST_TTL,
+      requestEtag: req.headers?.['if-none-match'],
+      buildPayload: async () => {
+        // Get all enabled IP whitelists
+        const ipWhitelistsResult = await IpWhitelistModel.findAll(1, 10000, { isEnabled: true });
+        const now = new Date();
 
-    // Filter by date range
-    const activeIpWhitelists = ipWhitelistsResult.ipWhitelists.filter((ip: any) => {
-      if (ip.startDate && new Date(ip.startDate) > now) return false;
-      if (ip.endDate && new Date(ip.endDate) < now) return false;
-      return true;
-    });
+        // Filter by date range
+        const activeIpWhitelists = ipWhitelistsResult.ipWhitelists.filter((ip: any) => {
+          if (ip.startDate && new Date(ip.startDate) > now) return false;
+          if (ip.endDate && new Date(ip.endDate) < now) return false;
+          return true;
+        });
 
-    // Get all enabled account whitelists
-    const accountWhitelistsResult = await WhitelistModel.findAll(1, 10000, { isEnabled: true });
+        // Get all enabled account whitelists
+        const accountWhitelistsResult = await WhitelistModel.findAll(1, 10000, { isEnabled: true });
 
-    // Filter by date range
-    const activeAccountWhitelists = accountWhitelistsResult.whitelists.filter((account: any) => {
-      if (account.startDate && new Date(account.startDate) > now) return false;
-      if (account.endDate && new Date(account.endDate) < now) return false;
-      return true;
-    });
+        // Filter by date range
+        const activeAccountWhitelists = accountWhitelistsResult.whitelists.filter((account: any) => {
+          if (account.startDate && new Date(account.startDate) > now) return false;
+          if (account.endDate && new Date(account.endDate) < now) return false;
+          return true;
+        });
 
-    // Format response to match SDK expectations
-    const ipWhitelist = activeIpWhitelists.map((ip: any) => ({
-      id: ip.id,
-      ipAddress: ip.ipAddress,
-    }));
+        // Format response to match SDK expectations
+        const ipWhitelist = activeIpWhitelists.map((ip: any) => ({
+          id: ip.id,
+          ipAddress: ip.ipAddress,
+        }));
 
-    const accountWhitelist = activeAccountWhitelists.map((account: any) => ({
-      id: account.id,
-      accountId: account.accountId,
-    }));
+        const accountWhitelist = activeAccountWhitelists.map((account: any) => ({
+          id: account.id,
+          accountId: account.accountId,
+        }));
 
-    res.json({
-      success: true,
-      data: {
-        ipWhitelist,
-        accountWhitelist,
+        return {
+          success: true,
+          data: {
+            ipWhitelist,
+            accountWhitelist,
+          },
+        };
       },
     });
   } catch (error: any) {

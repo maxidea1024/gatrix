@@ -2,6 +2,7 @@ import { WhitelistModel, Whitelist, CreateWhitelistData, UpdateWhitelistData, Wh
 import { CustomError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
+import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 export interface BulkCreateEntry {
   nickname: string;
@@ -67,6 +68,8 @@ export class WhitelistService {
           type: 'whitelist.updated',
           data: { id: whitelist.id, timestamp: Date.now() },
         });
+
+        await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -114,6 +117,8 @@ export class WhitelistService {
           type: 'whitelist.updated',
           data: { id: updated.id, timestamp: Date.now() },
         });
+
+        await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -153,6 +158,8 @@ export class WhitelistService {
           type: 'whitelist.updated',
           data: { id, timestamp: Date.now() },
         });
+
+        await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -206,8 +213,11 @@ export class WhitelistService {
         createdBy,
       });
 
-      // Note: Individual whitelist.updated events are published for each created entry
-      // via createWhitelist method, so no need to publish a bulk event here
+      try {
+        await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
+      } catch (eventError) {
+        logger.warn('Failed to invalidate whitelist ETag cache after bulk create:', eventError);
+      }
 
       return createdCount;
     } catch (error) {
@@ -251,6 +261,8 @@ export class WhitelistService {
           type: 'whitelist.updated',
           data: { id: updated.id, timestamp: Date.now() },
         });
+
+        await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request

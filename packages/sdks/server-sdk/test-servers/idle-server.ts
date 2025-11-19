@@ -33,8 +33,8 @@ async function main() {
     // Cache configuration
     cache: {
       enabled: true,
-      ttl: 300,
-      refreshMethod: 'event', // Use event-based refresh (requires Redis)
+      ttl: 1,
+      refreshMethod: 'polling', // Use event-based refresh (requires Redis)
     },
 
     // Logger configuration

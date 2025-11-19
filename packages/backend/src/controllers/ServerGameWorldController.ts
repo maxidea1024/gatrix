@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { GameWorldService } from '../services/GameWorldService';
 import logger from '../config/logger';
+import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
+import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 
 export interface SDKRequest extends Request {
   apiToken?: any;
@@ -40,65 +42,73 @@ export class ServerGameWorldController {
         return null;
       };
 
-      // Fetch visible game worlds sorted by displayOrder ASC
-      const allWorlds = await GameWorldService.getAllGameWorlds({
-        isVisible: true
-      });
+      await respondWithEtagCache(res, {
+        cacheKey: SERVER_SDK_ETAG.GAME_WORLDS,
+        ttlMs: DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL,
+        requestEtag: req.headers['if-none-match'],
+        buildPayload: async () => {
+          // Fetch visible game worlds sorted by displayOrder ASC
+          const allWorlds = await GameWorldService.getAllGameWorlds({
+            isVisible: true,
+          });
 
-      logger.debug(`Game worlds fetched. First world displayOrder: ${allWorlds[0]?.displayOrder}, Last world displayOrder: ${allWorlds[allWorlds.length - 1]?.displayOrder}`);
+          logger.debug(
+            `Game worlds fetched. First world displayOrder: ${allWorlds[0]?.displayOrder}, Last world displayOrder: ${allWorlds[allWorlds.length - 1]?.displayOrder}`,
+          );
 
-      // Fetch tags for each world
-      const { TagService } = await import('../services/TagService');
-      const worldsWithTags = await Promise.all(
-        allWorlds.map(async (world) => {
-          const tags = await TagService.listTagsForEntity('game_world', world.id);
-          // Convert tags to array of tag names only
-          const tagNames = tags ? tags.map((tag: any) => tag.name) : [];
+          // Fetch tags for each world
+          const { TagService } = await import('../services/TagService');
+          const worldsWithTags = await Promise.all(
+            allWorlds.map(async (world) => {
+              const tags = await TagService.listTagsForEntity('game_world', world.id);
+              // Convert tags to array of tag names only
+              const tagNames = tags ? tags.map((tag: any) => tag.name) : [];
 
-          const worldData: any = {
-            id: world.id,
-            worldId: world.worldId,
-            name: world.name,
-            isMaintenance: toBoolean(world.isMaintenance),
-            displayOrder: world.displayOrder,
-            worldServerAddress: world.worldServerAddress || null,
-            customPayload: parseCustomPayload(world.customPayload),
-            tags: tagNames,
-            createdAt: world.createdAt
+              const worldData: any = {
+                id: world.id,
+                worldId: world.worldId,
+                name: world.name,
+                isMaintenance: toBoolean(world.isMaintenance),
+                displayOrder: world.displayOrder,
+                worldServerAddress: world.worldServerAddress || null,
+                customPayload: parseCustomPayload(world.customPayload),
+                tags: tagNames,
+                createdAt: world.createdAt,
+              };
+
+              // Add maintenance info if in maintenance mode
+              if (toBoolean(world.isMaintenance)) {
+                if (world.maintenanceStartDate) {
+                  worldData.maintenanceStartDate = world.maintenanceStartDate;
+                }
+                if (world.maintenanceEndDate) {
+                  worldData.maintenanceEndDate = world.maintenanceEndDate;
+                }
+                if (world.maintenanceMessage) {
+                  worldData.maintenanceMessage = world.maintenanceMessage;
+                }
+                // Include all maintenance locales if they exist
+                if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
+                  worldData.maintenanceLocales = world.maintenanceLocales.map((locale: any) => ({
+                    lang: locale.lang,
+                    message: locale.message,
+                  }));
+                }
+              }
+
+              return worldData;
+            }),
+          );
+
+          logger.info(`Server SDK: Retrieved ${worldsWithTags.length} visible game worlds`);
+
+          return {
+            success: true,
+            data: {
+              worlds: worldsWithTags,
+            },
           };
-
-          // Add maintenance info if in maintenance mode
-          if (toBoolean(world.isMaintenance)) {
-            if (world.maintenanceStartDate) {
-              worldData.maintenanceStartDate = world.maintenanceStartDate;
-            }
-            if (world.maintenanceEndDate) {
-              worldData.maintenanceEndDate = world.maintenanceEndDate;
-            }
-            if (world.maintenanceMessage) {
-              worldData.maintenanceMessage = world.maintenanceMessage;
-            }
-            // Include all maintenance locales if they exist
-            if (world.maintenanceLocales && world.maintenanceLocales.length > 0) {
-              worldData.maintenanceLocales = world.maintenanceLocales.map((locale: any) => ({
-                lang: locale.lang,
-                message: locale.message,
-              }));
-            }
-          }
-
-          return worldData;
-        })
-      );
-
-      logger.info(`Server SDK: Retrieved ${worldsWithTags.length} visible game worlds`);
-
-      // Return response
-      res.json({
-        success: true,
-        data: {
-          worlds: worldsWithTags
-        }
+        },
       });
     } catch (error) {
       logger.error('Error in ServerGameWorldController.getGameWorlds:', error);
@@ -106,8 +116,8 @@ export class ServerGameWorldController {
         success: false,
         error: {
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve game worlds'
-        }
+          message: 'Failed to retrieve game worlds',
+        },
       });
     }
   }

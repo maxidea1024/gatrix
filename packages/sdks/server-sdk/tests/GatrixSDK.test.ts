@@ -22,14 +22,14 @@ describe('GatrixSDK', () => {
       }).toThrow('gatrixUrl is required');
     });
 
-    it('should throw error when apiToken is missing', () => {
-      expect(() => {
-        new GatrixSDK({
-          gatrixUrl: 'http://localhost:3000',
-          apiToken: '',
-          applicationName: 'test-app',
-        });
-      }).toThrow('apiToken is required');
+    it('should use default unsecured api token when apiToken is missing', () => {
+      const sdk = new GatrixSDK({
+        gatrixUrl: 'http://localhost:3000',
+        apiToken: '',
+        applicationName: 'test-app',
+      });
+
+      expect(sdk).toBeInstanceOf(GatrixSDK);
     });
 
     it('should throw error when applicationName is missing', () => {
@@ -72,18 +72,18 @@ describe('GatrixSDK', () => {
       expect(sdk).toBeInstanceOf(GatrixSDK);
     });
 
-    it('should accept optional service discovery configuration', () => {
+    it('should accept optional retry and metrics configuration', () => {
       const sdk = new GatrixSDK({
         gatrixUrl: 'http://localhost:3000',
         apiToken: 'test-token',
         applicationName: 'test-app',
-        etcd: {
-          hosts: 'localhost:2379',
-        },
-        serviceDiscovery: {
+        retry: {
           enabled: true,
-          mode: 'etcd',
-          ttlSeconds: 30,
+          maxRetries: 3,
+          retryDelay: 1000,
+        },
+        metrics: {
+          enabled: false,
         },
       });
 

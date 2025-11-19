@@ -119,7 +119,7 @@ export class GatrixServerSDK {
     // Validate URL format
     try {
       new URL(config.gatrixUrl);
-    } catch (error) {
+    } catch (_error) {
       throw createError(ErrorCode.INVALID_CONFIG, 'gatrixUrl must be a valid URL');
     }
   }
@@ -656,7 +656,6 @@ export class GatrixServerSDK {
       this.initialized = false;
 
       this.logger.info('GatrixServerSDK closed successfully');
-      this.logger.info('SDK가 종료되었습니다.');
     } catch (error: any) {
       this.logger.error('Error while closing SDK', { error: error.message });
       throw error;

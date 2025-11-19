@@ -4,6 +4,8 @@ import { asyncHandler } from '../middleware/errorHandler';
 import { CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../types/auth';
 import { pubSubService } from '../services/PubSubService';
+import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
+import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 
 export class SurveyController {
   /**
@@ -102,6 +104,8 @@ export class SurveyController {
       },
     });
 
+    await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEYS);
+
     res.status(201).json({
       success: true,
       data: { survey },
@@ -145,6 +149,8 @@ export class SurveyController {
       },
     });
 
+    await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEYS);
+
     res.json({
       success: true,
       data: { survey },
@@ -177,6 +183,8 @@ export class SurveyController {
       type: 'survey.deleted',
       data: { id: parseInt(id), timestamp: Date.now() },
     });
+
+    await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEYS);
 
     res.json({
       success: true,
@@ -211,6 +219,8 @@ export class SurveyController {
         isActive: survey.isActive
       },
     });
+
+    await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEYS);
 
     res.json({
       success: true,
@@ -249,6 +259,9 @@ export class SurveyController {
       },
     });
 
+    await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEY_SETTINGS);
+    await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEYS);
+
     res.json({
       success: true,
       data: { config },
@@ -262,18 +275,25 @@ export class SurveyController {
    * Returns only the survey configuration settings
    */
   static getServerSurveySettings = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const config = await SurveyService.getSurveyConfig();
+    await respondWithEtagCache(res, {
+      cacheKey: SERVER_SDK_ETAG.SURVEY_SETTINGS,
+      ttlMs: DEFAULT_CONFIG.SURVEY_SETTINGS_TTL,
+      requestEtag: req.headers['if-none-match'],
+      buildPayload: async () => {
+        const config = await SurveyService.getSurveyConfig();
 
-    const settings = {
-      defaultSurveyUrl: config.baseSurveyUrl,
-      completionUrl: config.baseJoinedUrl,
-      linkCaption: config.linkCaption,
-      verificationKey: config.joinedSecretKey,
-    };
+        const settings = {
+          defaultSurveyUrl: config.baseSurveyUrl,
+          completionUrl: config.baseJoinedUrl,
+          linkCaption: config.linkCaption,
+          verificationKey: config.joinedSecretKey,
+        };
 
-    res.json({
-      success: true,
-      data: { settings },
+        return {
+          success: true,
+          data: { settings },
+        };
+      },
     });
   });
 
@@ -283,46 +303,52 @@ export class SurveyController {
    * Returns surveys with common settings
    */
   static getServerSurveys = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const result = await SurveyService.getSurveys({
-      page: 1,
-      limit: 1000,
-      isActive: true,
-    });
+    await respondWithEtagCache(res, {
+      cacheKey: SERVER_SDK_ETAG.SURVEYS,
+      ttlMs: DEFAULT_CONFIG.SURVEYS_TTL,
+      requestEtag: req.headers['if-none-match'],
+      buildPayload: async () => {
+        const result = await SurveyService.getSurveys({
+          page: 1,
+          limit: 1000,
+          isActive: true,
+        });
 
-    // Get survey configuration
-    const config = await SurveyService.getSurveyConfig();
+        // Get survey configuration
+        const config = await SurveyService.getSurveyConfig();
 
-    // Filter out fields not needed by SDK
-    const filteredSurveys = result.surveys.map((survey: any) => ({
-      id: survey.id,
-      platformSurveyId: survey.platformSurveyId,
-      surveyTitle: survey.surveyTitle,
-      surveyContent: survey.surveyContent,
-      triggerConditions: survey.triggerConditions,
-      participationRewards: survey.participationRewards,
-      rewardMailTitle: survey.rewardMailTitle,
-      rewardMailContent: survey.rewardMailContent,
-      targetPlatforms: survey.targetPlatforms,
-      targetPlatformsInverted: survey.targetPlatformsInverted,
-      targetChannels: survey.targetChannels,
-      targetChannelsInverted: survey.targetChannelsInverted,
-      targetSubchannels: survey.targetSubchannels,
-      targetSubchannelsInverted: survey.targetSubchannelsInverted,
-      targetWorlds: survey.targetWorlds,
-      targetWorldsInverted: survey.targetWorldsInverted,
-    }));
+        // Filter out fields not needed by SDK
+        const filteredSurveys = result.surveys.map((survey: any) => ({
+          id: survey.id,
+          platformSurveyId: survey.platformSurveyId,
+          surveyTitle: survey.surveyTitle,
+          surveyContent: survey.surveyContent,
+          triggerConditions: survey.triggerConditions,
+          participationRewards: survey.participationRewards,
+          rewardMailTitle: survey.rewardMailTitle,
+          rewardMailContent: survey.rewardMailContent,
+          targetPlatforms: survey.targetPlatforms,
+          targetPlatformsInverted: survey.targetPlatformsInverted,
+          targetChannels: survey.targetChannels,
+          targetChannelsInverted: survey.targetChannelsInverted,
+          targetSubchannels: survey.targetSubchannels,
+          targetSubchannelsInverted: survey.targetSubchannelsInverted,
+          targetWorlds: survey.targetWorlds,
+          targetWorldsInverted: survey.targetWorldsInverted,
+        }));
 
-    // Return surveys with settings
-    res.json({
-      success: true,
-      data: {
-        surveys: filteredSurveys,
-        settings: {
-          defaultSurveyUrl: config.baseSurveyUrl,
-          completionUrl: config.baseJoinedUrl,
-          linkCaption: config.linkCaption,
-          verificationKey: config.joinedSecretKey,
-        }
+        return {
+          success: true,
+          data: {
+            surveys: filteredSurveys,
+            settings: {
+              defaultSurveyUrl: config.baseSurveyUrl,
+              completionUrl: config.baseJoinedUrl,
+              linkCaption: config.linkCaption,
+              verificationKey: config.joinedSecretKey,
+            },
+          },
+        };
       },
     });
   });

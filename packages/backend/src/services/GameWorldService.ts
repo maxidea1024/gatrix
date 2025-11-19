@@ -6,7 +6,7 @@ import {
   GameWorldListParams
 } from '../models/GameWorld';
 import { GatrixError } from '../middleware/errorHandler';
-import { GAME_WORLDS } from '../constants/cacheKeys';
+import { GAME_WORLDS, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { createLogger } from '../config/logger';
 import { pubSubService } from './PubSubService';
 
@@ -95,6 +95,7 @@ export class GameWorldService {
 
       // Invalidate game worlds cache
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -139,6 +140,7 @@ export class GameWorldService {
 
       // Invalidate game worlds cache
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -175,6 +177,7 @@ export class GameWorldService {
 
       // Invalidate game worlds cache
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -213,6 +216,7 @@ export class GameWorldService {
       // Invalidate game worlds cache
       logger.info(`Calling cache invalidation for ${GAME_WORLDS.PUBLIC}`);
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
       logger.info('Cache invalidation completed');
 
       // Publish event for SDK real-time updates
@@ -252,6 +256,7 @@ export class GameWorldService {
 
       // Invalidate game worlds cache
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -276,6 +281,7 @@ export class GameWorldService {
       // Invalidate all game worlds cache (both public and admin)
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
       await pubSubService.invalidateKey(GAME_WORLDS.ADMIN);
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
 
       // Publish event for SDK to clear entire game worlds cache
       await pubSubService.publishSDKEvent({
@@ -297,6 +303,7 @@ export class GameWorldService {
 
       // Invalidate game worlds cache
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
 
       return result;
     } catch (error) {
@@ -311,6 +318,7 @@ export class GameWorldService {
 
       // Invalidate game worlds cache
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
 
       return result;
     } catch (error) {
@@ -323,6 +331,7 @@ export class GameWorldService {
     try {
       // Invalidate game worlds cache
       await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
     } catch (error) {
       logger.error('Error in invalidateCache service:', error);
       throw new GatrixError('Failed to invalidate cache', 500);

@@ -108,7 +108,7 @@ export class CacheManager {
         this.gameWorldService.list(),
         this.popupNoticeService.list(),
         // Note: Survey endpoint might need admin auth, handle gracefully
-        this.surveyService.list({ isActive: true }).catch((error) => {
+        this.surveyService.list({ isActive: true }).catch((_error) => {
           return { surveys: [], settings: null };
         }),
         this.whitelistService.list().catch((error) => {
@@ -149,7 +149,7 @@ export class CacheManager {
           this.logger.info('Backend is ready');
           return;
         }
-      } catch (error: any) {
+      } catch (_error: any) {
         // Silently continue on connection errors during startup
       }
 

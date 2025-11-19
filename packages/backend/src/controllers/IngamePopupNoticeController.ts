@@ -6,6 +6,8 @@ import IngamePopupNoticeService, {
   IngamePopupNoticeFilters
 } from '../services/IngamePopupNoticeService';
 import { pubSubService } from '../services/PubSubService';
+import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
+import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 
 // Validation schemas
 const createIngamePopupNoticeSchema = Joi.object({
@@ -181,6 +183,8 @@ class IngamePopupNoticeController {
         },
       });
 
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
+
       res.status(201).json({
         success: true,
         notice
@@ -235,6 +239,8 @@ class IngamePopupNoticeController {
         },
       });
 
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
+
       res.json({
         success: true,
         notice
@@ -266,6 +272,8 @@ class IngamePopupNoticeController {
         data: { id, timestamp: Date.now() },
       });
 
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
+
       res.json({
         success: true,
         message: 'Ingame popup notice deleted successfully'
@@ -292,6 +300,8 @@ class IngamePopupNoticeController {
 
       await IngamePopupNoticeService.deleteMultipleIngamePopupNotices(ids);
 
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
+
       res.json({
         success: true,
         message: `${ids.length} ingame popup notice(s) deleted successfully`
@@ -309,6 +319,8 @@ class IngamePopupNoticeController {
     try {
       const id = parseInt(req.params.id);
       const notice = await IngamePopupNoticeService.toggleActive(id);
+
+      await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
 
       res.json({
         success: true,
@@ -328,27 +340,34 @@ class IngamePopupNoticeController {
     try {
       const filters: IngamePopupNoticeFilters = {
         isActive: true,
-        currentlyVisible: true
+        currentlyVisible: true,
       };
 
-      const result = await IngamePopupNoticeService.getIngamePopupNotices(1, 1000, filters);
+      await respondWithEtagCache(res, {
+        cacheKey: SERVER_SDK_ETAG.POPUP_NOTICES,
+        ttlMs: DEFAULT_CONFIG.POPUP_NOTICE_TTL,
+        requestEtag: req.headers['if-none-match'],
+        buildPayload: async () => {
+          const result = await IngamePopupNoticeService.getIngamePopupNotices(1, 1000, filters);
 
-      // Filter out notices where endDate is in the past
-      const now = new Date();
-      const activeNotices = result.notices.filter(notice => {
-        if (!notice.endDate) return true;
-        const endDate = new Date(notice.endDate);
-        return endDate > now;
-      });
+          // Filter out notices where endDate is in the past
+          const now = new Date();
+          const activeNotices = result.notices.filter((notice) => {
+            if (!notice.endDate) return true;
+            const endDate = new Date(notice.endDate);
+            return endDate > now;
+          });
 
-      // Format notices for Server SDK response
-      const formattedNotices = activeNotices.map(notice =>
-        IngamePopupNoticeService.formatNoticeForServerSDK(notice as any)
-      );
+          // Format notices for Server SDK response
+          const formattedNotices = activeNotices.map((notice) =>
+            IngamePopupNoticeService.formatNoticeForServerSDK(notice as any),
+          );
 
-      res.json({
-        success: true,
-        data: formattedNotices
+          return {
+            success: true,
+            data: formattedNotices,
+          };
+        },
       });
     } catch (error) {
       next(error);

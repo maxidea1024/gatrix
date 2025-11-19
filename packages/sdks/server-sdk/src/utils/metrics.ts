@@ -20,7 +20,6 @@ export function attachExpressMetrics(app: any, opts: ExpressMetricsOptions = {})
     const enabledEnv = String(process.env.MONITORING_ENABLED || '').toLowerCase() === 'true';
     if (!opts.enabled && !enabledEnv) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const promClient = require('prom-client');
     const register = opts.registry || new promClient.Registry();
     promClient.collectDefaultMetrics({ register });
@@ -52,7 +51,6 @@ export function attachExpressMetrics(app: any, opts: ExpressMetricsOptions = {})
       res.end(await register.metrics());
     });
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.warn('[SDK] attachExpressMetrics skipped due to error:', err);
   }
 }
@@ -63,7 +61,6 @@ export function attachFastifyMetrics(app: any, opts: FastifyMetricsOptions = {})
     const enabledEnv = String(process.env.MONITORING_ENABLED || '').toLowerCase() === 'true';
     if (!opts.enabled && !enabledEnv) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const promClient = require('prom-client');
     const register = opts.registry || new promClient.Registry();
     promClient.collectDefaultMetrics({ register });
@@ -100,7 +97,6 @@ export function attachFastifyMetrics(app: any, opts: FastifyMetricsOptions = {})
       reply.header('Content-Type', register.contentType).send(body);
     });
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.warn('[SDK] attachFastifyMetrics skipped due to error:', err);
   }
 }

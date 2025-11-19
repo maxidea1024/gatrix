@@ -28,11 +28,11 @@ export interface RedeemCouponRequest {
   code: string; // Coupon code
   userId: string; // User ID
   userName: string; // User name
-  characterId?: string; // Character ID (optional)
-  worldId?: string; // Game world ID (optional)
-  platform?: string; // Platform (optional)
-  channel?: string; // Channel (optional)
-  subChannel?: string; // Sub-channel (optional)
+  characterId: string; // Character ID
+  worldId: string; // Game world ID
+  platform: string; // Platform
+  channel: string; // Channel
+  subChannel: string; // Sub-channel
   // Note: requestId is passed via x-request-id header, not in body
 }
 
@@ -42,8 +42,8 @@ export interface RedeemCouponResponse {
   globalUsed: number; // Global usage count
   sequence: number; // Sequence number
   usedAt: string; // Usage timestamp
-  rewardMailTitle?: string | null; // Reward email title
-  rewardMailContent?: string | null; // Reward email content
+  rewardMailTitle: string; // Reward email title
+  rewardMailContent: string; // Reward email content
 }
 
 // ============================================================================
@@ -245,4 +245,3 @@ export interface WhitelistData {
     accountIds: string[]; // List of whitelisted account IDs
   };
 }
-

@@ -10,6 +10,7 @@ import { CustomError } from '../middleware/errorHandler';
 import { normalizeIPOrCIDR, isValidIPOrCIDR } from '../utils/ipValidation';
 import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
+import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 // CIDR 매칭 함수
 function ipMatchesCIDR(ip: string, cidr: string): boolean {
@@ -135,6 +136,8 @@ export class IpWhitelistService {
           type: 'whitelist.updated',
           data: { id: created.id, timestamp: Date.now() },
         });
+
+        await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -210,6 +213,8 @@ export class IpWhitelistService {
           type: 'whitelist.updated',
           data: { id: updated.id, timestamp: Date.now() },
         });
+
+        await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -250,6 +255,8 @@ export class IpWhitelistService {
           type: 'whitelist.updated',
           data: { id, timestamp: Date.now() },
         });
+
+        await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request
@@ -291,6 +298,8 @@ export class IpWhitelistService {
           type: 'whitelist.updated',
           data: { id: updated.id, timestamp: Date.now() },
         });
+
+        await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
       } catch (eventError) {
         logger.warn('Failed to publish whitelist.updated event:', eventError);
         // Don't throw - event publishing failure shouldn't fail the request

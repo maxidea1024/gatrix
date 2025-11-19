@@ -71,7 +71,7 @@ export class Logger {
     return offsetDate.toISOString();
   }
 
-  private formatMessage(level: LogLevel, message: string, meta?: any): string {
+  private formatMessage(level: LogLevel, message: string): string {
     const timestamp = this.getFormattedTimestamp();
     const category = this.category || 'GatrixServerSDK';
 
@@ -95,7 +95,7 @@ export class Logger {
     if (this.customLogger) {
       this.customLogger('debug', message, meta);
     } else {
-      const formatted = this.formatMessage('debug', message, meta);
+      const formatted = this.formatMessage('debug', message);
       if (meta !== undefined) {
         console.debug(`${formatted}:`, meta);
       } else {
@@ -110,7 +110,7 @@ export class Logger {
     if (this.customLogger) {
       this.customLogger('info', message, meta);
     } else {
-      const formatted = this.formatMessage('info', message, meta);
+      const formatted = this.formatMessage('info', message);
       if (meta !== undefined) {
         console.info(`${formatted}:`, meta);
       } else {
@@ -125,7 +125,7 @@ export class Logger {
     if (this.customLogger) {
       this.customLogger('warn', message, meta);
     } else {
-      const formatted = this.formatMessage('warn', message, meta);
+      const formatted = this.formatMessage('warn', message);
       if (meta !== undefined) {
         console.warn(`${formatted}:`, meta);
       } else {
@@ -140,7 +140,7 @@ export class Logger {
     if (this.customLogger) {
       this.customLogger('error', message, meta);
     } else {
-      const formatted = this.formatMessage('error', message, meta);
+      const formatted = this.formatMessage('error', message);
       if (meta !== undefined) {
         console.error(`${formatted}:`, meta);
       } else {

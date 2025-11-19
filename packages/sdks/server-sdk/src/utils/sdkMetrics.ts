@@ -34,7 +34,6 @@ export class SdkMetrics {
     if (!this.enabled) return;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const promClient = require('prom-client');
       this.client = promClient;
       this.registry = opts.registry || new promClient.Registry();

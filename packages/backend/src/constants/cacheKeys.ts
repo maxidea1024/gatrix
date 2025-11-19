@@ -208,6 +208,42 @@ export const AUDIT_LOG = {
    */
   BY_USER: (userId: number, page: number) => `audit_logs:user:${userId}:${page}`,
 } as const;
+/**
+ * Server SDK endpoint ETag cache keys
+ */
+export const SERVER_SDK_ETAG = {
+  /**
+   * Game worlds list for server SDK
+   */
+  GAME_WORLDS: 'server_sdk:etag:game_worlds',
+
+  /**
+   * In-game popup notices for server SDK
+   */
+  POPUP_NOTICES: 'server_sdk:etag:popup_notices',
+
+  /**
+   * Whitelists for server SDK
+   */
+  WHITELISTS: 'server_sdk:etag:whitelists',
+
+  /**
+   * Maintenance status for server SDK
+   */
+  MAINTENANCE: 'server_sdk:etag:maintenance',
+
+  /**
+   * Surveys list for server SDK
+   */
+  SURVEYS: 'server_sdk:etag:surveys',
+
+  /**
+   * Survey settings for server SDK
+   */
+  SURVEY_SETTINGS: 'server_sdk:etag:survey_settings',
+} as const;
+
+
 
 /**
  * 캐시 패턴 (패턴 기반 삭제용)
@@ -333,6 +369,21 @@ export const DEFAULT_CONFIG = {
    * 점검 상태 TTL
    */
   MAINTENANCE_TTL: TTL.ONE_MINUTE,
+
+  /**
+   * 인게임 팝업 공지 TTL (Server SDK용)
+   */
+  POPUP_NOTICE_TTL: TTL.ONE_MINUTE,
+
+  /**
+   * 설문 목록 TTL (Server SDK용)
+   */
+  SURVEYS_TTL: TTL.ONE_MINUTE,
+
+  /**
+   * 설문 설정 TTL (Server SDK용)
+   */
+  SURVEY_SETTINGS_TTL: TTL.ONE_MINUTE,
 
   /**
    * 번역 결과/언어 감지 TTL

@@ -34,11 +34,15 @@ export class ApiClient {
   private logger: Logger;
   private retryConfig: Required<RetryConfig>;
   private metrics?: SdkMetrics;
+  private etagStore: Map<string, string>;
+  private bodyCache: Map<string, ApiResponse<any>>;
 
   constructor(config: ApiClientConfig) {
     this.logger = config.logger || new Logger();
     this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config.retry };
     this.metrics = config.metrics;
+    this.etagStore = new Map();
+    this.bodyCache = new Map();
 
     // Create axios instance
     this.client = axios.create({
@@ -215,6 +219,34 @@ export class ApiClient {
   }
 
   /**
+   * Build a stable cache key for ETag storage based on URL and query params
+   */
+  private buildCacheKey(url: string, config?: AxiosRequestConfig): string {
+    if (!config || !config.params) {
+      return url;
+    }
+
+    try {
+      const params = config.params as Record<string, any>;
+      const sortedKeys = Object.keys(params).sort();
+      const normalized: Record<string, any> = {};
+
+      for (const key of sortedKeys) {
+        const value = params[key];
+        if (value === undefined) {
+          continue;
+        }
+        normalized[key] = value;
+      }
+
+      return `${url}?${JSON.stringify(normalized)}`;
+    } catch {
+      // Fallback to URL only if params cannot be serialized safely
+      return url;
+    }
+  }
+
+  /**
    * Execute request with retry logic
    * Supports infinite retries when maxRetries is -1
    */
@@ -261,8 +293,57 @@ export class ApiClient {
    * GET request (with retry)
    */
   async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const requestConfig: AxiosRequestConfig = { ...(config || {}) };
+    const headers: Record<string, any> = { ...(requestConfig.headers || {}) };
+
+    const cacheKey = this.buildCacheKey(url, requestConfig);
+    const cachedEtag = this.etagStore.get(cacheKey);
+    if (cachedEtag) {
+      headers['If-None-Match'] = cachedEtag;
+    }
+
+    requestConfig.headers = headers;
+
     return this.executeWithRetry(
-      () => this.client.get<ApiResponse<T>>(url, config),
+      async () => {
+        const response = await this.client.get<ApiResponse<T>>(url, requestConfig);
+
+        // Handle 304 Not Modified using cached response body
+        if (response.status === 304) {
+          const cachedBody = this.bodyCache.get(cacheKey) as ApiResponse<T> | undefined;
+          if (cachedBody) {
+            return {
+              ...response,
+              status: 200,
+              data: cachedBody,
+            } as AxiosResponse<ApiResponse<T>>;
+          }
+
+          // No cached body but got 304: fall back to a fresh request without conditional header
+          const retryConfig: AxiosRequestConfig = { ...requestConfig, headers: { ...headers } };
+          delete (retryConfig.headers as any)['If-None-Match'];
+          delete (retryConfig.headers as any)['if-none-match'];
+
+          const freshResponse = await this.client.get<ApiResponse<T>>(url, retryConfig);
+
+          const freshEtag = (freshResponse.headers as any)?.etag as string | undefined;
+          if (freshEtag) {
+            this.etagStore.set(cacheKey, freshEtag);
+            this.bodyCache.set(cacheKey, freshResponse.data);
+          }
+
+          return freshResponse;
+        }
+
+        // Normal 2xx response: capture ETag and cache body if present
+        const etag = (response.headers as any)?.etag as string | undefined;
+        if (etag) {
+          this.etagStore.set(cacheKey, etag);
+          this.bodyCache.set(cacheKey, response.data);
+        }
+
+        return response;
+      },
       { method: 'GET', url }
     );
   }
