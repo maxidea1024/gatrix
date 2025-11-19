@@ -52,6 +52,17 @@ scrape_configs:
     metrics_path: '/metrics'
 
   # Prometheus Self-Monitoring
+  # etcd Metrics
+  - job_name: 'etcd'
+    static_configs:
+      - targets: ['etcd:2379']
+        labels:
+          service: etcd
+          instance: etcd
+          hostname: etcd
+          ip: etcd
+
+
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']

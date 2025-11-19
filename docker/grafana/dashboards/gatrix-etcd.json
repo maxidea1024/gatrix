@@ -1,0 +1,440 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "values": false, "fields": "", "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "etcd Up",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 0 },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "values": false, "fields": "", "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "etcd_debugging_mvcc_db_total_size_in_bytes{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "DB Size (bytes)",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 0 },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "values": false, "fields": "", "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "rate(etcd_server_leader_changes_seen_total{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m])",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Leader Changes (5m rate)",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "id": 4,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "rate(etcd_server_proposals_committed_total{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m])",
+          "legendFormat": "Proposals committed/sec",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(etcd_server_proposals_failed_total{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m])",
+          "legendFormat": "Proposals failed/sec",
+          "refId": "B"
+        }
+      ],
+      "title": "Proposals Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "id": 5,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "8 * sum(rate(etcd_network_client_grpc_received_bytes_total{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m]))",
+          "legendFormat": "Received bps",
+          "refId": "A"
+        },
+        {
+          "expr": "8 * sum(rate(etcd_network_client_grpc_sent_bytes_total{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m]))",
+          "legendFormat": "Sent bps",
+          "refId": "B"
+        }
+      ],
+      "title": "Client Traffic (bps)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
+      "id": 6,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "rate(etcd_disk_wal_fsync_duration_seconds_sum{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m]) / rate(etcd_disk_wal_fsync_duration_seconds_count{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m])",
+          "legendFormat": "WAL fsync avg sec",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(etcd_disk_backend_commit_duration_seconds_sum{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m]) / rate(etcd_disk_backend_commit_duration_seconds_count{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m])",
+          "legendFormat": "Backend commit avg sec",
+          "refId": "B"
+        }
+      ],
+      "title": "Disk / Backend Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "id": 7,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "etcd_debugging_mvcc_db_total_size_in_bytes{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
+          "legendFormat": "DB size",
+          "refId": "A"
+        },
+        {
+          "expr": "etcd_server_quota_backend_bytes{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
+          "legendFormat": "Quota",
+          "refId": "B"
+        }
+      ],
+      "title": "DB Size vs Quota",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+          "unit": "percent(0-100)"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "id": 8,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "100 * etcd_debugging_mvcc_db_total_size_in_bytes{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"} / etcd_server_quota_backend_bytes{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}",
+          "legendFormat": "DB usage %",
+          "refId": "A"
+        }
+      ],
+      "title": "DB Usage (% of quota)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
+      "id": 9,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(etcd_network_peer_received_bytes_total{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m]))",
+          "legendFormat": "Peer received Bps",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(etcd_network_peer_sent_bytes_total{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m]))",
+          "legendFormat": "Peer sent Bps",
+          "refId": "B"
+        }
+      ],
+      "title": "Peer Traffic (bytes/sec)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 28 },
+      "id": 10,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "topk(5, sum(rate(etcd_grpc_requests_total{job=\"etcd\", instance=~\"$instance\", hostname=~\"$hostname\", ip=~\"$ip\"}[5m])) by (grpc_method))",
+          "legendFormat": "{{grpc_method}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Top gRPC methods by RPS",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 27,
+  "style": "dark",
+  "tags": ["etcd", "infrastructure"],
+  "templating": {
+    "list": [
+      {
+        "name": "instance",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({job=\"etcd\"}, instance)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "hostname",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({job=\"etcd\"}, hostname)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "ip",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values({job=\"etcd\"}, ip)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Gatrix ETCD",
+  "uid": "gatrix-etcd",
+  "version": 0
+}
+
