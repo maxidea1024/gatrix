@@ -19,6 +19,46 @@
         "refresh": 1
       },
       {
+        "name": "service",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(sdk_http_requests_total, service)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "hostname",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(sdk_http_requests_total, hostname)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "ip",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(sdk_http_requests_total, ip)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "instanceId",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(sdk_http_requests_total, instanceId)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
         "name": "window",
         "type": "interval",
         "label": "Window",
@@ -36,7 +76,7 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum by (route, status) (rate(sdk_http_requests_total{application=~\"$application\"}[$window]))",
+          "expr": "sum by (route, status) (rate(sdk_http_requests_total{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$ip\",instanceId=~\"$instanceId\"}[$window]))",
           "legendFormat": "{{route}} [{{status}}]",
           "refId": "A"
         }
@@ -50,7 +90,7 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(sdk_http_requests_total{status!=\"200\",application=~\"$application\"}[$window])) / sum(rate(sdk_http_requests_total{application=~\"$application\"}[$window]))",
+          "expr": "sum(rate(sdk_http_requests_total{status!=\"200\",application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$ip\",instanceId=~\"$instanceId\"}[$window])) / sum(rate(sdk_http_requests_total{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$ip\",instanceId=~\"$instanceId\"}[$window]))",
           "legendFormat": "error rate",
           "refId": "A"
         }
@@ -64,7 +104,7 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(sdk_http_request_duration_seconds_bucket{application=~\"$application\"}[$window])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(sdk_http_request_duration_seconds_bucket{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$ip\",instanceId=~\"$instanceId\"}[$window])))",
           "legendFormat": "p95 latency",
           "refId": "A"
         }
@@ -78,7 +118,7 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum by (target) (increase(sdk_cache_refresh_total{application=~\"$application\"}[$window]))",
+          "expr": "sum by (target) (increase(sdk_cache_refresh_total{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$ip\",instanceId=~\"$instanceId\"}[$window]))",
           "legendFormat": "{{target}}",
           "refId": "A"
         }
@@ -92,7 +132,7 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "max(sdk_redis_connected{application=~\"$application\"})",
+          "expr": "max(sdk_redis_connected{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$ip\",instanceId=~\"$instanceId\"})",
           "refId": "A"
         }
       ],
@@ -105,7 +145,7 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(increase(sdk_redis_reconnect_total{application=~\"$application\"}[$window]))",
+          "expr": "sum(increase(sdk_redis_reconnect_total{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$ip\",instanceId=~\"$instanceId\"}[$window]))",
           "refId": "A"
         }
       ],

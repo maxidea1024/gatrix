@@ -150,13 +150,62 @@
           "sort": "none"
         }
       },
-      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 0 }
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 0 }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Error logs per service",
+      "datasource": "Loki",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service) (count_over_time({job=\"gatrix\", service=~\"$service\", internalIp=~\"$internalIp\", externalIp=~\"$externalIp\"} | json | level=~\"error|fatal\" | hostname=~\"$hostname\" | line_format \"{{.}}\" |~ \"(?i)$search\" [1m]))",
+          "queryType": "range",
+          "legendFormat": "{{service}}",
+          "step": "30s"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "fillOpacity": 40,
+            "gradientMode": "none",
+            "lineWidth": 1,
+            "pointSize": 4,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "placement": "bottom",
+          "displayMode": "list"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 0 }
     },
     {
       "type": "logs",
       "title": "Logs",
       "id": 1,
-      "gridPos": { "h": 18, "w": 24, "x": 0, "y": 6 },
+      "gridPos": { "h": 18, "w": 24, "x": 0, "y": 12 },
       "datasource": "Loki",
       "targets": [
         {
