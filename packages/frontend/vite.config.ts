@@ -46,6 +46,8 @@ console.log(`🔧 Vite proxy configuration:`, {
   viteDockerEnvVar: process.env.VITE_DOCKER_ENV
 });
 
+const frontendRoot = path.resolve(__dirname).replace(/\\/g, '/');
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -67,7 +69,13 @@ export default defineConfig({
     watch: {
       usePolling: true, // Required for Docker on Windows/WSL
       interval: 1000, // Increased from 100ms to 1000ms to reduce unnecessary reloads
-      ignored: (path: string) => {
+      ignored: (watchPath: string) => {
+        // Only watch files inside the frontend workspace to avoid reloads from other packages
+        const normalizedPath = watchPath.replace(/\\/g, '/');
+        if (!normalizedPath.startsWith(frontendRoot)) {
+          return true;
+        }
+
         // Ignore common non-source directories and files
         const ignoredPatterns = [
           'node_modules',
@@ -83,7 +91,7 @@ export default defineConfig({
           'coverage',
           '.turbo',
         ];
-        return ignoredPatterns.some(pattern => path.includes(pattern));
+        return ignoredPatterns.some(pattern => normalizedPath.includes(pattern));
       },
     },
     // Let Vite infer the HMR host from the page URL so LAN clients use the correct IP

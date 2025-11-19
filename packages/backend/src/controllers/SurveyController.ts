@@ -6,6 +6,40 @@ import { AuthenticatedRequest } from '../types/auth';
 import { pubSubService } from '../services/PubSubService';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
+import RewardTemplateService from '../services/RewardTemplateService';
+
+interface ServerReward {
+  type: number;
+  id: number;
+  quantity: number;
+}
+
+function normalizeParticipationRewards(
+  rawItems: any[] | null | undefined,
+): ServerReward[] | null {
+  if (!Array.isArray(rawItems) || rawItems.length === 0) {
+    return null;
+  }
+
+  return rawItems.map((item: any) => ({
+    type: Number(item.rewardType ?? item.type ?? 0),
+    id: Number(item.itemId ?? item.id ?? 0),
+    quantity: Number(item.quantity ?? 0),
+  }));
+}
+
+async function buildParticipationRewardsForServerSurvey(survey: any): Promise<ServerReward[] | null> {
+  if (Array.isArray(survey.participationRewards) && survey.participationRewards.length > 0) {
+    return normalizeParticipationRewards(survey.participationRewards);
+  }
+
+  if (survey.rewardTemplateId) {
+    const template = await RewardTemplateService.getRewardTemplateById(survey.rewardTemplateId);
+    return normalizeParticipationRewards(template.rewardItems);
+  }
+
+  return null;
+}
 
 export class SurveyController {
   /**
@@ -233,7 +267,7 @@ export class SurveyController {
    * Get survey configuration
    * GET /api/v1/admin/surveys/config
    */
-  static getSurveyConfig = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  static getSurveyConfig = asyncHandler(async (_req: AuthenticatedRequest, res: Response) => {
     const config = await SurveyService.getSurveyConfig();
 
     res.json({
@@ -317,25 +351,31 @@ export class SurveyController {
         // Get survey configuration
         const config = await SurveyService.getSurveyConfig();
 
-        // Filter out fields not needed by SDK
-        const filteredSurveys = result.surveys.map((survey: any) => ({
-          id: survey.id,
-          platformSurveyId: survey.platformSurveyId,
-          surveyTitle: survey.surveyTitle,
-          surveyContent: survey.surveyContent,
-          triggerConditions: survey.triggerConditions,
-          participationRewards: survey.participationRewards,
-          rewardMailTitle: survey.rewardMailTitle,
-          rewardMailContent: survey.rewardMailContent,
-          targetPlatforms: survey.targetPlatforms,
-          targetPlatformsInverted: survey.targetPlatformsInverted,
-          targetChannels: survey.targetChannels,
-          targetChannelsInverted: survey.targetChannelsInverted,
-          targetSubchannels: survey.targetSubchannels,
-          targetSubchannelsInverted: survey.targetSubchannelsInverted,
-          targetWorlds: survey.targetWorlds,
-          targetWorldsInverted: survey.targetWorldsInverted,
-        }));
+        // Filter out fields not needed by SDK and resolve participation rewards
+        const filteredSurveys = await Promise.all(
+          result.surveys.map(async (survey: any) => {
+            const participationRewards = await buildParticipationRewardsForServerSurvey(survey);
+
+            return {
+              id: survey.id,
+              platformSurveyId: survey.platformSurveyId,
+              surveyTitle: survey.surveyTitle,
+              surveyContent: survey.surveyContent,
+              triggerConditions: survey.triggerConditions,
+              participationRewards,
+              rewardMailTitle: survey.rewardMailTitle,
+              rewardMailContent: survey.rewardMailContent,
+              targetPlatforms: survey.targetPlatforms,
+              targetPlatformsInverted: survey.targetPlatformsInverted,
+              targetChannels: survey.targetChannels,
+              targetChannelsInverted: survey.targetChannelsInverted,
+              targetSubchannels: survey.targetSubchannels,
+              targetSubchannelsInverted: survey.targetSubchannelsInverted,
+              targetWorlds: survey.targetWorlds,
+              targetWorldsInverted: survey.targetWorldsInverted,
+            };
+          }),
+        );
 
         return {
           success: true,

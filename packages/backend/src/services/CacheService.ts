@@ -352,4 +352,4 @@ export class CacheService extends EventEmitter {
 }
 
 // Singleton instance
-export const cacheService = new CacheService();
+export const cacheService = CacheService.getInstance();

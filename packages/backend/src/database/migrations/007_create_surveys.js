@@ -51,7 +51,7 @@ exports.up = async function(connection) {
     VALUES
     ('survey.baseSurveyUrl', 'https://survey.dw.sdo.com', 'Base URL for surveys', 1),
     ('survey.baseJoinedUrl', 'https://survey.dw.sdo.com/survey/joined', 'Base URL for joined survey callback', 1),
-    ('survey.linkCaption', '설문조사 참여하기', 'Survey link caption text', 1),
+    ('survey.linkCaption', '参与调查', 'Survey link caption text', 1),
     ('survey.joinedSecretKey', '123', 'Secret key for survey joined verification', 1)
   `);
 

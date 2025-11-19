@@ -402,7 +402,7 @@ export class SurveyService {
     return {
       baseSurveyUrl: config.baseSurveyUrl || 'https://survey.dw.sdo.com',
       baseJoinedUrl: config.baseJoinedUrl || 'https://survey.dw.sdo.com/survey/joined',
-      linkCaption: config.linkCaption || '설문조사 참여하기',
+      linkCaption: config.linkCaption || 'Respond to the survey',
       joinedSecretKey: config.joinedSecretKey || '123',
     };
   }

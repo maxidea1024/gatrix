@@ -97,7 +97,7 @@ export interface PopupNotice {
 // ============================================================================
 
 export interface Reward {
-  type: string;
+  type: number;
   id: number;
   quantity: number;
 }
