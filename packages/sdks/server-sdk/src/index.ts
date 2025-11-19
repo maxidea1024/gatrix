@@ -3,7 +3,7 @@
  * Entry point
  */
 
-export { GatrixServerSDK, GatrixSDK } from './GatrixServerSDK';
+export { GatrixServerSDK } from './GatrixServerSDK';
 
 // Export types
 export * from './types';
@@ -20,4 +20,3 @@ export { SdkMetrics } from './utils/sdkMetrics';
 
 // Default export
 export { GatrixServerSDK as default } from './GatrixServerSDK';
-

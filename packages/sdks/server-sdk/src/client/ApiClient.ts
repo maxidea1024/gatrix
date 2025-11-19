@@ -53,6 +53,8 @@ export class ApiClient {
         'X-API-Token': config.apiToken,
         'X-Application-Name': config.applicationName,
       },
+      // Treat 304 Not Modified as a successful response so we can handle ETag logic
+      validateStatus: (status) => (status >= 200 && status < 300) || status === 304,
     });
 
     // Request interceptor

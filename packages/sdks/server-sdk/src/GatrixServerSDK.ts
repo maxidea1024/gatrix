@@ -149,7 +149,6 @@ export class GatrixServerSDK {
       retry: this.config.retry ?? 'default',
     });
 
-
     try {
       // Initialize cache manager
       const cacheConfig = this.config.cache || {};
@@ -662,7 +661,3 @@ export class GatrixServerSDK {
     }
   }
 }
-
-// Backward compatibility: export as GatrixSDK as well
-export { GatrixServerSDK as GatrixSDK };
-
