@@ -252,7 +252,7 @@ export class BaseTestServer {
     this.log('=== Cache State ===');
 
     // Game worlds
-    const worlds = await this.sdk.getGameWorlds();
+    const worlds = await this.sdk.fetchGameWorlds();
     this.log(`Game Worlds: ${worlds.length} loaded`);
     worlds.forEach(world => {
       const maintenance = this.sdk.isWorldInMaintenance(world.worldId);
@@ -260,7 +260,7 @@ export class BaseTestServer {
     });
 
     // Popup notices
-    const popups = await this.sdk.getPopupNotices();
+    const popups = await this.sdk.fetchPopupNotices();
     this.log(`Popup Notices: ${popups.length} loaded`);
     popups.forEach(popup => {
       const contentPreview = popup.message.substring(0, 50) + (popup.message.length > 50 ? '...' : '');
@@ -269,7 +269,7 @@ export class BaseTestServer {
 
     // Surveys (may fail if admin auth is required)
     try {
-      const surveys = await this.sdk.getSurveys();
+      const surveys = await this.sdk.fetchSurveys();
       this.log(`Surveys: ${surveys.length} loaded`);
       surveys.forEach(survey => {
         this.log(`  - ${survey.id}: ${survey.surveyTitle || 'No title'}`);
@@ -353,20 +353,20 @@ export class BaseTestServer {
   protected async testServiceDiscoveryAPI(): Promise<void> {
     try {
       // Get all services
-      const allServices = await this.sdk.getServices();
+      const allServices = await this.sdk.fetchServices();
       this.log(`Service Discovery API: ${allServices.length} total services`);
 
       // Get services by service type
-      const authServices = await this.sdk.getServices({ serviceType: 'authd' });
+      const authServices = await this.sdk.fetchServices({ serviceType: 'authd' });
       this.log(`  - authd: ${authServices.length} instances`);
 
-      const lobbydServices = await this.sdk.getServices({ serviceType: 'lobbyd' });
+      const lobbydServices = await this.sdk.fetchServices({ serviceType: 'lobbyd' });
       this.log(`  - lobbyd: ${lobbydServices.length} instances`);
 
-      const chatdServices = await this.sdk.getServices({ serviceType: 'chatd' });
+      const chatdServices = await this.sdk.fetchServices({ serviceType: 'chatd' });
       this.log(`  - chatd: ${chatdServices.length} instances`);
 
-      const worlddServices = await this.sdk.getServices({ serviceType: 'worldd' });
+      const worlddServices = await this.sdk.fetchServices({ serviceType: 'worldd' });
       this.log(`  - worldd: ${worlddServices.length} instances`);
 
       // Get services by group

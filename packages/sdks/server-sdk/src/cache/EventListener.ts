@@ -87,7 +87,7 @@ export class EventListener {
       this.subscriber.on('ready', async () => {
         if (!this.isConnected) {
           this.isConnected = true;
-          this.logger.info('✅ Redis connection restored successfully');
+          this.logger.info('Redis connection restored successfully');
           try { this.metrics?.setRedisConnected(true); this.metrics?.incRedisReconnect(); } catch (_) {}
           try {
             await this.reinitializeCache();
@@ -96,7 +96,6 @@ export class EventListener {
           }
         }
       });
-
 
       // Connect to Redis
       await this.subscriber.connect();

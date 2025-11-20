@@ -38,12 +38,12 @@ class WorldServer extends BaseTestServer {
 
   private async checkPopupsAndSurveys(): Promise<void> {
     // Check popups for this world
-    const popups = await this.sdk.getPopupNotices();
+    const popups = await this.sdk.fetchPopupNotices();
     this.log(`Active popups: ${popups.length}`);
 
     // Check surveys (may fail if not available)
     try {
-      const surveys = await this.sdk.getSurveys();
+      const surveys = await this.sdk.fetchSurveys();
       this.log(`Active surveys: ${surveys.length}`);
     } catch (error: any) {
       this.log(`Surveys not available: ${error.message}`);

@@ -204,23 +204,23 @@ export class GatrixServerSDK {
   // ============================================================================
 
   /**
-   * Get all game worlds
+   * Fetch all game worlds
    */
-  async getGameWorlds(): Promise<GameWorld[]> {
+  async fetchGameWorlds(): Promise<GameWorld[]> {
     return await this.gameWorld.list();
   }
 
   /**
-   * Get game world by ID
+   * Fetch game world by ID
    */
-  async getGameWorldById(id: number): Promise<GameWorld> {
+  async fetchGameWorldById(id: number): Promise<GameWorld> {
     return await this.gameWorld.getById(id);
   }
 
   /**
-   * Get game world by worldId
+   * Fetch game world by worldId
    */
-  async getGameWorldByWorldId(worldId: string): Promise<GameWorld> {
+  async fetchGameWorldByWorldId(worldId: string): Promise<GameWorld> {
     return await this.gameWorld.getByWorldId(worldId);
   }
 
@@ -246,9 +246,9 @@ export class GatrixServerSDK {
   }
 
   /**
-   * Get global maintenance status
+   * Fetch global maintenance status
    */
-  async getMaintenanceStatus() {
+  async fetchMaintenanceStatus() {
     const response = await this.apiClient.get('/api/v1/server/maintenance');
     return response.data;
   }
@@ -265,9 +265,9 @@ export class GatrixServerSDK {
   // ============================================================================
 
   /**
-   * Get active popup notices
+   * Fetch active popup notices
    */
-  async getPopupNotices(): Promise<PopupNotice[]> {
+  async fetchPopupNotices(): Promise<PopupNotice[]> {
     return await this.popupNotice.list();
   }
 
@@ -300,9 +300,9 @@ export class GatrixServerSDK {
   // ============================================================================
 
   /**
-   * Get surveys with settings
+   * Fetch surveys with settings
    */
-  async getSurveys(): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
+  async fetchSurveys(): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
     return await this.survey.list({ isActive: true });
   }
 
@@ -493,18 +493,18 @@ export class GatrixServerSDK {
   }
 
   /**
-   * Get services with filtering via Backend API
+   * Fetch services with filtering via Backend API
    * @param params - Filter parameters (serviceType, group, status, labels, excludeSelf)
    */
-  async getServices(params?: GetServicesParams): Promise<ServiceInstance[]> {
-    return await this.serviceDiscovery.getServices(params);
+  async fetchServices(params?: GetServicesParams): Promise<ServiceInstance[]> {
+    return await this.serviceDiscovery.fetchServices(params);
   }
 
   /**
-   * Get a specific service instance via Backend API
+   * Fetch a specific service instance via Backend API
    */
-  async getService(serviceType: string, instanceId: string): Promise<ServiceInstance | null> {
-    return await this.serviceDiscovery.getService(serviceType, instanceId);
+  async fetchService(serviceType: string, instanceId: string): Promise<ServiceInstance | null> {
+    return await this.serviceDiscovery.fetchService(serviceType, instanceId);
   }
 
   /**
@@ -532,10 +532,10 @@ export class GatrixServerSDK {
   }
 
   /**
-   * Get whitelists (IP and Account)
+   * Fetch whitelists (IP and Account)
    */
-  async getWhitelists() {
-    return await this.serviceDiscovery.getWhitelists();
+  async fetchWhitelists() {
+    return await this.serviceDiscovery.fetchWhitelists();
   }
 
   /**

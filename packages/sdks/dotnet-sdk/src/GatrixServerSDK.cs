@@ -90,34 +90,70 @@ public class GatrixServerSDK : IAsyncDisposable
     }
 
     /// <summary>
-    /// Get all game worlds
+    /// Get all game worlds from cache
     /// </summary>
-    public List<GameWorld> GetGameWorlds() => _cacheManager.GetGameWorlds();
+    public List<GameWorld> GetCachedGameWorlds() => _cacheManager.GetGameWorlds();
 
     /// <summary>
-    /// Get game world by ID
+    /// Get game world by ID from cache
     /// </summary>
-    public GameWorld? GetGameWorldById(string id) => _cacheManager.GetGameWorldById(id);
+    public GameWorld? GetCachedGameWorldById(string id) => _cacheManager.GetGameWorldById(id);
 
     /// <summary>
-    /// Get all popup notices
+    /// Get all popup notices from cache
     /// </summary>
-    public List<PopupNotice> GetPopupNotices() => _cacheManager.GetPopupNotices();
+    public List<PopupNotice> GetCachedPopupNotices() => _cacheManager.GetPopupNotices();
 
     /// <summary>
-    /// Get popup notice by ID
+    /// Get popup notice by ID from cache
     /// </summary>
-    public PopupNotice? GetPopupNoticeById(string id) => _cacheManager.GetPopupNoticeById(id);
+    public PopupNotice? GetCachedPopupNoticeById(string id) => _cacheManager.GetPopupNoticeById(id);
 
     /// <summary>
-    /// Get all surveys
+    /// Get all surveys from cache
     /// </summary>
-    public List<Survey> GetSurveys() => _cacheManager.GetSurveys();
+    public List<Survey> GetCachedSurveys() => _cacheManager.GetSurveys();
 
     /// <summary>
-    /// Get survey by ID
+    /// Get survey by ID from cache
     /// </summary>
-    public Survey? GetSurveyById(string id) => _cacheManager.GetSurveyById(id);
+    public Survey? GetCachedSurveyById(string id) => _cacheManager.GetSurveyById(id);
+
+    /// <summary>
+    /// [Obsolete] Use GetCachedGameWorlds instead. This method will be removed in a future version.
+    /// </summary>
+    [Obsolete("Use GetCachedGameWorlds() instead. This method will be removed in a future version.")]
+    public List<GameWorld> GetGameWorlds() => GetCachedGameWorlds();
+
+    /// <summary>
+    /// [Obsolete] Use GetCachedGameWorldById instead. This method will be removed in a future version.
+    /// </summary>
+    [Obsolete("Use GetCachedGameWorldById() instead. This method will be removed in a future version.")]
+    public GameWorld? GetGameWorldById(string id) => GetCachedGameWorldById(id);
+
+    /// <summary>
+    /// [Obsolete] Use GetCachedPopupNotices instead. This method will be removed in a future version.
+    /// </summary>
+    [Obsolete("Use GetCachedPopupNotices() instead. This method will be removed in a future version.")]
+    public List<PopupNotice> GetPopupNotices() => GetCachedPopupNotices();
+
+    /// <summary>
+    /// [Obsolete] Use GetCachedPopupNoticeById instead. This method will be removed in a future version.
+    /// </summary>
+    [Obsolete("Use GetCachedPopupNoticeById() instead. This method will be removed in a future version.")]
+    public PopupNotice? GetPopupNoticeById(string id) => GetCachedPopupNoticeById(id);
+
+    /// <summary>
+    /// [Obsolete] Use GetCachedSurveys instead. This method will be removed in a future version.
+    /// </summary>
+    [Obsolete("Use GetCachedSurveys() instead. This method will be removed in a future version.")]
+    public List<Survey> GetSurveys() => GetCachedSurveys();
+
+    /// <summary>
+    /// [Obsolete] Use GetCachedSurveyById instead. This method will be removed in a future version.
+    /// </summary>
+    [Obsolete("Use GetCachedSurveyById() instead. This method will be removed in a future version.")]
+    public Survey? GetSurveyById(string id) => GetCachedSurveyById(id);
 
     /// <summary>
     /// Refresh all caches

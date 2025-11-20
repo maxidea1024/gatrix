@@ -74,8 +74,7 @@ export interface GameWorldListResponse {
 
 export interface PopupNotice {
   id: number;
-  isActive: boolean;
-  message: string; // Actual message content (from template or direct)
+  content: string; // Actual message content (from template or direct)
   targetWorlds: string[] | null;
   targetWorldsInverted?: boolean;
   targetPlatforms: string[] | null;

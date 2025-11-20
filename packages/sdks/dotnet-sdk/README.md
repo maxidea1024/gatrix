@@ -165,17 +165,17 @@ customLogger.Info("Custom service message");
 ### Get Data
 
 ```csharp
-// Get all game worlds
-var gameWorlds = sdk.GetGameWorlds();
+// Get all game worlds from cache (no API call)
+var gameWorlds = sdk.GetCachedGameWorlds();
 
-// Get specific game world
-var world = sdk.GetGameWorldById("world-1");
+// Get specific game world from cache (no API call)
+var world = sdk.GetCachedGameWorldById("world-1");
 
-// Get all popup notices
-var notices = sdk.GetPopupNotices();
+// Get all popup notices from cache (no API call)
+var notices = sdk.GetCachedPopupNotices();
 
-// Get all surveys
-var surveys = sdk.GetSurveys();
+// Get all surveys from cache (no API call)
+var surveys = sdk.GetCachedSurveys();
 ```
 
 ### Refresh Cache

@@ -11,9 +11,9 @@ class LobbyServer extends BaseTestServer {
 
   protected async onStart(): Promise<void> {
     this.log('Lobby server specific initialization');
-    
+
     // Check game worlds for lobby creation
-    const worlds = await this.sdk.getGameWorlds();
+    const worlds = await this.sdk.fetchGameWorlds();
     this.log(`Available game worlds for lobbies: ${worlds.length}`);
 
     // Simulate lobby creation/management
@@ -28,7 +28,7 @@ class LobbyServer extends BaseTestServer {
   }
 
   private async manageLobby(): Promise<void> {
-    const worlds = await this.sdk.getGameWorlds();
+    const worlds = await this.sdk.fetchGameWorlds();
     
     if (worlds.length === 0) {
       this.log('No game worlds available for lobby creation');

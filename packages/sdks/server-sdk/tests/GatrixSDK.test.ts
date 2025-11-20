@@ -1,4 +1,4 @@
-import { GatrixSDK } from '../src/GatrixSDK';
+import { GatrixServerSDK as GatrixSDK } from '../src';
 
 describe('GatrixSDK', () => {
   describe('constructor', () => {

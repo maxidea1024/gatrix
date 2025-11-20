@@ -33,8 +33,8 @@ async function main() {
     // Cache configuration
     cache: {
       enabled: true,
-      ttl: 1,
-      refreshMethod: 'polling', // Use event-based refresh (requires Redis)
+      ttl: 100,
+      refreshMethod: 'event', // Use event-based refresh (requires Redis)
     },
 
     // Logger configuration
@@ -118,6 +118,8 @@ async function main() {
     sdk.on('popup.updated', (event) => {
       logger.info('POPUP UPDATED', event.data);
       printCachedData();
+
+      console.log(JSON.stringify(sdk.getActivePopupNotices(), null, 2));
     });
 
     sdk.on('popup.deleted', (event) => {

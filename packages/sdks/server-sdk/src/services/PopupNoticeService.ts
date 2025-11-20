@@ -175,8 +175,7 @@ export class PopupNoticeService {
         }
 
         return true;
-      })
-      .sort((a, b) => a.displayPriority - b.displayPriority);
+      });
   }
 }
 

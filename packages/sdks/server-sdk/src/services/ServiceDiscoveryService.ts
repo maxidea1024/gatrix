@@ -199,7 +199,7 @@ export class ServiceDiscoveryService {
   }
 
   /**
-   * Get services with filtering via Backend API
+   * Fetch services with filtering via Backend API
    * GET /api/v1/server/services?serviceType=world&serviceGroup=kr&status=ready&env=prod
    *
    * Supports filtering by:
@@ -208,7 +208,7 @@ export class ServiceDiscoveryService {
    * - status: service status
    * - Any custom label key-value pairs
    */
-  async getServices(params?: GetServicesParams): Promise<ServiceInstance[]> {
+  async fetchServices(params?: GetServicesParams): Promise<ServiceInstance[]> {
     this.logger.debug('Fetching services via API', params);
 
     const queryParams: any = {};
@@ -256,10 +256,10 @@ export class ServiceDiscoveryService {
   }
 
   /**
-   * Get a specific service instance
+   * Fetch a specific service instance
    * GET /api/v1/server/services/:serviceType/:instanceId
    */
-  async getService(serviceType: string, instanceId: string): Promise<ServiceInstance | null> {
+  async fetchService(serviceType: string, instanceId: string): Promise<ServiceInstance | null> {
     this.logger.debug('Fetching service via API', { serviceType, instanceId });
 
     const response = await this.apiClient.get<ServiceInstance>(
@@ -276,10 +276,10 @@ export class ServiceDiscoveryService {
   }
 
   /**
-   * Get whitelists (IP and Account)
+   * Fetch whitelists (IP and Account)
    * GET /api/v1/server/whitelists
    */
-  async getWhitelists(): Promise<WhitelistData> {
+  async fetchWhitelists(): Promise<WhitelistData> {
     this.logger.debug('Fetching whitelists via API');
 
     const response = await this.apiClient.get<WhitelistData>('/api/v1/server/whitelists');
@@ -301,7 +301,7 @@ export class ServiceDiscoveryService {
    * Helper method that fetches whitelists and checks IP
    */
   async isIpWhitelisted(ip: string): Promise<boolean> {
-    const whitelists = await this.getWhitelists();
+    const whitelists = await this.fetchWhitelists();
 
     if (!whitelists.ipWhitelist.enabled) {
       return false;
@@ -332,7 +332,7 @@ export class ServiceDiscoveryService {
    * Helper method that fetches whitelists and checks account ID
    */
   async isAccountWhitelisted(accountId: string): Promise<boolean> {
-    const whitelists = await this.getWhitelists();
+    const whitelists = await this.fetchWhitelists();
 
     if (!whitelists.accountWhitelist.enabled) {
       return false;

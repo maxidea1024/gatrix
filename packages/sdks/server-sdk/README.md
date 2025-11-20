@@ -38,7 +38,7 @@ const sdk = new GatrixServerSDK({
 await sdk.initialize();
 
 // Use SDK
-const worlds = await sdk.getGameWorlds();
+const worlds = await sdk.fetchGameWorlds();
 console.log('Game worlds:', worlds);
 
 // Close SDK when done
@@ -166,7 +166,7 @@ console.log('User used count:', result.userUsedCount);
 #### Get All Game Worlds
 
 ```typescript
-const worlds = await sdk.getGameWorlds('en'); // language parameter (default: 'en')
+const worlds = await sdk.fetchGameWorlds('en'); // language parameter (default: 'en')
 console.log('Worlds:', worlds);
 ```
 
@@ -181,7 +181,7 @@ Each game world object includes:
 #### Get Game World by ID
 
 ```typescript
-const world = await sdk.getGameWorldById(1);
+const world = await sdk.fetchGameWorldById(1);
 console.log('World:', world);
 console.log('Server address:', world.worldServerAddress); // e.g., "192.168.1.100:8080"
 ```
@@ -189,7 +189,7 @@ console.log('Server address:', world.worldServerAddress); // e.g., "192.168.1.10
 #### Get Game World by World ID
 
 ```typescript
-const world = await sdk.getGameWorldByWorldId('world-1');
+const world = await sdk.fetchGameWorldByWorldId('world-1');
 console.log('World:', world);
 console.log('Server address:', world.worldServerAddress); // e.g., "192.168.1.100:8080"
 ```
@@ -216,7 +216,7 @@ console.log('Maintenance message:', message);
 #### Get Active Popup Notices
 
 ```typescript
-const notices = await sdk.getPopupNotices();
+const notices = await sdk.fetchPopupNotices();
 console.log('Notices:', notices);
 ```
 
@@ -239,7 +239,7 @@ console.log('Notices for world-1:', notices);
 #### Get Surveys
 
 ```typescript
-const surveys = await sdk.getSurveys();
+const surveys = await sdk.fetchSurveys();
 console.log('Surveys:', surveys);
 ```
 
@@ -515,19 +515,19 @@ await sdk.updateServiceStatus({
 
 ```typescript
 // Get all services
-const allServices = await sdk.getServices();
+const allServices = await sdk.fetchServices();
 
 // Get services of specific type
-const worldServers = await sdk.getServices({ serviceType: 'worldd' });
+const worldServers = await sdk.fetchServices({ serviceType: 'worldd' });
 
 // Get services by group
-const kr1Servers = await sdk.getServices({ serviceGroup: 'kr-1' });
+const kr1Servers = await sdk.fetchServices({ serviceGroup: 'kr-1' });
 
 // Get ready services only
-const readyServers = await sdk.getServices({ status: 'ready' });
+const readyServers = await sdk.fetchServices({ status: 'ready' });
 
 // Exclude self
-const otherServers = await sdk.getServices({ excludeSelf: true });
+const otherServers = await sdk.fetchServices({ excludeSelf: true });
 
 console.log('World servers:', worldServers);
 ```
@@ -535,7 +535,7 @@ console.log('World servers:', worldServers);
 #### Get Specific Service
 
 ```typescript
-const service = await sdk.getService('worldd', 'instance-id');
+const service = await sdk.fetchService('worldd', 'instance-id');
 console.log('Service:', service);
 ```
 
