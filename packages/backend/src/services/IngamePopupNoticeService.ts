@@ -476,6 +476,7 @@ class IngamePopupNoticeService {
 
     // Build response object, only including non-empty arrays
     const response: any = {
+      id: row.id,
       content: row.content,
       displayPriority: row.displayPriority,
       showOnce: Boolean(row.showOnce),

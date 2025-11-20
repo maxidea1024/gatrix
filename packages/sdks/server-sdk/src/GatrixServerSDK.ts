@@ -12,6 +12,7 @@ import { GameWorldService } from './services/GameWorldService';
 import { PopupNoticeService } from './services/PopupNoticeService';
 import { SurveyService } from './services/SurveyService';
 import { WhitelistService } from './services/WhitelistService';
+import { MaintenanceService } from './services/MaintenanceService';
 import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
 import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
@@ -46,6 +47,7 @@ export class GatrixServerSDK {
   public readonly popupNotice: PopupNoticeService;
   public readonly survey: SurveyService;
   public readonly whitelist: WhitelistService;
+  public readonly maintenance: MaintenanceService;
   public readonly serviceDiscovery: ServiceDiscoveryService;
 
   // Cache and Events
@@ -91,6 +93,7 @@ export class GatrixServerSDK {
     this.popupNotice = new PopupNoticeService(this.apiClient, this.logger);
     this.survey = new SurveyService(this.apiClient, this.logger);
     this.whitelist = new WhitelistService(this.apiClient, this.logger);
+    this.maintenance = new MaintenanceService(this.apiClient, this.logger);
     this.serviceDiscovery = new ServiceDiscoveryService(this.apiClient, this.logger);
 
     this.logger.info('GatrixServerSDK created', {
@@ -158,6 +161,7 @@ export class GatrixServerSDK {
         this.popupNotice,
         this.survey,
         this.whitelist,
+        this.maintenance,
         this.apiClient,
         this.logger,
         this.metrics
@@ -249,8 +253,7 @@ export class GatrixServerSDK {
    * Fetch global maintenance status
    */
   async fetchMaintenanceStatus() {
-    const response = await this.apiClient.get('/api/v1/server/maintenance');
-    return response.data;
+    return await this.maintenance.getStatus();
   }
 
   /**
@@ -286,13 +289,19 @@ export class GatrixServerSDK {
   }
 
   /**
-   * Get active popup notices that are currently visible
-   * Filters by isActive status and date range (startDate/endDate)
-   * Sorted by displayPriority
+   * Get active popup notices that are currently visible for the given context
+   * Filters by date range (startDate/endDate) and targeting fields
+   * Sorted by displayPriority (ascending, lower values mean higher priority)
    * @returns Array of active popup notices, empty array if none match
    */
-  getActivePopupNotices(): PopupNotice[] {
-    return this.popupNotice.getActivePopupNotices();
+  getActivePopupNotices(options?: {
+    platform?: string;
+    channel?: string;
+    subChannel?: string;
+    worldId?: string;
+    userId?: string;
+  }): PopupNotice[] {
+    return this.popupNotice.getActivePopupNotices(options);
   }
 
   // ============================================================================
@@ -314,13 +323,6 @@ export class GatrixServerSDK {
       surveys: this.survey.getCached(),
       settings: this.survey.getCachedSettings(),
     };
-  }
-
-  /**
-   * Get active surveys
-   */
-  getActiveSurveys(): Survey[] {
-    return this.survey.getActiveSurveys();
   }
 
   /**
@@ -533,23 +535,26 @@ export class GatrixServerSDK {
 
   /**
    * Fetch whitelists (IP and Account)
+   * Performs API call via WhitelistService and updates cache
    */
   async fetchWhitelists() {
-    return await this.serviceDiscovery.fetchWhitelists();
+    return await this.whitelist.list();
   }
 
   /**
-   * Check if IP is whitelisted
+   * Check if IP is whitelisted using cached data
+   * Note: Uses WhitelistService cache; call fetchWhitelists or initialize cache beforehand.
    */
   async isIpWhitelisted(ip: string): Promise<boolean> {
-    return await this.serviceDiscovery.isIpWhitelisted(ip);
+    return this.whitelist.isIpWhitelisted(ip);
   }
 
   /**
-   * Check if account is whitelisted
+   * Check if account is whitelisted using cached data
+   * Note: Uses WhitelistService cache; call fetchWhitelists or initialize cache beforehand.
    */
   async isAccountWhitelisted(accountId: string): Promise<boolean> {
-    return await this.serviceDiscovery.isAccountWhitelisted(accountId);
+    return this.whitelist.isAccountWhitelisted(accountId);
   }
 
   // ============================================================================

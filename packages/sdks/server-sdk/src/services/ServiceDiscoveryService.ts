@@ -6,7 +6,7 @@
 import * as os from 'os';
 import { Logger } from '../utils/logger';
 import { ApiClient } from '../client/ApiClient';
-import { ServiceInstance, GetServicesParams, RegisterServiceInput, UpdateServiceStatusInput, WhitelistData, ServiceLabels } from '../types/api';
+import { ServiceInstance, GetServicesParams, RegisterServiceInput, UpdateServiceStatusInput, ServiceLabels } from '../types/api';
 import { getFirstNicAddress } from '../utils/network';
 
 export class ServiceDiscoveryService {
@@ -275,71 +275,6 @@ export class ServiceDiscoveryService {
     return response.data;
   }
 
-  /**
-   * Fetch whitelists (IP and Account)
-   * GET /api/v1/server/whitelists
-   */
-  async fetchWhitelists(): Promise<WhitelistData> {
-    this.logger.debug('Fetching whitelists via API');
-
-    const response = await this.apiClient.get<WhitelistData>('/api/v1/server/whitelists');
-
-    if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch whitelists');
-    }
-
-    this.logger.info('Whitelists fetched via API', {
-      ipCount: response.data.ipWhitelist.ips.length,
-      accountCount: response.data.accountWhitelist.accountIds.length
-    });
-
-    return response.data;
-  }
-
-  /**
-   * Check if IP is whitelisted
-   * Helper method that fetches whitelists and checks IP
-   */
-  async isIpWhitelisted(ip: string): Promise<boolean> {
-    const whitelists = await this.fetchWhitelists();
-
-    if (!whitelists.ipWhitelist.enabled) {
-      return false;
-    }
-
-    // Check exact match
-    if (whitelists.ipWhitelist.ips.includes(ip)) {
-      return true;
-    }
-
-    // Check CIDR match (basic implementation)
-    // For production, use a proper CIDR library like 'ip-cidr'
-    for (const cidr of whitelists.ipWhitelist.ips) {
-      if (cidr.includes('/')) {
-        // CIDR notation detected - for now, just check prefix
-        const [network] = cidr.split('/');
-        if (ip.startsWith(network.split('.').slice(0, 3).join('.'))) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Check if account is whitelisted
-   * Helper method that fetches whitelists and checks account ID
-   */
-  async isAccountWhitelisted(accountId: string): Promise<boolean> {
-    const whitelists = await this.fetchWhitelists();
-
-    if (!whitelists.accountWhitelist.enabled) {
-      return false;
-    }
-
-    return whitelists.accountWhitelist.accountIds.includes(accountId);
-  }
 
   /**
    * Start automatic heartbeat to keep service alive in Redis

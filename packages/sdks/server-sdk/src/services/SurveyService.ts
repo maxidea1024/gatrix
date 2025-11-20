@@ -165,13 +165,6 @@ export class SurveyService {
   }
 
   /**
-   * Get active surveys
-   */
-  getActiveSurveys(): Survey[] {
-    return this.cachedSurveys.filter((survey) => survey.isActive);
-  }
-
-  /**
    * Get surveys for a specific world
    */
   getSurveysForWorld(worldId: string): Survey[] {
@@ -297,4 +290,3 @@ export class SurveyService {
     });
   }
 }
-

@@ -83,7 +83,7 @@ export interface PopupNotice {
   targetChannelsInverted?: boolean;
   targetSubchannels: string[] | null;
   targetSubchannelsInverted?: boolean;
-  targetUserIds: string | null;
+  targetUserIds: string[] | null;
   targetUserIdsInverted?: boolean;
   displayPriority: number;
   showOnce: boolean;
@@ -119,7 +119,6 @@ export interface Survey {
   participationRewards?: Reward[];
   rewardMailTitle?: string;
   rewardMailContent?: string;
-  isActive: boolean;
   targetPlatforms?: string[];
   targetPlatformsInverted?: boolean;
   targetChannels?: string[];
@@ -243,4 +242,24 @@ export interface WhitelistData {
     enabled: boolean;
     accountIds: string[]; // List of whitelisted account IDs
   };
+}
+
+
+// ============================================================================
+// Maintenance Types
+// ============================================================================
+
+export interface MaintenanceDetail {
+  type: 'regular' | 'emergency';
+  startsAt: string | null;
+  endsAt: string | null;
+  message: string;
+  localeMessages?: { ko?: string; en?: string; zh?: string };
+  kickExistingPlayers?: boolean;
+  kickDelayMinutes?: number;
+}
+
+export interface MaintenanceStatus {
+  isUnderMaintenance: boolean;
+  detail: MaintenanceDetail | null;
 }

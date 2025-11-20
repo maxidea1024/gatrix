@@ -143,39 +143,102 @@ export class PopupNoticeService {
   }
 
   /**
-   * Get active popup notices that are currently visible
-   * Filters by isActive status and date range (startDate/endDate)
-   * Sorted by displayPriority
+   * Get active popup notices that are currently visible for the given context
+   * Filters by date range (startDate/endDate) and targeting fields
+   * Sorted by displayPriority (ascending, lower values mean higher priority)
    * @returns Array of active popup notices, empty array if none match
    */
-  getActivePopupNotices(): PopupNotice[] {
+  getActivePopupNotices(options?: {
+    platform?: string;
+    channel?: string;
+    subChannel?: string;
+    worldId?: string;
+    userId?: string;
+  }): PopupNotice[] {
     const now = new Date();
+    const { platform, channel, subChannel, worldId, userId } = options ?? {};
 
-    return this.cachedNotices
-      .filter((notice) => {
-        // Must be active
-        if (!notice.isActive) {
+    const filtered = this.cachedNotices.filter((notice) => {
+      // Check startDate: if set, current time must be after startDate
+      if (notice.startDate) {
+        const startDate = new Date(notice.startDate);
+        if (now < startDate) {
           return false;
         }
+      }
 
-        // Check startDate: if set, current time must be after startDate
-        if (notice.startDate) {
-          const startDate = new Date(notice.startDate);
-          if (now < startDate) {
+      // Check endDate: if set, current time must be before endDate
+      if (notice.endDate) {
+        const endDate = new Date(notice.endDate);
+        if (now > endDate) {
+          return false;
+        }
+      }
+
+      // Platform targeting
+      if (platform && notice.targetPlatforms && notice.targetPlatforms.length > 0) {
+        const isInPlatformList = notice.targetPlatforms.includes(platform);
+        const inverted = Boolean(notice.targetPlatformsInverted);
+        if (inverted ? isInPlatformList : !isInPlatformList) {
+          return false;
+        }
+      }
+
+      // Channel targeting
+      if (channel && notice.targetChannels && notice.targetChannels.length > 0) {
+        const isInChannelList = notice.targetChannels.includes(channel);
+        const inverted = Boolean(notice.targetChannelsInverted);
+        if (inverted ? isInChannelList : !isInChannelList) {
+          return false;
+        }
+      }
+
+      // Subchannel targeting (format: channel:subchannel)
+      if (
+        channel &&
+        subChannel &&
+        notice.targetSubchannels &&
+        notice.targetSubchannels.length > 0
+      ) {
+        const subchannelKey = `${channel}:${subChannel}`;
+        const isInSubchannelList = notice.targetSubchannels.includes(subchannelKey);
+        const inverted = Boolean(notice.targetSubchannelsInverted);
+        if (inverted ? isInSubchannelList : !isInSubchannelList) {
+          return false;
+        }
+      }
+
+      // World targeting
+      if (worldId && notice.targetWorlds && notice.targetWorlds.length > 0) {
+        const isInWorldList = notice.targetWorlds.includes(worldId);
+        const inverted = Boolean(notice.targetWorldsInverted);
+        if (inverted ? isInWorldList : !isInWorldList) {
+          return false;
+        }
+      }
+
+      // User targeting
+      if (userId && notice.targetUserIds) {
+        const userIdList = Array.isArray(notice.targetUserIds)
+          ? notice.targetUserIds
+          : String(notice.targetUserIds)
+              .split(',')
+              .map((id) => id.trim())
+              .filter((id) => id);
+
+        if (userIdList.length > 0) {
+          const isInUserList = userIdList.includes(userId);
+          const inverted = Boolean(notice.targetUserIdsInverted);
+          if (inverted ? isInUserList : !isInUserList) {
             return false;
           }
         }
+      }
 
-        // Check endDate: if set, current time must be before endDate
-        if (notice.endDate) {
-          const endDate = new Date(notice.endDate);
-          if (now > endDate) {
-            return false;
-          }
-        }
+      return true;
+    });
 
-        return true;
-      });
+    return filtered.sort((a, b) => a.displayPriority - b.displayPriority);
   }
 }
 

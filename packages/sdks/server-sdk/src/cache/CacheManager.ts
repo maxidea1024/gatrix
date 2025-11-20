@@ -9,23 +9,10 @@ import { GameWorldService } from '../services/GameWorldService';
 import { PopupNoticeService } from '../services/PopupNoticeService';
 import { SurveyService } from '../services/SurveyService';
 import { WhitelistService } from '../services/WhitelistService';
+import { MaintenanceService } from '../services/MaintenanceService';
 import { ApiClient } from '../client/ApiClient';
 import { SdkMetrics } from '../utils/sdkMetrics';
-
-export interface MaintenanceDetail {
-  type: 'regular' | 'emergency';
-  startsAt: string | null;
-  endsAt: string | null;
-  message: string;
-  localeMessages?: { ko?: string; en?: string; zh?: string };
-  kickExistingPlayers?: boolean;
-  kickDelayMinutes?: number;
-}
-
-export interface MaintenanceStatus {
-  isUnderMaintenance: boolean;
-  detail: MaintenanceDetail | null;
-}
+import { MaintenanceStatus } from '../types/api';
 
 export class CacheManager {
   private logger: Logger;
@@ -34,11 +21,11 @@ export class CacheManager {
   private popupNoticeService: PopupNoticeService;
   private surveyService: SurveyService;
   private whitelistService: WhitelistService;
+  private maintenanceService: MaintenanceService;
   private apiClient: ApiClient;
   private refreshInterval?: NodeJS.Timeout;
   private refreshCallbacks: Array<(type: string, data: any) => void> = [];
   private metrics?: SdkMetrics;
-  private cachedMaintenance: MaintenanceStatus | null = null;
 
   constructor(
     config: CacheConfig,
@@ -46,6 +33,7 @@ export class CacheManager {
     popupNoticeService: PopupNoticeService,
     surveyService: SurveyService,
     whitelistService: WhitelistService,
+    maintenanceService: MaintenanceService,
     apiClient: ApiClient,
     logger: Logger,
     metrics?: SdkMetrics
@@ -59,6 +47,7 @@ export class CacheManager {
     this.popupNoticeService = popupNoticeService;
     this.surveyService = surveyService;
     this.whitelistService = whitelistService;
+    this.maintenanceService = maintenanceService;
     this.apiClient = apiClient;
     this.logger = logger;
     this.metrics = metrics;
@@ -311,6 +300,8 @@ export class CacheManager {
       gameWorlds: this.gameWorldService.getCached(),
       popupNotices: this.popupNoticeService.getCached(),
       surveys: this.surveyService.getCached(),
+      whitelists: this.whitelistService.getCached(),
+      maintenance: this.maintenanceService.getCached(),
     };
   }
 
@@ -385,11 +376,8 @@ export class CacheManager {
     this.logger.info('Refreshing maintenance cache...');
     const start = process.hrtime.bigint();
     try {
-      const response = await this.apiClient.get<MaintenanceStatus>('/api/v1/server/maintenance');
-      if (response.success && response.data) {
-        this.cachedMaintenance = response.data;
-        this.emitRefreshEvent('maintenance', response.data);
-      }
+      const status = await this.maintenanceService.refresh();
+      this.emitRefreshEvent('maintenance', status);
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       try {
         this.metrics?.incRefresh('maintenance');
@@ -405,7 +393,7 @@ export class CacheManager {
    * Get cached maintenance status
    */
   getCachedMaintenance(): MaintenanceStatus | null {
-    return this.cachedMaintenance;
+    return this.maintenanceService.getCached();
   }
 
   /**
@@ -417,6 +405,7 @@ export class CacheManager {
     this.popupNoticeService.updateCache([]);
     this.surveyService.updateCache([]);
     this.whitelistService.updateCache({ ipWhitelist: [], accountWhitelist: [] });
+    this.maintenanceService.updateCache(null);
   }
 
   /**
@@ -428,4 +417,3 @@ export class CacheManager {
     this.logger.info('Cache manager destroyed');
   }
 }
-

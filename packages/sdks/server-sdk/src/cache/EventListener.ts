@@ -176,6 +176,8 @@ export class EventListener {
       await this.cacheManager.refreshGameWorlds();
       await this.cacheManager.refreshPopupNotices();
       await this.cacheManager.refreshSurveys();
+      await this.cacheManager.refreshWhitelists();
+      await this.cacheManager.refreshMaintenance();
 
       this.logger.info('Cache reinitialized after reconnection');
     } catch (error: any) {
