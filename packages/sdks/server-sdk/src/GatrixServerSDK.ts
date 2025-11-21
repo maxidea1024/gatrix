@@ -176,6 +176,11 @@ export class GatrixServerSDK {
         await this.eventListener.initialize();
       }
 
+      // TODO
+      // 필요하다면 여기서 service discovery를 등록해야하지 않나?
+      // 아직은 initializing으로 하고, application에서 ready로 updateStatus를 해주는 형태.
+      // 물론, registerService시에 초기 상태는 initializing, ready 둘중에 하나는 선택할수 있도록 하자.
+
       this.initialized = true;
 
       this.logger.info('GatrixServerSDK initialized successfully');
@@ -284,7 +289,7 @@ export class GatrixServerSDK {
   /**
    * Get popup notices for a specific world
    */
-  getPopupNoticesForWorld(worldId: string): PopupNotice[] {
+  getCachedPopupNoticesForWorld(worldId: string): PopupNotice[] {
     return this.popupNotice.getNoticesForWorld(worldId);
   }
 
@@ -341,7 +346,7 @@ export class GatrixServerSDK {
   }
 
   /**
-   * Check appropriate surveys for a user based on their conditions
+   * Get filtered(active) surveys for a user based on their conditions
    * Filters surveys based on platform, channel, subchannel, world, and trigger conditions
    * @param platform User's platform (e.g., 'pc', 'ios', 'android')
    * @param channel User's channel (e.g., 'steam', 'epic')
@@ -351,7 +356,7 @@ export class GatrixServerSDK {
    * @param joinDays User's join days
    * @returns Array of appropriate surveys, empty array if none match
    */
-  checkAppropriateSurveys(
+  getActiveSurveys(
     platform: string,
     channel: string,
     subChannel: string,
@@ -359,7 +364,7 @@ export class GatrixServerSDK {
     userLevel: number,
     joinDays: number
   ): Survey[] {
-    return this.survey.checkAppropriateSurveys(platform, channel, subChannel, worldId, userLevel, joinDays);
+    return this.survey.getActiveSurveys(platform, channel, subChannel, worldId, userLevel, joinDays);
   }
 
   // ============================================================================
@@ -426,7 +431,7 @@ export class GatrixServerSDK {
     if (refreshMethod === 'event') {
       if (!this.eventListener) {
         this.logger.warn('Event listener not initialized. Events will not be received.');
-        return () => {}; // Return no-op function
+        return () => { }; // Return no-op function
       }
       return this.eventListener.on(eventType, callback);
     }
@@ -434,7 +439,7 @@ export class GatrixServerSDK {
     else if (refreshMethod === 'polling') {
       if (!this.cacheManager) {
         this.logger.warn('Cache manager not initialized.');
-        return () => {}; // Return no-op function
+        return () => { }; // Return no-op function
       }
       const unsubscribe = this.cacheManager.onRefresh((type: string, data: any) => {
         // Convert cache refresh events to SDK events
@@ -447,7 +452,7 @@ export class GatrixServerSDK {
       return unsubscribe;
     }
 
-    return () => {}; // Return no-op function as fallback
+    return () => { }; // Return no-op function as fallback
   }
 
   /**

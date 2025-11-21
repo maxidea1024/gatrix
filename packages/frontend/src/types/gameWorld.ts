@@ -20,7 +20,7 @@ export interface GameWorld {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
   customPayload?: Record<string, any> | null;
-  worldServerAddress: string; // Required: ip:port format (e.g., 192.168.1.100:8080)
+  worldServerAddress: string; // Required: URL or host:port format (e.g., https://world.example.com or world.example.com:8080)
   tags?: Tag[]; // normalized
   createdAt: string;
   updatedAt: string;

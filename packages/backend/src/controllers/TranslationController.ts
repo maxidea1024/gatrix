@@ -3,10 +3,10 @@ import Joi from 'joi';
 import { TranslationService } from '../services/TranslationService';
 import { asyncHandler } from '../middleware/errorHandler';
 import { CustomError } from '../middleware/errorHandler';
+import { sleep } from '../utils/asyncUtils';
 
 // Ensure a minimum response time for UI update timing
 const MIN_RESPONSE_MS = 2_000;
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // 단일 번역 요청 스키마
 const translateSchema = Joi.object({

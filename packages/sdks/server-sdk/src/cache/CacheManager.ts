@@ -13,6 +13,7 @@ import { MaintenanceService } from '../services/MaintenanceService';
 import { ApiClient } from '../client/ApiClient';
 import { SdkMetrics } from '../utils/sdkMetrics';
 import { MaintenanceStatus } from '../types/api';
+import { sleep } from '../utils/time';
 
 export class CacheManager {
   private logger: Logger;
@@ -135,7 +136,7 @@ export class CacheManager {
         const response = await this.apiClient.get<{ status: string }>('/api/v1/ready');
 
         if (response.success && response.data?.status === 'ready') {
-          this.logger.info('Backend is ready');
+          this.logger.info('Gatrix backend is ready');
           return;
         }
       } catch (_error: any) {
@@ -143,24 +144,18 @@ export class CacheManager {
       }
 
       if (attempt === maxAttempts) {
-        this.logger.error('Backend is not ready after maximum attempts', {
+        this.logger.error('Gatrix backend is not ready after maximum attempts', {
           attempts: maxAttempts,
           totalTime: `${maxAttempts * retryInterval / 1000}s`,
         });
-        throw new Error('Backend failed to become ready within timeout period');
+        throw new Error('Gatrix backend failed to become ready within timeout period');
       }
 
       // Wait before retrying
-      await this.sleep(retryInterval);
+      await sleep(retryInterval);
     }
   }
 
-  /**
-   * Sleep for specified milliseconds
-   */
-  private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
 
   /**
    * Start auto-refresh interval

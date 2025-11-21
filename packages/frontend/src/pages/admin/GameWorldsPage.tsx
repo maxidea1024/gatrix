@@ -791,10 +791,10 @@ const GameWorldsPage: React.FC = () => {
       errors.name = t('validation.fieldRequired', { field: t('gameWorlds.name') });
     }
 
-    // worldServerAddress 필수 체크 및 형식 검증
+    // worldServerAddress 필수 체크 및 형식 검증 (일반 URL 또는 host:port 허용)
     if (!formData.worldServerAddress || !formData.worldServerAddress.trim()) {
       errors.worldServerAddress = t('validation.fieldRequired', { field: t('gameWorlds.worldServerAddress') });
-    } else if (!/^[\d.]+:\d+$/.test(formData.worldServerAddress.trim())) {
+    } else if (!/^(?:[a-zA-Z][a-zA-Z0-9+.-]*:\/\/\S+|[a-zA-Z0-9.-]+:\d+)$/.test(formData.worldServerAddress.trim())) {
       errors.worldServerAddress = t('gameWorlds.form.worldServerAddressInvalid');
     }
 

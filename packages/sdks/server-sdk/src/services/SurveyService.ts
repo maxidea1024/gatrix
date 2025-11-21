@@ -228,7 +228,7 @@ export class SurveyService {
    * @param joinDays User's join days
    * @returns Array of appropriate surveys, empty array if none match
    */
-  checkAppropriateSurveys(
+  getActiveSurveys(
     platform: string,
     channel: string,
     subChannel: string,

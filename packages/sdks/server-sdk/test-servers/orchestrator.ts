@@ -6,6 +6,7 @@
 
 import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
+import { sleep } from '../src/utils/time';
 
 interface ServerInstance {
   name: string;
@@ -179,9 +180,6 @@ class TestOrchestrator {
     console.log('='.repeat(80));
   }
 
-  private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
 }
 
 // Main execution

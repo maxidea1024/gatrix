@@ -172,7 +172,7 @@ console.log('Worlds:', worlds);
 
 Each game world object includes:
 - `worldId`: Unique world identifier
-- `worldServerAddress`: Server address in `ip:port` format (e.g., `192.168.1.100:8080`)
+- `worldServerAddress`: Server address as a URL or host:port (e.g., `https://world.example.com` or `world.example.com:8080`)
 - `name`: World name (localized)
 - `description`: World description (localized)
 - `status`: World status (`active`, `maintenance`, etc.)
@@ -183,7 +183,7 @@ Each game world object includes:
 ```typescript
 const world = await sdk.fetchGameWorldById(1);
 console.log('World:', world);
-console.log('Server address:', world.worldServerAddress); // e.g., "192.168.1.100:8080"
+console.log('Server address:', world.worldServerAddress); // e.g., "https://world.example.com" or "world.example.com:8080"
 ```
 
 #### Get Game World by World ID
@@ -191,7 +191,7 @@ console.log('Server address:', world.worldServerAddress); // e.g., "192.168.1.10
 ```typescript
 const world = await sdk.fetchGameWorldByWorldId('world-1');
 console.log('World:', world);
-console.log('Server address:', world.worldServerAddress); // e.g., "192.168.1.100:8080"
+console.log('Server address:', world.worldServerAddress); // e.g., "https://world.example.com" or "world.example.com:8080"
 ```
 
 #### Get Cached Game Worlds

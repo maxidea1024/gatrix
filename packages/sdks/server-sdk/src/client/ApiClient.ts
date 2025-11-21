@@ -9,6 +9,7 @@ import { ErrorCode, createError } from '../utils/errors';
 import { ApiResponse } from '../types/api';
 import { RetryConfig } from '../types/config';
 import { SdkMetrics } from '../utils/sdkMetrics';
+import { sleep } from '../utils/time';
 
 export interface ApiClientConfig {
   baseURL: string;
@@ -213,12 +214,6 @@ export class ApiClient {
     return Math.min(delay, this.retryConfig.maxRetryDelay);
   }
 
-  /**
-   * Sleep for specified milliseconds
-   */
-  private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
 
   /**
    * Build a stable cache key for ETag storage based on URL and query params
@@ -283,7 +278,7 @@ export class ApiClient {
           error: lastError.message,
         });
 
-        await this.sleep(delay);
+        await sleep(delay);
       }
     }
 

@@ -8,6 +8,9 @@ import logger from '../config/logger';
 import Joi from 'joi';
 import { pubSubService } from '../services/PubSubService';
 
+// Allow full URLs (scheme://host[:port][...]) or host:port without scheme
+const WORLD_SERVER_ADDRESS_REGEX = /^(?:[a-zA-Z][a-zA-Z0-9+.-]*:\/\/\S+|[a-zA-Z0-9.-]+:\d+)$/;
+
 // Validation schemas
 const createGameWorldSchema = Joi.object({
   worldId: Joi.string().min(1).max(100).required(),
@@ -32,8 +35,8 @@ const createGameWorldSchema = Joi.object({
     })
   ).optional().default([]),
   customPayload: Joi.object().unknown(true).optional().default({}),
-  worldServerAddress: Joi.string().pattern(/^[\d.]+:\d+$/).max(255).required().messages({
-    'string.pattern.base': 'worldServerAddress must be in ip:port format (e.g., 192.168.1.100:8080)',
+  worldServerAddress: Joi.string().pattern(WORLD_SERVER_ADDRESS_REGEX).max(255).required().messages({
+    'string.pattern.base': 'worldServerAddress must be a valid URL or host:port (e.g., https://world.example.com or world.example.com:8080)',
     'any.required': 'worldServerAddress is required'
   }),
   tagIds: Joi.array().items(Joi.number().integer().min(1)).optional()
@@ -62,8 +65,8 @@ const updateGameWorldSchema = Joi.object({
     })
   ).optional().default([]),
   customPayload: Joi.object().unknown(true).optional().allow(null),
-  worldServerAddress: Joi.string().pattern(/^[\d.]+:\d+$/).max(255).optional().messages({
-    'string.pattern.base': 'worldServerAddress must be in ip:port format (e.g., 192.168.1.100:8080)'
+  worldServerAddress: Joi.string().pattern(WORLD_SERVER_ADDRESS_REGEX).max(255).optional().messages({
+    'string.pattern.base': 'worldServerAddress must be a valid URL or host:port (e.g., https://world.example.com or world.example.com:8080)'
   }),
   tagIds: Joi.array().items(Joi.number().integer().min(1)).optional()
 });

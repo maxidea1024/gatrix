@@ -100,7 +100,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
         "worldId": "world_001",
         "name": "Main World",
         "isMaintenance": false,
-        "worldServerAddress": "192.168.1.100:8080",
+        "worldServerAddress": "https://world-001.example.com",
         "customPayload": {
           "region": "asia",
           "maxPlayers": 1000
@@ -112,7 +112,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
         "name": "PvP Arena",
         "isMaintenance": true,
         "maintenanceMessage": "Server maintenance in progress. Expected completion: 2025-10-30 14:00 UTC",
-        "worldServerAddress": "192.168.1.101:8081",
+        "worldServerAddress": "world-002.example.com:8080",
         "customPayload": null,
         "tags": ["pvp"]
       }
