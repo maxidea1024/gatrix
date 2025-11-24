@@ -1,4 +1,5 @@
 import { GatrixServerSDK as GatrixSDK } from '../src';
+import { ServiceDiscoveryService } from '../src/services/ServiceDiscoveryService';
 
 describe('GatrixSDK', () => {
   describe('constructor', () => {
@@ -88,6 +89,52 @@ describe('GatrixSDK', () => {
       });
 
       expect(sdk).toBeInstanceOf(GatrixSDK);
+    });
+
+    it('should support config-based service discovery auto-registration', async () => {
+      const registerMock = jest
+        .spyOn(ServiceDiscoveryService.prototype, 'register')
+        .mockResolvedValue({
+          instanceId: 'test-instance',
+          hostname: 'test-host',
+          internalAddress: '10.0.0.1',
+          externalAddress: '1.2.3.4',
+        });
+
+      const sdk = new GatrixSDK({
+        gatrixUrl: 'http://localhost:3000',
+        apiToken: 'test-token',
+        applicationName: 'test-app',
+        serviceDiscovery: {
+          autoRegister: true,
+          labels: {
+            service: 'worldd',
+            group: 'kr-1',
+          },
+          ports: {
+            http: [8080],
+          },
+          status: 'ready',
+        },
+      });
+
+      await sdk.initialize();
+
+      expect(registerMock).toHaveBeenCalledTimes(1);
+      expect(registerMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          labels: {
+            service: 'worldd',
+            group: 'kr-1',
+          },
+          ports: {
+            http: [8080],
+          },
+          status: 'ready',
+        })
+      );
+
+      registerMock.mockRestore();
     });
   });
 });

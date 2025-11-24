@@ -128,6 +128,57 @@ export class GatrixServerSDK {
   }
 
   /**
+   * Auto-register service to service discovery if configured
+   */
+  private async autoRegisterServiceIfConfigured(): Promise<void> {
+    const serviceDiscoveryConfig = this.config.serviceDiscovery;
+    if (!serviceDiscoveryConfig?.autoRegister) {
+      return;
+    }
+
+    const { labels, hostname, internalAddress, ports, status, stats, meta } = serviceDiscoveryConfig;
+
+    if (!labels || !labels.service) {
+      throw createError(
+        ErrorCode.INVALID_CONFIG,
+        'serviceDiscovery.labels.service is required when autoRegister is enabled'
+      );
+    }
+
+    if (!ports || (!ports.tcp?.length && !ports.udp?.length && !ports.http?.length)) {
+      throw createError(
+        ErrorCode.INVALID_CONFIG,
+        'serviceDiscovery.ports must have at least one port when autoRegister is enabled'
+      );
+    }
+
+    this.logger.info('Auto-registering service via serviceDiscovery config', {
+      labels,
+      ports,
+      status: status ?? 'ready',
+      hostname: hostname ?? 'auto',
+      internalAddress: internalAddress ?? 'auto',
+    });
+
+    const result = await this.serviceDiscovery.register({
+      labels,
+      hostname,
+      internalAddress,
+      ports,
+      status,
+      stats,
+      meta,
+    });
+
+    this.logger.info('Service auto-registered via serviceDiscovery config', {
+      instanceId: result.instanceId,
+      hostname: result.hostname,
+      internalAddress: result.internalAddress,
+      externalAddress: result.externalAddress,
+    });
+  }
+
+  /**
    * Initialize SDK
    * - Initialize cache
    * - Initialize event listener
@@ -176,10 +227,8 @@ export class GatrixServerSDK {
         await this.eventListener.initialize();
       }
 
-      // TODO
-      // 필요하다면 여기서 service discovery를 등록해야하지 않나?
-      // 아직은 initializing으로 하고, application에서 ready로 updateStatus를 해주는 형태.
-      // 물론, registerService시에 초기 상태는 initializing, ready 둘중에 하나는 선택할수 있도록 하자.
+      // Auto-register service discovery if configured
+      await this.autoRegisterServiceIfConfigured();
 
       this.initialized = true;
 
@@ -427,6 +476,17 @@ export class GatrixServerSDK {
     }
 
     await this.cacheManager.refreshSurveys();
+  }
+
+  /**
+   * Refresh maintenance cache
+   */
+  async refreshMaintenanceCache(): Promise<void> {
+    if (!this.cacheManager) {
+      throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
+    }
+
+    await this.cacheManager.refreshMaintenance();
   }
 
   // ============================================================================

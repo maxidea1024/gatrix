@@ -545,6 +545,40 @@ console.log('Service:', service);
 await sdk.unregisterService();
 ```
 
+
+#### Config-based Auto Registration (optional)
+
+Instead of calling `registerService()` manually, you can configure service discovery in the SDK config and let the SDK auto-register during `initialize()`:
+
+```typescript
+const sdk = new GatrixServerSDK({
+  gatrixUrl: 'https://api.gatrix.com',
+  apiToken: 'your-token',
+  applicationName: 'world-server',
+  serviceDiscovery: {
+    autoRegister: true,
+    labels: {
+      service: 'worldd', // Required service type
+      group: 'kr-1',     // Optional group
+      env: 'production',
+    },
+    ports: {
+      http: [8080],
+      tcp: [7777],
+    },
+    status: 'ready',
+    meta: {
+      instanceName: 'world-1',
+      startTime: new Date().toISOString(),
+    },
+  },
+});
+
+await sdk.initialize(); // This will internally call registerService() using the config
+```
+
+> Note: Auto-registration does not change how you unregister. You should still call `sdk.unregisterService()` (or `sdk.serviceDiscovery.unregister()`) during shutdown to remove the instance from service discovery.
+
 #### Service Maintenance
 
 Check if a service is in maintenance mode and get localized maintenance messages:

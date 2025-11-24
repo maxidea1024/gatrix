@@ -2,6 +2,8 @@
  * SDK Configuration Types
  */
 
+import type { ServiceLabels, ServicePorts, ServiceStatus } from './api';
+
 export interface RedisConfig {
   host: string;
   port: number;
@@ -44,6 +46,20 @@ export interface RetryConfig {
 }
 
 /**
+ * Service Discovery Configuration
+ */
+export interface ServiceDiscoveryConfig {
+  autoRegister?: boolean; // Auto-register service during SDK initialization (default: false)
+  labels?: ServiceLabels; // Service labels (required when autoRegister is true; must include labels.service)
+  hostname?: string; // Optional explicit hostname; defaults to os.hostname() when omitted
+  internalAddress?: string; // Optional explicit internal address; defaults to first NIC address when omitted
+  ports?: ServicePorts; // Service ports (required when autoRegister is true)
+  status?: ServiceStatus; // Initial service status. Default: 'ready'
+  stats?: Record<string, any>; // Optional instance statistics to send on registration
+  meta?: Record<string, any>; // Optional static metadata (immutable after registration)
+}
+
+/**
  * Main SDK Configuration
  */
 export interface GatrixSDKConfig {
@@ -66,5 +82,8 @@ export interface GatrixSDKConfig {
 
   // Optional - Metrics settings
   metrics?: MetricsConfig;
+
+  // Optional - Service discovery settings (auto-registration)
+  serviceDiscovery?: ServiceDiscoveryConfig;
 }
 
