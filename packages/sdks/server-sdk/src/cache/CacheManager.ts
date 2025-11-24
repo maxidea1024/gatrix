@@ -156,7 +156,6 @@ export class CacheManager {
     }
   }
 
-
   /**
    * Start auto-refresh interval
    */
@@ -360,7 +359,7 @@ export class CacheManager {
   /**
    * Get cached whitelists
    */
-  getCachedWhitelists() {
+  getWhitelists() {
     return this.whitelistService.getCached();
   }
 
@@ -387,7 +386,7 @@ export class CacheManager {
   /**
    * Get cached maintenance status
    */
-  getCachedMaintenance(): MaintenanceStatus | null {
+  getMaintenanceStatus(): MaintenanceStatus | null {
     return this.maintenanceService.getCached();
   }
 

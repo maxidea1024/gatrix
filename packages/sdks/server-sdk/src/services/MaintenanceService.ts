@@ -63,5 +63,60 @@ export class MaintenanceService {
   updateCache(status: MaintenanceStatus | null): void {
     this.cachedStatus = status;
   }
-}
 
+  /**
+   * Check if service is currently in maintenance based on flag and time window
+   */
+  isServiceMaintenance(): boolean {
+    if (!this.cachedStatus) {
+      return false;
+    }
+
+    const { isUnderMaintenance, detail } = this.cachedStatus;
+
+    if (!isUnderMaintenance) {
+      return false;
+    }
+
+    const now = new Date();
+
+    // Check if maintenance has not started yet
+    if (detail?.startsAt) {
+      const startDate = new Date(detail.startsAt);
+      if (!Number.isNaN(startDate.getTime()) && now < startDate) {
+        return false;
+      }
+    }
+
+    // Check if maintenance has already ended
+    if (detail?.endsAt) {
+      const endDate = new Date(detail.endsAt);
+      if (!Number.isNaN(endDate.getTime()) && now > endDate) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Get localized maintenance message for the service
+   * Returns null when maintenance is not active
+   */
+  getMaintenanceMessage(lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
+    if (!this.isServiceMaintenance() || !this.cachedStatus?.detail) {
+      return null;
+    }
+
+    const detail = this.cachedStatus.detail;
+
+    // Try localized message first
+    const localized = detail.localeMessages?.[lang];
+    if (localized && localized.trim().length > 0) {
+      return localized;
+    }
+
+    // Fallback to default message
+    return detail.message || null;
+  }
+}

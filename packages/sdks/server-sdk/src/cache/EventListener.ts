@@ -19,6 +19,8 @@ export class EventListener {
   private cacheManager: CacheManager;
   private readonly CHANNEL_NAME = 'gatrix-sdk-events';
   private isConnected: boolean = false;
+  // Flag to suppress noisy logs during intentional shutdown
+  private isShuttingDown: boolean = false;
   private metrics?: SdkMetrics;
   private reconnectAttempts: number = 0;
   private readonly MAX_RECONNECT_ATTEMPTS = 60; // 30 seconds with 500ms interval
@@ -59,9 +61,14 @@ export class EventListener {
         autoResubscribe: true,
       });
 
-
       // Suppress ioredis internal logs
       this.subscriber.on('error', (error) => {
+        if (this.isShuttingDown) {
+          // Avoid noisy error logs during intentional shutdown
+          this.isConnected = false;
+          try { this.metrics?.setRedisConnected(false); } catch (_) {}
+          return;
+        }
         // Only log actual connection errors, not retry attempts
         if (!error.message.includes('ECONNREFUSED') && !error.message.includes('connect')) {
           this.logger.error('Subscriber error', { error: error.message });
@@ -73,6 +80,12 @@ export class EventListener {
       });
 
       this.subscriber.on('close', () => {
+        if (this.isShuttingDown) {
+          // Avoid noisy close logs during intentional shutdown
+          this.isConnected = false;
+          try { this.metrics?.setRedisConnected(false); } catch (_) {}
+          return;
+        }
         this.logger.warn('Subscriber connection closed');
         // Mark as disconnected; rely on ioredis auto-reconnect
         this.isConnected = false;
@@ -158,7 +171,7 @@ export class EventListener {
         await this.initialize();
 
         // After successful reconnection, reinitialize all cache data
-        this.logger.info('✅ Event listener reconnected. Reinitializing cache data...');
+        this.logger.info('Event listener reconnected. Reinitializing cache data...');
         await this.reinitializeCache();
       } catch (_error: any) {
         // Silently continue on reconnection failures
@@ -190,7 +203,6 @@ export class EventListener {
    * Process incoming event
    */
   private async processEvent(event: any): Promise<void> {
-
     this.logger.debug('Processing event', { type: event.type, data: event.data });
 
     // Handle standard events (cache invalidation)
@@ -433,64 +445,24 @@ export class EventListener {
     }
   }
 
-
-
-
-
   /**
    * Check if service is currently in maintenance
    */
-  private isInMaintenance(maintenance: any): boolean {
-    if (!maintenance || !maintenance.isMaintenance) {
-      return false;
-    }
-
-    // If no dates provided, maintenance is active
-    if (!maintenance.maintenanceStartDate && !maintenance.maintenanceEndDate) {
-      return true;
-    }
-
-    const now = new Date();
-
-    // Check start date
-    if (maintenance.maintenanceStartDate) {
-      const startDate = new Date(maintenance.maintenanceStartDate);
-      if (now < startDate) {
-        return false; // Not started yet
-      }
-    }
-
-    // Check end date
-    if (maintenance.maintenanceEndDate) {
-      const endDate = new Date(maintenance.maintenanceEndDate);
-      if (now > endDate) {
-        return false; // Already ended
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * Emit virtual event to registered listeners
-   */
-  private emitVirtualEvent(type: string, data: any): void {
-    const event: CustomEvent = {
-      type,
-      data,
-      timestamp: Date.now(),
-    };
-
-    this.emitEvent(event).catch((error: any) => {
-      this.logger.error('Failed to emit virtual event', { type, error: error.message });
-    });
-  }
-
   /**
    * Close event listener and cleanup
    */
   async close(): Promise<void> {
     this.logger.info('Closing event listener...');
+
+    // Mark as shutting down to suppress noisy connection logs
+    this.isShuttingDown = true;
+    this.isConnected = false;
+    try { this.metrics?.setRedisConnected(false); } catch (_) {}
+
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = undefined;
+    }
 
     if (this.subscriber) {
       await this.subscriber.unsubscribe(this.CHANNEL_NAME);
@@ -503,4 +475,3 @@ export class EventListener {
     this.logger.info('Event listener closed');
   }
 }
-

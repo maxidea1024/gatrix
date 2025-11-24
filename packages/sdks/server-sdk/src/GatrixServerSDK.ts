@@ -236,7 +236,7 @@ export class GatrixServerSDK {
   /**
    * Get cached game worlds
    */
-  getCachedGameWorlds(): GameWorld[] {
+  getGameWorlds(): GameWorld[] {
     return this.gameWorld.getCached();
   }
 
@@ -250,7 +250,7 @@ export class GatrixServerSDK {
   /**
    * Get maintenance message for a world
    */
-  getMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
+  getWorldMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
     return this.gameWorld.getMaintenanceMessage(worldId, lang);
   }
 
@@ -264,8 +264,22 @@ export class GatrixServerSDK {
   /**
    * Get cached global maintenance status
    */
-  getCachedMaintenanceStatus() {
-    return this.cacheManager?.getCachedMaintenance();
+  getMaintenanceStatus() {
+    return this.maintenance.getCached();
+  }
+
+  /**
+   * Check if global service is currently in maintenance
+   */
+  isServiceInMaintenance(): boolean {
+    return this.maintenance.isServiceMaintenance();
+  }
+
+  /**
+   * Get localized maintenance message for global service
+   */
+  getServiceMaintenanceMessage(lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
+    return this.maintenance.getMaintenanceMessage(lang);
   }
 
   // ============================================================================
@@ -282,14 +296,14 @@ export class GatrixServerSDK {
   /**
    * Get cached popup notices
    */
-  getCachedPopupNotices(): PopupNotice[] {
+  getPopupNotices(): PopupNotice[] {
     return this.popupNotice.getCached();
   }
 
   /**
    * Get popup notices for a specific world
    */
-  getCachedPopupNoticesForWorld(worldId: string): PopupNotice[] {
+  getPopupNoticesForWorld(worldId: string): PopupNotice[] {
     return this.popupNotice.getNoticesForWorld(worldId);
   }
 
@@ -323,7 +337,7 @@ export class GatrixServerSDK {
   /**
    * Get cached surveys with settings
    */
-  getCachedSurveys(): { surveys: Survey[]; settings: SurveySettings | null } {
+  getSurveys(): { surveys: Survey[]; settings: SurveySettings | null } {
     return {
       surveys: this.survey.getCached(),
       settings: this.survey.getCachedSettings(),
@@ -570,12 +584,12 @@ export class GatrixServerSDK {
    * Get cached whitelists (IP and Account)
    * Returns cached data without making API call
    */
-  getCachedWhitelists() {
+  getWhitelists() {
     if (!this.cacheManager) {
       this.logger.warn('Cache manager not initialized');
       return { ipWhitelist: [], accountWhitelist: [] };
     }
-    return this.cacheManager.getCachedWhitelists();
+    return this.cacheManager.getWhitelists();
   }
 
   /**
