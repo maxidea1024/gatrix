@@ -97,21 +97,30 @@ export class EventListener {
         this.logger.warn('Subscriber reconnecting...', { delay: time });
       });
 
+      // Track if this is the first connection (to skip reinitializeCache on initial connect)
+      let isFirstConnection = true;
+
       this.subscriber.on('ready', async () => {
         if (!this.isConnected) {
           this.isConnected = true;
-          this.logger.info('Redis connection restored successfully');
-          try { this.metrics?.setRedisConnected(true); this.metrics?.incRedisReconnect(); } catch (_) {}
-          try {
-            await this.reinitializeCache();
-          } catch {
-            // Errors are already logged inside reinitializeCache
+
+          // Only reinitialize cache on reconnection, not on first connect
+          // (CacheManager.initialize() already loads initial data)
+          if (!isFirstConnection) {
+            this.logger.info('Redis connection restored successfully');
+            try { this.metrics?.setRedisConnected(true); this.metrics?.incRedisReconnect(); } catch (_) {}
+            try {
+              await this.reinitializeCache();
+            } catch {
+              // Errors are already logged inside reinitializeCache
+            }
           }
         }
       });
 
       // Connect to Redis
       await this.subscriber.connect();
+      isFirstConnection = false; // Mark first connection complete
       try { this.metrics?.setRedisConnected(true); } catch (_) {}
 
       // Subscribe to SDK events channel

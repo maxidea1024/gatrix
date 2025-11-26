@@ -436,11 +436,6 @@ const MaintenancePage: React.FC = () => {
                             </Box>
                             <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
                               {startsAt.format('YYYY-MM-DD A h:mm')}
-                              {isStartTimeInPast() && (
-                                <Box component="span" sx={{ color: 'warning.main', fontWeight: 600, ml: 0.5 }}>
-                                  ({t('maintenance.immediateStartLabel')})
-                                </Box>
-                              )}
                               <Box component="span" sx={{ color: 'text.secondary', ml: 0.5 }}>
                                 ({startsAt.toISOString()})
                               </Box>

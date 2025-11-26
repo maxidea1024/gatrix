@@ -669,9 +669,10 @@ export class GatrixServerSDK {
   /**
    * Emit maintenance event to all registered listeners
    * Called by MaintenanceWatcher when maintenance state changes
+   * Local events are prefixed with 'local.' to distinguish from backend events
    */
   private emitMaintenanceEvent(
-    eventType: 'maintenance.started' | 'maintenance.ended',
+    eventType: 'local.maintenance.started' | 'local.maintenance.ended' | 'local.maintenance.updated',
     data: MaintenanceEventData
   ): void {
     const listeners = this.maintenanceEventListeners.get(eventType) || [];
@@ -695,12 +696,12 @@ export class GatrixServerSDK {
   /**
    * Register event listener
    * Works with both event-based and polling refresh methods
-   * Also supports maintenance.started and maintenance.ended events
+   * Also supports local.maintenance.started, local.maintenance.ended, and local.maintenance.updated events
    * Returns a function to unregister the listener
    */
   on(eventType: string, callback: EventCallback): () => void {
-    // Handle maintenance events separately (these are local events from MaintenanceWatcher)
-    if (eventType === 'maintenance.started' || eventType === 'maintenance.ended') {
+    // Handle local maintenance events separately (these are local events from MaintenanceWatcher)
+    if (eventType === 'local.maintenance.started' || eventType === 'local.maintenance.ended' || eventType === 'local.maintenance.updated') {
       const listeners = this.maintenanceEventListeners.get(eventType) || [];
       listeners.push(callback);
       this.maintenanceEventListeners.set(eventType, listeners);

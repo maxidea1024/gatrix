@@ -250,6 +250,7 @@ export class CacheManager {
 
   /**
    * Refresh game worlds cache
+   * Also checks and emits maintenance state change events
    */
   async refreshGameWorlds(): Promise<void> {
     const start = process.hrtime.bigint();
@@ -260,6 +261,8 @@ export class CacheManager {
       this.metrics?.observeRefresh('gameworlds', duration);
       this.metrics?.setLastRefresh('gameworlds');
     } catch (_) {}
+    // Check maintenance state changes after refresh
+    this.checkMaintenanceStateChanges();
   }
 
   /**
@@ -299,9 +302,12 @@ export class CacheManager {
 
   /**
    * Update a single game world in cache (immutable)
+   * Also checks and emits maintenance state change events
    */
   async updateSingleGameWorld(id: number, isVisible?: boolean | number): Promise<void> {
     await this.gameWorldService.updateSingleWorld(id, isVisible);
+    // Check maintenance state changes after update
+    this.checkMaintenanceStateChanges();
   }
 
   /**
