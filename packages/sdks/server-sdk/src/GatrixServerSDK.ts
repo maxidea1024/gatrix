@@ -31,6 +31,7 @@ import {
   UpdateServiceStatusInput,
   GetServicesParams,
   MaintenanceInfo,
+  CurrentMaintenanceStatus,
 } from './types/api';
 
 /**
@@ -386,6 +387,73 @@ export class GatrixServerSDK {
    */
   getServiceMaintenanceMessage(lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
     return this.serviceMaintenance.getMessage(lang);
+  }
+
+  /**
+   * Get current maintenance status for client delivery
+   * Returns the ACTUAL maintenance status after checking time ranges
+   *
+   * Behavior:
+   * - Global service maintenance is always checked first
+   * - If worldId is configured in SDK, only that world is checked
+   * - Time-based maintenance (startsAt/endsAt) is calculated to determine actual status
+   *
+   * @returns CurrentMaintenanceStatus with isInMaintenance, source, and detail
+   */
+  getCurrentMaintenanceStatus(): CurrentMaintenanceStatus {
+    // Check global service maintenance first (uses time calculation internally)
+    if (this.serviceMaintenance.isInMaintenance()) {
+      const status = this.serviceMaintenance.getCached();
+      return {
+        isInMaintenance: true,
+        source: 'service',
+        detail: {
+          startsAt: status?.detail?.startsAt,
+          endsAt: status?.detail?.endsAt,
+          message: status?.detail?.message,
+          localeMessages: status?.detail?.localeMessages,
+          forceDisconnect: status?.detail?.kickExistingPlayers,
+          gracePeriodMinutes: status?.detail?.kickDelayMinutes,
+        },
+      };
+    }
+
+    // Check world-level maintenance
+    const targetWorldId = this.config.worldId;
+
+    if (targetWorldId && this.gameWorld.isWorldInMaintenance(targetWorldId)) {
+      const world = this.gameWorld.getWorldByWorldId(targetWorldId);
+      if (world) {
+        // Convert maintenanceLocales array to localeMessages object
+        const localeMessages: { ko?: string; en?: string; zh?: string } = {};
+        if (world.maintenanceLocales) {
+          for (const locale of world.maintenanceLocales) {
+            if (locale.lang === 'ko' || locale.lang === 'en' || locale.lang === 'zh') {
+              localeMessages[locale.lang] = locale.message;
+            }
+          }
+        }
+
+        return {
+          isInMaintenance: true,
+          source: 'world',
+          worldId: targetWorldId,
+          detail: {
+            startsAt: world.maintenanceStartDate,
+            endsAt: world.maintenanceEndDate,
+            message: world.maintenanceMessage,
+            localeMessages: Object.keys(localeMessages).length > 0 ? localeMessages : undefined,
+            forceDisconnect: world.forceDisconnect,
+            gracePeriodMinutes: world.gracePeriodMinutes,
+          },
+        };
+      }
+    }
+
+    // Not in maintenance
+    return {
+      isInMaintenance: false,
+    };
   }
 
   // ============================================================================

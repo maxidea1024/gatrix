@@ -251,7 +251,7 @@ export class MaintenanceWatcher {
       serviceDetails = {
         startsAt: detail?.startsAt ?? undefined,
         endsAt: detail?.endsAt ?? undefined,
-        message: detail?.localeMessages?.en || detail?.localeMessages?.ko,
+        message: detail?.message || detail?.localeMessages?.en || detail?.localeMessages?.ko,
         kickExistingPlayers: detail?.kickExistingPlayers,
         kickDelayMinutes: detail?.kickDelayMinutes,
       };

@@ -16,6 +16,8 @@ async function main() {
     apiToken: process.env.API_TOKEN || 'gatrix-unsecured-server-api-token',
     applicationName: 'maintenance-test',
 
+    worldId: 'UWO-GL-01',
+
     // Redis for events
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
@@ -51,6 +53,7 @@ async function main() {
         timestamp: event.timestamp,
         details: event.data.details,
       });
+      logger.info('📊 Current Maintenance Status:', sdk.getCurrentMaintenanceStatus());
     });
 
     sdk.on('local.maintenance.ended', (event) => {
@@ -59,6 +62,7 @@ async function main() {
         worldId: event.data.worldId,
         timestamp: event.timestamp,
       });
+      logger.info('📊 Current Maintenance Status:', sdk.getCurrentMaintenanceStatus());
     });
 
     sdk.on('local.maintenance.updated', (event) => {
@@ -68,32 +72,11 @@ async function main() {
         timestamp: event.timestamp,
         details: event.data.details,
       });
+      logger.info('📊 Current Maintenance Status:', sdk.getCurrentMaintenanceStatus());
     });
 
     // Print current maintenance status (once on startup)
-    const serviceStatus = sdk.getServiceMaintenanceStatus();
-    const worlds = sdk.getGameWorlds();
-
-    logger.info('Current Status:', {
-      service: {
-        isUnderMaintenance: serviceStatus?.isUnderMaintenance ?? false,
-        startsAt: serviceStatus?.detail?.startsAt,
-        endsAt: serviceStatus?.detail?.endsAt,
-        message: serviceStatus?.detail?.localeMessages,
-        kickExistingPlayers: serviceStatus?.detail?.kickExistingPlayers,
-        kickDelayMinutes: serviceStatus?.detail?.kickDelayMinutes,
-      },
-      worlds: worlds.map(w => ({
-        worldId: w.worldId,
-        name: w.name,
-        isMaintenance: w.isMaintenance,
-        startDate: w.maintenanceStartDate,
-        endDate: w.maintenanceEndDate,
-        message: w.maintenanceMessage,
-        forceDisconnect: w.forceDisconnect,
-        gracePeriodMinutes: w.gracePeriodMinutes,
-      })),
-    });
+    logger.info('📊 Current Maintenance Status:', sdk.getCurrentMaintenanceStatus());
 
     logger.info('');
     logger.info('='.repeat(60));

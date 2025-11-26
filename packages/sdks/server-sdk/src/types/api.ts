@@ -290,3 +290,42 @@ export interface MaintenanceInfo {
   /** Maintenance end time (ISO 8601 string) */
   endsAt: string | null;
 }
+
+/**
+ * Maintenance detail for client delivery
+ * Contains all information needed for client to display maintenance status
+ */
+export interface MaintenanceDetailSummary {
+  /** Maintenance start time (ISO 8601 string) */
+  startsAt?: string | null;
+  /** Maintenance end time (ISO 8601 string) */
+  endsAt?: string | null;
+  /** Default maintenance message */
+  message?: string;
+  /** Localized maintenance messages */
+  localeMessages?: { ko?: string; en?: string; zh?: string };
+  /** Whether to force disconnect existing players */
+  forceDisconnect?: boolean;
+  /** Grace period in minutes before disconnecting players */
+  gracePeriodMinutes?: number;
+}
+
+/**
+ * Current maintenance status for client delivery
+ * Used for initial client delivery to inform about current maintenance state
+ *
+ * This returns the ACTUAL maintenance status after checking time ranges:
+ * - Global service maintenance is always checked
+ * - If worldId is configured in SDK, only that world is checked
+ * - Time-based maintenance (startsAt/endsAt) is calculated at query time
+ */
+export interface CurrentMaintenanceStatus {
+  /** Whether currently in maintenance (calculated at query time, not just cached flag) */
+  isInMaintenance: boolean;
+  /** Source of maintenance: 'service' for global, 'world' for world-level (only present when isInMaintenance is true) */
+  source?: 'service' | 'world';
+  /** World ID if source is 'world' */
+  worldId?: string;
+  /** Maintenance detail (only present when isInMaintenance is true) */
+  detail?: MaintenanceDetailSummary;
+}
