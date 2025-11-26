@@ -3,7 +3,7 @@ import RemoteConfigController from '../../controllers/RemoteConfigController';
 import { ContextFieldController } from '../../controllers/ContextFieldControllerNew';
 import { authenticate, requireAdmin } from '../../middleware/auth';
 import { body, param, query, validationResult } from 'express-validator';
-import { CustomError } from '../../middleware/errorHandler';
+import { GatrixError } from '../../middleware/errorHandler';
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ const validateRequest = (req: express.Request, res: express.Response, next: expr
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const errorMessages = errors.array().map(err => err.msg).join(', ');
-    throw new CustomError(`Validation failed: ${errorMessages}`, 400);
+    throw new GatrixError(`Validation failed: ${errorMessages}`, 400);
   }
   next();
 };
@@ -86,11 +86,11 @@ const listConfigsValidation = [
   query('isActive')
     .optional()
     .custom((value) => {
-      // �?문자?�이??undefined???�용
+      // �?문자?�이??undefined???�용
       if (value === '' || value === undefined || value === null) {
         return true;
       }
-      // 'true' ?�는 'false' 문자?�만 ?�용
+      // 'true' ?�는 'false' 문자?�만 ?�용
       if (value === 'true' || value === 'false') {
         return true;
       }

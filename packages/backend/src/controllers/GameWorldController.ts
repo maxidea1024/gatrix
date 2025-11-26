@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { AuthenticatedRequest } from '../types/auth';
 import { GameWorldService } from '../services/GameWorldService';
 import { TagService } from '../services/TagService';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import { asyncHandler } from '../utils/asyncHandler';
 import logger from '../config/logger';
 import Joi from 'joi';
@@ -109,7 +109,7 @@ export class GameWorldController {
     // Validate query parameters (optional)
     // const { error, value } = listGameWorldsSchema.validate(req.query);
     // if (error) {
-    //   throw new CustomError(error.details[0].message, 400);
+    //   throw new GatrixError(error.details[0].message, 400);
     // }
 
     // Use raw query params if validation is skipped
@@ -162,7 +162,7 @@ export class GameWorldController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid game world ID', 400);
+      throw new GatrixError('Invalid game world ID', 400);
     }
 
     const world = await GameWorldService.getGameWorldById(id);
@@ -179,7 +179,7 @@ export class GameWorldController {
     const { worldId } = req.params;
 
     if (!worldId) {
-      throw new CustomError('World ID is required', 400);
+      throw new GatrixError('World ID is required', 400);
     }
 
     const world = await GameWorldService.getGameWorldByWorldId(worldId);
@@ -196,7 +196,7 @@ export class GameWorldController {
     // Validate request body
     const { error, value } = createGameWorldSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { tagIds, ...worldValue } = value as any;
@@ -209,13 +209,13 @@ export class GameWorldController {
 
       // If both times are set, endsAt must be after startsAt
       if (startsAt && endsAt && endsAt <= startsAt) {
-        throw new CustomError('End time must be after start time.', 400);
+        throw new GatrixError('End time must be after start time.', 400);
       }
 
       // If only endsAt is set, it must be in the future
       if (!startsAt && endsAt) {
         if (endsAt <= now) {
-          throw new CustomError('End time must be in the future.', 400);
+          throw new GatrixError('End time must be in the future.', 400);
         }
       }
     }
@@ -223,7 +223,7 @@ export class GameWorldController {
     // Resolve authenticated user id from middleware (supports both payload and loaded user)
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
     if (!authenticatedUserId) {
-      throw new CustomError('User authentication required', 401);
+      throw new GatrixError('User authentication required', 401);
     }
 
     const worldData = {
@@ -261,13 +261,13 @@ export class GameWorldController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid game world ID', 400);
+      throw new GatrixError('Invalid game world ID', 400);
     }
 
     // Validate request body
     const { error, value } = updateGameWorldSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { tagIds, ...updateValue } = value as any;
@@ -280,13 +280,13 @@ export class GameWorldController {
 
       // If both times are set, endsAt must be after startsAt
       if (startsAt && endsAt && endsAt <= startsAt) {
-        throw new CustomError('End time must be after start time.', 400);
+        throw new GatrixError('End time must be after start time.', 400);
       }
 
       // If only endsAt is set, it must be in the future
       if (!startsAt && endsAt) {
         if (endsAt <= now) {
-          throw new CustomError('End time must be in the future.', 400);
+          throw new GatrixError('End time must be in the future.', 400);
         }
       }
     }
@@ -328,7 +328,7 @@ export class GameWorldController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid game world ID', 400);
+      throw new GatrixError('Invalid game world ID', 400);
     }
 
     await GameWorldService.deleteGameWorld(id);
@@ -357,7 +357,7 @@ export class GameWorldController {
     logger.info(`GameWorldController.toggleVisibility called for id: ${id}`);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid game world ID', 400);
+      throw new GatrixError('Invalid game world ID', 400);
     }
 
     const world = await GameWorldService.toggleVisibility(id);
@@ -373,7 +373,7 @@ export class GameWorldController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid game world ID', 400);
+      throw new GatrixError('Invalid game world ID', 400);
     }
 
     const world = await GameWorldService.toggleMaintenance(id);
@@ -389,13 +389,13 @@ export class GameWorldController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid game world ID', 400);
+      throw new GatrixError('Invalid game world ID', 400);
     }
 
     // Validate request body
     const { error, value } = updateMaintenanceSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     // Validate time settings
@@ -406,13 +406,13 @@ export class GameWorldController {
 
       // If both times are set, endsAt must be after startsAt
       if (startsAt && endsAt && endsAt <= startsAt) {
-        throw new CustomError('End time must be after start time.', 400);
+        throw new GatrixError('End time must be after start time.', 400);
       }
 
       // If only endsAt is set, it must be in the future
       if (!startsAt && endsAt) {
         if (endsAt <= now) {
-          throw new CustomError('End time must be in the future.', 400);
+          throw new GatrixError('End time must be in the future.', 400);
         }
       }
     }
@@ -437,13 +437,13 @@ export class GameWorldController {
     const { orderUpdates } = req.body;
 
     if (!Array.isArray(orderUpdates)) {
-      throw new CustomError('Order updates must be an array', 400);
+      throw new GatrixError('Order updates must be an array', 400);
     }
 
     // Validate each update
     for (const update of orderUpdates) {
       if (!update.id || typeof update.displayOrder !== 'number') {
-        throw new CustomError('Each update must have id and displayOrder', 400);
+        throw new GatrixError('Each update must have id and displayOrder', 400);
       }
     }
 
@@ -459,7 +459,7 @@ export class GameWorldController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid game world ID', 400);
+      throw new GatrixError('Invalid game world ID', 400);
     }
 
     const moved = await GameWorldService.moveUp(id);
@@ -475,7 +475,7 @@ export class GameWorldController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid game world ID', 400);
+      throw new GatrixError('Invalid game world ID', 400);
     }
 
     const moved = await GameWorldService.moveDown(id);

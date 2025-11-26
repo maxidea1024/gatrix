@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { IpWhitelistService } from '../services/IpWhitelistService';
-import { asyncHandler, CustomError } from '../middleware/errorHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import Joi from 'joi';
 import { isValidIPOrCIDR } from '../utils/ipValidation';
@@ -90,7 +90,7 @@ export class IpWhitelistController {
     // Validate query parameters
     const { error, value } = getIpWhitelistsQuerySchema.validate(req.query);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { page, limit, ipAddress, purpose, isEnabled, createdBy, search, tags } = value;
@@ -120,7 +120,7 @@ export class IpWhitelistController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid IP whitelist ID', 400);
+      throw new GatrixError('Invalid IP whitelist ID', 400);
     }
 
     const ipWhitelist = await IpWhitelistService.getIpWhitelistById(id);
@@ -135,7 +135,7 @@ export class IpWhitelistController {
     // Validate request body
     const { error, value } = createIpWhitelistSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     // Clean up the validated data to remove any undefined values
@@ -171,13 +171,13 @@ export class IpWhitelistController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid IP whitelist ID', 400);
+      throw new GatrixError('Invalid IP whitelist ID', 400);
     }
 
     // Validate request body
     const { error, value } = updateIpWhitelistSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const updateData = {
@@ -197,7 +197,7 @@ export class IpWhitelistController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid IP whitelist ID', 400);
+      throw new GatrixError('Invalid IP whitelist ID', 400);
     }
 
     await IpWhitelistService.deleteIpWhitelist(id);
@@ -212,7 +212,7 @@ export class IpWhitelistController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid IP whitelist ID', 400);
+      throw new GatrixError('Invalid IP whitelist ID', 400);
     }
 
     const updated = await IpWhitelistService.toggleIpWhitelistStatus(id, (req.user as any).userId);
@@ -227,7 +227,7 @@ export class IpWhitelistController {
     // Validate request body
     const { error, value } = bulkCreateSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const createdCount = await IpWhitelistService.bulkCreateIpWhitelists(
@@ -249,7 +249,7 @@ export class IpWhitelistController {
     const { ipAddress } = req.query;
 
     if (!ipAddress || typeof ipAddress !== 'string') {
-      throw new CustomError('IP address is required', 400);
+      throw new GatrixError('IP address is required', 400);
     }
 
     const isWhitelisted = await IpWhitelistService.isIpWhitelisted(ipAddress);

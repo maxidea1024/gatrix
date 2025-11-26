@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { asyncHandler, CustomError } from '../middleware/errorHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { MonitoringAlert } from '../models/MonitoringAlert';
 
@@ -100,7 +100,7 @@ export class MonitoringAlertController {
     const alert = await MonitoringAlert.query().findById(id);
 
     if (!alert) {
-      throw new CustomError('Alert not found', 404);
+      throw new GatrixError('Alert not found', 404);
     }
 
     res.json({ success: true, data: alert });
@@ -115,7 +115,7 @@ export class MonitoringAlertController {
     const { alertStatus } = req.body || {};
 
     if (!alertStatus) {
-      throw new CustomError('alertStatus is required', 400);
+      throw new GatrixError('alertStatus is required', 400);
     }
 
     const updated = await MonitoringAlert.query().patchAndFetchById(id, {
@@ -123,7 +123,7 @@ export class MonitoringAlertController {
     });
 
     if (!updated) {
-      throw new CustomError('Alert not found', 404);
+      throw new GatrixError('Alert not found', 404);
     }
 
     res.json({ success: true, data: updated });

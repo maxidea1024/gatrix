@@ -9,7 +9,7 @@ import { GameWorldService } from '../services/GameWorldService';
 import { PopupNoticeService } from '../services/PopupNoticeService';
 import { SurveyService } from '../services/SurveyService';
 import { WhitelistService } from '../services/WhitelistService';
-import { MaintenanceService } from '../services/MaintenanceService';
+import { ServiceMaintenanceService } from '../services/ServiceMaintenanceService';
 import { ApiClient } from '../client/ApiClient';
 import { SdkMetrics } from '../utils/sdkMetrics';
 import { MaintenanceStatus } from '../types/api';
@@ -22,7 +22,7 @@ export class CacheManager {
   private popupNoticeService: PopupNoticeService;
   private surveyService: SurveyService;
   private whitelistService: WhitelistService;
-  private maintenanceService: MaintenanceService;
+  private serviceMaintenanceService: ServiceMaintenanceService;
   private apiClient: ApiClient;
   private refreshInterval?: NodeJS.Timeout;
   private refreshCallbacks: Array<(type: string, data: any) => void> = [];
@@ -34,7 +34,7 @@ export class CacheManager {
     popupNoticeService: PopupNoticeService,
     surveyService: SurveyService,
     whitelistService: WhitelistService,
-    maintenanceService: MaintenanceService,
+    serviceMaintenanceService: ServiceMaintenanceService,
     apiClient: ApiClient,
     logger: Logger,
     metrics?: SdkMetrics
@@ -48,7 +48,7 @@ export class CacheManager {
     this.popupNoticeService = popupNoticeService;
     this.surveyService = surveyService;
     this.whitelistService = whitelistService;
-    this.maintenanceService = maintenanceService;
+    this.serviceMaintenanceService = serviceMaintenanceService;
     this.apiClient = apiClient;
     this.logger = logger;
     this.metrics = metrics;
@@ -105,8 +105,8 @@ export class CacheManager {
           this.logger.warn('Failed to load whitelists', { error: error.message });
           return { ipWhitelist: [], accountWhitelist: [] };
         }),
-        this.refreshMaintenance().catch((error) => {
-          this.logger.warn('Failed to load maintenance status', { error: error.message });
+        this.refreshServiceMaintenance().catch((error) => {
+          this.logger.warn('Failed to load service maintenance status', { error: error.message });
         }),
       ]);
 
@@ -202,8 +202,8 @@ export class CacheManager {
         this.whitelistService.refresh().catch((error) => {
           this.logger.warn('Failed to refresh whitelists', { error: error.message });
         }),
-        this.refreshMaintenance().catch((error) => {
-          this.logger.warn('Failed to refresh maintenance', { error: error.message });
+        this.refreshServiceMaintenance().catch((error) => {
+          this.logger.warn('Failed to refresh service maintenance', { error: error.message });
         }),
       ]);
 
@@ -220,7 +220,7 @@ export class CacheManager {
       if (this.config.refreshMethod === 'polling') {
         this.emitRefreshEvent('cache.refreshed', {
           timestamp: new Date().toISOString(),
-          types: ['gameworld', 'popup', 'survey', 'whitelist', 'maintenance'],
+          types: ['gameworld', 'popup', 'survey', 'whitelist', 'serviceMaintenance'],
         });
       }
     } catch (error: any) {
@@ -295,7 +295,7 @@ export class CacheManager {
       popupNotices: this.popupNoticeService.getCached(),
       surveys: this.surveyService.getCached(),
       whitelists: this.whitelistService.getCached(),
-      maintenance: this.maintenanceService.getCached(),
+      serviceMaintenance: this.serviceMaintenanceService.getCached(),
     };
   }
 
@@ -364,30 +364,30 @@ export class CacheManager {
   }
 
   /**
-   * Refresh maintenance status
+   * Refresh service maintenance status
    */
-  async refreshMaintenance(): Promise<void> {
-    this.logger.info('Refreshing maintenance cache...');
+  async refreshServiceMaintenance(): Promise<void> {
+    this.logger.info('Refreshing service maintenance cache...');
     const start = process.hrtime.bigint();
     try {
-      const status = await this.maintenanceService.refresh();
-      this.emitRefreshEvent('maintenance', status);
+      const status = await this.serviceMaintenanceService.refresh();
+      this.emitRefreshEvent('serviceMaintenance', status);
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       try {
-        this.metrics?.incRefresh('maintenance');
-        this.metrics?.observeRefresh('maintenance', duration);
-        this.metrics?.setLastRefresh('maintenance');
+        this.metrics?.incRefresh('serviceMaintenance');
+        this.metrics?.observeRefresh('serviceMaintenance', duration);
+        this.metrics?.setLastRefresh('serviceMaintenance');
       } catch (_) {}
     } catch (error: any) {
-      this.logger.warn('Failed to refresh maintenance status', { error: error.message });
+      this.logger.warn('Failed to refresh service maintenance status', { error: error.message });
     }
   }
 
   /**
-   * Get cached maintenance status
+   * Get cached service maintenance status
    */
-  getMaintenanceStatus(): MaintenanceStatus | null {
-    return this.maintenanceService.getCached();
+  getServiceMaintenanceStatus(): MaintenanceStatus | null {
+    return this.serviceMaintenanceService.getCached();
   }
 
   /**
@@ -399,7 +399,7 @@ export class CacheManager {
     this.popupNoticeService.updateCache([]);
     this.surveyService.updateCache([]);
     this.whitelistService.updateCache({ ipWhitelist: [], accountWhitelist: [] });
-    this.maintenanceService.updateCache(null);
+    this.serviceMaintenanceService.updateCache(null);
   }
 
   /**

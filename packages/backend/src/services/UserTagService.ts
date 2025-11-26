@@ -1,5 +1,5 @@
 import { UserModel } from '../models/User';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 
 export class UserTagService {
@@ -9,7 +9,7 @@ export class UserTagService {
       return await UserModel.getTags(userId);
     } catch (error) {
       logger.error('Error getting user tags:', error);
-      throw new CustomError('Failed to get user tags', 500);
+      throw new GatrixError('Failed to get user tags', 500);
     }
   }
 
@@ -19,16 +19,16 @@ export class UserTagService {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       await UserModel.setTags(userId, tagIds, updatedBy);
     } catch (error) {
       logger.error('Error setting user tags:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to set user tags', 500);
+      throw new GatrixError('Failed to set user tags', 500);
     }
   }
 
@@ -38,16 +38,16 @@ export class UserTagService {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       await UserModel.addTag(userId, tagId, createdBy);
     } catch (error) {
       logger.error('Error adding user tag:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to add user tag', 500);
+      throw new GatrixError('Failed to add user tag', 500);
     }
   }
 
@@ -57,16 +57,16 @@ export class UserTagService {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       await UserModel.removeTag(userId, tagId);
     } catch (error) {
       logger.error('Error removing user tag:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to remove user tag', 500);
+      throw new GatrixError('Failed to remove user tag', 500);
     }
   }
 }

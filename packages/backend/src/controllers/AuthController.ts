@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../services/AuthService';
 import passwordResetService from '../services/PasswordResetService';
-import { asyncHandler, CustomError } from '../middleware/errorHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import logger from '../config/logger';
 import Joi from 'joi';
@@ -44,7 +44,7 @@ export class AuthController {
     // Validate request body
     const { error, value } = loginSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { email, password, rememberMe } = value;
@@ -82,19 +82,19 @@ export class AuthController {
       const type = error.details[0].type;
 
       if (field === 'email' && type === 'string.email') {
-        throw new CustomError('INVALID_EMAIL_FORMAT', 400);
+        throw new GatrixError('INVALID_EMAIL_FORMAT', 400);
       } else if (field === 'password' && type === 'string.min') {
-        throw new CustomError('PASSWORD_TOO_SHORT', 400);
+        throw new GatrixError('PASSWORD_TOO_SHORT', 400);
       } else if (field === 'name' && type === 'string.min') {
-        throw new CustomError('NAME_TOO_SHORT', 400);
+        throw new GatrixError('NAME_TOO_SHORT', 400);
       } else if (field === 'name' && type === 'string.max') {
-        throw new CustomError('NAME_TOO_LONG', 400);
+        throw new GatrixError('NAME_TOO_LONG', 400);
       } else if (type === 'any.required') {
-        throw new CustomError(`${String(field).toUpperCase()}_REQUIRED`, 400);
+        throw new GatrixError(`${String(field).toUpperCase()}_REQUIRED`, 400);
       }
 
       // Fallback to original message
-      throw new CustomError('VALIDATION_ERROR', 400);
+      throw new GatrixError('VALIDATION_ERROR', 400);
     }
 
     const user = await AuthService.register(value);
@@ -110,7 +110,7 @@ export class AuthController {
     const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
 
     if (!refreshToken) {
-      throw new CustomError('Refresh token is required', 401);
+      throw new GatrixError('Refresh token is required', 401);
     }
 
     const result = await AuthService.refreshToken(refreshToken);
@@ -144,7 +144,7 @@ export class AuthController {
 
   static getProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
-      throw new CustomError('User not authenticated', 401);
+      throw new GatrixError('User not authenticated', 401);
     }
 
     const user = await AuthService.getProfile(req.user.userId);
@@ -157,13 +157,13 @@ export class AuthController {
 
   static updateProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
-      throw new CustomError('User not authenticated', 401);
+      throw new GatrixError('User not authenticated', 401);
     }
 
     // Validate request body
     const { error, value } = updateProfileSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const user = await AuthService.updateProfile(req.user.userId, value);
@@ -177,13 +177,13 @@ export class AuthController {
 
   static changePassword = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
-      throw new CustomError('User not authenticated', 401);
+      throw new GatrixError('User not authenticated', 401);
     }
 
     // Validate request body
     const { error, value } = changePasswordSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { currentPassword, newPassword } = value;
@@ -197,7 +197,7 @@ export class AuthController {
 
   static verifyEmail = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
-      throw new CustomError('User not authenticated', 401);
+      throw new GatrixError('User not authenticated', 401);
     }
 
     await AuthService.verifyEmail(req.user.userId);
@@ -213,7 +213,7 @@ export class AuthController {
     const user = req.user as any;
 
     if (!user) {
-      throw new CustomError('OAuth authentication failed', 401);
+      throw new GatrixError('OAuth authentication failed', 401);
     }
 
     // Check if user is active
@@ -316,7 +316,7 @@ export class AuthController {
   static forgotPassword = asyncHandler(async (req: Request, res: Response) => {
     const { error, value } = forgotPasswordSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { email } = value;
@@ -337,7 +337,7 @@ export class AuthController {
     const { token } = req.params;
 
     if (!token) {
-      throw new CustomError('토큰이 필요합니다.', 400);
+      throw new GatrixError('토큰이 필요합니다.', 400);
     }
 
     const result = await passwordResetService.validateResetToken(token);
@@ -356,7 +356,7 @@ export class AuthController {
   static resetPassword = asyncHandler(async (req: Request, res: Response) => {
     const { error, value } = resetPasswordSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { token, newPassword } = value;

@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import Joi from 'joi';
-import { asyncHandler, CustomError } from '../middleware/errorHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../types/auth';
 import { CouponRedeemService } from '../services/CouponRedeemService';
 
@@ -25,13 +25,13 @@ export class CouponRedeemController {
     const { code } = req.params;
 
     if (!code) {
-      throw new CustomError('Coupon code is required', 400);
+      throw new GatrixError('Coupon code is required', 400);
     }
 
     // Validate request body
     const { error, value } = redeemSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.message, 400);
+      throw new GatrixError(error.message, 400);
     }
 
     // Redeem coupon

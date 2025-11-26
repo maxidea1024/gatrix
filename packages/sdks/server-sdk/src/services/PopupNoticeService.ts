@@ -56,6 +56,24 @@ export class PopupNoticeService {
   }
 
   /**
+   * Get popup notice by ID
+   * GET /api/v1/server/ingame-popup-notices/:id
+   */
+  async getById(id: number): Promise<PopupNotice> {
+    this.logger.debug('Fetching popup notice by ID', { id });
+
+    const response = await this.apiClient.get<{ notice: PopupNotice }>(`/api/v1/server/ingame-popup-notices/${id}`);
+
+    if (!response.success || !response.data) {
+      throw new Error(response.error?.message || 'Failed to fetch popup notice');
+    }
+
+    this.logger.info('Popup notice fetched', { id });
+
+    return response.data.notice;
+  }
+
+  /**
    * Update cache with new data
    */
   updateCache(notices: PopupNotice[]): void {
@@ -81,14 +99,16 @@ export class PopupNoticeService {
       }
 
       // Otherwise, fetch from API and add/update
-      // Fetch all notices and find the updated one
-      const notices = await this.list();
-      const updatedNotice = notices.find(n => n.id === id);
+      // Add small delay to ensure backend transaction is committed
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-      // If notice is not found in active notices, it means isActive is false
-      // Remove it from cache
-      if (!updatedNotice) {
-        this.logger.debug('Popup notice is no longer active, removing from cache', { id });
+      // Fetch the single notice from backend using getById (instead of list)
+      let updatedNotice: PopupNotice;
+      try {
+        updatedNotice = await this.getById(id);
+      } catch (_error: any) {
+        // If notice not found (404), it's no longer active or visible
+        this.logger.debug('Popup notice not found or not active, removing from cache', { id });
         this.removeNotice(id);
         return;
       }

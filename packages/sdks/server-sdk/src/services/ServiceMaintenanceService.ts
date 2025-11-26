@@ -1,13 +1,13 @@
 /**
- * Maintenance Service
- * Handles global maintenance status retrieval and caching
+ * Service Maintenance Service
+ * Handles global service maintenance status retrieval and caching
  */
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
 import { MaintenanceStatus } from '../types/api';
 
-export class MaintenanceService {
+export class ServiceMaintenanceService {
   private apiClient: ApiClient;
   private logger: Logger;
   private cachedStatus: MaintenanceStatus | null = null;
@@ -18,23 +18,23 @@ export class MaintenanceService {
   }
 
   /**
-   * Fetch maintenance status from backend
+   * Fetch service maintenance status from backend
    * GET /api/v1/server/maintenance
    */
   async getStatus(): Promise<MaintenanceStatus> {
-    this.logger.debug('Fetching maintenance status');
+    this.logger.debug('Fetching service maintenance status');
 
     const response = await this.apiClient.get<MaintenanceStatus>(
       '/api/v1/server/maintenance'
     );
 
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch maintenance status');
+      throw new Error(response.error?.message || 'Failed to fetch service maintenance status');
     }
 
     this.cachedStatus = response.data;
 
-    this.logger.info('Maintenance status fetched', {
+    this.logger.info('Service maintenance status fetched', {
       isUnderMaintenance: response.data.isUnderMaintenance,
     });
 
@@ -42,22 +42,22 @@ export class MaintenanceService {
   }
 
   /**
-   * Refresh maintenance cache
+   * Refresh service maintenance cache
    */
   async refresh(): Promise<MaintenanceStatus> {
-    this.logger.info('Refreshing maintenance cache');
+    this.logger.info('Refreshing service maintenance cache');
     return await this.getStatus();
   }
 
   /**
-   * Get cached maintenance status
+   * Get cached service maintenance status
    */
   getCached(): MaintenanceStatus | null {
     return this.cachedStatus;
   }
 
   /**
-   * Update cached maintenance status
+   * Update cached service maintenance status
    * Used by cache manager or event listener when maintenance changes
    */
   updateCache(status: MaintenanceStatus | null): void {
@@ -67,7 +67,7 @@ export class MaintenanceService {
   /**
    * Check if service is currently in maintenance based on flag and time window
    */
-  isServiceMaintenance(): boolean {
+  isInMaintenance(): boolean {
     if (!this.cachedStatus) {
       return false;
     }
@@ -103,8 +103,8 @@ export class MaintenanceService {
    * Get localized maintenance message for the service
    * Returns null when maintenance is not active
    */
-  getMaintenanceMessage(lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
-    if (!this.isServiceMaintenance() || !this.cachedStatus?.detail) {
+  getMessage(lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
+    if (!this.isInMaintenance() || !this.cachedStatus?.detail) {
       return null;
     }
 
@@ -120,3 +120,4 @@ export class MaintenanceService {
     return detail.message || null;
   }
 }
+

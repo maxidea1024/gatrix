@@ -1,5 +1,5 @@
 import db from '../config/knex';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import TagAssignmentModel from './TagAssignment';
 
 export interface Whitelist {
@@ -149,7 +149,7 @@ export class WhitelistModel {
       };
     } catch (error) {
       console.error('AccountWhitelist.findAll error:', error);
-      throw new CustomError('Failed to fetch whitelists', 500);
+      throw new GatrixError('Failed to fetch whitelists', 500);
     }
   }
 
@@ -181,7 +181,7 @@ export class WhitelistModel {
 
       return result ? this.mapRowToWhitelist(result) : null;
     } catch (error) {
-      throw new CustomError('Failed to fetch whitelist entry', 500);
+      throw new GatrixError('Failed to fetch whitelist entry', 500);
     }
   }
 
@@ -200,12 +200,12 @@ export class WhitelistModel {
 
       const created = await this.findById(insertId);
       if (!created) {
-        throw new CustomError('Failed to create whitelist entry', 500);
+        throw new GatrixError('Failed to create whitelist entry', 500);
       }
 
       return created;
     } catch (error) {
-      throw new CustomError('Failed to create whitelist entry', 500);
+      throw new GatrixError('Failed to create whitelist entry', 500);
     }
   }
 
@@ -246,7 +246,7 @@ export class WhitelistModel {
       }
 
       if (Object.keys(updateData).length === 0) {
-        throw new CustomError('No fields to update', 400);
+        throw new GatrixError('No fields to update', 400);
       }
 
       updateData.updatedAt = db.fn.now();
@@ -257,7 +257,7 @@ export class WhitelistModel {
 
       return await this.findById(id);
     } catch (error) {
-      throw new CustomError('Failed to update whitelist entry', 500);
+      throw new GatrixError('Failed to update whitelist entry', 500);
     }
   }
 
@@ -268,7 +268,7 @@ export class WhitelistModel {
         .del();
       return result > 0;
     } catch (error) {
-      throw new CustomError('Failed to delete whitelist entry', 500);
+      throw new GatrixError('Failed to delete whitelist entry', 500);
     }
   }
 
@@ -292,7 +292,7 @@ export class WhitelistModel {
       const result = await db('g_account_whitelist').insert(insertData);
       return Array.isArray(result) ? result.length : 1;
     } catch (error) {
-      throw new CustomError('Failed to bulk create whitelist entries', 500);
+      throw new GatrixError('Failed to bulk create whitelist entries', 500);
     }
   }
 
@@ -349,7 +349,7 @@ export class WhitelistModel {
 
       return rows.map(this.mapRowToWhitelist);
     } catch (error) {
-      throw new CustomError('Failed to find whitelist entries by account ID', 500);
+      throw new GatrixError('Failed to find whitelist entries by account ID', 500);
     }
   }
 

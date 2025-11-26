@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { SurveyService } from '../services/SurveyService';
 import { asyncHandler } from '../middleware/errorHandler';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../types/auth';
 import { pubSubService } from '../services/PubSubService';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
@@ -71,7 +71,7 @@ export class SurveyController {
     const { id } = req.params;
 
     if (!id) {
-      throw new CustomError('Survey ID is required', 400);
+      throw new GatrixError('Survey ID is required', 400);
     }
 
     const survey = await SurveyService.getSurveyById(id);
@@ -91,7 +91,7 @@ export class SurveyController {
     const { platformSurveyId } = req.params;
 
     if (!platformSurveyId) {
-      throw new CustomError('Platform survey ID is required', 400);
+      throw new GatrixError('Platform survey ID is required', 400);
     }
 
     const survey = await SurveyService.getSurveyByPlatformId(platformSurveyId);
@@ -111,7 +111,7 @@ export class SurveyController {
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
     
     if (!authenticatedUserId) {
-      throw new CustomError('User authentication required', 401);
+      throw new GatrixError('User authentication required', 401);
     }
 
     const surveyData = {
@@ -156,7 +156,7 @@ export class SurveyController {
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
 
     if (!id) {
-      throw new CustomError('Survey ID is required', 400);
+      throw new GatrixError('Survey ID is required', 400);
     }
 
     const updateData = {
@@ -200,7 +200,7 @@ export class SurveyController {
     const { id } = req.params;
 
     if (!id) {
-      throw new CustomError('Survey ID is required', 400);
+      throw new GatrixError('Survey ID is required', 400);
     }
 
     await SurveyService.deleteSurvey(id);
@@ -235,7 +235,7 @@ export class SurveyController {
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
 
     if (!id) {
-      throw new CustomError('Survey ID is required', 400);
+      throw new GatrixError('Survey ID is required', 400);
     }
 
     const currentSurvey = await SurveyService.getSurveyById(id);

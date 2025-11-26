@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { RemoteConfigModel } from '../models/RemoteConfig';
 import logger from '../config/logger';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import { TrafficSplitter } from '../utils/trafficSplitter';
 import db from '../config/knex';
 import {
@@ -56,7 +56,7 @@ export class RemoteConfigClientController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigClientController.evaluate:', error);
-      throw new CustomError('Failed to evaluate remote configs', 500);
+      throw new GatrixError('Failed to evaluate remote configs', 500);
     }
   }
 
@@ -71,7 +71,7 @@ export class RemoteConfigClientController {
       const config = await RemoteConfigModel.findByKey(keyName);
       
       if (!config || !config.isActive) {
-        throw new CustomError('Config not found or inactive', 404);
+        throw new GatrixError('Config not found or inactive', 404);
       }
 
       const evaluatedValue = await this.evaluateConfig(config, context);
@@ -86,10 +86,10 @@ export class RemoteConfigClientController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigClientController.getConfigByKey:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to get config', 500);
+      throw new GatrixError('Failed to get config', 500);
     }
   }
 

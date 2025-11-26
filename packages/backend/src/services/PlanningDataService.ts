@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { cacheService } from './CacheService';
 
@@ -194,7 +194,7 @@ export class PlanningDataService {
       return parsed;
     } catch (error) {
       logger.error('Failed to read reward lookup data', { error, lang });
-      throw new CustomError('Failed to load reward lookup data', 500);
+      throw new GatrixError('Failed to load reward lookup data', 500);
     }
   }
 
@@ -221,7 +221,7 @@ export class PlanningDataService {
       return parsed;
     } catch (error) {
       logger.error('Failed to read reward type list', { error });
-      throw new CustomError('Failed to load reward type list', 500);
+      throw new GatrixError('Failed to load reward type list', 500);
     }
   }
 
@@ -237,17 +237,17 @@ export class PlanningDataService {
       const typeData = lookupData[rewardType.toString()];
 
       if (!typeData) {
-        throw new CustomError(`Reward type ${rewardType} not found`, 404);
+        throw new GatrixError(`Reward type ${rewardType} not found`, 404);
       }
 
       // Data is already localized at generation time, so just return items as-is
       return typeData.items || [];
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Failed to get reward type items', { error, rewardType, language });
-      throw new CustomError('Failed to load reward type items', 500);
+      throw new GatrixError('Failed to load reward type items', 500);
     }
   }
 
@@ -265,7 +265,7 @@ export class PlanningDataService {
       try {
         await fs.access(builderPath);
       } catch {
-        throw new CustomError('Admin tool data builder not found', 500);
+        throw new GatrixError('Admin tool data builder not found', 500);
       }
 
       // Get the actual CMS directory path (where Point.json, Item.json, etc. are located)
@@ -291,7 +291,7 @@ export class PlanningDataService {
         await fs.access(PlanningDataService.rewardLookupZhPath);
         await fs.access(PlanningDataService.rewardTypeListPath);
       } catch {
-        throw new CustomError('Planning data files were not created', 500);
+        throw new GatrixError('Planning data files were not created', 500);
       }
 
       // Invalidate Redis cache for all instances
@@ -346,11 +346,11 @@ export class PlanningDataService {
         stats,
       };
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Failed to rebuild planning data', { error });
-      throw new CustomError('Failed to rebuild planning data', 500);
+      throw new GatrixError('Failed to rebuild planning data', 500);
     }
   }
 
@@ -399,7 +399,7 @@ export class PlanningDataService {
       return parsed;
     } catch (error) {
       logger.error('Failed to read UI list data', { error });
-      throw new CustomError('Failed to load UI list data', 500);
+      throw new GatrixError('Failed to load UI list data', 500);
     }
   }
 
@@ -413,17 +413,17 @@ export class PlanningDataService {
       const uiListData = await PlanningDataService.getUIListData(language);
 
       if (!uiListData[category]) {
-        throw new CustomError(`Category '${category}' not found`, 404);
+        throw new GatrixError(`Category '${category}' not found`, 404);
       }
 
       // Data is already localized at generation time, so just return items as-is
       return uiListData[category];
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Failed to get UI list items', { error, category, language });
-      throw new CustomError('Failed to load UI list items', 500);
+      throw new GatrixError('Failed to load UI list items', 500);
     }
   }
 
@@ -470,7 +470,7 @@ export class PlanningDataService {
       };
     } catch (error) {
       logger.error('Failed to get planning data stats', { error });
-      throw new CustomError('Failed to load planning data statistics', 500);
+      throw new GatrixError('Failed to load planning data statistics', 500);
     }
   }
 
@@ -513,7 +513,7 @@ export class PlanningDataService {
       return parsed;
     } catch (error) {
       logger.error('Failed to read HotTimeBuff lookup data', { error });
-      throw new CustomError('Failed to load HotTimeBuff lookup data', 500);
+      throw new GatrixError('Failed to load HotTimeBuff lookup data', 500);
     }
   }
 
@@ -532,7 +532,7 @@ export class PlanningDataService {
       try {
         await fs.access(hotTimeBuffSourcePath);
       } catch {
-        throw new CustomError('HotTimeBuff.json not found in cms directory', 500);
+        throw new GatrixError('HotTimeBuff.json not found in cms directory', 500);
       }
 
       // Load WorldBuff data for name mapping
@@ -603,11 +603,11 @@ export class PlanningDataService {
         itemCount: items.length,
       };
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Failed to build HotTimeBuff lookup data', { error });
-      throw new CustomError('Failed to build HotTimeBuff lookup data', 500);
+      throw new GatrixError('Failed to build HotTimeBuff lookup data', 500);
     }
   }
 
@@ -647,7 +647,7 @@ export class PlanningDataService {
       return parsed;
     } catch (error) {
       logger.error('Failed to read EventPage lookup data', { error });
-      throw new CustomError('Failed to load EventPage lookup data', 500);
+      throw new GatrixError('Failed to load EventPage lookup data', 500);
     }
   }
 
@@ -662,7 +662,7 @@ export class PlanningDataService {
       try {
         await fs.access(sourceFilePath);
       } catch {
-        throw new CustomError('EventPage.json not found in cms directory', 500);
+        throw new GatrixError('EventPage.json not found in cms directory', 500);
       }
 
       // PageGroup and Type name mappings
@@ -711,9 +711,9 @@ export class PlanningDataService {
       logger.info('EventPage lookup data built successfully', { itemCount: items.length });
       return { success: true, message: 'EventPage lookup data built successfully', itemCount: items.length };
     } catch (error) {
-      if (error instanceof CustomError) throw error;
+      if (error instanceof GatrixError) throw error;
       logger.error('Failed to build EventPage lookup data', { error });
-      throw new CustomError('Failed to build EventPage lookup data', 500);
+      throw new GatrixError('Failed to build EventPage lookup data', 500);
     }
   }
 
@@ -753,7 +753,7 @@ export class PlanningDataService {
       return parsed;
     } catch (error) {
       logger.error('Failed to read LiveEvent lookup data', { error });
-      throw new CustomError('Failed to load LiveEvent lookup data', 500);
+      throw new GatrixError('Failed to load LiveEvent lookup data', 500);
     }
   }
 
@@ -768,7 +768,7 @@ export class PlanningDataService {
       try {
         await fs.access(sourceFilePath);
       } catch {
-        throw new CustomError('LiveEvent.json not found in cms directory', 500);
+        throw new GatrixError('LiveEvent.json not found in cms directory', 500);
       }
       const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
       const parsedData = JSON.parse(sourceData);
@@ -801,9 +801,9 @@ export class PlanningDataService {
       logger.info('LiveEvent lookup data built successfully', { itemCount: items.length });
       return { success: true, message: 'LiveEvent lookup data built successfully', itemCount: items.length };
     } catch (error) {
-      if (error instanceof CustomError) throw error;
+      if (error instanceof GatrixError) throw error;
       logger.error('Failed to build LiveEvent lookup data', { error });
-      throw new CustomError('Failed to build LiveEvent lookup data', 500);
+      throw new GatrixError('Failed to build LiveEvent lookup data', 500);
     }
   }
 
@@ -843,7 +843,7 @@ export class PlanningDataService {
       return parsed;
     } catch (error) {
       logger.error('Failed to read MateRecruitingGroup lookup data', { error });
-      throw new CustomError('Failed to load MateRecruitingGroup lookup data', 500);
+      throw new GatrixError('Failed to load MateRecruitingGroup lookup data', 500);
     }
   }
 
@@ -864,7 +864,7 @@ export class PlanningDataService {
         await fs.access(mateTemplateFilePath);
         await fs.access(townFilePath);
       } catch {
-        throw new CustomError('Required JSON files not found in cms directory', 500);
+        throw new GatrixError('Required JSON files not found in cms directory', 500);
       }
 
       // This method is deprecated. Data should be built using adminToolDataBuilder.js
@@ -874,7 +874,7 @@ export class PlanningDataService {
       // Check if the file exists
       const exists = await fs.access(this.mateRecruitingGroupKrPath).then(() => true).catch(() => false);
       if (!exists) {
-        throw new CustomError('MateRecruitingGroup lookup file not found. Please run adminToolDataBuilder.js', 500);
+        throw new GatrixError('MateRecruitingGroup lookup file not found. Please run adminToolDataBuilder.js', 500);
       }
 
       // Invalidate Redis cache for all instances
@@ -883,9 +883,9 @@ export class PlanningDataService {
       logger.info('MateRecruitingGroup cache invalidated');
       return { success: true, message: 'MateRecruitingGroup cache invalidated (data should be built using adminToolDataBuilder.js)', itemCount: 0 };
     } catch (error) {
-      if (error instanceof CustomError) throw error;
+      if (error instanceof GatrixError) throw error;
       logger.error('Failed to build MateRecruitingGroup lookup data', { error });
-      throw new CustomError('Failed to build MateRecruitingGroup lookup data', 500);
+      throw new GatrixError('Failed to build MateRecruitingGroup lookup data', 500);
     }
   }
 
@@ -925,7 +925,7 @@ export class PlanningDataService {
       return parsed;
     } catch (error) {
       logger.error('Failed to read OceanNpcAreaSpawner lookup data', { error });
-      throw new CustomError('Failed to load OceanNpcAreaSpawner lookup data', 500);
+      throw new GatrixError('Failed to load OceanNpcAreaSpawner lookup data', 500);
     }
   }
 
@@ -944,7 +944,7 @@ export class PlanningDataService {
       // Check if the file exists
       const exists = await fs.access(this.oceanNpcAreaSpawnerKrPath).then(() => true).catch(() => false);
       if (!exists) {
-        throw new CustomError('OceanNpcAreaSpawner lookup file not found. Please run adminToolDataBuilder.js', 500);
+        throw new GatrixError('OceanNpcAreaSpawner lookup file not found. Please run adminToolDataBuilder.js', 500);
       }
 
       // Invalidate Redis cache for all instances
@@ -953,9 +953,9 @@ export class PlanningDataService {
       logger.info('OceanNpcAreaSpawner cache invalidated');
       return { success: true, message: 'OceanNpcAreaSpawner cache invalidated (data should be built using adminToolDataBuilder.js)', itemCount: 0 };
     } catch (error) {
-      if (error instanceof CustomError) throw error;
+      if (error instanceof GatrixError) throw error;
       logger.error('Failed to build OceanNpcAreaSpawner lookup data', { error });
-      throw new CustomError('Failed to build OceanNpcAreaSpawner lookup data', 500);
+      throw new GatrixError('Failed to build OceanNpcAreaSpawner lookup data', 500);
     }
   }
 
@@ -1005,7 +1005,7 @@ export class PlanningDataService {
 
       // Validate uploaded files
       if (!files || Object.keys(files).length === 0) {
-        throw new CustomError('No files uploaded', 400);
+        throw new GatrixError('No files uploaded', 400);
       }
 
       const uploadedFiles: string[] = [];
@@ -1035,7 +1035,7 @@ export class PlanningDataService {
           const content = file.buffer.toString('utf-8');
           JSON.parse(content);
         } catch (error) {
-          throw new CustomError(`File ${fileName} is not valid JSON`, 400);
+          throw new GatrixError(`File ${fileName} is not valid JSON`, 400);
         }
 
         // Save file to disk
@@ -1053,9 +1053,9 @@ export class PlanningDataService {
 
       if (uploadedFiles.length === 0) {
         if (invalidFiles.length > 0) {
-          throw new CustomError(`인식할 수 없는 파일입니다: ${invalidFiles.join(', ')}`, 400);
+          throw new GatrixError(`인식할 수 없는 파일입니다: ${invalidFiles.join(', ')}`, 400);
         }
-        throw new CustomError('No valid files were uploaded', 400);
+        throw new GatrixError('No valid files were uploaded', 400);
       }
 
       // Cache all uploaded files in Redis
@@ -1074,9 +1074,9 @@ export class PlanningDataService {
         },
       };
     } catch (error) {
-      if (error instanceof CustomError) throw error;
+      if (error instanceof GatrixError) throw error;
       logger.error('Failed to upload planning data', { error });
-      throw new CustomError('Failed to upload planning data', 500);
+      throw new GatrixError('Failed to upload planning data', 500);
     }
   }
 
@@ -1135,7 +1135,7 @@ export class PlanningDataService {
       logger.info('All uploaded files cached in Redis successfully');
     } catch (error) {
       logger.error('Failed to cache uploaded files in Redis', { error });
-      throw new CustomError('Failed to cache planning data', 500);
+      throw new GatrixError('Failed to cache planning data', 500);
     }
   }
 }

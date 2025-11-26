@@ -12,7 +12,7 @@ import { GameWorldService } from './services/GameWorldService';
 import { PopupNoticeService } from './services/PopupNoticeService';
 import { SurveyService } from './services/SurveyService';
 import { WhitelistService } from './services/WhitelistService';
-import { MaintenanceService } from './services/MaintenanceService';
+import { ServiceMaintenanceService } from './services/ServiceMaintenanceService';
 import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
 import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
@@ -47,7 +47,7 @@ export class GatrixServerSDK {
   public readonly popupNotice: PopupNoticeService;
   public readonly survey: SurveyService;
   public readonly whitelist: WhitelistService;
-  public readonly maintenance: MaintenanceService;
+  public readonly serviceMaintenance: ServiceMaintenanceService;
   public readonly serviceDiscovery: ServiceDiscoveryService;
 
   // Cache and Events
@@ -93,7 +93,7 @@ export class GatrixServerSDK {
     this.popupNotice = new PopupNoticeService(this.apiClient, this.logger);
     this.survey = new SurveyService(this.apiClient, this.logger);
     this.whitelist = new WhitelistService(this.apiClient, this.logger);
-    this.maintenance = new MaintenanceService(this.apiClient, this.logger);
+    this.serviceMaintenance = new ServiceMaintenanceService(this.apiClient, this.logger);
     this.serviceDiscovery = new ServiceDiscoveryService(this.apiClient, this.logger);
 
     this.logger.info('GatrixServerSDK created', {
@@ -212,7 +212,7 @@ export class GatrixServerSDK {
         this.popupNotice,
         this.survey,
         this.whitelist,
-        this.maintenance,
+        this.serviceMaintenance,
         this.apiClient,
         this.logger,
         this.metrics
@@ -300,35 +300,35 @@ export class GatrixServerSDK {
    * Get maintenance message for a world
    */
   getWorldMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
-    return this.gameWorld.getMaintenanceMessage(worldId, lang);
+    return this.gameWorld.getWorldMaintenanceMessage(worldId, lang);
   }
 
   /**
-   * Fetch global maintenance status
+   * Fetch global service maintenance status
    */
-  async fetchMaintenanceStatus() {
-    return await this.maintenance.getStatus();
+  async fetchServiceMaintenanceStatus() {
+    return await this.serviceMaintenance.getStatus();
   }
 
   /**
-   * Get cached global maintenance status
+   * Get cached global service maintenance status
    */
-  getMaintenanceStatus() {
-    return this.maintenance.getCached();
+  getServiceMaintenanceStatus() {
+    return this.serviceMaintenance.getCached();
   }
 
   /**
    * Check if global service is currently in maintenance
    */
   isServiceInMaintenance(): boolean {
-    return this.maintenance.isServiceMaintenance();
+    return this.serviceMaintenance.isInMaintenance();
   }
 
   /**
    * Get localized maintenance message for global service
    */
   getServiceMaintenanceMessage(lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
-    return this.maintenance.getMaintenanceMessage(lang);
+    return this.serviceMaintenance.getMessage(lang);
   }
 
   // ============================================================================
@@ -479,14 +479,14 @@ export class GatrixServerSDK {
   }
 
   /**
-   * Refresh maintenance cache
+   * Refresh service maintenance cache
    */
-  async refreshMaintenanceCache(): Promise<void> {
+  async refreshServiceMaintenanceCache(): Promise<void> {
     if (!this.cacheManager) {
       throw createError(ErrorCode.NOT_INITIALIZED, 'Cache manager not initialized');
     }
 
-    await this.cacheManager.refreshMaintenance();
+    await this.cacheManager.refreshServiceMaintenance();
   }
 
   // ============================================================================

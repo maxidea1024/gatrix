@@ -1,5 +1,5 @@
 import db from '../config/knex';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import { ulid } from 'ulid';
 
 export interface TriggerCondition {
@@ -181,7 +181,7 @@ export class SurveyService {
     const row = await db('g_surveys').where('id', id).first();
 
     if (!row) {
-      throw new CustomError('Survey not found', 404);
+      throw new GatrixError('Survey not found', 404);
     }
 
     const survey = {
@@ -226,7 +226,7 @@ export class SurveyService {
     const row = await db('g_surveys').where('platformSurveyId', platformSurveyId).first();
 
     if (!row) {
-      throw new CustomError('Survey not found', 404);
+      throw new GatrixError('Survey not found', 404);
     }
 
     const survey = {
@@ -270,19 +270,19 @@ export class SurveyService {
   static async createSurvey(input: CreateSurveyInput): Promise<Survey> {
     // Validate trigger conditions
     if (!input.triggerConditions || input.triggerConditions.length === 0) {
-      throw new CustomError('At least one trigger condition is required', 400);
+      throw new GatrixError('At least one trigger condition is required', 400);
     }
 
     // Validate that either participationRewards or rewardTemplateId is provided, but not both
     if (input.participationRewards && input.rewardTemplateId) {
-      throw new CustomError('Cannot specify both participationRewards and rewardTemplateId', 400);
+      throw new GatrixError('Cannot specify both participationRewards and rewardTemplateId', 400);
     }
 
     // Check if platformSurveyId already exists
     const existing = await db('g_surveys').where('platformSurveyId', input.platformSurveyId).first();
 
     if (existing) {
-      throw new CustomError('Platform survey ID already exists', 400);
+      throw new GatrixError('Platform survey ID already exists', 400);
     }
 
     const id = ulid();
@@ -328,19 +328,19 @@ export class SurveyService {
         .first();
 
       if (existing) {
-        throw new CustomError('Platform survey ID already exists', 400);
+        throw new GatrixError('Platform survey ID already exists', 400);
       }
     }
 
     // Validate trigger conditions if provided
     if (input.triggerConditions && input.triggerConditions.length === 0) {
-      throw new CustomError('At least one trigger condition is required', 400);
+      throw new GatrixError('At least one trigger condition is required', 400);
     }
 
     // Validate that either participationRewards or rewardTemplateId is provided, but not both
     if (input.participationRewards !== undefined && input.rewardTemplateId !== undefined) {
       if (input.participationRewards && input.rewardTemplateId) {
-        throw new CustomError('Cannot specify both participationRewards and rewardTemplateId', 400);
+        throw new GatrixError('Cannot specify both participationRewards and rewardTemplateId', 400);
       }
     }
 
@@ -366,7 +366,7 @@ export class SurveyService {
     if (input.updatedBy !== undefined) updateData.updatedBy = input.updatedBy;
 
     if (Object.keys(updateData).length === 0) {
-      throw new CustomError('No fields to update', 400);
+      throw new GatrixError('No fields to update', 400);
     }
 
     await db('g_surveys').where('id', id).update(updateData);
@@ -381,7 +381,7 @@ export class SurveyService {
     const result = await db('g_surveys').where('id', id).del();
 
     if (result === 0) {
-      throw new CustomError('Survey not found', 404);
+      throw new GatrixError('Survey not found', 404);
     }
   }
 
@@ -427,7 +427,7 @@ export class SurveyService {
     }
 
     if (updates.length === 0) {
-      throw new CustomError('No fields to update', 400);
+      throw new GatrixError('No fields to update', 400);
     }
 
     // Update each var using raw query for ON DUPLICATE KEY UPDATE

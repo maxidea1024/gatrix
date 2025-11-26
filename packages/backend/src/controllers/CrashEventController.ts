@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { asyncHandler, CustomError } from '../middleware/errorHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { CrashEvent } from '../models/CrashEvent';
 import { ClientCrash } from '../models/ClientCrash';
@@ -143,7 +143,7 @@ export class CrashEventController {
     const event = await CrashEvent.query().findById(id);
 
     if (!event) {
-      throw new CustomError('Crash event not found', 404);
+      throw new GatrixError('Crash event not found', 404);
     }
 
     res.json({
@@ -196,11 +196,11 @@ export class CrashEventController {
     const event = await CrashEvent.query().findById(id);
 
     if (!event) {
-      throw new CustomError('Crash event not found', 404);
+      throw new GatrixError('Crash event not found', 404);
     }
 
     if (!event.logFilePath) {
-      throw new CustomError('Log file not available for this crash event', 404);
+      throw new GatrixError('Log file not available for this crash event', 404);
     }
 
     try {
@@ -219,7 +219,7 @@ export class CrashEventController {
       });
     } catch (error) {
       logger.error('Failed to read log file:', { eventId: id, logFilePath: event.logFilePath, error });
-      throw new CustomError('Failed to read log file', 500);
+      throw new GatrixError('Failed to read log file', 500);
     }
   });
 
@@ -233,18 +233,18 @@ export class CrashEventController {
     const event = await CrashEvent.query().findById(id);
 
     if (!event) {
-      throw new CustomError('Crash event not found', 404);
+      throw new GatrixError('Crash event not found', 404);
     }
 
     // Get the crash group to find stack trace file
     const crash = await ClientCrash.query().findById(event.crashId);
 
     if (!crash) {
-      throw new CustomError('Crash group not found', 404);
+      throw new GatrixError('Crash group not found', 404);
     }
 
     if (!crash.stackFilePath) {
-      throw new CustomError('Stack trace not available for this crash', 404);
+      throw new GatrixError('Stack trace not available for this crash', 404);
     }
 
     try {
@@ -261,7 +261,7 @@ export class CrashEventController {
       });
     } catch (error) {
       logger.error('Failed to read stack trace file:', { crashId: crash.id, stackFilePath: crash.stackFilePath, error });
-      throw new CustomError('Failed to read stack trace file', 500);
+      throw new GatrixError('Failed to read stack trace file', 500);
     }
   });
 

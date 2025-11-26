@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 import { Express } from 'express-serve-static-core';
-import { CustomError } from './errorHandler';
+import { GatrixError } from './errorHandler';
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -31,7 +31,7 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: (error: Error | nul
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new CustomError('Only image files are allowed (JPEG, PNG, GIF, WebP)', 400));
+    cb(new GatrixError('Only image files are allowed (JPEG, PNG, GIF, WebP)', 400));
   }
 };
 

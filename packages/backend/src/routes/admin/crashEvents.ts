@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { param, query, validationResult } from 'express-validator';
-import { CustomError } from '../../middleware/errorHandler';
+import { GatrixError } from '../../middleware/errorHandler';
 import { CrashEventController } from '../../controllers/CrashEventController';
 
 // Validation middleware
@@ -8,7 +8,7 @@ const validateRequest = (req: any, res: any, next: any) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const errorMessages = errors.array().map((err: any) => err.msg).join(', ');
-    throw new CustomError(`Validation failed: ${errorMessages}`, 400);
+    throw new GatrixError(`Validation failed: ${errorMessages}`, 400);
   }
   next();
 };

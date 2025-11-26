@@ -22,9 +22,6 @@ export class GatrixError extends Error implements AppError {
   }
 }
 
-// Backward compatibility alias
-export const CustomError = GatrixError;
-
 export const createError = (message: string, statusCode: number = 500): GatrixError => {
   return new GatrixError(message, statusCode);
 };

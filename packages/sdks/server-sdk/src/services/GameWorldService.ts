@@ -178,7 +178,7 @@ export class GameWorldService {
    * Get maintenance message for a world with language support
    * Falls back to default message if language not found
    */
-  getMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
+  getWorldMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
     const world = this.cachedWorlds.find((w) => w.worldId === worldId);
     if (!world || !world.isMaintenance) {
       return null;
@@ -196,4 +196,3 @@ export class GameWorldService {
     return world.maintenanceMessage || null;
   }
 }
-

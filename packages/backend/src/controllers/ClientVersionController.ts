@@ -3,7 +3,7 @@ import Joi from 'joi';
 import ClientVersionService, { ClientVersionFilters, ClientVersionPagination, BulkStatusUpdateRequest } from '../services/ClientVersionService';
 import { ClientStatus } from '../models/ClientVersion';
 import { ClientVersionModel } from '../models/ClientVersion';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 
 /**
@@ -390,7 +390,7 @@ export class ClientVersionController {
       clientVersions = await ClientVersionService.bulkCreateClientVersions(bulkCreateData);
     } catch (error: any) {
       if (error.message && error.message.includes('Duplicate client versions found')) {
-        throw new CustomError(error.message, 409);
+        throw new GatrixError(error.message, 409);
       }
       throw error;
     }

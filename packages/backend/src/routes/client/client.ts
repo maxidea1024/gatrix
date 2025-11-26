@@ -6,7 +6,7 @@ import { ClientCrashController } from '../../controllers/ClientCrashController';
 import { requestLogger } from '../../middleware/requestLogger';
 import { clientSDKAuth } from '../../middleware/apiTokenAuth';
 import { body, param, validationResult } from 'express-validator';
-import { CustomError } from '../../middleware/errorHandler';
+import { GatrixError } from '../../middleware/errorHandler';
 
 const router = Router();
 /**
@@ -367,7 +367,7 @@ const validateRequest = (req: any, res: any, next: any) => {
       .map((err: any) => `${err.field}: ${err.message}`)
       .join(', ');
 
-    const error = new CustomError(`Validation failed: ${errorMessage}`, 400);
+    const error = new GatrixError(`Validation failed: ${errorMessage}`, 400);
     (error as any).validationErrors = errorDetails;
     throw error;
   }

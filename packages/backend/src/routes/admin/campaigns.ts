@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { CampaignController } from '../../controllers/CampaignController';
 import { authenticate, requireAdmin } from '../../middleware/auth';
-import { asyncHandler, CustomError } from '../../middleware/errorHandler';
+import { asyncHandler, GatrixError } from '../../middleware/errorHandler';
 import { query, param, validationResult } from 'express-validator';
 
 const router = Router();
@@ -11,7 +11,7 @@ const validateRequest = (req: any, res: any, next: any) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const errorMessages = errors.array().map(err => err.msg).join(', ');
-    throw new CustomError(`Validation failed: ${errorMessages}`, 400);
+    throw new GatrixError(`Validation failed: ${errorMessages}`, 400);
   }
   next();
 };

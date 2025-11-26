@@ -2,7 +2,7 @@ import express from 'express';
 import { ContextFieldController } from '../../controllers/ContextFieldControllerNew';
 import { authenticate, requireAdmin } from '../../middleware/auth';
 import { body, validationResult } from 'express-validator';
-import { CustomError } from '../../middleware/errorHandler';
+import { GatrixError } from '../../middleware/errorHandler';
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ const validateRequest = (req: express.Request, res: express.Response, next: expr
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const errorMessages = errors.array().map(err => err.msg).join(', ');
-    throw new CustomError(`Validation failed: ${errorMessages}`, 400);
+    throw new GatrixError(`Validation failed: ${errorMessages}`, 400);
   }
   next();
 };

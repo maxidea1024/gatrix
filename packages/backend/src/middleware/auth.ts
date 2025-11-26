@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { JwtUtils, JwtPayload } from '../utils/jwt';
 import { UserModel } from '../models/User';
-import { CustomError } from './errorHandler';
+import { GatrixError } from './errorHandler';
 import logger from '../config/logger';
 
 export interface AuthenticatedRequest extends Request {
@@ -29,7 +29,7 @@ export const auth = async (
         path: req.path,
         method: req.method
       });
-      throw new CustomError('Access token is required', 401);
+      throw new GatrixError('Access token is required', 401);
     }
 
     const payload = JwtUtils.verifyToken(token);
@@ -39,7 +39,7 @@ export const auth = async (
         method: req.method,
         tokenPrefix: token.substring(0, 20) + '...'
       });
-      throw new CustomError('Invalid or expired token', 401);
+      throw new GatrixError('Invalid or expired token', 401);
     }
 
     // Verify user still exists and is active
@@ -50,7 +50,7 @@ export const auth = async (
         method: req.method,
         userId: payload.userId
       });
-      throw new CustomError('User not found', 401);
+      throw new GatrixError('User not found', 401);
     }
 
     if (user.status !== 'active') {
@@ -60,7 +60,7 @@ export const auth = async (
         userId: payload.userId,
         userStatus: user.status
       });
-      throw new CustomError('User account is not active', 401);
+      throw new GatrixError('User account is not active', 401);
     }
 
     // Normalize user object on req.user to AppUser-like shape while keeping compatibility
@@ -80,7 +80,7 @@ export const auth = async (
     req.userDetails = normalizedUser;
     next();
   } catch (error) {
-    if (error instanceof CustomError) {
+    if (error instanceof GatrixError) {
       next(error);
     } else {
       logger.error('Authentication error:', {
@@ -89,7 +89,7 @@ export const auth = async (
         path: req.path,
         method: req.method
       });
-      next(new CustomError('Authentication failed', 401));
+      next(new GatrixError('Authentication failed', 401));
     }
   }
 };
@@ -97,7 +97,7 @@ export const auth = async (
 export const requireRole = (roles: string | string[]) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
-      next(new CustomError('Authentication required', 401));
+      next(new GatrixError('Authentication required', 401));
       return;
     }
 
@@ -111,7 +111,7 @@ export const requireRole = (roles: string | string[]) => {
         requiredRoles: allowedRoles,
         endpoint: req.path,
       });
-      next(new CustomError('Insufficient permissions', 403));
+      next(new GatrixError('Insufficient permissions', 403));
       return;
     }
 
@@ -164,12 +164,12 @@ export const requireActiveUser = (
   next: NextFunction
 ): void => {
   if (!req.userDetails) {
-    next(new CustomError('User details not found', 401));
+    next(new GatrixError('User details not found', 401));
     return;
   }
 
   if (req.userDetails.status !== 'active') {
-    next(new CustomError('User account is not active', 403));
+    next(new GatrixError('User account is not active', 403));
     return;
   }
 
@@ -182,12 +182,12 @@ export const requireEmailVerified = (
   next: NextFunction
 ): void => {
   if (!req.userDetails) {
-    next(new CustomError('User details not found', 401));
+    next(new GatrixError('User details not found', 401));
     return;
   }
 
   if (!req.userDetails.email_verified) {
-    next(new CustomError('Email verification required', 403));
+    next(new GatrixError('Email verification required', 403));
     return;
   }
 

@@ -1,6 +1,6 @@
 import { UserModel } from '../models/User';
 import { UserWithoutPassword } from '../types/user';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import EmailService from './EmailService';
 
@@ -38,7 +38,7 @@ export class UserService {
       // Check if user already exists
       const existingUser = await UserModel.findByEmail(userData.email);
       if (existingUser) {
-        throw new CustomError('User with this email already exists', 400);
+        throw new GatrixError('User with this email already exists', 400);
       }
 
       const user = await UserModel.create({
@@ -59,11 +59,11 @@ export class UserService {
 
       return user;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error creating user:', error);
-      throw new CustomError('Failed to create user', 500);
+      throw new GatrixError('Failed to create user', 500);
     }
   }
 
@@ -83,7 +83,7 @@ export class UserService {
       };
     } catch (error) {
       logger.error('Error getting all users:', error);
-      throw new CustomError('Failed to get users', 500);
+      throw new GatrixError('Failed to get users', 500);
     }
   }
 
@@ -91,13 +91,13 @@ export class UserService {
     try {
       const user = await UserModel.findById(id);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       return user;
     } catch (error) {
       logger.error('Error getting user by ID:', error);
-      throw new CustomError('Failed to get user', 500);
+      throw new GatrixError('Failed to get user', 500);
     }
   }
 
@@ -114,12 +114,12 @@ export class UserService {
       }
 
       if (Object.keys(filteredUpdates).length === 0) {
-        throw new CustomError('No valid fields to update', 400);
+        throw new GatrixError('No valid fields to update', 400);
       }
 
       const user = await UserModel.update(id, filteredUpdates);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       logger.info('User updated successfully:', {
@@ -129,11 +129,11 @@ export class UserService {
 
       return user;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error updating user:', error);
-      throw new CustomError('Failed to update user', 500);
+      throw new GatrixError('Failed to update user', 500);
     }
   }
 
@@ -141,7 +141,7 @@ export class UserService {
     try {
       const user = await UserModel.findById(id);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       await UserModel.delete(id);
@@ -151,11 +151,11 @@ export class UserService {
         userEmail: user.email,
       });
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error deleting user:', error);
-      throw new CustomError('Failed to delete user', 500);
+      throw new GatrixError('Failed to delete user', 500);
     }
   }
 
@@ -184,7 +184,7 @@ export class UserService {
       };
     } catch (error) {
       logger.error('Error getting user stats:', error);
-      throw new CustomError('Failed to get user statistics', 500);
+      throw new GatrixError('Failed to get user statistics', 500);
     }
   }
 
@@ -192,11 +192,11 @@ export class UserService {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       if (user.status === 'active') {
-        throw new CustomError('User is already active', 400);
+        throw new GatrixError('User is already active', 400);
       }
 
       await UserModel.update(userId, { status: 'active' });
@@ -223,7 +223,7 @@ export class UserService {
       });
     } catch (error) {
       logger.error('Error activating user:', error);
-      throw error instanceof CustomError ? error : new CustomError('Failed to activate user', 500);
+      throw error instanceof GatrixError ? error : new GatrixError('Failed to activate user', 500);
     }
   }
 
@@ -231,11 +231,11 @@ export class UserService {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       if (user.status === 'suspended') {
-        throw new CustomError('User is already suspended', 400);
+        throw new GatrixError('User is already suspended', 400);
       }
 
       await UserModel.update(userId, { status: 'suspended' });
@@ -246,7 +246,7 @@ export class UserService {
       });
     } catch (error) {
       logger.error('Error suspending user:', error);
-      throw error instanceof CustomError ? error : new CustomError('Failed to suspend user', 500);
+      throw error instanceof GatrixError ? error : new GatrixError('Failed to suspend user', 500);
     }
   }
 
@@ -254,11 +254,11 @@ export class UserService {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       if (user.role === 'admin') {
-        throw new CustomError('User is already an admin', 400);
+        throw new GatrixError('User is already an admin', 400);
       }
 
       await UserModel.update(userId, { role: 'admin' });
@@ -269,7 +269,7 @@ export class UserService {
       });
     } catch (error) {
       logger.error('Error promoting user to admin:', error);
-      throw error instanceof CustomError ? error : new CustomError('Failed to promote user to admin', 500);
+      throw error instanceof GatrixError ? error : new GatrixError('Failed to promote user to admin', 500);
     }
   }
 
@@ -277,11 +277,11 @@ export class UserService {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       if (user.role !== 'admin') {
-        throw new CustomError('User is not an admin', 400);
+        throw new GatrixError('User is not an admin', 400);
       }
 
       await UserModel.update(userId, { role: 'user' });
@@ -292,7 +292,7 @@ export class UserService {
       });
     } catch (error) {
       logger.error('Error demoting user from admin:', error);
-      throw error instanceof CustomError ? error : new CustomError('Failed to demote user from admin', 500);
+      throw error instanceof GatrixError ? error : new GatrixError('Failed to demote user from admin', 500);
     }
   }
 
@@ -302,7 +302,7 @@ export class UserService {
       return result.users;
     } catch (error) {
       logger.error('Error getting pending users:', error);
-      throw new CustomError('Failed to get pending users', 500);
+      throw new GatrixError('Failed to get pending users', 500);
     }
   }
   // 태그 관련 메서드들
@@ -311,7 +311,7 @@ export class UserService {
       return await UserModel.getTags(userId);
     } catch (error) {
       logger.error('Error getting user tags:', error);
-      throw new CustomError('Failed to get user tags', 500);
+      throw new GatrixError('Failed to get user tags', 500);
     }
   }
 
@@ -320,16 +320,16 @@ export class UserService {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       await UserModel.setTags(userId, tagIds, updatedBy);
     } catch (error) {
       logger.error('Error setting user tags:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to set user tags', 500);
+      throw new GatrixError('Failed to set user tags', 500);
     }
   }
 
@@ -338,16 +338,16 @@ export class UserService {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       await UserModel.addTag(userId, tagId, createdBy);
     } catch (error) {
       logger.error('Error adding user tag:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to add user tag', 500);
+      throw new GatrixError('Failed to add user tag', 500);
     }
   }
 
@@ -356,16 +356,16 @@ export class UserService {
       // 사용자 존재 확인
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       await UserModel.removeTag(userId, tagId);
     } catch (error) {
       logger.error('Error removing user tag:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to remove user tag', 500);
+      throw new GatrixError('Failed to remove user tag', 500);
     }
   }
 
@@ -374,11 +374,11 @@ export class UserService {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       if (user.emailVerified) {
-        throw new CustomError('User email is already verified', 400);
+        throw new GatrixError('User email is already verified', 400);
       }
 
       await UserModel.update(userId, { emailVerified: true });
@@ -389,7 +389,7 @@ export class UserService {
       });
     } catch (error) {
       logger.error('Error verifying user email:', error);
-      throw error instanceof CustomError ? error : new CustomError('Failed to verify user email', 500);
+      throw error instanceof GatrixError ? error : new GatrixError('Failed to verify user email', 500);
     }
   }
 
@@ -398,11 +398,11 @@ export class UserService {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       if (user.emailVerified) {
-        throw new CustomError('User email is already verified', 400);
+        throw new GatrixError('User email is already verified', 400);
       }
 
       // 이메일 인증 메일 발송 (현재는 웰컴 이메일로 대체)
@@ -418,11 +418,11 @@ export class UserService {
           email: user.email,
           error: emailError,
         });
-        throw new CustomError('Failed to send verification email', 500);
+        throw new GatrixError('Failed to send verification email', 500);
       }
     } catch (error) {
       logger.error('Error resending verification email:', error);
-      throw error instanceof CustomError ? error : new CustomError('Failed to resend verification email', 500);
+      throw error instanceof GatrixError ? error : new GatrixError('Failed to resend verification email', 500);
     }
   }
 
@@ -433,7 +433,7 @@ export class UserService {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       await UserModel.updateLanguage(userId, preferredLanguage);
@@ -445,7 +445,7 @@ export class UserService {
       });
     } catch (error) {
       logger.error('Error updating user language:', error);
-      throw error instanceof CustomError ? error : new CustomError('Failed to update user language', 500);
+      throw error instanceof GatrixError ? error : new GatrixError('Failed to update user language', 500);
     }
   }
 
@@ -458,7 +458,7 @@ export class UserService {
       return users;
     } catch (error) {
       logger.error('Error searching users:', error);
-      throw error instanceof CustomError ? error : new CustomError('Failed to search users', 500);
+      throw error instanceof GatrixError ? error : new GatrixError('Failed to search users', 500);
     }
   }
 }

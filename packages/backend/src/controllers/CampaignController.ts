@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { CampaignModel } from '../models/Campaign';
 import { VariantModel } from '../models/Variant';
 import logger from '../config/logger';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import {
   CreateCampaignData,
   CreateCampaignConfigData,
@@ -29,7 +29,7 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.list:', error);
-      throw new CustomError('Failed to fetch campaigns', 500);
+      throw new GatrixError('Failed to fetch campaigns', 500);
     }
   }
 
@@ -42,7 +42,7 @@ export class CampaignController {
       const campaign = await CampaignModel.findById(id, true);
 
       if (!campaign) {
-        throw new CustomError('Campaign not found', 404);
+        throw new GatrixError('Campaign not found', 404);
       }
 
       res.json({
@@ -51,10 +51,10 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.getById:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to fetch campaign', 500);
+      throw new GatrixError('Failed to fetch campaign', 500);
     }
   }
 
@@ -71,7 +71,7 @@ export class CampaignController {
 
       // Validate required fields
       if (!data.campaignName) {
-        throw new CustomError('Campaign name is required', 400);
+        throw new GatrixError('Campaign name is required', 400);
       }
 
       // Validate dates
@@ -79,7 +79,7 @@ export class CampaignController {
         const start = new Date(data.startDate);
         const end = new Date(data.endDate);
         if (start >= end) {
-          throw new CustomError('End date must be after start date', 400);
+          throw new GatrixError('End date must be after start date', 400);
         }
       }
 
@@ -92,10 +92,10 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.create:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to create campaign', 500);
+      throw new GatrixError('Failed to create campaign', 500);
     }
   }
 
@@ -112,7 +112,7 @@ export class CampaignController {
         const start = new Date(data.startDate);
         const end = new Date(data.endDate);
         if (start >= end) {
-          throw new CustomError('End date must be after start date', 400);
+          throw new GatrixError('End date must be after start date', 400);
         }
       }
 
@@ -125,10 +125,10 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.update:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to update campaign', 500);
+      throw new GatrixError('Failed to update campaign', 500);
     }
   }
 
@@ -142,7 +142,7 @@ export class CampaignController {
       // Check if campaign exists
       const campaign = await CampaignModel.findById(id, false);
       if (!campaign) {
-        throw new CustomError('Campaign not found', 404);
+        throw new GatrixError('Campaign not found', 404);
       }
 
       await CampaignModel.delete(id);
@@ -153,10 +153,10 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.delete:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to delete campaign', 500);
+      throw new GatrixError('Failed to delete campaign', 500);
     }
   }
 
@@ -173,13 +173,13 @@ export class CampaignController {
 
       // Validate required fields
       if (!data.configId) {
-        throw new CustomError('Config ID is required', 400);
+        throw new GatrixError('Config ID is required', 400);
       }
 
       // Check if campaign exists
       const campaign = await CampaignModel.findById(campaignId, false);
       if (!campaign) {
-        throw new CustomError('Campaign not found', 404);
+        throw new GatrixError('Campaign not found', 404);
       }
 
       const campaignConfig = await CampaignModel.addConfig(data);
@@ -191,10 +191,10 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.addConfig:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to add config to campaign', 500);
+      throw new GatrixError('Failed to add config to campaign', 500);
     }
   }
 
@@ -209,7 +209,7 @@ export class CampaignController {
       // Check if campaign exists
       const campaign = await CampaignModel.findById(campaignId, false);
       if (!campaign) {
-        throw new CustomError('Campaign not found', 404);
+        throw new GatrixError('Campaign not found', 404);
       }
 
       await CampaignModel.removeConfig(campaignId, configId);
@@ -220,10 +220,10 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.removeConfig:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to remove config from campaign', 500);
+      throw new GatrixError('Failed to remove config from campaign', 500);
     }
   }
 
@@ -245,7 +245,7 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.getVariants:', error);
-      throw new CustomError('Failed to fetch variants', 500);
+      throw new GatrixError('Failed to fetch variants', 500);
     }
   }
 
@@ -264,7 +264,7 @@ export class CampaignController {
 
       // Validate required fields
       if (!data.variantName) {
-        throw new CustomError('Variant name is required', 400);
+        throw new GatrixError('Variant name is required', 400);
       }
 
       const variant = await VariantModel.create(data);
@@ -276,10 +276,10 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.createVariant:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to create variant', 500);
+      throw new GatrixError('Failed to create variant', 500);
     }
   }
 
@@ -300,10 +300,10 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.updateVariant:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to update variant', 500);
+      throw new GatrixError('Failed to update variant', 500);
     }
   }
 
@@ -317,7 +317,7 @@ export class CampaignController {
       // Check if variant exists
       const variant = await VariantModel.findById(variantId);
       if (!variant) {
-        throw new CustomError('Variant not found', 404);
+        throw new GatrixError('Variant not found', 404);
       }
 
       await VariantModel.delete(variantId);
@@ -328,10 +328,10 @@ export class CampaignController {
       });
     } catch (error) {
       logger.error('Error in CampaignController.deleteVariant:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to delete variant', 500);
+      throw new GatrixError('Failed to delete variant', 500);
     }
   }
 }

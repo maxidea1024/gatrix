@@ -1,4 +1,4 @@
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 
 /**
  * IP address and CIDR validation utilities
@@ -99,13 +99,13 @@ export function isValidIPOrCIDR(input: string): boolean {
  */
 export function normalizeIPOrCIDR(input: string): string {
   if (!input || typeof input !== 'string') {
-    throw new CustomError('Invalid IP address or CIDR notation', 400);
+    throw new GatrixError('Invalid IP address or CIDR notation', 400);
   }
   
   const normalized = input.trim().toLowerCase();
   
   if (!isValidIPOrCIDR(normalized)) {
-    throw new CustomError('Invalid IP address or CIDR notation format', 400);
+    throw new GatrixError('Invalid IP address or CIDR notation format', 400);
   }
   
   return normalized;

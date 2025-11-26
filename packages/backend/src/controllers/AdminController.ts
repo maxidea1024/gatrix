@@ -3,7 +3,7 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { UserService } from '../services/userService';
 import { UserTagService } from '../services/UserTagService';
 import { AuditLogModel } from '../models/AuditLog';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import { clearAllCache } from '../middleware/responseCache';
 import logger from '../config/logger';
 import db from '../config/knex';
@@ -134,14 +134,14 @@ export class AdminController {
       const { name, email, password, role, tagIds } = req.body;
 
       if (!req.user?.userId) {
-        throw new CustomError('User not authenticated', 401);
+        throw new GatrixError('User not authenticated', 401);
       }
 
       const createdBy = req.user.userId;
 
       // Validate required fields
       if (!name || !email || !password) {
-        throw new CustomError('Name, email, and password are required', 400);
+        throw new GatrixError('Name, email, and password are required', 400);
       }
 
       const userData = {
@@ -180,7 +180,7 @@ export class AdminController {
       const { tagIds, ...updates } = req.body;
 
       if (!req.user?.userId) {
-        throw new CustomError('User not authenticated', 401);
+        throw new GatrixError('User not authenticated', 401);
       }
 
       const updatedBy = req.user.userId;
@@ -211,7 +211,7 @@ export class AdminController {
 
       // Prevent admin from deleting themselves
       if (req.user?.userId === userId) {
-        throw new CustomError('Cannot delete your own account', 400);
+        throw new GatrixError('Cannot delete your own account', 400);
       }
 
       await UserService.deleteUser(userId);
@@ -245,7 +245,7 @@ export class AdminController {
 
       // Prevent admin from suspending themselves
       if (req.user?.userId === userId) {
-        throw new CustomError('Cannot suspend your own account', 400);
+        throw new GatrixError('Cannot suspend your own account', 400);
       }
 
       await UserService.suspendUser(userId);
@@ -279,7 +279,7 @@ export class AdminController {
 
       // Prevent admin from demoting themselves
       if (req.user?.userId === userId) {
-        throw new CustomError('Cannot demote your own account', 400);
+        throw new GatrixError('Cannot demote your own account', 400);
       }
 
       await UserService.demoteFromAdmin(userId);
@@ -298,18 +298,18 @@ export class AdminController {
       const userId = parseInt(req.params.id);
 
       if (!userId || isNaN(userId)) {
-        throw new CustomError('Invalid user ID', 400);
+        throw new GatrixError('Invalid user ID', 400);
       }
 
       // 사용자 존재 확인
       const user = await db('g_users').where('id', userId).first();
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       // 이미 인증된 경우 확인
       if (user.emailVerified) {
-        throw new CustomError('Email is already verified', 400);
+        throw new GatrixError('Email is already verified', 400);
       }
 
       // 이메일 인증 상태 업데이트
@@ -636,15 +636,15 @@ export class AdminController {
       const { userIds, status } = req.body;
 
       if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-        throw new CustomError('User IDs are required', 400);
+        throw new GatrixError('User IDs are required', 400);
       }
 
       if (!status || !['active', 'pending', 'suspended'].includes(status)) {
-        throw new CustomError('Valid status is required', 400);
+        throw new GatrixError('Valid status is required', 400);
       }
 
       if (!req.user?.userId) {
-        throw new CustomError('User not authenticated', 401);
+        throw new GatrixError('User not authenticated', 401);
       }
 
       const currentUserId = req.user.userId;
@@ -686,15 +686,15 @@ export class AdminController {
       const { userIds, role } = req.body;
 
       if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-        throw new CustomError('User IDs are required', 400);
+        throw new GatrixError('User IDs are required', 400);
       }
 
       if (!role || !['user', 'admin'].includes(role)) {
-        throw new CustomError('Valid role is required', 400);
+        throw new GatrixError('Valid role is required', 400);
       }
 
       if (!req.user?.userId) {
-        throw new CustomError('User not authenticated', 401);
+        throw new GatrixError('User not authenticated', 401);
       }
 
       const currentUserId = req.user.userId;
@@ -736,15 +736,15 @@ export class AdminController {
       const { userIds, emailVerified } = req.body;
 
       if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-        throw new CustomError('User IDs are required', 400);
+        throw new GatrixError('User IDs are required', 400);
       }
 
       if (typeof emailVerified !== 'boolean') {
-        throw new CustomError('Valid emailVerified boolean is required', 400);
+        throw new GatrixError('Valid emailVerified boolean is required', 400);
       }
 
       if (!req.user?.userId) {
-        throw new CustomError('User not authenticated', 401);
+        throw new GatrixError('User not authenticated', 401);
       }
 
       const currentUserId = req.user.userId;
@@ -786,15 +786,15 @@ export class AdminController {
       const { userIds, tagIds } = req.body;
 
       if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-        throw new CustomError('User IDs are required', 400);
+        throw new GatrixError('User IDs are required', 400);
       }
 
       if (!tagIds || !Array.isArray(tagIds)) {
-        throw new CustomError('Tag IDs array is required', 400);
+        throw new GatrixError('Tag IDs array is required', 400);
       }
 
       if (!req.user?.userId) {
-        throw new CustomError('User not authenticated', 401);
+        throw new GatrixError('User not authenticated', 401);
       }
 
       const currentUserId = req.user.userId;
@@ -848,18 +848,18 @@ export class AdminController {
       const { userIds } = req.body;
 
       if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-        throw new CustomError('User IDs are required', 400);
+        throw new GatrixError('User IDs are required', 400);
       }
 
       if (!req.user?.userId) {
-        throw new CustomError('User not authenticated', 401);
+        throw new GatrixError('User not authenticated', 401);
       }
 
       const currentUserId = req.user.userId;
 
       // Prevent deleting current user
       if (userIds.includes(currentUserId)) {
-        throw new CustomError('Cannot delete your own account', 400);
+        throw new GatrixError('Cannot delete your own account', 400);
       }
 
       await db.transaction(async (trx) => {

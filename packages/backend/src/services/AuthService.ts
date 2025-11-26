@@ -1,7 +1,7 @@
 // import bcrypt from 'bcryptjs'; // Removed as it's not used directly here
 import { UserModel } from '../models/User';
 import { JwtUtils } from '../utils/jwt';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { CreateUserData, UserWithoutPassword } from '../types/user';
 import db from '../config/knex';
@@ -31,24 +31,24 @@ export class AuthService {
       // Find user by email
       const user = await UserModel.findByEmail(email);
       if (!user) {
-        throw new CustomError('USER_NOT_FOUND', 404);
+        throw new GatrixError('USER_NOT_FOUND', 404);
       }
 
       // Check if user is active
       if (user.status !== 'active') {
         if (user.status === 'pending') {
-          throw new CustomError('ACCOUNT_PENDING', 403);
+          throw new GatrixError('ACCOUNT_PENDING', 403);
         } else if (user.status === 'suspended') {
-          throw new CustomError('ACCOUNT_SUSPENDED', 403);
+          throw new GatrixError('ACCOUNT_SUSPENDED', 403);
         } else {
-          throw new CustomError('Account is not active. Please contact an administrator.', 403);
+          throw new GatrixError('Account is not active. Please contact an administrator.', 403);
         }
       }
 
       // Verify password
       const isValidPassword = await UserModel.verifyPassword(user, password);
       if (!isValidPassword) {
-        throw new CustomError('Invalid email or password', 401);
+        throw new GatrixError('Invalid email or password', 401);
       }
 
       // Update last login
@@ -72,11 +72,11 @@ export class AuthService {
         refreshToken,
       };
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Login error:', error);
-      throw new CustomError('Login failed', 500);
+      throw new GatrixError('Login failed', 500);
     }
   }
 
@@ -87,7 +87,7 @@ export class AuthService {
       // Check if user already exists
       const existingUser = await UserModel.findByEmail(email);
       if (existingUser) {
-        throw new CustomError('EMAIL_ALREADY_EXISTS', 409);
+        throw new GatrixError('EMAIL_ALREADY_EXISTS', 409);
       }
 
       // Create user data
@@ -109,11 +109,11 @@ export class AuthService {
 
       return user;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Registration error:', error);
-      throw new CustomError('REGISTRATION_FAILED', 500);
+      throw new GatrixError('REGISTRATION_FAILED', 500);
     }
   }
 
@@ -123,7 +123,7 @@ export class AuthService {
       const payload = JwtUtils.verifyRefreshToken(refreshToken);
       if (!payload) {
         logger.warn('Refresh token verification failed: invalid or expired token');
-        throw new CustomError('Invalid or expired refresh token', 401);
+        throw new GatrixError('Invalid or expired refresh token', 401);
       }
 
       logger.debug('Refresh token verified, looking up user:', { userId: payload.userId });
@@ -132,12 +132,12 @@ export class AuthService {
       const user = await UserModel.findById(payload.userId);
       if (!user) {
         logger.warn('User not found during token refresh:', { userId: payload.userId });
-        throw new CustomError('User not found', 401);
+        throw new GatrixError('User not found', 401);
       }
 
       if (user.status !== 'active') {
         logger.warn('User account is not active during token refresh:', { userId: payload.userId, status: user.status });
-        throw new CustomError('User account is not active', 401);
+        throw new GatrixError('User account is not active', 401);
       }
 
       // Generate new tokens
@@ -149,11 +149,11 @@ export class AuthService {
         refreshToken: newRefreshToken,
       };
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Token refresh error:', error);
-      throw new CustomError('Token refresh failed', 500);
+      throw new GatrixError('Token refresh failed', 500);
     }
   }
 
@@ -162,23 +162,23 @@ export class AuthService {
       // Get user with password hash
       const user = await UserModel.findByEmail((await UserModel.findById(userId))!.email);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       // OAuth 사용자들은 비밀번호 변경 불가
       if (user.authType !== 'local') {
-        throw new CustomError('Password change is not available for OAuth users', 400);
+        throw new GatrixError('Password change is not available for OAuth users', 400);
       }
 
       // Verify current password
       if (user.passwordHash) {
         const isValidPassword = await UserModel.verifyPassword(user, currentPassword);
         if (!isValidPassword) {
-          throw new CustomError('Current password is incorrect', 400);
+          throw new GatrixError('Current password is incorrect', 400);
         }
       } else {
         // local 사용자인데 passwordHash가 없는 경우 (데이터 불일치)
-        throw new CustomError('Password not set for this account', 400);
+        throw new GatrixError('Password not set for this account', 400);
       }
 
       // Update password
@@ -188,11 +188,11 @@ export class AuthService {
         userId,
       });
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Change password error:', error);
-      throw new CustomError('Password change failed', 500);
+      throw new GatrixError('Password change failed', 500);
     }
   }
 
@@ -242,7 +242,7 @@ export class AuthService {
       });
     } catch (error) {
       logger.error('Password reset error:', error);
-      throw new CustomError('Password reset failed', 500);
+      throw new GatrixError('Password reset failed', 500);
     }
   }
 
@@ -257,7 +257,7 @@ export class AuthService {
       });
     } catch (error) {
       logger.error('Email verification error:', error);
-      throw new CustomError('Email verification failed', 500);
+      throw new GatrixError('Email verification failed', 500);
     }
   }
 
@@ -265,16 +265,16 @@ export class AuthService {
     try {
       const user = await UserModel.findById(userId);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       return user;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Get profile error:', error);
-      throw new CustomError('Failed to get user profile', 500);
+      throw new GatrixError('Failed to get user profile', 500);
     }
   }
 
@@ -291,12 +291,12 @@ export class AuthService {
       }
 
       if (Object.keys(filteredData).length === 0) {
-        throw new CustomError('No valid fields to update', 400);
+        throw new GatrixError('No valid fields to update', 400);
       }
 
       const user = await UserModel.update(userId, filteredData);
       if (!user) {
-        throw new CustomError('User not found', 404);
+        throw new GatrixError('User not found', 404);
       }
 
       logger.info('Profile updated successfully:', {
@@ -306,11 +306,11 @@ export class AuthService {
 
       return user;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Update profile error:', error);
-      throw new CustomError('Profile update failed', 500);
+      throw new GatrixError('Profile update failed', 500);
     }
   }
 }

@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import Joi from 'joi';
-import { asyncHandler, CustomError } from '../middleware/errorHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../types/auth';
 import { CouponSettingsService } from '../services/CouponSettingsService';
 
@@ -88,7 +88,7 @@ export class CouponSettingsController {
 
   static getById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    if (!id) throw new CustomError('id is required', 400);
+    if (!id) throw new GatrixError('id is required', 400);
     const setting = await CouponSettingsService.getSettingById(id);
     res.json({ success: true, data: { setting } });
   });
@@ -102,7 +102,7 @@ export class CouponSettingsController {
         details: error.details,
         payload: req.body,
       });
-      throw new CustomError(error.message, 400);
+      throw new GatrixError(error.message, 400);
     }
 
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
@@ -112,10 +112,10 @@ export class CouponSettingsController {
 
   static update = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    if (!id) throw new CustomError('id is required', 400);
+    if (!id) throw new GatrixError('id is required', 400);
 
     const { error, value } = updateSchema.validate(req.body);
-    if (error) throw new CustomError(error.message, 400);
+    if (error) throw new GatrixError(error.message, 400);
 
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
     const setting = await CouponSettingsService.updateSetting(id, { ...value, updatedBy: authenticatedUserId ?? null });
@@ -124,7 +124,7 @@ export class CouponSettingsController {
 
   static remove = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    if (!id) throw new CustomError('id is required', 400);
+    if (!id) throw new GatrixError('id is required', 400);
     await CouponSettingsService.deleteSetting(id);
     res.json({ success: true });
   });
@@ -153,7 +153,7 @@ export class CouponSettingsController {
   // Get status statistics for issued coupon codes
   static getIssuedCodesStats = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    if (!id) throw new CustomError('id is required', 400);
+    if (!id) throw new GatrixError('id is required', 400);
     const stats = await CouponSettingsService.getIssuedCodesStats(id);
     res.json({ success: true, data: stats });
   });
@@ -161,7 +161,7 @@ export class CouponSettingsController {
   // Get issued codes for export (chunked)
   static getIssuedCodesForExport = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    if (!id) throw new CustomError('id is required', 400);
+    if (!id) throw new GatrixError('id is required', 400);
     const { offset, limit, search } = req.query;
     const data = await CouponSettingsService.getIssuedCodesForExport(id, {
       offset: offset ? parseInt(offset as string) : undefined,
@@ -174,7 +174,7 @@ export class CouponSettingsController {
   // List issued codes for NORMAL type settings
   static getIssuedCodes = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    if (!id) throw new CustomError('id is required', 400);
+    if (!id) throw new GatrixError('id is required', 400);
     const { page, limit, search } = req.query;
     const data = await CouponSettingsService.getIssuedCodes(id, {
       page: page ? parseInt(page as string) : undefined,
@@ -187,7 +187,7 @@ export class CouponSettingsController {
   // Get generation status for async coupon code generation
   static getGenerationStatus = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    if (!id) throw new CustomError('id is required', 400);
+    if (!id) throw new GatrixError('id is required', 400);
     const status = await CouponSettingsService.getGenerationStatus(id);
     res.json({ success: true, data: status });
   });
@@ -201,7 +201,7 @@ export class CouponSettingsController {
   // Recalculate cache for a specific coupon setting (admin only)
   static recalculateCacheForSetting = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    if (!id) throw new CustomError('id is required', 400);
+    if (!id) throw new GatrixError('id is required', 400);
     const result = await CouponSettingsService.recalculateCacheForSetting(id);
     res.json({ success: true, data: result });
   });

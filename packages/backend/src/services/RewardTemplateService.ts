@@ -1,6 +1,6 @@
 import { ulid } from 'ulid';
 import database from '../config/database';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { TagService } from './TagService';
 
@@ -115,7 +115,7 @@ class RewardTemplateService {
       };
     } catch (error) {
       logger.error('Failed to get reward templates', { error });
-      throw new CustomError('Failed to get reward templates', 500);
+      throw new GatrixError('Failed to get reward templates', 500);
     }
   }
 
@@ -131,7 +131,7 @@ class RewardTemplateService {
       );
 
       if (templates.length === 0) {
-        throw new CustomError('Reward template not found', 404);
+        throw new GatrixError('Reward template not found', 404);
       }
 
       const template = templates[0];
@@ -142,9 +142,9 @@ class RewardTemplateService {
         tags: tags,
       };
     } catch (error) {
-      if (error instanceof CustomError) throw error;
+      if (error instanceof GatrixError) throw error;
       logger.error('Failed to get reward template', { error, id });
-      throw new CustomError('Failed to get reward template', 500);
+      throw new GatrixError('Failed to get reward template', 500);
     }
   }
 
@@ -173,7 +173,7 @@ class RewardTemplateService {
       return this.getRewardTemplateById(id);
     } catch (error) {
       logger.error('Failed to create reward template', { error, input });
-      throw new CustomError('Failed to create reward template', 500);
+      throw new GatrixError('Failed to create reward template', 500);
     }
   }
 
@@ -225,9 +225,9 @@ class RewardTemplateService {
 
       return this.getRewardTemplateById(id);
     } catch (error) {
-      if (error instanceof CustomError) throw error;
+      if (error instanceof GatrixError) throw error;
       logger.error('Failed to update reward template', { error, id, input });
-      throw new CustomError('Failed to update reward template', 500);
+      throw new GatrixError('Failed to update reward template', 500);
     }
   }
 
@@ -257,7 +257,7 @@ class RewardTemplateService {
       };
     } catch (error) {
       logger.error('Failed to check references', { error, templateId });
-      throw new CustomError('Failed to check references', 500);
+      throw new GatrixError('Failed to check references', 500);
     }
   }
 
@@ -275,9 +275,9 @@ class RewardTemplateService {
         [id]
       );
     } catch (error) {
-      if (error instanceof CustomError) throw error;
+      if (error instanceof GatrixError) throw error;
       logger.error('Failed to delete reward template', { error, id });
-      throw new CustomError('Failed to delete reward template', 500);
+      throw new GatrixError('Failed to delete reward template', 500);
     }
   }
 }

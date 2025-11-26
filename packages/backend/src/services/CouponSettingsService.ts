@@ -1,5 +1,5 @@
 import database from '../config/database';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import { ulid } from 'ulid';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { convertToMySQLDateTime } from '../utils/dateUtils';
@@ -148,7 +148,7 @@ export class CouponSettingsService {
       'SELECT * FROM g_coupon_settings WHERE id = ?',
       [id]
     );
-    if (rows.length === 0) throw new CustomError('Coupon setting not found', 404);
+    if (rows.length === 0) throw new GatrixError('Coupon setting not found', 404);
 
     const base: any = rows[0];
     base.tags = typeof base.tags === 'string' ? JSON.parse(base.tags) : base.tags;
@@ -192,14 +192,14 @@ export class CouponSettingsService {
     const pool = database.getPool();
 
     if (input.rewardTemplateId && input.rewardData) {
-      throw new CustomError('Use either rewardTemplateId or rewardData, not both', 400);
+      throw new GatrixError('Use either rewardTemplateId or rewardData, not both', 400);
     }
 
     // Convert dates to MySQL DATETIME
     // startsAt is optional - if not provided, coupon is immediately available
     const startsAt = input.startsAt ? convertToMySQLDateTime(input.startsAt) : null;
     const expiresAt = convertToMySQLDateTime(input.expiresAt);
-    if (!expiresAt) throw new CustomError('Invalid expiration date', 400);
+    if (!expiresAt) throw new GatrixError('Invalid expiration date', 400);
 
     const id = ulid();
 
@@ -210,7 +210,7 @@ export class CouponSettingsService {
     if (isSpecial) {
       // SPECIAL: code must be >= 4
       const code = (input.code || '').trim();
-      if (!code || code.length < 4) throw new CustomError('code must be at least 4 characters for SPECIAL', 400);
+      if (!code || code.length < 4) throw new GatrixError('code must be at least 4 characters for SPECIAL', 400);
     }
 
     // SPECIAL: perUserLimit forced to 1; NORMAL: ignore maxTotalUses
@@ -221,7 +221,7 @@ export class CouponSettingsService {
     // Validate codePattern for NORMAL type
     const codePattern = isNormal ? (input.codePattern ?? 'ALPHANUMERIC_8') : 'ALPHANUMERIC_8';
     if (isNormal && !['ALPHANUMERIC_8', 'ALPHANUMERIC_16', 'ALPHANUMERIC_16_HYPHEN'].includes(codePattern)) {
-      throw new CustomError('Invalid code pattern', 400);
+      throw new GatrixError('Invalid code pattern', 400);
     }
 
     // Insert main row
@@ -325,7 +325,7 @@ export class CouponSettingsService {
     await this.getSettingById(id);
 
     if (input.rewardTemplateId && input.rewardData) {
-      throw new CustomError('Use either rewardTemplateId or rewardData, not both', 400);
+      throw new GatrixError('Use either rewardTemplateId or rewardData, not both', 400);
     }
 
     const updates: string[] = [];
@@ -352,13 +352,13 @@ export class CouponSettingsService {
         add('startsAt = ?', null);
       } else {
         const v = convertToMySQLDateTime(input.startsAt);
-        if (!v) throw new CustomError('Invalid startsAt', 400);
+        if (!v) throw new GatrixError('Invalid startsAt', 400);
         add('startsAt = ?', v);
       }
     }
     if (input.expiresAt !== undefined) {
       const v = convertToMySQLDateTime(input.expiresAt);
-      if (!v) throw new CustomError('Invalid expiresAt', 400);
+      if (!v) throw new GatrixError('Invalid expiresAt', 400);
       add('expiresAt = ?', v);
     }
     if (input.status !== undefined) add('status = ?', input.status);
@@ -429,7 +429,7 @@ export class CouponSettingsService {
       [id]
     );
 
-    if (settingRows.length === 0) throw new CustomError('Coupon setting not found', 404);
+    if (settingRows.length === 0) throw new GatrixError('Coupon setting not found', 404);
 
     const setting = settingRows[0] as any;
 
@@ -455,7 +455,7 @@ export class CouponSettingsService {
       `UPDATE g_coupon_settings SET status = 'DELETED', generationStatus = 'FAILED', issuedCount = 0, usedCount = 0 WHERE id = ?`,
       [id]
     );
-    if (res.affectedRows === 0) throw new CustomError('Coupon setting not found', 404);
+    if (res.affectedRows === 0) throw new GatrixError('Coupon setting not found', 404);
   }
 
   /**
@@ -784,7 +784,7 @@ export class CouponSettingsService {
     );
 
     if (rows.length === 0) {
-      throw new CustomError('Coupon setting not found', 404);
+      throw new GatrixError('Coupon setting not found', 404);
     }
 
     const row = rows[0] as any;
@@ -868,7 +868,7 @@ export class CouponSettingsService {
       );
 
       if (settingRows.length === 0) {
-        throw new CustomError('Coupon setting not found', 404);
+        throw new GatrixError('Coupon setting not found', 404);
       }
 
       total = Number(settingRows[0].issuedCount || 0);
@@ -907,7 +907,7 @@ export class CouponSettingsService {
       [settingId]
     );
 
-    if (rows.length === 0) throw new CustomError('Coupon setting not found', 404);
+    if (rows.length === 0) throw new GatrixError('Coupon setting not found', 404);
 
     const row = rows[0] as any;
     return {
@@ -975,7 +975,7 @@ export class CouponSettingsService {
       return mismatches;
     } catch (error) {
       logger.error('Failed to recalculate cache', { error });
-      throw new CustomError('Failed to recalculate cache', 500);
+      throw new GatrixError('Failed to recalculate cache', 500);
     }
   }
 
@@ -1010,7 +1010,7 @@ export class CouponSettingsService {
       return { issued: issuedCount, used: usedCount };
     } catch (error) {
       logger.error('Failed to recalculate cache for setting', { settingId, error });
-      throw new CustomError('Failed to recalculate cache', 500);
+      throw new GatrixError('Failed to recalculate cache', 500);
     }
   }
 
@@ -1123,7 +1123,7 @@ export class CouponSettingsService {
       }
     } catch (error) {
       logger.error('Failed to enqueue coupon generation job', { settingId, quantity, error });
-      throw new CustomError('Failed to enqueue coupon generation job', 500);
+      throw new GatrixError('Failed to enqueue coupon generation job', 500);
     }
   }
 }

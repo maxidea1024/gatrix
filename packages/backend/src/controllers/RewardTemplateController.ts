@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { asyncHandler, CustomError } from '../middleware/errorHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import RewardTemplateService from '../services/RewardTemplateService';
 import { TagService } from '../services/TagService';
@@ -35,7 +35,7 @@ export class RewardTemplateController {
     const { id } = req.params;
 
     if (!id) {
-      throw new CustomError('Reward template ID is required', 400);
+      throw new GatrixError('Reward template ID is required', 400);
     }
 
     const template = await RewardTemplateService.getRewardTemplateById(id);
@@ -55,19 +55,19 @@ export class RewardTemplateController {
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
 
     if (!authenticatedUserId) {
-      throw new CustomError('User authentication required', 401);
+      throw new GatrixError('User authentication required', 401);
     }
 
     const { name, description, rewardItems, tagIds } = req.body;
 
     // Validate template name
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      throw new CustomError('Template name is required and must be a non-empty string', 400);
+      throw new GatrixError('Template name is required and must be a non-empty string', 400);
     }
 
     // Validate reward items array
     if (!rewardItems || !Array.isArray(rewardItems) || rewardItems.length === 0) {
-      throw new CustomError('At least one reward item is required', 400);
+      throw new GatrixError('At least one reward item is required', 400);
     }
 
     // Validate each reward item
@@ -75,15 +75,15 @@ export class RewardTemplateController {
       const reward = rewardItems[i];
 
       if (!reward.rewardType || typeof reward.rewardType !== 'string' || reward.rewardType.trim().length === 0) {
-        throw new CustomError(`Reward item #${i + 1}: rewardType is required and must be a non-empty string`, 400);
+        throw new GatrixError(`Reward item #${i + 1}: rewardType is required and must be a non-empty string`, 400);
       }
 
       if (!reward.itemId || typeof reward.itemId !== 'string' || reward.itemId.trim().length === 0) {
-        throw new CustomError(`Reward item #${i + 1}: itemId is required and must be a non-empty string`, 400);
+        throw new GatrixError(`Reward item #${i + 1}: itemId is required and must be a non-empty string`, 400);
       }
 
       if (!reward.quantity || typeof reward.quantity !== 'number' || reward.quantity < 1) {
-        throw new CustomError(`Reward item #${i + 1}: quantity is required and must be a number greater than or equal to 1`, 400);
+        throw new GatrixError(`Reward item #${i + 1}: quantity is required and must be a number greater than or equal to 1`, 400);
       }
     }
 
@@ -118,24 +118,24 @@ export class RewardTemplateController {
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
 
     if (!id) {
-      throw new CustomError('Reward template ID is required', 400);
+      throw new GatrixError('Reward template ID is required', 400);
     }
 
     if (!authenticatedUserId) {
-      throw new CustomError('User authentication required', 401);
+      throw new GatrixError('User authentication required', 401);
     }
 
     const { name, description, rewardItems, tagIds } = req.body;
 
     // Validate template name if provided
     if (name !== undefined && (!name || typeof name !== 'string' || name.trim().length === 0)) {
-      throw new CustomError('Template name must be a non-empty string', 400);
+      throw new GatrixError('Template name must be a non-empty string', 400);
     }
 
     // Validate reward items array if provided
     if (rewardItems !== undefined) {
       if (!Array.isArray(rewardItems) || rewardItems.length === 0) {
-        throw new CustomError('At least one reward item is required', 400);
+        throw new GatrixError('At least one reward item is required', 400);
       }
 
       // Validate each reward item
@@ -143,15 +143,15 @@ export class RewardTemplateController {
         const reward = rewardItems[i];
 
         if (!reward.rewardType || typeof reward.rewardType !== 'string' || reward.rewardType.trim().length === 0) {
-          throw new CustomError(`Reward item #${i + 1}: rewardType is required and must be a non-empty string`, 400);
+          throw new GatrixError(`Reward item #${i + 1}: rewardType is required and must be a non-empty string`, 400);
         }
 
         if (!reward.itemId || typeof reward.itemId !== 'string' || reward.itemId.trim().length === 0) {
-          throw new CustomError(`Reward item #${i + 1}: itemId is required and must be a non-empty string`, 400);
+          throw new GatrixError(`Reward item #${i + 1}: itemId is required and must be a non-empty string`, 400);
         }
 
         if (!reward.quantity || typeof reward.quantity !== 'number' || reward.quantity < 1) {
-          throw new CustomError(`Reward item #${i + 1}: quantity is required and must be a number greater than or equal to 1`, 400);
+          throw new GatrixError(`Reward item #${i + 1}: quantity is required and must be a number greater than or equal to 1`, 400);
         }
       }
     }
@@ -186,7 +186,7 @@ export class RewardTemplateController {
     const { id } = req.params;
 
     if (!id) {
-      throw new CustomError('Reward template ID is required', 400);
+      throw new GatrixError('Reward template ID is required', 400);
     }
 
     const references = await RewardTemplateService.checkReferences(id);
@@ -206,7 +206,7 @@ export class RewardTemplateController {
     const { id } = req.params;
 
     if (!id) {
-      throw new CustomError('Reward template ID is required', 400);
+      throw new GatrixError('Reward template ID is required', 400);
     }
 
     await RewardTemplateService.deleteRewardTemplate(id);

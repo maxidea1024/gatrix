@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { PlatformDefaultsService, PlatformDefaults, PlatformDefaultsMap } from '../services/PlatformDefaultsService';
 import { AuthenticatedRequest } from '../middleware/auth';
-import { CustomError, asyncHandler } from '../middleware/errorHandler';
+import { GatrixError, asyncHandler } from '../middleware/errorHandler';
 import Joi from 'joi';
 
 // Validation schemas
@@ -37,7 +37,7 @@ export class PlatformDefaultsController {
     const { platform } = req.params;
     
     if (!platform) {
-      throw new CustomError('Platform parameter is required', 400);
+      throw new GatrixError('Platform parameter is required', 400);
     }
 
     const defaults = await PlatformDefaultsService.getPlatformDefaults(platform);
@@ -59,13 +59,13 @@ export class PlatformDefaultsController {
     const { platform } = req.params;
     
     if (!platform) {
-      throw new CustomError('Platform parameter is required', 400);
+      throw new GatrixError('Platform parameter is required', 400);
     }
 
     // Validate request body
     const { error, value } = platformDefaultsSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const defaults: PlatformDefaults = value;
@@ -90,7 +90,7 @@ export class PlatformDefaultsController {
     // Validate request body
     const { error, value } = allDefaultsSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const defaultsMap: PlatformDefaultsMap = value;
@@ -112,7 +112,7 @@ export class PlatformDefaultsController {
     const { platform } = req.params;
     
     if (!platform) {
-      throw new CustomError('Platform parameter is required', 400);
+      throw new GatrixError('Platform parameter is required', 400);
     }
 
     await PlatformDefaultsService.deletePlatformDefaults(platform, (req.user as any).userId);

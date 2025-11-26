@@ -190,7 +190,7 @@ export class EventListener {
       await this.cacheManager.refreshPopupNotices();
       await this.cacheManager.refreshSurveys();
       await this.cacheManager.refreshWhitelists();
-      await this.cacheManager.refreshMaintenance();
+      await this.cacheManager.refreshServiceMaintenance();
 
       this.logger.info('Cache reinitialized after reconnection');
     } catch (error: any) {
@@ -323,13 +323,13 @@ export class EventListener {
         break;
 
       case 'maintenance.settings.updated':
-        // Refresh maintenance cache when maintenance settings are updated
-        this.logger.info('Maintenance settings updated event received, refreshing maintenance cache');
+        // Refresh service maintenance cache when maintenance settings are updated
+        this.logger.info('Service maintenance settings updated event received, refreshing service maintenance cache');
         try {
-          await this.cacheManager.refreshMaintenance();
-          this.logger.info('Maintenance cache refreshed successfully');
+          await this.cacheManager.refreshServiceMaintenance();
+          this.logger.info('Service maintenance cache refreshed successfully');
         } catch (error) {
-          this.logger.error('Failed to refresh maintenance cache', { error });
+          this.logger.error('Failed to refresh service maintenance cache', { error });
         }
         break;
 

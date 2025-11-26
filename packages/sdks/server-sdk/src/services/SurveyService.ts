@@ -66,6 +66,24 @@ export class SurveyService {
   }
 
   /**
+   * Get survey by ID
+   * GET /api/v1/server/surveys/:id
+   */
+  async getById(id: string): Promise<Survey> {
+    this.logger.debug('Fetching survey by ID', { id });
+
+    const response = await this.apiClient.get<{ survey: Survey }>(`/api/v1/server/surveys/${id}`);
+
+    if (!response.success || !response.data) {
+      throw new Error(response.error?.message || 'Failed to fetch survey');
+    }
+
+    this.logger.info('Survey fetched', { id });
+
+    return response.data.survey;
+  }
+
+  /**
    * Refresh survey settings only
    * GET /api/v1/server/surveys/settings
    */
@@ -117,12 +135,16 @@ export class SurveyService {
       }
 
       // Otherwise, fetch from API and add/update
-      // Fetch all surveys and find the updated one
-      const result = await this.list();
-      const updatedSurvey = result.surveys.find(s => s.id === id);
+      // Add small delay to ensure backend transaction is committed
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-      if (!updatedSurvey) {
-        this.logger.debug('Survey is no longer active, removing from cache', { id });
+      // Fetch the single survey from backend using getById (instead of list)
+      let updatedSurvey: Survey;
+      try {
+        updatedSurvey = await this.getById(id);
+      } catch (_error: any) {
+        // If survey not found (404), it's no longer active
+        this.logger.debug('Survey not found or not active, removing from cache', { id });
         this.removeSurvey(id);
         return;
       }

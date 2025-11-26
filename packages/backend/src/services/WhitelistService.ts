@@ -1,5 +1,5 @@
 import { WhitelistModel, Whitelist, CreateWhitelistData, UpdateWhitelistData, WhitelistFilters, WhitelistListResponse } from '../models/AccountWhitelist';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
@@ -26,7 +26,7 @@ export class WhitelistService {
       return result;
     } catch (error) {
       logger.error('Error getting all whitelists:', error);
-      throw new CustomError('Failed to get whitelists', 500);
+      throw new GatrixError('Failed to get whitelists', 500);
     }
   }
 
@@ -34,16 +34,16 @@ export class WhitelistService {
     try {
       const whitelist = await WhitelistModel.findById(id);
       if (!whitelist) {
-        throw new CustomError('Whitelist entry not found', 404);
+        throw new GatrixError('Whitelist entry not found', 404);
       }
 
       return whitelist;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error getting whitelist by ID:', error);
-      throw new CustomError('Failed to get whitelist entry', 500);
+      throw new GatrixError('Failed to get whitelist entry', 500);
     }
   }
 
@@ -51,7 +51,7 @@ export class WhitelistService {
     try {
       // Validate dates if provided
       if (data.startDate && data.endDate && data.startDate > data.endDate) {
-        throw new CustomError('Start date cannot be after end date', 400);
+        throw new GatrixError('Start date cannot be after end date', 400);
       }
 
       const whitelist = await WhitelistModel.create(data);
@@ -77,11 +77,11 @@ export class WhitelistService {
 
       return whitelist;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error creating whitelist:', error);
-      throw new CustomError('Failed to create whitelist entry', 500);
+      throw new GatrixError('Failed to create whitelist entry', 500);
     }
   }
 
@@ -90,7 +90,7 @@ export class WhitelistService {
       // Check if whitelist exists
       const existing = await WhitelistModel.findById(id);
       if (!existing) {
-        throw new CustomError('Whitelist entry not found', 404);
+        throw new GatrixError('Whitelist entry not found', 404);
       }
 
       // Validate dates if provided
@@ -98,12 +98,12 @@ export class WhitelistService {
       const endDate = data.endDate !== undefined ? data.endDate : existing.endDate;
 
       if (startDate && endDate && startDate > endDate) {
-        throw new CustomError('Start date cannot be after end date', 400);
+        throw new GatrixError('Start date cannot be after end date', 400);
       }
 
       const updated = await WhitelistModel.update(id, data);
       if (!updated) {
-        throw new CustomError('Failed to update whitelist entry', 500);
+        throw new GatrixError('Failed to update whitelist entry', 500);
       }
 
       logger.info('Whitelist entry updated successfully:', {
@@ -126,11 +126,11 @@ export class WhitelistService {
 
       return updated;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error updating whitelist:', error);
-      throw new CustomError('Failed to update whitelist entry', 500);
+      throw new GatrixError('Failed to update whitelist entry', 500);
     }
   }
 
@@ -139,12 +139,12 @@ export class WhitelistService {
       // Check if whitelist exists
       const existing = await WhitelistModel.findById(id);
       if (!existing) {
-        throw new CustomError('Whitelist entry not found', 404);
+        throw new GatrixError('Whitelist entry not found', 404);
       }
 
       const deleted = await WhitelistModel.delete(id);
       if (!deleted) {
-        throw new CustomError('Failed to delete whitelist entry', 500);
+        throw new GatrixError('Failed to delete whitelist entry', 500);
       }
 
       logger.info('Whitelist entry deleted successfully:', {
@@ -165,32 +165,32 @@ export class WhitelistService {
         // Don't throw - event publishing failure shouldn't fail the request
       }
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error deleting whitelist:', error);
-      throw new CustomError('Failed to delete whitelist entry', 500);
+      throw new GatrixError('Failed to delete whitelist entry', 500);
     }
   }
 
   static async bulkCreateWhitelists(entries: BulkCreateEntry[], createdBy: number): Promise<number> {
     try {
       if (entries.length === 0) {
-        throw new CustomError('No entries provided for bulk creation', 400);
+        throw new GatrixError('No entries provided for bulk creation', 400);
       }
 
       if (entries.length > 1000) {
-        throw new CustomError('Cannot create more than 1000 entries at once', 400);
+        throw new GatrixError('Cannot create more than 1000 entries at once', 400);
       }
 
       // Validate each entry
       for (const entry of entries) {
         if (!entry.nickname || entry.nickname.trim() === '') {
-          throw new CustomError('All entries must have a nickname', 400);
+          throw new GatrixError('All entries must have a nickname', 400);
         }
 
         if (entry.startDate && entry.endDate && entry.startDate > entry.endDate) {
-          throw new CustomError(`Invalid date range for entry: ${entry.nickname}`, 400);
+          throw new GatrixError(`Invalid date range for entry: ${entry.nickname}`, 400);
         }
       }
 
@@ -221,11 +221,11 @@ export class WhitelistService {
 
       return createdCount;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error bulk creating whitelists:', error);
-      throw new CustomError('Failed to bulk create whitelist entries', 500);
+      throw new GatrixError('Failed to bulk create whitelist entries', 500);
     }
   }
 
@@ -236,7 +236,7 @@ export class WhitelistService {
     try {
       const existing = await WhitelistModel.findById(id);
       if (!existing) {
-        throw new CustomError('Account whitelist entry not found', 404);
+        throw new GatrixError('Account whitelist entry not found', 404);
       }
 
       const updated = await WhitelistModel.update(id, {
@@ -245,7 +245,7 @@ export class WhitelistService {
       });
 
       if (!updated) {
-        throw new CustomError('Failed to update whitelist entry', 500);
+        throw new GatrixError('Failed to update whitelist entry', 500);
       }
 
       logger.info('Account whitelist status toggled:', {
@@ -270,11 +270,11 @@ export class WhitelistService {
 
       return updated;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error toggling account whitelist status:', error);
-      throw new CustomError('Failed to toggle account whitelist status', 500);
+      throw new GatrixError('Failed to toggle account whitelist status', 500);
     }
   }
 
@@ -354,7 +354,7 @@ export class WhitelistService {
       };
     } catch (error) {
       logger.error('Error testing whitelist:', error);
-      throw new CustomError('Failed to test whitelist', 500);
+      throw new GatrixError('Failed to test whitelist', 500);
     }
   }
 }

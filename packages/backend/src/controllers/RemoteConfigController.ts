@@ -3,7 +3,7 @@ import { RemoteConfigModel } from '../models/RemoteConfig';
 import SegmentModel from '../models/Segment';
 import { pubSubService } from '../services/PubSubService';
 import logger from '../config/logger';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import db from '../config/knex';
 import {
   CreateRemoteConfigData,
@@ -47,7 +47,7 @@ export class RemoteConfigController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigController.list:', error);
-      throw new CustomError('Failed to fetch remote configs', 500);
+      throw new GatrixError('Failed to fetch remote configs', 500);
     }
   }
 
@@ -62,7 +62,7 @@ export class RemoteConfigController {
       const config = await RemoteConfigModel.findById(id, includeRelations);
       
       if (!config) {
-        throw new CustomError('Remote config not found', 404);
+        throw new GatrixError('Remote config not found', 404);
       }
 
       res.json({
@@ -71,10 +71,10 @@ export class RemoteConfigController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigController.getById:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to fetch remote config', 500);
+      throw new GatrixError('Failed to fetch remote config', 500);
     }
   }
 
@@ -96,17 +96,17 @@ export class RemoteConfigController {
 
       // Validate required fields
       if (!data.keyName) {
-        throw new CustomError('Key name is required', 400);
+        throw new GatrixError('Key name is required', 400);
       }
 
       if (!data.valueType) {
-        throw new CustomError('Value type is required', 400);
+        throw new GatrixError('Value type is required', 400);
       }
 
       // Check if key already exists
       const existing = await RemoteConfigModel.findByKey(data.keyName);
       if (existing) {
-        throw new CustomError('Remote config with this key already exists', 409);
+        throw new GatrixError('Remote config with this key already exists', 409);
       }
 
       const config = await RemoteConfigModel.create(data);
@@ -124,10 +124,10 @@ export class RemoteConfigController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigController.create:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to create remote config', 500);
+      throw new GatrixError('Failed to create remote config', 500);
     }
   }
 
@@ -151,14 +151,14 @@ export class RemoteConfigController {
       // Check if config exists
       const existing = await RemoteConfigModel.findById(id, false);
       if (!existing) {
-        throw new CustomError('Remote config not found', 404);
+        throw new GatrixError('Remote config not found', 404);
       }
 
       // Check if key name is being changed and if it conflicts
       if (data.keyName && data.keyName !== existing.keyName) {
         const conflicting = await RemoteConfigModel.findByKey(data.keyName);
         if (conflicting && conflicting.id !== id) {
-          throw new CustomError('Remote config with this key already exists', 409);
+          throw new GatrixError('Remote config with this key already exists', 409);
         }
       }
 
@@ -181,10 +181,10 @@ export class RemoteConfigController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigController.update:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to update remote config', 500);
+      throw new GatrixError('Failed to update remote config', 500);
     }
   }
 
@@ -198,7 +198,7 @@ export class RemoteConfigController {
       // Check if config exists
       const existing = await RemoteConfigModel.findById(id, false);
       if (!existing) {
-        throw new CustomError('Remote config not found', 404);
+        throw new GatrixError('Remote config not found', 404);
       }
 
       await RemoteConfigModel.delete(id);
@@ -216,10 +216,10 @@ export class RemoteConfigController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigController.delete:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to delete remote config', 500);
+      throw new GatrixError('Failed to delete remote config', 500);
     }
   }
 
@@ -266,10 +266,10 @@ export class RemoteConfigController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigController.getTemplate:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to get template', 500);
+      throw new GatrixError('Failed to get template', 500);
     }
   }
 
@@ -325,10 +325,10 @@ export class RemoteConfigController {
       logger.info(`Template updated by user ${userId}`);
     } catch (error) {
       logger.error('Error in RemoteConfigController.updateTemplate:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to update template', 500);
+      throw new GatrixError('Failed to update template', 500);
     }
   }
 
@@ -361,7 +361,7 @@ export class RemoteConfigController {
 
       // Check if parameter already exists
       if (templateData.parameters[key]) {
-        throw new CustomError(`Parameter '${key}' already exists. Use PUT to update existing parameters.`, 409);
+        throw new GatrixError(`Parameter '${key}' already exists. Use PUT to update existing parameters.`, 409);
       }
 
       // Add new parameter
@@ -414,10 +414,10 @@ export class RemoteConfigController {
       logger.info(`Parameter ${key} added by user ${userId}`);
     } catch (error) {
       logger.error('Error in RemoteConfigController.addParameter:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to add parameter', 500);
+      throw new GatrixError('Failed to add parameter', 500);
     }
   }
 
@@ -437,7 +437,7 @@ export class RemoteConfigController {
         .first();
 
       if (!template) {
-        throw new CustomError('Template not found', 404);
+        throw new GatrixError('Template not found', 404);
       }
 
       const templateData = typeof template.templateData === 'string'
@@ -446,7 +446,7 @@ export class RemoteConfigController {
 
       // Check if parameter exists
       if (!templateData.parameters[key]) {
-        throw new CustomError(`Parameter '${key}' not found. Use POST to create new parameters.`, 404);
+        throw new GatrixError(`Parameter '${key}' not found. Use POST to create new parameters.`, 404);
       }
 
       // Update existing parameter
@@ -478,10 +478,10 @@ export class RemoteConfigController {
       logger.info(`Parameter ${key} updated by user ${userId}`);
     } catch (error) {
       logger.error('Error in RemoteConfigController.updateParameter:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to update parameter', 500);
+      throw new GatrixError('Failed to update parameter', 500);
     }
   }
 
@@ -499,7 +499,7 @@ export class RemoteConfigController {
         .first();
 
       if (!template || !template.templateData) {
-        throw new CustomError('Template not found', 404);
+        throw new GatrixError('Template not found', 404);
       }
 
       const templateData = typeof template.templateData === 'string'
@@ -507,7 +507,7 @@ export class RemoteConfigController {
         : template.templateData;
 
       if (!templateData.parameters || !templateData.parameters[key]) {
-        throw new CustomError('Parameter not found', 404);
+        throw new GatrixError('Parameter not found', 404);
       }
 
       // Delete parameter
@@ -531,10 +531,10 @@ export class RemoteConfigController {
       logger.info(`Parameter ${key} deleted by user ${userId}`);
     } catch (error) {
       logger.error('Error in RemoteConfigController.deleteParameter:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to delete parameter', 500);
+      throw new GatrixError('Failed to delete parameter', 500);
     }
   }
 
@@ -634,10 +634,10 @@ export class RemoteConfigController {
       logger.info(`Published template version ${nextVersion} by user ${userId}`);
     } catch (error) {
       logger.error('Error in RemoteConfigController.publish:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to publish configs', 500);
+      throw new GatrixError('Failed to publish configs', 500);
     }
   }
 
@@ -656,10 +656,10 @@ export class RemoteConfigController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigController.getSegments:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to fetch segments', 500);
+      throw new GatrixError('Failed to fetch segments', 500);
     }
   }
 
@@ -723,7 +723,7 @@ export class RemoteConfigController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigController.getDeployments:', error);
-      throw new CustomError('Failed to fetch deployments', 500);
+      throw new GatrixError('Failed to fetch deployments', 500);
     }
   }
 
@@ -792,7 +792,7 @@ export class RemoteConfigController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigController.getVersionHistory:', error);
-      throw new CustomError('Failed to fetch version history', 500);
+      throw new GatrixError('Failed to fetch version history', 500);
     }
   }
 
@@ -805,7 +805,7 @@ export class RemoteConfigController {
       const userId = (req as any).user?.id;
 
       if (!deploymentId) {
-        throw new CustomError('Deployment ID is required', 400);
+        throw new GatrixError('Deployment ID is required', 400);
       }
 
       // Get the target deployment
@@ -814,7 +814,7 @@ export class RemoteConfigController {
         .first();
 
       if (!targetDeployment) {
-        throw new CustomError('Deployment not found', 404);
+        throw new GatrixError('Deployment not found', 404);
       }
 
       // Parse the configs snapshot
@@ -824,7 +824,7 @@ export class RemoteConfigController {
           ? JSON.parse(targetDeployment.configsSnapshot)
           : targetDeployment.configsSnapshot;
       } catch (error) {
-        throw new CustomError('Invalid deployment snapshot', 400);
+        throw new GatrixError('Invalid deployment snapshot', 400);
       }
 
       // Start transaction
@@ -884,7 +884,7 @@ export class RemoteConfigController {
       });
     } catch (error) {
       logger.error('Error in RemoteConfigController.rollback:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         res.status(error.statusCode).json({
           success: false,
           message: error.message

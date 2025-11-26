@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { UserService } from '../services/userService';
 import { UserTagService } from '../services/UserTagService';
 import { ChatServerService } from '../services/ChatServerService';
-import { asyncHandler, CustomError } from '../middleware/errorHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import Joi from 'joi';
 
@@ -58,7 +58,7 @@ export class UserController {
     // Validate query parameters
     const { error, value } = getUsersQuerySchema.validate(req.query);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { page, limit, role, status, search } = value;
@@ -77,7 +77,7 @@ export class UserController {
   static createUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { error, value } = createUserSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { tagIds, ...userData } = value;
@@ -110,7 +110,7 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     const user = await UserService.getUserById(userId);
@@ -125,7 +125,7 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     // Validate request body
@@ -133,7 +133,7 @@ export class UserController {
     const { error, value } = updateUserSchema.validate(req.body);
     if (error) {
       console.log('Validation error:', error.details);
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     console.log('Validated value:', value);
@@ -145,7 +145,7 @@ export class UserController {
     // Prevent users from modifying their own role or status (except admins)
     if (req.user?.userId === userId && req.user?.role !== 'admin') {
       if (userData.role || userData.status) {
-        throw new CustomError('You cannot modify your own role or status', 403);
+        throw new GatrixError('You cannot modify your own role or status', 403);
       }
     }
 
@@ -174,12 +174,12 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     // Prevent users from deleting themselves
     if (req.user?.userId === userId) {
-      throw new CustomError('You cannot delete your own account', 403);
+      throw new GatrixError('You cannot delete your own account', 403);
     }
 
     await UserService.deleteUser(userId);
@@ -194,7 +194,7 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     await UserService.activateUser(userId);
@@ -211,7 +211,7 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     await UserService.deleteUser(userId);
@@ -226,12 +226,12 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     // Prevent users from suspending themselves
     if (req.user?.userId === userId) {
-      throw new CustomError('You cannot suspend your own account', 403);
+      throw new GatrixError('You cannot suspend your own account', 403);
     }
 
     const user = await UserService.suspendUser(userId);
@@ -247,7 +247,7 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     await UserService.activateUser(userId);
@@ -264,7 +264,7 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     const user = await UserService.promoteToAdmin(userId);
@@ -280,12 +280,12 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     // Prevent users from demoting themselves
     if (req.user?.userId === userId) {
-      throw new CustomError('You cannot demote your own account', 403);
+      throw new GatrixError('You cannot demote your own account', 403);
     }
 
     const user = await UserService.demoteFromAdmin(userId);
@@ -320,11 +320,11 @@ export class UserController {
     const { q: query, limit = 20 } = req.query;
 
     if (!query || typeof query !== 'string') {
-      throw new CustomError('Search query is required', 400);
+      throw new GatrixError('Search query is required', 400);
     }
 
     if (query.length < 2) {
-      throw new CustomError('Search query must be at least 2 characters', 400);
+      throw new GatrixError('Search query must be at least 2 characters', 400);
     }
 
     const searchLimit = Math.min(parseInt(limit as string) || 20, 50); // 최대 50개로 제한
@@ -340,7 +340,7 @@ export class UserController {
   // Self-service endpoints for regular users
   static getCurrentUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
-      throw new CustomError('User not authenticated', 401);
+      throw new GatrixError('User not authenticated', 401);
     }
 
     const user = await UserService.getUserById(req.user.userId);
@@ -353,7 +353,7 @@ export class UserController {
 
   static updateCurrentUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
-      throw new CustomError('User not authenticated', 401);
+      throw new GatrixError('User not authenticated', 401);
     }
 
     // Validate request body (limited fields for self-update)
@@ -365,7 +365,7 @@ export class UserController {
 
     const { error, value } = selfUpdateSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const user = await UserService.updateUser(req.user.userId, value);
@@ -401,7 +401,7 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     const tags = await UserTagService.getUserTags(userId);
@@ -416,12 +416,12 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     const { error, value } = setUserTagsSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { tagIds } = value;
@@ -439,12 +439,12 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     const { error, value } = addUserTagSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { tagId } = value;
@@ -463,7 +463,7 @@ export class UserController {
     const tagId = parseInt(req.params.tagId);
 
     if (isNaN(userId) || isNaN(tagId)) {
-      throw new CustomError('Invalid user ID or tag ID', 400);
+      throw new GatrixError('Invalid user ID or tag ID', 400);
     }
 
     await UserTagService.removeUserTag(userId, tagId);
@@ -479,7 +479,7 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     await UserService.verifyUserEmail(userId);
@@ -495,7 +495,7 @@ export class UserController {
     const userId = parseInt(req.params.id);
 
     if (isNaN(userId)) {
-      throw new CustomError('Invalid user ID', 400);
+      throw new GatrixError('Invalid user ID', 400);
     }
 
     await UserService.resendVerificationEmail(userId);
@@ -512,7 +512,7 @@ export class UserController {
   static updateLanguage = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { error, value } = updateLanguageSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { preferredLanguage } = value;

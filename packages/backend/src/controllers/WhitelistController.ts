@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { WhitelistService } from '../services/WhitelistService';
-import { asyncHandler, CustomError } from '../middleware/errorHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import Joi from 'joi';
 import { WhitelistModel } from '../models/AccountWhitelist';
@@ -81,7 +81,7 @@ export class WhitelistController {
     // Validate query parameters
     const { error, value } = getWhitelistsQuerySchema.validate(req.query);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { page, limit, accountId, ipAddress, createdBy, search, tags } = value;
@@ -111,7 +111,7 @@ export class WhitelistController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid whitelist ID', 400);
+      throw new GatrixError('Invalid whitelist ID', 400);
     }
 
     const whitelist = await WhitelistService.getWhitelistById(id);
@@ -124,13 +124,13 @@ export class WhitelistController {
 
   static createWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
-      throw new CustomError('User not authenticated', 401);
+      throw new GatrixError('User not authenticated', 401);
     }
 
     // Validate request body
     const { error, value } = createWhitelistSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const whitelistData = {
@@ -151,13 +151,13 @@ export class WhitelistController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid whitelist ID', 400);
+      throw new GatrixError('Invalid whitelist ID', 400);
     }
 
     // Validate request body
     const { error, value } = updateWhitelistSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const whitelist = await WhitelistService.updateWhitelist(id, value);
@@ -173,7 +173,7 @@ export class WhitelistController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid whitelist ID', 400);
+      throw new GatrixError('Invalid whitelist ID', 400);
     }
 
     await WhitelistService.deleteWhitelist(id);
@@ -186,13 +186,13 @@ export class WhitelistController {
 
   static bulkCreateWhitelists = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
-      throw new CustomError('User not authenticated', 401);
+      throw new GatrixError('User not authenticated', 401);
     }
 
     // Validate request body
     const { error, value } = bulkCreateSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const createdCount = await WhitelistService.bulkCreateWhitelists(value.entries, req.user.userId);
@@ -213,7 +213,7 @@ export class WhitelistController {
     const { tagIds } = req.body;
 
     if (!Array.isArray(tagIds)) {
-      throw new CustomError('tagIds must be an array', 400);
+      throw new GatrixError('tagIds must be an array', 400);
     }
 
     await WhitelistModel.setTags(parseInt(id), tagIds);
@@ -239,7 +239,7 @@ export class WhitelistController {
     const id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-      throw new CustomError('Invalid whitelist ID', 400);
+      throw new GatrixError('Invalid whitelist ID', 400);
     }
 
     const updated = await WhitelistService.toggleWhitelistStatus(id, (req.user as any).userId);
@@ -254,7 +254,7 @@ export class WhitelistController {
   static testWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { error, value } = testWhitelistSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { accountId, ipAddress } = value;

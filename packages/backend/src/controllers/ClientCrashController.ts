@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { asyncHandler, CustomError } from '../middleware/errorHandler';
+import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { ClientCrash } from '../models/ClientCrash';
 import { CrashEvent } from '../models/CrashEvent';
 import { CrashUploadRequest, CrashState, CRASH_CONSTANTS } from '../types/crash';
@@ -21,7 +21,7 @@ export class ClientCrashController {
 
     // Validate required fields
     if (!body.platform || !body.branch || !body.environment || !body.stack) {
-      throw new CustomError('Bad request body: Missing required fields (platform, branch, environment, stack)', 400);
+      throw new GatrixError('Bad request body: Missing required fields (platform, branch, environment, stack)', 400);
     }
 
     try {
@@ -89,7 +89,7 @@ export class ClientCrashController {
         const insertedCrash = await ClientCrash.query().findById(newCrashId);
 
         if (!insertedCrash) {
-          throw new CustomError('Failed to create crash record', 500);
+          throw new GatrixError('Failed to create crash record', 500);
         }
 
         crash = insertedCrash;
@@ -108,7 +108,7 @@ export class ClientCrashController {
         if (!crash!) {
           const foundCrash = await ClientCrash.query().findById(crashId!);
           if (!foundCrash) {
-            throw new CustomError('Crash not found', 404);
+            throw new GatrixError('Crash not found', 404);
           }
           crash = foundCrash;
         }
@@ -186,10 +186,10 @@ export class ClientCrashController {
 
     } catch (error) {
       logger.error('Error uploading crash:', error);
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
-      throw new CustomError('Failed to upload crash', 500);
+      throw new GatrixError('Failed to upload crash', 500);
     }
   });
 

@@ -6,7 +6,7 @@ import {
   IpWhitelistFilters,
   IpWhitelistListResponse
 } from '../models/IpWhitelist';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import { normalizeIPOrCIDR, isValidIPOrCIDR } from '../utils/ipValidation';
 import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
@@ -56,7 +56,7 @@ export class IpWhitelistService {
       return result;
     } catch (error) {
       logger.error('Error getting all IP whitelists:', error);
-      throw new CustomError('Failed to get IP whitelists', 500);
+      throw new GatrixError('Failed to get IP whitelists', 500);
     }
   }
 
@@ -68,16 +68,16 @@ export class IpWhitelistService {
       const ipWhitelist = await IpWhitelistModel.findById(id);
 
       if (!ipWhitelist) {
-        throw new CustomError('IP whitelist entry not found', 404);
+        throw new GatrixError('IP whitelist entry not found', 404);
       }
 
       return ipWhitelist;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error getting IP whitelist by ID:', error);
-      throw new CustomError('Failed to get IP whitelist entry', 500);
+      throw new GatrixError('Failed to get IP whitelist entry', 500);
     }
   }
 
@@ -88,11 +88,11 @@ export class IpWhitelistService {
     try {
       // Validate and normalize IP address
       if (!data.ipAddress || !data.ipAddress.trim()) {
-        throw new CustomError('IP address is required', 400);
+        throw new GatrixError('IP address is required', 400);
       }
 
       if (!data.purpose || !data.purpose.trim()) {
-        throw new CustomError('Purpose is required', 400);
+        throw new GatrixError('Purpose is required', 400);
       }
 
       // Normalize IP address/CIDR
@@ -101,7 +101,7 @@ export class IpWhitelistService {
       // Check if IP already exists
       const existing = await IpWhitelistModel.findByIpAddress(normalizedIP);
       if (existing) {
-        throw new CustomError('IP address already exists in whitelist', 409);
+        throw new GatrixError('IP address already exists in whitelist', 409);
       }
 
       // Clean up data to ensure no undefined values
@@ -145,11 +145,11 @@ export class IpWhitelistService {
 
       return created;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error creating IP whitelist:', error);
-      throw new CustomError('Failed to create IP whitelist entry', 500);
+      throw new GatrixError('Failed to create IP whitelist entry', 500);
     }
   }
 
@@ -161,7 +161,7 @@ export class IpWhitelistService {
       // Check if entry exists
       const existing = await IpWhitelistModel.findById(id);
       if (!existing) {
-        throw new CustomError('IP whitelist entry not found', 404);
+        throw new GatrixError('IP whitelist entry not found', 404);
       }
 
       const updateData: UpdateIpWhitelistData = { ...data };
@@ -169,7 +169,7 @@ export class IpWhitelistService {
       // Validate and normalize IP address if provided
       if (data.ipAddress !== undefined) {
         if (!data.ipAddress || !data.ipAddress.trim()) {
-          throw new CustomError('IP address cannot be empty', 400);
+          throw new GatrixError('IP address cannot be empty', 400);
         }
 
         const normalizedIP = normalizeIPOrCIDR(data.ipAddress);
@@ -177,7 +177,7 @@ export class IpWhitelistService {
         // Check if new IP already exists (excluding current entry)
         const existingWithIP = await IpWhitelistModel.findByIpAddress(normalizedIP);
         if (existingWithIP && existingWithIP.id !== id) {
-          throw new CustomError('IP address already exists in whitelist', 409);
+          throw new GatrixError('IP address already exists in whitelist', 409);
         }
 
         updateData.ipAddress = normalizedIP;
@@ -186,7 +186,7 @@ export class IpWhitelistService {
       // Validate purpose if provided
       if (data.purpose !== undefined) {
         if (!data.purpose || !data.purpose.trim()) {
-          throw new CustomError('Purpose cannot be empty', 400);
+          throw new GatrixError('Purpose cannot be empty', 400);
         }
         updateData.purpose = data.purpose.trim();
       }
@@ -194,7 +194,7 @@ export class IpWhitelistService {
       // Validate dates if provided
       if (data.startDate !== undefined && data.endDate !== undefined) {
         if (data.startDate && data.endDate && data.startDate >= data.endDate) {
-          throw new CustomError('Start date must be before end date', 400);
+          throw new GatrixError('Start date must be before end date', 400);
         }
       }
 
@@ -222,11 +222,11 @@ export class IpWhitelistService {
 
       return updated;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error updating IP whitelist:', error);
-      throw new CustomError('Failed to update IP whitelist entry', 500);
+      throw new GatrixError('Failed to update IP whitelist entry', 500);
     }
   }
 
@@ -238,7 +238,7 @@ export class IpWhitelistService {
       // Check if entry exists
       const existing = await IpWhitelistModel.findById(id);
       if (!existing) {
-        throw new CustomError('IP whitelist entry not found', 404);
+        throw new GatrixError('IP whitelist entry not found', 404);
       }
 
       await IpWhitelistModel.delete(id);
@@ -262,11 +262,11 @@ export class IpWhitelistService {
         // Don't throw - event publishing failure shouldn't fail the request
       }
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error deleting IP whitelist:', error);
-      throw new CustomError('Failed to delete IP whitelist entry', 500);
+      throw new GatrixError('Failed to delete IP whitelist entry', 500);
     }
   }
 
@@ -277,7 +277,7 @@ export class IpWhitelistService {
     try {
       const existing = await IpWhitelistModel.findById(id);
       if (!existing) {
-        throw new CustomError('IP whitelist entry not found', 404);
+        throw new GatrixError('IP whitelist entry not found', 404);
       }
 
       const updated = await IpWhitelistModel.update(id, {
@@ -307,11 +307,11 @@ export class IpWhitelistService {
 
       return updated;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error toggling IP whitelist status:', error);
-      throw new CustomError('Failed to toggle IP whitelist status', 500);
+      throw new GatrixError('Failed to toggle IP whitelist status', 500);
     }
   }
 
@@ -366,11 +366,11 @@ export class IpWhitelistService {
   ): Promise<number> {
     try {
       if (!entries || entries.length === 0) {
-        throw new CustomError('No entries provided', 400);
+        throw new GatrixError('No entries provided', 400);
       }
 
       if (entries.length > 100) {
-        throw new CustomError('Too many entries. Maximum 100 entries allowed per bulk operation', 400);
+        throw new GatrixError('Too many entries. Maximum 100 entries allowed per bulk operation', 400);
       }
 
       let createdCount = 0;
@@ -404,11 +404,11 @@ export class IpWhitelistService {
 
       return createdCount;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error bulk creating IP whitelists:', error);
-      throw new CustomError('Failed to bulk create IP whitelist entries', 500);
+      throw new GatrixError('Failed to bulk create IP whitelist entries', 500);
     }
   }
 }

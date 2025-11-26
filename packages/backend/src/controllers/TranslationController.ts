@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import Joi from 'joi';
 import { TranslationService } from '../services/TranslationService';
 import { asyncHandler } from '../middleware/errorHandler';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import { sleep } from '../utils/asyncUtils';
 
 // Ensure a minimum response time for UI update timing
@@ -52,7 +52,7 @@ export class TranslationController {
 
     const { error, value } = translateSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const result = await TranslationService.translateText(value);
@@ -76,7 +76,7 @@ export class TranslationController {
 
     const { error, value } = translateMultipleSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const { text, targetLanguages, sourceLanguage } = value;
@@ -106,7 +106,7 @@ export class TranslationController {
 
     const { error, value } = detectLanguageSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      throw new GatrixError(error.details[0].message, 400);
     }
 
     const detectedLanguage = await TranslationService.detectLanguage(value.text);

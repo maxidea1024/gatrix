@@ -1,8 +1,36 @@
 import database from '../config/database';
-import { CustomError } from '../middleware/errorHandler';
+import { GatrixError } from '../middleware/errorHandler';
 import { ulid } from 'ulid';
-import { RowDataPacket, ResultSetHeader, PoolConnection } from 'mysql2/promise';
+import { RowDataPacket, PoolConnection } from 'mysql2/promise';
 import logger from '../config/logger';
+
+/**
+ * Coupon Redeem Error Codes
+ * These codes are used by SDK to identify specific error conditions
+ */
+export const CouponErrorCode = {
+  // Validation errors (400)
+  INVALID_PARAMETERS: 'COUPON_INVALID_PARAMETERS',
+
+  // Not found errors (404)
+  CODE_NOT_FOUND: 'COUPON_CODE_NOT_FOUND',
+
+  // Conflict errors (409)
+  ALREADY_USED: 'COUPON_ALREADY_USED',
+  USER_LIMIT_EXCEEDED: 'COUPON_USER_LIMIT_EXCEEDED',
+
+  // Unprocessable errors (422)
+  NOT_ACTIVE: 'COUPON_NOT_ACTIVE',
+  NOT_STARTED: 'COUPON_NOT_STARTED',
+  EXPIRED: 'COUPON_EXPIRED',
+  INVALID_WORLD: 'COUPON_INVALID_WORLD',
+  INVALID_PLATFORM: 'COUPON_INVALID_PLATFORM',
+  INVALID_CHANNEL: 'COUPON_INVALID_CHANNEL',
+  INVALID_SUBCHANNEL: 'COUPON_INVALID_SUBCHANNEL',
+  INVALID_USER: 'COUPON_INVALID_USER',
+} as const;
+
+export type CouponErrorCodeType = (typeof CouponErrorCode)[keyof typeof CouponErrorCode];
 
 export interface RedeemRequest {
   userId: string;
@@ -38,13 +66,13 @@ export class CouponRedeemService {
     try {
       // Validate input
       if (!request.userId || !request.userName) {
-        throw new CustomError('userId and userName are required', 400);
+        throw new GatrixError('userId and userName are required', 400, true, CouponErrorCode.INVALID_PARAMETERS);
       }
 
       // Sanitize userName (max 128 chars)
       const sanitizedUserName = (request.userName || '').substring(0, 128).trim();
       if (!sanitizedUserName) {
-        throw new CustomError('userName cannot be empty', 400);
+        throw new GatrixError('userName cannot be empty', 400, true, CouponErrorCode.INVALID_PARAMETERS);
       }
 
       // Start transaction
@@ -57,16 +85,14 @@ export class CouponRedeemService {
       );
 
       if (couponRows.length === 0) {
-        const error = new CustomError('Coupon code not found', 404, true, 'NOT_FOUND');
-        throw error;
+        throw new GatrixError('Coupon code not found', 404, true, CouponErrorCode.CODE_NOT_FOUND);
       }
 
       const coupon = couponRows[0] as any;
 
       // 2. Check if coupon is already used
       if (coupon.status === 'USED') {
-        const error = new CustomError('Coupon has already been used', 409, true, 'CONFLICT');
-        throw error;
+        throw new GatrixError('Coupon has already been used', 409, true, CouponErrorCode.ALREADY_USED);
       }
 
       // 3. Get coupon setting
@@ -76,16 +102,14 @@ export class CouponRedeemService {
       );
 
       if (settingRows.length === 0) {
-        const error = new CustomError('Coupon setting not found', 404, true, 'NOT_FOUND');
-        throw error;
+        throw new GatrixError('Coupon setting not found', 404, true, CouponErrorCode.CODE_NOT_FOUND);
       }
 
       const setting = settingRows[0] as any;
 
       // 4. Check if setting is active
       if (setting.status !== 'ACTIVE') {
-        const error = new CustomError('Coupon is not active', 422, true, 'UNPROCESSABLE_ENTITY');
-        throw error;
+        throw new GatrixError('Coupon is not active', 422, true, CouponErrorCode.NOT_ACTIVE);
       }
 
       // 5. Check date range
@@ -96,14 +120,12 @@ export class CouponRedeemService {
 
       // Check if coupon has started (if startsAt is set)
       if (startsAt && now < startsAt) {
-        const error = new CustomError('Coupon is not available yet', 422, true, 'UNPROCESSABLE_ENTITY');
-        throw error;
+        throw new GatrixError('Coupon is not available yet', 422, true, CouponErrorCode.NOT_STARTED);
       }
 
       // Check if coupon has expired
       if (now > expiresAt) {
-        const error = new CustomError('Coupon has expired', 422, true, 'UNPROCESSABLE_ENTITY');
-        throw error;
+        throw new GatrixError('Coupon has expired', 422, true, CouponErrorCode.EXPIRED);
       }
 
       // 6. Check targeting conditions
@@ -126,8 +148,7 @@ export class CouponRedeemService {
       const userUsedCount = (usageRows[0] as any).count || 0;
 
       if (userUsedCount >= setting.perUserLimit) {
-        const error = new CustomError('User has reached the usage limit for this coupon', 409, true, 'LIMIT_REACHED');
-        throw error;
+        throw new GatrixError('User has reached the usage limit for this coupon', 409, true, CouponErrorCode.USER_LIMIT_EXCEEDED);
       }
 
       // 8. Update coupon status to USED
@@ -316,8 +337,7 @@ export class CouponRedeemService {
         [settingId, request.worldId]
       );
       if ((worldMatch[0] as any).count === 0) {
-        const error = new CustomError('Coupon is not available for this game world', 422, true, 'UNPROCESSABLE_ENTITY');
-        throw error;
+        throw new GatrixError('Coupon is not available for this game world', 422, true, CouponErrorCode.INVALID_WORLD);
       }
     }
 
@@ -328,8 +348,7 @@ export class CouponRedeemService {
         [settingId, request.platform]
       );
       if ((platformMatch[0] as any).count === 0) {
-        const error = new CustomError('Coupon is not available for this platform', 422, true, 'UNPROCESSABLE_ENTITY');
-        throw error;
+        throw new GatrixError('Coupon is not available for this platform', 422, true, CouponErrorCode.INVALID_PLATFORM);
       }
     }
 
@@ -344,8 +363,7 @@ export class CouponRedeemService {
 
       // If inverted: should NOT match. If normal: should match
       if (isInverted ? isMatched : !isMatched) {
-        const error = new CustomError('Coupon is not available for this channel', 422, true, 'UNPROCESSABLE_ENTITY');
-        throw error;
+        throw new GatrixError('Coupon is not available for this channel', 422, true, CouponErrorCode.INVALID_CHANNEL);
       }
     }
 
@@ -360,8 +378,7 @@ export class CouponRedeemService {
 
       // If inverted: should NOT match. If normal: should match
       if (isInverted ? isMatched : !isMatched) {
-        const error = new CustomError('Coupon is not available for this subchannel', 422, true, 'UNPROCESSABLE_ENTITY');
-        throw error;
+        throw new GatrixError('Coupon is not available for this subchannel', 422, true, CouponErrorCode.INVALID_SUBCHANNEL);
       }
     }
 
@@ -376,8 +393,7 @@ export class CouponRedeemService {
 
       // If inverted: should NOT match. If normal: should match
       if (isInverted ? isMatched : !isMatched) {
-        const error = new CustomError('Coupon is not available for this user', 422, true, 'UNPROCESSABLE_ENTITY');
-        throw error;
+        throw new GatrixError('Coupon is not available for this user', 422, true, CouponErrorCode.INVALID_USER);
       }
     }
   }

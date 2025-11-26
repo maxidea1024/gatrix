@@ -9,7 +9,16 @@ export { GatrixServerSDK } from './GatrixServerSDK';
 export * from './types';
 
 // Export errors
-export { GatrixSDKError, ErrorCode, createError, isGatrixSDKError } from './utils/errors';
+export {
+  GatrixSDKError,
+  ErrorCode,
+  createError,
+  isGatrixSDKError,
+  // Coupon-specific errors
+  CouponRedeemError,
+  CouponRedeemErrorCode,
+  isCouponRedeemError,
+} from './utils/errors';
 
 // Export logger
 export { Logger, LogLevel, getLogger } from './utils/logger';
