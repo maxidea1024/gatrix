@@ -387,6 +387,9 @@ const GameWorldsPage: React.FC = () => {
   const [infraSettingsText, setInfraSettingsText] = useState<string>('{}');
   const [infraSettingsError, setInfraSettingsError] = useState<string>('');
 
+  // Form active tab state (0: Basic Info, 1: Infra Settings)
+  const [formActiveTab, setFormActiveTab] = useState<number>(0);
+
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
     { id: 'worldId', labelKey: 'gameWorlds.worldId', visible: true },
@@ -713,6 +716,7 @@ const GameWorldsPage: React.FC = () => {
     setInputMode('direct');
     setSelectedTemplateId('');
     setFormErrors({});
+    setFormActiveTab(0); // Reset to Basic Info tab
     setDialogOpen(true);
     setTimeout(() => {
       worldIdRef.current?.focus();
@@ -746,7 +750,8 @@ const GameWorldsPage: React.FC = () => {
     });
     setCustomPayloadText(JSON.stringify(world.customPayload || {}, null, 2));
     setCustomPayloadError('');
-    setInfraSettingsText(JSON.stringify(world.infraSettings || {}, null, 2));
+    // Use infraSettingsRaw for editing (preserves JSON5 with comments), fallback to JSON.stringify
+    setInfraSettingsText(world.infraSettingsRaw || JSON.stringify(world.infraSettings || {}, null, 2));
     setInfraSettingsError('');
     setFormTags((world.tags || []));
     setMaintenanceLocales(world.maintenanceLocales || []);
@@ -754,6 +759,7 @@ const GameWorldsPage: React.FC = () => {
     setInputMode('direct');
     setSelectedTemplateId('');
     setFormErrors({});
+    setFormActiveTab(0); // Reset to Basic Info tab
     setDialogOpen(true);
   };
 
@@ -785,7 +791,8 @@ const GameWorldsPage: React.FC = () => {
 
     setCustomPayloadText(JSON.stringify(world.customPayload || {}, null, 2));
     setCustomPayloadError('');
-    setInfraSettingsText(JSON.stringify(world.infraSettings || {}, null, 2));
+    // Use infraSettingsRaw for editing (preserves JSON5 with comments), fallback to JSON.stringify
+    setInfraSettingsText(world.infraSettingsRaw || JSON.stringify(world.infraSettings || {}, null, 2));
     setInfraSettingsError('');
     setFormTags(world.tags || []);
     setMaintenanceLocales(world.maintenanceLocales || []);
@@ -793,6 +800,7 @@ const GameWorldsPage: React.FC = () => {
     setInputMode('direct');
     setSelectedTemplateId('');
     setFormErrors({});
+    setFormActiveTab(0); // Reset to Basic Info tab
     setDialogOpen(true);
 
     // Focus worldId for quick entry
@@ -884,6 +892,7 @@ const GameWorldsPage: React.FC = () => {
         ...formData,
         customPayload: parsedCustomPayload,
         infraSettings: parsedInfraSettings,
+        infraSettingsRaw: infraText || null, // Store original JSON5 text for editing
         tagIds,
         isVisible: Boolean(formData.isVisible),
         isMaintenance: Boolean(formData.isMaintenance),
@@ -1518,6 +1527,8 @@ const GameWorldsPage: React.FC = () => {
             selectedTemplateId={selectedTemplateId}
             onSelectedTemplateIdChange={setSelectedTemplateId}
             worldIdRef={worldIdRef}
+            activeTab={formActiveTab}
+            onActiveTabChange={setFormActiveTab}
           />
         </Box>
 
@@ -1541,8 +1552,9 @@ const GameWorldsPage: React.FC = () => {
           <Button
             onClick={handleSaveWorld}
             variant="contained"
-            disabled={saving}
+            disabled={saving || formActiveTab !== 0}
             startIcon={saving ? <CircularProgress size={20} /> : (editingWorld ? <SaveIcon /> : <AddIcon />)}
+            title={formActiveTab !== 0 ? t('gameWorlds.form.switchToBasicInfoToSave') : undefined}
           >
             {saving ? t('common.saving') : (editingWorld ? t('gameWorlds.saveWorld') : t('gameWorlds.addGameWorld'))}
           </Button>

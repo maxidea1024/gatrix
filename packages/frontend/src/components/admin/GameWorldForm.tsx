@@ -56,6 +56,8 @@ export interface GameWorldFormProps {
   selectedTemplateId: number | '';
   onSelectedTemplateIdChange: (id: number | '') => void;
   worldIdRef?: React.RefObject<HTMLInputElement>;
+  activeTab?: number;
+  onActiveTabChange?: (tab: number) => void;
 }
 
 const GameWorldForm: React.FC<GameWorldFormProps> = ({
@@ -84,23 +86,35 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
   selectedTemplateId,
   onSelectedTemplateIdChange,
   worldIdRef,
+  activeTab: controlledActiveTab,
+  onActiveTabChange,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const [activeTab, setActiveTab] = useState(0);
+  const [internalActiveTab, setInternalActiveTab] = useState(0);
+
+  // Use controlled or internal state
+  const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : internalActiveTab;
+  const setActiveTab = (tab: number) => {
+    if (onActiveTabChange) {
+      onActiveTabChange(tab);
+    } else {
+      setInternalActiveTab(tab);
+    }
+  };
   const defaultWorldIdRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const refToUse = worldIdRef || defaultWorldIdRef;
 
-  // Export settings to file
+  // Export settings to file (JSON5 format)
   const handleExportSettings = () => {
     try {
       const settings = infraSettingsText.trim() || '{}';
-      const blob = new Blob([settings], { type: 'application/json' });
+      const blob = new Blob([settings], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${formData.worldId || 'world'}-infra-settings.json`;
+      a.download = `${formData.worldId || 'world'}-infra-settings.json5`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -396,7 +410,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
               <input
                 type="file"
                 ref={fileInputRef}
-                accept=".json"
+                accept=".json5"
                 style={{ display: 'none' }}
                 onChange={handleImportSettings}
               />
@@ -408,9 +422,7 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
                 value={infraSettingsText}
                 onChange={(val) => onInfraSettingsTextChange(val)}
                 height="100%"
-                label={t('gameWorlds.form.infraSettings')}
                 error={infraSettingsError}
-                helperText={t('gameWorlds.form.infraSettingsHelp')}
                 onValidationError={(err) => onInfraSettingsErrorChange(err || '')}
               />
             </Box>

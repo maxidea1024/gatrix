@@ -23,6 +23,7 @@ export interface GameWorld {
   gracePeriodMinutes?: number; // Grace period in minutes before disconnecting players
   customPayload?: Record<string, any> | null;
   infraSettings?: Record<string, any> | null; // Infrastructure settings for game server configuration (passed to SDK)
+  infraSettingsRaw?: string | null; // Original JSON5 source for editing (preserves comments)
   worldServerAddress: string; // Required: URL or host:port format (e.g., https://world.example.com or world.example.com:8080)
   tags?: Tag[]; // normalized
   createdAt: string;
@@ -49,6 +50,7 @@ export interface CreateGameWorldData {
   gracePeriodMinutes?: number;
   customPayload?: Record<string, any> | null;
   infraSettings?: Record<string, any> | null;
+  infraSettingsRaw?: string | null;
   worldServerAddress: string; // Required: ip:port format (e.g., 192.168.1.100:8080)
   tagIds?: number[]; // normalized
 }
@@ -69,6 +71,7 @@ export interface UpdateGameWorldData {
   gracePeriodMinutes?: number;
   customPayload?: Record<string, any> | null;
   infraSettings?: Record<string, any> | null;
+  infraSettingsRaw?: string | null;
   tagIds?: number[]; // normalized
 }
 

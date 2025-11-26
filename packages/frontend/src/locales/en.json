@@ -743,7 +743,8 @@
       "settingsExported": "Settings exported to file.",
       "settingsImported": "Settings imported successfully.",
       "settingsCopied": "Settings copied to clipboard.",
-      "invalidJsonFile": "Invalid JSON file."
+      "invalidJsonFile": "Invalid JSON5 file.",
+      "switchToBasicInfoToSave": "Switch to Basic Info tab to save."
     },
     "hidden": "Hidden",
     "hiddenWorlds": "Hidden Worlds",
