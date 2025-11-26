@@ -3910,5 +3910,26 @@
       "overview": "개요",
       "sdkMetrics": "SDK 메트릭"
     }
+  },
+  "codemirror": {
+    "find": "찾기",
+    "replace": "바꾸기",
+    "next": "다음",
+    "previous": "이전",
+    "all": "모두",
+    "matchCase": "대/소문자 구분",
+    "byWord": "단어 단위",
+    "regexp": "정규식",
+    "replaceAction": "바꾸기",
+    "replaceAll": "모두 바꾸기",
+    "close": "닫기",
+    "goToLine": "줄 이동",
+    "go": "이동",
+    "undo": "실행 취소",
+    "redo": "다시 실행",
+    "cut": "잘라내기",
+    "copy": "복사",
+    "paste": "붙여넣기",
+    "selectAll": "모두 선택"
   }
 }

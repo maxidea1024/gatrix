@@ -1,11 +1,22 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { Box, Typography, Alert } from '@mui/material';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { Box, Typography, Alert, Menu, MenuItem, Divider, ListItemIcon, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { EditorView, basicSetup } from 'codemirror';
 import { EditorState } from '@codemirror/state';
 import { json5, json5ParseLinter } from 'codemirror-json5';
 import { linter, lintGutter } from '@codemirror/lint';
+import { openSearchPanel, gotoLine } from '@codemirror/search';
+import { undo, redo, selectAll } from '@codemirror/commands';
 import JSON5 from 'json5';
+import { useTranslation } from 'react-i18next';
+import ContentCutIcon from '@mui/icons-material/ContentCut';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import UndoIcon from '@mui/icons-material/Undo';
+import RedoIcon from '@mui/icons-material/Redo';
+import SelectAllIcon from '@mui/icons-material/SelectAll';
+import SearchIcon from '@mui/icons-material/Search';
+import ShortcutIcon from '@mui/icons-material/Shortcut';
 
 interface Json5EditorProps {
   value: string;
@@ -30,10 +41,120 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
   onValidationError
 }) => {
   const theme = useTheme();
+  const { t, i18n } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const editorViewRef = useRef<EditorView | null>(null);
   const isUpdatingRef = useRef(false);
   const [internalError, setInternalError] = useState<string | null>(null);
+
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<{
+    mouseX: number;
+    mouseY: number;
+  } | null>(null);
+
+  const handleContextMenu = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    setContextMenu(
+      contextMenu === null
+        ? { mouseX: event.clientX + 2, mouseY: event.clientY - 6 }
+        : null,
+    );
+  }, [contextMenu]);
+
+  const handleCloseContextMenu = useCallback(() => {
+    setContextMenu(null);
+  }, []);
+
+  // Context menu actions
+  const handleCut = useCallback(() => {
+    const view = editorViewRef.current;
+    if (view) {
+      const selection = view.state.sliceDoc(view.state.selection.main.from, view.state.selection.main.to);
+      navigator.clipboard.writeText(selection);
+      view.dispatch({
+        changes: { from: view.state.selection.main.from, to: view.state.selection.main.to, insert: '' }
+      });
+    }
+    handleCloseContextMenu();
+  }, [handleCloseContextMenu]);
+
+  const handleCopy = useCallback(() => {
+    const view = editorViewRef.current;
+    if (view) {
+      const selection = view.state.sliceDoc(view.state.selection.main.from, view.state.selection.main.to);
+      navigator.clipboard.writeText(selection);
+    }
+    handleCloseContextMenu();
+  }, [handleCloseContextMenu]);
+
+  const handlePaste = useCallback(async () => {
+    const view = editorViewRef.current;
+    if (view) {
+      const text = await navigator.clipboard.readText();
+      view.dispatch({
+        changes: { from: view.state.selection.main.from, to: view.state.selection.main.to, insert: text }
+      });
+    }
+    handleCloseContextMenu();
+  }, [handleCloseContextMenu]);
+
+  const handleUndo = useCallback(() => {
+    const view = editorViewRef.current;
+    if (view) {
+      undo(view);
+    }
+    handleCloseContextMenu();
+  }, [handleCloseContextMenu]);
+
+  const handleRedo = useCallback(() => {
+    const view = editorViewRef.current;
+    if (view) {
+      redo(view);
+    }
+    handleCloseContextMenu();
+  }, [handleCloseContextMenu]);
+
+  const handleSelectAll = useCallback(() => {
+    const view = editorViewRef.current;
+    if (view) {
+      selectAll(view);
+    }
+    handleCloseContextMenu();
+  }, [handleCloseContextMenu]);
+
+  const handleFind = useCallback(() => {
+    const view = editorViewRef.current;
+    if (view) {
+      openSearchPanel(view);
+    }
+    handleCloseContextMenu();
+  }, [handleCloseContextMenu]);
+
+  const handleGoToLine = useCallback(() => {
+    const view = editorViewRef.current;
+    if (view) {
+      gotoLine(view);
+    }
+    handleCloseContextMenu();
+  }, [handleCloseContextMenu]);
+
+  // CodeMirror search dialog phrases for localization
+  const getSearchPhrases = () => ({
+    'Find': t('codemirror.find'),
+    'Replace': t('codemirror.replace'),
+    'next': t('codemirror.next'),
+    'previous': t('codemirror.previous'),
+    'all': t('codemirror.all'),
+    'match case': t('codemirror.matchCase'),
+    'by word': t('codemirror.byWord'),
+    'regexp': t('codemirror.regexp'),
+    'replace': t('codemirror.replaceAction'),
+    'replace all': t('codemirror.replaceAll'),
+    'close': t('codemirror.close'),
+    'Go to line': t('codemirror.goToLine'),
+    'go': t('codemirror.go'),
+  });
 
   // Create editor on mount
   useEffect(() => {
@@ -72,6 +193,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
       lintGutter(),
       updateListener,
       EditorView.editable.of(!readOnly),
+      EditorState.phrases.of(getSearchPhrases()),
       EditorView.theme({
         '&': {
           height: typeof height === 'number' ? `${height}px` : height,
@@ -80,6 +202,10 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
           borderRadius: '4px',
           fontSize: '14px',
           backgroundColor: isDark ? '#1e1e1e' : '#ffffff',
+          outline: 'none !important',
+        },
+        '&.cm-focused': {
+          outline: 'none !important',
         },
         '.cm-scroller': {
           overflow: 'auto',
@@ -183,7 +309,7 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
       view.destroy();
       editorViewRef.current = null;
     };
-  }, [theme.palette.mode]); // Only recreate on theme change
+  }, [theme.palette.mode, i18n.language]); // Recreate on theme or language change
 
   // Update editor content when value prop changes externally
   useEffect(() => {
@@ -213,17 +339,74 @@ const Json5Editor: React.FC<Json5EditorProps> = ({
           {label}
         </Typography>
       )}
-      
-      <Box 
-        ref={containerRef} 
-        sx={{ 
+
+      <Box
+        ref={containerRef}
+        onContextMenu={handleContextMenu}
+        sx={{
           flex: height === '100%' ? 1 : 'none',
           minHeight: 0,
           '& .cm-editor': {
             height: height === '100%' ? '100%' : undefined,
           }
-        }} 
+        }}
       />
+
+      {/* Context Menu */}
+      <Menu
+        open={contextMenu !== null}
+        onClose={handleCloseContextMenu}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
+        }
+      >
+        <MenuItem onClick={handleUndo} disabled={readOnly}>
+          <ListItemIcon><UndoIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('codemirror.undo')}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+Z</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleRedo} disabled={readOnly}>
+          <ListItemIcon><RedoIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('codemirror.redo')}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+Y</Typography>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleCut} disabled={readOnly}>
+          <ListItemIcon><ContentCutIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('codemirror.cut')}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+X</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleCopy}>
+          <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('codemirror.copy')}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+C</Typography>
+        </MenuItem>
+        <MenuItem onClick={handlePaste} disabled={readOnly}>
+          <ListItemIcon><ContentPasteIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('codemirror.paste')}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+V</Typography>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleSelectAll}>
+          <ListItemIcon><SelectAllIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('codemirror.selectAll')}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+A</Typography>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleFind}>
+          <ListItemIcon><SearchIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('codemirror.find')}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+F</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleGoToLine}>
+          <ListItemIcon><ShortcutIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('codemirror.goToLine')}</ListItemText>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Ctrl+G</Typography>
+        </MenuItem>
+      </Menu>
 
       {displayError && (
         <Alert severity="error" sx={{ mt: 1, flexShrink: 0 }}>

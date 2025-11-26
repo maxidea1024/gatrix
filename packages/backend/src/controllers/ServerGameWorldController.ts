@@ -28,8 +28,8 @@ export class ServerGameWorldController {
         return false;
       };
 
-      // Helper function to parse customPayload
-      const parseCustomPayload = (payload: any): Record<string, any> | null => {
+      // Helper function to parse JSON field
+      const parseJsonField = (payload: any): Record<string, any> | null => {
         if (!payload) return null;
         if (typeof payload === 'string') {
           try {
@@ -71,7 +71,8 @@ export class ServerGameWorldController {
                 isMaintenance: toBoolean(world.isMaintenance),
                 displayOrder: world.displayOrder,
                 worldServerAddress: world.worldServerAddress || null,
-                customPayload: parseCustomPayload(world.customPayload),
+                customPayload: parseJsonField(world.customPayload),
+                infraSettings: parseJsonField(world.infraSettings),
                 tags: tagNames,
                 createdAt: world.createdAt,
               };
@@ -154,8 +155,8 @@ export class ServerGameWorldController {
         return false;
       };
 
-      // Helper function to parse customPayload
-      const parseCustomPayload = (payload: any): Record<string, any> | null => {
+      // Helper function to parse JSON field
+      const parseJsonField = (payload: any): Record<string, any> | null => {
         if (!payload) return null;
         if (typeof payload === 'string') {
           try {
@@ -180,7 +181,8 @@ export class ServerGameWorldController {
         isMaintenance: toBoolean(world.isMaintenance),
         displayOrder: world.displayOrder,
         worldServerAddress: world.worldServerAddress || null,
-        customPayload: parseCustomPayload(world.customPayload),
+        customPayload: parseJsonField(world.customPayload),
+        infraSettings: parseJsonField(world.infraSettings),
         tags: tagNames,
         createdAt: world.createdAt
       };
@@ -256,8 +258,8 @@ export class ServerGameWorldController {
         return false;
       };
 
-      // Helper function to parse customPayload
-      const parseCustomPayload = (payload: any): Record<string, any> | null => {
+      // Helper function to parse JSON field
+      const parseJsonField = (payload: any): Record<string, any> | null => {
         if (!payload) return null;
         if (typeof payload === 'string') {
           try {
@@ -277,7 +279,8 @@ export class ServerGameWorldController {
         isMaintenance: toBoolean(world.isMaintenance),
         displayOrder: world.displayOrder,
         worldServerAddress: world.worldServerAddress || null,
-        customPayload: parseCustomPayload(world.customPayload),
+        customPayload: parseJsonField(world.customPayload),
+        infraSettings: parseJsonField(world.infraSettings),
         createdAt: world.createdAt
       };
 

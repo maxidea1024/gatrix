@@ -46,6 +46,7 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
   const [appName, setAppName] = useState('MyGameApp');
   const [page, setPage] = useState('1');
   const [limit, setLimit] = useState('10');
+  const [lang, setLang] = useState(''); // Optional language parameter for maintenance message
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);

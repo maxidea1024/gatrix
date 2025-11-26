@@ -3909,5 +3909,26 @@
       "overview": "Overview",
       "sdkMetrics": "SDK Metrics"
     }
+  },
+  "codemirror": {
+    "find": "Find",
+    "replace": "Replace",
+    "next": "next",
+    "previous": "previous",
+    "all": "all",
+    "matchCase": "match case",
+    "byWord": "by word",
+    "regexp": "regexp",
+    "replaceAction": "replace",
+    "replaceAll": "replace all",
+    "close": "close",
+    "goToLine": "Go to line",
+    "go": "go",
+    "undo": "Undo",
+    "redo": "Redo",
+    "cut": "Cut",
+    "copy": "Copy",
+    "paste": "Paste",
+    "selectAll": "Select All"
   }
 }
