@@ -64,6 +64,7 @@ export interface GameWorld {
   gracePeriodMinutes?: number; // Grace period in minutes before disconnecting players
   displayOrder: number;
   customPayload?: Record<string, any>;
+  infraSettings?: Record<string, any>; // Infrastructure settings passed to game servers
   worldServerAddress: string; // Required: URL or host:port format (e.g., https://world.example.com or world.example.com:8080)
   tags?: string[];
   createdAt?: string;

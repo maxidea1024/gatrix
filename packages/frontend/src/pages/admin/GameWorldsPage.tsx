@@ -106,6 +106,7 @@ import { messageTemplateService, MessageTemplate } from '@/services/messageTempl
 import GameWorldSDKGuideDrawer from '../../components/gameWorlds/GameWorldSDKGuideDrawer';
 import GameWorldForm from '../../components/admin/GameWorldForm';
 import MaintenanceSettingsInput from '../../components/common/MaintenanceSettingsInput';
+import { parseJson5 } from '../../components/common/JsonEditor';
 
 // Column definition interface
 interface ColumnConfig {
@@ -381,6 +382,10 @@ const GameWorldsPage: React.FC = () => {
   // Custom payload JSON editor state
   const [customPayloadText, setCustomPayloadText] = useState<string>('{}');
   const [customPayloadError, setCustomPayloadError] = useState<string>('');
+
+  // Infra settings JSON editor state
+  const [infraSettingsText, setInfraSettingsText] = useState<string>('{}');
+  const [infraSettingsError, setInfraSettingsError] = useState<string>('');
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -700,6 +705,8 @@ const GameWorldsPage: React.FC = () => {
 
     setCustomPayloadText('{}');
     setCustomPayloadError('');
+    setInfraSettingsText('{}');
+    setInfraSettingsError('');
     setFormTags([]);
     setMaintenanceLocales([]);
     setSupportsMultiLanguage(false);
@@ -739,6 +746,8 @@ const GameWorldsPage: React.FC = () => {
     });
     setCustomPayloadText(JSON.stringify(world.customPayload || {}, null, 2));
     setCustomPayloadError('');
+    setInfraSettingsText(JSON.stringify(world.infraSettings || {}, null, 2));
+    setInfraSettingsError('');
     setFormTags((world.tags || []));
     setMaintenanceLocales(world.maintenanceLocales || []);
     setSupportsMultiLanguage(shouldEnableMultiLanguage);
@@ -776,6 +785,8 @@ const GameWorldsPage: React.FC = () => {
 
     setCustomPayloadText(JSON.stringify(world.customPayload || {}, null, 2));
     setCustomPayloadError('');
+    setInfraSettingsText(JSON.stringify(world.infraSettings || {}, null, 2));
+    setInfraSettingsError('');
     setFormTags(world.tags || []);
     setMaintenanceLocales(world.maintenanceLocales || []);
     setSupportsMultiLanguage(shouldEnableMultiLanguage);
@@ -853,9 +864,26 @@ const GameWorldsPage: React.FC = () => {
         }
       }
 
+      // Parse infra settings JSON5 (supports comments, trailing commas, etc.)
+      let parsedInfraSettings: any = {};
+      const infraText = (infraSettingsText || '').trim();
+      if (infraText.length > 0) {
+        const result = parseJson5(infraText);
+        if (result.success) {
+          parsedInfraSettings = result.data;
+          setInfraSettingsError('');
+        } else {
+          setInfraSettingsError(result.error || 'Invalid JSON5 format');
+          enqueueSnackbar('Infra settings JSON5 is invalid', { variant: 'error' });
+          setSaving(false);
+          return;
+        }
+      }
+
       const dataToSend = {
         ...formData,
         customPayload: parsedCustomPayload,
+        infraSettings: parsedInfraSettings,
         tagIds,
         isVisible: Boolean(formData.isVisible),
         isMaintenance: Boolean(formData.isMaintenance),
@@ -1480,6 +1508,10 @@ const GameWorldsPage: React.FC = () => {
             onCustomPayloadTextChange={setCustomPayloadText}
             customPayloadError={customPayloadError}
             onCustomPayloadErrorChange={setCustomPayloadError}
+            infraSettingsText={infraSettingsText}
+            onInfraSettingsTextChange={setInfraSettingsText}
+            infraSettingsError={infraSettingsError}
+            onInfraSettingsErrorChange={setInfraSettingsError}
             messageTemplates={messageTemplates}
             inputMode={inputMode}
             onInputModeChange={setInputMode}

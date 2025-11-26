@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import Editor from '@monaco-editor/react';
 import { Box, Typography, Alert, CircularProgress } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import JSON5 from 'json5';
 import { prodLogger } from '../../utils/logger';
 
 interface JsonEditorProps {
@@ -13,6 +14,10 @@ interface JsonEditorProps {
   label?: string;
   placeholder?: string;
   helperText?: string;
+  /** Enable JSON5 mode (supports comments, trailing commas, unquoted keys, etc.) */
+  json5Mode?: boolean;
+  /** Callback for real-time validation error (JSON5 mode only) */
+  onValidationError?: (error: string | null) => void;
 }
 
 const JsonEditor: React.FC<JsonEditorProps> = ({
@@ -23,26 +28,64 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   error,
   label,
   placeholder = '{\n  "key": "value"\n}',
-  helperText
+  helperText,
+  json5Mode = false,
+  onValidationError
 }) => {
   const theme = useTheme();
   const editorRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isUpdatingRef = useRef(false);
+  const [internalError, setInternalError] = useState<string | null>(null);
+
+  // Real-time JSON5 validation
+  useEffect(() => {
+    if (json5Mode && onValidationError) {
+      const trimmed = (value || '').trim();
+      if (trimmed.length === 0) {
+        onValidationError(null);
+        setInternalError(null);
+        return;
+      }
+      try {
+        JSON5.parse(trimmed);
+        onValidationError(null);
+        setInternalError(null);
+      } catch (e: any) {
+        const errorMsg = e.message || 'Invalid JSON5';
+        onValidationError(errorMsg);
+        setInternalError(errorMsg);
+      }
+    }
+  }, [value, json5Mode, onValidationError]);
+
+  // Displayed error: external error takes priority, then internal validation error
+  const displayError = error || (json5Mode ? internalError : null);
 
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
     setIsLoading(false);
 
     try {
-      // JSON 스키마 설정
-      if (monaco?.languages?.json?.jsonDefaults) {
-        monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-          validate: true,
-          allowComments: false,
-          schemas: [],
-          enableSchemaRequest: true
-        });
+      if (json5Mode) {
+        // JSON5 mode: Disable all validation in editor
+        // Validation happens on save via parseJson5()
+        if (monaco?.languages?.typescript?.javascriptDefaults) {
+          monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+            noSemanticValidation: true,
+            noSyntaxValidation: true,
+          });
+        }
+      } else {
+        // Standard JSON mode
+        if (monaco?.languages?.json?.jsonDefaults) {
+          monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+            validate: true,
+            allowComments: false,
+            schemas: [],
+            enableSchemaRequest: true
+          });
+        }
       }
 
       // 에디터 옵션 설정
@@ -111,19 +154,23 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 
   const editorTheme = theme.palette.mode === 'dark' ? 'vs-dark' : 'vs';
 
+  // Check if height is 100% to use flex layout
+  const isFlexHeight = height === '100%';
+
   return (
-    <Box>
+    <Box sx={isFlexHeight ? { display: 'flex', flexDirection: 'column', height: '100%' } : undefined}>
       {label && (
-        <Typography variant="subtitle2" gutterBottom>
+        <Typography variant="subtitle2" gutterBottom sx={{ flexShrink: 0 }}>
           {label}
         </Typography>
       )}
-      
+
       <Box
         sx={{
           border: '1px solid',
           borderColor: error ? 'error.main' : 'divider',
           borderRadius: 1,
+          ...(isFlexHeight && { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }),
           overflow: 'hidden',
           position: 'relative',
           transition: 'border-color 0.2s ease-in-out',
@@ -166,20 +213,21 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
             <CircularProgress size={24} />
           </Box>
         )}
-        <Editor
-          height={height}
-          defaultLanguage="json"
-          defaultValue={value || placeholder}
-          onChange={handleEditorChange}
-          onMount={handleEditorDidMount}
-          theme={editorTheme}
-          loading={<CircularProgress size={24} />}
-          options={{
-            readOnly,
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            wordWrap: 'on',
-            automaticLayout: true,
+        <Box sx={isFlexHeight ? { flex: 1, minHeight: 0 } : { height }}>
+          <Editor
+            height="100%"
+            defaultLanguage={json5Mode ? 'javascript' : 'json'}
+            defaultValue={value || placeholder}
+            onChange={handleEditorChange}
+            onMount={handleEditorDidMount}
+            theme={editorTheme}
+            loading={<CircularProgress size={24} />}
+            options={{
+              readOnly,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              wordWrap: 'on',
+              automaticLayout: true,
             formatOnPaste: false,
             formatOnType: false,
             tabSize: 2,
@@ -205,6 +253,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
             }
           }}
         />
+        </Box>
       </Box>
 
       {error && (
@@ -223,3 +272,25 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 };
 
 export default JsonEditor;
+
+// Utility function to parse JSON5 and convert to standard JSON object
+export const parseJson5 = (text: string): { success: boolean; data?: any; error?: string } => {
+  try {
+    const trimmed = (text || '').trim();
+    if (trimmed.length === 0) {
+      return { success: true, data: {} };
+    }
+    const data = JSON5.parse(trimmed);
+    return { success: true, data };
+  } catch (e: any) {
+    return { success: false, error: e.message || 'Invalid JSON5 format' };
+  }
+};
+
+// Utility function to stringify object to JSON5 format (actually uses standard JSON for storage)
+export const stringifyJson5 = (obj: any, pretty = true): string => {
+  if (obj === null || obj === undefined) {
+    return '{}';
+  }
+  return pretty ? JSON.stringify(obj, null, 2) : JSON.stringify(obj);
+};

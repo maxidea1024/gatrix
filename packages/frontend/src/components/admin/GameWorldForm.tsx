@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Box,
   TextField,
@@ -10,13 +10,25 @@ import {
   Autocomplete,
   Chip,
   Tooltip,
+  Tabs,
+  Tab,
+  Button,
+  Stack,
 } from '@mui/material';
+import {
+  Download as DownloadIcon,
+  Upload as UploadIcon,
+  ContentCopy as CopyIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import { Tag } from '@/services/tagService';
 import { GameWorld, GameWorldMaintenanceLocale, CreateGameWorldData } from '@/types/gameWorld';
 import MaintenanceSettingsInput from '@/components/common/MaintenanceSettingsInput';
-import JsonEditor from '@/components/common/JsonEditor';
+import JsonEditor, { parseJson5 } from '@/components/common/JsonEditor';
+import Json5Editor from '@/components/common/Json5Editor';
 import { MessageTemplate } from '@/services/messageTemplateService';
+import { copyToClipboardWithNotification } from '@/utils/clipboard';
 
 export interface GameWorldFormProps {
   editingWorld: GameWorld | null;
@@ -34,6 +46,10 @@ export interface GameWorldFormProps {
   onCustomPayloadTextChange: (text: string) => void;
   customPayloadError: string;
   onCustomPayloadErrorChange: (error: string) => void;
+  infraSettingsText: string;
+  onInfraSettingsTextChange: (text: string) => void;
+  infraSettingsError: string;
+  onInfraSettingsErrorChange: (error: string) => void;
   messageTemplates: MessageTemplate[];
   inputMode: 'direct' | 'template';
   onInputModeChange: (mode: 'direct' | 'template') => void;
@@ -58,6 +74,10 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
   onCustomPayloadTextChange,
   customPayloadError,
   onCustomPayloadErrorChange,
+  infraSettingsText,
+  onInfraSettingsTextChange,
+  infraSettingsError,
+  onInfraSettingsErrorChange,
   messageTemplates,
   inputMode,
   onInputModeChange,
@@ -66,37 +86,110 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
   worldIdRef,
 }) => {
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
+  const [activeTab, setActiveTab] = useState(0);
   const defaultWorldIdRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const refToUse = worldIdRef || defaultWorldIdRef;
 
+  // Export settings to file
+  const handleExportSettings = () => {
+    try {
+      const settings = infraSettingsText.trim() || '{}';
+      const blob = new Blob([settings], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${formData.worldId || 'world'}-infra-settings.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      enqueueSnackbar(t('gameWorlds.form.settingsExported'), { variant: 'success' });
+    } catch {
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
+    }
+  };
+
+  // Import settings from file
+  const handleImportSettings = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        // Support JSON5 format for import
+        const result = parseJson5(content);
+        if (result.success) {
+          // Keep original content to preserve comments/formatting
+          onInfraSettingsTextChange(content);
+          onInfraSettingsErrorChange('');
+          enqueueSnackbar(t('gameWorlds.form.settingsImported'), { variant: 'success' });
+        } else {
+          enqueueSnackbar(t('gameWorlds.form.invalidJsonFile'), { variant: 'error' });
+        }
+      } catch {
+        enqueueSnackbar(t('gameWorlds.form.invalidJsonFile'), { variant: 'error' });
+      }
+    };
+    reader.readAsText(file);
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Copy settings to clipboard
+  const handleCopySettings = () => {
+    const settings = infraSettingsText.trim() || '{}';
+    copyToClipboardWithNotification(settings, t('gameWorlds.form.settingsCopied'), enqueueSnackbar);
+  };
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
-      {/* World ID */}
-      <Box>
-        <TextField
-          fullWidth
-          label={t('gameWorlds.worldId')}
-          value={formData.worldId}
-          onChange={(e) => {
-            const newWorldId = e.target.value;
-            const newFormData = { ...formData, worldId: newWorldId };
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Tabs */}
+      <Tabs
+        value={activeTab}
+        onChange={(_, newValue) => setActiveTab(newValue)}
+        sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}
+      >
+        <Tab label={t('gameWorlds.form.basicInfoTab')} />
+        <Tab label={t('gameWorlds.form.infraSettingsTab')} />
+      </Tabs>
 
-            if (!editingWorld && (formData.name === '' || formData.name === formData.worldId)) {
-              newFormData.name = newWorldId;
-            }
+      {/* Tab Content */}
+      <Box sx={{ flex: 1, overflow: 'auto' }}>
+        {/* Basic Info Tab */}
+        {activeTab === 0 && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+            {/* World ID */}
+            <Box>
+              <TextField
+                fullWidth
+                label={t('gameWorlds.worldId')}
+                value={formData.worldId}
+                onChange={(e) => {
+                  const newWorldId = e.target.value;
+                  const newFormData = { ...formData, worldId: newWorldId };
 
-            onFormDataChange(newFormData);
-          }}
-          error={!!formErrors.worldId}
-          helperText={formErrors.worldId}
-          required
-          inputRef={refToUse}
-          autoFocus
-        />
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-          {t('gameWorlds.form.worldIdHelp')}
-        </Typography>
-      </Box>
+                  if (!editingWorld && (formData.name === '' || formData.name === formData.worldId)) {
+                    newFormData.name = newWorldId;
+                  }
+
+                  onFormDataChange(newFormData);
+                }}
+                error={!!formErrors.worldId}
+                helperText={formErrors.worldId}
+                required
+                inputRef={refToUse}
+                autoFocus
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {t('gameWorlds.form.worldIdHelp')}
+              </Typography>
+            </Box>
 
       {/* Name */}
       <Box>
@@ -258,16 +351,72 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
         />
       )}
 
-      {/* Custom Payload */}
-      <JsonEditor
-        value={customPayloadText}
-        onChange={(val) => onCustomPayloadTextChange(val)}
-        height="200px"
-        label={t('gameWorlds.customPayload') || 'Custom Payload'}
-        placeholder='{\n  "key": "value"\n}'
-        error={customPayloadError}
-        helperText={t('gameWorlds.form.customPayloadHelp') || '게임월드 관련 추가 데이터(JSON). 비워두면 {}로 저장됩니다.'}
-      />
+            {/* Custom Payload */}
+            <JsonEditor
+              value={customPayloadText}
+              onChange={(val) => onCustomPayloadTextChange(val)}
+              height="200px"
+              label={t('gameWorlds.customPayload') || 'Custom Payload'}
+              placeholder='{\n  "key": "value"\n}'
+              error={customPayloadError}
+              helperText={t('gameWorlds.form.customPayloadHelp') || '게임월드 관련 추가 데이터(JSON). 비워두면 {}로 저장됩니다.'}
+            />
+          </Box>
+        )}
+
+        {/* Infra Settings Tab */}
+        {activeTab === 1 && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1, height: '100%' }}>
+            {/* Action Buttons */}
+            <Stack direction="row" spacing={1} justifyContent="flex-end" flexShrink={0}>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<DownloadIcon />}
+                onClick={handleExportSettings}
+              >
+                {t('gameWorlds.form.exportSettings')}
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<UploadIcon />}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {t('gameWorlds.form.importSettings')}
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<CopyIcon />}
+                onClick={handleCopySettings}
+              >
+                {t('gameWorlds.form.copyToClipboard')}
+              </Button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept=".json"
+                style={{ display: 'none' }}
+                onChange={handleImportSettings}
+              />
+            </Stack>
+
+            {/* Infra Settings JSON5 Editor (supports comments, unquoted keys, trailing commas) */}
+            <Box sx={{ flex: 1, minHeight: 0 }}>
+              <Json5Editor
+                value={infraSettingsText}
+                onChange={(val) => onInfraSettingsTextChange(val)}
+                height="100%"
+                label={t('gameWorlds.form.infraSettings')}
+                error={infraSettingsError}
+                helperText={t('gameWorlds.form.infraSettingsHelp')}
+                onValidationError={(err) => onInfraSettingsErrorChange(err || '')}
+              />
+            </Box>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };

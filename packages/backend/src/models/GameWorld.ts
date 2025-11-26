@@ -31,6 +31,7 @@ export interface GameWorld {
   forceDisconnect?: boolean; // Force disconnect existing players when maintenance starts
   gracePeriodMinutes?: number; // Grace period in minutes before disconnecting players
   customPayload?: Record<string, any> | null;
+  infraSettings?: Record<string, any> | null; // Infrastructure settings for game server configuration (passed to SDK)
   worldServerAddress: string; // Required: URL or host:port format (e.g., https://world.example.com or world.example.com:8080)
   createdBy: number;
   updatedBy?: number;
@@ -59,6 +60,7 @@ export interface CreateGameWorldData {
   forceDisconnect?: boolean;
   gracePeriodMinutes?: number;
   customPayload?: Record<string, any> | null;
+  infraSettings?: Record<string, any> | null;
   worldServerAddress: string; // Required: ip:port format (e.g., 192.168.1.100:8080)
   createdBy: number;
 }
@@ -80,6 +82,7 @@ export interface UpdateGameWorldData {
   forceDisconnect?: boolean;
   gracePeriodMinutes?: number;
   customPayload?: Record<string, any> | null;
+  infraSettings?: Record<string, any> | null;
   worldServerAddress?: string | null;
   updatedBy?: number;
 }
@@ -286,6 +289,7 @@ export class GameWorldModel {
           maintenanceMessage: gameWorldData.maintenanceMessage || null,
           supportsMultiLanguage: gameWorldData.supportsMultiLanguage ?? false,
           customPayload: gameWorldData.customPayload ?? {},
+          infraSettings: gameWorldData.infraSettings ?? null,
           worldServerAddress: gameWorldData.worldServerAddress, // Required field
           createdBy: gameWorldData.createdBy
         };
@@ -334,9 +338,9 @@ export class GameWorldModel {
 
         Object.entries(gameWorldUpdateData).forEach(([key, value]) => {
           if (value !== undefined) {
-            // customPayload는 JSON 문자열로 변환
-            if (key === 'customPayload') {
-              updateData[key] = JSON.stringify(value);
+            // customPayload, infraSettings는 JSON 문자열로 변환
+            if (key === 'customPayload' || key === 'infraSettings') {
+              updateData[key] = value === null ? null : JSON.stringify(value);
             } else {
               updateData[key] = value;
             }
