@@ -34,6 +34,8 @@ const createGameWorldSchema = Joi.object({
       message: Joi.string().required(),
     })
   ).optional().default([]),
+  forceDisconnect: Joi.boolean().optional().default(false),
+  gracePeriodMinutes: Joi.number().integer().min(0).max(60).optional().default(5),
   customPayload: Joi.object().unknown(true).optional().default({}),
   worldServerAddress: Joi.string().pattern(WORLD_SERVER_ADDRESS_REGEX).max(255).required().messages({
     'string.pattern.base': 'worldServerAddress must be a valid URL or host:port (e.g., https://world.example.com or world.example.com:8080)',
@@ -64,6 +66,8 @@ const updateGameWorldSchema = Joi.object({
       message: Joi.string().required(),
     })
   ).optional().default([]),
+  forceDisconnect: Joi.boolean().optional().default(false),
+  gracePeriodMinutes: Joi.number().integer().min(0).max(60).optional().default(5),
   customPayload: Joi.object().unknown(true).optional().allow(null),
   worldServerAddress: Joi.string().pattern(WORLD_SERVER_ADDRESS_REGEX).max(255).optional().messages({
     'string.pattern.base': 'worldServerAddress must be a valid URL or host:port (e.g., https://world.example.com or world.example.com:8080)'
@@ -93,6 +97,8 @@ const updateMaintenanceSchema = Joi.object({
       message: Joi.string().required(),
     })
   ).optional().default([]),
+  forceDisconnect: Joi.boolean().optional().default(false),
+  gracePeriodMinutes: Joi.number().integer().min(0).max(60).optional().default(5),
 });
 
 // const listGameWorldsSchema = Joi.object({

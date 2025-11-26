@@ -56,7 +56,12 @@ export interface GameWorld {
   name: string;
   isMaintenance: boolean;
   maintenanceMessage?: string;
+  maintenanceStartDate?: string;
+  maintenanceEndDate?: string;
+  supportsMultiLanguage?: boolean;
   maintenanceLocales?: Array<{ lang: string; message: string }>;
+  forceDisconnect?: boolean; // Force disconnect existing players when maintenance starts
+  gracePeriodMinutes?: number; // Grace period in minutes before disconnecting players
   displayOrder: number;
   customPayload?: Record<string, any>;
   worldServerAddress: string; // Required: URL or host:port format (e.g., https://world.example.com or world.example.com:8080)
@@ -262,4 +267,26 @@ export interface MaintenanceDetail {
 export interface MaintenanceStatus {
   isUnderMaintenance: boolean;
   detail: MaintenanceDetail | null;
+}
+
+/**
+ * Comprehensive maintenance information returned by getMaintenanceInfo()
+ */
+export interface MaintenanceInfo {
+  /** Whether the service/world is currently in maintenance */
+  isMaintenance: boolean;
+  /** Source of maintenance: 'service' for global, 'world' for world-level, null if not in maintenance */
+  source: 'service' | 'world' | null;
+  /** World ID if source is 'world' */
+  worldId?: string;
+  /** Localized maintenance message */
+  message: string | null;
+  /** Whether to force disconnect existing players */
+  forceDisconnect: boolean;
+  /** Grace period in minutes before disconnecting players */
+  gracePeriodMinutes: number;
+  /** Maintenance start time (ISO 8601 string) */
+  startsAt: string | null;
+  /** Maintenance end time (ISO 8601 string) */
+  endsAt: string | null;
 }

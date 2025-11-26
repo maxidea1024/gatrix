@@ -100,12 +100,15 @@ export const gameWorldService = {
     maintenanceMessageTemplateId?: number | null;
     supportsMultiLanguage?: boolean;
     maintenanceLocales?: Array<{ lang: 'ko' | 'en' | 'zh'; message: string }>;
+    forceDisconnect?: boolean;
+    gracePeriodMinutes?: number;
   }): Promise<GameWorld> {
     // Ensure boolean fields are actually boolean
     const sanitizedData = {
       ...data,
       isMaintenance: Boolean(data.isMaintenance),
       ...(data.supportsMultiLanguage !== undefined && { supportsMultiLanguage: Boolean(data.supportsMultiLanguage) }),
+      ...(data.forceDisconnect !== undefined && { forceDisconnect: Boolean(data.forceDisconnect) }),
     };
     const response = await api.patch(`/admin/game-worlds/${id}/maintenance`, sanitizedData);
     return response.data?.data?.world || response.data?.world;

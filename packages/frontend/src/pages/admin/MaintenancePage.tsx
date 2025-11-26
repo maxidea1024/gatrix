@@ -61,7 +61,7 @@ const MaintenancePage: React.FC = () => {
 
   const [endsAt, setEndsAt] = useState<Dayjs | null>(null);
   const [kickExistingPlayers, setKickExistingPlayers] = useState(false);
-  const [kickDelayMinutes, setKickDelayMinutes] = useState<number>(0); // 유예시간 (분)
+  const [kickDelayMinutes, setKickDelayMinutes] = useState<number>(5); // 유예시간 (분) - 기본값 5분
 
   // Input mode
   const [inputMode, setInputMode] = useState<'direct'|'template'|''>('direct');

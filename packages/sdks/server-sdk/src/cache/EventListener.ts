@@ -224,6 +224,8 @@ export class EventListener {
 
   /**
    * Check if event type is a standard event
+   * Note: maintenance.started and maintenance.ended are NOT included here
+   * because they are local events emitted by MaintenanceWatcher, not backend events
    */
   private isStandardEvent(type: string): boolean {
     return [
@@ -324,6 +326,8 @@ export class EventListener {
 
       case 'maintenance.settings.updated':
         // Refresh service maintenance cache when maintenance settings are updated
+        // Note: This will also trigger MaintenanceWatcher to check state changes
+        // and emit maintenance.started/maintenance.ended events if needed
         this.logger.info('Service maintenance settings updated event received, refreshing service maintenance cache');
         try {
           await this.cacheManager.refreshServiceMaintenance();
@@ -332,6 +336,9 @@ export class EventListener {
           this.logger.error('Failed to refresh service maintenance cache', { error });
         }
         break;
+
+      // Note: maintenance.started and maintenance.ended are NOT handled here
+      // They are local events emitted by MaintenanceWatcher based on cache state changes
 
       default:
         this.logger.warn('Unknown standard event type', { type: event.type });

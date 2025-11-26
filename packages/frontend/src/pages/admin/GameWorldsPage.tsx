@@ -64,6 +64,7 @@ import {
   Refresh as RefreshIcon,
   ExpandMore as ExpandMoreIcon,
   Code as CodeIcon,
+  Schedule as ScheduleIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -345,6 +346,8 @@ const GameWorldsPage: React.FC = () => {
       maintenanceMessage: string;
       supportsMultiLanguage: boolean;
       maintenanceLocales: GameWorldMaintenanceLocale[];
+      forceDisconnect: boolean;
+      gracePeriodMinutes: number;
     };
   }>({
     open: false,
@@ -357,6 +360,8 @@ const GameWorldsPage: React.FC = () => {
       maintenanceMessage: '',
       supportsMultiLanguage: false,
       maintenanceLocales: [],
+      forceDisconnect: false,
+      gracePeriodMinutes: 5,
     },
   });
   const [toggleMaintenanceLocales, setToggleMaintenanceLocales] = useState<GameWorldMaintenanceLocale[]>([]);
@@ -687,6 +692,8 @@ const GameWorldsPage: React.FC = () => {
       maintenanceMessage: '',
       supportsMultiLanguage: false,
       maintenanceLocales: [],
+      forceDisconnect: false,
+      gracePeriodMinutes: 5,
       customPayload: {},
       tagIds: [],
     });
@@ -725,6 +732,8 @@ const GameWorldsPage: React.FC = () => {
       maintenanceMessage: world.maintenanceMessage || '',
       supportsMultiLanguage: shouldEnableMultiLanguage,
       maintenanceLocales: world.maintenanceLocales || [],
+      forceDisconnect: world.forceDisconnect ?? false,
+      gracePeriodMinutes: world.gracePeriodMinutes ?? 5,
       customPayload: world.customPayload || {},
       tagIds: (world.tags || []).map(t => t.id),
     });
@@ -759,6 +768,8 @@ const GameWorldsPage: React.FC = () => {
       maintenanceMessage: world.maintenanceMessage || '',
       supportsMultiLanguage: shouldEnableMultiLanguage,
       maintenanceLocales: world.maintenanceLocales || [],
+      forceDisconnect: world.forceDisconnect ?? false,
+      gracePeriodMinutes: world.gracePeriodMinutes ?? 5,
       customPayload: world.customPayload || {},
       tagIds: (world.tags || []).map(t => t.id),
     });
@@ -853,6 +864,8 @@ const GameWorldsPage: React.FC = () => {
         maintenanceMessage: formData.maintenanceMessage || undefined,
         supportsMultiLanguage: Boolean(formData.supportsMultiLanguage),
         maintenanceLocales: maintenanceLocales.filter(l => l.message.trim() !== ''),
+        forceDisconnect: Boolean(formData.forceDisconnect),
+        gracePeriodMinutes: formData.forceDisconnect ? (formData.gracePeriodMinutes ?? 5) : undefined,
       };
 
       let savedWorld: any;
@@ -949,6 +962,8 @@ const GameWorldsPage: React.FC = () => {
         maintenanceMessage: world.maintenanceMessage || '',
         supportsMultiLanguage: world.supportsMultiLanguage || false,
         maintenanceLocales: world.maintenanceLocales || [],
+        forceDisconnect: world.forceDisconnect || false,
+        gracePeriodMinutes: world.gracePeriodMinutes ?? 5,
       },
     });
   };
@@ -963,6 +978,10 @@ const GameWorldsPage: React.FC = () => {
           isMaintenance: true,
           maintenanceStartDate: maintenanceToggleDialog.maintenanceData.maintenanceStartDate || undefined,
           maintenanceEndDate: maintenanceToggleDialog.maintenanceData.maintenanceEndDate || undefined,
+          forceDisconnect: maintenanceToggleDialog.maintenanceData.forceDisconnect,
+          gracePeriodMinutes: maintenanceToggleDialog.maintenanceData.forceDisconnect
+            ? maintenanceToggleDialog.maintenanceData.gracePeriodMinutes
+            : undefined,
         };
 
         // 메시지 소스에 따라 분기
@@ -1000,6 +1019,8 @@ const GameWorldsPage: React.FC = () => {
           maintenanceMessage: '',
           supportsMultiLanguage: false,
           maintenanceLocales: [],
+          forceDisconnect: false,
+          gracePeriodMinutes: 5,
         },
       });
       setToggleMaintenanceLocales([]);
@@ -1181,17 +1202,45 @@ const GameWorldsPage: React.FC = () => {
           startsAt: world.maintenanceStartDate,
           endsAt: world.maintenanceEndDate,
         } as any);
-        const statusDisplay = getMaintenanceStatusDisplay(maintenanceStatus);
-        return (
+        // Generate tooltip for scheduled/active status
+        const maintenanceTooltip = (maintenanceStatus === 'scheduled' || maintenanceStatus === 'active') ? (() => {
+          const parts: string[] = [];
+          // Start time: show "immediate start" if not set
+          parts.push(`${t('maintenance.tooltipStartTime')}: ${world.maintenanceStartDate ? formatDateTimeDetailed(world.maintenanceStartDate) : t('maintenance.immediateStart')}`);
+          // End time: show "manual stop" if not set
+          parts.push(`${t('maintenance.tooltipEndTime')}: ${world.maintenanceEndDate ? formatDateTimeDetailed(world.maintenanceEndDate) : t('maintenance.manualStop')}`);
+          // Force disconnect info
+          if (world.forceDisconnect) {
+            const delayText = (world.gracePeriodMinutes ?? 0) === 0
+              ? t('maintenance.kickDelayImmediate')
+              : `${world.gracePeriodMinutes}${t('maintenance.minutesUnit')}`;
+            parts.push(`${t('maintenance.kickExistingPlayers')}: ${t('common.yes')} (${delayText})`);
+          } else {
+            parts.push(`${t('maintenance.kickExistingPlayers')}: ${t('common.no')}`);
+          }
+          if (world.maintenanceMessage) {
+            const msg = world.maintenanceMessage;
+            parts.push(`${t('maintenance.tooltipMessage')}: ${msg.length > 50 ? msg.substring(0, 50) + '...' : msg}`);
+          }
+          return parts.join('\n');
+        })() : '';
+
+        const chip = (
           <Chip
             label={maintenanceStatus === 'active' ? t('gameWorlds.maintenance') : maintenanceStatus === 'scheduled' ? t('maintenance.statusScheduled') : t('gameWorlds.normal')}
             size="small"
             color={maintenanceStatus === 'active' ? 'warning' : maintenanceStatus === 'scheduled' ? 'info' : 'success'}
-            icon={maintenanceStatus === 'active' ? <MaintenanceIcon /> : undefined}
+            icon={maintenanceStatus === 'active' ? <MaintenanceIcon /> : maintenanceStatus === 'scheduled' ? <ScheduleIcon /> : undefined}
             onClick={() => handleToggleMaintenance(world.id)}
             sx={{ cursor: 'pointer' }}
           />
         );
+
+        return maintenanceTooltip ? (
+          <Tooltip title={maintenanceTooltip} arrow placement="top" slotProps={{ tooltip: { sx: { whiteSpace: 'pre-line' } } }}>
+            {chip}
+          </Tooltip>
+        ) : chip;
       }
       case 'tags':
         return (
@@ -1547,8 +1596,7 @@ const GameWorldsPage: React.FC = () => {
       </Drawer>
 
       {/* Maintenance Toggle Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={maintenanceToggleDialog.open}
         onClose={() => {
           setMaintenanceToggleDialog({
@@ -1562,71 +1610,21 @@ const GameWorldsPage: React.FC = () => {
               maintenanceMessage: '',
               supportsMultiLanguage: false,
               maintenanceLocales: [],
+              forceDisconnect: false,
+              gracePeriodMinutes: 5,
             },
           });
           setToggleMaintenanceLocales([]);
           setToggleSupportsMultiLanguage(false);
         }}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: 600,
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
-        ModalProps={{
-          keepMounted: false
-        }}
+        title={maintenanceToggleDialog.isActivating
+          ? t('gameWorlds.confirmMaintenanceStart')
+          : t('gameWorlds.confirmMaintenanceEnd')}
+        storageKey="gameWorldMaintenanceToggleDrawerWidth"
+        defaultWidth={600}
+        minWidth={500}
+        zIndex={1301}
       >
-        {/* Header */}
-        <Box sx={{
-          p: 3,
-          borderBottom: 1,
-          borderColor: 'divider',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: 'background.paper',
-          position: 'sticky',
-          top: 0,
-          zIndex: 1
-        }}>
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {maintenanceToggleDialog.isActivating
-              ? t('gameWorlds.confirmMaintenanceStart')
-              : t('gameWorlds.confirmMaintenanceEnd')}
-          </Typography>
-          <IconButton
-            onClick={() => {
-              setMaintenanceToggleDialog({
-                open: false,
-                world: null,
-                isActivating: false,
-                confirmInput: '',
-                maintenanceData: {
-                  maintenanceStartDate: '',
-                  maintenanceEndDate: '',
-                  maintenanceMessage: '',
-                  supportsMultiLanguage: false,
-                  maintenanceLocales: [],
-                },
-              });
-              setToggleMaintenanceLocales([]);
-              setToggleSupportsMultiLanguage(false);
-            }}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CancelIcon />
-          </IconButton>
-        </Box>
-
         {/* Content */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           {maintenanceToggleDialog.isActivating ? (
@@ -1636,71 +1634,81 @@ const GameWorldsPage: React.FC = () => {
               </Alert>
 
               {/* 점검 설정 폼 */}
-              <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', mb: 3 }}>
-                <Typography variant="subtitle1" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  🔧 {t('gameWorlds.maintenanceSettings')}
-                </Typography>
-
-                <Box sx={{ mt: 2 }}>
-                  <MaintenanceSettingsInput
-                    startDate={maintenanceToggleDialog.maintenanceData.maintenanceStartDate}
-                    endDate={maintenanceToggleDialog.maintenanceData.maintenanceEndDate}
-                    onStartDateChange={(date) => setMaintenanceToggleDialog(prev => ({
-                      ...prev,
-                      maintenanceData: {
-                        ...prev.maintenanceData,
-                        maintenanceStartDate: date
-                      }
-                    }))}
-                    onEndDateChange={(date) => setMaintenanceToggleDialog(prev => ({
-                      ...prev,
-                      maintenanceData: {
-                        ...prev.maintenanceData,
-                        maintenanceEndDate: date
-                      }
-                    }))}
-                    inputMode={toggleInputMode}
-                    onInputModeChange={setToggleInputMode}
-                    maintenanceMessage={maintenanceToggleDialog.maintenanceData.maintenanceMessage}
-                    onMaintenanceMessageChange={(message) => setMaintenanceToggleDialog(prev => ({
-                      ...prev,
-                      maintenanceData: {
-                        ...prev.maintenanceData,
-                        maintenanceMessage: message
-                      }
-                    }))}
-                    supportsMultiLanguage={toggleSupportsMultiLanguage}
-                    onSupportsMultiLanguageChange={(enabled) => {
-                      setToggleSupportsMultiLanguage(enabled);
-                      if (enabled) {
-                        const availableLanguages = [
-                          { code: 'ko' as const, label: t('gameWorlds.maintenanceConfig.korean') },
-                          { code: 'en' as const, label: t('gameWorlds.maintenanceConfig.english') },
-                          { code: 'zh' as const, label: t('gameWorlds.maintenanceConfig.chinese') },
-                        ];
-                        const merged = availableLanguages.map((lang) => {
-                          const existing = toggleMaintenanceLocales.find(l => l.lang === lang.code);
-                          return { lang: lang.code, message: existing?.message || '' };
-                        });
-                        setToggleMaintenanceLocales(merged);
-                      }
-                    }}
-                    maintenanceLocales={toggleMaintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
-                    onMaintenanceLocalesChange={(locales) => {
-                      const newLocales = locales.map(l => ({ lang: l.lang, message: l.message }));
-                      setToggleMaintenanceLocales(newLocales);
-                      const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
-                      if (hasNonEmptyLocales && !toggleSupportsMultiLanguage) {
-                        setToggleSupportsMultiLanguage(true);
-                      }
-                    }}
-                    templates={messageTemplates}
-                    selectedTemplateId={toggleSelectedTemplateId}
-                    onSelectedTemplateIdChange={setToggleSelectedTemplateId}
-                    messageRequired={true}
-                  />
-                </Box>
-              </Paper>
+              <MaintenanceSettingsInput
+                startDate={maintenanceToggleDialog.maintenanceData.maintenanceStartDate}
+                endDate={maintenanceToggleDialog.maintenanceData.maintenanceEndDate}
+                onStartDateChange={(date) => setMaintenanceToggleDialog(prev => ({
+                  ...prev,
+                  maintenanceData: {
+                    ...prev.maintenanceData,
+                    maintenanceStartDate: date
+                  }
+                }))}
+                onEndDateChange={(date) => setMaintenanceToggleDialog(prev => ({
+                  ...prev,
+                  maintenanceData: {
+                    ...prev.maintenanceData,
+                    maintenanceEndDate: date
+                  }
+                }))}
+                inputMode={toggleInputMode}
+                onInputModeChange={setToggleInputMode}
+                maintenanceMessage={maintenanceToggleDialog.maintenanceData.maintenanceMessage}
+                onMaintenanceMessageChange={(message) => setMaintenanceToggleDialog(prev => ({
+                  ...prev,
+                  maintenanceData: {
+                    ...prev.maintenanceData,
+                    maintenanceMessage: message
+                  }
+                }))}
+                supportsMultiLanguage={toggleSupportsMultiLanguage}
+                onSupportsMultiLanguageChange={(enabled) => {
+                  setToggleSupportsMultiLanguage(enabled);
+                  if (enabled) {
+                    const availableLanguages = [
+                      { code: 'ko' as const, label: t('gameWorlds.maintenanceConfig.korean') },
+                      { code: 'en' as const, label: t('gameWorlds.maintenanceConfig.english') },
+                      { code: 'zh' as const, label: t('gameWorlds.maintenanceConfig.chinese') },
+                    ];
+                    const merged = availableLanguages.map((lang) => {
+                      const existing = toggleMaintenanceLocales.find(l => l.lang === lang.code);
+                      return { lang: lang.code, message: existing?.message || '' };
+                    });
+                    setToggleMaintenanceLocales(merged);
+                  }
+                }}
+                maintenanceLocales={toggleMaintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
+                onMaintenanceLocalesChange={(locales) => {
+                  const newLocales = locales.map(l => ({ lang: l.lang, message: l.message }));
+                  setToggleMaintenanceLocales(newLocales);
+                  const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
+                  if (hasNonEmptyLocales && !toggleSupportsMultiLanguage) {
+                    setToggleSupportsMultiLanguage(true);
+                  }
+                }}
+                templates={messageTemplates}
+                selectedTemplateId={toggleSelectedTemplateId}
+                onSelectedTemplateIdChange={setToggleSelectedTemplateId}
+                messageRequired={true}
+                showForceDisconnect={true}
+                forceDisconnect={maintenanceToggleDialog.maintenanceData.forceDisconnect}
+                onForceDisconnectChange={(value) => setMaintenanceToggleDialog(prev => ({
+                  ...prev,
+                  maintenanceData: {
+                    ...prev.maintenanceData,
+                    forceDisconnect: value
+                  }
+                }))}
+                gracePeriodMinutes={maintenanceToggleDialog.maintenanceData.gracePeriodMinutes}
+                onGracePeriodMinutesChange={(value) => setMaintenanceToggleDialog(prev => ({
+                  ...prev,
+                  maintenanceData: {
+                    ...prev.maintenanceData,
+                    gracePeriodMinutes: value
+                  }
+                }))}
+                sx={{ mb: 3 }}
+              />
 
               {/* 확인 입력 */}
               <Typography variant="body2" sx={{ mb: 2 }}>
@@ -1756,6 +1764,8 @@ const GameWorldsPage: React.FC = () => {
                   maintenanceMessage: '',
                   supportsMultiLanguage: false,
                   maintenanceLocales: [],
+                  forceDisconnect: false,
+                  gracePeriodMinutes: 5,
                 },
               });
               setToggleMaintenanceLocales([]);
@@ -1782,7 +1792,7 @@ const GameWorldsPage: React.FC = () => {
             {maintenanceToggleDialog.isActivating ? t('gameWorlds.startMaintenance') : t('gameWorlds.endMaintenance')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* Delete Confirmation Drawer */}
       <Drawer

@@ -28,6 +28,8 @@ export interface GameWorld {
   maintenanceMessageTemplateId?: number | null;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  forceDisconnect?: boolean; // Force disconnect existing players when maintenance starts
+  gracePeriodMinutes?: number; // Grace period in minutes before disconnecting players
   customPayload?: Record<string, any> | null;
   worldServerAddress: string; // Required: URL or host:port format (e.g., https://world.example.com or world.example.com:8080)
   createdBy: number;
@@ -54,6 +56,8 @@ export interface CreateGameWorldData {
   maintenanceMessageTemplateId?: number | null;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  forceDisconnect?: boolean;
+  gracePeriodMinutes?: number;
   customPayload?: Record<string, any> | null;
   worldServerAddress: string; // Required: ip:port format (e.g., 192.168.1.100:8080)
   createdBy: number;
@@ -73,6 +77,8 @@ export interface UpdateGameWorldData {
   maintenanceMessageTemplateId?: number | null;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  forceDisconnect?: boolean;
+  gracePeriodMinutes?: number;
   customPayload?: Record<string, any> | null;
   worldServerAddress?: string | null;
   updatedBy?: number;

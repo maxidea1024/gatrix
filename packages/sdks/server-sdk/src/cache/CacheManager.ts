@@ -14,6 +14,7 @@ import { ApiClient } from '../client/ApiClient';
 import { SdkMetrics } from '../utils/sdkMetrics';
 import { MaintenanceStatus } from '../types/api';
 import { sleep } from '../utils/time';
+import { MaintenanceWatcher, MaintenanceEventCallback } from './MaintenanceWatcher';
 
 export class CacheManager {
   private logger: Logger;
@@ -27,6 +28,7 @@ export class CacheManager {
   private refreshInterval?: NodeJS.Timeout;
   private refreshCallbacks: Array<(type: string, data: any) => void> = [];
   private metrics?: SdkMetrics;
+  private maintenanceWatcher: MaintenanceWatcher;
 
   constructor(
     config: CacheConfig,
@@ -37,7 +39,8 @@ export class CacheManager {
     serviceMaintenanceService: ServiceMaintenanceService,
     apiClient: ApiClient,
     logger: Logger,
-    metrics?: SdkMetrics
+    metrics?: SdkMetrics,
+    configWorldId?: string
   ) {
     this.config = {
       enabled: config.enabled !== false,
@@ -52,6 +55,7 @@ export class CacheManager {
     this.apiClient = apiClient;
     this.logger = logger;
     this.metrics = metrics;
+    this.maintenanceWatcher = new MaintenanceWatcher(logger, configWorldId);
   }
 
   /**
@@ -65,6 +69,14 @@ export class CacheManager {
     return () => {
       this.refreshCallbacks = this.refreshCallbacks.filter((cb) => cb !== callback);
     };
+  }
+
+  /**
+   * Register callback for maintenance state change events
+   * Returns a function to unregister the callback
+   */
+  onMaintenanceChange(callback: MaintenanceEventCallback): () => void {
+    return this.maintenanceWatcher.onMaintenanceChange(callback);
   }
 
   /**
@@ -105,10 +117,13 @@ export class CacheManager {
           this.logger.warn('Failed to load whitelists', { error: error.message });
           return { ipWhitelist: [], accountWhitelist: [] };
         }),
-        this.refreshServiceMaintenance().catch((error) => {
+        this.refreshServiceMaintenanceInternal().catch((error) => {
           this.logger.warn('Failed to load service maintenance status', { error: error.message });
         }),
       ]);
+
+      // Initialize maintenance watcher with current state (no events emitted on first check)
+      this.checkMaintenanceStateChanges();
 
       this.logger.info('SDK cache initialized');
 
@@ -202,7 +217,7 @@ export class CacheManager {
         this.whitelistService.refresh().catch((error) => {
           this.logger.warn('Failed to refresh whitelists', { error: error.message });
         }),
-        this.refreshServiceMaintenance().catch((error) => {
+        this.refreshServiceMaintenanceInternal().catch((error) => {
           this.logger.warn('Failed to refresh service maintenance', { error: error.message });
         }),
       ]);
@@ -215,6 +230,9 @@ export class CacheManager {
       } catch (_) {}
 
       this.logger.info('All caches refreshed successfully');
+
+      // Check and emit maintenance state changes
+      this.checkMaintenanceStateChanges();
 
       // Emit refresh events for polling method
       if (this.config.refreshMethod === 'polling') {
@@ -364,9 +382,10 @@ export class CacheManager {
   }
 
   /**
-   * Refresh service maintenance status
+   * Internal service maintenance refresh (without maintenance state check)
+   * Used by refreshAll() to avoid duplicate state checks
    */
-  async refreshServiceMaintenance(): Promise<void> {
+  private async refreshServiceMaintenanceInternal(): Promise<void> {
     this.logger.info('Refreshing service maintenance cache...');
     const start = process.hrtime.bigint();
     try {
@@ -380,6 +399,30 @@ export class CacheManager {
       } catch (_) {}
     } catch (error: any) {
       this.logger.warn('Failed to refresh service maintenance status', { error: error.message });
+    }
+  }
+
+  /**
+   * Refresh service maintenance status
+   * Also checks and emits maintenance state change events
+   */
+  async refreshServiceMaintenance(): Promise<void> {
+    await this.refreshServiceMaintenanceInternal();
+    // Check maintenance state changes after refresh
+    this.checkMaintenanceStateChanges();
+  }
+
+  /**
+   * Check and emit maintenance state change events
+   * Compares current state with previous state and emits events if changed
+   */
+  private checkMaintenanceStateChanges(): void {
+    try {
+      const serviceStatus = this.serviceMaintenanceService.getCached();
+      const gameWorlds = this.gameWorldService.getCached();
+      this.maintenanceWatcher.checkAndEmitChanges(serviceStatus, gameWorlds);
+    } catch (error: any) {
+      this.logger.error('Error checking maintenance state changes', { error: error.message });
     }
   }
 

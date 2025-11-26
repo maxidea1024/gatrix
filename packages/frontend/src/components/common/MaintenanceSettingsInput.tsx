@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import {
   Box,
   TextField,
@@ -9,15 +9,20 @@ import {
   FormControl,
   InputLabel,
   SelectChangeEvent,
+  FormControlLabel,
+  Switch,
+  Chip,
+  Tooltip,
 } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import BuildIcon from '@mui/icons-material/Build';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import MultiLanguageMessageInput, { MessageLocale } from './MultiLanguageMessageInput';
 import { MessageTemplate } from '@/services/messageTemplateService';
-import { getDateLocale, parseUTCForPicker } from '@/utils/dateFormat';
+import { getDateLocale, parseUTCForPicker, formatDateTimeDetailed } from '@/utils/dateFormat';
+import { computeMaintenanceStatus, getMaintenanceStatusDisplay } from '@/utils/maintenanceStatusUtils';
 
 export interface MaintenanceSettingsInputProps {
   // 점검 시작/종료 날짜
@@ -42,6 +47,13 @@ export interface MaintenanceSettingsInputProps {
   templates: MessageTemplate[];
   selectedTemplateId: number | '';
   onSelectedTemplateIdChange: (id: number | '') => void;
+
+  // 강제 종료 옵션 (게임월드에서만 사용)
+  showForceDisconnect?: boolean;
+  forceDisconnect?: boolean;
+  onForceDisconnectChange?: (value: boolean) => void;
+  gracePeriodMinutes?: number;
+  onGracePeriodMinutesChange?: (value: number) => void;
 
   // 에러 상태
   messageError?: boolean;
@@ -69,17 +81,82 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
   templates,
   selectedTemplateId,
   onSelectedTemplateIdChange,
+  showForceDisconnect = false,
+  forceDisconnect = false,
+  onForceDisconnectChange,
+  gracePeriodMinutes = 5,
+  onGracePeriodMinutesChange,
   messageError = false,
   messageRequired = true,
   sx,
 }) => {
   const { t } = useTranslation();
 
+  // Compute maintenance status based on start/end dates
+  const maintenanceStatus = useMemo(() => {
+    // Always treat as maintenance enabled (isMaintenance = true) since this component is only shown when maintenance is on
+    return computeMaintenanceStatus(true, {
+      startsAt: startDate || null,
+      endsAt: endDate || null,
+    });
+  }, [startDate, endDate]);
+
+  const statusDisplay = getMaintenanceStatusDisplay(maintenanceStatus);
+
+  // Generate tooltip text for scheduled/active status
+  const statusTooltip = useMemo(() => {
+    if (maintenanceStatus === 'inactive') return '';
+    const parts: string[] = [];
+    // Start time: show "immediate start" if not set
+    parts.push(`${t('maintenance.tooltipStartTime')}: ${startDate ? formatDateTimeDetailed(startDate) : t('maintenance.immediateStart')}`);
+    // End time: show "manual stop" if not set
+    parts.push(`${t('maintenance.tooltipEndTime')}: ${endDate ? formatDateTimeDetailed(endDate) : t('maintenance.manualStop')}`);
+    // Force disconnect info
+    if (forceDisconnect) {
+      const delayText = gracePeriodMinutes === 0
+        ? t('maintenance.kickDelayImmediate')
+        : `${gracePeriodMinutes}${t('maintenance.minutesUnit')}`;
+      parts.push(`${t('maintenance.kickExistingPlayers')}: ${t('common.yes')} (${delayText})`);
+    } else {
+      parts.push(`${t('maintenance.kickExistingPlayers')}: ${t('common.no')}`);
+    }
+    if (maintenanceMessage) {
+      parts.push(`${t('maintenance.tooltipMessage')}: ${maintenanceMessage.length > 50 ? maintenanceMessage.substring(0, 50) + '...' : maintenanceMessage}`);
+    }
+    return parts.join('\n');
+  }, [maintenanceStatus, startDate, endDate, forceDisconnect, gracePeriodMinutes, maintenanceMessage, t]);
+
   return (
     <Box sx={{ mt: 2, p: 2, border: '1px solid', borderColor: 'warning.light', borderRadius: 1, bgcolor: 'background.default', ...sx }}>
-      <Typography variant="subtitle1" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <BuildIcon fontSize="small" sx={{ mr: 0.5 }} /> {t('maintenance.title')}
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+        <Typography variant="subtitle1" sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <BuildIcon fontSize="small" sx={{ mr: 0.5 }} /> {t('maintenance.title')}
+        </Typography>
+        {/* Maintenance status chip with tooltip for scheduled status */}
+        <Tooltip
+          title={statusTooltip}
+          arrow
+          placement="left"
+          disableHoverListener={maintenanceStatus === 'inactive' || !statusTooltip}
+          slotProps={{
+            tooltip: { sx: { whiteSpace: 'pre-line' } }
+          }}
+        >
+          <Chip
+            icon={maintenanceStatus === 'scheduled' ? <ScheduleIcon /> : <BuildIcon />}
+            label={t(statusDisplay.label)}
+            size="small"
+            sx={{
+              backgroundColor: statusDisplay.bgColor,
+              color: statusDisplay.color,
+              fontWeight: 600,
+              '& .MuiChip-icon': {
+                color: statusDisplay.color,
+              },
+            }}
+          />
+        </Tooltip>
+      </Box>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         {t('maintenance.description')}
       </Typography>
@@ -218,6 +295,60 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
                 );
               })()}
             </Box>
+          )}
+
+          {/* 강제 종료 옵션 (showForceDisconnect가 true일 때만 표시) */}
+          {showForceDisconnect && (
+            <>
+              {/* 구분선 */}
+              <Box sx={{ width: '100%', my: 1 }}>
+                <Box sx={{
+                  height: '1px',
+                  backgroundColor: 'divider',
+                  width: '100%'
+                }} />
+              </Box>
+
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3, flexWrap: 'wrap' }}>
+                <Box sx={{ flex: '0 0 auto' }}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={forceDisconnect}
+                        onChange={(e) => onForceDisconnectChange?.(e.target.checked)}
+                        color="warning"
+                      />
+                    }
+                    label={t('maintenance.kickExistingPlayers')}
+                  />
+                  <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary', maxWidth: 300 }}>
+                    {t('maintenance.kickExistingPlayersHelp')}
+                  </Typography>
+                </Box>
+
+                {forceDisconnect === true && (
+                  <Box sx={{ flex: '0 0 auto', minWidth: 200 }}>
+                    <TextField
+                      select
+                      label={t('maintenance.kickDelayMinutes')}
+                      value={gracePeriodMinutes}
+                      onChange={(e) => onGracePeriodMinutesChange?.(Number(e.target.value))}
+                      size="small"
+                      sx={{ width: 180 }}
+                    >
+                      <MenuItem value={0}>{t('maintenance.kickDelayImmediate')}</MenuItem>
+                      <MenuItem value={1}>{t('maintenance.kickDelay1Min')}</MenuItem>
+                      <MenuItem value={5}>{t('maintenance.kickDelay5Min')}</MenuItem>
+                      <MenuItem value={10}>{t('maintenance.kickDelay10Min')}</MenuItem>
+                      <MenuItem value={30}>{t('maintenance.kickDelay30Min')}</MenuItem>
+                    </TextField>
+                    <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+                      {t('maintenance.kickDelayHelp')}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            </>
           )}
         </Stack>
       </LocalizationProvider>

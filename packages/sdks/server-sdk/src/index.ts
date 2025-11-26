@@ -8,6 +8,9 @@ export { GatrixServerSDK } from './GatrixServerSDK';
 // Export types
 export * from './types';
 
+// Export maintenance watcher types
+export { MaintenanceEventData, MaintenanceStateSnapshot } from './cache/MaintenanceWatcher';
+
 // Export errors
 export {
   GatrixSDKError,

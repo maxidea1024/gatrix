@@ -169,13 +169,13 @@ async function main() {
 
     // Helper function to print cached data
     function printCachedData() {
-      const surveysData = sdk.getCachedSurveys();
+      const surveysData = sdk.getSurveys();
       const cachedData = {
-        gameWorlds: sdk.getCachedGameWorlds(),
-        popupNotices: sdk.getCachedPopupNotices(),
+        gameWorlds: sdk.getGameWorlds(),
+        popupNotices: sdk.getPopupNotices(),
         surveys: surveysData,
         whitelists: sdk.whitelist.getCached(),
-        maintenance: sdk.getCachedMaintenanceStatus(),
+        maintenance: sdk.getServiceMaintenanceStatus(),
         timestamp: new Date().toISOString(),
       };
 

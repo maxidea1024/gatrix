@@ -68,6 +68,9 @@ export interface GatrixSDKConfig {
   apiToken: string; // Server API Token (required; use 'gatrix-unsecured-server-api-token' for testing)
   applicationName: string; // Application name
 
+  // Optional - World ID for world-specific maintenance checks
+  worldId?: string; // Game world ID (e.g., 'world-1', 'asia-1'). Required for isMaintenance() to check world-level maintenance.
+
   // Optional - Redis (for BullMQ events)
   redis?: RedisConfig;
 

@@ -167,11 +167,40 @@ export class GameWorldService {
   }
 
   /**
-   * Check if a world is in maintenance
+   * Check if a world is in maintenance based on flag and time window
    */
   isWorldInMaintenance(worldId: string): boolean {
     const world = this.cachedWorlds.find((w) => w.worldId === worldId);
-    return world?.isMaintenance || false;
+    if (!world || !world.isMaintenance) {
+      return false;
+    }
+
+    const now = new Date();
+
+    // Check if maintenance has not started yet
+    if (world.maintenanceStartDate) {
+      const startDate = new Date(world.maintenanceStartDate);
+      if (!Number.isNaN(startDate.getTime()) && now < startDate) {
+        return false;
+      }
+    }
+
+    // Check if maintenance has already ended
+    if (world.maintenanceEndDate) {
+      const endDate = new Date(world.maintenanceEndDate);
+      if (!Number.isNaN(endDate.getTime()) && now > endDate) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Get world by worldId from cache
+   */
+  getWorldByWorldId(worldId: string): GameWorld | null {
+    return this.cachedWorlds.find((w) => w.worldId === worldId) || null;
   }
 
   /**
@@ -180,7 +209,7 @@ export class GameWorldService {
    */
   getWorldMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
     const world = this.cachedWorlds.find((w) => w.worldId === worldId);
-    if (!world || !world.isMaintenance) {
+    if (!world || !this.isWorldInMaintenance(worldId)) {
       return null;
     }
 

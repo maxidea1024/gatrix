@@ -250,6 +250,11 @@ const GameWorldForm: React.FC<GameWorldFormProps> = ({
           onSelectedTemplateIdChange={onSelectedTemplateIdChange}
           messageRequired={formData.isMaintenance}
           messageError={!!formErrors.maintenanceMessage}
+          showForceDisconnect={true}
+          forceDisconnect={formData.forceDisconnect ?? false}
+          onForceDisconnectChange={(value) => onFormDataChange({ ...formData, forceDisconnect: value })}
+          gracePeriodMinutes={formData.gracePeriodMinutes ?? 5}
+          onGracePeriodMinutesChange={(value) => onFormDataChange({ ...formData, gracePeriodMinutes: value })}
         />
       )}
 

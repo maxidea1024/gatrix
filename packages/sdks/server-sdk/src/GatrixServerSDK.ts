@@ -16,8 +16,9 @@ import { ServiceMaintenanceService } from './services/ServiceMaintenanceService'
 import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
 import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
-import { EventCallback } from './types/events';
+import { EventCallback, SdkEvent } from './types/events';
 import { SdkMetrics } from './utils/sdkMetrics';
+import { MaintenanceEventData } from './cache/MaintenanceWatcher';
 import {
   RedeemCouponRequest,
   RedeemCouponResponse,
@@ -29,6 +30,7 @@ import {
   RegisterServiceInput,
   UpdateServiceStatusInput,
   GetServicesParams,
+  MaintenanceInfo,
 } from './types/api';
 
 /**
@@ -54,6 +56,8 @@ export class GatrixServerSDK {
   private cacheManager?: CacheManager;
   private eventListener?: EventListener;
   private metrics?: SdkMetrics;
+  // Maintenance event listeners (separate from standard event listeners)
+  private maintenanceEventListeners: Map<string, EventCallback[]> = new Map();
 
   constructor(config: GatrixSDKConfig) {
     // Set default API token if not provided (for testing)
@@ -107,6 +111,7 @@ export class GatrixServerSDK {
    * Validate SDK configuration
    */
   private validateConfig(config: GatrixSDKConfig): void {
+    // Required fields
     if (!config.gatrixUrl) {
       throw createError(ErrorCode.INVALID_CONFIG, 'gatrixUrl is required');
     }
@@ -125,6 +130,65 @@ export class GatrixServerSDK {
     } catch (_error) {
       throw createError(ErrorCode.INVALID_CONFIG, 'gatrixUrl must be a valid URL');
     }
+
+    // Validate worldId format if provided
+    if (config.worldId !== undefined) {
+      if (typeof config.worldId !== 'string' || config.worldId.trim() === '') {
+        throw createError(ErrorCode.INVALID_CONFIG, 'worldId must be a non-empty string');
+      }
+    }
+
+    // Validate metrics config
+    if (config.metrics) {
+      if (config.metrics.enabled !== undefined && typeof config.metrics.enabled !== 'boolean') {
+        throw createError(ErrorCode.INVALID_CONFIG, 'metrics.enabled must be a boolean');
+      }
+    }
+
+    // Validate serviceDiscovery config
+    if (config.serviceDiscovery) {
+      const sd = config.serviceDiscovery;
+
+      // If autoRegister is enabled, validate required fields
+      if (sd.autoRegister) {
+        if (!sd.labels || !sd.labels.service) {
+          throw createError(
+            ErrorCode.INVALID_CONFIG,
+            'serviceDiscovery.labels.service is required when autoRegister is enabled'
+          );
+        }
+
+        if (!sd.ports || (!sd.ports.tcp?.length && !sd.ports.udp?.length && !sd.ports.http?.length)) {
+          throw createError(
+            ErrorCode.INVALID_CONFIG,
+            'serviceDiscovery.ports must have at least one port when autoRegister is enabled'
+          );
+        }
+      }
+    }
+
+    // Validate cache config
+    if (config.cache) {
+      if (config.cache.ttl !== undefined) {
+        if (typeof config.cache.ttl !== 'number' || config.cache.ttl < 0) {
+          throw createError(ErrorCode.INVALID_CONFIG, 'cache.ttl must be a non-negative number');
+        }
+      }
+
+      if (config.cache.refreshMethod !== undefined) {
+        if (!['polling', 'event'].includes(config.cache.refreshMethod)) {
+          throw createError(ErrorCode.INVALID_CONFIG, 'cache.refreshMethod must be "polling" or "event"');
+        }
+      }
+    }
+
+    // Validate redis config if event-based refresh is used
+    if (config.cache?.refreshMethod === 'event' && !config.redis) {
+      throw createError(
+        ErrorCode.INVALID_CONFIG,
+        'redis config is required when cache.refreshMethod is "event"'
+      );
+    }
   }
 
   /**
@@ -136,21 +200,8 @@ export class GatrixServerSDK {
       return;
     }
 
+    // Note: labels and ports are already validated in validateConfig()
     const { labels, hostname, internalAddress, ports, status, stats, meta } = serviceDiscoveryConfig;
-
-    if (!labels || !labels.service) {
-      throw createError(
-        ErrorCode.INVALID_CONFIG,
-        'serviceDiscovery.labels.service is required when autoRegister is enabled'
-      );
-    }
-
-    if (!ports || (!ports.tcp?.length && !ports.udp?.length && !ports.http?.length)) {
-      throw createError(
-        ErrorCode.INVALID_CONFIG,
-        'serviceDiscovery.ports must have at least one port when autoRegister is enabled'
-      );
-    }
 
     this.logger.info('Auto-registering service via serviceDiscovery config', {
       labels,
@@ -161,10 +212,10 @@ export class GatrixServerSDK {
     });
 
     const result = await this.serviceDiscovery.register({
-      labels,
+      labels: labels!, // Already validated in validateConfig()
       hostname,
       internalAddress,
-      ports,
+      ports: ports!, // Already validated in validateConfig()
       status,
       stats,
       meta,
@@ -215,8 +266,14 @@ export class GatrixServerSDK {
         this.serviceMaintenance,
         this.apiClient,
         this.logger,
-        this.metrics
+        this.metrics,
+        this.config.worldId // Pass worldId for maintenance watcher
       );
+
+      // Register maintenance state change listener to emit SDK events
+      this.cacheManager.onMaintenanceChange((eventType, data) => {
+        this.emitMaintenanceEvent(eventType, data);
+      });
 
       await this.cacheManager.initialize();
 
@@ -329,6 +386,122 @@ export class GatrixServerSDK {
    */
   getServiceMaintenanceMessage(lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
     return this.serviceMaintenance.getMessage(lang);
+  }
+
+  // ============================================================================
+  // Integrated Maintenance Methods
+  // ============================================================================
+
+  /**
+   * Check if the service is in maintenance (global or world-level)
+   * Checks in order: global service maintenance → world-level maintenance
+   *
+   * Behavior:
+   * - If worldId is provided: checks global service + that specific world
+   * - If config.worldId is set: checks global service + that specific world
+   * - If neither is set: checks global service + ALL worlds (returns true if any world is in maintenance)
+   *
+   * @param worldId Optional world ID to check (uses config.worldId if not provided)
+   * @returns true if either global service or world(s) is in maintenance
+   */
+  isMaintenance(worldId?: string): boolean {
+    // First check global service maintenance
+    if (this.serviceMaintenance.isInMaintenance()) {
+      return true;
+    }
+
+    // Determine target world ID
+    const targetWorldId = worldId ?? this.config.worldId;
+
+    // If specific worldId is specified, check only that world
+    if (targetWorldId) {
+      return this.gameWorld.isWorldInMaintenance(targetWorldId);
+    }
+
+    // If no worldId specified, check ALL worlds (world-wide service mode)
+    const allWorlds = this.gameWorld.getCached();
+    for (const world of allWorlds) {
+      if (world.worldId && this.gameWorld.isWorldInMaintenance(world.worldId)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Get comprehensive maintenance information
+   * Returns detailed info about maintenance status including source, message, and options
+   *
+   * Behavior:
+   * - If worldId is provided: returns info for global service or that specific world
+   * - If config.worldId is set: returns info for global service or that specific world
+   * - If neither is set: returns info for global service or the first world in maintenance
+   *
+   * @param worldId Optional world ID to check (uses config.worldId if not provided)
+   * @param lang Language for maintenance message
+   */
+  getMaintenanceInfo(worldId?: string, lang: 'ko' | 'en' | 'zh' = 'en'): MaintenanceInfo {
+    const targetWorldId = worldId ?? this.config.worldId;
+
+    // Check global service maintenance first
+    if (this.serviceMaintenance.isInMaintenance()) {
+      const status = this.serviceMaintenance.getCached();
+      return {
+        isMaintenance: true,
+        source: 'service',
+        message: this.serviceMaintenance.getMessage(lang),
+        forceDisconnect: status?.detail?.kickExistingPlayers ?? false,
+        gracePeriodMinutes: status?.detail?.kickDelayMinutes ?? 0,
+        startsAt: status?.detail?.startsAt ?? null,
+        endsAt: status?.detail?.endsAt ?? null,
+      };
+    }
+
+    // If specific worldId is specified, check that world
+    if (targetWorldId && this.gameWorld.isWorldInMaintenance(targetWorldId)) {
+      const world = this.gameWorld.getWorldByWorldId(targetWorldId);
+      return {
+        isMaintenance: true,
+        source: 'world',
+        worldId: targetWorldId,
+        message: this.gameWorld.getWorldMaintenanceMessage(targetWorldId, lang),
+        forceDisconnect: world?.forceDisconnect ?? false,
+        gracePeriodMinutes: world?.gracePeriodMinutes ?? 0,
+        startsAt: world?.maintenanceStartDate ?? null,
+        endsAt: world?.maintenanceEndDate ?? null,
+      };
+    }
+
+    // If no worldId specified, check ALL worlds and return first one in maintenance
+    if (!targetWorldId) {
+      const allWorlds = this.gameWorld.getCached();
+      for (const world of allWorlds) {
+        if (world.worldId && this.gameWorld.isWorldInMaintenance(world.worldId)) {
+          return {
+            isMaintenance: true,
+            source: 'world',
+            worldId: world.worldId,
+            message: this.gameWorld.getWorldMaintenanceMessage(world.worldId, lang),
+            forceDisconnect: world.forceDisconnect ?? false,
+            gracePeriodMinutes: world.gracePeriodMinutes ?? 0,
+            startsAt: world.maintenanceStartDate ?? null,
+            endsAt: world.maintenanceEndDate ?? null,
+          };
+        }
+      }
+    }
+
+    // Not in maintenance
+    return {
+      isMaintenance: false,
+      source: null,
+      message: null,
+      forceDisconnect: false,
+      gracePeriodMinutes: 0,
+      startsAt: null,
+      endsAt: null,
+    };
   }
 
   // ============================================================================
@@ -494,11 +667,54 @@ export class GatrixServerSDK {
   // ============================================================================
 
   /**
+   * Emit maintenance event to all registered listeners
+   * Called by MaintenanceWatcher when maintenance state changes
+   */
+  private emitMaintenanceEvent(
+    eventType: 'maintenance.started' | 'maintenance.ended',
+    data: MaintenanceEventData
+  ): void {
+    const listeners = this.maintenanceEventListeners.get(eventType) || [];
+    const event: SdkEvent = {
+      type: eventType,
+      data,
+      timestamp: data.timestamp,
+    };
+
+    for (const callback of listeners) {
+      try {
+        callback(event);
+      } catch (error: any) {
+        this.logger.error('Error in maintenance event callback', { error: error.message });
+      }
+    }
+
+    this.logger.info('Maintenance event emitted', { eventType, source: data.source, worldId: data.worldId });
+  }
+
+  /**
    * Register event listener
    * Works with both event-based and polling refresh methods
+   * Also supports maintenance.started and maintenance.ended events
    * Returns a function to unregister the listener
    */
   on(eventType: string, callback: EventCallback): () => void {
+    // Handle maintenance events separately (these are local events from MaintenanceWatcher)
+    if (eventType === 'maintenance.started' || eventType === 'maintenance.ended') {
+      const listeners = this.maintenanceEventListeners.get(eventType) || [];
+      listeners.push(callback);
+      this.maintenanceEventListeners.set(eventType, listeners);
+
+      // Return unsubscribe function
+      return () => {
+        const currentListeners = this.maintenanceEventListeners.get(eventType) || [];
+        this.maintenanceEventListeners.set(
+          eventType,
+          currentListeners.filter((cb) => cb !== callback)
+        );
+      };
+    }
+
     const refreshMethod = this.config.cache?.refreshMethod ?? 'polling';
 
     // For event-based refresh, use EventListener
@@ -533,6 +749,16 @@ export class GatrixServerSDK {
    * Unregister event listener
    */
   off(eventType: string, callback: EventCallback): void {
+    // Handle maintenance events separately
+    if (eventType === 'maintenance.started' || eventType === 'maintenance.ended') {
+      const currentListeners = this.maintenanceEventListeners.get(eventType) || [];
+      this.maintenanceEventListeners.set(
+        eventType,
+        currentListeners.filter((cb) => cb !== callback)
+      );
+      return;
+    }
+
     const refreshMethod = this.config.cache?.refreshMethod ?? 'polling';
 
     // For event-based refresh, use EventListener
