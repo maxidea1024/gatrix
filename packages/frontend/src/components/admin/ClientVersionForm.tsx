@@ -561,7 +561,18 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Error saving client version:', error);
-      enqueueSnackbar(error.message || t('clientVersions.saveError'), { variant: 'error' });
+
+      // Handle version validation error
+      let errorMessage = error.message || t('clientVersions.saveError');
+      if (error.message?.startsWith('VERSION_TOO_OLD:')) {
+        const latestVersion = error.message.split(':')[1];
+        errorMessage = t('clientVersions.versionTooOld', {
+          newVersion: data.clientVersion,
+          latestVersion
+        });
+      }
+
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setLoading(false);
     }

@@ -3,6 +3,29 @@ import { pubSubService } from './PubSubService';
 import logger from '../config/logger';
 import { applyMaintenanceStatusCalculationToArray, applyMaintenanceStatusCalculation } from '../utils/maintenanceUtils';
 
+/**
+ * Parse semver string to numeric array [major, minor, patch]
+ */
+function parseSemver(version: string): [number, number, number] {
+  const match = version.match(/^(\d+)\.(\d+)\.(\d+)/);
+  if (!match) return [0, 0, 0];
+  return [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])];
+}
+
+/**
+ * Compare two semver versions
+ * Returns: 1 if a > b, -1 if a < b, 0 if equal
+ */
+function compareSemver(a: string, b: string): number {
+  const [aMajor, aMinor, aPatch] = parseSemver(a);
+  const [bMajor, bMinor, bPatch] = parseSemver(b);
+
+  if (aMajor !== bMajor) return aMajor > bMajor ? 1 : -1;
+  if (aMinor !== bMinor) return aMinor > bMinor ? 1 : -1;
+  if (aPatch !== bPatch) return aPatch > bPatch ? 1 : -1;
+  return 0;
+}
+
 export interface ClientVersionFilters {
   version?: string | string[];
   platform?: string | string[];
@@ -258,6 +281,14 @@ export class ClientVersionService {
   static async createClientVersion(
     data: ClientVersionCreationAttributes
   ): Promise<ClientVersionAttributes> {
+    // Validate that the new version is greater than the latest version for this platform
+    const latestVersion = await this.findLatestByPlatform(data.platform);
+    if (latestVersion && compareSemver(data.clientVersion, latestVersion.clientVersion) <= 0) {
+      throw new Error(
+        `VERSION_TOO_OLD:${latestVersion.clientVersion}` // Error code format for i18n
+      );
+    }
+
     const result = await ClientVersionModel.create(data);
 
     // Invalidate client version cache
@@ -269,6 +300,21 @@ export class ClientVersionService {
   static async bulkCreateClientVersions(
     data: any
   ): Promise<ClientVersionAttributes[]> {
+    // Version validation for each platform
+    const versionErrors: string[] = [];
+    for (const platform of data.platforms) {
+      const latestVersion = await this.findLatestByPlatform(platform.platform);
+      if (latestVersion && compareSemver(data.clientVersion, latestVersion.clientVersion) <= 0) {
+        versionErrors.push(`${platform.platform}: ${latestVersion.clientVersion}`);
+      }
+    }
+
+    if (versionErrors.length > 0) {
+      throw new Error(
+        `VERSION_TOO_OLD_BULK:${versionErrors.join(', ')}` // Error code format for i18n
+      );
+    }
+
     // 중복 체크
     const duplicates = [];
     for (const platform of data.platforms) {
@@ -413,6 +459,41 @@ export class ClientVersionService {
     clientVersion: string
   ): Promise<ClientVersionAttributes | null> {
     return this.findByExact(platform, clientVersion);
+  }
+
+  /**
+   * Find the latest client version for a given platform
+   * Since versions are validated on creation (must be greater than previous),
+   * the most recently created version is the latest.
+   *
+   * @param platform - Platform identifier
+   * @param status - Optional status filter. If provided, only versions with this status are considered.
+   *                 If not provided, all versions are considered regardless of status.
+   */
+  static async findLatestByPlatform(
+    platform: string,
+    status?: ClientStatus | ClientStatus[]
+  ): Promise<ClientVersionAttributes | null> {
+    const queryOptions: any = {
+      platform,
+      limit: 1,
+      offset: 0,
+      sortBy: 'id',
+      sortOrder: 'DESC',
+    };
+
+    // Only filter by status if explicitly provided
+    if (status) {
+      queryOptions.clientStatus = status;
+    }
+
+    const result = await ClientVersionModel.findAll(queryOptions);
+    const { clientVersions: rows } = result;
+
+    if (rows.length === 0) return null;
+
+    // Apply maintenance status calculation based on time constraints
+    return applyMaintenanceStatusCalculation(rows[0]);
   }
 }
 

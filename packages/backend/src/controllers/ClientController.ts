@@ -30,15 +30,26 @@ export class ClientController {
   /**
    * Get client version information
    * GET /api/v1/client/client-version
+   *
+   * Query params:
+   * - platform (required): Platform identifier (e.g., 'android', 'ios', 'windows')
+   * - version (optional): Client version string. If omitted or 'latest', returns the latest version for the platform
+   * - status (optional): Filter by status (e.g., 'ONLINE', 'MAINTENANCE'). Only applied when fetching latest version.
+   * - lang (optional): Language code for localized maintenance messages
    */
   static getClientVersion = asyncHandler(async (req: Request, res: Response) => {
-    const { platform, version, lang } = req.query as { platform?: string; version?: string; lang?: string };
+    const { platform, version, status, lang } = req.query as {
+      platform?: string;
+      version?: string;
+      status?: string;
+      lang?: string;
+    };
 
-    // Validate required query params
-    if (!platform || !version) {
+    // Validate required query params - platform is always required
+    if (!platform) {
       return res.status(400).json({
         success: false,
-        message: 'platform and version are required query parameters',
+        message: 'platform is a required query parameter',
       });
     }
 
@@ -53,9 +64,27 @@ export class ClientController {
       });
     }
 
-    // Create cache key for exact match (with language)
-    // Cache separately for each language to ensure correct maintenance messages
-    const cacheKey = `client_version:${platform}:${version}${lang ? `:${lang}` : ''}`;
+    // Validate status parameter if provided
+    const validStatuses = Object.values(ClientStatus);
+    let statusFilter: ClientStatus | undefined;
+    if (status) {
+      const upperStatus = status.toUpperCase() as ClientStatus;
+      if (!validStatuses.includes(upperStatus)) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid status. Valid values are: ${validStatuses.join(', ')}`,
+        });
+      }
+      statusFilter = upperStatus;
+    }
+
+    // Determine if we should fetch the latest version
+    const isLatestRequest = !version || version.toLowerCase() === 'latest';
+
+    // Create cache key (use 'latest' for latest requests)
+    const versionKey = isLatestRequest ? 'latest' : version;
+    const statusKey = statusFilter ? `:${statusFilter}` : '';
+    const cacheKey = `client_version:${platform}:${versionKey}${statusKey}${lang ? `:${lang}` : ''}`;
 
     // Try to get from cache first
     const cachedData = await cacheService.get(cacheKey);
@@ -68,15 +97,24 @@ export class ClientController {
       });
     }
 
-    // If not in cache, fetch from database (exact match, any status)
+    // If not in cache, fetch from database
     logger.debug(`Cache miss for client version: ${cacheKey}`);
 
-    const record = await ClientVersionService.findByExact(platform, version);
+    let record;
+    if (isLatestRequest) {
+      // Get the latest version for the platform (with optional status filter)
+      record = await ClientVersionService.findLatestByPlatform(platform, statusFilter);
+    } else {
+      // Get exact version match
+      record = await ClientVersionService.findByExact(platform, version);
+    }
 
     if (!record) {
       return res.status(404).json({
         success: false,
-        message: 'Client version not found',
+        message: isLatestRequest
+          ? `No client version found for platform: ${platform}${statusFilter ? ` with status: ${statusFilter}` : ''}`
+          : 'Client version not found',
       });
     }
 

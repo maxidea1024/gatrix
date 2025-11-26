@@ -376,10 +376,21 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Error creating client versions:', error);
-      enqueueSnackbar(
-        error.message || t('clientVersions.bulkCreateFailed'),
-        { variant: 'error' }
-      );
+
+      // Handle version validation error
+      let errorMessage = error.message || t('clientVersions.bulkCreateFailed');
+      if (error.message?.startsWith('VERSION_TOO_OLD:')) {
+        const latestVersion = error.message.split(':')[1];
+        errorMessage = t('clientVersions.versionTooOld', {
+          newVersion: data.clientVersion,
+          latestVersion
+        });
+      } else if (error.message?.startsWith('VERSION_TOO_OLD_BULK:')) {
+        const platforms = error.message.split(':')[1];
+        errorMessage = t('clientVersions.versionTooOldBulk', { platforms });
+      }
+
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setLoading(false);
     }

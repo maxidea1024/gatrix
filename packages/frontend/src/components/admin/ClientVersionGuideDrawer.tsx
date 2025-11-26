@@ -20,6 +20,10 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -58,7 +62,8 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
   // State for API test
   const [apiToken, setApiToken] = useState('gatrix-unsecured-client-api-token'); // Default to unsecured client token
   const [platform, setPlatform] = useState('ios');
-  const [version, setVersion] = useState('1.0.0');
+  const [version, setVersion] = useState(''); // Optional - empty means latest
+  const [status, setStatus] = useState(''); // Optional status filter
   const [lang, setLang] = useState('ko');
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
@@ -78,10 +83,11 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
     try {
       const saved = localStorage.getItem('clientVersionGuideDrawer_testInputs');
       if (saved) {
-        const { apiToken: savedToken, platform: savedPlatform, version: savedVersion, lang: savedLang } = JSON.parse(saved);
+        const { apiToken: savedToken, platform: savedPlatform, version: savedVersion, status: savedStatus, lang: savedLang } = JSON.parse(saved);
         if (savedToken) setApiToken(savedToken);
         if (savedPlatform) setPlatform(savedPlatform);
-        if (savedVersion) setVersion(savedVersion);
+        if (savedVersion !== undefined) setVersion(savedVersion);
+        if (savedStatus !== undefined) setStatus(savedStatus);
         if (savedLang) setLang(savedLang);
       }
     } catch (error) {
@@ -96,16 +102,30 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
         apiToken,
         platform,
         version,
+        status,
         lang,
       }));
     } catch (error) {
       // Silently ignore localStorage errors
     }
-  }, [apiToken, platform, version, lang]);
+  }, [apiToken, platform, version, status, lang]);
 
   // curl example code
   const curlExample = `# Client Version Query API Example
+# Query specific version
 curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&version=1.0.0&lang=ko" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: MyGameApp" \\
+  -H "X-API-Token: your-api-token-here"
+
+# Query latest version (omit version parameter)
+curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&lang=ko" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: MyGameApp" \\
+  -H "X-API-Token: your-api-token-here"
+
+# Query latest ONLINE version only
+curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&status=ONLINE" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
   -H "X-API-Token: your-api-token-here"`;
@@ -154,7 +174,7 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
   // Error response examples
   const errorMissingParams = `{
   "success": false,
-  "message": "platform and version are required query parameters"
+  "message": "platform is a required query parameter"
 }`;
 
   const errorMissingHeaders = `{
@@ -190,7 +210,14 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
     try {
       const params = new URLSearchParams();
       params.append('platform', platform);
-      params.append('version', version);
+      // version is optional - omit to get latest
+      if (version && version.trim()) {
+        params.append('version', version.trim());
+      }
+      // status is optional - filter by status when fetching latest
+      if (status && status.trim()) {
+        params.append('status', status.trim());
+      }
       if (lang) {
         params.append('lang', lang);
       }
@@ -683,7 +710,7 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
                           fontWeight: 500,
                           fontSize: '0.875rem'
                         }}>
-                          Version *
+                          Version
                         </Box>
                         <Box sx={{
                           p: 1,
@@ -695,9 +722,45 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
                             onChange={(e) => setVersion(e.target.value)}
                             size="small"
                             fullWidth
-                            placeholder="e.g., 1.0.0"
+                            placeholder={t('clientVersions.sdkGuideDrawer.versionPlaceholder')}
                             sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
                           />
+                        </Box>
+
+                        {/* Status */}
+                        <Box sx={{
+                          p: 1.5,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f5f5f5',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontWeight: 500,
+                          fontSize: '0.875rem'
+                        }}>
+                          Status
+                        </Box>
+                        <Box sx={{
+                          p: 1,
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          borderLeft: `1px solid ${theme.palette.divider}`
+                        }}>
+                          <FormControl size="small" fullWidth>
+                            <Select
+                              value={status}
+                              onChange={(e) => setStatus(e.target.value)}
+                              displayEmpty
+                              sx={{ '& .MuiInputBase-input': { fontSize: '0.875rem' } }}
+                            >
+                              <MenuItem value="">{t('clientVersions.sdkGuideDrawer.statusNone')}</MenuItem>
+                              <MenuItem value="ONLINE">ONLINE</MenuItem>
+                              <MenuItem value="OFFLINE">OFFLINE</MenuItem>
+                              <MenuItem value="MAINTENANCE">MAINTENANCE</MenuItem>
+                              <MenuItem value="RECOMMENDED_UPDATE">RECOMMENDED_UPDATE</MenuItem>
+                              <MenuItem value="FORCED_UPDATE">FORCED_UPDATE</MenuItem>
+                              <MenuItem value="UNDER_REVIEW">UNDER_REVIEW</MenuItem>
+                              <MenuItem value="BLOCKED_PATCH_ALLOWED">BLOCKED_PATCH_ALLOWED</MenuItem>
+                            </Select>
+                          </FormControl>
                         </Box>
 
                         {/* Language */}
