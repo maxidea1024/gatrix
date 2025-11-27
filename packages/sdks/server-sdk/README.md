@@ -1008,22 +1008,32 @@ npm run clean
 Deploy SDK to game server (UWO):
 
 ```bash
-# Build and deploy to game server
+# Build and deploy to game server (uses default path or GAME_SERVER_PATH env var)
 npm run deploy:game
 
 # Bump patch version and deploy
 npm run deploy:game:bump
+
+# Set specific version and deploy
+npm run deploy:game -- --bump 1.2.3
+
+# Deploy to custom game server path
+npm run deploy:game -- --path /path/to/game/server
+
+# Combine options
+npm run deploy:game -- --bump 2.0.0 --path /custom/path
 ```
 
+**Environment Variables:**
+- `GAME_SERVER_PATH`: Default game server path (default: `c:/work/uwo/game/server/node`)
+
 The deploy script automatically:
-1. Bumps version (with `--bump` flag)
+1. Bumps version (with `--bump` flag, optionally to specific version)
 2. Builds the SDK
 3. Creates npm package (`.tgz`)
 4. Copies to game server `lib/` folder
 5. Updates game server `package.json`
 6. Runs `npm install` in game server
-
-**Configuration**: Edit `scripts/deploy-to-game-server.ts` to change the game server path.
 
 ### Test Servers
 
