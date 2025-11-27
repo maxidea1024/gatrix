@@ -1555,6 +1555,8 @@ const CouponSettingsPage: React.FC = () => {
                     label={t('coupons.couponSettings.form.startsAt')}
                     value={form.startsAt}
                     onChange={(date) => setForm((s: any) => ({ ...s, startsAt: date }))}
+                    timeSteps={{ minutes: 1 }}
+                    readOnly
                     slotProps={{
                       textField: { fullWidth: true },
                       actionBar: {
@@ -1567,6 +1569,8 @@ const CouponSettingsPage: React.FC = () => {
                     value={form.expiresAt}
                     onChange={(date) => setForm((s: any) => ({ ...s, expiresAt: date }))}
                     minDateTime={form.startsAt || undefined}
+                    timeSteps={{ minutes: 1 }}
+                    readOnly
                     slotProps={{
                       textField: { fullWidth: true, required: true },
                       actionBar: {

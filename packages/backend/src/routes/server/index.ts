@@ -76,10 +76,12 @@ router.get('/game-worlds/:id', serverSDKAuth, ServerGameWorldController.getGameW
 
 // Ingame popup notice routes
 router.get('/ingame-popup-notices', serverSDKAuth, IngamePopupNoticeController.getServerIngamePopupNotices);
+router.get('/ingame-popup-notices/:id', serverSDKAuth, IngamePopupNoticeController.getServerIngamePopupNoticeById);
 
 // Survey routes
 router.get('/surveys/settings', serverSDKAuth, SurveyController.getServerSurveySettings);
 router.get('/surveys', serverSDKAuth, SurveyController.getServerSurveys);
+router.get('/surveys/:id', serverSDKAuth, SurveyController.getServerSurveyById);
 
 // Whitelist routes
 router.get('/whitelists', serverSDKAuth, getWhitelistsHandler);

@@ -858,7 +858,9 @@
       "translateTooltip": "Automatically translate the default maintenance message to multiple languages",
       "translationCompleted": "Translation completed successfully",
       "translationFailed": "Translation failed",
-      "noMessageToTranslate": "No message to translate"
+      "noMessageToTranslate": "No message to translate",
+      "validationMinDuration": "维护期间必须至少为5分钟。（当前：{{duration}}分钟）",
+      "validationGracePeriodExceedsDuration": "宽限期必须短于维护期间。（维护期间：{{duration}}分钟，宽限期：{{gracePeriod}}分钟）"
     },
     "sdkGuide": {
       "title": "Server SDK 集成指南",
@@ -1040,6 +1042,8 @@
     "validationEndTimeInPast": "结束时间已过期。请设置为未来时间。",
     "validationEndBeforeStart": "结束时间早于开始时间。",
     "validationTooShort": "维护时间太短。请至少设置5分钟。",
+    "validationMinDuration": "维护期间必须至少为5分钟。（当前：{{duration}}分钟）",
+    "validationGracePeriodExceedsDuration": "宽限期必须短于维护期间。（维护期间：{{duration}}分钟，宽限期：{{gracePeriod}}分钟）",
     "directInput": "直接输入",
     "startsAt": "开始时间",
     "endsAt": "结束时间",
@@ -1050,9 +1054,9 @@
     "start": "开始维护",
     "statusOff": "正常",
     "statusOn": "维护中",
-    "statusActive": "🔧 进行中",
-    "statusScheduled": "⏱️ 已安排",
-    "statusInactive": "✓ 未激活",
+    "statusActive": "进行中",
+    "statusScheduled": "已安排",
+    "statusInactive": "未激活",
     "stop": "停止维护",
     "title": "服务维护",
     "type": "维护类型",

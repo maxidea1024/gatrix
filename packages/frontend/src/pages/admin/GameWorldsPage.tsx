@@ -833,6 +833,28 @@ const GameWorldsPage: React.FC = () => {
       errors.maintenanceMessage = t('gameWorlds.maintenance.messageRequired');
     }
 
+    // 점검 모드일 때 기간 및 유예시간 검증
+    if (formData.isMaintenance && formData.maintenanceEndDate) {
+      const now = dayjs();
+      const startsAt = formData.maintenanceStartDate ? dayjs(formData.maintenanceStartDate) : null;
+      const endsAt = dayjs(formData.maintenanceEndDate);
+      const effectiveStart = startsAt || now;
+      const duration = endsAt.diff(effectiveStart, 'minute');
+
+      // Minimum 5 minutes validation
+      if (duration < 5) {
+        errors.maintenanceEndDate = t('gameWorlds.maintenanceConfig.validationMinDuration', { duration: Math.max(0, duration) });
+      }
+
+      // Grace period validation (if forceDisconnect is enabled)
+      if (formData.forceDisconnect && formData.gracePeriodMinutes >= duration) {
+        errors.gracePeriodMinutes = t('gameWorlds.maintenanceConfig.validationGracePeriodExceedsDuration', {
+          duration,
+          gracePeriod: formData.gracePeriodMinutes
+        });
+      }
+    }
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -1010,15 +1032,40 @@ const GameWorldsPage: React.FC = () => {
 
     try {
       if (maintenanceToggleDialog.isActivating) {
+        // Validate maintenance time settings
+        const { maintenanceStartDate, maintenanceEndDate, forceDisconnect, gracePeriodMinutes } = maintenanceToggleDialog.maintenanceData;
+        const now = dayjs();
+        const startsAt = maintenanceStartDate ? dayjs(maintenanceStartDate) : null;
+        const endsAt = maintenanceEndDate ? dayjs(maintenanceEndDate) : null;
+
+        // Calculate duration based on start time (or now if immediate start)
+        if (endsAt) {
+          const effectiveStart = startsAt || now;
+          const duration = endsAt.diff(effectiveStart, 'minute');
+
+          // Minimum 5 minutes validation
+          if (duration < 5) {
+            enqueueSnackbar(t('gameWorlds.maintenanceConfig.validationMinDuration', { duration: Math.max(0, duration) }), { variant: 'error' });
+            return;
+          }
+
+          // Grace period validation (if forceDisconnect is enabled)
+          if (forceDisconnect && gracePeriodMinutes >= duration) {
+            enqueueSnackbar(t('gameWorlds.maintenanceConfig.validationGracePeriodExceedsDuration', {
+              duration,
+              gracePeriod: gracePeriodMinutes
+            }), { variant: 'error' });
+            return;
+          }
+        }
+
         // 점검 활성화: 점검 전용 API 사용
         const updateData: any = {
           isMaintenance: true,
-          maintenanceStartDate: maintenanceToggleDialog.maintenanceData.maintenanceStartDate || undefined,
-          maintenanceEndDate: maintenanceToggleDialog.maintenanceData.maintenanceEndDate || undefined,
-          forceDisconnect: maintenanceToggleDialog.maintenanceData.forceDisconnect,
-          gracePeriodMinutes: maintenanceToggleDialog.maintenanceData.forceDisconnect
-            ? maintenanceToggleDialog.maintenanceData.gracePeriodMinutes
-            : undefined,
+          maintenanceStartDate: maintenanceStartDate || undefined,
+          maintenanceEndDate: maintenanceEndDate || undefined,
+          forceDisconnect: forceDisconnect,
+          gracePeriodMinutes: forceDisconnect ? gracePeriodMinutes : undefined,
         };
 
         // 메시지 소스에 따라 분기

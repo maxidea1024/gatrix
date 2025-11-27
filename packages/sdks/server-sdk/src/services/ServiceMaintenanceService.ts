@@ -32,20 +32,26 @@ export class ServiceMaintenanceService {
       throw new Error(response.error?.message || 'Failed to fetch service maintenance status');
     }
 
-    this.cachedStatus = response.data;
+    // Ensure isMaintenanceActive has a boolean value (for backward compatibility with older backend)
+    const status: MaintenanceStatus = {
+      ...response.data,
+      isMaintenanceActive: response.data.isMaintenanceActive ?? false,
+    };
+
+    this.cachedStatus = status;
 
     this.logger.info('Service maintenance status fetched', {
-      isUnderMaintenance: response.data.isUnderMaintenance,
+      hasMaintenanceScheduled: status.hasMaintenanceScheduled,
+      isMaintenanceActive: status.isMaintenanceActive,
     });
 
-    return response.data;
+    return status;
   }
 
   /**
    * Refresh service maintenance cache
    */
   async refresh(): Promise<MaintenanceStatus> {
-    this.logger.info('Refreshing service maintenance cache');
     return await this.getStatus();
   }
 
@@ -67,14 +73,14 @@ export class ServiceMaintenanceService {
   /**
    * Check if service is currently in maintenance based on flag and time window
    */
-  isInMaintenance(): boolean {
+  isMaintenanceActive(): boolean {
     if (!this.cachedStatus) {
       return false;
     }
 
-    const { isUnderMaintenance, detail } = this.cachedStatus;
+    const { hasMaintenanceScheduled, detail } = this.cachedStatus;
 
-    if (!isUnderMaintenance) {
+    if (!hasMaintenanceScheduled) {
       return false;
     }
 
@@ -104,7 +110,7 @@ export class ServiceMaintenanceService {
    * Returns null when maintenance is not active
    */
   getMessage(lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
-    if (!this.isInMaintenance() || !this.cachedStatus?.detail) {
+    if (!this.isMaintenanceActive() || !this.cachedStatus?.detail) {
       return null;
     }
 

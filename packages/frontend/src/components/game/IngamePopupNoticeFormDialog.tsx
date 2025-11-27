@@ -358,6 +358,8 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
                 label={t('ingamePopupNotices.startDate')}
                 value={startDate}
                 onChange={(date) => setStartDate(date)}
+                timeSteps={{ minutes: 1 }}
+                readOnly
                 slotProps={{
                   textField: {
                     fullWidth: true,
@@ -373,6 +375,8 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
                 value={endDate}
                 onChange={(date) => setEndDate(date)}
                 minDateTime={startDate || undefined}
+                timeSteps={{ minutes: 1 }}
+                readOnly
                 slotProps={{
                   textField: {
                     fullWidth: true,

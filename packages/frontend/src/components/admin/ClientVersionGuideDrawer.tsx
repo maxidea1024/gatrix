@@ -64,7 +64,7 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
   const [platform, setPlatform] = useState('ios');
   const [version, setVersion] = useState(''); // Optional - empty means latest
   const [status, setStatus] = useState(''); // Optional status filter
-  const [lang, setLang] = useState('ko');
+  const [lang, setLang] = useState(''); // Optional - empty means no language filter
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
@@ -778,14 +778,19 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&sta
                           p: 1,
                           borderLeft: `1px solid ${theme.palette.divider}`
                         }}>
-                          <TextField
-                            value={lang}
-                            onChange={(e) => setLang(e.target.value)}
-                            size="small"
-                            fullWidth
-                            placeholder="e.g., ko, en, zh (optional)"
-                            sx={{ '& .MuiInputBase-root': { fontSize: '0.875rem' } }}
-                          />
+                          <FormControl size="small" fullWidth>
+                            <Select
+                              value={lang}
+                              onChange={(e) => setLang(e.target.value)}
+                              displayEmpty
+                              sx={{ '& .MuiInputBase-input': { fontSize: '0.875rem' } }}
+                            >
+                              <MenuItem value="">{t('clientVersions.sdkGuideDrawer.statusNone')}</MenuItem>
+                              <MenuItem value="ko">ko</MenuItem>
+                              <MenuItem value="en">en</MenuItem>
+                              <MenuItem value="zh">zh</MenuItem>
+                            </Select>
+                          </FormControl>
                         </Box>
                       </Box>
                     </Box>

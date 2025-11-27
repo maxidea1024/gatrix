@@ -348,10 +348,10 @@ export class GatrixServerSDK {
   }
 
   /**
-   * Check if a world is in maintenance
+   * Check if a world is in maintenance (time-based check)
    */
-  isWorldInMaintenance(worldId: string): boolean {
-    return this.gameWorld.isWorldInMaintenance(worldId);
+  isWorldMaintenanceActive(worldId: string): boolean {
+    return this.gameWorld.isWorldMaintenanceActive(worldId);
   }
 
   /**
@@ -376,10 +376,10 @@ export class GatrixServerSDK {
   }
 
   /**
-   * Check if global service is currently in maintenance
+   * Check if global service is currently in maintenance (time-based check)
    */
-  isServiceInMaintenance(): boolean {
-    return this.serviceMaintenance.isInMaintenance();
+  isServiceMaintenanceActive(): boolean {
+    return this.serviceMaintenance.isMaintenanceActive();
   }
 
   /**
@@ -398,14 +398,14 @@ export class GatrixServerSDK {
    * - If worldId is configured in SDK, only that world is checked
    * - Time-based maintenance (startsAt/endsAt) is calculated to determine actual status
    *
-   * @returns CurrentMaintenanceStatus with isInMaintenance, source, and detail
+   * @returns CurrentMaintenanceStatus with isMaintenanceActive, source, and detail
    */
   getCurrentMaintenanceStatus(): CurrentMaintenanceStatus {
     // Check global service maintenance first (uses time calculation internally)
-    if (this.serviceMaintenance.isInMaintenance()) {
+    if (this.serviceMaintenance.isMaintenanceActive()) {
       const status = this.serviceMaintenance.getCached();
       return {
-        isInMaintenance: true,
+        isMaintenanceActive: true,
         source: 'service',
         detail: {
           startsAt: status?.detail?.startsAt,
@@ -421,7 +421,7 @@ export class GatrixServerSDK {
     // Check world-level maintenance
     const targetWorldId = this.config.worldId;
 
-    if (targetWorldId && this.gameWorld.isWorldInMaintenance(targetWorldId)) {
+    if (targetWorldId && this.gameWorld.isWorldMaintenanceActive(targetWorldId)) {
       const world = this.gameWorld.getWorldByWorldId(targetWorldId);
       if (world) {
         // Convert maintenanceLocales array to localeMessages object
@@ -435,7 +435,7 @@ export class GatrixServerSDK {
         }
 
         return {
-          isInMaintenance: true,
+          isMaintenanceActive: true,
           source: 'world',
           worldId: targetWorldId,
           detail: {
@@ -452,7 +452,7 @@ export class GatrixServerSDK {
 
     // Not in maintenance
     return {
-      isInMaintenance: false,
+      isMaintenanceActive: false,
     };
   }
 
@@ -472,9 +472,9 @@ export class GatrixServerSDK {
    * @param worldId Optional world ID to check (uses config.worldId if not provided)
    * @returns true if either global service or world(s) is in maintenance
    */
-  isMaintenance(worldId?: string): boolean {
+  isMaintenanceActive(worldId?: string): boolean {
     // First check global service maintenance
-    if (this.serviceMaintenance.isInMaintenance()) {
+    if (this.serviceMaintenance.isMaintenanceActive()) {
       return true;
     }
 
@@ -483,13 +483,13 @@ export class GatrixServerSDK {
 
     // If specific worldId is specified, check only that world
     if (targetWorldId) {
-      return this.gameWorld.isWorldInMaintenance(targetWorldId);
+      return this.gameWorld.isWorldMaintenanceActive(targetWorldId);
     }
 
     // If no worldId specified, check ALL worlds (world-wide service mode)
     const allWorlds = this.gameWorld.getCached();
     for (const world of allWorlds) {
-      if (world.worldId && this.gameWorld.isWorldInMaintenance(world.worldId)) {
+      if (world.worldId && this.gameWorld.isWorldMaintenanceActive(world.worldId)) {
         return true;
       }
     }
@@ -513,24 +513,27 @@ export class GatrixServerSDK {
     const targetWorldId = worldId ?? this.config.worldId;
 
     // Check global service maintenance first
-    if (this.serviceMaintenance.isInMaintenance()) {
+    if (this.serviceMaintenance.isMaintenanceActive()) {
       const status = this.serviceMaintenance.getCached();
+      const actualStartTime = this.cacheManager?.getServiceMaintenanceActualStartTime() ?? null;
       return {
-        isMaintenance: true,
+        isMaintenanceActive: true,
         source: 'service',
         message: this.serviceMaintenance.getMessage(lang),
         forceDisconnect: status?.detail?.kickExistingPlayers ?? false,
         gracePeriodMinutes: status?.detail?.kickDelayMinutes ?? 0,
         startsAt: status?.detail?.startsAt ?? null,
         endsAt: status?.detail?.endsAt ?? null,
+        actualStartTime,
       };
     }
 
     // If specific worldId is specified, check that world
-    if (targetWorldId && this.gameWorld.isWorldInMaintenance(targetWorldId)) {
+    if (targetWorldId && this.gameWorld.isWorldMaintenanceActive(targetWorldId)) {
       const world = this.gameWorld.getWorldByWorldId(targetWorldId);
+      const actualStartTime = this.cacheManager?.getWorldMaintenanceActualStartTime(targetWorldId) ?? null;
       return {
-        isMaintenance: true,
+        isMaintenanceActive: true,
         source: 'world',
         worldId: targetWorldId,
         message: this.gameWorld.getWorldMaintenanceMessage(targetWorldId, lang),
@@ -538,6 +541,7 @@ export class GatrixServerSDK {
         gracePeriodMinutes: world?.gracePeriodMinutes ?? 0,
         startsAt: world?.maintenanceStartDate ?? null,
         endsAt: world?.maintenanceEndDate ?? null,
+        actualStartTime,
       };
     }
 
@@ -545,9 +549,10 @@ export class GatrixServerSDK {
     if (!targetWorldId) {
       const allWorlds = this.gameWorld.getCached();
       for (const world of allWorlds) {
-        if (world.worldId && this.gameWorld.isWorldInMaintenance(world.worldId)) {
+        if (world.worldId && this.gameWorld.isWorldMaintenanceActive(world.worldId)) {
+          const actualStartTime = this.cacheManager?.getWorldMaintenanceActualStartTime(world.worldId) ?? null;
           return {
-            isMaintenance: true,
+            isMaintenanceActive: true,
             source: 'world',
             worldId: world.worldId,
             message: this.gameWorld.getWorldMaintenanceMessage(world.worldId, lang),
@@ -555,6 +560,7 @@ export class GatrixServerSDK {
             gracePeriodMinutes: world.gracePeriodMinutes ?? 0,
             startsAt: world.maintenanceStartDate ?? null,
             endsAt: world.maintenanceEndDate ?? null,
+            actualStartTime,
           };
         }
       }
@@ -562,13 +568,14 @@ export class GatrixServerSDK {
 
     // Not in maintenance
     return {
-      isMaintenance: false,
+      isMaintenanceActive: false,
       source: null,
       message: null,
       forceDisconnect: false,
       gracePeriodMinutes: 0,
       startsAt: null,
       endsAt: null,
+      actualStartTime: null,
     };
   }
 
@@ -740,7 +747,7 @@ export class GatrixServerSDK {
    * Local events are prefixed with 'local.' to distinguish from backend events
    */
   private emitMaintenanceEvent(
-    eventType: 'local.maintenance.started' | 'local.maintenance.ended' | 'local.maintenance.updated',
+    eventType: 'local.maintenance.started' | 'local.maintenance.ended' | 'local.maintenance.updated' | 'local.maintenance.grace_period_expired',
     data: MaintenanceEventData
   ): void {
     const listeners = this.maintenanceEventListeners.get(eventType) || [];
@@ -769,7 +776,7 @@ export class GatrixServerSDK {
    */
   on(eventType: string, callback: EventCallback): () => void {
     // Handle local maintenance events separately (these are local events from MaintenanceWatcher)
-    if (eventType === 'local.maintenance.started' || eventType === 'local.maintenance.ended' || eventType === 'local.maintenance.updated') {
+    if (eventType === 'local.maintenance.started' || eventType === 'local.maintenance.ended' || eventType === 'local.maintenance.updated' || eventType === 'local.maintenance.grace_period_expired') {
       const listeners = this.maintenanceEventListeners.get(eventType) || [];
       listeners.push(callback);
       this.maintenanceEventListeners.set(eventType, listeners);

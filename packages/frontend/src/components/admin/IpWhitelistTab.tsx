@@ -585,6 +585,8 @@ const IpWhitelistTab: React.FC = () => {
                   ...formData,
                   startDate: date?.isValid() ? date.toISOString() : undefined
                 })}
+                timeSteps={{ minutes: 1 }}
+                readOnly
                 slotProps={{
                   textField: {
                     fullWidth: true
@@ -604,6 +606,8 @@ const IpWhitelistTab: React.FC = () => {
                   endDate: date?.isValid() ? date.toISOString() : undefined
                 })}
                 minDateTime={formData.startDate ? dayjs(formData.startDate) : undefined}
+                timeSteps={{ minutes: 1 }}
+                readOnly
                 slotProps={{
                   textField: {
                     fullWidth: true

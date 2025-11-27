@@ -393,6 +393,59 @@ export class SurveyController {
     });
   });
 
+  /**
+   * Get survey by ID for Server SDK
+   * GET /api/v1/server/surveys/:id
+   * Returns survey formatted for Server SDK
+   */
+  static getServerSurveyById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+
+    if (!id) {
+      throw new GatrixError('Survey ID is required', 400);
+    }
+
+    const survey: any = await SurveyService.getSurveyById(id);
+
+    // Get survey configuration
+    const config = await SurveyService.getSurveyConfig();
+
+    // Resolve participation rewards
+    const participationRewards = await buildParticipationRewardsForServerSurvey(survey);
+
+    // Format survey for Server SDK response (same format as getServerSurveys)
+    const formattedSurvey = {
+      id: survey.id,
+      platformSurveyId: survey.platformSurveyId,
+      surveyTitle: survey.surveyTitle,
+      surveyContent: survey.surveyContent,
+      triggerConditions: survey.triggerConditions,
+      participationRewards,
+      rewardMailTitle: survey.rewardMailTitle,
+      rewardMailContent: survey.rewardMailContent,
+      targetPlatforms: survey.targetPlatforms,
+      targetPlatformsInverted: survey.targetPlatformsInverted,
+      targetChannels: survey.targetChannels,
+      targetChannelsInverted: survey.targetChannelsInverted,
+      targetSubchannels: survey.targetSubchannels,
+      targetSubchannelsInverted: survey.targetSubchannelsInverted,
+      targetWorlds: survey.targetWorlds,
+      targetWorldsInverted: survey.targetWorldsInverted,
+    };
+
+    res.json({
+      success: true,
+      data: {
+        survey: formattedSurvey,
+        settings: {
+          defaultSurveyUrl: config.baseSurveyUrl,
+          completionUrl: config.baseJoinedUrl,
+          linkCaption: config.linkCaption,
+          verificationKey: config.joinedSecretKey,
+        },
+      },
+    });
+  });
 
 }
 

@@ -266,7 +266,29 @@ export interface MaintenanceDetail {
 }
 
 export interface MaintenanceStatus {
+  /**
+   * Whether maintenance is scheduled/configured (stored in DB as isMaintenance=true).
+   * This does NOT mean maintenance is currently active - use isMaintenanceActive for that.
+   *
+   * @example
+   * // Maintenance scheduled for future: hasMaintenanceScheduled=true, isMaintenanceActive=false
+   * // Maintenance currently active: hasMaintenanceScheduled=true, isMaintenanceActive=true
+   * // No maintenance: hasMaintenanceScheduled=false, isMaintenanceActive=false
+   */
+  hasMaintenanceScheduled: boolean;
+
+  /**
+   * Whether maintenance is currently active (time-based check).
+   * True only when current time is within startsAt and endsAt range.
+   */
+  isMaintenanceActive: boolean;
+
+  /**
+   * @deprecated Use hasMaintenanceScheduled instead. This field will be removed in a future version.
+   * Kept for backward compatibility - same value as hasMaintenanceScheduled.
+   */
   isUnderMaintenance: boolean;
+
   detail: MaintenanceDetail | null;
 }
 
@@ -274,8 +296,8 @@ export interface MaintenanceStatus {
  * Comprehensive maintenance information returned by getMaintenanceInfo()
  */
 export interface MaintenanceInfo {
-  /** Whether the service/world is currently in maintenance */
-  isMaintenance: boolean;
+  /** Whether the service/world is currently in maintenance (time-based check) */
+  isMaintenanceActive: boolean;
   /** Source of maintenance: 'service' for global, 'world' for world-level, null if not in maintenance */
   source: 'service' | 'world' | null;
   /** World ID if source is 'world' */
@@ -290,6 +312,12 @@ export interface MaintenanceInfo {
   startsAt: string | null;
   /** Maintenance end time (ISO 8601 string) */
   endsAt: string | null;
+  /**
+   * Actual time when maintenance started (ISO 8601 string)
+   * Used by clients to calculate remaining grace period:
+   * remainingGraceMinutes = gracePeriodMinutes - ((Date.now() - new Date(actualStartTime).getTime()) / 60000)
+   */
+  actualStartTime: string | null;
 }
 
 /**
@@ -322,11 +350,11 @@ export interface MaintenanceDetailSummary {
  */
 export interface CurrentMaintenanceStatus {
   /** Whether currently in maintenance (calculated at query time, not just cached flag) */
-  isInMaintenance: boolean;
+  isMaintenanceActive: boolean;
   /** Source of maintenance: 'service' for global, 'world' for world-level (only present when isInMaintenance is true) */
   source?: 'service' | 'world';
   /** World ID if source is 'world' */
   worldId?: string;
-  /** Maintenance detail (only present when isInMaintenance is true) */
+  /** Maintenance detail (only present when isMaintenanceActive is true) */
   detail?: MaintenanceDetailSummary;
 }

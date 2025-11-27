@@ -373,6 +373,35 @@ class IngamePopupNoticeController {
       next(error);
     }
   }
+
+  /**
+   * Get ingame popup notice by ID for Server SDK
+   * GET /api/v1/server/ingame-popup-notices/:id
+   * Returns notice formatted for Server SDK
+   */
+  async getServerIngamePopupNoticeById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = parseInt(req.params.id);
+      const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id);
+
+      if (!notice) {
+        return res.status(404).json({
+          success: false,
+          error: { message: 'Ingame popup notice not found' }
+        });
+      }
+
+      // Format notice for Server SDK response
+      const formattedNotice = IngamePopupNoticeService.formatNoticeForServerSDK(notice);
+
+      res.json({
+        success: true,
+        data: { notice: formattedNotice }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new IngamePopupNoticeController();

@@ -169,7 +169,7 @@ export class GameWorldService {
   /**
    * Check if a world is in maintenance based on flag and time window
    */
-  isWorldInMaintenance(worldId: string): boolean {
+  isWorldMaintenanceActive(worldId: string): boolean {
     const world = this.cachedWorlds.find((w) => w.worldId === worldId);
     if (!world || !world.isMaintenance) {
       return false;
@@ -209,7 +209,7 @@ export class GameWorldService {
    */
   getWorldMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
     const world = this.cachedWorlds.find((w) => w.worldId === worldId);
-    if (!world || !this.isWorldInMaintenance(worldId)) {
+    if (!world || !this.isWorldMaintenanceActive(worldId)) {
       return null;
     }
 

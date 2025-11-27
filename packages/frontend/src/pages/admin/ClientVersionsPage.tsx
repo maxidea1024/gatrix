@@ -1819,6 +1819,8 @@ const ClientVersionsPage: React.FC = () => {
                     label={t('clientVersions.maintenance.startDate')}
                     value={parseUTCForPicker(maintenanceStartDate)}
                     onChange={(date) => setMaintenanceStartDate(date ? date.toISOString() : '')}
+                    timeSteps={{ minutes: 1 }}
+                    readOnly
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -1832,6 +1834,8 @@ const ClientVersionsPage: React.FC = () => {
                     label={t('clientVersions.maintenance.endDate')}
                     value={parseUTCForPicker(maintenanceEndDate)}
                     onChange={(date) => setMaintenanceEndDate(date ? date.toISOString() : '')}
+                    timeSteps={{ minutes: 1 }}
+                    readOnly
                     slotProps={{
                       textField: {
                         fullWidth: true,

@@ -89,6 +89,30 @@ const MaintenancePage: React.FC = () => {
   const [confirmMode, setConfirmMode] = useState<'start'|'stop'|'update'|null>(null);
   const [confirmInput, setConfirmInput] = useState('');
 
+  // Periodically recompute maintenance status when scheduled
+  // This ensures UI updates when scheduled maintenance starts/ends
+  useEffect(() => {
+    // Only run when maintenance is configured and status is scheduled
+    if (!isMaintenance || maintenanceStatus !== 'scheduled') {
+      return;
+    }
+
+    const checkStatusChange = () => {
+      const newStatus = computeMaintenanceStatus(isMaintenance, currentMaintenanceDetail);
+      if (newStatus !== maintenanceStatus) {
+        setMaintenanceStatus(newStatus);
+      }
+    };
+
+    // Check every 10 seconds for status changes
+    const intervalId = setInterval(checkStatusChange, 10000);
+
+    // Also check immediately in case we just loaded the page
+    checkStatusChange();
+
+    return () => clearInterval(intervalId);
+  }, [isMaintenance, maintenanceStatus, currentMaintenanceDetail]);
+
   useEffect(() => {
     maintenanceService.getStatus().then(({ isUnderMaintenance, detail }) => {
       if (updatedBySSE.current) return; // keep SSE-updated status
@@ -180,8 +204,27 @@ const MaintenancePage: React.FC = () => {
       return { valid: false };
     }
 
-    // 시작 시간이 설정되지 않았고 종료 시간만 설정된 경우: 유효함 (즉시 시작)
+    // 시작 시간이 설정되지 않았고 종료 시간만 설정된 경우 (즉시 시작)
     if (!startsAt && endsAt) {
+      // 즉시 시작이므로 현재 시간부터 종료 시간까지의 기간 계산
+      const duration = endsAt.diff(now, 'minute');
+
+      // 최소 5분 검증
+      if (duration < 5) {
+        enqueueSnackbar(t('maintenance.validationMinDuration', { duration: Math.max(0, duration) }), { variant: 'error' });
+        endsAtRef.current?.focus();
+        return { valid: false };
+      }
+
+      // 유예시간 검증 (kickExistingPlayers가 활성화된 경우)
+      if (kickExistingPlayers && kickDelayMinutes >= duration) {
+        enqueueSnackbar(t('maintenance.validationGracePeriodExceedsDuration', {
+          duration,
+          gracePeriod: kickDelayMinutes
+        }), { variant: 'error' });
+        return { valid: false };
+      }
+
       return { valid: true };
     }
 
@@ -194,12 +237,23 @@ const MaintenancePage: React.FC = () => {
         return { valid: false };
       }
 
-      // 점검 시간이 너무 짧은지 확인 (5분 미만)
+      // 종료 시간이 설정된 경우 기간 검증
       if (endsAt) {
         const duration = endsAt.diff(startsAt, 'minute');
+
+        // 최소 5분 검증
         if (duration < 5) {
-          enqueueSnackbar(t('maintenance.validationTooShort'), { variant: 'error' });
+          enqueueSnackbar(t('maintenance.validationMinDuration', { duration }), { variant: 'error' });
           endsAtRef.current?.focus();
+          return { valid: false };
+        }
+
+        // 유예시간 검증 (kickExistingPlayers가 활성화된 경우)
+        if (kickExistingPlayers && kickDelayMinutes >= duration) {
+          enqueueSnackbar(t('maintenance.validationGracePeriodExceedsDuration', {
+            duration,
+            gracePeriod: kickDelayMinutes
+          }), { variant: 'error' });
           return { valid: false };
         }
       }
@@ -561,22 +615,23 @@ const MaintenancePage: React.FC = () => {
                         label={t('maintenance.startsAt')}
                         value={startsAt}
                         onChange={(newValue) => {
-                          console.log('DateTimePicker startsAt changed:', newValue?.format(), newValue?.toISOString());
                           setStartsAt(newValue);
                         }}
                         ampm={true}
-                        format="YYYY-MM-DD A h:mm"
+                        format="YYYY-MM-DD A hh:mm"
                         views={['year', 'month', 'day', 'hours', 'minutes']}
+                        timeSteps={{ minutes: 1 }}
                         slotProps={{
                           textField: {
                             fullWidth: true,
                             placeholder: t('maintenance.selectDateTime'),
-                            inputRef: startsAtRef
+                            inputRef: startsAtRef,
                           },
                           actionBar: {
                             actions: ['clear', 'cancel', 'accept']
                           }
                         }}
+                        readOnly
                       />
                       <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
                         {t('maintenance.startsAtHelp')}
@@ -587,22 +642,23 @@ const MaintenancePage: React.FC = () => {
                         label={t('maintenance.endsAt')}
                         value={endsAt}
                         onChange={(newValue) => {
-                          console.log('DateTimePicker endsAt changed:', newValue?.format(), newValue?.toISOString());
                           setEndsAt(newValue);
                         }}
                         ampm={true}
-                        format="YYYY-MM-DD A h:mm"
+                        format="YYYY-MM-DD A hh:mm"
                         views={['year', 'month', 'day', 'hours', 'minutes']}
+                        timeSteps={{ minutes: 1 }}
                         slotProps={{
                           textField: {
                             fullWidth: true,
                             placeholder: t('maintenance.selectDateTime'),
-                            inputRef: endsAtRef
+                            inputRef: endsAtRef,
                           },
                           actionBar: {
                             actions: ['clear', 'cancel', 'accept']
                           }
                         }}
+                        readOnly
                       />
                       <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
                         {t('maintenance.endsAtHelp')}
@@ -980,7 +1036,7 @@ const MaintenancePage: React.FC = () => {
                         {t('maintenance.startsAt')}:
                       </Box>
                       <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                        {startsAt.format('YYYY-MM-DD A h:mm')} ({startsAt.toISOString()})
+                        {startsAt.format('YYYY-MM-DD A h:mm')} ({startsAt.isValid() ? startsAt.toISOString() : '-'})
                       </Box>
                     </Box>
                   )}
@@ -997,7 +1053,7 @@ const MaintenancePage: React.FC = () => {
                         {t('maintenance.endsAt')}:
                       </Box>
                       <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                        {endsAt.format('YYYY-MM-DD A h:mm')} ({endsAt.toISOString()})
+                        {endsAt.format('YYYY-MM-DD A h:mm')} ({endsAt.isValid() ? endsAt.toISOString() : '-'})
                       </Box>
                     </Box>
                   )}

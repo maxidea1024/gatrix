@@ -516,6 +516,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
                 label={t('serviceNotices.startDate')}
                 value={startDate}
                 onChange={(date) => setStartDate(date)}
+                timeSteps={{ minutes: 1 }}
+                readOnly
                 slotProps={{
                   textField: {
                     fullWidth: true,
@@ -531,6 +533,8 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
                 value={endDate}
                 onChange={(date) => setEndDate(date)}
                 minDateTime={startDate || undefined}
+                timeSteps={{ minutes: 1 }}
+                readOnly
                 slotProps={{
                   textField: {
                     fullWidth: true,

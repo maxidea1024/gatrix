@@ -816,7 +816,9 @@
       "translateTooltip": "Automatically translate the default maintenance message to multiple languages",
       "translationCompleted": "Translation completed successfully",
       "translationFailed": "Translation failed",
-      "noMessageToTranslate": "No message to translate"
+      "noMessageToTranslate": "No message to translate",
+      "validationMinDuration": "Maintenance duration must be at least 5 minutes. (Current: {{duration}} min)",
+      "validationGracePeriodExceedsDuration": "Grace period must be shorter than maintenance duration. (Duration: {{duration}} min, Grace period: {{gracePeriod}} min)"
     },
     "sdkGuide": {
       "title": "Server SDK Integration Guide",
@@ -1002,6 +1004,8 @@
     "validationEndTimeInPast": "End time is in the past. Please set a future time.",
     "validationEndBeforeStart": "End time is earlier than start time.",
     "validationTooShort": "Maintenance time is too short. Please set at least 5 minutes.",
+    "validationMinDuration": "Maintenance duration must be at least 5 minutes. (Current: {{duration}} min)",
+    "validationGracePeriodExceedsDuration": "Grace period must be shorter than maintenance duration. (Duration: {{duration}} min, Grace period: {{gracePeriod}} min)",
     "directInput": "Direct Input",
     "startsAt": "Start Time",
     "endsAt": "End Time",
@@ -1012,9 +1016,9 @@
     "start": "Start Maintenance",
     "statusOff": "Normal",
     "statusOn": "Under Maintenance",
-    "statusActive": "🔧 Active",
-    "statusScheduled": "⏱️ Scheduled",
-    "statusInactive": "✓ Inactive",
+    "statusActive": "Active",
+    "statusScheduled": "Scheduled",
+    "statusInactive": "Inactive",
     "stop": "Stop Maintenance",
     "title": "Service Maintenance",
     "type": "Maintenance Type",

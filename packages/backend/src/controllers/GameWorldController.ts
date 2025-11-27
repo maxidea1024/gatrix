@@ -425,6 +425,29 @@ export class GameWorldController {
           throw new GatrixError('End time must be in the future.', 400);
         }
       }
+
+      // Validate minimum duration (5 minutes)
+      if (endsAt) {
+        const effectiveStart = startsAt || now;
+        const durationMinutes = (endsAt.getTime() - effectiveStart.getTime()) / 60000;
+
+        if (durationMinutes < 5) {
+          throw new GatrixError(
+            `Maintenance duration must be at least 5 minutes. (Current: ${Math.max(0, Math.floor(durationMinutes))} min)`,
+            400
+          );
+        }
+
+        // Validate grace period does not exceed duration
+        if (value.forceDisconnect && value.gracePeriodMinutes !== undefined) {
+          if (value.gracePeriodMinutes >= durationMinutes) {
+            throw new GatrixError(
+              `Grace period must be shorter than maintenance duration. (Duration: ${Math.floor(durationMinutes)} min, Grace period: ${value.gracePeriodMinutes} min)`,
+              400
+            );
+          }
+        }
+      }
     }
 
     // Add updatedBy from authenticated user session

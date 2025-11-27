@@ -32,13 +32,29 @@ export class MaintenanceController {
           const detail = detailRaw ? JSON.parse(detailRaw) : null;
           // Return the actual isMaintenance flag value (not computed active status)
           // Frontend will compute the status (active/scheduled/inactive) based on current time
-          const isMaintenance = is === 'true';
+          const hasMaintenanceScheduled = is === 'true';
+
+          // Calculate if maintenance is currently active (time-based check)
+          let isMaintenanceActive = false;
+          if (hasMaintenanceScheduled && detail) {
+            const now = new Date();
+            const startsAt = detail.startsAt ? new Date(detail.startsAt) : null;
+            const endsAt = detail.endsAt ? new Date(detail.endsAt) : null;
+
+            // Active if: no start time (immediate) or past start time, AND no end time or before end time
+            const hasStarted = !startsAt || now >= startsAt;
+            const hasNotEnded = !endsAt || now < endsAt;
+            isMaintenanceActive = hasStarted && hasNotEnded;
+          }
 
           return {
             success: true,
             data: {
-              isUnderMaintenance: isMaintenance,
-              ...(isMaintenance && detail ? { detail } : {}),
+              hasMaintenanceScheduled,
+              isMaintenanceActive,
+              // Deprecated: kept for backward compatibility
+              isUnderMaintenance: hasMaintenanceScheduled,
+              ...(hasMaintenanceScheduled && detail ? { detail } : {}),
             },
           };
         },
@@ -76,6 +92,31 @@ export class MaintenanceController {
           if (endsAt <= now) {
             logger.warn(`[Maintenance Validation] End time must be in the future. endsAt: ${endsAt}, now: ${now}`);
             return res.status(400).json({ success: false, message: 'End time must be in the future.' });
+          }
+        }
+
+        // Validate minimum duration (5 minutes)
+        if (endsAt) {
+          const effectiveStart = startsAt || now;
+          const durationMinutes = (endsAt.getTime() - effectiveStart.getTime()) / 60000;
+
+          if (durationMinutes < 5) {
+            logger.warn(`[Maintenance Validation] Duration too short. durationMinutes: ${durationMinutes}`);
+            return res.status(400).json({
+              success: false,
+              message: `Maintenance duration must be at least 5 minutes. (Current: ${Math.max(0, Math.floor(durationMinutes))} min)`
+            });
+          }
+
+          // Validate grace period (kickDelayMinutes) does not exceed duration
+          if (payload.kickExistingPlayers && payload.kickDelayMinutes !== undefined) {
+            if (payload.kickDelayMinutes >= durationMinutes) {
+              logger.warn(`[Maintenance Validation] Grace period exceeds duration. kickDelayMinutes: ${payload.kickDelayMinutes}, durationMinutes: ${durationMinutes}`);
+              return res.status(400).json({
+                success: false,
+                message: `Grace period must be shorter than maintenance duration. (Duration: ${Math.floor(durationMinutes)} min, Grace period: ${payload.kickDelayMinutes} min)`
+              });
+            }
           }
         }
       }

@@ -816,7 +816,9 @@
       "translateTooltip": "기본 점검 메시지를 여러 언어로 자동 번역합니다",
       "translationCompleted": "번역이 완료되었습니다",
       "translationFailed": "번역에 실패했습니다",
-      "noMessageToTranslate": "번역할 메시지가 없습니다"
+      "noMessageToTranslate": "번역할 메시지가 없습니다",
+      "validationMinDuration": "점검 기간은 최소 5분 이상이어야 합니다. (현재: {{duration}}분)",
+      "validationGracePeriodExceedsDuration": "유예시간은 점검 기간보다 짧아야 합니다. (점검 기간: {{duration}}분, 유예시간: {{gracePeriod}}분)"
     },
     "sdkGuide": {
       "title": "Server SDK 연동 가이드",
@@ -1002,6 +1004,8 @@
     "validationEndTimeInPast": "종료 시간이 과거입니다. 현재 시간 이후로 설정해주세요.",
     "validationEndBeforeStart": "종료 시간이 시작 시간보다 이릅니다.",
     "validationTooShort": "점검 시간이 너무 짧습니다. 최소 5분 이상 설정해주세요.",
+    "validationMinDuration": "점검 기간은 최소 5분 이상이어야 합니다. (현재: {{duration}}분)",
+    "validationGracePeriodExceedsDuration": "유예시간은 점검 기간보다 짧아야 합니다. (점검 기간: {{duration}}분, 유예시간: {{gracePeriod}}분)",
     "directInput": "직접 입력",
     "startsAt": "시작 시간",
     "endsAt": "종료 시간",
@@ -1012,9 +1016,9 @@
     "start": "점검 시작",
     "statusOff": "정상",
     "statusOn": "점검 중",
-    "statusActive": "🔧 진행 중",
-    "statusScheduled": "⏱️ 예약됨",
-    "statusInactive": "✓ 비활성",
+    "statusActive": "진행 중",
+    "statusScheduled": "예약됨",
+    "statusInactive": "비활성",
     "stop": "점검 종료",
     "title": "서비스 점검",
     "type": "점검 유형",

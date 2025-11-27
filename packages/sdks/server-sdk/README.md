@@ -111,7 +111,7 @@ const sdk = new GatrixServerSDK({
   // Optional - Cache
   cache: {
     enabled: true,
-    ttl: 300, // seconds
+    ttl: 300, // seconds (only used with 'polling' refreshMethod)
     refreshMethod: 'polling', // 'polling' | 'event' | 'manual'. Default: 'polling'
   },
 
@@ -201,14 +201,121 @@ const worlds = sdk.getCachedGameWorlds();
 console.log('Cached worlds:', worlds);
 ```
 
-#### Check Maintenance Status
+#### Check World Maintenance Status
 
 ```typescript
-const isMaintenance = sdk.isWorldInMaintenance('world-1');
-console.log('Is in maintenance:', isMaintenance);
+const isActive = sdk.isWorldMaintenanceActive('world-1');
+console.log('Is maintenance active:', isActive);
 
-const message = sdk.getMaintenanceMessage('world-1');
+const message = sdk.getWorldMaintenanceMessage('world-1', 'ko');
 console.log('Maintenance message:', message);
+```
+
+### Maintenance API
+
+The SDK provides comprehensive maintenance status checking with clear naming conventions:
+
+#### Naming Convention
+
+| Property/Method | Description |
+|-----------------|-------------|
+| `hasMaintenanceScheduled` | Whether maintenance is scheduled (configured in admin) |
+| `isMaintenanceActive` | Whether maintenance is currently active (time-based check) |
+
+#### Check Global Service Maintenance
+
+```typescript
+// Check if global service maintenance is active
+const isActive = sdk.isServiceMaintenanceActive();
+console.log('Service maintenance active:', isActive);
+
+// Get localized maintenance message
+const message = sdk.getServiceMaintenanceMessage('ko');
+console.log('Maintenance message:', message);
+```
+
+#### Check Combined Maintenance (Service + World)
+
+```typescript
+// Check if ANY maintenance is active (service or world)
+const isActive = sdk.isMaintenanceActive();
+console.log('Maintenance active:', isActive);
+
+// Check specific world (also checks global service)
+const isWorldActive = sdk.isMaintenanceActive('world-1');
+console.log('World maintenance active:', isWorldActive);
+```
+
+#### Get Comprehensive Maintenance Info
+
+```typescript
+// Get detailed maintenance info
+const info = sdk.getMaintenanceInfo('world-1', 'ko');
+console.log('Maintenance info:', info);
+
+// MaintenanceInfo structure:
+// {
+//   isMaintenanceActive: boolean,    // Is maintenance currently active (time-based)
+//   source: 'service' | 'world' | null,
+//   worldId?: string,
+//   message: string | null,
+//   startsAt: string | null,         // ISO 8601 date
+//   endsAt: string | null,           // ISO 8601 date
+//   forceDisconnect: boolean,
+//   gracePeriodMinutes: number,
+//   actualStartTime: string | null,  // When maintenance actually started
+// }
+```
+
+#### Get Current Maintenance Status (for Client)
+
+```typescript
+// Get status formatted for client delivery
+const status = sdk.getCurrentMaintenanceStatus();
+console.log('Status:', status);
+
+// CurrentMaintenanceStatus structure:
+// {
+//   isMaintenanceActive: boolean,    // Is maintenance currently active (time-based)
+//   source?: 'service' | 'world',
+//   worldId?: string,
+//   detail?: {
+//     startsAt?: string,
+//     endsAt?: string,
+//     message?: string,
+//     localeMessages?: { ko?: string, en?: string, zh?: string },
+//     forceDisconnect?: boolean,
+//     gracePeriodMinutes?: number,
+//   }
+// }
+```
+
+#### Listen to Maintenance Events
+
+```typescript
+// Maintenance started (time window began)
+sdk.on('local.maintenance.started', (event) => {
+  console.log('Maintenance started:', event.data);
+  // { source: 'service' | 'world', worldId?: string, actualStartTime: string }
+});
+
+// Maintenance ended (time window ended or cancelled)
+sdk.on('local.maintenance.ended', (event) => {
+  console.log('Maintenance ended:', event.data);
+  // { source: 'service' | 'world', worldId?: string }
+});
+
+// Maintenance settings updated (while active)
+sdk.on('local.maintenance.updated', (event) => {
+  console.log('Maintenance updated:', event.data);
+  // { source: 'service' | 'world', worldId?: string }
+});
+
+// Grace period expired - kick users
+sdk.on('local.maintenance.grace_period_expired', (event) => {
+  console.log('Grace period expired:', event.data);
+  // { source: 'service' | 'world', worldId?: string, actualStartTime: string }
+});
 ```
 
 ### Popup Notices
@@ -270,8 +377,14 @@ console.log('Surveys for world-1:', surveys);
 
 The SDK supports three cache refresh methods:
 
+| Method | TTL Used | Redis Required | Refresh Trigger |
+|--------|----------|----------------|-----------------|
+| `polling` | ✅ Yes | ❌ No | Periodic interval based on `ttl` |
+| `event` | ❌ No | ✅ Yes | Redis PubSub events from backend |
+| `manual` | ❌ No | ❌ No | Manual `sdk.refreshCache()` calls only |
+
 **1. Polling (Default)**
-- Periodically refreshes cache at fixed intervals
+- Periodically refreshes cache at fixed intervals based on `ttl`
 - No Redis required
 - Suitable for applications that don't need real-time updates
 
@@ -282,7 +395,7 @@ const sdk = new GatrixServerSDK({
   applicationName: 'your-app',
   cache: {
     enabled: true,
-    ttl: 300, // Refresh every 300 seconds
+    ttl: 300, // Required for polling: refresh every 300 seconds
     refreshMethod: 'polling', // Default method
   },
   // Redis NOT required for polling
@@ -290,8 +403,9 @@ const sdk = new GatrixServerSDK({
 ```
 
 **2. Event-Based (Real-time)**
-- Refreshes cache immediately when backend sends events
+- Refreshes cache immediately when backend sends events via Redis PubSub
 - Requires Redis for PubSub
+- `ttl` setting is **ignored** (no periodic polling)
 - Suitable for applications that need real-time updates
 
 ```typescript
@@ -305,14 +419,17 @@ const sdk = new GatrixServerSDK({
   },
   cache: {
     enabled: true,
-    ttl: 300, // Fallback polling interval if events fail
+    // ttl is NOT used in event mode - cache is only refreshed via Redis events
     refreshMethod: 'event', // Event-based refresh
   },
 });
 ```
 
+> **Note:** In event mode, cache is refreshed only when Redis events are received. There is no periodic polling fallback. If Redis connection is lost, the cache will not be automatically refreshed until the connection is restored.
+
 **3. Manual**
 - No automatic cache refresh
+- `ttl` setting is **ignored** (no periodic polling)
 - Manual refresh only via `sdk.refreshCache()`
 
 ```typescript
@@ -322,6 +439,7 @@ const sdk = new GatrixServerSDK({
   applicationName: 'your-app',
   cache: {
     enabled: true,
+    // ttl is NOT used in manual mode
     refreshMethod: 'manual', // Manual refresh only
   },
 });
@@ -581,20 +699,17 @@ await sdk.initialize(); // This will internally call registerService() using the
 
 #### Service Maintenance
 
-Check if a service is in maintenance mode and get localized maintenance messages:
+Check if global service maintenance is active and get localized messages.
+See [Maintenance API](#maintenance-api) section for full documentation.
 
 ```typescript
-// Check if service is in maintenance
-const isInMaintenance = await sdk.isServiceInMaintenance('world');
+// Check if service maintenance is active (time-based check)
+const isActive = sdk.isServiceMaintenanceActive();
 
-if (isInMaintenance) {
+if (isActive) {
   // Get maintenance message in Korean
-  const message = await sdk.getServiceMaintenanceMessage('world', 'ko');
+  const message = sdk.getServiceMaintenanceMessage('ko');
   console.log('Maintenance message:', message);
-
-  // Get message in English
-  const enMessage = await sdk.getServiceMaintenanceMessage('world', 'en');
-  console.log('Maintenance message (EN):', enMessage);
 }
 ```
 
@@ -868,6 +983,61 @@ try {
     console.error('Unknown error:', error);
   }
 }
+```
+
+## Development
+
+### Available Scripts
+
+```bash
+# Build the SDK
+npm run build
+
+# Run tests
+npm run test
+
+# Lint code
+npm run lint
+
+# Clean build output
+npm run clean
+```
+
+### Deployment Scripts
+
+Deploy SDK to game server (UWO):
+
+```bash
+# Build and deploy to game server
+npm run deploy:game
+
+# Bump patch version and deploy
+npm run deploy:game:bump
+```
+
+The deploy script automatically:
+1. Bumps version (with `--bump` flag)
+2. Builds the SDK
+3. Creates npm package (`.tgz`)
+4. Copies to game server `lib/` folder
+5. Updates game server `package.json`
+6. Runs `npm install` in game server
+
+**Configuration**: Edit `scripts/deploy-to-game-server.ts` to change the game server path.
+
+### Test Servers
+
+Run test servers for development:
+
+```bash
+# Run all test servers
+npm run test:servers
+
+# Run individual test servers
+npm run test:authd
+npm run test:lobbyd
+npm run test:chatd
+npm run test:worldd
 ```
 
 ## License

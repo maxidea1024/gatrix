@@ -49,7 +49,8 @@ export class EventListener {
         password: this.redisConfig.password,
         db: this.redisConfig.db || 0,
         retryStrategy: (times) => {
-          const delay = Math.min(times * 50, 2000);
+          // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s (max)
+          const delay = Math.min(Math.pow(2, times - 1) * 1000, 30000);
           return delay;
         },
         lazyConnect: true,

@@ -440,6 +440,24 @@ export class CacheManager {
   }
 
   /**
+   * Get actual start time for service maintenance
+   * Used by getMaintenanceInfo() to provide actualStartTime to clients
+   */
+  getServiceMaintenanceActualStartTime(): string | undefined {
+    const state = this.maintenanceWatcher.getCurrentState();
+    return state?.serviceActualStartTime;
+  }
+
+  /**
+   * Get actual start time for world maintenance
+   * @param worldId The world ID to check
+   */
+  getWorldMaintenanceActualStartTime(worldId: string): string | undefined {
+    const state = this.maintenanceWatcher.getCurrentState();
+    return state?.worldActualStartTimes.get(worldId);
+  }
+
+  /**
    * Clear all caches
    */
   clear(): void {

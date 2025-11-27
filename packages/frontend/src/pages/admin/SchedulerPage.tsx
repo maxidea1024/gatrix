@@ -457,6 +457,8 @@ const SchedulerPage: React.FC = () => {
                     label="Start Date/Time"
                     value={formData.start ? moment(formData.start) : null}
                     onChange={(date) => setFormData({ ...formData, start: date ? date.toDate() : new Date() })}
+                    timeSteps={{ minutes: 1 }}
+                    readOnly
                     slotProps={{ textField: { fullWidth: true } }}
                   />
                 </Grid>
@@ -465,6 +467,8 @@ const SchedulerPage: React.FC = () => {
                     label="End Date/Time"
                     value={formData.end ? moment(formData.end) : null}
                     onChange={(date) => setFormData({ ...formData, end: date ? date.toDate() : undefined })}
+                    timeSteps={{ minutes: 1 }}
+                    readOnly
                     slotProps={{ textField: { fullWidth: true } }}
                   />
                 </Grid>
