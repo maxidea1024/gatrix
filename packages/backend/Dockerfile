@@ -34,6 +34,9 @@ RUN yarn install --frozen-lockfile --production=false
 # Copy source code
 COPY . .
 
+# Build server-sdk first (required because main points to dist/index.js)
+RUN yarn workspace @gatrix/server-sdk build
+
 # Build the backend
 RUN yarn workspace @gatrix/backend build
 

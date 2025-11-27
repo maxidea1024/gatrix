@@ -24,6 +24,9 @@ RUN yarn install --frozen-lockfile
 COPY packages/chat-server ./packages/chat-server
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
+# Build server-sdk (required because main points to dist/index.js)
+RUN yarn workspace @gatrix/server-sdk build
+
 # Create directories
 RUN mkdir -p uploads logs
 
