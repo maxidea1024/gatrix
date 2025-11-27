@@ -24,7 +24,7 @@ COPY packages/backend ./packages/backend
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
 # Build server-sdk (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn build
+RUN cd packages/sdks/server-sdk && yarn install && yarn build
 
 # Create logs directory in backend package
 RUN mkdir -p packages/backend/logs

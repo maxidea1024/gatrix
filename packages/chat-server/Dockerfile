@@ -51,7 +51,7 @@ RUN yarn install --frozen-lockfile --production=true && \
     yarn cache clean
 
 # Build server-sdk (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn build
+RUN cd packages/sdks/server-sdk && yarn install && yarn build
 
 # Copy built application
 COPY --from=builder /app/packages/chat-server/dist ./packages/chat-server/dist
