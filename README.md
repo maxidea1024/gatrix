@@ -671,6 +671,7 @@ The Docker setup includes:
 | Chat Server | 5100 | 55100 | WebSocket Server | Both |
 | Event Lens | 5200 | 55200 | Analytics API | Both |
 | ClickHouse | 8123, 9000 | 58123, 59000 | Analytics DB | Both |
+| etcd | 2379, 2380 | 52879, 52880 | Service Discovery | Both |
 | Prometheus | 9090 | 59090 | Metrics Collection | Both |
 | Grafana | 3000 | 54000 | Monitoring Dashboard | Both |
 | Debug (Backend) | 9229 | 59229 | Node.js Debugger | Dev only |

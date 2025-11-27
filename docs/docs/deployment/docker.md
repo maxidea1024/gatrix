@@ -22,6 +22,7 @@ This page explains how to run Gatrix with Docker in both development and product
 - Backend API: host 55000 -> container 5000
 - Event Lens: host 53002 -> container 3002
 - Chat Server: host 53001 -> container 3001
+- etcd: host 52879 -> container 2379, host 52880 -> container 2380
 
 ## Environment Variables (selected)
 
