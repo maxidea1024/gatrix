@@ -42,6 +42,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@gatrix/server-sdk": "file:../sdks/server-sdk",
     "@bull-board/api": "^6.12.6",
     "@bull-board/express": "^6.12.6",
     "@bull-board/ui": "^6.12.6",

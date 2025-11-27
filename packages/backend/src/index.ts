@@ -1,6 +1,7 @@
 import { config } from './config';
 import { createServer } from 'http';
 import type { SSENotificationBusMessage } from './services/PubSubService';
+import { GatrixServerSDK } from '@gatrix/server-sdk';
 
 // Lazy imports to avoid initialization at import time
 let app: any;
@@ -13,6 +14,9 @@ let apiTokenUsageService: any;
 let setDatabaseTimezoneToUTC: any;
 let appInstance: any;
 let SSENotificationService: any;
+
+// SDK instance for service discovery
+let gatrixSdk: GatrixServerSDK | null = null;
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error: Error) => {
@@ -82,10 +86,14 @@ const gracefulShutdown = async (signal: string) => {
       if (logger) logger.info('etcd cleanup interval cleared');
     }
 
-    // Clear backend heartbeat interval
-    if ((global as any).backendHeartbeatInterval) {
-      clearInterval((global as any).backendHeartbeatInterval);
-      if (logger) logger.info('Backend heartbeat interval cleared');
+    // Unregister backend service from service discovery
+    if (gatrixSdk) {
+      try {
+        await gatrixSdk.unregisterService();
+        if (logger) logger.info('Backend service unregistered from Service Discovery');
+      } catch (error) {
+        if (logger) logger.warn('Error unregistering backend service:', error);
+      }
     }
 
     if (logger) {
@@ -238,66 +246,34 @@ const startServer = async () => {
     }
 
 
-    // Register Backend service to Service Discovery
-    let backendInstanceId: string | null = null;
+    // Register Backend service to Service Discovery via SDK
     try {
-      const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
-      const os = await import('os');
-      const { ulid } = await import('ulid');
-
-      // Get primary IP address (first non-loopback IPv4)
-      const interfaces = os.networkInterfaces();
-      let internalIp = 'localhost';
-      for (const name of Object.keys(interfaces)) {
-        const iface = interfaces[name];
-        if (iface) {
-          for (const addr of iface) {
-            if (addr.family === 'IPv4' && !addr.internal) {
-              internalIp = addr.address;
-              break;
-            }
-          }
-          if (internalIp !== 'localhost') break;
-        }
-      }
-
-      backendInstanceId = ulid();
-      const backendInstance = {
-        instanceId: backendInstanceId,
-        labels: {
-          service: 'backend',
-          group: 'development',
+      const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
+      gatrixSdk = new GatrixServerSDK({
+        gatrixUrl: `http://localhost:${config.port}`,
+        apiToken: apiToken,
+        applicationName: 'backend',
+        logger: { level: 'info' },
+        serviceDiscovery: {
+          autoRegister: true,
+          labels: {
+            service: 'backend',
+            group: process.env.SERVICE_GROUP || 'development',
+          },
+          ports: {
+            http: [config.port],
+          },
+          status: 'ready',
+          meta: {
+            instanceName: 'backend-1',
+          },
         },
-        hostname: os.hostname(),
-        externalAddress: internalIp,
-        internalAddress: internalIp,
-        ports: {
-          http: [config.port],
-        },
-        status: 'ready' as const,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        meta: {
-          instanceName: 'backend-1',
-          startTime: new Date().toISOString(),
-        },
-      };
+      });
 
-      await serviceDiscoveryService.register(backendInstance);
-      logger.info('Backend service registered to Service Discovery', { instanceId: backendInstanceId });
-
-      // Start heartbeat to keep service alive
-      const heartbeatInterval = setInterval(async () => {
-        try {
-          const provider = (await import('./services/serviceDiscovery/ServiceDiscoveryFactory')).ServiceDiscoveryFactory.getInstance();
-          await provider.heartbeat(backendInstanceId!, 'backend');
-        } catch (error) {
-          logger.warn('Backend heartbeat failed', { error: error instanceof Error ? error.message : String(error) });
-        }
-      }, 10000); // Send heartbeat every 10 seconds
-
-      // Store interval for graceful shutdown
-      (global as any).backendHeartbeatInterval = heartbeatInterval;
+      await gatrixSdk.initialize();
+      logger.info('Backend service registered to Service Discovery via SDK', {
+        instanceId: gatrixSdk.getServiceInstanceId()
+      });
     } catch (error) {
       logger.warn('Backend service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });
     }

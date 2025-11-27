@@ -12,6 +12,7 @@ COPY packages/backend/package.json ./packages/backend/
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 RUN yarn install --frozen-lockfile --production=false
 
 # Rebuild the source code only when needed
@@ -25,6 +26,7 @@ COPY packages/backend/package.json ./packages/backend/
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install dependencies
 RUN yarn install --frozen-lockfile --production=false

@@ -29,6 +29,7 @@
   "author": "Gatrix Team",
   "license": "MIT",
   "dependencies": {
+    "@gatrix/server-sdk": "file:../sdks/server-sdk",
     "@keyv/redis": "^5.1.2",
     "@socket.io/redis-adapter": "^8.2.1",
     "@types/cheerio": "^0.22.35",

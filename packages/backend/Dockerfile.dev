@@ -14,12 +14,14 @@ RUN apk add --no-cache \
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/backend/package.json ./packages/backend/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install all dependencies (including dev dependencies)
 RUN yarn install --frozen-lockfile
 
 # Copy source code
 COPY packages/backend ./packages/backend
+COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
 # Create logs directory in backend package
 RUN mkdir -p packages/backend/logs

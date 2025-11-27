@@ -14,8 +14,12 @@ import { redisManager } from './config/redis';
 import { ApiTokenService } from './services/ApiTokenService';
 import { databaseManager } from './config/database';
 import apiRoutes from './routes';
+import { GatrixServerSDK } from '@gatrix/server-sdk';
 
 const logger = createLogger('ChatServerApp');
+
+// SDK instance for service discovery
+let gatrixSdk: GatrixServerSDK | null = null;
 
 class ChatServerApp {
   private app: express.Application;
@@ -283,99 +287,38 @@ class ChatServerApp {
             logger.info(`Metrics available at http://${config.host}:${config.port}/metrics`);
           }
 
-          // Register Chat Server service to Service Discovery
-          let chatServerInstanceId: string | null = null;
+          // Register Chat Server service to Service Discovery via SDK
           try {
-            const os = await import('os');
-            const { randomUUID } = await import('crypto');
-
-            // Get primary IP address (first non-loopback IPv4)
-            const interfaces = os.networkInterfaces();
-            let internalIp = 'localhost';
-            for (const name of Object.keys(interfaces)) {
-              const iface = interfaces[name];
-              if (iface) {
-                for (const addr of iface) {
-                  if (addr.family === 'IPv4' && !addr.internal) {
-                    internalIp = addr.address;
-                    break;
-                  }
-                }
-                if (internalIp !== 'localhost') break;
-              }
-            }
-
-            // Import axios for HTTP request
-            const axios = await import('axios');
             const backendUrl = process.env.GATRIX_URL || 'http://localhost:55000';
             const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
 
-            chatServerInstanceId = randomUUID();
-            const chatServerInstance = {
-              instanceId: chatServerInstanceId,
-              labels: {
-                service: 'chat',
-                group: 'development',
+            gatrixSdk = new GatrixServerSDK({
+              gatrixUrl: backendUrl,
+              apiToken: apiToken,
+              applicationName: 'chat-server',
+              logger: { level: 'info' },
+              serviceDiscovery: {
+                autoRegister: true,
+                labels: {
+                  service: 'chat',
+                  group: process.env.SERVICE_GROUP || 'development',
+                },
+                ports: {
+                  http: [config.port],
+                },
+                status: 'ready',
+                meta: {
+                  instanceName: 'chat-server-1',
+                },
               },
-              hostname: os.hostname(),
-              internalAddress: internalIp,
-              ports: {
-                http: [config.port],
-              },
-              status: 'ready' as const,
-              meta: {
-                instanceName: 'chat-server-1',
-                startTime: new Date().toISOString(),
-              },
-            };
+            });
 
-            try {
-              await axios.default.post(
-                `${backendUrl}/api/v1/server/services/register`,
-                chatServerInstance,
-                {
-                  headers: {
-                    'X-API-Token': apiToken,
-                    'X-Application-Name': 'chat-server',
-                  },
-                }
-              );
-              logger.info('Chat Server service registered to Service Discovery', { instanceId: chatServerInstanceId });
-
-              // Start heartbeat to keep service alive (only if registration succeeded)
-              const heartbeatInterval = setInterval(async () => {
-                try {
-                  await axios.default.post(
-                    `${backendUrl}/api/v1/server/services/status`,
-                    {
-                      instanceId: chatServerInstanceId,
-                      labels: {
-                        service: 'chat',
-                        group: 'development',
-                      },
-                      status: 'ready',
-                    },
-                    {
-                      headers: {
-                        'X-API-Token': apiToken,
-                        'X-Application-Name': 'chat-server',
-                      },
-                    }
-                  );
-                } catch (error: any) {
-                  const hbErrorMsg = error?.response?.status ? `HTTP ${error.response.status}` : (error instanceof Error ? error.message : 'Unknown error');
-                  logger.warn('Chat Server heartbeat failed', { error: hbErrorMsg });
-                }
-              }, 10000); // Send heartbeat every 10 seconds
-
-              // Store interval for graceful shutdown
-              (global as any).chatServerHeartbeatInterval = heartbeatInterval;
-            } catch (regError: any) {
-              const regErrorMsg = regError?.response?.status ? `HTTP ${regError.response.status}` : (regError instanceof Error ? regError.message : 'Unknown error');
-              logger.warn('Chat Server service registration failed, continuing', { error: regErrorMsg });
-            }
+            await gatrixSdk.initialize();
+            logger.info('Chat Server service registered to Service Discovery via SDK', {
+              instanceId: gatrixSdk.getServiceInstanceId(),
+            });
           } catch (error: any) {
-            logger.warn('Chat Server service registration setup failed, continuing', { error: error instanceof Error ? error.message : String(error) });
+            logger.warn('Chat Server service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });
           }
 
           resolve();
@@ -394,18 +337,20 @@ class ChatServerApp {
     logger.info(`Received ${signal}. Starting graceful shutdown...`);
 
     try {
-      // Clear heartbeat interval
-      if ((global as any).chatServerHeartbeatInterval) {
-        clearInterval((global as any).chatServerHeartbeatInterval);
-        logger.info('Chat Server heartbeat interval cleared');
+      // Unregister from Service Discovery via SDK
+      if (gatrixSdk) {
+        try {
+          await gatrixSdk.unregisterService();
+          logger.info('Chat Server service unregistered from Service Discovery');
+        } catch (error) {
+          logger.warn('Error unregistering Chat Server service:', error);
+        }
       }
 
       // Stop accepting new connections
       this.server.close(() => {
         logger.info('HTTP server closed');
       });
-
-      // Chat server shutdown - no external dependencies to unregister
 
       // User synchronization service is no longer used
 

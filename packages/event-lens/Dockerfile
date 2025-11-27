@@ -10,6 +10,7 @@ WORKDIR /app
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install dependencies
 RUN yarn install --frozen-lockfile --production=false
@@ -36,6 +37,10 @@ ENV NODE_ENV=production
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+
+# Copy server-sdk source (needed for file: dependency)
+COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
 # Install production dependencies only
 RUN yarn install --frozen-lockfile --production=true && \

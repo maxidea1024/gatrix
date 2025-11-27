@@ -15,12 +15,14 @@ RUN apk add --no-cache \
 # Copy package files for workspace
 COPY package.json yarn.lock* ./
 COPY packages/chat-server/package.json ./packages/chat-server/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install all dependencies (including dev dependencies)
 RUN yarn install --frozen-lockfile
 
 # Copy source code
 COPY packages/chat-server ./packages/chat-server
+COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
 # Create directories
 RUN mkdir -p uploads logs

@@ -10,6 +10,7 @@ WORKDIR /app
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/chat-server/package.json ./packages/chat-server/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install dependencies
 RUN yarn install --frozen-lockfile --production=false
@@ -40,6 +41,10 @@ RUN addgroup -g 1001 -S nodejs && \
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/chat-server/package.json ./packages/chat-server/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+
+# Copy server-sdk source (needed for file: dependency)
+COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
 # Install production dependencies only
 RUN yarn install --frozen-lockfile --production=true && \

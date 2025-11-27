@@ -3,6 +3,10 @@ import { config } from './config';
 import { testClickHouseConnection, initClickHouseDatabase } from './config/clickhouse';
 import { testMySQLConnection } from './config/mysql';
 import logger from './utils/logger';
+import { GatrixServerSDK } from '@gatrix/server-sdk';
+
+// SDK instance for service discovery
+let gatrixSdk: GatrixServerSDK | null = null;
 
 async function start() {
   try {
@@ -38,99 +42,38 @@ async function start() {
     logger.info(`Environment: ${config.nodeEnv}`);
     logger.info(`Log Level: ${config.logLevel}`);
 
-    // Register Event-Lens service to Service Discovery
-    let eventLensInstanceId: string | null = null;
+    // Register Event-Lens service to Service Discovery via SDK
     try {
-      const os = await import('os');
-      const { ulid } = await import('ulid');
-
-      // Get primary IP address (first non-loopback IPv4)
-      const interfaces = os.networkInterfaces();
-      let internalIp = 'localhost';
-      for (const name of Object.keys(interfaces)) {
-        const iface = interfaces[name];
-        if (iface) {
-          for (const addr of iface) {
-            if (addr.family === 'IPv4' && !addr.internal) {
-              internalIp = addr.address;
-              break;
-            }
-          }
-          if (internalIp !== 'localhost') break;
-        }
-      }
-
-      // Import axios for HTTP request
-      const axios = await import('axios');
       const backendUrl = process.env.GATRIX_URL || 'http://localhost:55000';
       const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
 
-      eventLensInstanceId = ulid();
-      const eventLensInstance = {
-        instanceId: eventLensInstanceId,
-        labels: {
-          service: 'event-lens',
-          group: 'development',
+      gatrixSdk = new GatrixServerSDK({
+        gatrixUrl: backendUrl,
+        apiToken: apiToken,
+        applicationName: 'event-lens',
+        logger: { level: 'info' },
+        serviceDiscovery: {
+          autoRegister: true,
+          labels: {
+            service: 'event-lens',
+            group: process.env.SERVICE_GROUP || 'development',
+          },
+          ports: {
+            http: [config.port],
+          },
+          status: 'ready',
+          meta: {
+            instanceName: 'event-lens-1',
+          },
         },
-        hostname: os.hostname(),
-        internalAddress: internalIp,
-        ports: {
-          http: [config.port],
-        },
-        status: 'ready' as const,
-        meta: {
-          instanceName: 'event-lens-1',
-          startTime: new Date().toISOString(),
-        },
-      };
+      });
 
-      try {
-        await axios.default.post(
-          `${backendUrl}/api/v1/server/services/register`,
-          eventLensInstance,
-          {
-            headers: {
-              'X-API-Token': apiToken,
-              'X-Application-Name': 'event-lens',
-            },
-          }
-        );
-        logger.info('Event-Lens service registered to Service Discovery', { instanceId: eventLensInstanceId });
-
-        // Start heartbeat to keep service alive (only if registration succeeded)
-        const heartbeatInterval = setInterval(async () => {
-          try {
-            await axios.default.post(
-              `${backendUrl}/api/v1/server/services/status`,
-              {
-                instanceId: eventLensInstanceId,
-                labels: {
-                  service: 'event-lens',
-                  group: 'development',
-                },
-                status: 'ready',
-              },
-              {
-                headers: {
-                  'X-API-Token': apiToken,
-                  'X-Application-Name': 'event-lens',
-                },
-              }
-            );
-          } catch (error: any) {
-            const hbErrorMsg = error?.response?.status ? `HTTP ${error.response.status}` : (error instanceof Error ? error.message : 'Unknown error');
-            logger.warn('Event-Lens heartbeat failed', { error: hbErrorMsg });
-          }
-        }, 10000); // Send heartbeat every 10 seconds
-
-        // Store interval for graceful shutdown
-        (global as any).eventLensHeartbeatInterval = heartbeatInterval;
-      } catch (regError: any) {
-        const regErrorMsg = regError?.response?.status ? `HTTP ${regError.response.status}` : (regError instanceof Error ? regError.message : 'Unknown error');
-        logger.warn('Event-Lens service registration failed, continuing', { error: regErrorMsg });
-      }
+      await gatrixSdk.initialize();
+      logger.info('Event-Lens service registered to Service Discovery via SDK', {
+        instanceId: gatrixSdk.getServiceInstanceId(),
+      });
     } catch (error: any) {
-      logger.warn('Event-Lens service registration setup failed, continuing', { error: error instanceof Error ? error.message : String(error) });
+      logger.warn('Event-Lens service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });
     }
 
     // Graceful Shutdown
@@ -138,10 +81,14 @@ async function start() {
       logger.info(`${signal} received, shutting down gracefully...`);
 
       try {
-        // Clear heartbeat interval
-        if ((global as any).eventLensHeartbeatInterval) {
-          clearInterval((global as any).eventLensHeartbeatInterval);
-          logger.info('Event-Lens heartbeat interval cleared');
+        // Unregister from Service Discovery via SDK
+        if (gatrixSdk) {
+          try {
+            await gatrixSdk.unregisterService();
+            logger.info('Event-Lens service unregistered from Service Discovery');
+          } catch (error) {
+            logger.warn('Error unregistering Event-Lens service:', error);
+          }
         }
 
         await app.close();

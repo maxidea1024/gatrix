@@ -15,12 +15,14 @@ RUN apk add --no-cache \
 # Copy package files for workspace
 COPY package.json yarn.lock* ./
 COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install all dependencies (including dev dependencies)
 RUN yarn install --frozen-lockfile
 
 # Copy source code
 COPY packages/event-lens ./packages/event-lens
+COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
 # Create logs directory
 RUN mkdir -p logs
