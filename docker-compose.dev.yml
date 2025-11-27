@@ -192,8 +192,8 @@ services:
       - --initial-cluster-state=new
       - --log-level=info
     ports:
-      - "127.0.0.1:52379:2379"
-      - "127.0.0.1:52380:2380"
+      - "127.0.0.1:52879:2379"
+      - "127.0.0.1:52880:2380"
     volumes:
       - etcd_dev_data:/etcd-data
     networks:
