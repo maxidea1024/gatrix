@@ -25,7 +25,7 @@ COPY packages/event-lens ./packages/event-lens
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
 # Build server-sdk (required because main points to dist/index.js)
-RUN yarn workspace @gatrix/server-sdk build
+RUN cd packages/sdks/server-sdk && yarn build
 
 # Create logs directory
 RUN mkdir -p logs

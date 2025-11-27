@@ -47,7 +47,7 @@ RUN yarn install --frozen-lockfile --production=true && \
     yarn cache clean
 
 # Build server-sdk (required because main points to dist/index.js)
-RUN yarn workspace @gatrix/server-sdk build
+RUN cd packages/sdks/server-sdk && yarn build
 
 # Copy built files from builder
 COPY --from=builder /app/packages/event-lens/dist ./packages/event-lens/dist
