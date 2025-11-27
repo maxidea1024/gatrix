@@ -141,7 +141,7 @@ services:
       - .:/app
       - /app/node_modules
       - backend_dev_logs:/app/packages/backend/logs
-    command: sh -c "mkdir -p /app/packages/backend/logs && chmod 777 /app/packages/backend/logs && yarn workspace @gatrix/backend dev"
+    command: sh -c "yarn workspace @gatrix/server-sdk build && mkdir -p /app/packages/backend/logs && chmod 777 /app/packages/backend/logs && yarn workspace @gatrix/backend dev"
 
   # Frontend for development (with hot reload)
   frontend-dev:
@@ -284,7 +284,7 @@ services:
       - .:/app
       - /app/node_modules
       - event_lens_dev_logs:/app/packages/event-lens/logs
-    command: yarn workspace @gatrix/event-lens dev
+    command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/event-lens dev"
     healthcheck:
       disable: true
 
@@ -334,7 +334,7 @@ services:
       - .:/app
       - /app/node_modules
       - event_lens_dev_logs:/app/packages/event-lens/logs
-    command: yarn workspace @gatrix/event-lens dev:worker
+    command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/event-lens dev:worker"
 
   # Chat Server for development (with hot reload)
   chat-server-dev:
@@ -405,7 +405,7 @@ services:
       - /app/node_modules
       - chat_server_dev_uploads:/app/packages/chat-server/uploads
       - chat_server_dev_logs:/app/packages/chat-server/logs
-    command: yarn workspace @gatrix/chat-server dev
+    command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/chat-server dev"
 
   # Loki - Log aggregation (development)
   loki:

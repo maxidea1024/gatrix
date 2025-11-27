@@ -138,7 +138,7 @@ class VideoBlot extends BlockEmbed {
 }
 
 Quill.register(CustomImageBlot, true); // true to overwrite default image format
-Quill.register(VideoBlot);
+Quill.register(VideoBlot, true); // true to suppress overwrite warning
 import {
   EmojiEmotions as EmojiIcon,
   FormatBold as BoldIcon,

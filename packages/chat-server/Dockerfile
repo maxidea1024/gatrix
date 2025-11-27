@@ -7,9 +7,12 @@ WORKDIR /app
 FROM base AS deps
 WORKDIR /app
 
-# Copy package files
+# Copy package files for all workspaces needed
 COPY package.json yarn.lock* ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
+COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install dependencies
@@ -38,9 +41,12 @@ ENV NODE_ENV=production
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S chatserver -u 1001
 
-# Copy package files
+# Copy package files for all workspaces needed
 COPY package.json yarn.lock* ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
+COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Copy server-sdk source (needed for file: dependency)

@@ -36,7 +36,7 @@ i18n
     supportedLngs: supportedLanguages,
     nonExplicitSupportedLngs: true,
     load: 'languageOnly',
-    debug: process.env.NODE_ENV === 'development',
+    debug: false, // Set to true for i18n debugging
 
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],

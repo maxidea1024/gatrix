@@ -595,6 +595,16 @@ export class MaintenanceWatcher {
         actualStartTime: currentState.serviceActualStartTime,
         details: currentState.serviceDetails,
       });
+
+      // Reschedule grace period timer if kick settings changed
+      if (currentState.serviceDetails?.kickExistingPlayers) {
+        const actualStartTime = currentState.serviceActualStartTime || timestamp;
+        const gracePeriodMinutes = currentState.serviceDetails.kickDelayMinutes ?? 0;
+        this.scheduleServiceGracePeriodTimer(actualStartTime, gracePeriodMinutes);
+      } else {
+        // kickExistingPlayers disabled - cancel timer
+        this.cancelServiceGracePeriodTimer();
+      }
     }
 
     // Check world-level maintenance changes
@@ -646,15 +656,26 @@ export class MaintenanceWatcher {
           actualStartTime: currentWorldActualStartTime,
           details: currentWorldDetails,
         });
+
+        // Reschedule grace period timer if kick settings changed
+        if (currentWorldDetails?.forceDisconnect) {
+          const actualStartTime = currentWorldActualStartTime || timestamp;
+          const gracePeriodMinutes = currentWorldDetails.gracePeriodMinutes ?? 0;
+          this.scheduleWorldGracePeriodTimer(worldId, actualStartTime, gracePeriodMinutes);
+        } else {
+          // forceDisconnect disabled - cancel timer
+          this.cancelWorldGracePeriodTimer(worldId);
+        }
       }
     }
+
+    // Update previous state BEFORE scheduling timers
+    // This ensures getCurrentState() returns the latest state when event handlers query it
+    this.previousState = currentState;
 
     // Schedule timers for future start/end times
     this.scheduleServiceTimers(serviceMaintenanceStatus);
     this.scheduleWorldTimers(gameWorlds);
-
-    // Update previous state
-    this.previousState = currentState;
   }
 
   /**

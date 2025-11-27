@@ -97,6 +97,8 @@ export default defineConfig({
     // Let Vite infer the HMR host from the page URL so LAN clients use the correct IP
     hmr: {
       port: 53000,
+      overlay: false, // Disable error overlay on connection loss
+      timeout: 30000, // Increase timeout before giving up on reconnection
     },
     proxy: {
       '/api': {

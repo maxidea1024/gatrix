@@ -427,6 +427,21 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     };
   }, [isConnected, autoConnect]);
 
+  // Clean up SSE connection before page unload to prevent error logs on refresh
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   return {
     isConnected,
     connectionStatus,

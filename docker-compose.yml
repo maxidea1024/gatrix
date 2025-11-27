@@ -444,8 +444,8 @@ services:
       - --initial-cluster-state=new
       - --log-level=info
     ports:
-      - "${ETCD_PORT:-52379}:2379"
-      - "52380:2380"
+      - "${ETCD_PORT:-52879}:2379"
+      - "52880:2380"
     volumes:
       - etcd_data:/etcd-data
     networks:

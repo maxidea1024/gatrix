@@ -1,7 +1,6 @@
 import { config } from './config';
 import { createServer } from 'http';
 import type { SSENotificationBusMessage } from './services/PubSubService';
-import { GatrixServerSDK } from '@gatrix/server-sdk';
 
 // Lazy imports to avoid initialization at import time
 let app: any;
@@ -15,8 +14,8 @@ let setDatabaseTimezoneToUTC: any;
 let appInstance: any;
 let SSENotificationService: any;
 
-// SDK instance for service discovery
-let gatrixSdk: GatrixServerSDK | null = null;
+// Backend service instance ID for service discovery
+let backendInstanceId: string | null = null;
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error: Error) => {
@@ -87,9 +86,10 @@ const gracefulShutdown = async (signal: string) => {
     }
 
     // Unregister backend service from service discovery
-    if (gatrixSdk) {
+    if (backendInstanceId) {
       try {
-        await gatrixSdk.unregisterService();
+        const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
+        await serviceDiscoveryService.unregister(backendInstanceId, 'backend', true);
         if (logger) logger.info('Backend service unregistered from Service Discovery');
       } catch (error) {
         if (logger) logger.warn('Error unregistering backend service:', error);
@@ -246,34 +246,33 @@ const startServer = async () => {
     }
 
 
-    // Register Backend service to Service Discovery via SDK
+    // Register Backend service to Service Discovery directly (no SDK needed for self-registration)
     try {
-      const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
-      gatrixSdk = new GatrixServerSDK({
-        gatrixUrl: `http://localhost:${config.port}`,
-        apiToken: apiToken,
-        applicationName: 'backend',
-        logger: { level: 'info' },
-        serviceDiscovery: {
-          autoRegister: true,
-          labels: {
-            service: 'backend',
-            group: process.env.SERVICE_GROUP || 'development',
-          },
-          ports: {
-            http: [config.port],
-          },
-          status: 'ready',
-          meta: {
-            instanceName: 'backend-1',
-          },
+      const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
+      const { ulid } = await import('ulid');
+      const os = await import('os');
+
+      backendInstanceId = ulid();
+      const hostname = os.hostname();
+
+      await serviceDiscoveryService.register({
+        instanceId: backendInstanceId,
+        hostname,
+        internalAddress: hostname,
+        labels: {
+          service: 'backend',
+          group: process.env.SERVICE_GROUP || 'development',
+        },
+        ports: {
+          http: [config.port],
+        },
+        status: 'ready',
+        meta: {
+          instanceName: 'backend-1',
         },
       });
 
-      await gatrixSdk.initialize();
-      logger.info('Backend service registered to Service Discovery via SDK', {
-        instanceId: gatrixSdk.getServiceInstanceId()
-      });
+      logger.info('Backend service registered to Service Discovery', { instanceId: backendInstanceId });
     } catch (error) {
       logger.warn('Backend service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });
     }

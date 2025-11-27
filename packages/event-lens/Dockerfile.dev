@@ -12,8 +12,11 @@ RUN apk add --no-cache \
     g++ \
     libc6-compat
 
-# Copy package files for workspace
+# Copy package files for all workspaces needed
 COPY package.json yarn.lock* ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/frontend/package.json ./packages/frontend/
+COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 

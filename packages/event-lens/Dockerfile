@@ -7,8 +7,11 @@ WORKDIR /app
 FROM base AS deps
 WORKDIR /app
 
-# Copy package files
+# Copy package files for all workspaces needed
 COPY package.json yarn.lock* ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/frontend/package.json ./packages/frontend/
+COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
@@ -34,8 +37,11 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy package files
+# Copy package files for all workspaces needed
 COPY package.json yarn.lock* ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/frontend/package.json ./packages/frontend/
+COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 

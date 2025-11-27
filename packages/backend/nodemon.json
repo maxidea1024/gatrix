@@ -1,9 +1,22 @@
 {
   "watch": ["src"],
-  "ext": "ts,json",
-  "ignore": ["src/**/*.test.ts", "src/**/*.spec.ts"],
+  "ext": "ts",
+  "ignore": [
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/*.log",
+    "**/logs/**",
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/uploads/**",
+    "**/cms/**",
+    "**/.git/**"
+  ],
   "exec": "ts-node --transpile-only src/index.ts",
   "env": {
     "NODE_ENV": "development"
-  }
+  },
+  "legacyWatch": true,
+  "delay": "3000",
+  "verbose": true
 }
