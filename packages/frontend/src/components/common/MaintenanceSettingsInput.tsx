@@ -170,11 +170,11 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
               value={parseUTCForPicker(startDate)}
               onChange={(date) => onStartDateChange(date ? date.toISOString() : '')}
               timeSteps={{ minutes: 1 }}
-              readOnly
               slotProps={{
                 textField: {
                   fullWidth: true,
                   helperText: t('maintenance.startDateHelp'),
+                  slotProps: { input: { readOnly: true } },
                 },
                 actionBar: {
                   actions: ['clear', 'cancel', 'accept'],
@@ -187,11 +187,11 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
               value={parseUTCForPicker(endDate)}
               onChange={(date) => onEndDateChange(date ? date.toISOString() : '')}
               timeSteps={{ minutes: 1 }}
-              readOnly
               slotProps={{
                 textField: {
                   fullWidth: true,
                   helperText: t('maintenance.endDateHelp'),
+                  slotProps: { input: { readOnly: true } },
                 },
                 actionBar: {
                   actions: ['clear', 'cancel', 'accept'],

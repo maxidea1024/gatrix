@@ -1556,9 +1556,8 @@ const CouponSettingsPage: React.FC = () => {
                     value={form.startsAt}
                     onChange={(date) => setForm((s: any) => ({ ...s, startsAt: date }))}
                     timeSteps={{ minutes: 1 }}
-                    readOnly
                     slotProps={{
-                      textField: { fullWidth: true },
+                      textField: { fullWidth: true, slotProps: { input: { readOnly: true } } },
                       actionBar: {
                         actions: ['clear', 'cancel', 'accept'],
                       },
@@ -1570,9 +1569,8 @@ const CouponSettingsPage: React.FC = () => {
                     onChange={(date) => setForm((s: any) => ({ ...s, expiresAt: date }))}
                     minDateTime={form.startsAt || undefined}
                     timeSteps={{ minutes: 1 }}
-                    readOnly
                     slotProps={{
-                      textField: { fullWidth: true, required: true },
+                      textField: { fullWidth: true, required: true, slotProps: { input: { readOnly: true } } },
                       actionBar: {
                         actions: ['clear', 'cancel', 'accept'],
                       },

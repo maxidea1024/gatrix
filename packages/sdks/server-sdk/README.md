@@ -865,6 +865,47 @@ const logger = new Logger({ timeOffset: -5 });
 const logger = new Logger({ timeOffset: 5.5 });
 ```
 
+### JSON Format
+
+For structured logging (e.g., for log aggregation tools like Loki, ELK), use JSON format:
+
+```typescript
+const logger = new Logger({
+  level: 'info',
+  format: 'json', // 'pretty' (default) or 'json'
+});
+
+logger.info('User logged in', { userId: 12345 });
+
+// Output:
+// {"timestamp":"2025-11-12T10:48:10.454Z","level":"INFO","category":"GatrixServerSDK","message":"User logged in","hostname":"server-01","internalIp":"192.168.1.100","meta":{"userId":12345}}
+```
+
+JSON format automatically includes:
+- `hostname` - Server hostname
+- `internalIp` - Server's internal IP address
+
+### Context Fields
+
+Add custom context fields that appear in every log entry (JSON format only):
+
+```typescript
+const logger = new Logger({
+  level: 'info',
+  format: 'json',
+  context: {
+    service: 'game-server',
+    region: 'us-east-1',
+    version: '1.2.3',
+  },
+});
+
+logger.info('Server started');
+
+// Output:
+// {"timestamp":"...","level":"INFO","category":"GatrixServerSDK","message":"Server started","hostname":"...","internalIp":"...","service":"game-server","region":"us-east-1","version":"1.2.3"}
+```
+
 ### Custom Logger
 
 ```typescript
@@ -888,9 +929,18 @@ logger.setTimestampFormat('local');
 // Change time offset at runtime
 logger.setTimeOffset(9);
 
+// Change output format at runtime
+logger.setFormat('json');
+
+// Set or update context fields
+logger.setContext({ service: 'my-service' });
+logger.addContext({ region: 'ap-northeast-2' });
+
 // Get current settings
 console.log('Format:', logger.getTimestampFormat());
 console.log('Offset:', logger.getTimeOffset());
+console.log('Output Format:', logger.getFormat());
+console.log('Context:', logger.getContext());
 ```
 
 ## HTTP Retry Configuration

@@ -22,6 +22,8 @@ export interface LoggerConfig {
   customLogger?: (level: string, message: string, meta?: any) => void;
   timeOffset?: number; // Time offset in hours (e.g., 9 for +09:00). Default: 0 (UTC)
   timestampFormat?: 'iso8601' | 'local'; // Timestamp format. Default: 'iso8601'
+  format?: 'pretty' | 'json'; // Output format. Default: 'pretty'
+  context?: Record<string, any>; // Additional context fields to include in every log entry (JSON format only)
 }
 
 /**

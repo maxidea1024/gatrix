@@ -1116,12 +1116,12 @@ const ApiTokensPage: React.FC = () => {
                 value={formData.expiresAt ? dayjs(formData.expiresAt) : null}
                 onChange={(date) => setFormData(prev => ({ ...prev, expiresAt: date ? date.toISOString() : undefined }))}
                 timeSteps={{ minutes: 1 }}
-                readOnly
                 slotProps={{
                   textField: {
                     fullWidth: true,
                     size: 'small',
                     helperText: t('apiTokens.expiresAtHelp'),
+                    slotProps: { input: { readOnly: true } },
                   },
                 }}
               />
@@ -1242,12 +1242,12 @@ const ApiTokensPage: React.FC = () => {
                 value={formData.expiresAt ? dayjs(formData.expiresAt) : null}
                 onChange={(date) => setFormData(prev => ({ ...prev, expiresAt: date ? date.toISOString() : undefined }))}
                 timeSteps={{ minutes: 1 }}
-                readOnly
                 slotProps={{
                   textField: {
                     fullWidth: true,
                     size: 'small',
                     helperText: t('apiTokens.expiresAtHelp'),
+                    slotProps: { input: { readOnly: true } },
                   },
                 }}
               />

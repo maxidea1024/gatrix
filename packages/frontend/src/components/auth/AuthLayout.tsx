@@ -1,6 +1,17 @@
 import React from 'react';
-import { Box, Typography, Container, Paper, IconButton, useTheme } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
+import { Box, Typography, Container, Paper, IconButton, useTheme, Button } from '@mui/material';
+import {
+  ArrowBack,
+  Speed,
+  People,
+  Build,
+  PhoneAndroid,
+  Campaign,
+  Mail,
+  CardGiftcard,
+  Security,
+  OpenInNew,
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -32,7 +43,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   showLeftPanel = true
 }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
 
   const handleBackClick = () => {
@@ -252,7 +263,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
               }}
             />
 
-            {/* Back Button */}
+            {/* Top Back Button */}
             {showBackButton && (
               <Box sx={{ position: 'absolute', top: 16, right: 16, zIndex: 3 }}>
                 <IconButton
@@ -271,8 +282,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
               </Box>
             )}
 
-            {/* Hero Content */}
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', zIndex: 3 }}>
+            {/* Hero Content - Top Section */}
+            <Box sx={{ position: 'relative', zIndex: 3, mt: 4 }}>
               <Typography
                 variant="h2"
                 sx={{
@@ -286,13 +297,11 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                 {leftContent.title}
               </Typography>
 
-
               {leftContent.description && (
                 <Typography
                   variant="h6"
                   sx={{
                     fontWeight: 400,
-                    marginBottom: 4,
                     lineHeight: 1.4,
                     textShadow: '0 2px 4px rgba(0,0,0,0.4)',
                     fontSize: { xs: '1rem', md: '1.25rem' },
@@ -301,67 +310,95 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                   {leftContent.description}
                 </Typography>
               )}
+            </Box>
 
-              {/* Feature highlights */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {/* Bottom - Feature highlights with cards */}
+            <Box sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 1.5,
+              position: 'relative',
+              zIndex: 3,
+            }}>
+              {[
+                { icon: Speed, text: t('auth.features.realtimeMonitoring') },
+                { icon: People, text: t('auth.features.playerManagement') },
+                { icon: Build, text: t('auth.features.maintenanceControl') },
+                { icon: PhoneAndroid, text: t('auth.features.versionControl') },
+                { icon: Campaign, text: t('auth.features.contentDelivery') },
+                { icon: Mail, text: t('auth.features.mailSystem') },
+                { icon: CardGiftcard, text: t('auth.features.couponSystem') },
+                { icon: Security, text: t('auth.features.securityTools') },
+              ].map((feature, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    padding: 1,
+                    borderRadius: 1,
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    backdropFilter: 'blur(4px)',
+                    transition: 'transform 0.2s ease, background-color 0.2s ease',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                      transform: 'translateY(-2px)',
+                    },
+                  }}
+                >
                   <Box
                     sx={{
-                      width: 8,
-                      height: 8,
-                      backgroundColor: 'white',
+                      width: 28,
+                      height: 28,
                       borderRadius: '50%',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                    }}
-                  />
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      textShadow: '0 2px 4px rgba(0,0,0,0.4)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
                     }}
                   >
-                    Game data analytics & insights
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      backgroundColor: 'white',
-                      borderRadius: '50%',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                    }}
-                  />
+                    <feature.icon sx={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.9)' }} />
+                  </Box>
                   <Typography
-                    variant="body1"
+                    variant="caption"
                     sx={{
-                      textShadow: '0 2px 4px rgba(0,0,0,0.4)',
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      fontWeight: 500,
+                      lineHeight: 1.3,
+                      fontSize: '0.7rem',
                     }}
                   >
-                    Real-time dashboard monitoring
+                    {feature.text}
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      backgroundColor: 'white',
-                      borderRadius: '50%',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                    }}
-                  />
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      textShadow: '0 2px 4px rgba(0,0,0,0.4)',
-                    }}
-                  >
-                    User management & engagement
-                  </Typography>
-                </Box>
-              </Box>
+              ))}
+            </Box>
+
+            {/* Learn More Button - Bottom Right */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1.5, mb: 2, position: 'relative', zIndex: 3 }}>
+              <Button
+                variant="text"
+                size="small"
+                endIcon={<OpenInNew sx={{ fontSize: 14 }} />}
+                onClick={() => {
+                  const lang = i18n.language;
+                  const aboutUrl = lang === 'ko' ? '/about-ko.html' : lang === 'zh' ? '/about-zh.html' : '/about.html';
+                  window.open(aboutUrl, '_blank');
+                }}
+                sx={{
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  fontSize: '0.75rem',
+                  textTransform: 'none',
+                  '&:hover': {
+                    color: 'rgba(255, 255, 255, 1)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                {t('auth.learnMore')}
+              </Button>
             </Box>
           </Box>
           )}

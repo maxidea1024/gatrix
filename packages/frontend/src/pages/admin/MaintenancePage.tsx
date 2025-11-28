@@ -626,12 +626,12 @@ const MaintenancePage: React.FC = () => {
                             fullWidth: true,
                             placeholder: t('maintenance.selectDateTime'),
                             inputRef: startsAtRef,
+                            slotProps: { input: { readOnly: true } },
                           },
                           actionBar: {
                             actions: ['clear', 'cancel', 'accept']
                           }
                         }}
-                        readOnly
                       />
                       <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
                         {t('maintenance.startsAtHelp')}
@@ -653,12 +653,12 @@ const MaintenancePage: React.FC = () => {
                             fullWidth: true,
                             placeholder: t('maintenance.selectDateTime'),
                             inputRef: endsAtRef,
+                            slotProps: { input: { readOnly: true } },
                           },
                           actionBar: {
                             actions: ['clear', 'cancel', 'accept']
                           }
                         }}
-                        readOnly
                       />
                       <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
                         {t('maintenance.endsAtHelp')}

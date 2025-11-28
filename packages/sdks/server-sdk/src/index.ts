@@ -24,7 +24,7 @@ export {
 } from './utils/errors';
 
 // Export logger
-export { Logger, LogLevel, getLogger } from './utils/logger';
+export { Logger, LogLevel, LogFormat, getLogger } from './utils/logger';
 
 // Export metrics helpers
 export { attachExpressMetrics, attachFastifyMetrics } from './utils/metrics';

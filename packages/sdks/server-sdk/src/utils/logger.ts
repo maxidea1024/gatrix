@@ -3,8 +3,10 @@
  */
 
 import { LoggerConfig } from '../types/config';
+import * as os from 'os';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export type LogFormat = 'pretty' | 'json';
 
 // ANSI color codes for terminal output
 const COLORS = {
@@ -17,6 +19,39 @@ const COLORS = {
   bracket: '\x1b[90m', // Gray
 };
 
+/**
+ * Get internal IPv4 address
+ */
+function getInternalIp(): string {
+  const interfaces = os.networkInterfaces();
+
+  // First pass: Look for non-internal IPv4 addresses
+  for (const name of Object.keys(interfaces)) {
+    const iface = interfaces[name];
+    if (!iface) continue;
+
+    for (const addr of iface) {
+      if (addr.family === 'IPv4' && !addr.internal) {
+        return addr.address;
+      }
+    }
+  }
+
+  // Second pass: Fall back to internal IPv4 addresses
+  for (const name of Object.keys(interfaces)) {
+    const iface = interfaces[name];
+    if (!iface) continue;
+
+    for (const addr of iface) {
+      if (addr.family === 'IPv4') {
+        return addr.address;
+      }
+    }
+  }
+
+  return '127.0.0.1';
+}
+
 export class Logger {
   private level: LogLevel;
   private customLogger?: (level: string, message: string, meta?: any) => void;
@@ -24,6 +59,10 @@ export class Logger {
   private timeOffset: number; // Time offset in hours
   private timestampFormat: 'iso8601' | 'local'; // Timestamp format
   private category?: string; // Category for logging
+  private format: LogFormat; // Output format
+  private context?: Record<string, any>; // Additional context fields
+  private hostname: string; // Cached hostname
+  private internalIp: string; // Cached internal IP
 
   private readonly levels: Record<LogLevel, number> = {
     debug: 0,
@@ -38,8 +77,13 @@ export class Logger {
     this.timeOffset = config?.timeOffset ?? 0; // Default: UTC (0 offset)
     this.timestampFormat = config?.timestampFormat ?? 'iso8601'; // Default: ISO8601
     this.category = category;
+    this.format = config?.format ?? 'pretty'; // Default: pretty
+    this.context = config?.context;
     // Enable colors by default, disable if running in non-TTY environment
     this.colorEnabled = process.stdout?.isTTY !== false;
+    // Cache hostname and IP (only used for JSON format)
+    this.hostname = os.hostname();
+    this.internalIp = getInternalIp();
   }
 
   private shouldLog(level: LogLevel): boolean {
@@ -71,7 +115,7 @@ export class Logger {
     return offsetDate.toISOString();
   }
 
-  private formatMessage(level: LogLevel, message: string): string {
+  private formatPrettyMessage(level: LogLevel, message: string): string {
     const timestamp = this.getFormattedTimestamp();
     const category = this.category || 'GatrixServerSDK';
 
@@ -89,64 +133,82 @@ export class Logger {
     return `${coloredBracket}[${coloredTimestamp}] [${coloredLevel}${coloredBracket}] [${category}]${COLORS.reset} ${message}`;
   }
 
-  debug(message: string, meta?: any): void {
-    if (!this.shouldLog('debug')) return;
+  private formatJsonMessage(level: LogLevel, message: string, meta?: any): string {
+    const logEntry: Record<string, any> = {
+      timestamp: this.getFormattedTimestamp(),
+      level: level.toUpperCase(),
+      category: this.category || 'GatrixServerSDK',
+      message,
+      hostname: this.hostname,
+      internalIp: this.internalIp,
+    };
+
+    // Add custom context if provided
+    if (this.context) {
+      Object.assign(logEntry, this.context);
+    }
+
+    // Add meta if provided
+    if (meta !== undefined) {
+      logEntry.meta = meta;
+    }
+
+    return JSON.stringify(logEntry);
+  }
+
+  private log(level: LogLevel, message: string, meta?: any): void {
+    if (!this.shouldLog(level)) return;
 
     if (this.customLogger) {
-      this.customLogger('debug', message, meta);
-    } else {
-      const formatted = this.formatMessage('debug', message);
-      if (meta !== undefined) {
-        console.debug(`${formatted}:`, meta);
-      } else {
-        console.debug(formatted);
-      }
+      this.customLogger(level, message, meta);
+      return;
     }
+
+    // JSON format
+    if (this.format === 'json') {
+      const jsonOutput = this.formatJsonMessage(level, message, meta);
+      switch (level) {
+        case 'debug':
+          console.debug(jsonOutput);
+          break;
+        case 'info':
+          console.info(jsonOutput);
+          break;
+        case 'warn':
+          console.warn(jsonOutput);
+          break;
+        case 'error':
+          console.error(jsonOutput);
+          break;
+      }
+      return;
+    }
+
+    // Pretty format (default)
+    const formatted = this.formatPrettyMessage(level, message);
+    const logFn = level === 'debug' ? console.debug : level === 'info' ? console.info : level === 'warn' ? console.warn : console.error;
+
+    if (meta !== undefined) {
+      logFn(`${formatted}:`, meta);
+    } else {
+      logFn(formatted);
+    }
+  }
+
+  debug(message: string, meta?: any): void {
+    this.log('debug', message, meta);
   }
 
   info(message: string, meta?: any): void {
-    if (!this.shouldLog('info')) return;
-
-    if (this.customLogger) {
-      this.customLogger('info', message, meta);
-    } else {
-      const formatted = this.formatMessage('info', message);
-      if (meta !== undefined) {
-        console.info(`${formatted}:`, meta);
-      } else {
-        console.info(formatted);
-      }
-    }
+    this.log('info', message, meta);
   }
 
   warn(message: string, meta?: any): void {
-    if (!this.shouldLog('warn')) return;
-
-    if (this.customLogger) {
-      this.customLogger('warn', message, meta);
-    } else {
-      const formatted = this.formatMessage('warn', message);
-      if (meta !== undefined) {
-        console.warn(`${formatted}:`, meta);
-      } else {
-        console.warn(formatted);
-      }
-    }
+    this.log('warn', message, meta);
   }
 
   error(message: string, meta?: any): void {
-    if (!this.shouldLog('error')) return;
-
-    if (this.customLogger) {
-      this.customLogger('error', message, meta);
-    } else {
-      const formatted = this.formatMessage('error', message);
-      if (meta !== undefined) {
-        console.error(`${formatted}:`, meta);
-      } else {
-        console.error(formatted);
-      }
-    }
+    this.log('error', message, meta);
   }
 
   setLevel(level: LogLevel): void {
@@ -193,6 +255,41 @@ export class Logger {
    */
   setCategory(category: string): void {
     this.category = category;
+  }
+
+  /**
+   * Set output format
+   */
+  setFormat(format: LogFormat): void {
+    this.format = format;
+  }
+
+  /**
+   * Get output format
+   */
+  getFormat(): LogFormat {
+    return this.format;
+  }
+
+  /**
+   * Set additional context fields (JSON format only)
+   */
+  setContext(context: Record<string, any>): void {
+    this.context = context;
+  }
+
+  /**
+   * Get additional context fields
+   */
+  getContext(): Record<string, any> | undefined {
+    return this.context;
+  }
+
+  /**
+   * Add or update context fields
+   */
+  addContext(fields: Record<string, any>): void {
+    this.context = { ...this.context, ...fields };
   }
 }
 
