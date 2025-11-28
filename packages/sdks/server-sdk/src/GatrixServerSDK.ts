@@ -1031,11 +1031,13 @@ export class GatrixServerSDK {
       // Stop cache auto-refresh
       if (this.cacheManager) {
         this.cacheManager.destroy();
+        this.cacheManager = undefined;
       }
 
       // Close event listener
       if (this.eventListener) {
         await this.eventListener.close();
+        this.eventListener = undefined;
       }
 
       this.initialized = false;

@@ -374,7 +374,7 @@ class IngamePopupNoticeService {
       data: {
         id: notice.id,
         timestamp: Date.now(),
-        isActive: notice.isActive,
+        isVisible: notice.isActive,
       }
     });
 
