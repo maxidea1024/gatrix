@@ -3136,7 +3136,7 @@
     "imageDelete": "Delete",
     "insertVideo": "Insert Video",
     "videoUrl": "Video URL",
-    "videoUrlHelp": "Enter YouTube or Bilibili video URL",
+    "videoUrlHelp": "Enter YouTube, Bilibili, or TikTok video URL",
     "videoWidth": "Width",
     "videoWidthCustom": "Custom",
     "videoWidthPixels": "Width (pixels)",
@@ -3151,7 +3151,7 @@
     "videoLoop": "Loop",
     "videoLoopHelp": "Loop the video continuously (YouTube only)",
     "videoPreview": "Preview",
-    "invalidVideoUrl": "Invalid video URL. Please use YouTube or Bilibili URL."
+    "invalidVideoUrl": "Invalid video URL. Please use YouTube, Bilibili, or TikTok URL."
   },
   "serviceNotices": {
     "title": "Service Notices",

@@ -356,13 +356,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     };
   }, [videoUrl, videoAutoplay, videoMuted, videoLoop]);
 
-  // Extract video embed URL from YouTube or Bilibili URL
+  // Extract video embed URL from YouTube, Bilibili, or TikTok URL
   const getVideoEmbedUrl = (
     url: string,
     autoplay: boolean = false,
     muted: boolean = false,
     loop: boolean = false
-  ): { embedUrl: string; platform: 'youtube' | 'bilibili' | null } | null => {
+  ): { embedUrl: string; platform: 'youtube' | 'bilibili' | 'tiktok' | null } | null => {
     try {
       const urlObj = new URL(url);
 
@@ -417,6 +417,39 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           return {
             embedUrl: `https://player.bilibili.com/player.html?${params.toString()}`,
             platform: 'bilibili',
+          };
+        }
+      }
+
+      // TikTok
+      if (urlObj.hostname.includes('tiktok.com')) {
+        // Extract video ID from URL patterns:
+        // https://www.tiktok.com/@username/video/1234567890
+        // https://www.tiktok.com/player/v1/1234567890
+        // https://vm.tiktok.com/XXXXXXXX (short URL - ID in path)
+        let videoId = '';
+
+        const videoMatch = urlObj.pathname.match(/\/video\/(\d+)/);
+        const playerMatch = urlObj.pathname.match(/\/player\/v1\/(\d+)/);
+
+        if (videoMatch) {
+          videoId = videoMatch[1];
+        } else if (playerMatch) {
+          videoId = playerMatch[1];
+        }
+
+        if (videoId) {
+          // Build TikTok embed URL with parameters
+          const params = new URLSearchParams();
+          params.set('autoplay', autoplay ? '1' : '0');
+          if (loop) {
+            params.set('loop', '1');
+          }
+          params.set('music_info', '1');
+          params.set('description', '1');
+          return {
+            embedUrl: `https://www.tiktok.com/player/v1/${videoId}?${params.toString()}`,
+            platform: 'tiktok',
           };
         }
       }
@@ -575,7 +608,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       const videoInfo = getVideoEmbedUrl(videoUrl, videoAutoplay, videoMuted, videoLoop);
 
       if (!videoInfo) {
-        alert(t('richTextEditor.invalidVideoUrl', 'Invalid video URL. Please use YouTube or Bilibili URL.'));
+        alert(t('richTextEditor.invalidVideoUrl', 'Invalid video URL. Please use YouTube, Bilibili, or TikTok URL.'));
         return;
       }
 
@@ -1983,7 +2016,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
               fullWidth
-              placeholder="https://www.youtube.com/watch?v=... or https://www.bilibili.com/video/BV..."
+              placeholder="https://www.youtube.com/watch?v=... / https://www.bilibili.com/video/BV... / https://www.tiktok.com/@user/video/..."
               helperText={t('richTextEditor.videoUrlHelp')}
             />
 

@@ -3136,7 +3136,7 @@
     "imageDelete": "삭제",
     "insertVideo": "동영상 삽입",
     "videoUrl": "동영상 URL",
-    "videoUrlHelp": "유튜브 또는 빌리빌리 동영상 URL을 입력하세요",
+    "videoUrlHelp": "유튜브, 빌리빌리 또는 틱톡 동영상 URL을 입력하세요",
     "videoWidth": "너비",
     "videoWidthCustom": "직접 입력",
     "videoWidthPixels": "너비 (픽셀)",
@@ -3151,7 +3151,7 @@
     "videoLoop": "반복 재생",
     "videoLoopHelp": "동영상을 반복 재생합니다 (YouTube만 지원)",
     "videoPreview": "미리보기",
-    "invalidVideoUrl": "유효하지 않은 동영상 URL입니다. 유튜브 또는 빌리빌리 URL을 사용하세요."
+    "invalidVideoUrl": "유효하지 않은 동영상 URL입니다. 유튜브, 빌리빌리 또는 틱톡 URL을 사용하세요."
   },
   "serviceNotices": {
     "title": "서비스 공지",
