@@ -12,7 +12,7 @@ services:
     ports:
       - "${MYSQL_HOST_PORT:-53306}:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ${DATA_ROOT:-./data}/mysql:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
     networks:
@@ -33,7 +33,7 @@ services:
     ports:
       - "${REDIS_HOST_PORT:-56379}:6379"
     volumes:
-      - redis_data:/data
+      - ${DATA_ROOT:-./data}/redis:/data
       - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
       - gatrix-network
@@ -125,8 +125,8 @@ services:
     networks:
       - gatrix-network
     volumes:
-      - backend_logs:/app/logs
-      - backend_data:/app/data
+      - ${DATA_ROOT:-./data}/backend/logs:/app/logs
+      - ${DATA_ROOT:-./data}/backend/data:/app/data
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       timeout: 10s
@@ -143,7 +143,7 @@ services:
       - "${CLICKHOUSE_HTTP_PORT:-58123}:8123"
       - "${CLICKHOUSE_NATIVE_PORT:-59000}:9000"
     volumes:
-      - clickhouse_data:/var/lib/clickhouse
+      - ${DATA_ROOT:-./data}/clickhouse:/var/lib/clickhouse
     networks:
       - gatrix-network
     healthcheck:
@@ -191,7 +191,7 @@ services:
     networks:
       - gatrix-network
     volumes:
-      - event_lens_logs:/app/logs
+      - ${DATA_ROOT:-./data}/event-lens/logs:/app/logs
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:5200/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       timeout: 10s
@@ -238,7 +238,7 @@ services:
     networks:
       - gatrix-network
     volumes:
-      - event_lens_logs:/app/logs
+      - ${DATA_ROOT:-./data}/event-lens/logs:/app/logs
 
   # Chat Server
   chat-server:
@@ -299,8 +299,8 @@ services:
     networks:
       - gatrix-network
     volumes:
-      - chat_server_uploads:/app/uploads
-      - chat_server_logs:/app/logs
+      - ${DATA_ROOT:-./data}/chat-server/uploads:/app/uploads
+      - ${DATA_ROOT:-./data}/chat-server/logs:/app/logs
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:5100/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
       timeout: 10s
@@ -318,7 +318,7 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
-      - loki_data:/loki
+      - ${DATA_ROOT:-./data}/loki:/loki
     networks:
       - gatrix-network
     healthcheck:
@@ -356,7 +356,7 @@ services:
     volumes:
       - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
       - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro
-      - prometheus_data:/prometheus
+      - ${DATA_ROOT:-./data}/prometheus:/prometheus
     entrypoint: ["/bin/sh", "/docker/prometheus/entrypoint.sh"]
     depends_on:
       backend:
@@ -386,7 +386,7 @@ services:
     ports:
       - "${GRAFANA_PORT:-54000}:3000"
     volumes:
-      - grafana_data:/var/lib/grafana
+      - ${DATA_ROOT:-./data}/grafana:/var/lib/grafana
       - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./docker/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
       - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
@@ -447,7 +447,7 @@ services:
       - "${ETCD_PORT:-52879}:2379"
       - "52880:2380"
     volumes:
-      - etcd_data:/etcd-data
+      - ${DATA_ROOT:-./data}/etcd:/etcd-data
     networks:
       - gatrix-network
     healthcheck:
@@ -456,33 +456,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-
-volumes:
-  mysql_data:
-    driver: local
-  redis_data:
-    driver: local
-  clickhouse_data:
-    driver: local
-  backend_logs:
-    driver: local
-  backend_data:
-    driver: local
-  event_lens_logs:
-    driver: local
-  chat_server_uploads:
-    driver: local
-  chat_server_logs:
-    driver: local
-  etcd_data:
-    driver: local
-  prometheus_data:
-    driver: local
-  grafana_data:
-    driver: local
-  loki_data:
-    driver: local
-
 
 networks:
   gatrix-network:
