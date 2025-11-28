@@ -140,12 +140,31 @@ Run the setup script to automatically generate the `.env` file with secure encry
 .\setup-env.ps1 -HostAddress example.cn -Environment production -DefaultLanguage zh -Protocol http
 ```
 
+**Custom Data Root (Linux/Mac):**
+```bash
+# Store all Docker volume data in /data/gatrix
+./setup-env.sh example.com production en --data-root /data/gatrix
+
+# Use custom path for development
+./setup-env.sh localhost development ko --data-root ./my-data
+```
+
+**Custom Data Root (Windows PowerShell):**
+```powershell
+# Store all Docker volume data in /data/gatrix
+.\setup-env.ps1 -HostAddress example.com -Environment production -DataRoot /data/gatrix
+
+# Use custom path for development
+.\setup-env.ps1 -HostAddress localhost -Environment development -DataRoot ./my-data
+```
+
 The script will:
 - Generate secure encryption keys automatically
 - Configure database and Redis for Docker
 - Set up default language (Korean `ko`, English `en`, or Chinese `zh`)
 - Set admin password (default: admin123, or custom if provided)
 - Set protocol (default: http for development, https for production)
+- Set data root path for Docker volumes (default: ./data for development, /data/gatrix for production)
 - Create a backup if `.env` already exists
 - Automatically select the correct docker-compose file based on environment
 

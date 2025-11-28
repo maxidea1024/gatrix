@@ -12,7 +12,7 @@ services:
     ports:
       - "0.0.0.0:${MYSQL_HOST_PORT:-53306}:3306"
     volumes:
-      - mysql_dev_data:/var/lib/mysql
+      - ${DATA_ROOT:-./data}/mysql:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
     networks:
@@ -35,7 +35,7 @@ services:
     ports:
       - "0.0.0.0:${REDIS_HOST_PORT:-56379}:6379"
     volumes:
-      - redis_dev_data:/data
+      - ${DATA_ROOT:-./data}/redis:/data
     networks:
       - gatrix-dev-network
     healthcheck:
@@ -140,7 +140,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - backend_dev_logs:/app/packages/backend/logs
+      - ${DATA_ROOT:-./data}/backend/logs:/app/packages/backend/logs
     command: sh -c "yarn workspace @gatrix/server-sdk build && mkdir -p /app/packages/backend/logs && chmod 777 /app/packages/backend/logs && yarn workspace @gatrix/backend dev"
 
   # Frontend for development (with hot reload)
@@ -195,7 +195,7 @@ services:
       - "127.0.0.1:52879:2379"
       - "127.0.0.1:52880:2380"
     volumes:
-      - etcd_dev_data:/etcd-data
+      - ${DATA_ROOT:-./data}/etcd:/etcd-data
     networks:
       - gatrix-dev-network
     healthcheck:
@@ -214,7 +214,7 @@ services:
       - "0.0.0.0:${CLICKHOUSE_HTTP_PORT:-58123}:8123"
       - "0.0.0.0:${CLICKHOUSE_NATIVE_PORT:-59000}:9000"
     volumes:
-      - clickhouse_dev_data:/var/lib/clickhouse
+      - ${DATA_ROOT:-./data}/clickhouse:/var/lib/clickhouse
     networks:
       - gatrix-dev-network
     environment:
@@ -283,7 +283,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - event_lens_dev_logs:/app/packages/event-lens/logs
+      - ${DATA_ROOT:-./data}/event-lens/logs:/app/packages/event-lens/logs
     command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/event-lens dev"
     healthcheck:
       disable: true
@@ -333,7 +333,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - event_lens_dev_logs:/app/packages/event-lens/logs
+      - ${DATA_ROOT:-./data}/event-lens/logs:/app/packages/event-lens/logs
     command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/event-lens dev:worker"
 
   # Chat Server for development (with hot reload)
@@ -403,8 +403,8 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - chat_server_dev_uploads:/app/packages/chat-server/uploads
-      - chat_server_dev_logs:/app/packages/chat-server/logs
+      - ${DATA_ROOT:-./data}/chat-server/uploads:/app/packages/chat-server/uploads
+      - ${DATA_ROOT:-./data}/chat-server/logs:/app/packages/chat-server/logs
     command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/chat-server dev"
 
   # Loki - Log aggregation (development)
@@ -417,7 +417,7 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
-      - loki_dev_data:/loki
+      - ${DATA_ROOT:-./data}/loki:/loki
     networks:
       - gatrix-dev-network
     healthcheck:
@@ -455,7 +455,7 @@ services:
     volumes:
       - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
       - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro
-      - prometheus_dev_data:/prometheus
+      - ${DATA_ROOT:-./data}/prometheus:/prometheus
     entrypoint: ["/bin/sh", "/docker/prometheus/entrypoint.sh"]
     depends_on:
       backend-dev:
@@ -485,7 +485,7 @@ services:
     ports:
       - "0.0.0.0:${GRAFANA_PORT:-54000}:3000"
     volumes:
-      - grafana_dev_data:/var/lib/grafana
+      - ${DATA_ROOT:-./data}/grafana:/var/lib/grafana
       - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./docker/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
       - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
@@ -494,31 +494,6 @@ services:
         condition: service_started
     networks:
       - gatrix-dev-network
-
-
-volumes:
-  mysql_dev_data:
-    driver: local
-  redis_dev_data:
-    driver: local
-  etcd_dev_data:
-    driver: local
-  backend_dev_logs:
-    driver: local
-  clickhouse_dev_data:
-    driver: local
-  event_lens_dev_logs:
-    driver: local
-  chat_server_dev_uploads:
-    driver: local
-  chat_server_dev_logs:
-    driver: local
-  prometheus_dev_data:
-    driver: local
-  grafana_dev_data:
-    driver: local
-  loki_dev_data:
-    driver: local
 
 
 networks:

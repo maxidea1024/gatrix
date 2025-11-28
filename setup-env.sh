@@ -15,6 +15,7 @@
 #   --admin-password           Set custom admin password
 #   --protocol                 Set protocol (http or https, default: http for dev, https for prod)
 #   --service-discovery-mode   Set service discovery mode (etcd or redis, default: etcd)
+#   --data-root                Set root path for Docker volume data (default: ./data for dev, /data/gatrix for prod)
 #
 # Examples:
 #   ./setup-env.sh localhost development
@@ -26,6 +27,7 @@
 #   ./setup-env.sh example.cn production zh --admin-password "SecurePass123" --force --nobackup
 #   ./setup-env.sh localhost development zh --protocol https
 #   ./setup-env.sh localhost development zh --service-discovery-mode redis
+#   ./setup-env.sh example.com production zh --data-root /data/gatrix
 #
 ################################################################################
 
@@ -224,6 +226,9 @@ create_env_file() {
   # Replace service discovery mode
   sed -i.bak "s|^SERVICE_DISCOVERY_MODE=.*|SERVICE_DISCOVERY_MODE=$SERVICE_DISCOVERY_MODE|" "$ENV_FILE"
 
+  # Replace data root
+  sed -i.bak "s|^DATA_ROOT=.*|DATA_ROOT=$DATA_ROOT|" "$ENV_FILE"
+
   # Replace secrets
   sed -i.bak "s|^JWT_SECRET=.*|JWT_SECRET=$JWT_SECRET|" "$ENV_FILE"
   sed -i.bak "s|^SESSION_SECRET=.*|SESSION_SECRET=$SESSION_SECRET|" "$ENV_FILE"
@@ -253,6 +258,7 @@ print_summary() {
   echo "  - DEFAULT_LANGUAGE: $DEFAULT_LANGUAGE"
   echo "  - ADMIN_PASSWORD: $ADMIN_PASSWORD"
   echo "  - SERVICE_DISCOVERY_MODE: $SERVICE_DISCOVERY_MODE"
+  echo "  - DATA_ROOT: $DATA_ROOT"
   echo "  - JWT_SECRET: [auto-generated] (32 chars)"
   echo "  - SESSION_SECRET: [auto-generated] (20 chars)"
   echo "  - JWT_REFRESH_SECRET: [auto-generated] (32 chars)"
@@ -306,6 +312,7 @@ main() {
   ADMIN_PASSWORD="admin123"
   PROTOCOL=""
   SERVICE_DISCOVERY_MODE="etcd"
+  DATA_ROOT=""
   FORCE=false
   NOBACKUP=false
 
@@ -332,6 +339,11 @@ main() {
       SERVICE_DISCOVERY_MODE="${!i}"
     elif [[ "$arg" == --service-discovery-mode=* ]]; then
       SERVICE_DISCOVERY_MODE="${arg#*=}"
+    elif [ "$arg" = "--data-root" ]; then
+      i=$((i + 1))
+      DATA_ROOT="${!i}"
+    elif [[ "$arg" == --data-root=* ]]; then
+      DATA_ROOT="${arg#*=}"
     fi
     i=$((i + 1))
   done
@@ -355,6 +367,15 @@ main() {
   if [ "$SERVICE_DISCOVERY_MODE" != "etcd" ] && [ "$SERVICE_DISCOVERY_MODE" != "redis" ]; then
     print_error "Service discovery mode must be 'etcd' or 'redis'."
     exit 1
+  fi
+
+  # Set default data root based on environment if not specified
+  if [ -z "$DATA_ROOT" ]; then
+    if [ "$ENVIRONMENT" = "development" ]; then
+      DATA_ROOT="./data"
+    else
+      DATA_ROOT="/data/gatrix"
+    fi
   fi
 
   validate_inputs

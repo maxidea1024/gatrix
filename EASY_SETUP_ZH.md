@@ -140,8 +140,23 @@ docker-compose --version
 .\setup-env.ps1 -HostAddress example.cn -Environment production -DefaultLanguage zh -Protocol http
 ```
 
+**自定义数据根路径 (Linux/Mac)：**
+```bash
+# 将所有 Docker 卷数据存储在 /data/gatrix
+./setup-env.sh example.com production en --data-root /data/gatrix
 
+# 开发环境使用自定义路径
+./setup-env.sh localhost development ko --data-root ./my-data
+```
 
+**自定义数据根路径 (Windows PowerShell)：**
+```powershell
+# 将所有 Docker 卷数据存储在 /data/gatrix
+.\setup-env.ps1 -HostAddress example.com -Environment production -DataRoot /data/gatrix
+
+# 开发环境使用自定义路径
+.\setup-env.ps1 -HostAddress localhost -Environment development -DataRoot ./my-data
+```
 
 脚本将执行以下操作：
 - 自动生成安全加密密钥
@@ -149,6 +164,7 @@ docker-compose --version
 - 设置默认语言（韩语 `ko`、英语 `en` 或中文 `zh`）
 - 设置管理员密码（默认：admin123，或自定义）
 - 设置协议（默认：开发环境为 http，生产环境为 https）
+- 设置数据根路径（默认：开发环境为 ./data，生产环境为 /data/gatrix）
 - 如果 `.env` 文件已存在则创建备份
 - 根据环境自动选择正确的 docker-compose 文件
 

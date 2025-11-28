@@ -158,7 +158,23 @@ docker-compose --version
 .\setup-env.ps1 -HostAddress localhost -Environment development -ServiceDiscoveryMode etcd
 ```
 
+**데이터 루트 경로 지정 (Linux/Mac):**
+```bash
+# 모든 Docker 볼륨 데이터를 /data/gatrix에 저장
+./setup-env.sh example.com production en --data-root /data/gatrix
 
+# 개발용 사용자 정의 경로
+./setup-env.sh localhost development ko --data-root ./my-data
+```
+
+**데이터 루트 경로 지정 (Windows PowerShell):**
+```powershell
+# 모든 Docker 볼륨 데이터를 /data/gatrix에 저장
+.\setup-env.ps1 -HostAddress example.com -Environment production -DataRoot /data/gatrix
+
+# 개발용 사용자 정의 경로
+.\setup-env.ps1 -HostAddress localhost -Environment development -DataRoot ./my-data
+```
 
 스크립트는 다음을 수행합니다:
 - 보안 암호화 키 자동 생성
@@ -167,6 +183,7 @@ docker-compose --version
 - 관리자 비밀번호 설정 (기본값: admin123, 또는 사용자 지정)
 - 프로토콜 설정 (기본값: 개발 환경은 http, 프로덕션은 https)
 - Service Discovery 모드 설정 (기본값: etcd, 옵션: redis)
+- 데이터 루트 경로 설정 (기본값: 개발 환경은 ./data, 프로덕션은 /data/gatrix)
 - `.env` 파일이 이미 존재하면 백업 생성
 - 환경에 따라 올바른 docker-compose 파일 자동 선택
 

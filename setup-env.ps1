@@ -24,6 +24,9 @@
 .PARAMETER ServiceDiscoveryMode
     Service Discovery mode (etcd or redis, default: etcd)
 
+.PARAMETER DataRoot
+    Root path for Docker volume data (default: ./data for dev, /data/gatrix for prod)
+
 .PARAMETER Force
     Force overwrite existing .env file
 
@@ -38,6 +41,7 @@
     .\setup-env.ps1 -HostAddress localhost -Environment development -Force -NoBackup
     .\setup-env.ps1 -HostAddress localhost -Environment development -Protocol https
     .\setup-env.ps1 -HostAddress localhost -Environment development -ServiceDiscoveryMode redis
+    .\setup-env.ps1 -HostAddress example.com -Environment production -DataRoot /data/gatrix
 
 .NOTES
     Requires Windows PowerShell 5.0 or higher
@@ -64,6 +68,9 @@ param(
     [Parameter(Mandatory=$false, HelpMessage="Service Discovery mode (etcd or redis, default: etcd)")]
     [ValidateSet("etcd", "redis")]
     [string]$ServiceDiscoveryMode = "etcd",
+
+    [Parameter(Mandatory=$false, HelpMessage="Root path for Docker volume data (default: ./data for dev, /data/gatrix for prod)")]
+    [string]$DataRoot = "",
 
     [Parameter(Mandatory=$false, HelpMessage="Force overwrite existing .env file")]
     [switch]$Force,
@@ -277,6 +284,8 @@ function Create-EnvFile {
             $newLines += "ADMIN_PASSWORD=$AdminPassword"
         } elseif ($line -match "^SERVICE_DISCOVERY_MODE=") {
             $newLines += "SERVICE_DISCOVERY_MODE=$ServiceDiscoveryMode"
+        } elseif ($line -match "^DATA_ROOT=") {
+            $newLines += "DATA_ROOT=$($script:DataRootToUse)"
         } else {
             $newLines += $line
         }
@@ -305,6 +314,7 @@ function Print-Summary {
     Write-Host "  - DEFAULT_LANGUAGE: $DefaultLanguage"
     Write-Host "  - ADMIN_PASSWORD: $AdminPassword"
     Write-Host "  - SERVICE_DISCOVERY_MODE: $ServiceDiscoveryMode"
+    Write-Host "  - DATA_ROOT: $($script:DataRootToUse)"
     Write-Host "  - JWT_SECRET: [auto-generated] (32 chars)"
     Write-Host "  - SESSION_SECRET: [auto-generated] (20 chars)"
     Write-Host "  - JWT_REFRESH_SECRET: [auto-generated] (32 chars)"
@@ -360,6 +370,17 @@ if ([string]::IsNullOrWhiteSpace($Protocol)) {
     }
 } else {
     $script:ProtocolToUse = $Protocol
+}
+
+# Set default data root based on environment if not specified
+if ([string]::IsNullOrWhiteSpace($DataRoot)) {
+    if ($Environment -eq "development") {
+        $script:DataRootToUse = "./data"
+    } else {
+        $script:DataRootToUse = "/data/gatrix"
+    }
+} else {
+    $script:DataRootToUse = $DataRoot
 }
 
 Validate-Inputs

@@ -63,7 +63,67 @@ Access:
 
 ## Data Persistence
 
-Both Prometheus and Grafana use Docker volumes configured in docker-compose files to persist data.
+All persistent data (MySQL, Redis, ClickHouse, logs, etc.) is stored under the `DATA_ROOT` path.
+
+### Volume Configuration
+
+The `DATA_ROOT` environment variable controls where all Docker volumes are stored:
+
+| Service | Host Path | Container Path |
+|---------|-----------|----------------|
+| MySQL | `${DATA_ROOT}/mysql` | `/var/lib/mysql` |
+| Redis | `${DATA_ROOT}/redis` | `/data` |
+| ClickHouse | `${DATA_ROOT}/clickhouse` | `/var/lib/clickhouse` |
+| Backend Logs | `${DATA_ROOT}/backend/logs` | `/app/logs` |
+| Backend Data | `${DATA_ROOT}/backend/data` | `/app/data` |
+| Event Lens Logs | `${DATA_ROOT}/event-lens/logs` | `/app/logs` |
+| Chat Server Uploads | `${DATA_ROOT}/chat-server/uploads` | `/app/uploads` |
+| Chat Server Logs | `${DATA_ROOT}/chat-server/logs` | `/app/logs` |
+| etcd | `${DATA_ROOT}/etcd` | `/etcd-data` |
+| Prometheus | `${DATA_ROOT}/prometheus` | `/prometheus` |
+| Grafana | `${DATA_ROOT}/grafana` | `/var/lib/grafana` |
+| Loki | `${DATA_ROOT}/loki` | `/loki` |
+
+### Environment Setup
+
+**Development** (`.env`):
+```env
+DATA_ROOT=./data
+```
+Result: All data stored in `./data/mysql`, `./data/redis`, etc. (relative to project root)
+
+**Production** (`.env`):
+```env
+DATA_ROOT=/data/gatrix
+```
+Result: All data stored in `/data/gatrix/mysql`, `/data/gatrix/redis`, etc. (absolute path)
+
+### Directory Structure
+
+```
+${DATA_ROOT}/
+├── mysql/              # MySQL database files
+├── redis/              # Redis persistence
+├── clickhouse/         # ClickHouse data
+├── backend/
+│   ├── logs/           # Backend application logs
+│   └── data/           # Backend data files
+├── event-lens/
+│   └── logs/           # Event Lens logs
+├── chat-server/
+│   ├── uploads/        # User uploaded files
+│   └── logs/           # Chat server logs
+├── etcd/               # etcd cluster data
+├── prometheus/         # Prometheus metrics storage
+├── grafana/            # Grafana dashboards & settings
+└── loki/               # Loki log aggregation
+```
+
+### Important Notes
+
+1. **Directory Permissions**: Ensure the `DATA_ROOT` directory has proper permissions for Docker to read/write
+2. **Data Migration**: When switching from named volumes to bind mounts, existing data needs to be migrated manually
+3. **Backup**: All persistent data is in one location, making backup easier
 
 ## Team Rule
 
