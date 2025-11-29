@@ -69,7 +69,8 @@
     "docs:write-translations": "cd docs && npm run write-translations",
     "docs:deploy": "cd docs && npm run deploy",
     "chat:reset": "node scripts/reset-chat-data.js --confirm",
-    "chat:reset-safe": "node scripts/reset-chat-data.js"
+    "chat:reset-safe": "node scripts/reset-chat-data.js",
+    "deploy:ftp": "node scripts/deploy-ftp.js"
   },
   "keywords": [
     "gatrix",
@@ -90,6 +91,7 @@
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20.10.4",
     "concurrently": "^8.2.2",
+    "ssh2-sftp-client": "^11.0.0",
     "typescript": "^5.3.3"
   },
   "engines": {
