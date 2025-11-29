@@ -105,3 +105,6 @@ temp/
 
 # Runtime generated planning data (dynamically generated at runtime)
 /packages/backend/data/planning/
+
+# Docker volume data
+data/

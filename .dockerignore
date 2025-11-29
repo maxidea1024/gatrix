@@ -23,3 +23,5 @@ packages/backend/logs
 coverage
 .nyc_output
 
+# Docker volume data
+data/

@@ -25,7 +25,7 @@
     Service Discovery mode (etcd or redis, default: etcd)
 
 .PARAMETER DataRoot
-    Root path for Docker volume data (default: ./data for dev, /data/gatrix for prod)
+    Root path for Docker volume data (default: ./data/gatrix-storage-root for Windows, /data/gatrix-storage-root for Linux)
 
 .PARAMETER Force
     Force overwrite existing .env file
@@ -406,12 +406,8 @@ else {
 
 # Set default data root based on environment if not specified
 if ([string]::IsNullOrWhiteSpace($DataRoot)) {
-    if ($Environment -eq "development") {
-        $script:DataRootToUse = "./data"
-    }
-    else {
-        $script:DataRootToUse = "/data/gatrix"
-    }
+    # Windows environment: always use relative path to avoid permission issues
+    $script:DataRootToUse = "./data/gatrix-storage-root"
 }
 else {
     $script:DataRootToUse = $DataRoot

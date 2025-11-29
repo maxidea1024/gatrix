@@ -15,7 +15,7 @@
 #   --admin-password           Set custom admin password
 #   --protocol                 Set protocol (http or https, default: http for dev, https for prod)
 #   --service-discovery-mode   Set service discovery mode (etcd or redis, default: etcd)
-#   --data-root                Set root path for Docker volume data (default: ./data for dev, /data/gatrix for prod)
+#   --data-root                Set root path for Docker volume data (default: ./data/gatrix-storage-root for non-Linux, /data/gatrix-storage-root for Linux)
 #
 # Examples:
 #   ./setup-env.sh localhost development
@@ -371,10 +371,13 @@ main() {
 
   # Set default data root based on environment if not specified
   if [ -z "$DATA_ROOT" ]; then
-    if [ "$ENVIRONMENT" = "development" ]; then
-      DATA_ROOT="./data"
+    # Check OS type
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+      # Linux: Use absolute path as per infrastructure policy
+      DATA_ROOT="/data/gatrix-storage-root"
     else
-      DATA_ROOT="/data/gatrix"
+      # macOS, Git Bash on Windows, etc.: Use relative path
+      DATA_ROOT="./data/gatrix-storage-root"
     fi
   fi
 

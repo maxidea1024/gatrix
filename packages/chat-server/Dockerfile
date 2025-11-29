@@ -59,8 +59,9 @@ COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 RUN yarn install --frozen-lockfile --production=true && \
   yarn cache clean
 
-# Copy built server-sdk from builder (no need to rebuild)
-COPY --from=builder /app/packages/sdks/server-sdk/dist ./packages/sdks/server-sdk/dist
+# Copy built server-sdk from builder to node_modules location
+COPY --from=builder /app/packages/sdks/server-sdk/dist ./packages/chat-server/node_modules/@gatrix/server-sdk/dist
+COPY --from=builder /app/packages/sdks/server-sdk/package.json ./packages/chat-server/node_modules/@gatrix/server-sdk/package.json
 
 # Copy built application
 COPY --from=builder /app/packages/chat-server/dist ./packages/chat-server/dist
