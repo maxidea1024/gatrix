@@ -28,6 +28,9 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy all source files
 COPY . .
 
+# Build server-sdk (required because main points to dist/index.js)
+RUN cd packages/sdks/server-sdk && yarn install && yarn build
+
 # Build chat-server
 RUN yarn workspace @gatrix/chat-server build
 
@@ -39,7 +42,7 @@ ENV NODE_ENV=production
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S chatserver -u 1001
+  adduser -S chatserver -u 1001
 
 # Copy package files for all workspaces needed
 COPY package.json yarn.lock* ./
@@ -54,10 +57,10 @@ COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
 # Install production dependencies only
 RUN yarn install --frozen-lockfile --production=true && \
-    yarn cache clean
+  yarn cache clean
 
-# Build server-sdk (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn install && yarn build
+# Copy built server-sdk from builder (no need to rebuild)
+COPY --from=builder /app/packages/sdks/server-sdk/dist ./packages/sdks/server-sdk/dist
 
 # Copy built application
 COPY --from=builder /app/packages/chat-server/dist ./packages/chat-server/dist

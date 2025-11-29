@@ -183,8 +183,8 @@ create_env_file() {
     sed -i.bak "s|^FRONTEND_URL=.*|FRONTEND_URL=$PROTOCOL://$HOST:53000|" "$ENV_FILE"
   else
     # Production: use standard HTTPS port (443), no port number in URL
-    sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=$PROTOCOL://$HOST|" "$ENV_FILE"
-    sed -i.bak "s|^FRONTEND_URL=.*|FRONTEND_URL=$PROTOCOL://$HOST|" "$ENV_FILE"
+    sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=$PROTOCOL://$HOST:53000|" "$ENV_FILE"
+    sed -i.bak "s|^FRONTEND_URL=.*|FRONTEND_URL=$PROTOCOL://$HOST:53000|" "$ENV_FILE"
   fi
 
   # Set LOG_LEVEL based on environment
@@ -207,7 +207,7 @@ create_env_file() {
     sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST:54000|" "$ENV_FILE"
   else
     # Production: Grafana accessed via /grafana subpath (handled by load balancer)
-    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST/grafana|" "$ENV_FILE"
+    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST:54000|" "$ENV_FILE"
   fi
 
   # Set Bull Board URL based on environment
@@ -216,7 +216,7 @@ create_env_file() {
     sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://$HOST:53000/bull-board|" "$ENV_FILE"
   else
     # Production: Bull Board accessed via /bull-board subpath
-    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://$HOST/bull-board|" "$ENV_FILE"
+    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://$HOST:53000/bull-board|" "$ENV_FILE"
   fi
 
 

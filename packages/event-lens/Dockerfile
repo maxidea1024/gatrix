@@ -28,6 +28,9 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy all source files
 COPY . .
 
+# Build server-sdk (required because main points to dist/index.js)
+RUN cd packages/sdks/server-sdk && yarn install && yarn build
+
 # Build event-lens
 RUN yarn workspace @gatrix/event-lens build
 
@@ -50,10 +53,10 @@ COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
 # Install production dependencies only
 RUN yarn install --frozen-lockfile --production=true && \
-    yarn cache clean
+  yarn cache clean
 
-# Build server-sdk (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn install && yarn build
+# Copy built server-sdk from builder (no need to rebuild)
+COPY --from=builder /app/packages/sdks/server-sdk/dist ./packages/sdks/server-sdk/dist
 
 # Copy built files from builder
 COPY --from=builder /app/packages/event-lens/dist ./packages/event-lens/dist

@@ -48,34 +48,34 @@
 #>
 
 param(
-    [Parameter(Mandatory=$true, HelpMessage="Host address (localhost, IP, or domain)")]
+    [Parameter(Mandatory = $true, HelpMessage = "Host address (localhost, IP, or domain)")]
     [string]$HostAddress,
 
-    [Parameter(Mandatory=$false, HelpMessage="Environment (development or production)")]
+    [Parameter(Mandatory = $false, HelpMessage = "Environment (development or production)")]
     [ValidateSet("development", "production")]
     [string]$Environment = "development",
 
-    [Parameter(Mandatory=$false, HelpMessage="Default language (ko, en, zh, etc.)")]
+    [Parameter(Mandatory = $false, HelpMessage = "Default language (ko, en, zh, etc.)")]
     [string]$DefaultLanguage = "zh",
 
-    [Parameter(Mandatory=$false, HelpMessage="Admin password (default: admin123)")]
+    [Parameter(Mandatory = $false, HelpMessage = "Admin password (default: admin123)")]
     [string]$AdminPassword = "admin123",
 
-    [Parameter(Mandatory=$false, HelpMessage="Protocol (http or https, default: http for dev, https for prod)")]
+    [Parameter(Mandatory = $false, HelpMessage = "Protocol (http or https, default: http for dev, https for prod)")]
     [ValidateSet("http", "https")]
     [string]$Protocol = "",
 
-    [Parameter(Mandatory=$false, HelpMessage="Service Discovery mode (etcd or redis, default: etcd)")]
+    [Parameter(Mandatory = $false, HelpMessage = "Service Discovery mode (etcd or redis, default: etcd)")]
     [ValidateSet("etcd", "redis")]
     [string]$ServiceDiscoveryMode = "etcd",
 
-    [Parameter(Mandatory=$false, HelpMessage="Root path for Docker volume data (default: ./data for dev, /data/gatrix for prod)")]
+    [Parameter(Mandatory = $false, HelpMessage = "Root path for Docker volume data (default: ./data for dev, /data/gatrix for prod)")]
     [string]$DataRoot = "",
 
-    [Parameter(Mandatory=$false, HelpMessage="Force overwrite existing .env file")]
+    [Parameter(Mandatory = $false, HelpMessage = "Force overwrite existing .env file")]
     [switch]$Force,
 
-    [Parameter(Mandatory=$false, HelpMessage="Do not create backup file when overwriting")]
+    [Parameter(Mandatory = $false, HelpMessage = "Do not create backup file when overwriting")]
     [switch]$NoBackup
 )
 
@@ -89,7 +89,8 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 if ((Split-Path -Leaf $ScriptDir) -eq "scripts") {
     $ProjectRoot = Split-Path -Parent $ScriptDir
-} else {
+}
+else {
     $ProjectRoot = $ScriptDir
 }
 $EnvFile = Join-Path $ProjectRoot ".env"
@@ -187,7 +188,8 @@ function Check-ExistingEnv {
             Copy-Item $EnvFile $backupFile
             Write-Warning-Custom "Existing .env file backed up: $backupFile"
             return $backupFile
-        } else {
+        }
+        else {
             Write-Info "Skipping backup (-NoBackup flag used)"
             return $null
         }
@@ -214,79 +216,106 @@ function Create-EnvFile {
     foreach ($line in $lines) {
         if ($line -match "^NODE_ENV=") {
             $newLines += "NODE_ENV=$Environment"
-        } elseif ($line -match "^DB_HOST=") {
+        }
+        elseif ($line -match "^DB_HOST=") {
             $newLines += "DB_HOST=mysql"
-        } elseif ($line -match "^DB_PORT=") {
+        }
+        elseif ($line -match "^DB_PORT=") {
             $newLines += "DB_PORT=3306"
-        } elseif ($line -match "^DB_NAME=") {
+        }
+        elseif ($line -match "^DB_NAME=") {
             $newLines += "DB_NAME=gatrix"
-        } elseif ($line -match "^DB_USER=") {
+        }
+        elseif ($line -match "^DB_USER=") {
             $newLines += "DB_USER=gatrix_user"
-        } elseif ($line -match "^DB_PASSWORD=") {
+        }
+        elseif ($line -match "^DB_PASSWORD=") {
             $newLines += "DB_PASSWORD=gatrix_password"
-        } elseif ($line -match "^REDIS_HOST=") {
+        }
+        elseif ($line -match "^REDIS_HOST=") {
             $newLines += "REDIS_HOST=redis"
-        } elseif ($line -match "^REDIS_PORT=") {
+        }
+        elseif ($line -match "^REDIS_PORT=") {
             # REDIS_PORT is the internal Docker port (6379), not the host port
             # Host port is configured separately in docker-compose.yml via REDIS_HOST_PORT
             $newLines += "REDIS_PORT=6379"
-        } elseif ($line -match "^CORS_ORIGIN=") {
+        }
+        elseif ($line -match "^CORS_ORIGIN=") {
             # In production with standard ports (80/443), omit port number
             # In development, include port number and use HOST address (not localhost)
             if ($Environment -eq "development") {
                 $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress`:53000"
-            } else {
-                $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress"
             }
-        } elseif ($line -match "^FRONTEND_URL=") {
+            else {
+                $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress`:53000"
+            }
+        }
+        elseif ($line -match "^FRONTEND_URL=") {
             # In production with standard ports (80/443), omit port number
             # In development, include port number and use HOST address (not localhost)
             if ($Environment -eq "development") {
                 $newLines += "FRONTEND_URL=$($script:ProtocolToUse)://$HostAddress`:53000"
-            } else {
-                $newLines += "FRONTEND_URL=$($script:ProtocolToUse)://$HostAddress"
             }
-        } elseif ($line -match "^CHAT_SERVER_URL=") {
+            else {
+                $newLines += "FRONTEND_URL=$($script:ProtocolToUse)://$HostAddress`:53000"
+            }
+        }
+        elseif ($line -match "^CHAT_SERVER_URL=") {
             $newLines += "CHAT_SERVER_URL=http://chat-server:5100"
-        } elseif ($line -match "^LOG_LEVEL=") {
+        }
+        elseif ($line -match "^LOG_LEVEL=") {
             if ($Environment -eq "development") {
                 $newLines += "LOG_LEVEL=debug"
-            } else {
+            }
+            else {
                 $newLines += "LOG_LEVEL=info"
             }
-        } elseif ($line -match "^JWT_SECRET=") {
+        }
+        elseif ($line -match "^JWT_SECRET=") {
             $newLines += "JWT_SECRET=$jwtSecret"
-        } elseif ($line -match "^SESSION_SECRET=") {
+        }
+        elseif ($line -match "^SESSION_SECRET=") {
             $newLines += "SESSION_SECRET=$sessionSecret"
-        } elseif ($line -match "^JWT_REFRESH_SECRET=") {
+        }
+        elseif ($line -match "^JWT_REFRESH_SECRET=") {
             $newLines += "JWT_REFRESH_SECRET=$jwtRefreshSecret"
-        } elseif ($line -match "^VITE_DEFAULT_LANGUAGE=") {
+        }
+        elseif ($line -match "^VITE_DEFAULT_LANGUAGE=") {
             $newLines += "VITE_DEFAULT_LANGUAGE=$DefaultLanguage"
-        } elseif ($line -match "^DEFAULT_LANGUAGE=") {
+        }
+        elseif ($line -match "^DEFAULT_LANGUAGE=") {
             $newLines += "DEFAULT_LANGUAGE=$DefaultLanguage"
-        } elseif ($line -match "^VITE_GRAFANA_URL=") {
+        }
+        elseif ($line -match "^VITE_GRAFANA_URL=") {
             if ($Environment -eq "development") {
                 # Development: include port number, use HOST address (not localhost)
                 $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:54000"
-            } else {
-                # Production: Grafana accessed via /grafana subpath (handled by load balancer)
-                $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress/grafana"
             }
-        } elseif ($line -match "^VITE_BULL_BOARD_URL=") {
+            else {
+                # Production: Grafana accessed via /grafana subpath (handled by load balancer)
+                $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:54000"
+            }
+        }
+        elseif ($line -match "^VITE_BULL_BOARD_URL=") {
             if ($Environment -eq "development") {
                 # Development: include port number, use HOST address (not localhost)
                 $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress`:53000/bull-board"
-            } else {
-                # Production: Bull Board accessed via /bull-board subpath
-                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress/bull-board"
             }
-        } elseif ($line -match "^ADMIN_PASSWORD=") {
+            else {
+                # Production: Bull Board accessed via /bull-board subpath
+                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress`:53000/bull-board"
+            }
+        }
+        elseif ($line -match "^ADMIN_PASSWORD=") {
             $newLines += "ADMIN_PASSWORD=$AdminPassword"
-        } elseif ($line -match "^SERVICE_DISCOVERY_MODE=") {
+        }
+        elseif ($line -match "^SERVICE_DISCOVERY_MODE=") {
             $newLines += "SERVICE_DISCOVERY_MODE=$ServiceDiscoveryMode"
-        } elseif ($line -match "^DATA_ROOT=") {
+        }
+        elseif ($line -match "^DATA_ROOT=") {
             $newLines += "DATA_ROOT=$($script:DataRootToUse)"
-        } else {
+        }
+        else {
             $newLines += $line
         }
     }
@@ -341,7 +370,8 @@ function Print-Summary {
     if ($Environment -eq "development") {
         Write-Host "  2. Start Docker services: docker-compose -f docker-compose.dev.yml up -d"
         Write-Host "  3. Access the application: $($script:ProtocolToUse)://$HostAddress`:53000"
-    } else {
+    }
+    else {
         Write-Host "  2. Start Docker services: docker-compose -f docker-compose.yml up -d"
         Write-Host "  3. Access the application: $($script:ProtocolToUse)://$HostAddress"
         Write-Host "  4. Configure your load balancer to forward:"
@@ -365,10 +395,12 @@ Write-Host ""
 if ([string]::IsNullOrWhiteSpace($Protocol)) {
     if ($Environment -eq "development") {
         $script:ProtocolToUse = "http"
-    } else {
+    }
+    else {
         $script:ProtocolToUse = "https"
     }
-} else {
+}
+else {
     $script:ProtocolToUse = $Protocol
 }
 
@@ -376,10 +408,12 @@ if ([string]::IsNullOrWhiteSpace($Protocol)) {
 if ([string]::IsNullOrWhiteSpace($DataRoot)) {
     if ($Environment -eq "development") {
         $script:DataRootToUse = "./data"
-    } else {
+    }
+    else {
         $script:DataRootToUse = "/data/gatrix"
     }
-} else {
+}
+else {
     $script:DataRootToUse = $DataRoot
 }
 
