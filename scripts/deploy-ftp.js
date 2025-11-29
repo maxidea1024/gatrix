@@ -55,8 +55,8 @@ try {
     const second = String(now.getSeconds()).padStart(2, '0');
     const dateTime = `${year}${month}${day}-${hour}${minute}${second}`;
 
-    // 3. Create filename: uwo.{label}.YYYYMMDD-HHMMSS.{commit}.tgz
-    const filename = `uwo.${label}.${dateTime}.${commitHash}.tgz`;
+    // 3. Create filename: uwo.{label}.YYYYMMDD-HHMMSS.{commit}-gatrix.tgz
+    const filename = `uwo.${label}.${dateTime}.${commitHash}-gatrix.tgz`;
     console.log(`📦 Package name: ${filename}`);
 
     // 4. Export main branch as tar.gz
