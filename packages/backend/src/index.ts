@@ -246,77 +246,77 @@ const startServer = async () => {
     }
 
 
-    // Register Backend service to Service Discovery directly (no SDK needed for self-registration)
-    try {
-      const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
-      const { ulid } = await import('ulid');
-      const os = await import('os');
+    // // Register Backend service to Service Discovery directly (no SDK needed for self-registration)
+    // try {
+    //   const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
+    //   const { ulid } = await import('ulid');
+    //   const os = await import('os');
 
-      backendInstanceId = ulid();
-      const hostname = os.hostname();
+    //   backendInstanceId = ulid();
+    //   const hostname = os.hostname();
 
-      await serviceDiscoveryService.register({
-        instanceId: backendInstanceId,
-        hostname,
-        internalAddress: hostname,
-        labels: {
-          service: 'backend',
-          group: process.env.SERVICE_GROUP || 'development',
-        },
-        ports: {
-          http: [config.port],
-        },
-        status: 'ready',
-        meta: {
-          instanceName: 'backend-1',
-        },
-      });
+    //   await serviceDiscoveryService.register({
+    //     instanceId: backendInstanceId,
+    //     hostname,
+    //     internalAddress: hostname,
+    //     labels: {
+    //       service: 'backend',
+    //       group: process.env.SERVICE_GROUP || 'development',
+    //     },
+    //     ports: {
+    //       http: [config.port],
+    //     },
+    //     status: 'ready',
+    //     meta: {
+    //       instanceName: 'backend-1',
+    //     },
+    //   });
 
-      logger.info('Backend service registered to Service Discovery', { instanceId: backendInstanceId });
-    } catch (error) {
-      logger.warn('Backend service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });
-    }
+    //   logger.info('Backend service registered to Service Discovery', { instanceId: backendInstanceId });
+    // } catch (error) {
+    //   logger.warn('Backend service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });
+    // }
 
-    // Initialize Service Discovery watch (for Redis keyspace notifications)
-    try {
-      const serviceDiscoveryMode = process.env.SERVICE_DISCOVERY_MODE || 'redis';
-      const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
+    // // Initialize Service Discovery watch (for Redis keyspace notifications)
+    // try {
+    //   const serviceDiscoveryMode = process.env.SERVICE_DISCOVERY_MODE || 'redis';
+    //   const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
 
-      if (serviceDiscoveryMode === 'redis') {
-        // Start watching for Redis keyspace notifications (TTL expiration)
-        // This is required for automatic cleanup of expired services
-        await serviceDiscoveryService.watchServices((event) => {
-          logger.debug(`Service Discovery event: ${event.type} ${event.instance.labels.service}:${event.instance.instanceId}`);
-        });
-        logger.info('Redis Service Discovery watch initialized (keyspace notifications enabled)');
-      } else if (serviceDiscoveryMode === 'etcd') {
-        // Start automatic monitoring every 5 seconds
-        // 1. Detect no-response services (lease expired but still in etcd)
-        // 2. Cleanup old inactive services (terminated/error/no-response > 300s)
-        const cleanupInterval = setInterval(async () => {
-          try {
-            // Detect and mark no-response services
-            await serviceDiscoveryService.detectNoResponseServices();
+    //   if (serviceDiscoveryMode === 'redis') {
+    //     // Start watching for Redis keyspace notifications (TTL expiration)
+    //     // This is required for automatic cleanup of expired services
+    //     await serviceDiscoveryService.watchServices((event) => {
+    //       logger.debug(`Service Discovery event: ${event.type} ${event.instance.labels.service}:${event.instance.instanceId}`);
+    //     });
+    //     logger.info('Redis Service Discovery watch initialized (keyspace notifications enabled)');
+    //   } else if (serviceDiscoveryMode === 'etcd') {
+    //     // Start automatic monitoring every 5 seconds
+    //     // 1. Detect no-response services (lease expired but still in etcd)
+    //     // 2. Cleanup old inactive services (terminated/error/no-response > 300s)
+    //     const cleanupInterval = setInterval(async () => {
+    //       try {
+    //         // Detect and mark no-response services
+    //         await serviceDiscoveryService.detectNoResponseServices();
 
-            // Cleanup old inactive services
-            const inactiveServices = await serviceDiscoveryService.getInactiveServices();
-            logger.info(`Auto-cleanup check: Found ${inactiveServices.length} inactive services`);
-            if (inactiveServices.length > 0) {
-              logger.info(`Auto-cleanup: Found ${inactiveServices.length} inactive services, cleaning up...`);
-              await serviceDiscoveryService.cleanupInactiveServices();
-            }
-          } catch (error) {
-            logger.error('Auto-cleanup failed:', error);
-          }
-        }, 5000); // 5 seconds
+    //         // Cleanup old inactive services
+    //         const inactiveServices = await serviceDiscoveryService.getInactiveServices();
+    //         logger.info(`Auto-cleanup check: Found ${inactiveServices.length} inactive services`);
+    //         if (inactiveServices.length > 0) {
+    //           logger.info(`Auto-cleanup: Found ${inactiveServices.length} inactive services, cleaning up...`);
+    //           await serviceDiscoveryService.cleanupInactiveServices();
+    //         }
+    //       } catch (error) {
+    //         logger.error('Auto-cleanup failed:', error);
+    //       }
+    //     }, 5000); // 5 seconds
 
-        // Store interval for graceful shutdown
-        (global as any).etcdCleanupInterval = cleanupInterval;
-        logger.info('etcd auto-cleanup initialized (runs every 5 seconds)');
-      }
-    } catch (error) {
-      logger.warn('Service Discovery initialization failed, continuing:', error);
-    }
+    //     // Store interval for graceful shutdown
+    //     (global as any).etcdCleanupInterval = cleanupInterval;
+    //     logger.info('etcd auto-cleanup initialized (runs every 5 seconds)');
+    //   }
+    // } catch (error) {
+    //   logger.warn('Service Discovery initialization failed, continuing:', error);
+    // }
 
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)
     const server = createServer(app);
