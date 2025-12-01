@@ -11,12 +11,15 @@ RUN apk add --no-cache \
     make \
     g++
 
+# Use Tencent npm mirror for faster downloads in China
+RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
+
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/frontend/package.json ./packages/frontend/
 
 # Install all dependencies (including dev dependencies)
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --network-timeout 600000
 
 # Rebuild esbuild to fix binary version mismatch
 RUN cd /app/packages/frontend && npm rebuild esbuild

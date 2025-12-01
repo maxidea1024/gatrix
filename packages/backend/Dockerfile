@@ -6,6 +6,9 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
+# Use Tencent npm mirror for faster downloads in China
+RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
+
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/backend/package.json ./packages/backend/
@@ -19,6 +22,9 @@ RUN yarn install --frozen-lockfile --production=false --network-timeout 600000
 FROM base AS builder
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
+
+# Use Tencent npm mirror for faster downloads in China
+RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 
 # Copy all package files first
 COPY package.json yarn.lock* ./
@@ -43,6 +49,9 @@ RUN yarn workspace @gatrix/backend build
 # Production image, copy all the files and run the app
 FROM base AS runner
 WORKDIR /app
+
+# Use Tencent npm mirror for faster downloads in China
+RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 
 # Create a non-root user
 RUN addgroup --system --gid 1001 nodejs

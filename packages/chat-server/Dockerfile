@@ -7,6 +7,9 @@ WORKDIR /app
 FROM base AS deps
 WORKDIR /app
 
+# Use Tencent npm mirror for faster downloads in China
+RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
+
 # Copy package files for all workspaces needed
 COPY package.json yarn.lock* ./
 COPY packages/backend/package.json ./packages/backend/
@@ -39,6 +42,9 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+
+# Use Tencent npm mirror for faster downloads in China
+RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \

@@ -6,6 +6,9 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
+# Use Tencent npm mirror for faster downloads in China
+RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
+
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/frontend/package.json ./packages/frontend/
