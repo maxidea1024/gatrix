@@ -87,6 +87,7 @@ services:
       dockerfile: packages/backend/Dockerfile
     container_name: gatrix-backend
     restart: unless-stopped
+    user: "0"  # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_FORMAT: json
@@ -162,6 +163,7 @@ services:
       dockerfile: packages/event-lens/Dockerfile
     container_name: gatrix-event-lens
     restart: unless-stopped
+    user: "0"  # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_FORMAT: json
@@ -208,6 +210,7 @@ services:
       dockerfile: packages/event-lens/Dockerfile
     container_name: gatrix-event-lens-worker
     restart: unless-stopped
+    user: "0"  # Run as root to avoid volume permission issues
     command: [ "node", "packages/event-lens/dist/worker.js" ]
     environment:
       NODE_ENV: ${NODE_ENV:-production}
@@ -249,6 +252,7 @@ services:
       dockerfile: packages/chat-server/Dockerfile
     container_name: gatrix-chat-server
     restart: unless-stopped
+    user: "0"  # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_FORMAT: json
