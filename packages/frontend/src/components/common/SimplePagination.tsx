@@ -31,6 +31,12 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
   showRowsPerPage = true,
 }) => {
   const { t } = useTranslation();
+
+  // Don't render pagination when there are no items
+  if (count <= 0) {
+    return null;
+  }
+
   const totalPages = Math.max(1, Math.ceil(count / rowsPerPage));
   const currentPage = page + 1; // Convert 0-based to 1-based
 
