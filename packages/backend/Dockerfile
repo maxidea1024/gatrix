@@ -53,7 +53,18 @@ COPY --from=builder /app/packages/backend/dist ./dist
 COPY --from=builder /app/packages/backend/package.json ./package.json
 
 # Copy production dependencies
-COPY --from=deps /app/node_modules ./node_modules
+COPY package.json yarn.lock* ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/frontend/package.json ./packages/frontend/
+COPY packages/chat-server/package.json ./packages/chat-server/
+COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+
+# Copy server-sdk source (needed for file: dependency)
+COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+
+RUN yarn install --frozen-lockfile --production=true && \
+  yarn cache clean
 
 # Create logs, uploads, and data directories
 RUN mkdir -p logs uploads data && chown nodejs:nodejs logs uploads data

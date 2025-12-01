@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@gatrix/server-sdk": "file:../sdks/server-sdk",
+    "adm-zip": "^0.5.10",
     "@bull-board/api": "^6.12.6",
     "@bull-board/express": "^6.12.6",
     "@bull-board/ui": "^6.12.6",
@@ -103,6 +104,7 @@
     "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.5",
     "@types/bcryptjs": "^2.4.6",
     "@types/compression": "^1.7.5",
     "@types/connect-redis": "^0.0.23",

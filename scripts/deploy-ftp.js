@@ -2,15 +2,21 @@
 
 /**
  * Deploy script for Gatrix
- * Exports main branch as tgz and uploads to SFTP server
- * 
+ * Exports specified branch as tgz and uploads to SFTP server
+ *
  * Usage:
- *   yarn deploy:sftp [label] [--local-only]
- *   
+ *   yarn deploy:ftp [label] [--branch <branch>] [--local-only]
+ *
+ * Options:
+ *   --branch, -b <branch>  Branch to export (default: main)
+ *   --local-only           Create archive only, skip upload
+ *
  * Example:
- *   yarn deploy:sftp cbt
- *   yarn deploy:sftp prod
- *   yarn deploy:sftp cbt --local-only  # Create archive only, skip upload
+ *   yarn deploy:ftp cbt
+ *   yarn deploy:ftp prod
+ *   yarn deploy:ftp cbt --branch develop
+ *   yarn deploy:ftp cbt -b feature/my-feature
+ *   yarn deploy:ftp cbt --local-only
  */
 
 const { execSync } = require('child_process');
@@ -27,12 +33,28 @@ const SFTP_CONFIG = {
     basePath: '/build/03. server_packages'
 };
 
-// Get label from command line argument, default to 'cbt'
+// Parse command line arguments
 const args = process.argv.slice(2);
 const localOnly = args.includes('--local-only');
-const label = args.find(arg => !arg.startsWith('--')) || 'cbt';
+
+// Parse --branch or -b option
+let branch = 'main';
+const branchIndex = args.findIndex(arg => arg === '--branch' || arg === '-b');
+if (branchIndex !== -1 && args[branchIndex + 1]) {
+    branch = args[branchIndex + 1];
+}
+
+// Get label (first non-option argument)
+const label = args.find((arg, idx) => {
+    // Skip if it's an option flag
+    if (arg.startsWith('--') || arg === '-b') return false;
+    // Skip if it's the value after --branch or -b
+    if (idx > 0 && (args[idx - 1] === '--branch' || args[idx - 1] === '-b')) return false;
+    return true;
+}) || 'cbt';
 
 console.log(`\n🚀 Starting deployment for label: ${label}`);
+console.log(`🌿 Branch: ${branch}`);
 if (localOnly) {
     console.log('📦 Local-only mode: Archive will be created without uploading\n');
 } else {
@@ -40,9 +62,9 @@ if (localOnly) {
 }
 
 try {
-    // 1. Get current commit hash (6 characters)
+    // 1. Get current commit hash (10 characters)
     console.log('📝 Getting commit hash...');
-    const commitHash = execSync('git rev-parse --short=6 HEAD', { encoding: 'utf-8' }).trim();
+    const commitHash = execSync('git rev-parse --short=10 HEAD', { encoding: 'utf-8' }).trim();
     console.log(`   Commit: ${commitHash}`);
 
     // 2. Get current date and time
@@ -53,14 +75,15 @@ try {
     const hour = String(now.getHours()).padStart(2, '0');
     const minute = String(now.getMinutes()).padStart(2, '0');
     const second = String(now.getSeconds()).padStart(2, '0');
-    const dateTime = `${year}${month}${day}-${hour}${minute}${second}`;
+    const dateStr = `${year}-${month}-${day}`;
+    const timeStr = `${hour}${minute}${second}`;
 
-    // 3. Create filename: uwo.{label}.YYYYMMDD-HHMMSS.{commit}-gatrix.tgz
-    const filename = `uwo.${label}.${dateTime}.${commitHash}-gatrix.tgz`;
+    // 3. Create filename: uwo.{label}.YYYY-MM-DD.HHMMSS.{commit}.gatrix.tgz
+    const filename = `uwo.${label}.${dateStr}.${timeStr}.${commitHash}.gatrix.tgz`;
     console.log(`📦 Package name: ${filename}`);
 
-    // 4. Export main branch as tar.gz
-    console.log('\n📤 Exporting main branch...');
+    // 4. Export specified branch as tar.gz
+    console.log(`\n📤 Exporting branch '${branch}'...`);
     const tempDir = path.join(__dirname, '..', 'temp-export');
 
     // Create temp directory if it doesn't exist
@@ -70,8 +93,8 @@ try {
 
     const archivePath = path.join(tempDir, filename);
 
-    // Use git archive to export main branch
-    execSync(`git archive --format=tar.gz --output="${archivePath}" main`, {
+    // Use git archive to export specified branch
+    execSync(`git archive --format=tar.gz --output="${archivePath}" ${branch}`, {
         stdio: 'inherit'
     });
 
@@ -90,17 +113,25 @@ try {
     console.log(`   User: ${SFTP_CONFIG.user}`);
     console.log(`   Path: ${SFTP_CONFIG.basePath}/${label}/`);
 
-    // Check if ssh2-sftp-client is installed
+    // Check if ssh2-sftp-client is installed (local or global)
+    let Client;
     try {
-        require.resolve('ssh2-sftp-client');
+        Client = require('ssh2-sftp-client');
     } catch (e) {
-        console.error('\n❌ Error: ssh2-sftp-client is not installed');
-        console.log('   Installing ssh2-sftp-client...\n');
-        execSync('yarn add -D ssh2-sftp-client', { stdio: 'inherit' });
+        // Try global yarn packages
+        try {
+            const globalPath = execSync('yarn global dir', { encoding: 'utf8' }).trim();
+            Client = require(require('path').join(globalPath, 'node_modules', 'ssh2-sftp-client'));
+        } catch (e2) {
+            console.error('\n❌ Error: ssh2-sftp-client is not installed');
+            console.log('   Installing ssh2-sftp-client globally...\n');
+            execSync('yarn global add ssh2-sftp-client', { stdio: 'inherit' });
+            const globalPath = execSync('yarn global dir', { encoding: 'utf8' }).trim();
+            Client = require(require('path').join(globalPath, 'node_modules', 'ssh2-sftp-client'));
+        }
     }
 
     // Upload using ssh2-sftp-client
-    const Client = require('ssh2-sftp-client');
     const sftp = new Client();
 
     (async () => {
@@ -126,11 +157,60 @@ try {
                 }
             }
 
-            // Upload file
+            // Upload file with progress using Transform stream
             const remoteFilePath = `${remoteLabelPath}/${filename}`;
-            await sftp.put(archivePath, remoteFilePath);
+            const fileSize = fs.statSync(archivePath).size;
+            const fileSizeMB = (fileSize / 1024 / 1024).toFixed(2);
+            let transferred = 0;
+            let lastPercent = -1;
+            const startTime = Date.now();
 
-            console.log(`✅ File uploaded: ${remoteFilePath}`);
+            console.log(`📦 File size: ${fileSizeMB} MB`);
+            process.stdout.write('⏳ Uploading: 0%');
+
+            // Format seconds to mm:ss
+            const formatTime = (seconds) => {
+                if (!isFinite(seconds) || seconds < 0) return '--:--';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            // Create transform stream for progress tracking
+            const { Transform } = require('stream');
+            const progressStream = new Transform({
+                transform(chunk, encoding, callback) {
+                    transferred += chunk.length;
+                    const percent = Math.floor((transferred / fileSize) * 100);
+                    if (percent !== lastPercent) {
+                        lastPercent = percent;
+
+                        // Calculate speed and ETA
+                        const elapsed = (Date.now() - startTime) / 1000;
+                        const speed = transferred / elapsed;
+                        const remaining = fileSize - transferred;
+                        const eta = remaining / speed;
+                        const speedMBps = (speed / 1024 / 1024).toFixed(2);
+
+                        process.stdout.clearLine(0);
+                        process.stdout.cursorTo(0);
+                        const bar = '█'.repeat(Math.floor(percent / 5)) + '░'.repeat(20 - Math.floor(percent / 5));
+                        const transferredMB = (transferred / 1024 / 1024).toFixed(2);
+                        process.stdout.write(`⏳ [${bar}] ${percent}% (${transferredMB}/${fileSizeMB} MB) ${speedMBps} MB/s ETA: ${formatTime(eta)}`);
+                    }
+                    callback(null, chunk);
+                }
+            });
+
+            const readStream = fs.createReadStream(archivePath);
+            const pipedStream = readStream.pipe(progressStream);
+
+            await sftp.put(pipedStream, remoteFilePath);
+
+            const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+            process.stdout.clearLine(0);
+            process.stdout.cursorTo(0);
+            console.log(`✅ File uploaded: ${remoteFilePath} (${totalTime}s)`);
 
             await sftp.end();
 

@@ -1,6 +1,7 @@
 {
   "sidebar.logs": "Service Logs",
   "sidebar.alerts": "Monitoring Alerts",
+  "sidebar.dataManagement": "Data Management",
   "monitoring.logs.title": "Service logs",
   "monitoring.logs.subtitle": "Log data collected from Gatrix services is visualized through the Grafana logs dashboard.",
   "monitoring.alerts.title": "Monitoring alerts",
@@ -12,7 +13,6 @@
   "monitoring.alerts.fields.message": "Message",
   "monitoring.alerts.fields.startsAt": "Starts at",
   "monitoring.alerts.fields.endsAt": "Ends at",
-
   "notifications": {
     "maintenance": {
       "started": "Service maintenance started",
@@ -1541,7 +1541,6 @@
     "loginFailed": "Login failed",
     "loginSuccess": "Login successful",
     "loginRequired": "Login is required.",
-
     "invitation": {
       "checking": "Checking invitation link...",
       "receivedTitle": "You have been invited to a team!",
@@ -2420,7 +2419,6 @@
     "console": "System Console",
     "monitoring": "Monitoring",
     "grafana": "Monitoring",
-
     "realtimeEvents": "Realtime Events",
     "itemRewards": "Item Rewards",
     "serviceNotices": "Service Notices",
@@ -2605,7 +2603,6 @@
     "createChannelFailed": "Failed to create channel",
     "loadChannelsFailed": "Failed to load channels",
     "loadMessagesFailed": "Failed to load messages",
-
     "noMessages": "No messages yet",
     "startConversation": "Start the conversation by sending a message!",
     "typeMessage": "Type a message...",
@@ -3987,5 +3984,24 @@
     "copy": "Copy",
     "paste": "Paste",
     "selectAll": "Select All"
-  }
+  },
+  "Data Management": "Data Management",
+  "Export Data": "Export Data",
+  "Download a full backup of the system data": "Download a full backup of the system data",
+  "This will export all database tables, planning data files, and uploads into a single ZIP file.": "This will export all database tables, planning data files, and uploads into a single ZIP file.",
+  "Export All Data": "Export All Data",
+  "Exporting...": "Exporting...",
+  "Import Data": "Import Data",
+  "Restore system data from a backup file": "Restore system data from a backup file",
+  "Warning: Importing data will OVERWRITE all existing data and cannot be undone.": "Warning: Importing data will OVERWRITE all existing data and cannot be undone.",
+  "Select Backup File (.zip)": "Select Backup File (.zip)",
+  "Importing...": "Importing...",
+  "Confirm Data Import": "Confirm Data Import",
+  "Are you sure you want to import this data? This action will overwrite all existing database records and files. This cannot be undone.": "Are you sure you want to import this data? This action will overwrite all existing database records and files. This cannot be undone.",
+  "Cancel": "Cancel",
+  "Import & Overwrite": "Import & Overwrite",
+  "Data exported successfully": "Data exported successfully",
+  "Failed to export data": "Failed to export data",
+  "Data imported successfully. Please refresh the page.": "Data imported successfully. Please refresh the page.",
+  "Failed to import data": "Failed to import data"
 }

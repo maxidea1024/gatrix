@@ -330,7 +330,23 @@ http://example.com
    docker-compose -f docker-compose.yml restart frontend
    ```
 
-3. **OAuth 인증 정보 업데이트** (선택사항):
+3. **채팅 서버 URL 설정** (선택사항):
+   - `.env` 파일 편집
+   - 채팅 서버가 다른 도메인에 있는 경우 `VITE_CHAT_SERVER_URL` 업데이트
+   - 채팅 서버가 비표준 포트를 사용하는 경우 `VITE_CHAT_SERVER_PORT` 업데이트 (기본값: 55100)
+   - 서비스 재시작:
+
+   **개발 환경:**
+   ```bash
+   docker-compose -f docker-compose.dev.yml restart frontend-dev
+   ```
+
+   **프로덕션 환경:**
+   ```bash
+   docker-compose -f docker-compose.yml restart frontend
+   ```
+
+4. **OAuth 인증 정보 업데이트** (선택사항):
    - `.env` 파일 편집
    - Google 및 GitHub OAuth 인증 정보 추가
    - 서비스 재시작:
@@ -345,7 +361,7 @@ http://example.com
    docker-compose -f docker-compose.yml restart
    ```
 
-4. **로그 확인**:
+5. **로그 확인**:
 
    **개발 환경:**
    ```bash
@@ -357,7 +373,7 @@ http://example.com
    docker-compose -f docker-compose.yml logs -f backend
    ```
 
-5. **서비스 중지**:
+6. **서비스 중지**:
 
    **개발 환경:**
    ```bash

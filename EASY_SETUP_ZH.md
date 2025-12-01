@@ -311,7 +311,23 @@ http://example.com
    docker-compose -f docker-compose.yml restart frontend
    ```
 
-3. **更新 OAuth 凭据**（可选）：
+3. **配置聊天服务器 URL**（可选）：
+   - 编辑 `.env` 文件
+   - 如果您的聊天服务器位于不同的域，请更新 `VITE_CHAT_SERVER_URL`
+   - 如果您的聊天服务器使用非标准端口，请更新 `VITE_CHAT_SERVER_PORT`（默认值：55100）
+   - 重启服务：
+
+   **开发环境：**
+   ```bash
+   docker-compose -f docker-compose.dev.yml restart frontend-dev
+   ```
+
+   **生产环境：**
+   ```bash
+   docker-compose -f docker-compose.yml restart frontend
+   ```
+
+4. **更新 OAuth 凭据**（可选）：
    - 编辑 `.env` 文件
    - 添加您的 Google 和 GitHub OAuth 凭据
    - 重启服务：
@@ -326,7 +342,7 @@ http://example.com
    docker-compose -f docker-compose.yml restart
    ```
 
-4. **查看日志**：
+5. **查看日志**：
 
    **开发环境：**
    ```bash
@@ -338,7 +354,7 @@ http://example.com
    docker-compose -f docker-compose.yml logs -f backend
    ```
 
-5. **停止服务**：
+6. **停止服务**：
 
    **开发环境：**
    ```bash

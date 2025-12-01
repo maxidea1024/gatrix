@@ -68,27 +68,35 @@ export const adminPanelMenuItems: MenuItem[] = [
   { text: 'sidebar.gameWorlds', icon: <LanguageIcon />, path: '/admin/game-worlds', adminOnly: true },
   { text: 'sidebar.maintenance', icon: <BuildIcon />, path: '/admin/maintenance', adminOnly: true },
   { text: 'sidebar.maintenanceTemplates', icon: <TextIcon />, path: '/admin/maintenance-templates', adminOnly: true },
-  { text: 'sidebar.scheduleManagement', icon: <ScheduleIcon />, adminOnly: true, children: [
-    { text: 'sidebar.scheduler', icon: <ScheduleIcon />, path: '/admin/scheduler', adminOnly: true },
-    { text: 'sidebar.jobs', icon: <JobIcon />, path: '/admin/jobs', adminOnly: true },
-    { text: 'sidebar.queueMonitor', icon: <MonitorIcon />, path: '/admin/queue-monitor', adminOnly: true },
-  ] },
+  {
+    text: 'sidebar.scheduleManagement', icon: <ScheduleIcon />, adminOnly: true, children: [
+      { text: 'sidebar.scheduler', icon: <ScheduleIcon />, path: '/admin/scheduler', adminOnly: true },
+      { text: 'sidebar.jobs', icon: <JobIcon />, path: '/admin/jobs', adminOnly: true },
+      { text: 'sidebar.queueMonitor', icon: <MonitorIcon />, path: '/admin/queue-monitor', adminOnly: true },
+    ]
+  },
   { text: 'sidebar.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs', adminOnly: true },
   { text: 'sidebar.realtimeEvents', icon: <TimelineIcon />, path: '/admin/realtime-events', adminOnly: true },
   { text: 'sidebar.crashEvents', icon: <BugReportIcon />, path: '/admin/crash-events', adminOnly: true },
   { text: 'sidebar.remoteConfig', icon: <CloudSyncIcon />, path: '/admin/remote-config', adminOnly: true },
-  { text: 'sidebar.security', icon: <SecurityIcon />, adminOnly: true, children: [
-    { text: 'sidebar.apiAccessTokens', icon: <VpnKeyIcon />, path: '/admin/api-tokens', adminOnly: true },
-    { text: 'sidebar.whitelist', icon: <SecurityIcon />, path: '/admin/whitelist', adminOnly: true },
-  ] },
-  { text: 'sidebar.serverManagement', icon: <DnsIcon />, adminOnly: true, children: [
-    { text: 'sidebar.serverList', icon: <ServerIcon />, path: '/admin/server-list', adminOnly: true },
-  ] },
-  { text: 'sidebar.monitoring', icon: <MonitorIcon />, adminOnly: true, children: [
-    { text: 'sidebar.grafana', icon: <MonitorIcon />, path: '/admin/grafana-dashboard', adminOnly: true },
-    { text: 'sidebar.logs', icon: <MonitorIcon />, path: '/monitoring/logs', adminOnly: true },
-    { text: 'sidebar.alerts', icon: <NotificationsIcon />, path: '/monitoring/alerts', adminOnly: true },
-  ] },
+  {
+    text: 'sidebar.security', icon: <SecurityIcon />, adminOnly: true, children: [
+      { text: 'sidebar.apiAccessTokens', icon: <VpnKeyIcon />, path: '/admin/api-tokens', adminOnly: true },
+      { text: 'sidebar.whitelist', icon: <SecurityIcon />, path: '/admin/whitelist', adminOnly: true },
+    ]
+  },
+  {
+    text: 'sidebar.serverManagement', icon: <DnsIcon />, adminOnly: true, children: [
+      { text: 'sidebar.serverList', icon: <ServerIcon />, path: '/admin/server-list', adminOnly: true },
+    ]
+  },
+  {
+    text: 'sidebar.monitoring', icon: <MonitorIcon />, adminOnly: true, children: [
+      { text: 'sidebar.grafana', icon: <MonitorIcon />, path: '/admin/grafana-dashboard', adminOnly: true },
+      { text: 'sidebar.logs', icon: <MonitorIcon />, path: '/monitoring/logs', adminOnly: true },
+      { text: 'sidebar.alerts', icon: <NotificationsIcon />, path: '/monitoring/alerts', adminOnly: true },
+    ]
+  },
   { text: 'sidebar.openApi', icon: <ApiIcon />, path: '/admin/open-api', adminOnly: true },
   { text: 'sidebar.console', icon: <TerminalIcon />, path: '/admin/console', adminOnly: true },
 ];
@@ -97,10 +105,12 @@ export const adminPanelMenuItems: MenuItem[] = [
 export const gameMenuItems: MenuItem[] = [
   { text: 'sidebar.serviceNotices', icon: <AnnouncementIcon />, path: '/game/service-notices', adminOnly: true },
   { text: 'sidebar.ingamePopupNotices', icon: <NotificationsIcon />, path: '/game/ingame-popup-notices', adminOnly: true },
-  { text: 'sidebar.coupons', icon: <ConfirmationNumberIcon />, adminOnly: true, children: [
-    { text: 'sidebar.couponSettings', icon: <SettingsIcon />, path: '/game/coupon-settings', adminOnly: true },
-    { text: 'sidebar.couponUsage', icon: <HistoryIcon />, path: '/game/coupon-usage', adminOnly: true },
-  ] },
+  {
+    text: 'sidebar.coupons', icon: <ConfirmationNumberIcon />, adminOnly: true, children: [
+      { text: 'sidebar.couponSettings', icon: <SettingsIcon />, path: '/game/coupon-settings', adminOnly: true },
+      { text: 'sidebar.couponUsage', icon: <HistoryIcon />, path: '/game/coupon-usage', adminOnly: true },
+    ]
+  },
   { text: 'sidebar.surveys', icon: <PollIcon />, path: '/game/surveys', adminOnly: true },
   {
     text: 'sidebar.operationEvents',
@@ -124,6 +134,7 @@ export const eventLensMenuItems: MenuItem[] = [
 export const settingsMenuItems: MenuItem[] = [
   { text: 'settings.general.title', icon: <SettingsIcon />, path: '/settings' },
   { text: 'tags.title', icon: <LabelIcon />, path: '/settings/tags' },
+  { text: 'sidebar.dataManagement', icon: <CloudSyncIcon />, path: '/admin/data-management', adminOnly: true },
 ];
 
 // 메뉴 카테고리 구성

@@ -1,6 +1,7 @@
 {
   "sidebar.logs": "服务日志",
   "sidebar.alerts": "监控告警",
+  "sidebar.dataManagement": "数据管理",
   "monitoring.logs.title": "服务日志",
   "monitoring.logs.subtitle": "可以通过 Grafana 日志仪表盘查看从 Gatrix 服务收集的日志数据。",
   "monitoring.alerts.title": "监控告警",
@@ -12,7 +13,6 @@
   "monitoring.alerts.fields.message": "消息",
   "monitoring.alerts.fields.startsAt": "开始时间",
   "monitoring.alerts.fields.endsAt": "结束时间",
-
   "notifications": {
     "maintenance": {
       "started": "服务维护已开始",
@@ -1579,7 +1579,6 @@
     "loginFailed": "登录失败",
     "loginSuccess": "登录成功",
     "loginRequired": "需要登录。",
-
     "invitation": {
       "checking": "Checking invitation link...",
       "receivedTitle": "You have been invited to a team!",
@@ -2447,7 +2446,6 @@
     "console": "系统控制台",
     "monitoring": "监控",
     "grafana": "监控",
-
     "realtimeEvents": "实时事件",
     "itemRewards": "道具奖励",
     "serviceNotices": "服务公告",
@@ -2632,7 +2630,6 @@
     "createChannelFailed": "Failed to create channel",
     "loadChannelsFailed": "Failed to load channels",
     "loadMessagesFailed": "无法加载消息",
-
     "noMessages": "No messages yet",
     "startConversation": "Start the conversation by sending a message!",
     "typeMessage": "Type a message...",
@@ -3970,5 +3967,24 @@
       "overview": "概览",
       "sdkMetrics": "SDK 指标"
     }
-  }
+  },
+  "Data Management": "数据管理",
+  "Export Data": "导出数据",
+  "Download a full backup of the system data": "下载系统数据的完整备份",
+  "This will export all database tables, planning data files, and uploads into a single ZIP file.": "这将把所有数据库表、策划数据文件和上传文件导出到一个ZIP文件中。",
+  "Export All Data": "导出所有数据",
+  "Exporting...": "导出中...",
+  "Import Data": "导入数据",
+  "Restore system data from a backup file": "从备份文件恢复系统数据",
+  "Warning: Importing data will OVERWRITE all existing data and cannot be undone.": "警告：导入数据将覆盖所有现有数据，此操作无法撤销。",
+  "Select Backup File (.zip)": "选择备份文件 (.zip)",
+  "Importing...": "导入中...",
+  "Confirm Data Import": "确认数据导入",
+  "Are you sure you want to import this data? This action will overwrite all existing database records and files. This cannot be undone.": "确定要导入此数据吗？此操作将覆盖所有现有的数据库记录和文件。此操作无法撤销。",
+  "Cancel": "取消",
+  "Import & Overwrite": "导入并覆盖",
+  "Data exported successfully": "数据导出成功",
+  "Failed to export data": "数据导出失败",
+  "Data imported successfully. Please refresh the page.": "数据导入成功。请刷新页面。",
+  "Failed to import data": "数据导入失败"
 }

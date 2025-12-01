@@ -311,7 +311,23 @@ http://example.com
    docker-compose -f docker-compose.yml restart frontend
    ```
 
-3. **Update OAuth Credentials** (Optional):
+3. **Configure Chat Server URL** (Optional):
+   - Edit `.env` file
+   - Update `VITE_CHAT_SERVER_URL` if your chat server is on a different domain
+   - Update `VITE_CHAT_SERVER_PORT` if your chat server uses a non-standard port (default: 55100)
+   - Restart services:
+
+   **Development:**
+   ```bash
+   docker-compose -f docker-compose.dev.yml restart frontend-dev
+   ```
+
+   **Production:**
+   ```bash
+   docker-compose -f docker-compose.yml restart frontend
+   ```
+
+4. **Update OAuth Credentials** (Optional):
    - Edit `.env` file
    - Add your Google and GitHub OAuth credentials
    - Restart services:
@@ -326,7 +342,7 @@ http://example.com
    docker-compose -f docker-compose.yml restart
    ```
 
-4. **View Logs**:
+5. **View Logs**:
 
    **Development:**
    ```bash
@@ -338,7 +354,7 @@ http://example.com
    docker-compose -f docker-compose.yml logs -f backend
    ```
 
-5. **Stop Services**:
+6. **Stop Services**:
 
    **Development:**
    ```bash

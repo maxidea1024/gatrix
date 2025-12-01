@@ -90,6 +90,7 @@ import ServerListPage from './pages/admin/ServerListPage';
 import OpenApiPage from './pages/admin/OpenApiPage';
 import GrafanaDashboardPage from './pages/admin/GrafanaDashboardPage';
 import EventLensProjectsPage from './pages/admin/EventLensProjectsPage';
+import DataManagementPage from './pages/admin/DataManagementPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Pages - Game
@@ -254,20 +255,20 @@ const AppContent: React.FC = () => {
         <PlatformConfigProvider>
           <GameWorldProvider>
             <AuthInitializer>
-            <LocalizedDatePickers>
-              <CssBaseline />
-              {/* Global scrollbar styles */}
-              <GlobalStyles
-                styles={(theme) => ({
-                  // Firefox - thin scrollbar for all elements
-                  'html, body, *, div, main, section, article, aside, nav': {
-                    scrollbarWidth: 'thin',
-                  },
-                  // WebKit/Blink (Chrome, Edge, Safari)
-                  'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar': {
-                    width: '8px',
-                    height: '8px',
-                  },
+              <LocalizedDatePickers>
+                <CssBaseline />
+                {/* Global scrollbar styles */}
+                <GlobalStyles
+                  styles={(theme) => ({
+                    // Firefox - thin scrollbar for all elements
+                    'html, body, *, div, main, section, article, aside, nav': {
+                      scrollbarWidth: 'thin',
+                    },
+                    // WebKit/Blink (Chrome, Edge, Safari)
+                    'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar': {
+                      width: '8px',
+                      height: '8px',
+                    },
                     'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track': {
                       background: 'transparent',
                     },
@@ -398,6 +399,7 @@ const AppContent: React.FC = () => {
                               <Route path="grafana-dashboard" element={<GrafanaDashboardPage />} />
                               <Route path="open-api" element={<OpenApiPage />} />
                               <Route path="event-lens/projects" element={<EventLensProjectsPage />} />
+                              <Route path="data-management" element={<DataManagementPage />} />
                             </Routes>
                           </MainLayout>
                         </ProtectedRoute>
@@ -449,7 +451,7 @@ const AppContent: React.FC = () => {
                     </Routes>
                   </Router>
                 </SnackbarProvider>
-            </LocalizedDatePickers>
+              </LocalizedDatePickers>
             </AuthInitializer>
           </GameWorldProvider>
         </PlatformConfigProvider>

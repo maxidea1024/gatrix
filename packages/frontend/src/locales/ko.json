@@ -1,6 +1,7 @@
 {
   "sidebar.logs": "서비스 로그",
   "sidebar.alerts": "모니터링 알림",
+  "sidebar.dataManagement": "데이터 관리",
   "monitoring.logs.title": "서비스 로그",
   "monitoring.logs.subtitle": "Gatrix 서비스에서 수집된 로그를 Grafana 로그 대시보드를 통해 확인할 수 있습니다.",
   "monitoring.alerts.title": "모니터링 알림",
@@ -12,7 +13,6 @@
   "monitoring.alerts.fields.message": "메시지",
   "monitoring.alerts.fields.startsAt": "시작 시각",
   "monitoring.alerts.fields.endsAt": "종료 시각",
-
   "notifications": {
     "maintenance": {
       "started": "서비스 점검이 시작되었습니다",
@@ -1541,7 +1541,6 @@
     "loginFailed": "로그인 실패",
     "loginSuccess": "로그인 성공",
     "loginRequired": "로그인이 필요합니다.",
-
     "invitation": {
       "checking": "Checking invitation link...",
       "receivedTitle": "You have been invited to a team!",
@@ -2420,7 +2419,6 @@
     "console": "시스템 콘솔",
     "monitoring": "모니터링",
     "grafana": "모니터링",
-
     "realtimeEvents": "실시간 이벤트",
     "itemRewards": "지급 아이템 관리",
     "serviceNotices": "서비스 공지",
@@ -2605,7 +2603,6 @@
     "createChannelFailed": "채널 생성에 실패했습니다",
     "loadChannelsFailed": "채널 목록을 불러오는데 실패했습니다",
     "loadMessagesFailed": "메시지를 불러오지 못했습니다",
-
     "noMessages": "아직 메시지가 없습니다",
     "startConversation": "메시지를 보내서 대화를 시작하세요!",
     "typeMessage": "메시지를 입력하세요...",
@@ -3988,5 +3985,25 @@
     "copy": "복사",
     "paste": "붙여넣기",
     "selectAll": "모두 선택"
-  }
+  },
+  "Data Management": "데이터 관리",
+  "Export Data": "데이터 내보내기",
+  "Download a full backup of the system data": "시스템 데이터의 전체 백업을 다운로드합니다",
+  "This will export all database tables, planning data files, and uploads into a single ZIP file.": "모든 데이터베이스 테이블, 기획 데이터 파일, 업로드 파일을 하나의 ZIP 파일로 내보냅니다.",
+  "Export All Data": "모든 데이터 내보내기",
+  "Exporting...": "내보내는 중...",
+  "Import Data": "데이터 가져오기",
+  "Restore system data from a backup file": "백업 파일에서 시스템 데이터를 복원합니다",
+  "Warning: Importing data will OVERWRITE all existing data and cannot be undone.": "경고: 데이터 가져오기는 모든 기존 데이터를 덮어쓰며 되돌릴 수 없습니다.",
+  "Select Backup File (.zip)": "백업 파일 선택 (.zip)",
+  "Import Data": "데이터 가져오기",
+  "Importing...": "가져오는 중...",
+  "Confirm Data Import": "데이터 가져오기 확인",
+  "Are you sure you want to import this data? This action will overwrite all existing database records and files. This cannot be undone.": "정말로 이 데이터를 가져오시겠습니까? 이 작업은 모든 기존 데이터베이스 레코드와 파일을 덮어씁니다. 이 작업은 되돌릴 수 없습니다.",
+  "Cancel": "취소",
+  "Import & Overwrite": "가져오기 및 덮어쓰기",
+  "Data exported successfully": "데이터가 성공적으로 내보내졌습니다",
+  "Failed to export data": "데이터 내보내기에 실패했습니다",
+  "Data imported successfully. Please refresh the page.": "데이터가 성공적으로 가져와졌습니다. 페이지를 새로고침해주세요.",
+  "Failed to import data": "데이터 가져오기에 실패했습니다"
 }
