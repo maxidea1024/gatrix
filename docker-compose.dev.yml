@@ -140,7 +140,7 @@ services:
         aliases:
           - backend
     volumes:
-      - .:/app
+      - .:/app:cached
       - /app/node_modules
       - ${DATA_ROOT:-./data}/backend/logs:/app/packages/backend/logs
     command: sh -c "yarn workspace @gatrix/server-sdk build && mkdir -p /app/packages/backend/logs && chmod 777 /app/packages/backend/logs && yarn workspace @gatrix/backend dev"
@@ -170,7 +170,7 @@ services:
       - gatrix-dev-network
     volumes:
       # Mount entire project but exclude dist folder to prevent unnecessary reloads
-      - .:/app
+      - .:/app:cached
       - /app/node_modules
       # Exclude dist folder from watch to prevent HMR triggers from build artifacts
       - /app/packages/frontend/dist
@@ -284,7 +284,7 @@ services:
         aliases:
           - event-lens
     volumes:
-      - .:/app
+      - .:/app:cached
       - /app/node_modules
       - ${DATA_ROOT:-./data}/event-lens/logs:/app/packages/event-lens/logs
     command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/event-lens dev"
@@ -334,7 +334,7 @@ services:
     networks:
       - gatrix-dev-network
     volumes:
-      - .:/app
+      - .:/app:cached
       - /app/node_modules
       - ${DATA_ROOT:-./data}/event-lens/logs:/app/packages/event-lens/logs
     command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/event-lens dev:worker"
@@ -404,7 +404,7 @@ services:
         aliases:
           - chat-server
     volumes:
-      - .:/app
+      - .:/app:cached
       - /app/node_modules
       - ${DATA_ROOT:-./data}/chat-server/uploads:/app/packages/chat-server/uploads
       - ${DATA_ROOT:-./data}/chat-server/logs:/app/packages/chat-server/logs
