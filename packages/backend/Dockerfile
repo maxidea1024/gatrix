@@ -13,7 +13,7 @@ COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
-RUN yarn install --frozen-lockfile --production=false
+RUN yarn install --frozen-lockfile --production=false --network-timeout 600000
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -29,13 +29,13 @@ COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install dependencies
-RUN yarn install --frozen-lockfile --production=false
+RUN yarn install --frozen-lockfile --production=false --network-timeout 600000
 
 # Copy source code
 COPY . .
 
 # Build server-sdk first (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn install && yarn build
+RUN cd packages/sdks/server-sdk && yarn install --network-timeout 600000 && yarn build
 
 # Build the backend
 RUN yarn workspace @gatrix/backend build
@@ -63,7 +63,7 @@ COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 # Copy server-sdk source (needed for file: dependency)
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
-RUN yarn install --frozen-lockfile --production=true && \
+RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 && \
   yarn cache clean
 
 # Create logs, uploads, and data directories
