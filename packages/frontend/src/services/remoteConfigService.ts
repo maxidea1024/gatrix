@@ -314,6 +314,330 @@ class RemoteConfigService {
     }
   }
 
+  // ==================== Campaigns ====================
+
+  /**
+   * Get all campaigns from template
+   */
+  async getCampaigns(): Promise<any[]> {
+    try {
+      const templateData = await this.getTemplate();
+      return Object.values(templateData.campaigns || {});
+    } catch (error) {
+      console.error('Error getting campaigns:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Add a new campaign
+   */
+  async addCampaign(campaign: any): Promise<any> {
+    try {
+      const templateData = await this.getTemplate();
+      const campaigns = templateData.campaigns || {};
+
+      const id = `campaign_${Date.now()}`;
+      campaigns[id] = {
+        ...campaign,
+        id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      await this.updateTemplate({ ...templateData, campaigns });
+      return campaigns[id];
+    } catch (error) {
+      console.error('Error adding campaign:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update an existing campaign
+   */
+  async updateCampaign(id: string, campaign: any): Promise<any> {
+    try {
+      const templateData = await this.getTemplate();
+      const campaigns = templateData.campaigns || {};
+
+      if (!campaigns[id]) {
+        throw new Error('Campaign not found');
+      }
+
+      campaigns[id] = {
+        ...campaigns[id],
+        ...campaign,
+        updatedAt: new Date().toISOString()
+      };
+
+      await this.updateTemplate({ ...templateData, campaigns });
+      return campaigns[id];
+    } catch (error) {
+      console.error('Error updating campaign:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a campaign
+   */
+  async deleteCampaign(id: string): Promise<void> {
+    try {
+      const templateData = await this.getTemplate();
+      const campaigns = templateData.campaigns || {};
+
+      delete campaigns[id];
+      await this.updateTemplate({ ...templateData, campaigns });
+    } catch (error) {
+      console.error('Error deleting campaign:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Context Fields ====================
+
+  /**
+   * Get all context fields from template
+   */
+  async getContextFields(): Promise<any[]> {
+    try {
+      const templateData = await this.getTemplate();
+      return Object.values(templateData.contextFields || {});
+    } catch (error) {
+      console.error('Error getting context fields:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Add a new context field
+   */
+  async addContextField(field: any): Promise<any> {
+    try {
+      const templateData = await this.getTemplate();
+      const contextFields = templateData.contextFields || {};
+
+      const id = `field_${Date.now()}`;
+      contextFields[id] = {
+        ...field,
+        id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      await this.updateTemplate({ ...templateData, contextFields });
+      return contextFields[id];
+    } catch (error) {
+      console.error('Error adding context field:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update an existing context field
+   */
+  async updateContextField(id: string, field: any): Promise<any> {
+    try {
+      const templateData = await this.getTemplate();
+      const contextFields = templateData.contextFields || {};
+
+      if (!contextFields[id]) {
+        throw new Error('Context field not found');
+      }
+
+      contextFields[id] = {
+        ...contextFields[id],
+        ...field,
+        updatedAt: new Date().toISOString()
+      };
+
+      await this.updateTemplate({ ...templateData, contextFields });
+      return contextFields[id];
+    } catch (error) {
+      console.error('Error updating context field:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a context field
+   */
+  async deleteContextField(id: string): Promise<void> {
+    try {
+      const templateData = await this.getTemplate();
+      const contextFields = templateData.contextFields || {};
+
+      delete contextFields[id];
+      await this.updateTemplate({ ...templateData, contextFields });
+    } catch (error) {
+      console.error('Error deleting context field:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Segments ====================
+
+  /**
+   * Get all segments from template
+   */
+  async getSegments(): Promise<any[]> {
+    try {
+      const templateData = await this.getTemplate();
+      return Object.values(templateData.segments || {});
+    } catch (error) {
+      console.error('Error getting segments:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Add a new segment
+   */
+  async addSegment(segment: any): Promise<any> {
+    try {
+      const templateData = await this.getTemplate();
+      const segments = templateData.segments || {};
+
+      const id = `segment_${Date.now()}`;
+      segments[id] = {
+        ...segment,
+        id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      await this.updateTemplate({ ...templateData, segments });
+      return segments[id];
+    } catch (error) {
+      console.error('Error adding segment:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update an existing segment
+   */
+  async updateSegment(id: string, segment: any): Promise<any> {
+    try {
+      const templateData = await this.getTemplate();
+      const segments = templateData.segments || {};
+
+      if (!segments[id]) {
+        throw new Error('Segment not found');
+      }
+
+      segments[id] = {
+        ...segments[id],
+        ...segment,
+        updatedAt: new Date().toISOString()
+      };
+
+      await this.updateTemplate({ ...templateData, segments });
+      return segments[id];
+    } catch (error) {
+      console.error('Error updating segment:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a segment
+   */
+  async deleteSegment(id: string): Promise<void> {
+    try {
+      const templateData = await this.getTemplate();
+      const segments = templateData.segments || {};
+
+      delete segments[id];
+      await this.updateTemplate({ ...templateData, segments });
+    } catch (error) {
+      console.error('Error deleting segment:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Variants ====================
+
+  /**
+   * Get all variants from template
+   */
+  async getVariants(): Promise<any[]> {
+    try {
+      const templateData = await this.getTemplate();
+      return Object.values(templateData.variants || {});
+    } catch (error) {
+      console.error('Error getting variants:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Add a new variant
+   */
+  async addVariant(variant: any): Promise<any> {
+    try {
+      const templateData = await this.getTemplate();
+      const variants = templateData.variants || {};
+
+      const id = `variant_${Date.now()}`;
+      variants[id] = {
+        ...variant,
+        id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      await this.updateTemplate({ ...templateData, variants });
+      return variants[id];
+    } catch (error) {
+      console.error('Error adding variant:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update an existing variant
+   */
+  async updateVariant(id: string, variant: any): Promise<any> {
+    try {
+      const templateData = await this.getTemplate();
+      const variants = templateData.variants || {};
+
+      if (!variants[id]) {
+        throw new Error('Variant not found');
+      }
+
+      variants[id] = {
+        ...variants[id],
+        ...variant,
+        updatedAt: new Date().toISOString()
+      };
+
+      await this.updateTemplate({ ...templateData, variants });
+      return variants[id];
+    } catch (error) {
+      console.error('Error updating variant:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a variant
+   */
+  async deleteVariant(id: string): Promise<void> {
+    try {
+      const templateData = await this.getTemplate();
+      const variants = templateData.variants || {};
+
+      delete variants[id];
+      await this.updateTemplate({ ...templateData, variants });
+    } catch (error) {
+      console.error('Error deleting variant:', error);
+      throw error;
+    }
+  }
+
   /**
    * Deploy changes (create new template version)
    */

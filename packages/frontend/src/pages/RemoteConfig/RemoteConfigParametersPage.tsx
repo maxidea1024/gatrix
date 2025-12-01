@@ -35,8 +35,9 @@ import {
   TableRow,
   RadioGroup,
   Radio,
-  Snackbar
+  Slider
 } from '@mui/material';
+import { useSnackbar } from 'notistack';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -56,6 +57,8 @@ import SimplePagination from '../../components/common/SimplePagination';
 import ReactDiffViewer from 'react-diff-viewer-continued';
 import remoteConfigService, { DeploymentHistoryItem, DeploymentChange } from '../../services/remoteConfigService';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
+import JsonEditor from '../../components/common/JsonEditor';
+import { formatDateTimeDetailed } from '../../utils/dateFormat';
 
 // Side Panel Component for Firebase-style forms with resizing
 interface SidePanelProps {
@@ -110,7 +113,8 @@ const SidePanel: React.FC<SidePanelProps> = ({
           bgcolor: 'background.paper',
           display: 'flex',
           gap: 1,
-          justifyContent: 'flex-end'
+          justifyContent: 'flex-end',
+          flexShrink: 0
         }}>
           {actions}
         </Box>
@@ -671,8 +675,7 @@ const ConfigsManagement: React.FC = () => {
   const [dialogType, setDialogType] = useState<'create' | 'edit'>('create');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [configToDelete, setConfigToDelete] = useState<Config | null>(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const { enqueueSnackbar } = useSnackbar();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -754,8 +757,7 @@ const ConfigsManagement: React.FC = () => {
       await remoteConfigService.deleteParameter(configToDelete.key);
 
       setConfigs(prev => prev.filter(c => c.id !== configToDelete.id));
-      setSnackbarMessage(t('remoteConfig.parameterDeleted'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('remoteConfig.parameterDeleted'), { variant: 'success' });
       markAsChanged({
         id: Date.now().toString(),
         type: 'parameter',
@@ -766,8 +768,7 @@ const ConfigsManagement: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to delete config:', error);
-      setSnackbarMessage(t('common.error'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     } finally {
       setDeleteDialogOpen(false);
       setConfigToDelete(null);
@@ -783,8 +784,7 @@ const ConfigsManagement: React.FC = () => {
         case 'number':
           processedValue = Number(formData.defaultValue);
           if (isNaN(processedValue)) {
-            setSnackbarMessage(t('remoteConfig.invalidNumber'));
-            setSnackbarOpen(true);
+            enqueueSnackbar(t('remoteConfig.invalidNumber'), { variant: 'error' });
             return;
           }
           break;
@@ -795,8 +795,7 @@ const ConfigsManagement: React.FC = () => {
           try {
             processedValue = JSON.parse(formData.defaultValue);
           } catch (e) {
-            setSnackbarMessage(t('remoteConfig.invalidJson'));
-            setSnackbarOpen(true);
+            enqueueSnackbar(t('remoteConfig.invalidJson'), { variant: 'error' });
             return;
           }
           break;
@@ -817,8 +816,7 @@ const ConfigsManagement: React.FC = () => {
       if (dialogType === 'create') {
         // Check for duplicate key
         if (configs.some(c => c.key === formData.key)) {
-          setSnackbarMessage(t('remoteConfig.duplicateKey'));
-          setSnackbarOpen(true);
+          enqueueSnackbar(t('remoteConfig.duplicateKey'), { variant: 'error' });
           return;
         }
 
@@ -831,7 +829,7 @@ const ConfigsManagement: React.FC = () => {
         );
 
         setConfigs(prev => [...prev, { ...newConfig, id: savedParameter.id }]);
-        setSnackbarMessage(t('remoteConfig.parameterCreated'));
+        enqueueSnackbar(t('remoteConfig.parameterCreated'), { variant: 'success' });
         markAsChanged({
           id: Date.now().toString(),
           type: 'parameter',
@@ -850,7 +848,7 @@ const ConfigsManagement: React.FC = () => {
         );
 
         setConfigs(prev => prev.map(c => c.id === selectedConfig?.id ? newConfig : c));
-        setSnackbarMessage(t('remoteConfig.parameterUpdated'));
+        enqueueSnackbar(t('remoteConfig.parameterUpdated'), { variant: 'success' });
         markAsChanged({
           id: Date.now().toString(),
           type: 'parameter',
@@ -861,12 +859,10 @@ const ConfigsManagement: React.FC = () => {
         });
       }
 
-      setSnackbarOpen(true);
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save config:', error);
-      setSnackbarMessage(t('common.error'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
   };
 
@@ -878,6 +874,13 @@ const ConfigsManagement: React.FC = () => {
       case 'json': return 'warning';
       default: return 'default';
     }
+  };
+
+  // Validate parameter key: must start with a letter and contain only letters, numbers, underscores, and hyphens
+  const isValidParameterKey = (key: string): boolean => {
+    if (!key) return false;
+    const pattern = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
+    return pattern.test(key);
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -906,14 +909,11 @@ const ConfigsManagement: React.FC = () => {
         );
       case 'json':
         return (
-          <TextField
-            fullWidth
-            multiline
-            rows={6}
+          <JsonEditor
             value={formData.defaultValue}
-            onChange={(e) => setFormData(prev => ({ ...prev, defaultValue: e.target.value }))}
+            onChange={(value) => setFormData(prev => ({ ...prev, defaultValue: value }))}
+            height={200}
             placeholder='{"key": "value"}'
-            sx={{ fontFamily: 'monospace' }}
           />
         );
       default:
@@ -979,11 +979,17 @@ const ConfigsManagement: React.FC = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                      {typeof config.defaultValue === 'object'
-                        ? JSON.stringify(config.defaultValue)
-                        : String(config.defaultValue)}
-                    </Typography>
+                    {config.defaultValue === null || config.defaultValue === undefined || config.defaultValue === '' ? (
+                      <Typography variant="body2" color="text.disabled" sx={{ fontStyle: 'italic' }}>
+                        {t('remoteConfig.noValue')}
+                      </Typography>
+                    ) : (
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                        {typeof config.defaultValue === 'object'
+                          ? JSON.stringify(config.defaultValue)
+                          : String(config.defaultValue)}
+                      </Typography>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">
@@ -1014,7 +1020,7 @@ const ConfigsManagement: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">
-                      {new Date(config.updatedAt).toLocaleDateString()}
+                      {formatDateTimeDetailed(config.updatedAt)}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -1071,7 +1077,7 @@ const ConfigsManagement: React.FC = () => {
           <Button
             onClick={handleSaveConfig}
             variant="contained"
-            disabled={!formData.key || !formData.description}
+            disabled={!isValidParameterKey(formData.key) || !formData.description}
           >
             {dialogType === 'create' ? t('common.create') : t('common.update')}
           </Button>
@@ -1084,8 +1090,13 @@ const ConfigsManagement: React.FC = () => {
         onChange={(e) => setFormData(prev => ({ ...prev, key: e.target.value }))}
         fullWidth
         required
+        autoFocus={dialogType === 'create'}
         disabled={dialogType === 'edit'}
         placeholder="feature_flag"
+        error={dialogType === 'create' && formData.key.length > 0 && !isValidParameterKey(formData.key)}
+        helperText={dialogType === 'edit'
+          ? t('remoteConfig.helpTexts.parameterKeyEdit')
+          : t('remoteConfig.helpTexts.parameterKey')}
         sx={{ fontFamily: 'monospace' }}
       />
 
@@ -1112,6 +1123,9 @@ const ConfigsManagement: React.FC = () => {
           <MenuItem value="boolean">Boolean</MenuItem>
           <MenuItem value="json">JSON</MenuItem>
         </Select>
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+          {t('remoteConfig.helpTexts.parameterType')}
+        </Typography>
       </FormControl>
 
       <Box>
@@ -1119,6 +1133,9 @@ const ConfigsManagement: React.FC = () => {
           {t('remoteConfig.defaultValue')}
         </Typography>
         {renderValueInput()}
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+          {t('remoteConfig.helpTexts.parameterDefaultValue')}
+        </Typography>
       </Box>
 
       <TextField
@@ -1126,9 +1143,11 @@ const ConfigsManagement: React.FC = () => {
         value={formData.description}
         onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
         fullWidth
+        required
         multiline
         rows={2}
         placeholder="Description of this parameter"
+        helperText={t('remoteConfig.helpTexts.parameterDescription')}
       />
     </SidePanel>
 
@@ -1152,14 +1171,6 @@ const ConfigsManagement: React.FC = () => {
         </Button>
       </DialogActions>
     </Dialog>
-
-    {/* Snackbar for notifications */}
-    <Snackbar
-      open={snackbarOpen}
-      autoHideDuration={4000}
-      onClose={() => setSnackbarOpen(false)}
-      message={snackbarMessage}
-    />
   </>
   );
 };
@@ -1170,6 +1181,7 @@ const CampaignsManagement: React.FC = () => {
   const { currentEnvironment } = useContext(EnvironmentContext);
   const { markAsChanged } = useContext(VersionContext);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [availableParameters, setAvailableParameters] = useState<Config[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
@@ -1178,8 +1190,7 @@ const CampaignsManagement: React.FC = () => {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [campaignToDelete, setCampaignToDelete] = useState<Campaign | null>(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const { enqueueSnackbar } = useSnackbar();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -1196,38 +1207,34 @@ const CampaignsManagement: React.FC = () => {
   useEffect(() => {
     if (currentEnvironment) {
       loadCampaigns();
+      loadAvailableParameters();
     }
   }, [currentEnvironment]);
+
+  const loadAvailableParameters = async () => {
+    try {
+      const templateData = await remoteConfigService.getTemplate();
+      const configsArray: Config[] = Object.entries(templateData.parameters || {}).map(([key, param]: [string, any]) => ({
+        id: param.id || key,
+        key: key,
+        type: param.type || 'string',
+        defaultValue: param.defaultValue,
+        description: param.description || '',
+        updatedAt: param.updatedAt || new Date().toISOString(),
+        updatedBy: param.updatedBy || 'system'
+      }));
+      setAvailableParameters(configsArray);
+    } catch (error) {
+      console.error('Failed to load parameters:', error);
+      setAvailableParameters([]);
+    }
+  };
 
   const loadCampaigns = async () => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API call
-      const mockCampaigns: Campaign[] = [
-        {
-          id: '1',
-          name: 'holiday_promotion',
-          configKey: 'welcome_message',
-          overrideValue: 'Happy Holidays! Welcome to our special promotion!',
-          startDate: '2024-12-20T00:00:00Z',
-          endDate: '2024-12-31T23:59:59Z',
-          isActive: true,
-          targetSegments: ['premium_users'],
-          trafficPercentage: 100
-        },
-        {
-          id: '2',
-          name: 'beta_feature_test',
-          configKey: 'enable_new_ui',
-          overrideValue: true,
-          startDate: '2024-01-15T00:00:00Z',
-          endDate: '2024-02-15T23:59:59Z',
-          isActive: false,
-          targetSegments: ['beta_users'],
-          trafficPercentage: 50
-        }
-      ];
-      setCampaigns(mockCampaigns);
+      const campaignsList = await remoteConfigService.getCampaigns();
+      setCampaigns(campaignsList);
     } catch (error) {
       console.error('Failed to load campaigns:', error);
     } finally {
@@ -1278,9 +1285,8 @@ const CampaignsManagement: React.FC = () => {
     if (!campaignToDelete) return;
 
     try {
-      setCampaigns(prev => prev.filter(c => c.id !== campaignToDelete.id));
-      setSnackbarMessage(t('remoteConfig.campaignDeleted'));
-      setSnackbarOpen(true);
+      await remoteConfigService.deleteCampaign(campaignToDelete.id);
+      enqueueSnackbar(t('remoteConfig.campaignDeleted'), { variant: 'success' });
       markAsChanged({
         id: Date.now().toString(),
         type: 'campaign',
@@ -1289,10 +1295,10 @@ const CampaignsManagement: React.FC = () => {
         description: `Deleted campaign "${campaignToDelete.name}"`,
         timestamp: new Date().toISOString()
       });
+      await loadCampaigns();
     } catch (error) {
       console.error('Failed to delete campaign:', error);
-      setSnackbarMessage(t('common.error'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     } finally {
       setDeleteDialogOpen(false);
       setCampaignToDelete(null);
@@ -1314,8 +1320,7 @@ const CampaignsManagement: React.FC = () => {
         else processedValue = formData.overrideValue;
       }
 
-      const newCampaign: Campaign = {
-        id: selectedCampaign?.id || Date.now().toString(),
+      const campaignData = {
         name: formData.name,
         configKey: formData.configKey,
         overrideValue: processedValue,
@@ -1327,19 +1332,19 @@ const CampaignsManagement: React.FC = () => {
       };
 
       if (dialogType === 'create') {
-        setCampaigns(prev => [...prev, newCampaign]);
-        setSnackbarMessage(t('remoteConfig.campaignCreated'));
+        await remoteConfigService.addCampaign(campaignData);
+        enqueueSnackbar(t('remoteConfig.campaignCreated'), { variant: 'success' });
         markAsChanged({
           id: Date.now().toString(),
           type: 'campaign',
           action: 'created',
           itemName: formData.name,
-          description: `Created campaign "${formData.name}" for parameter "${formData.targetParameter}"`,
+          description: `Created campaign "${formData.name}" for parameter "${formData.configKey}"`,
           timestamp: new Date().toISOString()
         });
       } else {
-        setCampaigns(prev => prev.map(c => c.id === selectedCampaign?.id ? newCampaign : c));
-        setSnackbarMessage(t('remoteConfig.campaignUpdated'));
+        await remoteConfigService.updateCampaign(selectedCampaign!.id, campaignData);
+        enqueueSnackbar(t('remoteConfig.campaignUpdated'), { variant: 'success' });
         markAsChanged({
           id: Date.now().toString(),
           type: 'campaign',
@@ -1350,12 +1355,11 @@ const CampaignsManagement: React.FC = () => {
         });
       }
 
-      setSnackbarOpen(true);
+      await loadCampaigns();
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save campaign:', error);
-      setSnackbarMessage(t('common.error'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
   };
 
@@ -1423,7 +1427,7 @@ const CampaignsManagement: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">
-                      {new Date(campaign.startDate).toLocaleDateString()} - {new Date(campaign.endDate).toLocaleDateString()}
+                      {formatDateTimeDetailed(campaign.startDate)} - {formatDateTimeDetailed(campaign.endDate)}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -1506,18 +1510,39 @@ const CampaignsManagement: React.FC = () => {
           onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
           fullWidth
           required
+          autoFocus={dialogType === 'create'}
           placeholder="holiday_promotion"
+          helperText={t('remoteConfig.helperCampaignName')}
         />
 
-        <TextField
-          label={t('remoteConfig.targetParameter')}
-          value={formData.configKey}
-          onChange={(e) => setFormData(prev => ({ ...prev, configKey: e.target.value }))}
-          fullWidth
-          required
-          placeholder="welcome_message"
-          sx={{ fontFamily: 'monospace' }}
-        />
+        <FormControl fullWidth required>
+          <InputLabel id="target-parameter-label">{t('remoteConfig.targetParameter')}</InputLabel>
+          <Select
+            labelId="target-parameter-label"
+            value={formData.configKey}
+            label={t('remoteConfig.targetParameter')}
+            onChange={(e) => setFormData(prev => ({ ...prev, configKey: e.target.value }))}
+            sx={{ fontFamily: 'monospace' }}
+          >
+            {availableParameters.length === 0 ? (
+              <MenuItem value="" disabled>
+                {t('remoteConfig.noParametersAvailable')}
+              </MenuItem>
+            ) : (
+              availableParameters.map((param) => (
+                <MenuItem key={param.key} value={param.key} sx={{ fontFamily: 'monospace' }}>
+                  {param.key}
+                  <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                    ({param.type})
+                  </Typography>
+                </MenuItem>
+              ))
+            )}
+          </Select>
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+            {t('remoteConfig.helperTargetParameter')}
+          </Typography>
+        </FormControl>
 
         <TextField
           label={t('remoteConfig.overrideValue')}
@@ -1528,6 +1553,7 @@ const CampaignsManagement: React.FC = () => {
           multiline
           rows={3}
           placeholder="New value for this campaign"
+          helperText={t('remoteConfig.helperOverrideValue')}
         />
 
         <Box sx={{ display: 'flex', gap: 2 }}>
@@ -1539,6 +1565,7 @@ const CampaignsManagement: React.FC = () => {
             fullWidth
             required
             InputLabelProps={{ shrink: true }}
+            helperText={t('remoteConfig.helperStartDate')}
           />
 
           <TextField
@@ -1549,17 +1576,42 @@ const CampaignsManagement: React.FC = () => {
             fullWidth
             required
             InputLabelProps={{ shrink: true }}
+            helperText={t('remoteConfig.helperEndDate')}
           />
         </Box>
 
-        <TextField
-          label={t('remoteConfig.trafficPercentage')}
-          type="number"
-          value={formData.trafficPercentage}
-          onChange={(e) => setFormData(prev => ({ ...prev, trafficPercentage: parseInt(e.target.value) }))}
-          fullWidth
-          inputProps={{ min: 1, max: 100 }}
-        />
+        <Box>
+          <Typography variant="body2" gutterBottom>
+            {t('remoteConfig.trafficPercentage')}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Slider
+              value={formData.trafficPercentage}
+              onChange={(_, value) => setFormData(prev => ({ ...prev, trafficPercentage: value as number }))}
+              min={1}
+              max={100}
+              valueLabelDisplay="auto"
+              sx={{ flex: 1 }}
+            />
+            <TextField
+              type="number"
+              value={formData.trafficPercentage}
+              onChange={(e) => {
+                const value = parseInt(e.target.value);
+                if (value >= 1 && value <= 100) {
+                  setFormData(prev => ({ ...prev, trafficPercentage: value }));
+                }
+              }}
+              inputProps={{ min: 1, max: 100 }}
+              sx={{ width: 80 }}
+              size="small"
+            />
+            <Typography variant="body2" color="text.secondary">%</Typography>
+          </Box>
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+            {t('remoteConfig.helperTrafficPercentage')}
+          </Typography>
+        </Box>
 
         <FormControlLabel
           control={
@@ -1593,14 +1645,6 @@ const CampaignsManagement: React.FC = () => {
         </Button>
       </DialogActions>
     </Dialog>
-
-    {/* Snackbar for notifications */}
-    <Snackbar
-      open={snackbarOpen}
-      autoHideDuration={4000}
-      onClose={() => setSnackbarOpen(false)}
-      message={snackbarMessage}
-    />
   </>
   );
 };
@@ -1619,8 +1663,7 @@ const ContextFieldsManagement: React.FC = () => {
   const [selectedField, setSelectedField] = useState<ContextField | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [fieldToDelete, setFieldToDelete] = useState<ContextField | null>(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const { enqueueSnackbar } = useSnackbar();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -1640,36 +1683,8 @@ const ContextFieldsManagement: React.FC = () => {
   const loadContextFields = async () => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API call
-      const mockContextFields: ContextField[] = [
-        {
-          id: '1',
-          name: 'userType',
-          type: 'string',
-          description: 'Type of user (free, premium, enterprise)',
-          possibleValues: ['free', 'premium', 'enterprise']
-        },
-        {
-          id: '2',
-          name: 'platform',
-          type: 'string',
-          description: 'Platform type (web, mobile, desktop)',
-          possibleValues: ['web', 'mobile', 'desktop']
-        },
-        {
-          id: '3',
-          name: 'appVersion',
-          type: 'string',
-          description: 'Application version number'
-        },
-        {
-          id: '4',
-          name: 'isDebugMode',
-          type: 'boolean',
-          description: 'Whether debug mode is enabled'
-        }
-      ];
-      setContextFields(mockContextFields);
+      const fieldsList = await remoteConfigService.getContextFields();
+      setContextFields(fieldsList);
     } catch (error) {
       console.error('Failed to load context fields:', error);
     } finally {
@@ -1712,9 +1727,8 @@ const ContextFieldsManagement: React.FC = () => {
     if (!fieldToDelete) return;
 
     try {
-      setContextFields(prev => prev.filter(f => f.id !== fieldToDelete.id));
-      setSnackbarMessage(t('remoteConfig.contextFieldDeleted'));
-      setSnackbarOpen(true);
+      await remoteConfigService.deleteContextField(fieldToDelete.id);
+      enqueueSnackbar(t('remoteConfig.contextFieldDeleted'), { variant: 'success' });
       markAsChanged({
         id: Date.now().toString(),
         type: 'context_field',
@@ -1723,10 +1737,10 @@ const ContextFieldsManagement: React.FC = () => {
         description: `Deleted context field "${fieldToDelete.name}"`,
         timestamp: new Date().toISOString()
       });
+      await loadContextFields();
     } catch (error) {
       console.error('Failed to delete context field:', error);
-      setSnackbarMessage(t('common.error'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     } finally {
       setDeleteDialogOpen(false);
       setFieldToDelete(null);
@@ -1735,8 +1749,7 @@ const ContextFieldsManagement: React.FC = () => {
 
   const handleSaveContextField = async () => {
     try {
-      const newField: ContextField = {
-        id: selectedField?.id || Date.now().toString(),
+      const fieldData = {
         name: formData.name,
         type: formData.type,
         description: formData.description,
@@ -1746,12 +1759,11 @@ const ContextFieldsManagement: React.FC = () => {
       if (dialogType === 'create') {
         // Check for duplicate name
         if (contextFields.some(f => f.name === formData.name)) {
-          setSnackbarMessage(t('remoteConfig.duplicateFieldName'));
-          setSnackbarOpen(true);
+          enqueueSnackbar(t('remoteConfig.duplicateFieldName'), { variant: 'error' });
           return;
         }
-        setContextFields(prev => [...prev, newField]);
-        setSnackbarMessage(t('remoteConfig.contextFieldCreated'));
+        await remoteConfigService.addContextField(fieldData);
+        enqueueSnackbar(t('remoteConfig.contextFieldCreated'), { variant: 'success' });
         markAsChanged({
           id: Date.now().toString(),
           type: 'context_field',
@@ -1761,8 +1773,8 @@ const ContextFieldsManagement: React.FC = () => {
           timestamp: new Date().toISOString()
         });
       } else {
-        setContextFields(prev => prev.map(f => f.id === selectedField?.id ? newField : f));
-        setSnackbarMessage(t('remoteConfig.contextFieldUpdated'));
+        await remoteConfigService.updateContextField(selectedField!.id, fieldData);
+        enqueueSnackbar(t('remoteConfig.contextFieldUpdated'), { variant: 'success' });
         markAsChanged({
           id: Date.now().toString(),
           type: 'context_field',
@@ -1773,12 +1785,11 @@ const ContextFieldsManagement: React.FC = () => {
         });
       }
 
-      setSnackbarOpen(true);
+      await loadContextFields();
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save context field:', error);
-      setSnackbarMessage(t('common.error'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
   };
 
@@ -2038,14 +2049,6 @@ const ContextFieldsManagement: React.FC = () => {
         </Button>
       </DialogActions>
     </Dialog>
-
-    {/* Snackbar for notifications */}
-    <Snackbar
-      open={snackbarOpen}
-      autoHideDuration={4000}
-      onClose={() => setSnackbarOpen(false)}
-      message={snackbarMessage}
-    />
   </>
   );
 };
@@ -2064,8 +2067,7 @@ const SegmentsManagement: React.FC = () => {
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [segmentToDelete, setSegmentToDelete] = useState<Segment | null>(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const { enqueueSnackbar } = useSnackbar();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -2085,47 +2087,8 @@ const SegmentsManagement: React.FC = () => {
   const loadSegments = async () => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API call
-      const mockSegments: Segment[] = [
-        {
-          id: '1',
-          name: 'premium_users',
-          displayName: 'Premium Users',
-          description: 'Users with premium subscription',
-          conditions: [
-            { field: 'userType', operator: 'equals', value: 'premium' }
-          ],
-          isActive: true,
-          createdAt: '2024-01-15T10:30:00Z',
-          updatedAt: '2024-01-15T10:30:00Z'
-        },
-        {
-          id: '2',
-          name: 'mobile_users',
-          displayName: 'Mobile Users',
-          description: 'Users accessing from mobile devices',
-          conditions: [
-            { field: 'platform', operator: 'equals', value: 'mobile' }
-          ],
-          isActive: true,
-          createdAt: '2024-01-14T15:45:00Z',
-          updatedAt: '2024-01-14T15:45:00Z'
-        },
-        {
-          id: '3',
-          name: 'beta_users',
-          displayName: 'Beta Users',
-          description: 'Users in beta testing program',
-          conditions: [
-            { field: 'userType', operator: 'equals', value: 'beta' },
-            { field: 'appVersion', operator: 'contains', value: 'beta' }
-          ],
-          isActive: true,
-          createdAt: '2024-01-13T09:15:00Z',
-          updatedAt: '2024-01-13T09:15:00Z'
-        }
-      ];
-      setSegments(mockSegments);
+      const segmentsList = await remoteConfigService.getSegments();
+      setSegments(segmentsList);
     } catch (error) {
       console.error('Failed to load segments:', error);
     } finally {
@@ -2168,9 +2131,8 @@ const SegmentsManagement: React.FC = () => {
     if (!segmentToDelete) return;
 
     try {
-      setSegments(prev => prev.filter(s => s.id !== segmentToDelete.id));
-      setSnackbarMessage(t('remoteConfig.segmentDeleted'));
-      setSnackbarOpen(true);
+      await remoteConfigService.deleteSegment(segmentToDelete.id);
+      enqueueSnackbar(t('remoteConfig.segmentDeleted'), { variant: 'success' });
       markAsChanged({
         id: Date.now().toString(),
         type: 'segment',
@@ -2179,10 +2141,10 @@ const SegmentsManagement: React.FC = () => {
         description: `Deleted segment "${segmentToDelete.name}"`,
         timestamp: new Date().toISOString()
       });
+      await loadSegments();
     } catch (error) {
       console.error('Failed to delete segment:', error);
-      setSnackbarMessage(t('common.error'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     } finally {
       setDeleteDialogOpen(false);
       setSegmentToDelete(null);
@@ -2191,26 +2153,22 @@ const SegmentsManagement: React.FC = () => {
 
   const handleSaveSegment = async () => {
     try {
-      const newSegment: Segment = {
-        id: selectedSegment?.id || Date.now().toString(),
+      const segmentData = {
         name: formData.name,
         displayName: formData.displayName,
         description: formData.description,
         conditions: formData.conditions,
-        isActive: formData.isActive,
-        createdAt: selectedSegment?.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        isActive: formData.isActive
       };
 
       if (dialogType === 'create') {
         // Check for duplicate name
         if (segments.some(s => s.name === formData.name)) {
-          setSnackbarMessage(t('remoteConfig.duplicateSegmentName'));
-          setSnackbarOpen(true);
+          enqueueSnackbar(t('remoteConfig.duplicateSegmentName'), { variant: 'error' });
           return;
         }
-        setSegments(prev => [...prev, newSegment]);
-        setSnackbarMessage(t('remoteConfig.segmentCreated'));
+        await remoteConfigService.addSegment(segmentData);
+        enqueueSnackbar(t('remoteConfig.segmentCreated'), { variant: 'success' });
         markAsChanged({
           id: Date.now().toString(),
           type: 'segment',
@@ -2220,8 +2178,8 @@ const SegmentsManagement: React.FC = () => {
           timestamp: new Date().toISOString()
         });
       } else {
-        setSegments(prev => prev.map(s => s.id === selectedSegment?.id ? newSegment : s));
-        setSnackbarMessage(t('remoteConfig.segmentUpdated'));
+        await remoteConfigService.updateSegment(selectedSegment!.id, segmentData);
+        enqueueSnackbar(t('remoteConfig.segmentUpdated'), { variant: 'success' });
         markAsChanged({
           id: Date.now().toString(),
           type: 'segment',
@@ -2232,12 +2190,11 @@ const SegmentsManagement: React.FC = () => {
         });
       }
 
-      setSnackbarOpen(true);
+      await loadSegments();
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save segment:', error);
-      setSnackbarMessage(t('common.error'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
   };
 
@@ -2338,7 +2295,7 @@ const SegmentsManagement: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">
-                      {new Date(segment.updatedAt).toLocaleDateString()}
+                      {formatDateTimeDetailed(segment.updatedAt)}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -2538,14 +2495,6 @@ const SegmentsManagement: React.FC = () => {
         </Button>
       </DialogActions>
     </Dialog>
-
-    {/* Snackbar for notifications */}
-    <Snackbar
-      open={snackbarOpen}
-      autoHideDuration={4000}
-      onClose={() => setSnackbarOpen(false)}
-      message={snackbarMessage}
-    />
   </>
   );
 };
@@ -2564,8 +2513,7 @@ const VariantsManagement: React.FC = () => {
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [variantToDelete, setVariantToDelete] = useState<Variant | null>(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const { enqueueSnackbar } = useSnackbar();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -2586,65 +2534,8 @@ const VariantsManagement: React.FC = () => {
   const loadVariants = async () => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API call
-      const mockVariants: Variant[] = [
-        {
-          id: '1',
-          parameterKey: 'enable_new_ui',
-          variantName: 'control',
-          value: false,
-          weight: 50,
-          description: 'Control group - old UI',
-          isActive: true,
-          createdAt: '2024-01-15T10:30:00Z',
-          updatedAt: '2024-01-15T10:30:00Z'
-        },
-        {
-          id: '2',
-          parameterKey: 'enable_new_ui',
-          variantName: 'treatment',
-          value: true,
-          weight: 50,
-          description: 'Treatment group - new UI',
-          isActive: true,
-          createdAt: '2024-01-15T10:30:00Z',
-          updatedAt: '2024-01-15T10:30:00Z'
-        },
-        {
-          id: '3',
-          parameterKey: 'button_color',
-          variantName: 'blue',
-          value: '#0066cc',
-          weight: 33,
-          description: 'Blue button variant',
-          isActive: true,
-          createdAt: '2024-01-14T15:45:00Z',
-          updatedAt: '2024-01-14T15:45:00Z'
-        },
-        {
-          id: '4',
-          parameterKey: 'button_color',
-          variantName: 'green',
-          value: '#00cc66',
-          weight: 33,
-          description: 'Green button variant',
-          isActive: true,
-          createdAt: '2024-01-14T15:45:00Z',
-          updatedAt: '2024-01-14T15:45:00Z'
-        },
-        {
-          id: '5',
-          parameterKey: 'button_color',
-          variantName: 'red',
-          value: '#cc0066',
-          weight: 34,
-          description: 'Red button variant',
-          isActive: false,
-          createdAt: '2024-01-14T15:45:00Z',
-          updatedAt: '2024-01-14T15:45:00Z'
-        }
-      ];
-      setVariants(mockVariants);
+      const variantsList = await remoteConfigService.getVariants();
+      setVariants(variantsList);
     } catch (error) {
       console.error('Failed to load variants:', error);
     } finally {
@@ -2691,9 +2582,8 @@ const VariantsManagement: React.FC = () => {
     if (!variantToDelete) return;
 
     try {
-      setVariants(prev => prev.filter(v => v.id !== variantToDelete.id));
-      setSnackbarMessage(t('remoteConfig.variantDeleted'));
-      setSnackbarOpen(true);
+      await remoteConfigService.deleteVariant(variantToDelete.id);
+      enqueueSnackbar(t('remoteConfig.variantDeleted'), { variant: 'success' });
       markAsChanged({
         id: Date.now().toString(),
         type: 'variant',
@@ -2702,10 +2592,10 @@ const VariantsManagement: React.FC = () => {
         description: `Deleted variant "${variantToDelete.variantName}" for parameter "${variantToDelete.parameterKey}"`,
         timestamp: new Date().toISOString()
       });
+      await loadVariants();
     } catch (error) {
       console.error('Failed to delete variant:', error);
-      setSnackbarMessage(t('common.error'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     } finally {
       setDeleteDialogOpen(false);
       setVariantToDelete(null);
@@ -2727,21 +2617,18 @@ const VariantsManagement: React.FC = () => {
         else processedValue = formData.value;
       }
 
-      const newVariant: Variant = {
-        id: selectedVariant?.id || Date.now().toString(),
+      const variantData = {
         parameterKey: formData.parameterKey,
         variantName: formData.variantName,
         value: processedValue,
         weight: formData.weight,
         description: formData.description,
-        isActive: formData.isActive,
-        createdAt: selectedVariant?.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        isActive: formData.isActive
       };
 
       if (dialogType === 'create') {
-        setVariants(prev => [...prev, newVariant]);
-        setSnackbarMessage(t('remoteConfig.variantCreated'));
+        await remoteConfigService.addVariant(variantData);
+        enqueueSnackbar(t('remoteConfig.variantCreated'), { variant: 'success' });
         markAsChanged({
           id: Date.now().toString(),
           type: 'variant',
@@ -2751,8 +2638,8 @@ const VariantsManagement: React.FC = () => {
           timestamp: new Date().toISOString()
         });
       } else {
-        setVariants(prev => prev.map(v => v.id === selectedVariant?.id ? newVariant : v));
-        setSnackbarMessage(t('remoteConfig.variantUpdated'));
+        await remoteConfigService.updateVariant(selectedVariant!.id, variantData);
+        enqueueSnackbar(t('remoteConfig.variantUpdated'), { variant: 'success' });
         markAsChanged({
           id: Date.now().toString(),
           type: 'variant',
@@ -2763,12 +2650,11 @@ const VariantsManagement: React.FC = () => {
         });
       }
 
-      setSnackbarOpen(true);
+      await loadVariants();
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save variant:', error);
-      setSnackbarMessage(t('common.error'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
   };
 
@@ -3022,14 +2908,6 @@ const VariantsManagement: React.FC = () => {
         </Button>
       </DialogActions>
     </Dialog>
-
-    {/* Snackbar for notifications */}
-    <Snackbar
-      open={snackbarOpen}
-      autoHideDuration={4000}
-      onClose={() => setSnackbarOpen(false)}
-      message={snackbarMessage}
-    />
   </>
   );
 };
@@ -3047,8 +2925,7 @@ const DeploymentHistoryManagement: React.FC = () => {
   const [selectedDeployment, setSelectedDeployment] = useState<DeploymentHistory | null>(null);
   const [rollbackDialogOpen, setRollbackDialogOpen] = useState(false);
   const [deploymentToRollback, setDeploymentToRollback] = useState<DeploymentHistory | null>(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (currentEnvironment) {
@@ -3067,8 +2944,7 @@ const DeploymentHistoryManagement: React.FC = () => {
       setCurrentVersion(currentDeploy || null);
     } catch (error) {
       console.error('Failed to load deployments:', error);
-      setSnackbarMessage(t('remoteConfig.loadDeploymentsError'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('remoteConfig.loadDeploymentsError'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -3093,15 +2969,13 @@ const DeploymentHistoryManagement: React.FC = () => {
         description: `Rollback to version #${deploymentToRollback.version}`
       });
 
-      setSnackbarMessage(t('remoteConfig.rollbackSuccess'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('remoteConfig.rollbackSuccess'), { variant: 'success' });
 
       // Reload deployments to show new rollback deployment
       loadDeployments();
     } catch (error) {
       console.error('Failed to rollback:', error);
-      setSnackbarMessage(t('remoteConfig.rollbackError'));
-      setSnackbarOpen(true);
+      enqueueSnackbar(t('remoteConfig.rollbackError'), { variant: 'error' });
     } finally {
       setRollbackDialogOpen(false);
       setDeploymentToRollback(null);
@@ -3219,7 +3093,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">
-                      {new Date(deployment.deployedAt).toLocaleString()}
+                      {formatDateTimeDetailed(deployment.deployedAt)}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -3320,7 +3194,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                   {t('remoteConfig.deployedAt')}
                 </Typography>
                 <Typography variant="body1">
-                  {new Date(selectedDeployment.deployedAt).toLocaleString()}
+                  {formatDateTimeDetailed(selectedDeployment.deployedAt)}
                 </Typography>
               </Grid>
             </Grid>
@@ -3428,7 +3302,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                       {currentVersion.deployedBy.name}
                     </Typography>
                     <Typography variant="caption">
-                      {new Date(currentVersion.deployedAt).toLocaleString()}
+                      {formatDateTimeDetailed(currentVersion.deployedAt)}
                     </Typography>
                   </Paper>
                 </Grid>
@@ -3441,7 +3315,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                       {deploymentToRollback.deployedBy.name}
                     </Typography>
                     <Typography variant="caption">
-                      {new Date(deploymentToRollback.deployedAt).toLocaleString()}
+                      {formatDateTimeDetailed(deploymentToRollback.deployedAt)}
                     </Typography>
                   </Paper>
                 </Grid>
@@ -3491,7 +3365,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                 • {t('remoteConfig.deployedBy')}: {deploymentToRollback.deployedBy.name} ({deploymentToRollback.deployedBy.email})
               </Typography>
               <Typography variant="body2">
-                • {t('remoteConfig.deployedAt')}: {new Date(deploymentToRollback.deployedAt).toLocaleString()}
+                • {t('remoteConfig.deployedAt')}: {formatDateTimeDetailed(deploymentToRollback.deployedAt)}
               </Typography>
               <Typography variant="body2">
                 • {t('remoteConfig.message')}: {deploymentToRollback.message}
@@ -3509,14 +3383,6 @@ const DeploymentHistoryManagement: React.FC = () => {
         </Button>
       </DialogActions>
     </Dialog>
-
-    {/* Snackbar for notifications */}
-    <Snackbar
-      open={snackbarOpen}
-      autoHideDuration={4000}
-      onClose={() => setSnackbarOpen(false)}
-      message={snackbarMessage}
-    />
   </>
   );
 };
