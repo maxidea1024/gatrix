@@ -157,11 +157,10 @@ try {
                 }
             }
 
-            // Upload file with progress using Transform stream
+            // Upload file with progress using fastPut (parallel transfer)
             const remoteFilePath = `${remoteLabelPath}/${filename}`;
             const fileSize = fs.statSync(archivePath).size;
             const fileSizeMB = (fileSize / 1024 / 1024).toFixed(2);
-            let transferred = 0;
             let lastPercent = -1;
             const startTime = Date.now();
 
@@ -176,19 +175,18 @@ try {
                 return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             };
 
-            // Create transform stream for progress tracking
-            const { Transform } = require('stream');
-            const progressStream = new Transform({
-                transform(chunk, encoding, callback) {
-                    transferred += chunk.length;
-                    const percent = Math.floor((transferred / fileSize) * 100);
+            await sftp.fastPut(archivePath, remoteFilePath, {
+                concurrency: 64,  // Number of concurrent reads
+                chunkSize: 32768, // Size of each read chunk
+                step: (transferred, chunk, total) => {
+                    const percent = Math.floor((transferred / total) * 100);
                     if (percent !== lastPercent) {
                         lastPercent = percent;
 
                         // Calculate speed and ETA
                         const elapsed = (Date.now() - startTime) / 1000;
                         const speed = transferred / elapsed;
-                        const remaining = fileSize - transferred;
+                        const remaining = total - transferred;
                         const eta = remaining / speed;
                         const speedMBps = (speed / 1024 / 1024).toFixed(2);
 
@@ -198,24 +196,29 @@ try {
                         const transferredMB = (transferred / 1024 / 1024).toFixed(2);
                         process.stdout.write(`⏳ [${bar}] ${percent}% (${transferredMB}/${fileSizeMB} MB) ${speedMBps} MB/s ETA: ${formatTime(eta)}`);
                     }
-                    callback(null, chunk);
                 }
             });
-
-            const readStream = fs.createReadStream(archivePath);
-            const pipedStream = readStream.pipe(progressStream);
-
-            await sftp.put(pipedStream, remoteFilePath);
 
             const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
             process.stdout.clearLine(0);
             process.stdout.cursorTo(0);
             console.log(`✅ File uploaded: ${remoteFilePath} (${totalTime}s)`);
 
+            // Verify file integrity by checking size
+            const remoteStats = await sftp.stat(remoteFilePath);
+            const remoteSize = remoteStats.size;
+            if (remoteSize !== fileSize) {
+                throw new Error(`File size mismatch! Local: ${fileSize} bytes, Remote: ${remoteSize} bytes`);
+            }
+            console.log(`✅ File integrity verified (${fileSize} bytes)`);
+
             await sftp.end();
 
-            // Clean up temp file
-            fs.unlinkSync(archivePath);
+            // Clean up temp-export folder entirely
+            const tempDir = path.dirname(archivePath);
+            if (fs.existsSync(tempDir)) {
+                fs.rmSync(tempDir, { recursive: true, force: true });
+            }
             console.log('🧹 Cleaned up temporary files');
 
             console.log(`\n✨ Deployment completed successfully!\n`);
