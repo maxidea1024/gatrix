@@ -142,6 +142,7 @@ services:
     image: clickhouse/clickhouse-server:24.12.2.29
     container_name: gatrix-clickhouse
     restart: unless-stopped
+    user: "0"  # Run as root to avoid volume permission issues
     ports:
       - "${CLICKHOUSE_HTTP_PORT:-58123}:8123"
       - "${CLICKHOUSE_NATIVE_PORT:-59000}:9000"
@@ -354,6 +355,7 @@ services:
     image: prom/prometheus:latest
     container_name: gatrix-prometheus
     restart: unless-stopped
+    user: "0"  # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
@@ -384,6 +386,7 @@ services:
     image: grafana/grafana:latest
     container_name: gatrix-grafana
     restart: unless-stopped
+    user: "0"  # Run as root to avoid volume permission issues
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
@@ -439,6 +442,7 @@ services:
     image: quay.io/coreos/etcd:v3.5.12
     container_name: gatrix-etcd
     restart: unless-stopped
+    user: "0"  # Run as root to avoid volume permission issues
     command:
       - /usr/local/bin/etcd
       - --name=etcd0
