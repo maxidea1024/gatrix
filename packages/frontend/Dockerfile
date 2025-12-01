@@ -9,7 +9,7 @@ WORKDIR /app
 # Copy package files
 COPY package.json yarn.lock* ./
 COPY packages/frontend/package.json ./packages/frontend/
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --network-timeout 600000
 
 # Rebuild the source code only when needed
 FROM base AS builder

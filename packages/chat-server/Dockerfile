@@ -15,8 +15,8 @@ COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
-# Install dependencies
-RUN yarn install --frozen-lockfile --production=false
+# Install dependencies (with increased network timeout for slow connections)
+RUN yarn install --frozen-lockfile --production=false --network-timeout 600000
 
 # Builder stage
 FROM base AS builder
@@ -55,8 +55,8 @@ COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 # Copy server-sdk source (needed for file: dependency)
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
-# Install production dependencies only
-RUN yarn install --frozen-lockfile --production=true && \
+# Install production dependencies only (with increased network timeout for slow connections)
+RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 && \
   yarn cache clean
 
 # Copy built server-sdk from builder to node_modules location

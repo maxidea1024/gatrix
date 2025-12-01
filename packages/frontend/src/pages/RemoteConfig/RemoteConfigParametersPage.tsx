@@ -20,7 +20,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Drawer,
   Fade,
   TextField,
   Switch,
@@ -56,63 +55,40 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import SimplePagination from '../../components/common/SimplePagination';
 import ReactDiffViewer from 'react-diff-viewer-continued';
 import remoteConfigService, { DeploymentHistoryItem, DeploymentChange } from '../../services/remoteConfigService';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
 
-// Side Panel Component for Firebase-style forms
+// Side Panel Component for Firebase-style forms with resizing
 interface SidePanelProps {
   open: boolean;
   onClose: () => void;
   title: string;
   children: React.ReactNode;
   actions?: React.ReactNode;
+  storageKey: string;
+  defaultWidth?: number;
+  minWidth?: number;
 }
 
-const SidePanel: React.FC<SidePanelProps> = ({ open, onClose, title, children, actions }) => {
+const SidePanel: React.FC<SidePanelProps> = ({
+  open,
+  onClose,
+  title,
+  children,
+  actions,
+  storageKey,
+  defaultWidth = 600,
+  minWidth = 400
+}) => {
   return (
-    <Drawer
-      anchor="right"
+    <ResizableDrawer
       open={open}
       onClose={onClose}
-      sx={{
-        '& .MuiDrawer-paper': {
-          width: { xs: '100%', sm: 480, md: 600 },
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column'
-        }
-      }}
-      ModalProps={{
-        keepMounted: false
-      }}
+      title={title}
+      storageKey={storageKey}
+      defaultWidth={defaultWidth}
+      minWidth={minWidth}
+      zIndex={1300}
     >
-      {/* Header */}
-      <Box sx={{
-        p: 3,
-        borderBottom: 1,
-        borderColor: 'divider',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: 'background.paper',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1
-      }}>
-        <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-          {title}
-        </Typography>
-        <IconButton
-          onClick={onClose}
-          size="small"
-          sx={{
-            '&:hover': {
-              backgroundColor: 'action.hover'
-            }
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Box>
-
       {/* Content */}
       <Box sx={{
         flex: 1,
@@ -139,7 +115,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ open, onClose, title, children, a
           {actions}
         </Box>
       )}
-    </Drawer>
+    </ResizableDrawer>
   );
 };
 
@@ -1084,6 +1060,9 @@ const ConfigsManagement: React.FC = () => {
         ? t('remoteConfig.addParameter')
         : t('remoteConfig.editParameter')
       }
+      storageKey="remoteConfigParameterFormWidth"
+      defaultWidth={600}
+      minWidth={450}
       actions={
         <>
           <Button onClick={() => setDialogOpen(false)}>
@@ -1502,6 +1481,9 @@ const CampaignsManagement: React.FC = () => {
         ? t('remoteConfig.addCampaign')
         : t('remoteConfig.editCampaign')
       }
+      storageKey="remoteConfigCampaignFormWidth"
+      defaultWidth={600}
+      minWidth={450}
       actions={
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
           <Button onClick={() => setDialogOpen(false)}>
@@ -1939,6 +1921,9 @@ const ContextFieldsManagement: React.FC = () => {
         ? t('remoteConfig.addContextField')
         : t('remoteConfig.editContextField')
       }
+      storageKey="remoteConfigContextFieldFormWidth"
+      defaultWidth={600}
+      minWidth={450}
       actions={
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
           <Button onClick={() => setDialogOpen(false)}>
@@ -2399,6 +2384,9 @@ const SegmentsManagement: React.FC = () => {
         ? t('remoteConfig.addSegment')
         : t('remoteConfig.editSegment')
       }
+      storageKey="remoteConfigSegmentFormWidth"
+      defaultWidth={700}
+      minWidth={500}
       actions={
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
           <Button onClick={() => setDialogOpen(false)}>
@@ -2930,6 +2918,9 @@ const VariantsManagement: React.FC = () => {
         ? t('remoteConfig.addVariant')
         : t('remoteConfig.editVariant')
       }
+      storageKey="remoteConfigVariantFormWidth"
+      defaultWidth={600}
+      minWidth={450}
       actions={
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
           <Button onClick={() => setDialogOpen(false)}>
