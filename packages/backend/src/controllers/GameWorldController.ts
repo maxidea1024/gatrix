@@ -8,8 +8,9 @@ import logger from '../config/logger';
 import Joi from 'joi';
 import { pubSubService } from '../services/PubSubService';
 
-// Allow full URLs (scheme://host[:port][...]) or host:port without scheme
-const WORLD_SERVER_ADDRESS_REGEX = /^(?:[a-zA-Z][a-zA-Z0-9+.-]*:\/\/\S+|[a-zA-Z0-9.-]+:\d+)$/;
+// Allow full URLs (scheme://host[:port][...]) or host[:port] without scheme
+// Examples: https://world.example.com, world.example.com:8080, world.example.com, 192.168.1.100:8080, 192.168.1.100
+const WORLD_SERVER_ADDRESS_REGEX = /^(?:[a-zA-Z][a-zA-Z0-9+.-]*:\/\/\S+|[a-zA-Z0-9.-]+(:\d+)?)$/;
 
 // Validation schemas
 const createGameWorldSchema = Joi.object({
@@ -40,7 +41,7 @@ const createGameWorldSchema = Joi.object({
   infraSettings: Joi.object().unknown(true).optional().allow(null).default(null),
   infraSettingsRaw: Joi.string().optional().allow(null, '').default(null),
   worldServerAddress: Joi.string().pattern(WORLD_SERVER_ADDRESS_REGEX).max(255).required().messages({
-    'string.pattern.base': 'worldServerAddress must be a valid URL or host:port (e.g., https://world.example.com or world.example.com:8080)',
+    'string.pattern.base': 'worldServerAddress must be a valid URL, domain, IP, or host:port (e.g., https://world.example.com, world.example.com, 192.168.1.100:8080)',
     'any.required': 'worldServerAddress is required'
   }),
   tagIds: Joi.array().items(Joi.number().integer().min(1)).optional()
@@ -74,7 +75,7 @@ const updateGameWorldSchema = Joi.object({
   infraSettings: Joi.object().unknown(true).optional().allow(null),
   infraSettingsRaw: Joi.string().optional().allow(null, ''),
   worldServerAddress: Joi.string().pattern(WORLD_SERVER_ADDRESS_REGEX).max(255).optional().messages({
-    'string.pattern.base': 'worldServerAddress must be a valid URL or host:port (e.g., https://world.example.com or world.example.com:8080)'
+    'string.pattern.base': 'worldServerAddress must be a valid URL, domain, IP, or host:port (e.g., https://world.example.com, world.example.com, 192.168.1.100:8080)'
   }),
   tagIds: Joi.array().items(Joi.number().integer().min(1)).optional()
 });
