@@ -16,7 +16,7 @@ COPY packages/frontend/package.json ./packages/frontend/
 # Skip Cypress binary download - not needed in production Docker image
 ENV CYPRESS_INSTALL_BINARY=0
 
-RUN yarn install --frozen-lockfile --network-timeout 600000
+RUN yarn install --frozen-lockfile --network-timeout 600000 --ignore-optional
 
 # Rebuild the source code only when needed
 FROM base AS builder
