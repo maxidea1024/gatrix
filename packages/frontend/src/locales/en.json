@@ -4094,6 +4094,8 @@
     "addFirstFrame": "Add First Frame",
     "noFrames": "No frames. Add a frame to get started.",
     "frameSettings": "Frame Settings",
+    "addFrame": "Add Frame",
+    "editFrame": "Edit Frame",
     "imageUrl": "Image URL",
     "frameType": "Type",
     "delay": "Delay",

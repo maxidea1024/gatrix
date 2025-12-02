@@ -6,6 +6,7 @@ import {
   SkipNext as SkipNextIcon,
   SkipPrevious as SkipPreviousIcon,
   Replay as ReplayIcon,
+  ImageNotSupported as NoImageIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { Sequence, Frame, FrameEffectType, TransitionType } from '../../services/bannerService';
@@ -359,14 +360,19 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
           height: previewHeight,
           bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.800' : 'grey.200',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          gap: 1.5,
           borderRadius: 1,
           border: 1,
           borderColor: 'divider',
         }}
       >
-        <Typography color="text.secondary">{t('banners.noFramesToPreview')}</Typography>
+        <NoImageIcon sx={{ fontSize: 48, color: 'text.disabled' }} />
+        <Typography color="text.secondary" variant="body2">
+          {t('banners.noFramesToPreview')}
+        </Typography>
       </Box>
     );
   }
@@ -474,7 +480,7 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
         </Box>
 
         {/* Action Info Overlay - shown on hover when clickUrl or action exists */}
-        {isHovering && (currentFrame?.clickUrl || currentFrame?.action) && (
+        {isHovering && (currentFrame?.clickUrl || (currentFrame?.action?.type && currentFrame.action.type !== 'none')) && (
           <Box
             sx={{
               position: 'absolute',
@@ -516,7 +522,7 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
                 </Typography>
               </Box>
             )}
-            {currentFrame?.action && (
+            {currentFrame?.action?.type && currentFrame.action.type !== 'none' && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: currentFrame?.clickUrl ? 0.5 : 0 }}>
                 <Typography
                   variant="caption"
@@ -535,7 +541,7 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
                     fontWeight: 500,
                   }}
                 >
-                  {currentFrame.action}
+                  {t(`banners.actionTypes.${currentFrame.action.type}`)} {currentFrame.action.value && `(${currentFrame.action.value})`}
                 </Typography>
               </Box>
             )}

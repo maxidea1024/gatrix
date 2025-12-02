@@ -89,7 +89,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
       frameId: generateULID(),
       imageUrl: '',
       type: 'png' as FrameType,
-      delay: 1000,
+      delay: 5000,
       loop: false,
     };
     onUpdate({ ...sequence, frames: [...sequence.frames, newFrame] });

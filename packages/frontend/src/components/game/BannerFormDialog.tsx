@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  AppBar,
-  Toolbar,
   Button,
   TextField,
   Box,
@@ -22,7 +20,6 @@ import {
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Close as CloseIcon,
   ExpandMore as ExpandMoreIcon,
   Visibility as VisibilityIcon,
   Info as InfoIcon,
@@ -289,19 +286,12 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
     <ResizableDrawer
       open={open}
       onClose={onClose}
+      title={isEditing ? t('banners.editBanner') : t('banners.createBanner')}
+      storageKey="bannerFormDrawerWidth"
       defaultWidth={900}
       minWidth={700}
       maxWidth={1400}
     >
-      <AppBar position="static" color="default" elevation={0}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            {isEditing ? t('banners.editBanner') : t('banners.createBanner')}
-          </Typography>
-          <IconButton edge="end" onClick={onClose}><CloseIcon /></IconButton>
-        </Toolbar>
-      </AppBar>
-
       <Box sx={{ p: 3, overflow: 'auto', flex: 1 }}>
         {/* Basic Info Accordion */}
         <Accordion
@@ -459,12 +449,15 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
             <Typography variant="subtitle2" fontWeight={600}>
               {t('banners.sequencesTab')}
             </Typography>
-            <Box sx={{ ml: 'auto', mr: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 2 }}>
+            {/* Toolbar: Undo/Redo | Add Sequence */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 2 }}>
               <Tooltip title={`${t('common.undo')} (Ctrl+Z)`}>
                 <span>
                   <IconButton
                     size="small"
-                    onClick={(e) => { e.stopPropagation(); handleUndo(); }}
+                    onClick={handleUndo}
                     disabled={!canUndo}
                     sx={{ p: 0.5 }}
                   >
@@ -476,7 +469,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                 <span>
                   <IconButton
                     size="small"
-                    onClick={(e) => { e.stopPropagation(); handleRedo(); }}
+                    onClick={handleRedo}
                     disabled={!canRedo}
                     sx={{ p: 0.5 }}
                   >
@@ -484,19 +477,16 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                   </IconButton>
                 </span>
               </Tooltip>
-              <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 20, alignSelf: 'center' }} />
+              <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 24, alignSelf: 'center' }} />
               <Button
                 variant="outlined"
                 size="small"
                 startIcon={<AddIcon />}
-                onClick={(e) => { e.stopPropagation(); handleAddSequence(); }}
-                sx={{ ml: 0.5 }}
+                onClick={handleAddSequence}
               >
                 {t('banners.addSequence')}
               </Button>
             </Box>
-          </AccordionSummary>
-          <AccordionDetails sx={{ p: 2 }}>
             {sequences.length === 0 ? (
               <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'action.hover' }}>
                 <Typography color="text.secondary">{t('banners.noSequences')}</Typography>

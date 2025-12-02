@@ -214,25 +214,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
 
   // Build tooltip content
   const tooltipContent = (
-    <Box sx={{ display: 'flex', gap: 1.5, p: 0.5 }}>
-      {/* Image/Video Preview */}
-      {frame.imageUrl && !imageError && (
-        <Box sx={{ flex: '0 0 auto' }}>
-          {isVideo && frame.type === 'mp4' ? (
-            <video
-              src={frame.imageUrl}
-              style={{ width: 120, height: 80, objectFit: 'contain', borderRadius: 4, background: '#000' }}
-              muted
-            />
-          ) : (
-            <img
-              src={frame.imageUrl}
-              alt=""
-              style={{ width: 120, height: 80, objectFit: 'contain', borderRadius: 4, background: '#000' }}
-            />
-          )}
-        </Box>
-      )}
+    <Box sx={{ p: 0.5 }}>
       {/* Info Table */}
       <Box component="table" sx={{ borderSpacing: '6px 2px', borderCollapse: 'separate', '& td': { verticalAlign: 'top' } }}>
         <tbody>
@@ -280,6 +262,27 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           )}
         </tbody>
       </Box>
+      {/* Image/Video Preview - at the bottom with divider */}
+      {frame.imageUrl && !imageError && (
+        <>
+          <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.2)' }} />
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            {isVideo && frame.type === 'mp4' ? (
+              <video
+                src={frame.imageUrl}
+                style={{ maxWidth: 180, maxHeight: 100, objectFit: 'contain', borderRadius: 4, background: '#000' }}
+                muted
+              />
+            ) : (
+              <img
+                src={frame.imageUrl}
+                alt=""
+                style={{ maxWidth: 180, maxHeight: 100, objectFit: 'contain', borderRadius: 4, background: '#000' }}
+              />
+            )}
+          </Box>
+        </>
+      )}
     </Box>
   );
 
@@ -410,7 +413,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
 
       {/* Settings Dialog */}
       <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} maxWidth="lg" fullWidth>
-        <DialogTitle>{t('banners.frameSettings')}</DialogTitle>
+        <DialogTitle>{frame.imageUrl ? t('banners.editFrame') : t('banners.addFrame')}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', gap: 3, pt: 1 }}>
             {/* Left: Settings - narrower width */}

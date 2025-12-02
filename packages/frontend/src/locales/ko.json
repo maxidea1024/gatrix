@@ -4096,6 +4096,8 @@
     "addFirstFrame": "첫 프레임 추가",
     "noFrames": "프레임이 없습니다. 프레임을 추가하여 시작하세요.",
     "frameSettings": "프레임 설정",
+    "addFrame": "프레임 추가",
+    "editFrame": "프레임 수정",
     "imageUrl": "이미지 URL",
     "frameType": "타입",
     "delay": "지연 시간",
