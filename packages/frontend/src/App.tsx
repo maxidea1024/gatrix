@@ -102,6 +102,7 @@ import CouponSettingsPage from './pages/game/CouponSettingsPage';
 import CouponUsagePage from './pages/game/CouponUsagePage';
 import SurveysPage from './pages/game/SurveysPage';
 import RewardTemplatesPage from './pages/game/RewardTemplatesPage';
+import BannerManagementPage from './pages/game/BannerManagementPage';
 import HotTimeButtonEventPage from './pages/game/HotTimeButtonEventPage';
 import LiveEventPage from './pages/game/LiveEventPage';
 import PlanningDataPage from './pages/game/PlanningDataPage';
@@ -435,6 +436,7 @@ const AppContent: React.FC = () => {
                                 <Route path="coupons" element={<CouponsPage />} />
                                 <Route path="surveys" element={<SurveysPage />} />
                                 <Route path="reward-templates" element={<RewardTemplatesPage />} />
+                                <Route path="banners" element={<BannerManagementPage />} />
                                 <Route path="hot-time-button-event" element={<HotTimeButtonEventPage />} />
                                 <Route path="coupon-settings" element={<CouponSettingsPage />} />
                                 <Route path="coupon-usage" element={<CouponUsagePage />} />

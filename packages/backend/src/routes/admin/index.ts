@@ -34,6 +34,7 @@ import couponSettingsRoutes from './couponSettings';
 import serviceDiscoveryRoutes from './serviceDiscovery';
 import monitoringAlertRoutes from './monitoringAlerts';
 import dataManagementRoutes from './dataManagement';
+import bannerRoutes from './banners';
 
 const router = express.Router();
 
@@ -78,5 +79,6 @@ router.use('/monitoring/alerts', monitoringAlertRoutes);
 router.use('/planning-data', planningDataRoutes);
 router.use('/coupon-settings', couponSettingsRoutes);
 router.use('/data-management', dataManagementRoutes);
+router.use('/banners', bannerRoutes);
 
 export default router;

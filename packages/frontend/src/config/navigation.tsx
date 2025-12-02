@@ -37,6 +37,7 @@ import {
   Api as ApiIcon,
   Insights as InsightsIcon,
   Folder as FolderIcon,
+  ViewCarousel as ViewCarouselIcon,
 } from '@mui/icons-material';
 
 export interface MenuItem {
@@ -122,6 +123,7 @@ export const gameMenuItems: MenuItem[] = [
     ]
   },
   { text: 'sidebar.rewardTemplates', icon: <CardGiftcardIcon />, path: '/game/reward-templates', adminOnly: true },
+  { text: 'sidebar.banners', icon: <ViewCarouselIcon />, path: '/game/banners', adminOnly: true },
   { text: 'sidebar.planningData', icon: <StorageIcon />, path: '/game/planning-data', adminOnly: true },
 ];
 

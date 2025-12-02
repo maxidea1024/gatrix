@@ -3,6 +3,7 @@ import { ClientController } from '../../controllers/ClientController';
 import RemoteConfigClientController from '../../controllers/RemoteConfigClientController';
 import RemoteConfigSDKController from '../../controllers/RemoteConfigSDKController';
 import { ClientCrashController } from '../../controllers/ClientCrashController';
+import { BannerClientController } from '../../controllers/BannerClientController';
 import { requestLogger } from '../../middleware/requestLogger';
 import { clientSDKAuth } from '../../middleware/apiTokenAuth';
 import { body, param, validationResult } from 'express-validator';
@@ -438,5 +439,9 @@ router.post('/crashes/upload',
   validateRequest,
   ClientCrashController.uploadCrash
 );
+
+// Banner routes for game client
+router.get('/banners', clientSDKAuth, BannerClientController.getBanners);
+router.get('/banners/:bannerId', clientSDKAuth, BannerClientController.getBannerById);
 
 export default router;

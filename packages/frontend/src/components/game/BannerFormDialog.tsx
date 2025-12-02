@@ -1,0 +1,571 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  AppBar,
+  Toolbar,
+  Button,
+  TextField,
+  Box,
+  Typography,
+  IconButton,
+  Paper,
+  Stack,
+  Grid,
+  Divider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Tooltip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Close as CloseIcon,
+  ExpandMore as ExpandMoreIcon,
+  Visibility as VisibilityIcon,
+  Info as InfoIcon,
+  ViewList as ViewListIcon,
+  Undo as UndoIcon,
+  Redo as RedoIcon,
+} from '@mui/icons-material';
+import ResizableDrawer from '../common/ResizableDrawer';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import bannerService, { Banner, Sequence, LoopModeType } from '../../services/bannerService';
+import { generateULID } from '../../utils/ulid';
+import SequenceEditor from './SequenceEditor';
+import BannerPreview from './BannerPreview';
+
+interface BannerFormDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onSave: () => void;
+  banner?: Banner | null;
+}
+
+// Predefined banner sizes
+const BANNER_SIZE_PRESETS = [
+  { label: '1024 × 512 (2:1)', width: 1024, height: 512 },
+  { label: '728 × 90 (Leaderboard)', width: 728, height: 90 },
+  { label: '300 × 250 (Medium Rectangle)', width: 300, height: 250 },
+  { label: '320 × 100 (Large Mobile)', width: 320, height: 100 },
+  { label: '468 × 60 (Banner)', width: 468, height: 60 },
+  { label: '320 × 50 (Mobile)', width: 320, height: 50 },
+  { label: '970 × 250 (Billboard)', width: 970, height: 250 },
+  { label: '300 × 600 (Half Page)', width: 300, height: 600 },
+  { label: '160 × 600 (Wide Skyscraper)', width: 160, height: 600 },
+  { label: '1200 × 628 (Social)', width: 1200, height: 628 },
+  { value: 'custom', label: '' }, // Custom will be set with translation
+];
+
+// Max undo/redo history size
+const MAX_HISTORY_SIZE = 50;
+
+const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
+  open,
+  onClose,
+  onSave,
+  banner,
+}) => {
+  const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
+
+  // Form state
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [width, setWidth] = useState(1024);
+  const [height, setHeight] = useState(512);
+  const [sizePreset, setSizePreset] = useState('1024x512');
+  const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+  const [sequences, setSequences] = useState<Sequence[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  // Accordion expansion states
+  const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
+  const [sequenceExpanded, setSequenceExpanded] = useState(true);
+  const [previewExpanded, setPreviewExpanded] = useState(true);
+
+  // Get size preset value from width/height
+  const getSizePresetValue = useCallback((w: number, h: number) => {
+    const match = BANNER_SIZE_PRESETS.find(p => p.width === w && p.height === h);
+    return match ? `${w}x${h}` : 'custom';
+  }, []);
+
+  // Handle size preset change
+  const handleSizePresetChange = useCallback((value: string) => {
+    setSizePreset(value);
+    if (value !== 'custom') {
+      const [w, h] = value.split('x').map(Number);
+      setWidth(w);
+      setHeight(h);
+    }
+  }, []);
+
+  // Refs
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  // Undo/Redo history
+  const [sequenceHistory, setSequenceHistory] = useState<Sequence[][]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const isUndoRedoRef = useRef(false);
+
+  // Initialize form
+  useEffect(() => {
+    if (banner) {
+      setName(banner.name);
+      setDescription(banner.description || '');
+      setWidth(banner.width);
+      setHeight(banner.height);
+      setSizePreset(getSizePresetValue(banner.width, banner.height));
+      setPlaybackSpeed(banner.playbackSpeed);
+      const initialSequences = banner.sequences ? JSON.parse(JSON.stringify(banner.sequences)) : [];
+      setSequences(initialSequences);
+      setSequenceHistory([initialSequences]);
+      setHistoryIndex(0);
+    } else {
+      // Reset form for new banner
+      setName('');
+      setDescription('');
+      setWidth(1024);
+      setHeight(512);
+      setSizePreset('1024x512');
+      setPlaybackSpeed(1.0);
+      setSequences([]);
+      setSequenceHistory([[]]);
+      setHistoryIndex(0);
+    }
+  }, [banner, open, getSizePresetValue]);
+
+  // Focus name input when dialog opens
+  useEffect(() => {
+    if (open) {
+      // Use setTimeout to ensure the input is rendered
+      setTimeout(() => {
+        nameInputRef.current?.focus();
+      }, 100);
+    }
+  }, [open]);
+
+  // Update history when sequences change (except from undo/redo)
+  useEffect(() => {
+    if (isUndoRedoRef.current) {
+      isUndoRedoRef.current = false;
+      return;
+    }
+    // Skip initial render
+    if (historyIndex === -1) return;
+
+    // Don't add to history if the sequences are the same as current history
+    const currentHistoryState = sequenceHistory[historyIndex];
+    if (JSON.stringify(currentHistoryState) === JSON.stringify(sequences)) return;
+
+    // Remove future history and add new state
+    const newHistory = sequenceHistory.slice(0, historyIndex + 1);
+    newHistory.push(JSON.parse(JSON.stringify(sequences)));
+
+    // Limit history size
+    if (newHistory.length > MAX_HISTORY_SIZE) {
+      newHistory.shift();
+    }
+
+    setSequenceHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+  }, [sequences]);
+
+  // Undo/Redo handlers
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) {
+      isUndoRedoRef.current = true;
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setSequences(JSON.parse(JSON.stringify(sequenceHistory[newIndex])));
+    }
+  }, [historyIndex, sequenceHistory]);
+
+  const handleRedo = useCallback(() => {
+    if (historyIndex < sequenceHistory.length - 1) {
+      isUndoRedoRef.current = true;
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setSequences(JSON.parse(JSON.stringify(sequenceHistory[newIndex])));
+    }
+  }, [historyIndex, sequenceHistory]);
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        if (e.shiftKey) {
+          handleRedo();
+        } else {
+          handleUndo();
+        }
+        e.preventDefault();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        handleRedo();
+        e.preventDefault();
+      }
+    };
+
+    if (open) {
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [open, handleUndo, handleRedo]);
+
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < sequenceHistory.length - 1;
+
+  const handleSave = async () => {
+    if (!name.trim()) {
+      enqueueSnackbar(t('banners.nameRequired'), { variant: 'error' });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (banner) {
+        await bannerService.updateBanner(banner.bannerId, {
+          name,
+          description,
+          width,
+          height,
+          playbackSpeed,
+          sequences,
+        });
+        enqueueSnackbar(t('banners.updateSuccess'), { variant: 'success' });
+      } else {
+        await bannerService.createBanner({
+          name,
+          description,
+          width,
+          height,
+          playbackSpeed,
+          sequences,
+        });
+        enqueueSnackbar(t('banners.createSuccess'), { variant: 'success' });
+      }
+      onSave();
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('banners.saveFailed'), { variant: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddSequence = () => {
+    const newSequence: Sequence = {
+      sequenceId: generateULID(),
+      name: `${t('banners.sequence')} ${sequences.length + 1}`,
+      speedMultiplier: 1.0,
+      loopMode: 'loop' as LoopModeType,
+      frames: [],
+    };
+    setSequences([...sequences, newSequence]);
+  };
+
+  const handleUpdateSequence = (index: number, updatedSequence: Sequence) => {
+    const newSequences = [...sequences];
+    newSequences[index] = updatedSequence;
+    setSequences(newSequences);
+  };
+
+  const handleDeleteSequence = (index: number) => {
+    setSequences(sequences.filter((_, i) => i !== index));
+  };
+
+  const handleMoveSequence = (fromIndex: number, toIndex: number) => {
+    const newSequences = [...sequences];
+    const [removed] = newSequences.splice(fromIndex, 1);
+    newSequences.splice(toIndex, 0, removed);
+    setSequences(newSequences);
+  };
+
+  const isEditing = !!banner;
+
+  return (
+    <ResizableDrawer
+      open={open}
+      onClose={onClose}
+      defaultWidth={900}
+      minWidth={700}
+      maxWidth={1400}
+    >
+      <AppBar position="static" color="default" elevation={0}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            {isEditing ? t('banners.editBanner') : t('banners.createBanner')}
+          </Typography>
+          <IconButton edge="end" onClick={onClose}><CloseIcon /></IconButton>
+        </Toolbar>
+      </AppBar>
+
+      <Box sx={{ p: 3, overflow: 'auto', flex: 1 }}>
+        {/* Basic Info Accordion */}
+        <Accordion
+          expanded={basicInfoExpanded}
+          onChange={(_, expanded) => setBasicInfoExpanded(expanded)}
+          sx={{
+            mb: 1,
+            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+            '&:before': { display: 'none' },
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            sx={{
+              minHeight: 48,
+              '& .MuiAccordionSummary-content': { my: 1 },
+            }}
+          >
+            <InfoIcon sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="subtitle2" fontWeight={600}>
+              {t('banners.basicInfo')}
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 2 }}>
+            <Stack spacing={2}>
+              <TextField
+                inputRef={nameInputRef}
+                label={t('banners.name')}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                fullWidth
+                required
+                size="small"
+              />
+              <TextField
+                label={t('banners.description')}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                fullWidth
+                multiline
+                rows={2}
+                size="small"
+              />
+              {/* Size row: Preset + (Custom fields if selected) */}
+              <Grid container spacing={2}>
+                <Grid item xs={sizePreset === 'custom' ? 4 : 6}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>{t('banners.sizePreset')}</InputLabel>
+                    <Select
+                      value={sizePreset}
+                      label={t('banners.sizePreset')}
+                      onChange={(e) => handleSizePresetChange(e.target.value)}
+                    >
+                      {BANNER_SIZE_PRESETS.map((preset) => (
+                        <MenuItem
+                          key={preset.value || `${preset.width}x${preset.height}`}
+                          value={preset.value || `${preset.width}x${preset.height}`}
+                        >
+                          {preset.value === 'custom' ? t('banners.customSize') : preset.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                {sizePreset === 'custom' && (
+                  <>
+                    <Grid item xs={4}>
+                      <TextField
+                        label={t('banners.width')}
+                        value={width}
+                        onChange={(e) => setWidth(Number(e.target.value) || 0)}
+                        fullWidth
+                        size="small"
+                        inputProps={{ style: { MozAppearance: 'textfield' } }}
+                        sx={{
+                          '& input[type=number]': { MozAppearance: 'textfield' },
+                          '& input[type=number]::-webkit-outer-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                          '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <TextField
+                        label={t('banners.height')}
+                        value={height}
+                        onChange={(e) => setHeight(Number(e.target.value) || 0)}
+                        fullWidth
+                        size="small"
+                        inputProps={{ style: { MozAppearance: 'textfield' } }}
+                        sx={{
+                          '& input[type=number]': { MozAppearance: 'textfield' },
+                          '& input[type=number]::-webkit-outer-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                          '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                        }}
+                      />
+                    </Grid>
+                  </>
+                )}
+                {sizePreset !== 'custom' && (
+                  <Grid item xs={6}>
+                    <TextField
+                      label={t('banners.playbackSpeed')}
+                      value={playbackSpeed}
+                      onChange={(e) => setPlaybackSpeed(Number(e.target.value) || 1)}
+                      fullWidth
+                      size="small"
+                      inputProps={{ style: { MozAppearance: 'textfield' } }}
+                      sx={{
+                        '& input[type=number]': { MozAppearance: 'textfield' },
+                        '& input[type=number]::-webkit-outer-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                        '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                      }}
+                    />
+                  </Grid>
+                )}
+              </Grid>
+              {/* Playback speed on separate row when custom size */}
+              {sizePreset === 'custom' && (
+                <TextField
+                  label={t('banners.playbackSpeed')}
+                  value={playbackSpeed}
+                  onChange={(e) => setPlaybackSpeed(Number(e.target.value) || 1)}
+                  fullWidth
+                  size="small"
+                  inputProps={{ style: { MozAppearance: 'textfield' } }}
+                  sx={{
+                    '& input[type=number]': { MozAppearance: 'textfield' },
+                    '& input[type=number]::-webkit-outer-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                    '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                  }}
+                />
+              )}
+            </Stack>
+          </AccordionDetails>
+        </Accordion>
+
+        {/* Sequence Accordion */}
+        <Accordion
+          expanded={sequenceExpanded}
+          onChange={(_, expanded) => setSequenceExpanded(expanded)}
+          sx={{
+            mb: 1,
+            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+            '&:before': { display: 'none' },
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            sx={{
+              minHeight: 48,
+              '& .MuiAccordionSummary-content': { my: 1 },
+            }}
+          >
+            <ViewListIcon sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="subtitle2" fontWeight={600}>
+              {t('banners.sequencesTab')}
+            </Typography>
+            <Box sx={{ ml: 'auto', mr: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Tooltip title={`${t('common.undo')} (Ctrl+Z)`}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => { e.stopPropagation(); handleUndo(); }}
+                    disabled={!canUndo}
+                    sx={{ p: 0.5 }}
+                  >
+                    <UndoIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip title={`${t('common.redo')} (Ctrl+Y)`}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => { e.stopPropagation(); handleRedo(); }}
+                    disabled={!canRedo}
+                    sx={{ p: 0.5 }}
+                  >
+                    <RedoIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 20, alignSelf: 'center' }} />
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={(e) => { e.stopPropagation(); handleAddSequence(); }}
+                sx={{ ml: 0.5 }}
+              >
+                {t('banners.addSequence')}
+              </Button>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 2 }}>
+            {sequences.length === 0 ? (
+              <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'action.hover' }}>
+                <Typography color="text.secondary">{t('banners.noSequences')}</Typography>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddSequence} sx={{ mt: 2 }}>
+                  {t('banners.addFirstSequence')}
+                </Button>
+              </Paper>
+            ) : (
+              <Stack spacing={2}>
+                {sequences.map((sequence, index) => (
+                  <SequenceEditor
+                    key={sequence.sequenceId}
+                    sequence={sequence}
+                    index={index}
+                    totalCount={sequences.length}
+                    onUpdate={(updated) => handleUpdateSequence(index, updated)}
+                    onDelete={() => handleDeleteSequence(index)}
+                    onMoveUp={() => index > 0 && handleMoveSequence(index, index - 1)}
+                    onMoveDown={() => index < sequences.length - 1 && handleMoveSequence(index, index + 1)}
+                  />
+                ))}
+              </Stack>
+            )}
+          </AccordionDetails>
+        </Accordion>
+
+        {/* Preview Accordion */}
+        <Accordion
+          expanded={previewExpanded}
+          onChange={(_, expanded) => setPreviewExpanded(expanded)}
+          sx={{
+            mb: 1,
+            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+            '&:before': { display: 'none' },
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            sx={{
+              minHeight: 48,
+              '& .MuiAccordionSummary-content': { my: 1 },
+            }}
+          >
+            <VisibilityIcon sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="subtitle2" fontWeight={600}>
+              {t('banners.previewTitle')}
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 2 }}>
+            <BannerPreview
+              width={width}
+              height={height}
+              sequences={sequences}
+              playbackSpeed={playbackSpeed}
+            />
+          </AccordionDetails>
+        </Accordion>
+      </Box>
+
+      {/* Footer */}
+      <Divider />
+      <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button variant="contained" onClick={handleSave} disabled={saving}>
+          {saving ? t('common.saving') : (isEditing ? t('common.save') : t('common.create'))}
+        </Button>
+      </Box>
+    </ResizableDrawer>
+  );
+};
+
+export default BannerFormDialog;
