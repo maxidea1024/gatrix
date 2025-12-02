@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
-import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, Menu, Divider, FormHelperText } from '@mui/material';
-import { Settings as SettingsIcon, Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, List as ListIcon, ContentCopy as ContentCopyIcon, Code as CodeIcon, CardGiftcard as CardGiftcardIcon, HourglassEmpty as HourglassEmptyIcon, Download as DownloadIcon, ArrowDropDown as ArrowDropDownIcon, CheckCircle as CheckCircleIcon, TableChart as TableChartIcon, Description as ExcelIcon } from '@mui/icons-material';
+import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, Menu, Divider, FormHelperText, Paper, Collapse } from '@mui/material';
+import { Settings as SettingsIcon, Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, List as ListIcon, ContentCopy as ContentCopyIcon, Code as CodeIcon, CardGiftcard as CardGiftcardIcon, HourglassEmpty as HourglassEmptyIcon, Download as DownloadIcon, ArrowDropDown as ArrowDropDownIcon, CheckCircle as CheckCircleIcon, TableChart as TableChartIcon, Description as ExcelIcon, ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -306,6 +306,15 @@ const CouponSettingsPage: React.FC = () => {
   const [rewardMode, setRewardMode] = useState<'direct' | 'template'>('direct');
   // Track if description was manually edited by user
   const [isDescriptionManuallyEdited, setIsDescriptionManuallyEdited] = useState(false);
+  // Collapsible group states (target settings is collapsed by default)
+  const [expandedGroups, setExpandedGroups] = useState({
+    basicInfo: true,
+    codeQuantity: true,
+    usageLimit: true,
+    dateRange: true,
+    rewards: true,
+    rewardEmail: true,
+  });
   // Ref for channel table container
   const channelTableRef = useRef<HTMLDivElement>(null);
   const platformTableRef = useRef<HTMLDivElement>(null);
@@ -985,11 +994,11 @@ const CouponSettingsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-            {selectedIds.length > 0 && (
-              <Typography variant="body2" sx={{ px: 2, pb: 1 }}>
-                {t('common.selectedCount', { count: selectedIds.length })}
-              </Typography>
-            )}
+      {selectedIds.length > 0 && (
+        <Typography variant="body2" sx={{ px: 2, pb: 1 }}>
+          {t('common.selectedCount', { count: selectedIds.length })}
+        </Typography>
+      )}
 
       {/* List */}
       <Card>
@@ -1353,336 +1362,433 @@ const CouponSettingsPage: React.FC = () => {
         <Box sx={{ p: 3, overflowY: 'auto', flex: 1 }}>
           <Stack spacing={3} sx={{ mt: 1 }}>
             {/* Status Checkbox */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Checkbox
-                checked={form.status === 'ACTIVE'}
-                onChange={(e) => setForm((s: any) => ({ ...s, status: e.target.checked ? 'ACTIVE' : 'DISABLED' }))}
-              />
-              <Typography variant="body2">
-                {t('common.enabled')}
+            <Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Checkbox
+                  checked={form.status === 'ACTIVE'}
+                  onChange={(e) => setForm((s: any) => ({ ...s, status: e.target.checked ? 'ACTIVE' : 'DISABLED' }))}
+                />
+                <Typography variant="body2">
+                  {t('common.enabled')}
+                </Typography>
+              </Box>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 4, mt: 0.5 }}>
+                {t('coupons.couponSettings.form.statusHelp')}
               </Typography>
             </Box>
 
             {/* Basic Information Group */}
-            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
-                📋 {t('common.basicInformation')}
-              </Typography>
-              <Stack spacing={2}>
-                {/* Name */}
-                <TextField
-                  required
-                  autoFocus
-                  label={t('coupons.couponSettings.form.name')}
-                  value={form.name}
-                  onChange={(e) => {
-                    const newName = e.target.value;
-                    setForm((s: any) => ({
-                      ...s,
-                      name: newName,
-                      description: !isDescriptionManuallyEdited ? newName : s.description,
-                    }));
-                  }}
-                  helperText={t('coupons.couponSettings.form.nameHelp')}
-                  fullWidth
-                />
-                {/* Description */}
-                <TextField
-                  label={t('coupons.couponSettings.form.description')}
-                  value={form.description}
-                  onChange={(e) => {
-                    setForm((s: any) => ({ ...s, description: e.target.value }));
-                    setIsDescriptionManuallyEdited(true);
-                  }}
-                  helperText={t('coupons.couponSettings.form.descriptionHelp')}
-                  fullWidth
-                />
-              </Stack>
-            </Box>
-            {/* Code & Quantity Group */}
-            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
-                🔐 {t('coupons.couponSettings.form.codeAndQuantity')}
-              </Typography>
-              <Stack spacing={2}>
-                {/* Type and Code Pattern/Code in one row */}
-                <Box sx={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 2 }}>
-                  {/* Type */}
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  mb: expandedGroups.basicInfo ? 1 : 0,
+                  cursor: 'pointer',
+                }}
+                onClick={() => setExpandedGroups(s => ({ ...s, basicInfo: !s.basicInfo }))}
+              >
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {t('common.basicInformation')}
+                </Typography>
+                <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                  {expandedGroups.basicInfo ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
+              </Box>
+              <Collapse in={expandedGroups.basicInfo}>
+                <Stack spacing={2} sx={{ mt: 1 }}>
+                  {/* Name */}
                   <TextField
-                    select
                     required
-                    label={t('coupons.couponSettings.form.type')}
-                    value={form.type}
-                    disabled={!!editing}
-                    onChange={(e) => setForm((s: any) => ({
-                      ...s,
-                      type: e.target.value,
-                      perUserLimit: e.target.value === 'SPECIAL' ? 1 : s.perUserLimit,
-                      maxTotalUses: e.target.value === 'NORMAL' ? null : s.maxTotalUses,
-                      code: e.target.value === 'NORMAL' ? '' : s.code,
-                      quantity: e.target.value === 'NORMAL' ? (s.quantity || 1) : 1,
-                    }))}
-                    helperText={!!editing ? t('coupons.couponSettings.form.typeCannotBeChanged') : undefined}
-                  >
-                    <MenuItem value="SPECIAL">SPECIAL</MenuItem>
-                    <MenuItem value="NORMAL">NORMAL</MenuItem>
-                  </TextField>
-
-                  {/* Code Pattern (NORMAL only) */}
-                  {form.type === 'NORMAL' && (
-                    <TextField
-                      select
-                      label={t('coupons.couponSettings.form.codePattern')}
-                      value={form.codePattern || 'ALPHANUMERIC_8'}
-                      onChange={(e) => setForm((s: any) => ({ ...s, codePattern: e.target.value }))}
-                      disabled={!!editing}
-                      helperText={!!editing ? t('coupons.couponSettings.form.codePatternCannotBeChanged') : `예시: ${codePatternExample}`}
-                    >
-                      <MenuItem value="ALPHANUMERIC_8">{t('coupons.couponSettings.form.codePattern8')}</MenuItem>
-                      <MenuItem value="ALPHANUMERIC_16">{t('coupons.couponSettings.form.codePattern16')}</MenuItem>
-                      <MenuItem value="ALPHANUMERIC_16_HYPHEN">{t('coupons.couponSettings.form.codePattern16Hyphen')}</MenuItem>
-                    </TextField>
-                  )}
-
-                  {/* Code (SPECIAL only) */}
-                  {form.type === 'SPECIAL' && (
-                    <TextField
-                      required
-                      label={t('coupons.couponSettings.form.code')}
-                      value={form.code}
-                      onChange={(e) => {
-                        const value = e.target.value.toUpperCase();
-                        setForm((s: any) => ({ ...s, code: value }));
-                      }}
-                      error={codeError}
-                      helperText={codeError ? getCodeErrorMessage() : t('coupons.couponSettings.form.codeHelp')}
-                      inputProps={{
-                        style: { textTransform: 'uppercase' }
-                      }}
-                    />
-                  )}
-                </Box>
-
-                {/* Quantity (NORMAL only) */}
-                {form.type === 'NORMAL' && !editing && (
-                  <TextField
-                    type="number"
-                    fullWidth
-                    label={t('coupons.couponSettings.form.quantity')}
-                    value={form.quantity}
-                    onChange={(e) => setForm((s: any) => ({ ...s, quantity: Number(e.target.value) }))}
-                    error={quantityError}
-                    helperText={quantityError ? t('coupons.couponSettings.form.quantityMinError') : t('coupons.couponSettings.form.quantityHelp')}
-                    sx={{
-                      '& input[type=number]': { MozAppearance: 'textfield' },
-                      '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                    autoFocus
+                    label={t('coupons.couponSettings.form.name')}
+                    value={form.name}
+                    onChange={(e) => {
+                      const newName = e.target.value;
+                      setForm((s: any) => ({
+                        ...s,
+                        name: newName,
+                        description: !isDescriptionManuallyEdited ? newName : s.description,
+                      }));
                     }}
+                    helperText={t('coupons.couponSettings.form.nameHelp')}
+                    fullWidth
                   />
-                )}
-              </Stack>
-            </Box>
-            {/* Usage Limit Group */}
-            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
-                ⏱️ {t('coupons.couponSettings.form.usageLimit')}
-              </Typography>
-              <Stack spacing={2}>
-                {/* Usage Limit Type + PerUserLimit (NORMAL only) */}
-                {form.type === 'NORMAL' && (
+                  {/* Description */}
+                  <TextField
+                    label={t('coupons.couponSettings.form.description')}
+                    value={form.description}
+                    onChange={(e) => {
+                      setForm((s: any) => ({ ...s, description: e.target.value }));
+                      setIsDescriptionManuallyEdited(true);
+                    }}
+                    helperText={t('coupons.couponSettings.form.descriptionHelp')}
+                    fullWidth
+                  />
+                </Stack>
+              </Collapse>
+            </Paper>
+            {/* Target Settings Group - moved right after basic info */}
+            <TargetSettingsGroup
+              targetPlatforms={form.targetPlatforms || []}
+              targetPlatformsInverted={form.targetPlatformsInverted || false}
+              platforms={platforms}
+              onPlatformsChange={(platforms, inverted) => setForm((s: any) => ({ ...s, targetPlatforms: platforms, targetPlatformsInverted: inverted }))}
+              targetChannelSubchannels={form.targetChannelSubchannels || []}
+              targetChannelSubchannelsInverted={form.targetChannelSubchannelsInverted || false}
+              channels={channels}
+              onChannelsChange={(channels, inverted) => setForm((s: any) => ({ ...s, targetChannelSubchannels: channels, targetChannelSubchannelsInverted: inverted }))}
+              targetWorlds={form.targetWorlds || []}
+              targetWorldsInverted={form.targetWorldsInverted || false}
+              worlds={worlds}
+              onWorldsChange={(worlds, inverted) => setForm((s: any) => ({ ...s, targetWorlds: worlds, targetWorldsInverted: inverted }))}
+              targetUserIds={form.targetUserIds || ''}
+              targetUserIdsInverted={form.targetUserIdsInverted || false}
+              onUserIdsChange={(ids) => setForm((s: any) => ({ ...s, targetUserIds: ids }))}
+              onUserIdsInvertedChange={(inverted) => setForm((s: any) => ({ ...s, targetUserIdsInverted: inverted }))}
+              showUserIdFilter={true}
+            />
+
+            {/* Code & Quantity Group */}
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  mb: expandedGroups.codeQuantity ? 1 : 0,
+                  cursor: 'pointer',
+                }}
+                onClick={() => setExpandedGroups(s => ({ ...s, codeQuantity: !s.codeQuantity }))}
+              >
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {t('coupons.couponSettings.form.codeAndQuantity')}
+                </Typography>
+                <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                  {expandedGroups.codeQuantity ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
+              </Box>
+              <Collapse in={expandedGroups.codeQuantity}>
+                <Stack spacing={2} sx={{ mt: 1 }}>
+                  {/* Type and Code Pattern/Code in one row */}
                   <Box sx={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 2 }}>
+                    {/* Type */}
                     <TextField
                       select
-                      label={t('coupons.couponSettings.form.usageLimitType')}
-                      value={form.usageLimitType}
-                      onChange={(e) => setForm((s: any) => ({ ...s, usageLimitType: e.target.value }))}
-                      helperText={t('coupons.couponSettings.form.usageLimitTypeHelp')}
+                      required
+                      label={t('coupons.couponSettings.form.type')}
+                      value={form.type}
+                      disabled={!!editing}
+                      onChange={(e) => setForm((s: any) => ({
+                        ...s,
+                        type: e.target.value,
+                        perUserLimit: e.target.value === 'SPECIAL' ? 1 : s.perUserLimit,
+                        maxTotalUses: e.target.value === 'NORMAL' ? null : s.maxTotalUses,
+                        code: e.target.value === 'NORMAL' ? '' : s.code,
+                        quantity: e.target.value === 'NORMAL' ? (s.quantity || 1) : 1,
+                      }))}
+                      helperText={!!editing ? t('coupons.couponSettings.form.typeCannotBeChanged') : undefined}
                     >
-                      <MenuItem value="USER">{t('coupons.couponSettings.form.usageLimitTypeUser')}</MenuItem>
-                      <MenuItem value="CHARACTER">{t('coupons.couponSettings.form.usageLimitTypeCharacter')}</MenuItem>
+                      <MenuItem value="SPECIAL">SPECIAL</MenuItem>
+                      <MenuItem value="NORMAL">NORMAL</MenuItem>
                     </TextField>
-                    <TextField
-                      type="number"
-                      label={form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimit') : t('coupons.couponSettings.form.perUserLimit')}
-                      value={form.perUserLimit}
-                      onChange={(e) => setForm((s: any) => ({ ...s, perUserLimit: Number(e.target.value) }))}
-                      error={perUserLimitError}
-                      helperText={perUserLimitError ? t('coupons.couponSettings.form.perUserLimitMinError') : (form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimitHelp') : t('coupons.couponSettings.form.perUserLimitHelp'))}
-                      sx={{
-                        '& input[type=number]': { MozAppearance: 'textfield' },
-                        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
-                      }}
-                    />
+
+                    {/* Code Pattern (NORMAL only) */}
+                    {form.type === 'NORMAL' && (
+                      <TextField
+                        select
+                        label={t('coupons.couponSettings.form.codePattern')}
+                        value={form.codePattern || 'ALPHANUMERIC_8'}
+                        onChange={(e) => setForm((s: any) => ({ ...s, codePattern: e.target.value }))}
+                        disabled={!!editing}
+                        helperText={!!editing ? t('coupons.couponSettings.form.codePatternCannotBeChanged') : `예시: ${codePatternExample}`}
+                      >
+                        <MenuItem value="ALPHANUMERIC_8">{t('coupons.couponSettings.form.codePattern8')}</MenuItem>
+                        <MenuItem value="ALPHANUMERIC_16">{t('coupons.couponSettings.form.codePattern16')}</MenuItem>
+                        <MenuItem value="ALPHANUMERIC_16_HYPHEN">{t('coupons.couponSettings.form.codePattern16Hyphen')}</MenuItem>
+                      </TextField>
+                    )}
+
+                    {/* Code (SPECIAL only) */}
+                    {form.type === 'SPECIAL' && (
+                      <TextField
+                        required
+                        label={t('coupons.couponSettings.form.code')}
+                        value={form.code}
+                        onChange={(e) => {
+                          const value = e.target.value.toUpperCase();
+                          setForm((s: any) => ({ ...s, code: value }));
+                        }}
+                        error={codeError}
+                        helperText={codeError ? getCodeErrorMessage() : t('coupons.couponSettings.form.codeHelp')}
+                        inputProps={{
+                          style: { textTransform: 'uppercase' }
+                        }}
+                      />
+                    )}
                   </Box>
-                )}
-                {/* MaxTotalUses + Unlimited (SPECIAL only) */}
-                {form.type === 'SPECIAL' && (
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+
+                  {/* Quantity (NORMAL only) */}
+                  {form.type === 'NORMAL' && !editing && (
                     <TextField
                       type="number"
                       fullWidth
-                      label={t('coupons.couponSettings.form.maxTotalUses')}
-                      value={form.maxTotalUses ?? ''}
-                      onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.value === '' ? null : Number(e.target.value) }))}
-                      error={maxTotalUsesError}
-                      helperText={maxTotalUsesError ? t('coupons.couponSettings.form.maxTotalUsesMinError') : t('coupons.couponSettings.form.maxTotalUsesHelp')}
-                      disabled={form.maxTotalUses === null}
+                      label={t('coupons.couponSettings.form.quantity')}
+                      value={form.quantity}
+                      onChange={(e) => setForm((s: any) => ({ ...s, quantity: Number(e.target.value) }))}
+                      error={quantityError}
+                      helperText={quantityError ? t('coupons.couponSettings.form.quantityMinError') : t('coupons.couponSettings.form.quantityHelp')}
                       sx={{
                         '& input[type=number]': { MozAppearance: 'textfield' },
                         '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
                       }}
                     />
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={form.maxTotalUses === null}
-                          onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.checked ? null : (s.maxTotalUses ?? 0) }))}
-                        />
-                      }
-                      label={t('coupons.couponSettings.form.unlimited')}
+                  )}
+                </Stack>
+              </Collapse>
+            </Paper>
+
+            {/* Usage Limit Group */}
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  mb: expandedGroups.usageLimit ? 1 : 0,
+                  cursor: 'pointer',
+                }}
+                onClick={() => setExpandedGroups(s => ({ ...s, usageLimit: !s.usageLimit }))}
+              >
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {t('coupons.couponSettings.form.usageLimit')}
+                </Typography>
+                <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                  {expandedGroups.usageLimit ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
+              </Box>
+              <Collapse in={expandedGroups.usageLimit}>
+                <Stack spacing={2} sx={{ mt: 1 }}>
+                  {/* Usage Limit Type + PerUserLimit (NORMAL only) */}
+                  {form.type === 'NORMAL' && (
+                    <Box sx={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 2 }}>
+                      <TextField
+                        select
+                        label={t('coupons.couponSettings.form.usageLimitType')}
+                        value={form.usageLimitType}
+                        onChange={(e) => setForm((s: any) => ({ ...s, usageLimitType: e.target.value }))}
+                        helperText={t('coupons.couponSettings.form.usageLimitTypeHelp')}
+                      >
+                        <MenuItem value="USER">{t('coupons.couponSettings.form.usageLimitTypeUser')}</MenuItem>
+                        <MenuItem value="CHARACTER">{t('coupons.couponSettings.form.usageLimitTypeCharacter')}</MenuItem>
+                      </TextField>
+                      <TextField
+                        type="number"
+                        label={form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimit') : t('coupons.couponSettings.form.perUserLimit')}
+                        value={form.perUserLimit}
+                        onChange={(e) => setForm((s: any) => ({ ...s, perUserLimit: Number(e.target.value) }))}
+                        error={perUserLimitError}
+                        helperText={perUserLimitError ? t('coupons.couponSettings.form.perUserLimitMinError') : (form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimitHelp') : t('coupons.couponSettings.form.perUserLimitHelp'))}
+                        sx={{
+                          '& input[type=number]': { MozAppearance: 'textfield' },
+                          '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                        }}
+                      />
+                    </Box>
+                  )}
+                  {/* MaxTotalUses + Unlimited (SPECIAL only) */}
+                  {form.type === 'SPECIAL' && (
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                      <TextField
+                        type="number"
+                        fullWidth
+                        label={t('coupons.couponSettings.form.maxTotalUses')}
+                        value={form.maxTotalUses ?? ''}
+                        onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.value === '' ? null : Number(e.target.value) }))}
+                        error={maxTotalUsesError}
+                        helperText={maxTotalUsesError ? t('coupons.couponSettings.form.maxTotalUsesMinError') : t('coupons.couponSettings.form.maxTotalUsesHelp')}
+                        disabled={form.maxTotalUses === null}
+                        sx={{
+                          '& input[type=number]': { MozAppearance: 'textfield' },
+                          '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                        }}
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={form.maxTotalUses === null}
+                            onChange={(e) => setForm((s: any) => ({ ...s, maxTotalUses: e.target.checked ? null : (s.maxTotalUses ?? 0) }))}
+                          />
+                        }
+                        label={t('coupons.couponSettings.form.unlimited')}
+                      />
+                    </Box>
+                  )}
+                </Stack>
+              </Collapse>
+            </Paper>
+
+            {/* Date Range Group */}
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  mb: expandedGroups.dateRange ? 1 : 0,
+                  cursor: 'pointer',
+                }}
+                onClick={() => setExpandedGroups(s => ({ ...s, dateRange: !s.dateRange }))}
+              >
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {t('coupons.couponSettings.form.dateRange')}
+                </Typography>
+                <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                  {expandedGroups.dateRange ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
+              </Box>
+              <Collapse in={expandedGroups.dateRange}>
+                <Stack spacing={2} sx={{ mt: 1 }}>
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <DateTimePicker
+                      label={t('coupons.couponSettings.form.startsAt')}
+                      value={form.startsAt}
+                      onChange={(date) => setForm((s: any) => ({ ...s, startsAt: date }))}
+                      timeSteps={{ minutes: 1 }}
+                      slotProps={{
+                        textField: { fullWidth: true, slotProps: { input: { readOnly: true } } },
+                        actionBar: {
+                          actions: ['clear', 'cancel', 'accept'],
+                        },
+                      }}
+                    />
+                    <DateTimePicker
+                      label={t('coupons.couponSettings.form.expiresAt')}
+                      value={form.expiresAt}
+                      onChange={(date) => setForm((s: any) => ({ ...s, expiresAt: date }))}
+                      minDateTime={form.startsAt || undefined}
+                      timeSteps={{ minutes: 1 }}
+                      slotProps={{
+                        textField: { fullWidth: true, required: true, slotProps: { input: { readOnly: true } } },
+                        actionBar: {
+                          actions: ['clear', 'cancel', 'accept'],
+                        },
+                      }}
                     />
                   </Box>
-                )}
-              </Stack>
-            </Box>
-            {/* Date Range Group */}
-            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
-                📅 {t('coupons.couponSettings.form.dateRange')}
-              </Typography>
-              <Stack spacing={2}>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <DateTimePicker
-                    label={t('coupons.couponSettings.form.startsAt')}
-                    value={form.startsAt}
-                    onChange={(date) => setForm((s: any) => ({ ...s, startsAt: date }))}
-                    timeSteps={{ minutes: 1 }}
-                    slotProps={{
-                      textField: { fullWidth: true, slotProps: { input: { readOnly: true } } },
-                      actionBar: {
-                        actions: ['clear', 'cancel', 'accept'],
-                      },
-                    }}
-                  />
-                  <DateTimePicker
-                    label={t('coupons.couponSettings.form.expiresAt')}
-                    value={form.expiresAt}
-                    onChange={(date) => setForm((s: any) => ({ ...s, expiresAt: date }))}
-                    minDateTime={form.startsAt || undefined}
-                    timeSteps={{ minutes: 1 }}
-                    slotProps={{
-                      textField: { fullWidth: true, required: true, slotProps: { input: { readOnly: true } } },
-                      actionBar: {
-                        actions: ['clear', 'cancel', 'accept'],
-                      },
-                    }}
-                  />
-                </Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t('coupons.couponSettings.form.startsAtHelp')} / {t('coupons.couponSettings.form.expiresAtHelp')}
-                </Typography>
-                {form.expiresAt && (
-                  <Typography variant="body2" color="text.secondary">
-                    {(() => {
-                      const e = form.expiresAt as Dayjs;
-                      const endStr = e.format('YYYY-MM-DD HH:mm');
-                      if (form.startsAt) {
-                        const s = form.startsAt as Dayjs;
-                        const startStr = s.format('YYYY-MM-DD HH:mm');
-                        const days = Math.max(0, Math.ceil(e.diff(s, 'hour') / 24));
-                        return `${t('coupons.couponSettings.form.applicablePeriod')}: ${startStr} ~ ${endStr} (${days}${t('common.day')})`;
-                      } else {
-                        return `${t('coupons.couponSettings.form.applicablePeriod')}: ${t('coupons.couponSettings.form.immediatelyAvailable')} ~ ${endStr}`;
-                      }
-                    })()}
+                  <Typography variant="caption" color="text.secondary">
+                    {t('coupons.couponSettings.form.startsAtHelp')} / {t('coupons.couponSettings.form.expiresAtHelp')}
                   </Typography>
-                )}
-              </Stack>
-            </Box>
-
-            {/* Target Settings Group */}
-            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
-                🎯 {t('coupons.couponSettings.form.targetSettings')}
-              </Typography>
-              <TargetSettingsGroup
-                targetPlatforms={form.targetPlatforms || []}
-                targetPlatformsInverted={form.targetPlatformsInverted || false}
-                platforms={platforms}
-                onPlatformsChange={(platforms, inverted) => setForm((s: any) => ({ ...s, targetPlatforms: platforms, targetPlatformsInverted: inverted }))}
-                targetChannelSubchannels={form.targetChannelSubchannels || []}
-                targetChannelSubchannelsInverted={form.targetChannelSubchannelsInverted || false}
-                channels={channels}
-                onChannelsChange={(channels, inverted) => setForm((s: any) => ({ ...s, targetChannelSubchannels: channels, targetChannelSubchannelsInverted: inverted }))}
-                targetWorlds={form.targetWorlds || []}
-                targetWorldsInverted={form.targetWorldsInverted || false}
-                worlds={worlds}
-                onWorldsChange={(worlds, inverted) => setForm((s: any) => ({ ...s, targetWorlds: worlds, targetWorldsInverted: inverted }))}
-                targetUserIds={form.targetUserIds || ''}
-                targetUserIdsInverted={form.targetUserIdsInverted || false}
-                onUserIdsChange={(ids) => setForm((s: any) => ({ ...s, targetUserIds: ids }))}
-                onUserIdsInvertedChange={(inverted) => setForm((s: any) => ({ ...s, targetUserIdsInverted: inverted }))}
-                showUserIdFilter={true}
-              />
-
-            </Box>
+                  {form.expiresAt && (
+                    <Typography variant="body2" color="text.secondary">
+                      {(() => {
+                        const e = form.expiresAt as Dayjs;
+                        const endStr = e.format('YYYY-MM-DD HH:mm');
+                        if (form.startsAt) {
+                          const s = form.startsAt as Dayjs;
+                          const startStr = s.format('YYYY-MM-DD HH:mm');
+                          const days = Math.max(0, Math.ceil(e.diff(s, 'hour') / 24));
+                          return `${t('coupons.couponSettings.form.applicablePeriod')}: ${startStr} ~ ${endStr} (${days}${t('common.day')})`;
+                        } else {
+                          return `${t('coupons.couponSettings.form.applicablePeriod')}: ${t('coupons.couponSettings.form.immediatelyAvailable')} ~ ${endStr}`;
+                        }
+                      })()}
+                    </Typography>
+                  )}
+                </Stack>
+              </Collapse>
+            </Paper>
 
             {/* Rewards Group */}
-            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
-                🎁 {t('surveys.participationRewards')}
-              </Typography>
-              <Stack spacing={2}>
-                <Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-                    {t('surveys.participationRewardsHelp')}
-                  </Typography>
-                  <RewardSelector
-                    value={form.rewardData || []}
-                    onChange={(rewards) => setForm((s: any) => ({ ...s, rewardData: rewards }))}
-                    onModeChange={(mode, templateId) => {
-                      setRewardMode(mode);
-                      if (mode === 'template') {
-                        setForm((s: any) => ({ ...s, rewardTemplateId: templateId || null }));
-                      } else {
-                        setForm((s: any) => ({ ...s, rewardTemplateId: null }));
-                      }
-                    }}
-                    minQuantity={1}
-                    initialMode={rewardMode}
-                    initialTemplateId={form.rewardTemplateId || ''}
-                  />
-                </Box>
-              </Stack>
-            </Box>
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  mb: expandedGroups.rewards ? 1 : 0,
+                  cursor: 'pointer',
+                }}
+                onClick={() => setExpandedGroups(s => ({ ...s, rewards: !s.rewards }))}
+              >
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {t('surveys.participationRewards')}
+                </Typography>
+                <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                  {expandedGroups.rewards ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
+              </Box>
+              <Collapse in={expandedGroups.rewards}>
+                <Stack spacing={2} sx={{ mt: 1 }}>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                      {t('surveys.participationRewardsHelp')}
+                    </Typography>
+                    <RewardSelector
+                      value={form.rewardData || []}
+                      onChange={(rewards) => setForm((s: any) => ({ ...s, rewardData: rewards }))}
+                      onModeChange={(mode, templateId) => {
+                        setRewardMode(mode);
+                        if (mode === 'template') {
+                          setForm((s: any) => ({ ...s, rewardTemplateId: templateId || null }));
+                        } else {
+                          setForm((s: any) => ({ ...s, rewardTemplateId: null }));
+                        }
+                      }}
+                      minQuantity={1}
+                      initialMode={rewardMode}
+                      initialTemplateId={form.rewardTemplateId || ''}
+                    />
+                  </Box>
+                </Stack>
+              </Collapse>
+            </Paper>
 
             {/* Reward Email Group */}
-            <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
-                ✉️ {t('coupons.couponSettings.form.rewardEmail')}
-              </Typography>
-              <Stack spacing={2}>
-                <TextField
-                  required
-                  fullWidth
-                  label={t('coupons.couponSettings.form.rewardEmailTitle')}
-                  value={form.rewardEmailTitle || ''}
-                  onChange={(e) => setForm((s: any) => ({ ...s, rewardEmailTitle: e.target.value }))}
-                  placeholder={t('coupons.couponSettings.form.rewardEmailTitlePlaceholder')}
-                  helperText={t('coupons.couponSettings.form.rewardEmailTitleHelp')}
-                />
-                <TextField
-                  required
-                  fullWidth
-                  multiline
-                  rows={4}
-                  label={t('coupons.couponSettings.form.rewardEmailBody')}
-                  value={form.rewardEmailBody || ''}
-                  onChange={(e) => setForm((s: any) => ({ ...s, rewardEmailBody: e.target.value }))}
-                  placeholder={t('coupons.couponSettings.form.rewardEmailBodyPlaceholder')}
-                  helperText={t('coupons.couponSettings.form.rewardEmailBodyHelp')}
-                />
-              </Stack>
-            </Box>
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  mb: expandedGroups.rewardEmail ? 1 : 0,
+                  cursor: 'pointer',
+                }}
+                onClick={() => setExpandedGroups(s => ({ ...s, rewardEmail: !s.rewardEmail }))}
+              >
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {t('coupons.couponSettings.form.rewardEmail')}
+                </Typography>
+                <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                  {expandedGroups.rewardEmail ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
+              </Box>
+              <Collapse in={expandedGroups.rewardEmail}>
+                <Stack spacing={2} sx={{ mt: 1 }}>
+                  <TextField
+                    required
+                    fullWidth
+                    label={t('coupons.couponSettings.form.rewardEmailTitle')}
+                    value={form.rewardEmailTitle || ''}
+                    onChange={(e) => setForm((s: any) => ({ ...s, rewardEmailTitle: e.target.value }))}
+                    placeholder={t('coupons.couponSettings.form.rewardEmailTitlePlaceholder')}
+                    helperText={t('coupons.couponSettings.form.rewardEmailTitleHelp')}
+                  />
+                  <TextField
+                    required
+                    fullWidth
+                    multiline
+                    rows={4}
+                    label={t('coupons.couponSettings.form.rewardEmailBody')}
+                    value={form.rewardEmailBody || ''}
+                    onChange={(e) => setForm((s: any) => ({ ...s, rewardEmailBody: e.target.value }))}
+                    placeholder={t('coupons.couponSettings.form.rewardEmailBodyPlaceholder')}
+                    helperText={t('coupons.couponSettings.form.rewardEmailBodyHelp')}
+                  />
+                </Stack>
+              </Collapse>
+            </Paper>
           </Stack>
         </Box>
 
@@ -1853,8 +1959,8 @@ const CouponSettingsPage: React.FC = () => {
                               c.status === 'USED'
                                 ? t('coupons.issuedCodes.statusUsed')
                                 : c.status === 'REVOKED'
-                                ? t('coupons.issuedCodes.statusRevoked')
-                                : t('coupons.issuedCodes.statusIssued')
+                                  ? t('coupons.issuedCodes.statusRevoked')
+                                  : t('coupons.issuedCodes.statusIssued')
                             }
                           />
                         </TableCell>
@@ -1933,8 +2039,8 @@ const CouponSettingsPage: React.FC = () => {
           {exportSuccess
             ? t('coupons.couponSettings.exportDialog.completed')
             : exportError
-            ? t('coupons.couponSettings.exportDialog.failed')
-            : t('coupons.couponSettings.exportDialog.title')}
+              ? t('coupons.couponSettings.exportDialog.failed')
+              : t('coupons.couponSettings.exportDialog.title')}
         </DialogTitle>
         <DialogContent sx={{ py: 3 }}>
           {exportingCodes ? (

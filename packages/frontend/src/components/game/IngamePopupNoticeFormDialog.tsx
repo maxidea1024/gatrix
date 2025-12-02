@@ -311,43 +311,38 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
           </Box>
 
           {/* Target Settings Group */}
-          <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-              {t('common.targetSettings')}
-            </Typography>
-            <TargetSettingsGroup
-              targetPlatforms={targetPlatforms}
-              targetPlatformsInverted={targetPlatformsInverted}
-              platforms={platforms}
-              onPlatformsChange={(platforms, inverted) => {
-                setTargetPlatforms(platforms);
-                setTargetPlatformsInverted(inverted);
-              }}
-              targetChannelSubchannels={targetChannelSubchannels}
-              targetChannelSubchannelsInverted={targetChannelSubchannelsInverted}
-              channels={channels}
-              onChannelsChange={(channels, inverted) => {
-                setTargetChannelSubchannels(channels);
-                setTargetChannelSubchannelsInverted(inverted);
-              }}
-              targetWorlds={targetWorlds}
-              targetWorldsInverted={targetWorldsInverted}
-              worlds={worlds}
-              onWorldsChange={(worlds, inverted) => {
-                setTargetWorlds(worlds);
-                setTargetWorldsInverted(inverted);
-              }}
-              targetUserIds={targetUserIds}
-              targetUserIdsInverted={targetUserIdsInverted}
-              onUserIdsChange={(ids) => {
-                setTargetUserIds(ids);
-              }}
-              onUserIdsInvertedChange={(inverted) => {
-                setTargetUserIdsInverted(inverted);
-              }}
-              showUserIdFilter={true}
-            />
-          </Paper>
+          <TargetSettingsGroup
+            targetPlatforms={targetPlatforms}
+            targetPlatformsInverted={targetPlatformsInverted}
+            platforms={platforms}
+            onPlatformsChange={(platforms, inverted) => {
+              setTargetPlatforms(platforms);
+              setTargetPlatformsInverted(inverted);
+            }}
+            targetChannelSubchannels={targetChannelSubchannels}
+            targetChannelSubchannelsInverted={targetChannelSubchannelsInverted}
+            channels={channels}
+            onChannelsChange={(channels, inverted) => {
+              setTargetChannelSubchannels(channels);
+              setTargetChannelSubchannelsInverted(inverted);
+            }}
+            targetWorlds={targetWorlds}
+            targetWorldsInverted={targetWorldsInverted}
+            worlds={worlds}
+            onWorldsChange={(worlds, inverted) => {
+              setTargetWorlds(worlds);
+              setTargetWorldsInverted(inverted);
+            }}
+            targetUserIds={targetUserIds}
+            targetUserIdsInverted={targetUserIdsInverted}
+            onUserIdsChange={(ids) => {
+              setTargetUserIds(ids);
+            }}
+            onUserIdsInvertedChange={(inverted) => {
+              setTargetUserIdsInverted(inverted);
+            }}
+            showUserIdFilter={true}
+          />
 
 
 

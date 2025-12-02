@@ -1860,6 +1860,7 @@
     }
   },
   "common": {
+    "targetSettings": "타겟 설정",
     "action": "작업",
     "actions": "작업",
     "add": "추가",
@@ -3507,7 +3508,8 @@
         "targetWorldsHelp": "쿠폰이 적용될 게임월드를 선택합니다 (복수 선택 가능, 미선택 시 전체)",
         "targetUserIds": "대상 유저 ID 목록",
         "targetUserIdsHelp": "쿠폰을 사용할 수 있는 유저 ID를 입력합니다 (줄바꿈으로 구분, 미입력 시 전체)",
-        "targetUserIdsPlaceholder": "user123\\nuser456\\nuser789"
+        "targetUserIdsPlaceholder": "user123\\nuser456\\nuser789",
+        "statusHelp": "쿠폰 사용 가능 여부를 설정합니다. 비활성화 시 사용자가 쿠폰을 사용할 수 없습니다."
       },
       "allUsed": "모두사용",
       "expired": "만료",

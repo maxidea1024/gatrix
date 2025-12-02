@@ -43,7 +43,6 @@ export class PubSubService extends EventEmitter {
   private isConnected = false;
   private readonly QUEUE_NAME = 'cache-invalidation';
   private readonly SSE_QUEUE_NAME = 'sse-notifications';
-  private readonly SDK_EVENTS_QUEUE_NAME = 'gatrix-sdk-events';
 
   constructor() {
     super();

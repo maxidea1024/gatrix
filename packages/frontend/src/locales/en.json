@@ -1860,6 +1860,7 @@
     }
   },
   "common": {
+    "targetSettings": "Target Settings",
     "action": "Action",
     "actions": "Actions",
     "add": "Add",
@@ -3507,7 +3508,8 @@
         "targetWorldsHelp": "Select game worlds where the coupon applies (multiple selection available, all if not selected)",
         "targetUserIds": "Target User ID List",
         "targetUserIdsHelp": "Enter user IDs that can use the coupon (separated by line breaks, all if not entered)",
-        "targetUserIdsPlaceholder": "user123\\nuser456\\nuser789"
+        "targetUserIdsPlaceholder": "user123\\nuser456\\nuser789",
+        "statusHelp": "Set whether the coupon is usable. When disabled, users cannot use the coupon."
       },
       "allUsed": "All Used",
       "expired": "Expired",

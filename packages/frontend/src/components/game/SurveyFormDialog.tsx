@@ -77,6 +77,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   const [targetWorldsInverted, setTargetWorldsInverted] = useState(false);
 
   // Collapse states
+  const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
   const [triggerConditionsExpanded, setTriggerConditionsExpanded] = useState(true);
   const [participationMailExpanded, setParticipationMailExpanded] = useState(true);
   const [rewardsExpanded, setRewardsExpanded] = useState(true);
@@ -319,7 +320,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
 
       if (backendMessage) {
         if (backendMessage.includes('Platform survey ID already exists') ||
-            backendMessage.includes('already exists')) {
+          backendMessage.includes('already exists')) {
           errorMessage = t('surveys.platformSurveyIdExists');
         } else if (backendMessage.includes('At least one trigger condition is required')) {
           errorMessage = t('surveys.triggerConditionRequired');
@@ -394,46 +395,64 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
             </Typography>
           </Box>
 
-          <TextField
-            label={t('surveys.platformSurveyId')}
-            value={platformSurveyId}
-            onChange={(e) => setPlatformSurveyId(e.target.value)}
-            required
-            fullWidth
-            helperText={t('surveys.platformSurveyIdHelp')}
-          />
+          {/* Basic Information Group */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                mb: basicInfoExpanded ? 1 : 0,
+                cursor: 'pointer',
+              }}
+              onClick={() => setBasicInfoExpanded(!basicInfoExpanded)}
+            >
+              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                {t('common.basicInformation')}
+              </Typography>
+              <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                {basicInfoExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
+            </Box>
+            <Collapse in={basicInfoExpanded}>
+              <Stack spacing={2} sx={{ mt: 1 }}>
+                <TextField
+                  label={t('surveys.platformSurveyId')}
+                  value={platformSurveyId}
+                  onChange={(e) => setPlatformSurveyId(e.target.value)}
+                  required
+                  fullWidth
+                  helperText={t('surveys.platformSurveyIdHelp')}
+                />
+              </Stack>
+            </Collapse>
+          </Paper>
 
           {/* Targeting */}
-          {/* Target Settings Group */}
-          <Box sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
-              🎯 {t('surveys.targeting')}
-            </Typography>
-            <TargetSettingsGroup
-              targetPlatforms={targetPlatforms}
-              targetPlatformsInverted={targetPlatformsInverted}
-              platforms={platforms}
-              onPlatformsChange={(platforms, inverted) => {
-                setTargetPlatforms(platforms);
-                setTargetPlatformsInverted(inverted);
-              }}
-              targetChannelSubchannels={targetChannelSubchannels}
-              targetChannelSubchannelsInverted={targetChannelSubchannelsInverted}
-              channels={channels}
-              onChannelsChange={(channels, inverted) => {
-                setTargetChannelSubchannels(channels);
-                setTargetChannelSubchannelsInverted(inverted);
-              }}
-              targetWorlds={targetWorlds}
-              targetWorldsInverted={targetWorldsInverted}
-              worlds={worlds}
-              onWorldsChange={(worlds, inverted) => {
-                setTargetWorlds(worlds);
-                setTargetWorldsInverted(inverted);
-              }}
-              showUserIdFilter={false}
-            />
-          </Box>
+          <TargetSettingsGroup
+            targetPlatforms={targetPlatforms}
+            targetPlatformsInverted={targetPlatformsInverted}
+            platforms={platforms}
+            onPlatformsChange={(platforms, inverted) => {
+              setTargetPlatforms(platforms);
+              setTargetPlatformsInverted(inverted);
+            }}
+            targetChannelSubchannels={targetChannelSubchannels}
+            targetChannelSubchannelsInverted={targetChannelSubchannelsInverted}
+            channels={channels}
+            onChannelsChange={(channels, inverted) => {
+              setTargetChannelSubchannels(channels);
+              setTargetChannelSubchannelsInverted(inverted);
+            }}
+            targetWorlds={targetWorlds}
+            targetWorldsInverted={targetWorldsInverted}
+            worlds={worlds}
+            onWorldsChange={(worlds, inverted) => {
+              setTargetWorlds(worlds);
+              setTargetWorldsInverted(inverted);
+            }}
+            showUserIdFilter={false}
+          />
 
           {/* Trigger Conditions */}
           <Paper variant="outlined" sx={{ p: 2 }}>
@@ -609,55 +628,55 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                 {t('surveys.rewardsHelp')}
               </Typography>
               <Stack spacing={2}>
-              {/* Reward Mail */}
-              <Box>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('surveys.rewardMailTitle')}</Typography>
-                <TextField
-                  value={rewardMailTitle}
-                  onChange={(e) => setRewardMailTitle(e.target.value)}
-                  fullWidth
-                  size="small"
-                  helperText={t('surveys.rewardMailTitleHelp')}
-                />
-              </Box>
+                {/* Reward Mail */}
+                <Box>
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('surveys.rewardMailTitle')}</Typography>
+                  <TextField
+                    value={rewardMailTitle}
+                    onChange={(e) => setRewardMailTitle(e.target.value)}
+                    fullWidth
+                    size="small"
+                    helperText={t('surveys.rewardMailTitleHelp')}
+                  />
+                </Box>
 
-              <Box>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('surveys.rewardMailContent')}</Typography>
-                <TextField
-                  value={rewardMailContent}
-                  onChange={(e) => setRewardMailContent(e.target.value)}
-                  multiline
-                  rows={3}
-                  fullWidth
-                  size="small"
-                  helperText={t('surveys.rewardMailContentHelp')}
-                />
-              </Box>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('surveys.rewardMailContent')}</Typography>
+                  <TextField
+                    value={rewardMailContent}
+                    onChange={(e) => setRewardMailContent(e.target.value)}
+                    multiline
+                    rows={3}
+                    fullWidth
+                    size="small"
+                    helperText={t('surveys.rewardMailContentHelp')}
+                  />
+                </Box>
 
-              {/* Participation Rewards */}
-              <Box>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                  {t('surveys.participationRewards')}
-                </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-                  {t('surveys.participationRewardsHelp')}
-                </Typography>
-                <RewardSelector
-                  value={participationRewards}
-                  onChange={setParticipationRewards}
-                  onModeChange={(mode, templateId) => {
-                    setRewardMode(mode);
-                    if (mode === 'template') {
-                      setRewardTemplateId(templateId || null);
-                    } else {
-                      setRewardTemplateId(null);
-                    }
-                  }}
-                  minQuantity={1}
-                  initialMode={rewardMode}
-                  initialTemplateId={rewardTemplateId || ''}
-                />
-              </Box>
+                {/* Participation Rewards */}
+                <Box>
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                    {t('surveys.participationRewards')}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                    {t('surveys.participationRewardsHelp')}
+                  </Typography>
+                  <RewardSelector
+                    value={participationRewards}
+                    onChange={setParticipationRewards}
+                    onModeChange={(mode, templateId) => {
+                      setRewardMode(mode);
+                      if (mode === 'template') {
+                        setRewardTemplateId(templateId || null);
+                      } else {
+                        setRewardTemplateId(null);
+                      }
+                    }}
+                    minQuantity={1}
+                    initialMode={rewardMode}
+                    initialTemplateId={rewardTemplateId || ''}
+                  />
+                </Box>
               </Stack>
             </Collapse>
           </Paper>
