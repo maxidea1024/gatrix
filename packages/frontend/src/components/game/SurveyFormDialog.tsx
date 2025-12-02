@@ -598,6 +598,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                   multiline
                   rows={3}
                   fullWidth
+                  required
                   helperText={t('surveys.surveyContentHelp')}
                 />
               </Stack>
@@ -629,29 +630,27 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
               </Typography>
               <Stack spacing={2}>
                 {/* Reward Mail */}
-                <Box>
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('surveys.rewardMailTitle')}</Typography>
-                  <TextField
-                    value={rewardMailTitle}
-                    onChange={(e) => setRewardMailTitle(e.target.value)}
-                    fullWidth
-                    size="small"
-                    helperText={t('surveys.rewardMailTitleHelp')}
-                  />
-                </Box>
+                <TextField
+                  label={t('surveys.rewardMailTitle')}
+                  value={rewardMailTitle}
+                  onChange={(e) => setRewardMailTitle(e.target.value)}
+                  fullWidth
+                  size="small"
+                  required
+                  helperText={t('surveys.rewardMailTitleHelp')}
+                />
 
-                <Box>
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('surveys.rewardMailContent')}</Typography>
-                  <TextField
-                    value={rewardMailContent}
-                    onChange={(e) => setRewardMailContent(e.target.value)}
-                    multiline
-                    rows={3}
-                    fullWidth
-                    size="small"
-                    helperText={t('surveys.rewardMailContentHelp')}
-                  />
-                </Box>
+                <TextField
+                  label={t('surveys.rewardMailContent')}
+                  value={rewardMailContent}
+                  onChange={(e) => setRewardMailContent(e.target.value)}
+                  multiline
+                  rows={3}
+                  fullWidth
+                  size="small"
+                  required
+                  helperText={t('surveys.rewardMailContentHelp')}
+                />
 
                 {/* Participation Rewards */}
                 <Box>
