@@ -400,6 +400,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                 rows={2}
                 size="small"
               />
+              <Divider />
               {/* Size row: Preset + (Custom fields if selected) */}
               <Grid container spacing={2}>
                 <Grid item xs={sizePreset === 'custom' ? 4 : 6}>
@@ -600,7 +601,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
               {t('banners.previewTitle')}
             </Typography>
           </AccordionSummary>
-          <AccordionDetails sx={{ p: 2 }}>
+          <AccordionDetails sx={{ p: 3 }}>
             <BannerPreview
               width={width}
               height={height}

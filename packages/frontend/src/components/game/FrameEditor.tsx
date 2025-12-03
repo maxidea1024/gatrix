@@ -73,11 +73,18 @@ interface FrameEditorProps {
 }
 
 // Auto-detect frame type from URL extension
-const detectFrameType = (url: string): FrameType => {
-  // Return default 'png' only if URL is empty (for new frames)
+const detectFrameType = (url: string): FrameType | null => {
+  // Return null if URL is empty or not a valid URL format
   if (!url || !url.trim()) {
-    return 'png';
+    return null;
   }
+
+  // Check if it looks like a valid URL (starts with http://, https://, or //)
+  const trimmedUrl = url.trim().toLowerCase();
+  if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://') && !trimmedUrl.startsWith('//')) {
+    return null;
+  }
+
   const ext = url.split('?')[0].split('.').pop()?.toLowerCase();
   switch (ext) {
     case 'jpg':
@@ -91,7 +98,7 @@ const detectFrameType = (url: string): FrameType => {
     case 'webm':
       return 'mp4';
     default:
-      return 'png';
+      return null;
   }
 };
 
@@ -176,7 +183,8 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
     setImageError(false);
     setImageInfo(null); // Reset image info when URL changes
     const detectedType = detectFrameType(imageUrl);
-    onUpdate({ ...frame, imageUrl, type: detectedType });
+    // Only set type if detected, otherwise keep previous type or use 'png' as fallback for valid URLs
+    onUpdate({ ...frame, imageUrl, type: detectedType || frame.type || 'png' });
   };
 
   // Handle image load to get dimensions
@@ -469,7 +477,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 fullWidth
                 size="small"
                 placeholder="https://cdn.example.com/image.png"
-                helperText={frame.imageUrl && frame.type ? `${t('banners.detectedType')}: ${frame.type.toUpperCase()}` : ''}
+                helperText={frame.imageUrl && detectFrameType(frame.imageUrl) ? `${t('banners.detectedType')}: ${frame.type?.toUpperCase()}` : ''}
               />
 
                 {/* Basic Settings */}

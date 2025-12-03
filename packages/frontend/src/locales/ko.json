@@ -4029,7 +4029,7 @@
   "banners": {
     "title": "배너 관리",
     "subtitle": "시퀀스와 프레임으로 인게임 배너를 생성하고 관리합니다",
-    "createBanner": "배너 생성",
+    "createBanner": "배너 추가",
     "editBanner": "배너 수정",
     "name": "이름",
     "description": "설명",

@@ -3993,7 +3993,7 @@
   "banners": {
     "title": "横幅管理",
     "subtitle": "使用序列和帧创建和管理游戏内横幅",
-    "createBanner": "创建横幅",
+    "createBanner": "添加横幅",
     "editBanner": "编辑横幅",
     "name": "名称",
     "description": "描述",

@@ -242,8 +242,9 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
   };
 
   // Calculate preview dimensions - fit to container while maintaining aspect ratio
-  const aspectRatio = width / height;
-  const availableWidth = containerWidth > 0 ? containerWidth - 32 : 400; // 32px for padding
+  // Subtract 16px (8px margin on each side) so image doesn't touch the container border
+  const imageMargin = 16;
+  const availableWidth = containerWidth > 0 ? containerWidth - imageMargin : 400;
   const scale = Math.min(1, availableWidth / width); // Don't scale up, only down
   const previewWidth = width * scale;
   const previewHeight = height * scale;
@@ -404,8 +405,9 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
     return (
       <Box
         sx={{
-          width: previewWidth,
-          height: previewHeight,
+          width: '100%',
+          height: '100%',
+          minHeight: 150,
           bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.800' : 'grey.200',
           display: 'flex',
           flexDirection: 'column',
@@ -431,7 +433,8 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
       sx={{
         bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100',
         borderRadius: 2,
-        p: 2,
+        py: 2,
+        px: 3,
         border: 1,
         borderColor: (theme) => theme.palette.mode === 'dark' ? 'grey.700' : 'grey.300',
         display: 'flex',
@@ -453,8 +456,8 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
         sx={{
           width: previewWidth,
           height: previewHeight,
+          m: 1,
           bgcolor: '#1a1a1a',
-          borderRadius: 1,
           overflow: 'hidden',
           position: 'relative',
           cursor: currentFrame?.clickUrl ? 'pointer' : 'default',

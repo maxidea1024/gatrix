@@ -4027,7 +4027,7 @@
   "banners": {
     "title": "Banner Management",
     "subtitle": "Create and manage in-game banners with sequences and frames",
-    "createBanner": "Create Banner",
+    "createBanner": "Add Banner",
     "editBanner": "Edit Banner",
     "name": "Name",
     "description": "Description",
