@@ -4171,5 +4171,59 @@
     "total": "총",
     "gridView": "그리드 보기",
     "timelineView": "타임라인 보기"
+  },
+  "environments": {
+    "title": "환경 관리",
+    "subtitle": "다중 환경(개발, QA, 프로덕션)을 관리합니다",
+    "currentEnvironment": "현재 환경",
+    "selectEnvironment": "환경 선택",
+    "switchEnvironment": "환경 전환",
+    "environmentSwitched": "환경이 전환되었습니다",
+    "name": "환경 이름",
+    "displayName": "표시 이름",
+    "description": "설명",
+    "type": "환경 타입",
+    "color": "색상",
+    "displayOrder": "표시 순서",
+    "isDefault": "기본 환경",
+    "isSystemDefined": "시스템 정의",
+    "requiresApproval": "승인 필요",
+    "requiredApprovers": "필요 승인자 수",
+    "types": {
+      "development": "개발",
+      "staging": "스테이징",
+      "production": "프로덕션"
+    },
+    "predefined": {
+      "development": "개발",
+      "qa": "QA",
+      "production": "프로덕션"
+    },
+    "create": "환경 생성",
+    "edit": "환경 편집",
+    "delete": "환경 삭제",
+    "deleteConfirm": "정말로 이 환경을 삭제하시겠습니까?",
+    "cannotDeleteSystemDefined": "시스템 정의 환경은 삭제할 수 없습니다",
+    "cannotDeleteDefault": "기본 환경은 삭제할 수 없습니다",
+    "cannotDeleteWithData": "데이터가 있는 환경은 삭제할 수 없습니다",
+    "copyData": "데이터 복사",
+    "copyDataDescription": "한 환경의 데이터를 다른 환경으로 복사합니다",
+    "sourceEnvironment": "원본 환경",
+    "targetEnvironment": "대상 환경",
+    "copyOptions": "복사 옵션",
+    "copyInProgress": "데이터 복사 중입니다...",
+    "copyCompleted": "데이터 복사가 완료되었습니다",
+    "copyFailed": "데이터 복사에 실패했습니다"
+  },
+  "projects": {
+    "title": "프로젝트",
+    "name": "프로젝트 이름",
+    "displayName": "표시 이름",
+    "description": "설명",
+    "isDefault": "기본 프로젝트",
+    "isActive": "활성화",
+    "create": "프로젝트 생성",
+    "edit": "프로젝트 편집",
+    "delete": "프로젝트 삭제"
   }
 }

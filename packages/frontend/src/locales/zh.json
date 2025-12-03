@@ -4134,5 +4134,59 @@
     "total": "总计",
     "gridView": "网格视图",
     "timelineView": "时间轴视图"
+  },
+  "environments": {
+    "title": "环境管理",
+    "subtitle": "管理多个环境（开发、QA、生产）",
+    "currentEnvironment": "当前环境",
+    "selectEnvironment": "选择环境",
+    "switchEnvironment": "切换环境",
+    "environmentSwitched": "环境已切换",
+    "name": "环境名称",
+    "displayName": "显示名称",
+    "description": "描述",
+    "type": "环境类型",
+    "color": "颜色",
+    "displayOrder": "显示顺序",
+    "isDefault": "默认环境",
+    "isSystemDefined": "系统定义",
+    "requiresApproval": "需要审批",
+    "requiredApprovers": "所需审批人数",
+    "types": {
+      "development": "开发",
+      "staging": "预发布",
+      "production": "生产"
+    },
+    "predefined": {
+      "development": "开发",
+      "qa": "QA",
+      "production": "生产"
+    },
+    "create": "创建环境",
+    "edit": "编辑环境",
+    "delete": "删除环境",
+    "deleteConfirm": "确定要删除此环境吗？",
+    "cannotDeleteSystemDefined": "无法删除系统定义的环境",
+    "cannotDeleteDefault": "无法删除默认环境",
+    "cannotDeleteWithData": "无法删除包含数据的环境",
+    "copyData": "复制数据",
+    "copyDataDescription": "将一个环境的数据复制到另一个环境",
+    "sourceEnvironment": "源环境",
+    "targetEnvironment": "目标环境",
+    "copyOptions": "复制选项",
+    "copyInProgress": "正在复制数据...",
+    "copyCompleted": "数据复制成功",
+    "copyFailed": "数据复制失败"
+  },
+  "projects": {
+    "title": "项目",
+    "name": "项目名称",
+    "displayName": "显示名称",
+    "description": "描述",
+    "isDefault": "默认项目",
+    "isActive": "已激活",
+    "create": "创建项目",
+    "edit": "编辑项目",
+    "delete": "删除项目"
   }
 }

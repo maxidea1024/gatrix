@@ -4169,5 +4169,59 @@
     "total": "total",
     "gridView": "Grid View",
     "timelineView": "Timeline View"
+  },
+  "environments": {
+    "title": "Environment Management",
+    "subtitle": "Manage multiple environments (development, QA, production)",
+    "currentEnvironment": "Current Environment",
+    "selectEnvironment": "Select Environment",
+    "switchEnvironment": "Switch Environment",
+    "environmentSwitched": "Environment has been switched",
+    "name": "Environment Name",
+    "displayName": "Display Name",
+    "description": "Description",
+    "type": "Environment Type",
+    "color": "Color",
+    "displayOrder": "Display Order",
+    "isDefault": "Default Environment",
+    "isSystemDefined": "System Defined",
+    "requiresApproval": "Requires Approval",
+    "requiredApprovers": "Required Approvers",
+    "types": {
+      "development": "Development",
+      "staging": "Staging",
+      "production": "Production"
+    },
+    "predefined": {
+      "development": "Development",
+      "qa": "QA",
+      "production": "Production"
+    },
+    "create": "Create Environment",
+    "edit": "Edit Environment",
+    "delete": "Delete Environment",
+    "deleteConfirm": "Are you sure you want to delete this environment?",
+    "cannotDeleteSystemDefined": "Cannot delete system-defined environment",
+    "cannotDeleteDefault": "Cannot delete default environment",
+    "cannotDeleteWithData": "Cannot delete environment with existing data",
+    "copyData": "Copy Data",
+    "copyDataDescription": "Copy data from one environment to another",
+    "sourceEnvironment": "Source Environment",
+    "targetEnvironment": "Target Environment",
+    "copyOptions": "Copy Options",
+    "copyInProgress": "Copying data...",
+    "copyCompleted": "Data copy completed successfully",
+    "copyFailed": "Failed to copy data"
+  },
+  "projects": {
+    "title": "Projects",
+    "name": "Project Name",
+    "displayName": "Display Name",
+    "description": "Description",
+    "isDefault": "Default Project",
+    "isActive": "Active",
+    "create": "Create Project",
+    "edit": "Edit Project",
+    "delete": "Delete Project"
   }
 }

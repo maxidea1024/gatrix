@@ -1,11 +1,23 @@
 import { Model } from 'objection';
 import { User } from './User';
 
+// Environment type classification
+export type EnvironmentType = 'development' | 'staging' | 'production';
+
+// System-defined environment names that cannot be deleted or modified
+export const SYSTEM_DEFINED_ENVIRONMENTS = ['development', 'qa', 'production'] as const;
+export type SystemDefinedEnvironment = typeof SYSTEM_DEFINED_ENVIRONMENTS[number];
+
 export interface RemoteConfigEnvironmentData {
   id?: number;
   environmentName: string;
   displayName: string;
   description?: string;
+  environmentType: EnvironmentType;
+  isSystemDefined: boolean;
+  displayOrder: number;
+  color: string;
+  projectId?: number;
   isDefault: boolean;
   requiresApproval: boolean;
   requiredApprovers: number;
@@ -22,6 +34,11 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
   environmentName!: string;
   displayName!: string;
   description?: string;
+  environmentType!: EnvironmentType;
+  isSystemDefined!: boolean;
+  displayOrder!: number;
+  color!: string;
+  projectId?: number;
   isDefault!: boolean;
   requiresApproval!: boolean;
   requiredApprovers!: number;
@@ -33,6 +50,7 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
   // Relations
   creator?: User;
   updater?: User;
+  project?: any; // Will be typed after Project model is created
 
   static get jsonSchema() {
     return {
@@ -40,14 +58,19 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
       required: ['environmentName', 'displayName', 'createdBy'],
       properties: {
         id: { type: 'integer' },
-        environmentName: { 
-          type: 'string', 
-          minLength: 1, 
+        environmentName: {
+          type: 'string',
+          minLength: 1,
           maxLength: 100,
           pattern: '^[a-z0-9_-]+$' // Only lowercase, numbers, underscore, hyphen
         },
         displayName: { type: 'string', minLength: 1, maxLength: 200 },
         description: { type: ['string', 'null'], maxLength: 1000 },
+        environmentType: { type: 'string', enum: ['development', 'staging', 'production'] },
+        isSystemDefined: { type: 'boolean' },
+        displayOrder: { type: 'integer', minimum: 0 },
+        color: { type: 'string', maxLength: 7, pattern: '^#[0-9A-Fa-f]{6}$' },
+        projectId: { type: ['integer', 'null'] },
         isDefault: { type: 'boolean' },
         requiresApproval: { type: 'boolean' },
         requiredApprovers: { type: 'integer', minimum: 1, maximum: 10 },
@@ -60,6 +83,7 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
   }
 
   static get relationMappings() {
+    const { Project } = require('./Project');
     return {
       creator: {
         relation: Model.BelongsToOneRelation,
@@ -75,6 +99,14 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
         join: {
           from: 'g_remote_config_environments.updatedBy',
           to: 'g_users.id'
+        }
+      },
+      project: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Project,
+        join: {
+          from: 'g_remote_config_environments.projectId',
+          to: 'g_projects.id'
         }
       }
     };
@@ -104,10 +136,26 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
   }
 
   /**
-   * Get all active environments
+   * Get all active environments ordered by displayOrder
    */
   static async getAll(): Promise<RemoteConfigEnvironment[]> {
-    return await this.query().orderBy('isDefault', 'desc').orderBy('environmentName');
+    return await this.query().orderBy('displayOrder', 'asc').orderBy('environmentName');
+  }
+
+  /**
+   * Get all environments by project
+   */
+  static async getByProject(projectId: number): Promise<RemoteConfigEnvironment[]> {
+    return await this.query()
+      .where('projectId', projectId)
+      .orderBy('displayOrder', 'asc');
+  }
+
+  /**
+   * Check if environment is system-defined
+   */
+  isSystemEnvironment(): boolean {
+    return this.isSystemDefined;
   }
 
   /**
@@ -171,9 +219,14 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
   }
 
   /**
-   * Delete environment (only if no templates exist)
+   * Delete environment (only if no templates exist and not system-defined)
    */
   async deleteEnvironment(): Promise<void> {
+    // Cannot delete system-defined environments
+    if (this.isSystemDefined) {
+      throw new Error('Cannot delete system-defined environment');
+    }
+
     // Check if environment has templates
     const { RemoteConfigTemplate } = require('./RemoteConfigTemplate');
     const templateCount = await RemoteConfigTemplate.query()

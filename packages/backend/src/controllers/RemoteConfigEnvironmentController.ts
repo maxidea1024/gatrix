@@ -64,7 +64,17 @@ export class RemoteConfigEnvironmentController {
    * Create new environment
    */
   static createEnvironment = asyncHandler(async (req: Request, res: Response) => {
-    const { environmentName, displayName, description, requiresApproval, requiredApprovers } = req.body;
+    const {
+      environmentName,
+      displayName,
+      description,
+      environmentType,
+      color,
+      displayOrder,
+      projectId,
+      requiresApproval,
+      requiredApprovers
+    } = req.body;
     const userId = (req.user as any)?.userId;
 
     if (!userId) {
@@ -79,6 +89,11 @@ export class RemoteConfigEnvironmentController {
         environmentName,
         displayName,
         description,
+        environmentType: environmentType || 'development',
+        isSystemDefined: false, // User-created environments are never system-defined
+        displayOrder: displayOrder || 99,
+        color: color || '#607D8B',
+        projectId: projectId || undefined,
         isDefault: false,
         requiresApproval: requiresApproval || false,
         requiredApprovers: requiredApprovers || 1,
