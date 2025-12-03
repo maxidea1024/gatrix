@@ -38,6 +38,10 @@ import {
   ArrowBack as InsertBeforeIcon,
   ArrowForward as InsertAfterIcon,
   SwapHoriz as ReplaceIcon,
+  KeyboardArrowUp as MovePrevIcon,
+  KeyboardArrowDown as MoveNextIcon,
+  Add as AddIcon,
+  AddCircleOutline as AddMultipleIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { Frame, FrameType, FrameActionType, FrameEffectType, TransitionType } from '../../services/bannerService';
@@ -58,11 +62,22 @@ interface FrameEditorProps {
   onPasteReplace: () => void;
   onMoveFirst: () => void;
   onMoveLast: () => void;
+  onMovePrev: () => void;
+  onMoveNext: () => void;
+  onAddEmptyBefore: () => void;
+  onAddEmptyAfter: () => void;
+  onAddMultipleEmptyBefore: (count: number) => void;
+  onAddMultipleEmptyAfter: (count: number) => void;
   hasClipboard: boolean;
+  timelineWidth?: number; // Optional width for timeline view mode
 }
 
 // Auto-detect frame type from URL extension
 const detectFrameType = (url: string): FrameType => {
+  // Return default 'png' only if URL is empty (for new frames)
+  if (!url || !url.trim()) {
+    return 'png';
+  }
   const ext = url.split('?')[0].split('.').pop()?.toLowerCase();
   switch (ext) {
     case 'jpg':
@@ -110,8 +125,19 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
   onPasteReplace,
   onMoveFirst,
   onMoveLast,
+  onMovePrev,
+  onMoveNext,
+  onAddEmptyBefore,
+  onAddEmptyAfter,
+  onAddMultipleEmptyBefore,
+  onAddMultipleEmptyAfter,
   hasClipboard,
+  timelineWidth,
 }) => {
+  // Timeline mode: use timelineWidth for both width and height (square)
+  const isTimelineMode = !!timelineWidth;
+  const frameSize = isTimelineMode ? timelineWidth : 100;
+  const [emptyFrameCountDialogOpen, setEmptyFrameCountDialogOpen] = useState<'before' | 'after' | null>(null);
   const { t } = useTranslation();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -312,8 +338,8 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           onDoubleClick={handleDoubleClick}
           onContextMenu={handleContextMenu}
           sx={{
-            width: 100,
-            height: 100,
+            width: frameSize,
+            height: isTimelineMode ? 60 : frameSize, // Timeline mode: shorter height
             position: 'relative',
             overflow: 'hidden',
             borderRadius: 1,
@@ -322,6 +348,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
             cursor: 'grab',
             bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
             transition: 'all 0.2s',
+            flexShrink: 0, // Prevent shrinking in timeline mode
             '&:hover': {
               borderColor: 'primary.light',
               '& .frame-overlay': { opacity: 1 },
@@ -426,20 +453,18 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 fullWidth
                 size="small"
                 placeholder="https://cdn.example.com/image.png"
-                helperText={frame.type ? `${t('banners.detectedType')}: ${frame.type.toUpperCase()}` : ''}
+                helperText={frame.imageUrl && frame.type ? `${t('banners.detectedType')}: ${frame.type.toUpperCase()}` : ''}
               />
 
                 {/* Basic Settings */}
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <TextField
                     label={t('banners.frameTime')}
-                    type="number"
                     value={localDelaySeconds}
                     onChange={(e) => handleDelaySecondsChange(e.target.value)}
                     size="small"
                     sx={{ flex: 1 }}
                     InputProps={{
-                      inputProps: { min: 0, step: 0.1 },
                       endAdornment: <InputAdornment position="end">s</InputAdornment>,
                     }}
                   />
@@ -524,13 +549,11 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                   </FormControl>
                   <TextField
                     label={t('banners.transitionDuration')}
-                    type="number"
                     defaultValue={((frame.transition?.duration || 300) / 1000).toFixed(2)}
                     onChange={(e) => handleTransitionDurationChange(e.target.value)}
                     size="small"
                     sx={{ flex: 1 }}
                     InputProps={{
-                      inputProps: { min: 0, step: 0.05 },
                       endAdornment: <InputAdornment position="end">s</InputAdornment>,
                     }}
                   />
@@ -644,7 +667,35 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
 
         <Divider />
 
+        {/* Add Empty Frames */}
+        <MenuItem onClick={() => handleMenuAction(onAddEmptyBefore)}>
+          <ListItemIcon><AddIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('banners.contextMenu.addEmptyBefore')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { handleCloseContextMenu(); setEmptyFrameCountDialogOpen('before'); }}>
+          <ListItemIcon><AddMultipleIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('banners.contextMenu.addMultipleEmptyBefore')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => handleMenuAction(onAddEmptyAfter)}>
+          <ListItemIcon><AddIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('banners.contextMenu.addEmptyAfter')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { handleCloseContextMenu(); setEmptyFrameCountDialogOpen('after'); }}>
+          <ListItemIcon><AddMultipleIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('banners.contextMenu.addMultipleEmptyAfter')}</ListItemText>
+        </MenuItem>
+
+        <Divider />
+
         {/* Move */}
+        <MenuItem onClick={() => handleMenuAction(onMovePrev)} disabled={frameIndex === 0}>
+          <ListItemIcon><MovePrevIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('banners.contextMenu.movePrev')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => handleMenuAction(onMoveNext)} disabled={frameIndex === totalFrames - 1}>
+          <ListItemIcon><MoveNextIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('banners.contextMenu.moveNext')}</ListItemText>
+        </MenuItem>
         <MenuItem onClick={() => handleMenuAction(onMoveFirst)} disabled={frameIndex === 0}>
           <ListItemIcon><MoveFirstIcon fontSize="small" /></ListItemIcon>
           <ListItemText>{t('banners.contextMenu.moveFirst')}</ListItemText>
@@ -662,6 +713,49 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
           <ListItemText>{t('banners.contextMenu.delete')}</ListItemText>
         </MenuItem>
       </Menu>
+
+      {/* Empty Frame Count Dialog */}
+      <Dialog
+        open={emptyFrameCountDialogOpen !== null}
+        onClose={() => setEmptyFrameCountDialogOpen(null)}
+        maxWidth="xs"
+      >
+        <DialogTitle>
+          {emptyFrameCountDialogOpen === 'before'
+            ? t('banners.contextMenu.addMultipleEmptyBefore')
+            : t('banners.contextMenu.addMultipleEmptyAfter')}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            label={t('banners.emptyFrameCount')}
+            defaultValue={5}
+            fullWidth
+            sx={{ mt: 1 }}
+            id="empty-frame-count"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEmptyFrameCountDialogOpen(null)}>{t('common.cancel')}</Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              const input = document.getElementById('empty-frame-count') as HTMLInputElement;
+              const count = parseInt(input?.value || '5', 10);
+              if (count > 0 && count <= 100) {
+                if (emptyFrameCountDialogOpen === 'before') {
+                  onAddMultipleEmptyBefore(count);
+                } else {
+                  onAddMultipleEmptyAfter(count);
+                }
+              }
+              setEmptyFrameCountDialogOpen(null);
+            }}
+          >
+            {t('common.add')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

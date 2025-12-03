@@ -46,7 +46,17 @@ export interface GetBannersResponse {
   limit: number;
 }
 
+// Regex for valid identifier: lowercase letters, numbers, underscore, hyphen (must start with letter)
+const BANNER_NAME_REGEX = /^[a-z][a-z0-9_-]*$/;
+
 class BannerService {
+  /**
+   * Validate banner name format (identifier style)
+   */
+  static isValidBannerName(name: string): boolean {
+    return BANNER_NAME_REGEX.test(name);
+  }
+
   /**
    * Get all banners with pagination
    */
@@ -102,6 +112,17 @@ class BannerService {
    * Create a new banner
    */
   static async createBanner(input: CreateBannerInput): Promise<BannerAttributes> {
+    // Validate name format (identifier style)
+    if (!this.isValidBannerName(input.name)) {
+      throw new GatrixError('Banner name must be a valid identifier (lowercase letters, numbers, underscore, hyphen, starting with a letter)', 400, 'INVALID_NAME_FORMAT');
+    }
+
+    // Check for duplicate name
+    const existing = await BannerModel.findByName(input.name);
+    if (existing) {
+      throw new GatrixError('A banner with this name already exists', 409, 'DUPLICATE_NAME');
+    }
+
     try {
       const bannerId = ulid();
 
@@ -131,6 +152,18 @@ class BannerService {
    * Update a banner
    */
   static async updateBanner(bannerId: string, input: UpdateBannerInput): Promise<BannerAttributes> {
+    // If name is being updated, validate format and check for duplicates
+    if (input.name) {
+      if (!this.isValidBannerName(input.name)) {
+        throw new GatrixError('Banner name must be a valid identifier (lowercase letters, numbers, underscore, hyphen, starting with a letter)', 400, 'INVALID_NAME_FORMAT');
+      }
+
+      const existing = await BannerModel.findByName(input.name, bannerId);
+      if (existing) {
+        throw new GatrixError('A banner with this name already exists', 409, 'DUPLICATE_NAME');
+      }
+    }
+
     try {
       // Check if banner exists
       await this.getBannerById(bannerId);

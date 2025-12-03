@@ -142,13 +142,34 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
   const [prevFrameIndex, setPrevFrameIndex] = useState<number | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isEnterEffectActive, setIsEnterEffectActive] = useState(false); // For enter effect animation
   const [playDirection, setPlayDirection] = useState<1 | -1>(1); // 1 = forward, -1 = backward (for pingpong)
   const [currentTime, setCurrentTime] = useState(0);
   const [selectedSequenceIndex, setSelectedSequenceIndex] = useState<number | 'all'>('all');
   const [isHovering, setIsHovering] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const enterEffectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  // Observe container width for responsive scaling
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+    // Initial measurement
+    setContainerWidth(containerRef.current.offsetWidth);
+
+    return () => resizeObserver.disconnect();
+  }, []);
 
   // Get frames based on selected sequence (or all sequences)
   const allFrames = useMemo(() => {
@@ -182,36 +203,48 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
   const currentFrame = allFrames.length > 0 ? allFrames[currentFrameIndex] : null;
   const previousFrame = prevFrameIndex !== null && allFrames.length > 0 ? allFrames[prevFrameIndex] : null;
 
-  // Get animation style for a frame
-  const getAnimationStyle = (frame: ExtendedFrame, isEntering: boolean) => {
-    const effectType = isEntering ? frame.effects?.enter : frame.effects?.exit;
-    const effectDuration = frame.effects?.duration || 300;
+  // Get transition animation style (for frame transitions like fade, crossfade, slide)
+  const getTransitionStyle = (frame: ExtendedFrame) => {
     const transitionType = frame.transition?.type;
     const transitionDuration = frame.transition?.duration || 300;
 
-    // Determine which animation to use
-    let animation: ReturnType<typeof keyframes> | null = null;
-    let duration = effectDuration;
-
-    if (isEntering && transitionType && transitionType !== 'none') {
-      animation = transitionAnimations[transitionType];
-      duration = transitionDuration;
-    } else if (effectType && effectType !== 'none') {
-      animation = effectAnimations[effectType];
+    if (!transitionType || transitionType === 'none') {
+      return {};
     }
 
+    const animation = transitionAnimations[transitionType];
     if (!animation) {
       return {};
     }
 
     return {
-      animation: `${animation} ${duration}ms ease-in-out`,
+      animation: `${animation} ${transitionDuration}ms ease-in-out`,
     };
   };
 
-  // Calculate preview dimensions (max 400px width, maintain aspect ratio)
-  const maxPreviewWidth = 400;
-  const scale = Math.min(1, maxPreviewWidth / width);
+  // Get enter effect animation style (for frame effects like slideLeft, zoomIn, etc.)
+  const getEnterEffectStyle = (frame: ExtendedFrame) => {
+    const effectType = frame.effects?.enter;
+    const effectDuration = frame.effects?.duration || 300;
+
+    if (!effectType || effectType === 'none') {
+      return {};
+    }
+
+    const animation = effectAnimations[effectType];
+    if (!animation) {
+      return {};
+    }
+
+    return {
+      animation: `${animation} ${effectDuration}ms ease-in-out`,
+    };
+  };
+
+  // Calculate preview dimensions - fit to container while maintaining aspect ratio
+  const aspectRatio = width / height;
+  const availableWidth = containerWidth > 0 ? containerWidth - 32 : 400; // 32px for padding
+  const scale = Math.min(1, availableWidth / width); // Don't scale up, only down
   const previewWidth = width * scale;
   const previewHeight = height * scale;
 
@@ -219,11 +252,26 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
   const changeFrame = (newIndex: number) => {
     const newFrame = allFrames[newIndex];
     const transitionDuration = newFrame?.transition?.duration || 300;
+    const effectDuration = newFrame?.effects?.duration || 300;
+    const hasEnterEffect = newFrame?.effects?.enter && newFrame.effects.enter !== 'none';
 
     // Start transition
     setPrevFrameIndex(currentFrameIndex);
     setIsTransitioning(true);
     setCurrentFrameIndex(newIndex);
+
+    // Activate enter effect
+    if (hasEnterEffect) {
+      setIsEnterEffectActive(true);
+      // Clear previous enter effect timer
+      if (enterEffectTimerRef.current) {
+        clearTimeout(enterEffectTimerRef.current);
+      }
+      // Deactivate enter effect after duration
+      enterEffectTimerRef.current = setTimeout(() => {
+        setIsEnterEffectActive(false);
+      }, effectDuration);
+    }
 
     // Clear previous transition timer
     if (transitionTimerRef.current) {
@@ -379,6 +427,7 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
 
   return (
     <Box
+      ref={containerRef}
       sx={{
         bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100',
         borderRadius: 2,
@@ -388,9 +437,10 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        width: '100%',
       }}
     >
-      {/* Preview Area */}
+      {/* Preview Area - auto-fit to container while maintaining aspect ratio */}
       <Box
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
@@ -450,7 +500,10 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
             width: '100%',
             height: '100%',
             zIndex: 2,
-            ...(currentFrame && isTransitioning && getAnimationStyle(currentFrame as ExtendedFrame, true)),
+            // Apply transition animation (fade, crossfade, slide) during frame transition
+            ...(currentFrame && isTransitioning && getTransitionStyle(currentFrame as ExtendedFrame)),
+            // Apply enter effect animation (slideLeft, zoomIn, etc.) when effect is active
+            ...(currentFrame && isEnterEffectActive && getEnterEffectStyle(currentFrame as ExtendedFrame)),
           }}
         >
           {currentFrame?.imageUrl ? (
@@ -591,10 +644,17 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
             </Typography>
           </Box>
         </Box>
+        {/* End of Preview Area */}
       </Box>
 
       {/* Controls */}
-      <Box sx={{ width: previewWidth }}>
+      <Box sx={{ width: '100%', maxWidth: Math.max(previewWidth, 300) }}>
+        {/* Original size indicator */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1, px: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
+            {width}×{height}px {scale < 1 && `(${Math.round(scale * 100)}%)`}
+          </Typography>
+        </Box>
         {/* Sequence selector - only show when multiple sequences */}
         {sequences.length > 1 && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1, px: 1 }}>

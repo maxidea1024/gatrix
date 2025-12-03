@@ -215,9 +215,36 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < sequenceHistory.length - 1;
 
+  // Regex for valid identifier: lowercase letters, numbers, underscore, hyphen (must start with letter)
+  const BANNER_NAME_REGEX = /^[a-z][a-z0-9_-]*$/;
+
+  // Validate banner name format
+  const isValidBannerName = (value: string): boolean => {
+    return BANNER_NAME_REGEX.test(value);
+  };
+
+  // Get name validation error message
+  const getNameError = (): string | null => {
+    if (!name.trim()) {
+      return null; // Don't show error for empty field until save
+    }
+    if (!isValidBannerName(name)) {
+      return t('banners.nameInvalidFormat');
+    }
+    return null;
+  };
+
+  const nameError = getNameError();
+
   const handleSave = async () => {
     if (!name.trim()) {
       enqueueSnackbar(t('banners.nameRequired'), { variant: 'error' });
+      return;
+    }
+
+    // Validate name format
+    if (!isValidBannerName(name)) {
+      enqueueSnackbar(t('banners.nameInvalidFormat'), { variant: 'error' });
       return;
     }
 
@@ -246,7 +273,15 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       }
       onSave();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('banners.saveFailed'), { variant: 'error' });
+      // Handle specific error codes from backend
+      const errorCode = error.response?.data?.error?.code || error.code;
+      if (errorCode === 'DUPLICATE_NAME') {
+        enqueueSnackbar(t('banners.nameDuplicate'), { variant: 'error' });
+      } else if (errorCode === 'INVALID_NAME_FORMAT') {
+        enqueueSnackbar(t('banners.nameInvalidFormat'), { variant: 'error' });
+      } else {
+        enqueueSnackbar(error.message || t('banners.saveFailed'), { variant: 'error' });
+      }
     } finally {
       setSaving(false);
     }
@@ -292,7 +327,34 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       minWidth={700}
       maxWidth={1400}
     >
-      <Box sx={{ p: 3, overflow: 'auto', flex: 1 }}>
+      <Box
+        sx={{
+          p: 3,
+          overflow: 'auto',
+          flex: 1,
+          // Chat message list scrollbar style
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: (theme) =>
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: (theme) =>
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+          },
+          scrollbarWidth: 'thin',
+          scrollbarColor: (theme) =>
+            theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.2) transparent'
+              : 'rgba(0, 0, 0, 0.2) transparent',
+        }}
+      >
         {/* Basic Info Accordion */}
         <Accordion
           expanded={basicInfoExpanded}

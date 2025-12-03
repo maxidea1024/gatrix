@@ -1976,6 +1976,8 @@
     "memo": "Memo",
     "minute": "Minute",
     "month": "Month",
+    "moveUp": "Move Up",
+    "moveDown": "Move Down",
     "moreThan": "more than",
     "name": "Name",
     "next": "Next",
@@ -4050,6 +4052,9 @@
     "deleteFailed": "Failed to delete banner.",
     "saveFailed": "Failed to save banner.",
     "nameRequired": "Banner name is required.",
+    "nameInvalidFormat": "Banner name must contain only lowercase letters, numbers, underscore (_), hyphen (-), and must start with a letter.",
+    "nameDuplicate": "A banner with this name already exists.",
+    "nameHelperText": "Lowercase letters, numbers, _, - allowed (e.g., main_banner, hero-1)",
     "deleteConfirmTitle": "Delete Banner",
     "deleteConfirmMessage": "Are you sure you want to delete the banner \"{{name}}\"?",
     "bulkDeleteConfirmTitle": "Delete Selected Banners",
@@ -4076,6 +4081,7 @@
     "noFramesToPreview": "No frames to preview",
     "noImage": "No image",
     "frame": "Frame",
+    "zoom": "Zoom",
     "sequence": "Sequence",
     "sequenceList": "Sequence List",
     "addSequence": "Add Sequence",
@@ -4148,9 +4154,19 @@
       "pasteBefore": "Paste Before",
       "pasteAfter": "Paste After",
       "pasteReplace": "Paste & Replace",
+      "addEmptyBefore": "Add Empty Frame Before",
+      "addMultipleEmptyBefore": "Add Multiple Empty Frames Before",
+      "addEmptyAfter": "Add Empty Frame After",
+      "addMultipleEmptyAfter": "Add Multiple Empty Frames After",
+      "movePrev": "Move to Previous",
+      "moveNext": "Move to Next",
       "moveFirst": "Move to First",
       "moveLast": "Move to Last",
       "delete": "Delete"
-    }
+    },
+    "emptyFrameCount": "Number of Frames to Add",
+    "total": "total",
+    "gridView": "Grid View",
+    "timelineView": "Timeline View"
   }
 }

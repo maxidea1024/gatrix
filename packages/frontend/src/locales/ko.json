@@ -1976,6 +1976,8 @@
     "memo": "메모",
     "minute": "분",
     "month": "월",
+    "moveUp": "위로 이동",
+    "moveDown": "아래로 이동",
     "moreThan": "이상",
     "name": "이름",
     "next": "다음",
@@ -4052,6 +4054,9 @@
     "deleteFailed": "배너 삭제에 실패했습니다.",
     "saveFailed": "배너 저장에 실패했습니다.",
     "nameRequired": "배너 이름은 필수입니다.",
+    "nameInvalidFormat": "배너 이름은 소문자, 숫자, 밑줄(_), 하이픈(-)만 사용 가능하며 문자로 시작해야 합니다.",
+    "nameDuplicate": "이미 동일한 이름의 배너가 존재합니다.",
+    "nameHelperText": "소문자, 숫자, _, - 사용 가능 (예: main_banner, hero-1)",
     "deleteConfirmTitle": "배너 삭제",
     "deleteConfirmMessage": "\"{{name}}\" 배너를 삭제하시겠습니까?",
     "bulkDeleteConfirmTitle": "선택한 배너 삭제",
@@ -4078,6 +4083,7 @@
     "noFramesToPreview": "미리볼 프레임이 없습니다",
     "noImage": "이미지 없음",
     "frame": "프레임",
+    "zoom": "확대",
     "sequence": "시퀀스",
     "sequenceList": "시퀀스 목록",
     "addSequence": "시퀀스 추가",
@@ -4150,9 +4156,19 @@
       "pasteBefore": "이전에 붙여넣기",
       "pasteAfter": "다음에 붙여넣기",
       "pasteReplace": "덮어쓰기",
+      "addEmptyBefore": "이전에 빈 프레임 추가",
+      "addMultipleEmptyBefore": "이전에 빈 프레임 여러개 추가",
+      "addEmptyAfter": "다음에 빈 프레임 추가",
+      "addMultipleEmptyAfter": "다음에 빈 프레임 여러개 추가",
+      "movePrev": "이전으로 이동",
+      "moveNext": "다음으로 이동",
       "moveFirst": "맨 앞으로 이동",
       "moveLast": "맨 뒤로 이동",
       "delete": "삭제"
-    }
+    },
+    "emptyFrameCount": "추가할 프레임 수",
+    "total": "총",
+    "gridView": "그리드 보기",
+    "timelineView": "타임라인 보기"
   }
 }

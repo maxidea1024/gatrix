@@ -189,6 +189,32 @@ export class BannerModel {
     }
   }
 
+  /**
+   * Find banner by name (for duplicate check)
+   * @param name Banner name to search
+   * @param excludeBannerId Optional bannerId to exclude (for update check)
+   */
+  static async findByName(name: string, excludeBannerId?: string): Promise<BannerAttributes | null> {
+    try {
+      let query = db('g_banners').where('name', name);
+      if (excludeBannerId) {
+        query = query.whereNot('bannerId', excludeBannerId);
+      }
+      const banner = await query.first();
+      if (!banner) {
+        return null;
+      }
+      return {
+        ...banner,
+        sequences: typeof banner.sequences === 'string' ? JSON.parse(banner.sequences) : banner.sequences,
+        metadata: banner.metadata ? (typeof banner.metadata === 'string' ? JSON.parse(banner.metadata) : banner.metadata) : null,
+      };
+    } catch (error) {
+      logger.error('Error finding banner by name:', error);
+      throw error;
+    }
+  }
+
   static async create(data: Omit<BannerAttributes, 'createdAt' | 'updatedAt'>): Promise<BannerAttributes> {
     try {
       await db('g_banners').insert({
