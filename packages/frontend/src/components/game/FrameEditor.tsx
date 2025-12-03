@@ -142,6 +142,9 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [localDelaySeconds, setLocalDelaySeconds] = useState((frame.delay / 1000).toString());
+
+  // Image metadata state
+  const [imageInfo, setImageInfo] = useState<{ width: number; height: number; } | null>(null);
   const [contextMenu, setContextMenu] = useState<{ mouseX: number; mouseY: number } | null>(null);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -171,8 +174,21 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
 
   const handleImageUrlChange = (imageUrl: string) => {
     setImageError(false);
+    setImageInfo(null); // Reset image info when URL changes
     const detectedType = detectFrameType(imageUrl);
     onUpdate({ ...frame, imageUrl, type: detectedType });
+  };
+
+  // Handle image load to get dimensions
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    setImageInfo({ width: img.naturalWidth, height: img.naturalHeight });
+  };
+
+  // Handle video load to get dimensions
+  const handleVideoLoad = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.currentTarget;
+    setImageInfo({ width: video.videoWidth, height: video.videoHeight });
   };
 
   const handleDelaySecondsChange = (value: string) => {
@@ -439,7 +455,7 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
       </Tooltip>
 
       {/* Settings Dialog */}
-      <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} maxWidth="lg" fullWidth>
+      <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>{frame.imageUrl ? t('banners.editFrame') : t('banners.addFrame')}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', gap: 3, pt: 1 }}>
@@ -560,53 +576,81 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 </Box>
             </Box>
 
-            {/* Right: Preview - takes remaining space */}
+            {/* Right: Preview - fills remaining space */}
             <Box
               sx={{
-                flex: '1 1 auto',
-                minWidth: 400,
-                minHeight: 280,
+                flex: 1,
+                minWidth: 200,
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
                 bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100',
                 borderRadius: 1,
-                p: 2,
+                p: 1.5,
               }}
             >
-              <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, textAlign: 'center' }}>
                 {t('banners.preview')}
               </Typography>
-              {frame.imageUrl ? (
-                imageError ? (
+
+              {/* Preview container - fills available space */}
+              <Box
+                sx={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  bgcolor: 'black',
+                  borderRadius: 1,
+                  overflow: 'hidden',
+                }}
+              >
+                {frame.imageUrl ? (
+                  imageError ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <BrokenImageIcon color="disabled" sx={{ fontSize: 48 }} />
+                      <Typography variant="caption" color="error" sx={{ mt: 1 }}>
+                        {t('banners.imageLoadError')}
+                      </Typography>
+                    </Box>
+                  ) : isVideo && frame.type === 'mp4' ? (
+                    <video
+                      src={frame.imageUrl}
+                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                      controls
+                      muted
+                      onError={() => setImageError(true)}
+                      onLoadedMetadata={handleVideoLoad}
+                    />
+                  ) : (
+                    <img
+                      src={frame.imageUrl}
+                      alt=""
+                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                      onError={() => setImageError(true)}
+                      onLoad={handleImageLoad}
+                    />
+                  )
+                ) : (
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <BrokenImageIcon color="disabled" sx={{ fontSize: 48 }} />
-                    <Typography variant="caption" color="error" sx={{ mt: 1 }}>
-                      {t('banners.imageLoadError')}
+                    <ImageIcon sx={{ fontSize: 48, color: 'grey.600' }} />
+                    <Typography variant="caption" sx={{ mt: 1, color: 'grey.500' }}>
+                      {t('banners.enterImageUrl')}
                     </Typography>
                   </Box>
-                ) : isVideo && frame.type === 'mp4' ? (
-                  <video
-                    src={frame.imageUrl}
-                    style={{ maxWidth: '100%', maxHeight: 400, borderRadius: 4 }}
-                    controls
-                    muted
-                    onError={() => setImageError(true)}
-                  />
-                ) : (
-                  <img
-                    src={frame.imageUrl}
-                    alt=""
-                    style={{ maxWidth: '100%', maxHeight: 400, borderRadius: 4, objectFit: 'contain' }}
-                    onError={() => setImageError(true)}
-                  />
-                )
-              ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <ImageIcon color="disabled" sx={{ fontSize: 48 }} />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                    {t('banners.enterImageUrl')}
+                )}
+              </Box>
+
+              {/* Image/Video Info */}
+              {frame.imageUrl && !imageError && (
+                <Box sx={{ mt: 1, textAlign: 'center' }}>
+                  <Typography variant="caption" color="text.secondary" component="div">
+                    {frame.type && <span>{t('banners.type')}: <strong>{frame.type.toUpperCase()}</strong></span>}
+                    {imageInfo && (
+                      <>
+                        <span style={{ margin: '0 8px' }}>•</span>
+                        <span>{t('banners.dimensions')}: <strong>{imageInfo.width} × {imageInfo.height}</strong></span>
+                      </>
+                    )}
                   </Typography>
                 </Box>
               )}

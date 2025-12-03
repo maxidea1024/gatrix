@@ -4104,6 +4104,7 @@
     "imageLoadError": "无法加载图片",
     "enterImageUrl": "请输入图片URL",
     "type": "类型",
+    "dimensions": "分辨率",
     "file": "文件",
     "transition": "过渡",
     "action": "动作",

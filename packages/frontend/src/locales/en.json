@@ -4143,6 +4143,7 @@
     "imageLoadError": "Failed to load image",
     "enterImageUrl": "Enter image URL",
     "type": "Type",
+    "dimensions": "Dimensions",
     "file": "File",
     "transition": "Transition",
     "action": "Action",

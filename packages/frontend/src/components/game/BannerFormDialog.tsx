@@ -383,10 +383,13 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                 inputRef={nameInputRef}
                 label={t('banners.name')}
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
                 fullWidth
                 required
                 size="small"
+                error={!!nameError}
+                helperText={nameError || t('banners.nameHelperText')}
+                placeholder="main_banner"
               />
               <TextField
                 label={t('banners.description')}

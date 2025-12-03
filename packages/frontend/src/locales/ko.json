@@ -4145,6 +4145,7 @@
     "imageLoadError": "이미지를 불러올 수 없습니다",
     "enterImageUrl": "이미지 URL을 입력하세요",
     "type": "타입",
+    "dimensions": "해상도",
     "file": "파일",
     "transition": "전환",
     "action": "액션",

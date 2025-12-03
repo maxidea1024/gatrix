@@ -351,7 +351,7 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                 <Typography variant="subtitle2">{t('banners.frames')} ({sequence.frames.length})</Typography>
                 {totalDuration > 0 && (
                   <Typography variant="caption" color="text.secondary">
-                    • {(totalDuration / 1000).toFixed(1)}s {t('banners.total')}
+                    • {(totalDuration / 1000).toFixed(1)}s
                   </Typography>
                 )}
               </Box>
