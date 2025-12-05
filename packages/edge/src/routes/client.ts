@@ -3,12 +3,46 @@ import { clientAuth, ClientRequest } from '../middleware/clientAuth';
 import { sdkManager } from '../services/sdkManager';
 import logger from '../config/logger';
 import { ClientVersion, Banner, GameWorld } from '@gatrix/server-sdk';
+import { cacheHitsTotal, cacheMissesTotal, cacheSize } from '../services/metricsServer';
 
 const router = Router();
 
 // ============================================================================
 // Helper Functions
 // ============================================================================
+
+/**
+ * Record cache hit metric
+ */
+function recordCacheHit(cacheType: string): void {
+  cacheHitsTotal.labels(cacheType).inc();
+}
+
+/**
+ * Record cache miss metric
+ */
+function recordCacheMiss(cacheType: string): void {
+  cacheMissesTotal.labels(cacheType).inc();
+}
+
+/**
+ * Update cache size metrics from SDK
+ */
+function updateCacheSizeMetrics(): void {
+  const sdk = sdkManager.getSDK();
+  if (!sdk) return;
+
+  const versions = sdk.getClientVersions();
+  const banners = sdk.getBanners();
+  const notices = sdk.getServiceNotices();
+  const worlds = sdk.getGameWorlds();
+
+  cacheSize.labels('client_versions').set(versions.length);
+  cacheSize.labels('banners').set(banners.length);
+  cacheSize.labels('service_notices').set(notices.length);
+  cacheSize.labels('game_worlds').set(worlds.length);
+  cacheSize.labels('total').set(versions.length + banners.length + notices.length + worlds.length);
+}
 
 /**
  * Get SDK instance or return 503 error
@@ -27,6 +61,16 @@ function getSDKOrError(res: Response): ReturnType<typeof sdkManager.getSDK> | nu
   }
   return sdk;
 }
+
+// Update cache size metrics periodically (every 30 seconds)
+setInterval(() => {
+  updateCacheSizeMetrics();
+}, 30000);
+
+// Initial update after a short delay (to allow SDK to initialize)
+setTimeout(() => {
+  updateCacheSizeMetrics();
+}, 5000);
 
 // ============================================================================
 // Public Routes (No Authentication Required - Same as Backend)
@@ -133,6 +177,7 @@ router.get('/client-version', async (req: Request, res: Response) => {
     }
 
     if (!record) {
+      recordCacheMiss('client_versions');
       return res.status(404).json({
         success: false,
         message: isLatestRequest
@@ -140,6 +185,9 @@ router.get('/client-version', async (req: Request, res: Response) => {
           : 'Client version not found',
       });
     }
+
+    // Record cache hit
+    recordCacheHit('client_versions');
 
     // Get maintenance message if status is MAINTENANCE
     let maintenanceMessage: string | undefined = record.maintenanceMessage;
@@ -208,6 +256,13 @@ router.get('/game-worlds', async (_req: Request, res: Response) => {
 
     // Get all game worlds from cache (using getGameWorlds() method)
     const allWorlds = sdk.getGameWorlds() as GameWorld[];
+
+    // Record cache hit/miss
+    if (allWorlds.length > 0) {
+      recordCacheHit('game_worlds');
+    } else {
+      recordCacheMiss('game_worlds');
+    }
 
     // Filter visible, non-maintenance worlds (same as Backend)
     const visibleWorlds = allWorlds.filter(
@@ -330,6 +385,13 @@ router.get('/banners', clientAuth, async (req: ClientRequest, res: Response) => 
     const envBanners = allBanners.filter(
       (b) => b.environmentId === environmentId
     );
+
+    // Record cache hit/miss
+    if (envBanners.length > 0) {
+      recordCacheHit('banners');
+    } else {
+      recordCacheMiss('banners');
+    }
 
     // Transform for client (same format as Backend BannerClientController)
     const clientBanners = envBanners.map((banner) => ({
@@ -464,6 +526,13 @@ router.get('/versions', clientAuth, async (req: ClientRequest, res: Response) =>
       );
     }
 
+    // Record cache hit/miss
+    if (filteredVersions.length > 0) {
+      recordCacheHit('client_versions');
+    } else {
+      recordCacheMiss('client_versions');
+    }
+
     logger.debug('Client versions retrieved', {
       environmentId,
       platform,
@@ -514,6 +583,13 @@ router.get('/notices', clientAuth, async (req: ClientRequest, res: Response) => 
       filteredNotices = envNotices.filter(
         (n: { platforms?: string[] }) => !n.platforms || n.platforms.length === 0 || n.platforms.includes(platform)
       );
+    }
+
+    // Record cache hit/miss
+    if (filteredNotices.length > 0) {
+      recordCacheHit('service_notices');
+    } else {
+      recordCacheMiss('service_notices');
     }
 
     logger.debug('Service notices retrieved', {
