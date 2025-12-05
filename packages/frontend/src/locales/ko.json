@@ -718,6 +718,7 @@
     "noPermissionsSelected": "선택된 권한이 없습니다.",
     "noEnvironmentsSelected": "선택된 환경이 없습니다.",
     "noPermissionsForUser": "일반 사용자는 관리자 권한이 없습니다.",
+    "noEnvironmentAccessForUser": "일반 사용자는 환경에 접근할 수 없습니다. 관리자로 승격하면 환경 접근 권한을 설정할 수 있습니다.",
     "hoverToLoadPermissions": "권한 정보를 불러오는 중...",
     "noPermissionsAssigned": "부여된 권한이 없습니다.",
     "assignedPermissions": "부여된 권한",

@@ -183,9 +183,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return false;
     }
 
+    // While permissions are loading, return false to prevent showing menus prematurely
+    if (permissionsLoading) {
+      return false;
+    }
+
     const requiredPermissions = Array.isArray(permission) ? permission : [permission];
     return requiredPermissions.some(p => permissions.includes(p));
-  }, [isAuthenticated, user, permissions]);
+  }, [isAuthenticated, user, permissions, permissionsLoading]);
 
   // Fetch permissions when user changes
   useEffect(() => {

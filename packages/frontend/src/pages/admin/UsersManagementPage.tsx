@@ -1916,7 +1916,7 @@ const UsersManagementPage: React.FC = () => {
                   ))
                 ) : users.length === 0 ? (
                   <EmptyTableRow
-                    colSpan={11}
+                    colSpan={columns.filter(col => col.visible).length + 2} // +2 for checkbox and actions columns
                     loading={false}
                     message={t('users.noUsersFound')}
                     loadingMessage={t('common.loadingUsers')}
@@ -2843,28 +2843,11 @@ const UsersManagementPage: React.FC = () => {
               </Box>
             )}
 
-            {/* Environment Access for non-admin users */}
+            {/* Non-admin users cannot access environments */}
             {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && editUserData.role !== 'admin' && (
-              <Box sx={{ mt: 2 }}>
-                <PermissionSelector
-                  permissions={[]}
-                  onChange={() => {}}
-                  showTitle={false}
-                  showSelectAll={false}
-                  showPermissionCategories={false}
-                  showEnvironments={true}
-                  environments={environments.map(env => ({
-                    id: env.id,
-                    name: env.environmentName,
-                    displayName: env.displayName,
-                    environmentName: env.environmentName
-                  }))}
-                  allowAllEnvs={editUserAllowAllEnvs}
-                  selectedEnvIds={editUserEnvIds}
-                  onAllowAllEnvsChange={setEditUserAllowAllEnvs}
-                  onEnvIdsChange={setEditUserEnvIds}
-                />
-              </Box>
+              <Alert severity="info" sx={{ mt: 2 }}>
+                {t('users.noEnvironmentAccessForUser')}
+              </Alert>
             )}
 
             {editUserDialog.user && isCurrentUser(editUserDialog.user) && (

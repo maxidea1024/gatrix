@@ -1381,8 +1381,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               }}
             />
 
-            {/* Environment Selector - 맨 오른쪽 */}
-            <EnvironmentSelector size="small" />
+            {/* Environment Selector - Only for admin users */}
+            {isAdmin() && <EnvironmentSelector size="small" />}
 
             <Menu
               anchorEl={userMenuAnchor}

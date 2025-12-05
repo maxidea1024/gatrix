@@ -718,6 +718,7 @@
     "noPermissionsSelected": "No permissions selected.",
     "noEnvironmentsSelected": "No environments selected.",
     "noPermissionsForUser": "Regular users do not have admin permissions.",
+    "noEnvironmentAccessForUser": "Regular users cannot access environments. Promote to admin to configure environment access.",
     "hoverToLoadPermissions": "Loading permissions...",
     "noPermissionsAssigned": "No permissions assigned.",
     "assignedPermissions": "Assigned Permissions",
