@@ -3926,7 +3926,11 @@
     "showLess": "Show less",
     "rewardTypeRequired": "Please select reward type for reward #{{index}}",
     "rewardItemRequired": "Please select item for reward #{{index}}",
-    "rewardQuantityRequired": "Please enter quantity for reward #{{index}}"
+    "rewardQuantityRequired": "Please enter quantity for reward #{{index}}",
+    "atLeastOneReward": "At least one reward is required",
+    "referencedBy": "Referenced by the following items",
+    "coupons": "Coupons",
+    "surveys": "Surveys"
   },
   "rewardSelector": {
     "selectMode": "Reward Configuration Method",
