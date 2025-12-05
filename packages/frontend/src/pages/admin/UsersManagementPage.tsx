@@ -190,6 +190,94 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
   );
 };
 
+// Role chip with permissions tooltip for admin users
+interface RoleChipWithTooltipProps {
+  user: User;
+}
+
+const RoleChipWithTooltip: React.FC<RoleChipWithTooltipProps> = ({ user }) => {
+  const { t } = useTranslation();
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  const handleMouseEnter = async () => {
+    if (user.role !== 'admin' || loaded) return;
+
+    setLoading(true);
+    try {
+      const response = await apiService.get<{ userId: number; permissions: Permission[] }>(
+        `/admin/users/${user.id}/permissions`
+      );
+      setPermissions(response.data?.permissions || []);
+      setLoaded(true);
+    } catch (error) {
+      console.error('Failed to load user permissions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getTooltipContent = () => {
+    if (user.role !== 'admin') {
+      return t('users.noPermissionsForUser');
+    }
+
+    if (loading) {
+      return t('common.loading');
+    }
+
+    if (!loaded) {
+      return t('users.hoverToLoadPermissions');
+    }
+
+    if (permissions.length === 0) {
+      return t('users.noPermissionsAssigned');
+    }
+
+    const maxDisplay = 5;
+    const displayPermissions = permissions.slice(0, maxDisplay);
+    const remaining = permissions.length - maxDisplay;
+
+    return (
+      <Box sx={{ maxWidth: 300 }}>
+        <Typography variant="caption" sx={{ fontWeight: 600, display: 'block', mb: 0.5 }}>
+          {t('users.assignedPermissions')} ({permissions.length})
+        </Typography>
+        {displayPermissions.map((perm) => (
+          <Typography key={perm} variant="caption" sx={{ display: 'block', color: 'inherit' }}>
+            • {t(`permissions.${perm.replace('.', '_')}`)}
+          </Typography>
+        ))}
+        {remaining > 0 && (
+          <Typography variant="caption" sx={{ display: 'block', fontStyle: 'italic', mt: 0.5 }}>
+            +{remaining} {t('users.morePermissions')}
+          </Typography>
+        )}
+      </Box>
+    );
+  };
+
+  return (
+    <Tooltip
+      title={getTooltipContent()}
+      arrow
+      placement="top"
+      enterDelay={300}
+      onOpen={handleMouseEnter}
+    >
+      <Chip
+        icon={user.role === 'admin' ? <SecurityIcon /> : <PersonIcon />}
+        label={t(`users.roles.${user.role}`)}
+        color={user.role === 'admin' ? 'primary' : 'secondary'}
+        size="small"
+        variant="outlined"
+        sx={{ cursor: user.role === 'admin' ? 'help' : 'default' }}
+      />
+    </Tooltip>
+  );
+};
+
 const UsersManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -1445,15 +1533,7 @@ const UsersManagementPage: React.FC = () => {
           />
         );
       case 'role':
-        return (
-          <Chip
-            icon={user.role === 'admin' ? <SecurityIcon /> : <PersonIcon />}
-            label={t(`users.roles.${user.role}`)}
-            color={user.role === 'admin' ? 'primary' : 'secondary'}
-            size="small"
-            variant="outlined"
-          />
-        );
+        return <RoleChipWithTooltip user={user} />;
       case 'status':
         return (
           <Chip
@@ -2364,46 +2444,16 @@ const UsersManagementPage: React.FC = () => {
       </Drawer>
 
       {/* Promote User Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={promoteDialog.open}
         onClose={handlePromoteCancel}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 600 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
+        title={promoteDialog.showReview ? t('users.reviewChanges') : t('common.promoteUser')}
+        subtitle={promoteDialog.showReview ? t('users.reviewChangesDesc') : t('users.selectPermissionsDesc')}
+        storageKey="usersPromoteFormDrawerWidth"
+        defaultWidth={600}
+        minWidth={450}
+        zIndex={1301}
       >
-        {/* Header */}
-        <Box sx={{
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {promoteDialog.showReview && (
-              <PreviewIcon color="primary" />
-            )}
-            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {promoteDialog.showReview ? t('users.reviewChanges') : t('common.promoteUser')}
-            </Typography>
-          </Box>
-          <IconButton
-            onClick={handlePromoteCancel}
-            size="small"
-            sx={{ '&:hover': { backgroundColor: 'action.hover' } }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
         {/* Content */}
         <Box sx={{ flex: 1, p: 2, overflow: 'auto' }}>
           {promoteDialog.user && !promoteDialog.showReview && (
@@ -2604,7 +2654,7 @@ const UsersManagementPage: React.FC = () => {
             </>
           )}
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* Edit User Drawer */}
       <ResizableDrawer
