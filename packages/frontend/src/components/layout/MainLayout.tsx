@@ -88,7 +88,7 @@ import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { computeMaintenanceStatus, getMaintenanceStatusDisplay, MaintenanceStatusType } from '@/utils/maintenanceStatusUtils';
 import moment from 'moment';
-import { getMenuCategories, MenuItem, MenuCategory } from '@/config/navigation';
+import { getMenuCategories, MenuItem as NavMenuItem, MenuCategory } from '@/config/navigation';
 import mailService from '@/services/mailService';
 import { Permission } from '@/types/permissions';
 
@@ -149,7 +149,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const hasEnvironmentAccess = isAdmin() && !environmentsLoading && environments.length > 0;
 
   // Filter menu items based on permissions
-  const canAccessMenuItem = useCallback((item: MenuItem): boolean => {
+  const canAccessMenuItem = useCallback((item: NavMenuItem): boolean => {
     // Check admin-only restriction
     if (item.adminOnly && !hasEnvironmentAccess) {
       return false;
@@ -164,7 +164,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     return true;
   }, [hasEnvironmentAccess, hasPermission]);
 
-  const filterMenuItems = useCallback((items: MenuItem[]): MenuItem[] => {
+  const filterMenuItems = useCallback((items: NavMenuItem[]): NavMenuItem[] => {
     return items.filter(item => {
       if (!canAccessMenuItem(item)) {
         return false;
@@ -1003,12 +1003,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     fontSize: '0.7rem'
                   }}
                 >
-                  {t(getMenuCategories(isAdmin()).find(c => c.id === selectedCategory)?.text || '')}
+                  {t(getFilteredMenuCategories().find(c => c.id === selectedCategory)?.text || '')}
                 </Typography>
               )}
 
               {/* Submenu items */}
-              {getMenuCategories(isAdmin())
+              {getFilteredMenuCategories()
                 .find(c => c.id === selectedCategory)
                 ?.children.map((item, index, items) => {
                   // Check if previous item has children (is a submenu group)

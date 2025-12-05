@@ -874,7 +874,11 @@
     "environments_view": "查看环境",
     "environments_view_desc": "可以查看开发、预发布、生产等环境列表和设置。",
     "environments_manage": "管理环境",
-    "environments_manage_desc": "可以添加、修改、删除环境，并管理各环境的设置。"
+    "environments_manage_desc": "可以添加、修改、删除环境，并管理各环境的设置。",
+    "system-settings_view": "查看系统设置",
+    "system-settings_view_desc": "可以查看网络、集成、服务发现、键值配置等系统设置。",
+    "system-settings_manage": "管理系统设置",
+    "system-settings_manage_desc": "可以修改和保存系统设置。管理网络URL、Webhook、服务发现设置等。"
   },
   "gameWorlds": {
     "worldId": "世界ID",
@@ -2458,6 +2462,7 @@
     "subtitle": "管理您的应用程序设置和偏好",
     "languageSaved": "语言偏好设置已成功保存",
     "languageSaveFailed": "保存语言偏好设置失败",
+    "systemSettings": "系统设置",
     "general": {
       "title": "常规设置",
       "subtitle": "配置语言、主题、时区等基本偏好设置"

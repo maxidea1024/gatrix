@@ -833,7 +833,11 @@
     "environments_view": "환경 조회",
     "environments_view_desc": "개발, 스테이징, 프로덕션 등 환경 목록과 설정을 조회할 수 있습니다.",
     "environments_manage": "환경 관리",
-    "environments_manage_desc": "환경을 추가, 수정, 삭제하고 환경별 설정을 관리할 수 있습니다."
+    "environments_manage_desc": "환경을 추가, 수정, 삭제하고 환경별 설정을 관리할 수 있습니다.",
+    "system-settings_view": "시스템 설정 조회",
+    "system-settings_view_desc": "네트워크, 통합, 서비스 디스커버리, 키-값 설정 등 시스템 설정을 조회할 수 있습니다.",
+    "system-settings_manage": "시스템 설정 관리",
+    "system-settings_manage_desc": "시스템 설정을 변경하고 저장할 수 있습니다. 네트워크 URL, 웹훅, 서비스 디스커버리 설정 등을 관리합니다."
   },
   "gameWorlds": {
     "worldId": "월드 ID",
@@ -2454,6 +2458,7 @@
     "subtitle": "환경설정 및 시스템 설정을 구성합니다",
     "languageSaved": "언어 설정이 저장되었습니다",
     "languageSaveFailed": "언어 설정 저장에 실패했습니다",
+    "systemSettings": "시스템 설정",
     "general": {
       "title": "일반 설정",
       "subtitle": "언어, 테마, 시간대 등 기본 환경을 설정합니다"

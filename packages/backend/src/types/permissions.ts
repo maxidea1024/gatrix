@@ -108,6 +108,10 @@ export const PERMISSIONS = {
   // Settings - Environments
   ENVIRONMENTS_VIEW: 'environments.view',
   ENVIRONMENTS_MANAGE: 'environments.manage',
+
+  // Settings - System Settings (Network, Integrations, Service Discovery, KV)
+  SYSTEM_SETTINGS_VIEW: 'system-settings.view',
+  SYSTEM_SETTINGS_MANAGE: 'system-settings.manage',
 } as const;
 
 export type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS];
@@ -183,6 +187,8 @@ export const PERMISSION_CATEGORIES = {
       PERMISSIONS.DATA_MANAGEMENT_MANAGE,
       PERMISSIONS.ENVIRONMENTS_VIEW,
       PERMISSIONS.ENVIRONMENTS_MANAGE,
+      PERMISSIONS.SYSTEM_SETTINGS_VIEW,
+      PERMISSIONS.SYSTEM_SETTINGS_MANAGE,
     ],
   },
 } as const;

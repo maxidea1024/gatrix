@@ -833,7 +833,11 @@
     "environments_view": "View Environments",
     "environments_view_desc": "View the list of environments (development, staging, production) and their settings.",
     "environments_manage": "Manage Environments",
-    "environments_manage_desc": "Add, edit, delete environments and manage environment-specific settings."
+    "environments_manage_desc": "Add, edit, delete environments and manage environment-specific settings.",
+    "system-settings_view": "View System Settings",
+    "system-settings_view_desc": "View system settings including network, integrations, service discovery, and key-value configurations.",
+    "system-settings_manage": "Manage System Settings",
+    "system-settings_manage_desc": "Modify and save system settings. Manage network URLs, webhooks, service discovery settings, and more."
   },
   "gameWorlds": {
     "worldId": "World ID",
@@ -2454,6 +2458,7 @@
     "subtitle": "Configure your preferences and system settings",
     "languageSaved": "Language preference saved successfully",
     "languageSaveFailed": "Failed to save language preference",
+    "systemSettings": "System Settings",
     "general": {
       "title": "General Settings",
       "subtitle": "Configure language, theme, timezone and other basic preferences"

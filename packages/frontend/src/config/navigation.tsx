@@ -63,6 +63,7 @@ export interface MenuCategory {
 // 기본 메뉴 (모든 사용자)
 export const baseMenuItems: MenuItem[] = [
   { text: 'sidebar.dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+  { text: 'settings.general.title', icon: <SettingsIcon />, path: '/settings' },
 ];
 
 // 관리자 메뉴 - 관리자패널 카테고리
@@ -136,10 +137,10 @@ export const eventLensMenuItems: MenuItem[] = [
   { text: 'sidebar.projects', icon: <FolderIcon />, path: '/admin/event-lens/projects', adminOnly: true, requiredPermission: [PERMISSIONS.EVENT_LENS_VIEW, PERMISSIONS.EVENT_LENS_MANAGE] },
 ];
 
-// 설정 메뉴
+// 설정 메뉴 - admin 전용
 export const settingsMenuItems: MenuItem[] = [
-  { text: 'settings.general.title', icon: <SettingsIcon />, path: '/settings' },
-  { text: 'tags.title', icon: <LabelIcon />, path: '/settings/tags', requiredPermission: [PERMISSIONS.TAGS_VIEW, PERMISSIONS.TAGS_MANAGE] },
+  { text: 'settings.systemSettings', icon: <SettingsIcon />, path: '/settings/system', adminOnly: true, requiredPermission: [PERMISSIONS.SYSTEM_SETTINGS_VIEW, PERMISSIONS.SYSTEM_SETTINGS_MANAGE] },
+  { text: 'tags.title', icon: <LabelIcon />, path: '/settings/tags', adminOnly: true, requiredPermission: [PERMISSIONS.TAGS_VIEW, PERMISSIONS.TAGS_MANAGE] },
   { text: 'sidebar.dataManagement', icon: <CloudSyncIcon />, path: '/admin/data-management', adminOnly: true, requiredPermission: [PERMISSIONS.DATA_MANAGEMENT_VIEW, PERMISSIONS.DATA_MANAGEMENT_MANAGE] },
   { text: 'environments.title', icon: <LayersIcon />, path: '/settings/environments', adminOnly: true, requiredPermission: [PERMISSIONS.ENVIRONMENTS_VIEW, PERMISSIONS.ENVIRONMENTS_MANAGE] },
 ];
@@ -182,6 +183,7 @@ export const getMenuCategories = (isAdmin: boolean): MenuCategory[] => {
         id: 'settings',
         text: 'sidebar.settings',
         icon: <SettingsIcon />,
+        adminOnly: true,
         children: settingsMenuItems,
       }
     );
