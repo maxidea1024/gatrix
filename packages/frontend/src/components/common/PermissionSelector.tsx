@@ -12,16 +12,25 @@ import {
   Tooltip,
   alpha,
   useTheme,
+  Alert,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   CheckCircle as CheckCircleIcon,
   RadioButtonUnchecked as UncheckedIcon,
   Info as InfoIcon,
+  Warning as WarningIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { Permission } from '@/types';
 import { PERMISSION_CATEGORIES, ALL_PERMISSIONS } from '@/types/permissions';
+
+export interface Environment {
+  id: string;
+  name: string;
+  displayName?: string;
+  environmentName?: string;
+}
 
 interface PermissionSelectorProps {
   permissions: Permission[];
@@ -29,6 +38,14 @@ interface PermissionSelectorProps {
   loading?: boolean;
   showTitle?: boolean;
   showSelectAll?: boolean;
+  showPermissionCategories?: boolean; // Show permission categories (default: true)
+  // Environment access props
+  environments?: Environment[];
+  allowAllEnvs?: boolean;
+  selectedEnvIds?: string[];
+  onAllowAllEnvsChange?: (allowAll: boolean) => void;
+  onEnvIdsChange?: (envIds: string[]) => void;
+  showEnvironments?: boolean;
 }
 
 // Convert PERMISSION_CATEGORIES object to array for iteration
@@ -47,6 +64,13 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
   loading = false,
   showTitle = true,
   showSelectAll = true,
+  showPermissionCategories = true,
+  environments = [],
+  allowAllEnvs = false,
+  selectedEnvIds = [],
+  onAllowAllEnvsChange,
+  onEnvIdsChange,
+  showEnvironments = false,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -127,7 +151,7 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
       )}
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {categoryEntries.map((category) => {
+        {showPermissionCategories && categoryEntries.map((category) => {
           const stats = getCategoryStats(category.permissions);
           const isAllSelected = stats.selected === stats.total;
           const isPartialSelected = stats.selected > 0 && stats.selected < stats.total;
@@ -260,6 +284,138 @@ const PermissionSelector: React.FC<PermissionSelectorProps> = ({
             </Accordion>
           );
         })}
+
+        {/* Environment Access Section */}
+        {showEnvironments && environments.length > 0 && (
+          <Accordion
+            defaultExpanded
+            disableGutters
+            sx={{
+              bgcolor: theme.palette.mode === 'dark'
+                ? alpha(theme.palette.background.paper, 0.6)
+                : theme.palette.background.paper,
+              border: 1,
+              borderColor: 'divider',
+              borderRadius: '8px !important',
+              '&:before': { display: 'none' },
+              '&.Mui-expanded': { margin: 0 },
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              sx={{
+                minHeight: 48,
+                px: 2,
+                '& .MuiAccordionSummary-content': {
+                  alignItems: 'center',
+                  gap: 1,
+                  my: 1,
+                },
+              }}
+            >
+              <Checkbox
+                size="small"
+                checked={allowAllEnvs}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  onAllowAllEnvsChange?.(e.target.checked);
+                }}
+                onClick={(e) => e.stopPropagation()}
+                sx={{ p: 0.5 }}
+              />
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                {t('permissions.categories.environments')}
+              </Typography>
+              <Chip
+                label={allowAllEnvs ? t('common.all') : `${selectedEnvIds.length}/${environments.length}`}
+                size="small"
+                color={allowAllEnvs ? 'warning' : selectedEnvIds.length > 0 ? 'success' : 'default'}
+                variant={allowAllEnvs || selectedEnvIds.length > 0 ? 'filled' : 'outlined'}
+                sx={{ ml: 'auto', mr: 1, height: 24, fontSize: '0.75rem' }}
+              />
+            </AccordionSummary>
+            <AccordionDetails sx={{ px: 2, pb: 2, pt: 0 }}>
+              {allowAllEnvs && (
+                <Alert
+                  severity="warning"
+                  icon={<WarningIcon fontSize="small" />}
+                  sx={{ mb: 2, py: 0.5 }}
+                >
+                  <Typography variant="body2">
+                    {t('users.allowAllEnvironmentsWarning')}
+                  </Typography>
+                </Alert>
+              )}
+              <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                gap: 1,
+                opacity: allowAllEnvs ? 0.5 : 1,
+                pointerEvents: allowAllEnvs ? 'none' : 'auto',
+              }}>
+                {environments.map((env) => {
+                  const isSelected = allowAllEnvs || selectedEnvIds.includes(env.id);
+                  const displayName = env.displayName || env.environmentName || env.name;
+                  return (
+                    <Tooltip
+                      key={env.id}
+                      title={t('users.environmentAccessDesc', { name: displayName })}
+                      arrow
+                      placement="top"
+                      enterDelay={300}
+                    >
+                      <Box
+                        onClick={() => {
+                          if (allowAllEnvs) return;
+                          if (selectedEnvIds.includes(env.id)) {
+                            onEnvIdsChange?.(selectedEnvIds.filter(id => id !== env.id));
+                          } else {
+                            onEnvIdsChange?.([...selectedEnvIds, env.id]);
+                          }
+                        }}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          p: 1,
+                          borderRadius: 1,
+                          cursor: allowAllEnvs ? 'default' : 'pointer',
+                          border: 1,
+                          borderColor: isSelected ? 'primary.main' : 'divider',
+                          bgcolor: isSelected
+                            ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.2 : 0.08)
+                            : 'transparent',
+                          transition: 'all 0.15s ease',
+                          '&:hover': allowAllEnvs ? {} : {
+                            borderColor: 'primary.main',
+                            bgcolor: alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.15 : 0.04),
+                          },
+                        }}
+                      >
+                        {isSelected ? (
+                          <CheckCircleIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                        ) : (
+                          <UncheckedIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                        )}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: isSelected ? 'primary.main' : 'text.secondary',
+                            fontWeight: isSelected ? 500 : 400,
+                            fontSize: '0.8125rem',
+                            flex: 1,
+                          }}
+                        >
+                          {displayName}
+                        </Typography>
+                      </Box>
+                    </Tooltip>
+                  );
+                })}
+              </Box>
+            </AccordionDetails>
+          </Accordion>
+        )}
       </Box>
     </Box>
   );

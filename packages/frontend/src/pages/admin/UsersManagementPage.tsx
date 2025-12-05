@@ -401,12 +401,16 @@ const UsersManagementPage: React.FC = () => {
     permissions: Permission[];
     loading: boolean;
     showReview: boolean;
+    allowAllEnvs: boolean;
+    envIds: string[];
   }>({
     open: false,
     user: null,
     permissions: [],
     loading: false,
     showReview: false,
+    allowAllEnvs: false,
+    envIds: [],
   });
 
   // 이메일 인증 관련 상태
@@ -793,6 +797,8 @@ const UsersManagementPage: React.FC = () => {
       permissions: [],
       loading: false,
       showReview: false,
+      allowAllEnvs: false,
+      envIds: [],
     });
   };
 
@@ -821,9 +827,15 @@ const UsersManagementPage: React.FC = () => {
         });
       }
 
+      // Set environment access
+      await apiService.put(`/admin/users/${promoteDialog.user.id}/environments`, {
+        allowAllEnvironments: promoteDialog.allowAllEnvs,
+        environmentIds: promoteDialog.allowAllEnvs ? [] : promoteDialog.envIds
+      });
+
       enqueueSnackbar(t('common.userPromoted'), { variant: 'success' });
       mutateUsers();
-      setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false });
+      setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false, allowAllEnvs: false, envIds: [] });
     } catch (error: any) {
       enqueueSnackbar(error.message || t('common.userPromoteFailed'), { variant: 'error' });
       setPromoteDialog(prev => ({ ...prev, loading: false }));
@@ -831,7 +843,7 @@ const UsersManagementPage: React.FC = () => {
   };
 
   const handlePromoteCancel = () => {
-    setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false });
+    setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false, allowAllEnvs: false, envIds: [] });
   };
 
   const handleDemoteUser = (user: User) => {
@@ -991,6 +1003,8 @@ const UsersManagementPage: React.FC = () => {
     details?: {
       added?: string[];
       removed?: string[];
+      addedKeys?: string[];  // Original permission keys for tooltip
+      removedKeys?: string[];
     };
   }
 
@@ -1060,21 +1074,44 @@ const UsersManagementPage: React.FC = () => {
           const addedPerms = editUserPermissions.filter(p => !originalUserData.permissions.includes(p));
           const removedPerms = originalUserData.permissions.filter(p => !editUserPermissions.includes(p));
 
-          let permChange = '';
-          if (addedPerms.length > 0) {
-            permChange += `+${addedPerms.length} ${t('users.added')}`;
+          // Build change description - if original is 0, just show "added", not "0 -> X"
+          const origCount = originalUserData.permissions.length;
+          const newCount = editUserPermissions.length;
+
+          let fromText = '';
+          let toText = '';
+
+          if (origCount === 0 && addedPerms.length > 0) {
+            // No previous permissions - just show what's being added
+            fromText = '-';
+            toText = `${newCount} ${t('users.permissionsCount')} (+${addedPerms.length} ${t('users.added')})`;
+          } else if (newCount === 0 && removedPerms.length > 0) {
+            // All permissions removed
+            fromText = `${origCount} ${t('users.permissionsCount')}`;
+            toText = `- (-${removedPerms.length} ${t('users.removed')})`;
+          } else {
+            // Mixed changes
+            let permChange = '';
+            if (addedPerms.length > 0) {
+              permChange += `+${addedPerms.length} ${t('users.added')}`;
+            }
+            if (removedPerms.length > 0) {
+              if (permChange) permChange += ', ';
+              permChange += `-${removedPerms.length} ${t('users.removed')}`;
+            }
+            fromText = `${origCount} ${t('users.permissionsCount')}`;
+            toText = `${newCount} ${t('users.permissionsCount')} (${permChange})`;
           }
-          if (removedPerms.length > 0) {
-            if (permChange) permChange += ', ';
-            permChange += `-${removedPerms.length} ${t('users.removed')}`;
-          }
+
           changes.push({
             field: t('users.permissions'),
-            from: `${originalUserData.permissions.length} ${t('users.permissionsCount')}`,
-            to: `${editUserPermissions.length} ${t('users.permissionsCount')} (${permChange})`,
+            from: fromText,
+            to: toText,
             details: {
               added: addedPerms.map(p => t(`permissions.${p.replace('.', '_')}`)),
-              removed: removedPerms.map(p => t(`permissions.${p.replace('.', '_')}`))
+              removed: removedPerms.map(p => t(`permissions.${p.replace('.', '_')}`)),
+              addedKeys: addedPerms,
+              removedKeys: removedPerms
             }
           });
         }
@@ -2112,97 +2149,24 @@ const UsersManagementPage: React.FC = () => {
             </Box>
 
             {/* Environment Access */}
-            <Box>
-              <Typography variant="subtitle2" gutterBottom sx={{ mt: 2, fontWeight: 600 }}>
-                {t('users.environmentAccess')}
-              </Typography>
-              <Box sx={{
-                p: 2,
-                bgcolor: 'background.paper',
-                borderRadius: 1,
-                border: 1,
-                borderColor: 'divider'
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <Checkbox
-                    checked={newUserAllowAllEnvs}
-                    onChange={(e) => setNewUserAllowAllEnvs(e.target.checked)}
-                  />
-                  <Typography variant="body2">
-                    {t('users.allowAllEnvironments')}
-                  </Typography>
-                </Box>
-                {newUserAllowAllEnvs && (
-                  <Alert severity="warning" sx={{ mb: 2 }}>
-                    {t('users.allowAllEnvironmentsWarning')}
-                  </Alert>
-                )}
-                {!newUserAllowAllEnvs && (
-                  <Autocomplete
-                    multiple
-                    options={environments}
-                    getOptionLabel={(option) => option.displayName || option.environmentName}
-                    filterSelectedOptions
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    value={environments.filter(env => newUserEnvIds.includes(env.id))}
-                    onChange={(_, value) => setNewUserEnvIds(value.map(v => v.id))}
-                    slotProps={{
-                      popper: {
-                        style: {
-                          zIndex: 9999
-                        }
-                      }
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label={t('users.selectEnvironments')}
-                        placeholder={newUserEnvIds.length === 0 ? t('users.selectEnvironmentsPlaceholder') : ''}
-                        helperText={t('users.selectEnvironmentsHelp')}
-                      />
-                    )}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => {
-                        const { key, ...chipProps } = getTagProps({ index });
-                        return (
-                          <Chip
-                            key={option.id}
-                            label={option.displayName || option.environmentName}
-                            size="small"
-                            {...chipProps}
-                            sx={{
-                              borderRadius: 1,
-                              bgcolor: option.color || '#666',
-                              color: '#fff',
-                              '& .MuiChip-deleteIcon': {
-                                color: 'rgba(255,255,255,0.7)',
-                                '&:hover': { color: '#fff' }
-                              }
-                            }}
-                          />
-                        );
-                      })
-                    }
-                    renderOption={(props, option) => {
-                      const { key, ...otherProps } = props;
-                      return (
-                        <Box component="li" key={key} {...otherProps}>
-                          <Box
-                            sx={{
-                              width: 12,
-                              height: 12,
-                              borderRadius: 0.5,
-                              bgcolor: option.color || '#666',
-                              mr: 1
-                            }}
-                          />
-                          {option.displayName || option.environmentName}
-                        </Box>
-                      );
-                    }}
-                  />
-                )}
-              </Box>
+            <Box sx={{ mt: 2 }}>
+              <PermissionSelector
+                permissions={[]}
+                onChange={() => {}}
+                showTitle={false}
+                showSelectAll={false}
+                showEnvironments={true}
+                environments={environments.map(env => ({
+                  id: env.id,
+                  name: env.environmentName,
+                  displayName: env.displayName,
+                  environmentName: env.environmentName
+                }))}
+                allowAllEnvs={newUserAllowAllEnvs}
+                selectedEnvIds={newUserEnvIds}
+                onAllowAllEnvsChange={setNewUserAllowAllEnvs}
+                onEnvIdsChange={setNewUserEnvIds}
+              />
             </Box>
           </Box>
         </Box>
@@ -2459,6 +2423,17 @@ const UsersManagementPage: React.FC = () => {
                 permissions={promoteDialog.permissions}
                 onChange={(permissions) => setPromoteDialog(prev => ({ ...prev, permissions }))}
                 showTitle={false}
+                showEnvironments={true}
+                environments={environments.map(env => ({
+                  id: env.id,
+                  name: env.environmentName,
+                  displayName: env.displayName,
+                  environmentName: env.environmentName
+                }))}
+                allowAllEnvs={promoteDialog.allowAllEnvs}
+                selectedEnvIds={promoteDialog.envIds}
+                onAllowAllEnvsChange={(allowAll) => setPromoteDialog(prev => ({ ...prev, allowAllEnvs: allowAll }))}
+                onEnvIdsChange={(envIds) => setPromoteDialog(prev => ({ ...prev, envIds }))}
               />
             </>
           )}
@@ -2518,16 +2493,59 @@ const UsersManagementPage: React.FC = () => {
                     </Typography>
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {promoteDialog.permissions.map(perm => (
-                        <Chip
-                          key={perm}
-                          label={t(`permissions.${perm.replace('.', '_')}`)}
-                          size="small"
-                          color="success"
-                          variant="outlined"
-                          sx={{ fontSize: '0.75rem' }}
-                        />
-                      ))}
+                      {promoteDialog.permissions.map(perm => {
+                        const permKey = perm.replace('.', '_');
+                        const tooltipText = t(`permissions.${permKey}_desc`, { defaultValue: '' });
+                        return (
+                          <Tooltip key={perm} title={tooltipText} arrow placement="top" enterDelay={200}>
+                            <Chip
+                              label={t(`permissions.${permKey}`)}
+                              size="small"
+                              color="success"
+                              variant="outlined"
+                              sx={{ fontSize: '0.75rem' }}
+                            />
+                          </Tooltip>
+                        );
+                      })}
+                    </Box>
+                  )}
+                </Box>
+
+                {/* Environment Access */}
+                <Box sx={{ pt: 2, borderTop: 1, borderColor: 'divider' }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                    {t('users.environmentAccess')}
+                  </Typography>
+                  {promoteDialog.allowAllEnvs ? (
+                    <Chip
+                      label={t('users.allowAllEnvironments')}
+                      size="small"
+                      color="warning"
+                      variant="filled"
+                      sx={{ fontSize: '0.75rem' }}
+                    />
+                  ) : promoteDialog.envIds.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary" fontStyle="italic">
+                      {t('users.noEnvironmentsSelected')}
+                    </Typography>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {promoteDialog.envIds.map(envId => {
+                        const env = environments.find(e => e.id === envId);
+                        const displayName = env?.displayName || env?.environmentName || envId;
+                        return (
+                          <Tooltip key={envId} title={t('users.environmentAccessDesc', { name: displayName })} arrow placement="top" enterDelay={200}>
+                            <Chip
+                              label={displayName}
+                              size="small"
+                              color="success"
+                              variant="outlined"
+                              sx={{ fontSize: '0.75rem' }}
+                            />
+                          </Tooltip>
+                        );
+                      })}
                     </Box>
                   )}
                 </Box>
@@ -2753,102 +2771,48 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
 
-            {/* Environment Access Section */}
-            {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && (
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                  {t('users.environmentAccess')}
-                </Typography>
-                <Box sx={{
-                  p: 2,
-                  bgcolor: 'background.paper',
-                  borderRadius: 1,
-                  border: 1,
-                  borderColor: 'divider'
-                }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Checkbox
-                      checked={editUserAllowAllEnvs}
-                      onChange={(e) => setEditUserAllowAllEnvs(e.target.checked)}
-                    />
-                    <Typography variant="body2">
-                      {t('users.allowAllEnvironments')}
-                    </Typography>
-                  </Box>
-                  {editUserAllowAllEnvs && (
-                    <Alert severity="warning" sx={{ mb: 2 }}>
-                      {t('users.allowAllEnvironmentsWarning')}
-                    </Alert>
-                  )}
-                  {!editUserAllowAllEnvs && (
-                    <Autocomplete
-                      multiple
-                      options={environments}
-                      getOptionLabel={(option) => option.displayName || option.environmentName}
-                      filterSelectedOptions
-                      isOptionEqualToValue={(option, value) => option.id === value.id}
-                      value={environments.filter(env => editUserEnvIds.includes(env.id))}
-                      onChange={(_, value) => setEditUserEnvIds(value.map(v => v.id))}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={t('users.selectEnvironments')}
-                          placeholder={editUserEnvIds.length === 0 ? t('users.selectEnvironmentsPlaceholder') : ''}
-                          helperText={t('users.selectEnvironmentsHelp')}
-                        />
-                      )}
-                      renderTags={(value, getTagProps) =>
-                        value.map((option, index) => {
-                          const { key, ...tagProps } = getTagProps({ index });
-                          return (
-                            <Chip
-                              key={key}
-                              label={option.displayName || option.environmentName}
-                              size="small"
-                              {...tagProps}
-                              sx={{
-                                borderRadius: 1,
-                                bgcolor: option.color || '#666',
-                                color: '#fff',
-                                '& .MuiChip-deleteIcon': {
-                                  color: 'rgba(255,255,255,0.7)',
-                                  '&:hover': { color: '#fff' }
-                                }
-                              }}
-                            />
-                          );
-                        })
-                      }
-                      renderOption={(props, option) => {
-                        const { key, ...otherProps } = props;
-                        return (
-                          <Box component="li" key={key} {...otherProps}>
-                            <Box
-                              sx={{
-                                width: 12,
-                                height: 12,
-                                borderRadius: 0.5,
-                                bgcolor: option.color || '#666',
-                                mr: 1
-                              }}
-                            />
-                            {option.displayName || option.environmentName}
-                          </Box>
-                        );
-                      }}
-                    />
-                  )}
-                </Box>
-              </Box>
-            )}
-
-            {/* Permissions Section - Only for admin users */}
+            {/* Permissions & Environment Access Section - Only for admin users */}
             {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && editUserData.role === 'admin' && (
               <Box sx={{ mt: 2 }}>
                 <PermissionSelector
                   permissions={editUserPermissions}
                   onChange={setEditUserPermissions}
                   loading={permissionsLoading}
+                  showEnvironments={true}
+                  environments={environments.map(env => ({
+                    id: env.id,
+                    name: env.environmentName,
+                    displayName: env.displayName,
+                    environmentName: env.environmentName
+                  }))}
+                  allowAllEnvs={editUserAllowAllEnvs}
+                  selectedEnvIds={editUserEnvIds}
+                  onAllowAllEnvsChange={setEditUserAllowAllEnvs}
+                  onEnvIdsChange={setEditUserEnvIds}
+                />
+              </Box>
+            )}
+
+            {/* Environment Access for non-admin users */}
+            {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && editUserData.role !== 'admin' && (
+              <Box sx={{ mt: 2 }}>
+                <PermissionSelector
+                  permissions={[]}
+                  onChange={() => {}}
+                  showTitle={false}
+                  showSelectAll={false}
+                  showPermissionCategories={false}
+                  showEnvironments={true}
+                  environments={environments.map(env => ({
+                    id: env.id,
+                    name: env.environmentName,
+                    displayName: env.displayName,
+                    environmentName: env.environmentName
+                  }))}
+                  allowAllEnvs={editUserAllowAllEnvs}
+                  selectedEnvIds={editUserEnvIds}
+                  onAllowAllEnvsChange={setEditUserAllowAllEnvs}
+                  onEnvIdsChange={setEditUserEnvIds}
                 />
               </Box>
             )}
@@ -2985,9 +2949,15 @@ const UsersManagementPage: React.FC = () => {
                                 + {t('users.added')}:
                               </Typography>
                               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {change.details.added.map((perm, i) => (
-                                  <Chip key={i} label={perm} size="small" color="success" variant="outlined" sx={{ fontSize: '0.7rem', height: 22 }} />
-                                ))}
+                                {change.details.added.map((perm, i) => {
+                                  const permKey = change.details?.addedKeys?.[i];
+                                  const tooltipText = permKey ? t(`permissions.${permKey.replace('.', '_')}_desc`, { defaultValue: '' }) : '';
+                                  return (
+                                    <Tooltip key={i} title={tooltipText} arrow placement="top" enterDelay={200}>
+                                      <Chip label={perm} size="small" color="success" variant="outlined" sx={{ fontSize: '0.7rem', height: 22 }} />
+                                    </Tooltip>
+                                  );
+                                })}
                               </Box>
                             </Box>
                           )}
@@ -2997,9 +2967,15 @@ const UsersManagementPage: React.FC = () => {
                                 - {t('users.removed')}:
                               </Typography>
                               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {change.details.removed.map((perm, i) => (
-                                  <Chip key={i} label={perm} size="small" color="error" variant="outlined" sx={{ fontSize: '0.7rem', height: 22 }} />
-                                ))}
+                                {change.details.removed.map((perm, i) => {
+                                  const permKey = change.details?.removedKeys?.[i];
+                                  const tooltipText = permKey ? t(`permissions.${permKey.replace('.', '_')}_desc`, { defaultValue: '' }) : '';
+                                  return (
+                                    <Tooltip key={i} title={tooltipText} arrow placement="top" enterDelay={200}>
+                                      <Chip label={perm} size="small" color="error" variant="outlined" sx={{ fontSize: '0.7rem', height: 22 }} />
+                                    </Tooltip>
+                                  );
+                                })}
                               </Box>
                             </Box>
                           )}
