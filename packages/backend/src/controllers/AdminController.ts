@@ -16,6 +16,15 @@ const setEnvironmentAccessSchema = Joi.object({
   environmentIds: Joi.array().items(Joi.string().length(26)).default([]),
 });
 
+// Super admin email - this account cannot be modified by anyone except themselves (name only)
+const SUPER_ADMIN_EMAIL = 'admin@gatrix.com';
+
+// Helper function to check if a user is the super admin
+const isSuperAdminUser = async (userId: number): Promise<boolean> => {
+  const user = await db('g_users').where('id', userId).select('email').first();
+  return user?.email === SUPER_ADMIN_EMAIL;
+};
+
 export class AdminController {
   // Dashboard and statistics
   static async getDashboard(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
@@ -48,6 +57,7 @@ export class AdminController {
           totalUsers: stats.total,
           activeUsers: stats.active,
           pendingUsers: stats.pending,
+          suspendedUsers: stats.suspended,
           adminUsers: stats.admins
         }
       });
@@ -202,6 +212,25 @@ export class AdminController {
         throw new GatrixError('User not authenticated', 401);
       }
 
+      // Protect super admin from being modified by others
+      const isTargetSuperAdmin = await isSuperAdminUser(userId);
+      const isOwnAccount = req.user.userId === userId;
+      if (isTargetSuperAdmin && !isOwnAccount) {
+        throw new GatrixError('Cannot modify super admin account', 403);
+      }
+
+      // If it's super admin modifying their own account, only allow name changes
+      if (isTargetSuperAdmin && isOwnAccount) {
+        const allowedUpdates = { name: updates.name };
+        let user = await UserService.updateUser(userId, allowedUpdates);
+        res.json({
+          success: true,
+          data: user,
+          message: 'User updated successfully'
+        });
+        return;
+      }
+
       const updatedBy = req.user.userId;
 
       let user = await UserService.updateUser(userId, updates);
@@ -233,6 +262,11 @@ export class AdminController {
         throw new GatrixError('Cannot delete your own account', 400);
       }
 
+      // Protect super admin from being deleted
+      if (await isSuperAdminUser(userId)) {
+        throw new GatrixError('Cannot delete super admin account', 403);
+      }
+
       await UserService.deleteUser(userId);
 
       res.json({
@@ -247,6 +281,12 @@ export class AdminController {
   static async activateUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = parseInt(req.params.id);
+
+      // Protect super admin from being modified by others
+      if (await isSuperAdminUser(userId) && req.user?.userId !== userId) {
+        throw new GatrixError('Cannot modify super admin account', 403);
+      }
+
       await UserService.activateUser(userId);
 
       res.json({
@@ -265,6 +305,11 @@ export class AdminController {
       // Prevent admin from suspending themselves
       if (req.user?.userId === userId) {
         throw new GatrixError('Cannot suspend your own account', 400);
+      }
+
+      // Protect super admin from being suspended
+      if (await isSuperAdminUser(userId)) {
+        throw new GatrixError('Cannot suspend super admin account', 403);
       }
 
       await UserService.suspendUser(userId);
@@ -978,6 +1023,11 @@ export class AdminController {
         throw new GatrixError('Invalid user ID', 400);
       }
 
+      // Protect super admin from being modified by others
+      if (await isSuperAdminUser(userId) && req.user?.userId !== userId) {
+        throw new GatrixError('Cannot modify super admin account', 403);
+      }
+
       const { error, value } = setEnvironmentAccessSchema.validate(req.body);
       if (error) {
         throw new GatrixError(error.details[0].message, 400);
@@ -1059,6 +1109,11 @@ export class AdminController {
 
       if (isNaN(userId)) {
         throw new GatrixError('Invalid user ID', 400);
+      }
+
+      // Protect super admin from being modified by others
+      if (await isSuperAdminUser(userId) && req.user?.userId !== userId) {
+        throw new GatrixError('Cannot modify super admin account', 403);
       }
 
       // Validate request body

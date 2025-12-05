@@ -292,6 +292,21 @@ const UsersManagementPage: React.FC = () => {
     return currentUser?.id === user?.id;
   };
 
+  // Helper function to check if user is super admin (admin@gatrix.com)
+  // Super admin cannot be modified by anyone except themselves (name only)
+  const isSuperAdmin = (user: User | null): boolean => {
+    return user?.email === 'admin@gatrix.com';
+  };
+
+  // Check if the target user can be modified
+  // Returns true if the user CAN be modified, false if they should be protected
+  const canModifyUser = (user: User | null): boolean => {
+    if (!user) return false;
+    // Super admin can only be modified by themselves
+    if (isSuperAdmin(user) && !isCurrentUser(user)) return false;
+    return true;
+  };
+
   // 클립보드 복사 함수
   const copyToClipboard = async (text: string, type: 'name' | 'email') => {
     copyToClipboardWithNotification(
@@ -2012,7 +2027,8 @@ const UsersManagementPage: React.FC = () => {
           horizontal: 'right',
         }}
       >
-        {canManage && (
+        {/* Edit: allowed for super admin only if it's their own account */}
+        {canManage && (isCurrentUser(selectedUser) || canModifyUser(selectedUser)) && (
           <MenuItem onClick={() => handleMenuAction('edit')}>
             <ListItemIcon>
               <EditIcon />
@@ -2021,7 +2037,8 @@ const UsersManagementPage: React.FC = () => {
           </MenuItem>
         )}
 
-        {canManage && (selectedUser?.status === 'active' ? (
+        {/* Suspend/Activate: not allowed for own account or super admin */}
+        {canManage && canModifyUser(selectedUser) && (selectedUser?.status === 'active' ? (
           <MenuItem
             onClick={() => handleMenuAction('suspend')}
             disabled={isCurrentUser(selectedUser)}
@@ -2043,7 +2060,8 @@ const UsersManagementPage: React.FC = () => {
           </MenuItem>
         ))}
 
-        {canManage && selectedUser?.role === 'user' && selectedUser?.status === 'active' && (
+        {/* Promote: not shown for super admin */}
+        {canManage && canModifyUser(selectedUser) && selectedUser?.role === 'user' && selectedUser?.status === 'active' && (
           <MenuItem onClick={() => handleMenuAction('promote')}>
             <ListItemIcon>
               <SecurityIcon />
@@ -2052,7 +2070,8 @@ const UsersManagementPage: React.FC = () => {
           </MenuItem>
         )}
 
-        {canManage && selectedUser?.role === 'admin' && (
+        {/* Demote: not allowed for own account or super admin */}
+        {canManage && canModifyUser(selectedUser) && selectedUser?.role === 'admin' && (
           <MenuItem
             onClick={() => handleMenuAction('demote')}
             disabled={isCurrentUser(selectedUser)}
@@ -2064,8 +2083,8 @@ const UsersManagementPage: React.FC = () => {
           </MenuItem>
         )}
 
-        {/* 이메일 인증 관련 메뉴 */}
-        {canManage && selectedUser && !selectedUser.emailVerified && (
+        {/* Email verification: not shown for super admin (unless own account) */}
+        {canManage && canModifyUser(selectedUser) && selectedUser && !selectedUser.emailVerified && (
           <>
             <MenuItem onClick={() => handleMenuAction('verifyEmail')}>
               <ListItemIcon>
@@ -2082,7 +2101,8 @@ const UsersManagementPage: React.FC = () => {
           </>
         )}
 
-        {canManage && (
+        {/* Delete: not allowed for own account or super admin */}
+        {canManage && canModifyUser(selectedUser) && (
           <MenuItem
             onClick={() => handleMenuAction('delete')}
             disabled={isCurrentUser(selectedUser)}

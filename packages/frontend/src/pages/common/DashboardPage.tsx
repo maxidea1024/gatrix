@@ -49,6 +49,7 @@ import {
   Timeline as TimelineIcon,
   OpenInNew as OpenInNewIcon,
   Refresh as RefreshIcon,
+  Block as BlockIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
@@ -217,6 +218,39 @@ interface RecentActivity {
   userName?: string;
 }
 
+// Environment interface
+interface Environment {
+  id: string;
+  environmentName: string;
+  displayName: string;
+  description?: string;
+  color?: string;
+}
+
+// Environment data counts interface
+interface EnvironmentDataCounts {
+  templates: number;
+  gameWorlds: number;
+  segments: number;
+  tags: number;
+  vars: number;
+  messageTemplates: number;
+  serviceNotices: number;
+  ingamePopups: number;
+  surveys: number;
+  coupons: number;
+  banners: number;
+  jobs: number;
+  clientVersions: number;
+  apiTokens: number;
+  total: number;
+}
+
+interface EnvironmentWithCounts extends Environment {
+  counts?: EnvironmentDataCounts;
+  loading?: boolean;
+}
+
 const DashboardPage: React.FC = () => {
   const theme = useTheme();
   const { user, isAdmin, hasPermission } = useAuth();
@@ -232,12 +266,15 @@ const DashboardPage: React.FC = () => {
   const [alertsSummaryLoading, setAlertsSummaryLoading] = useState(false);
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [activitiesLoading, setActivitiesLoading] = useState(false);
+  const [environmentsWithCounts, setEnvironmentsWithCounts] = useState<EnvironmentWithCounts[]>([]);
+  const [envCountsLoading, setEnvCountsLoading] = useState(false);
 
   // Map API response fields to local names
   const stats = {
     total: statsData?.totalUsers ?? 0,
     active: statsData?.activeUsers ?? 0,
     pending: statsData?.pendingUsers ?? 0,
+    suspended: statsData?.suspendedUsers ?? 0,
     admins: statsData?.adminUsers ?? 0,
   };
 
@@ -263,6 +300,36 @@ const DashboardPage: React.FC = () => {
         icon: <PeopleIcon />,
         path: '/admin/users',
         badge: stats.pending > 0 ? stats.pending : undefined,
+      });
+    }
+
+    if (hasPermission(PERMISSIONS.CLIENT_VERSIONS_VIEW)) {
+      actions.push({
+        key: 'clientVersions',
+        title: t('sidebar.clientVersions'),
+        description: t('dashboard.quickActions.clientVersionsDesc'),
+        icon: <StorageIcon />,
+        path: '/admin/client-versions',
+      });
+    }
+
+    if (hasPermission(PERMISSIONS.GAME_WORLDS_VIEW)) {
+      actions.push({
+        key: 'gameWorlds',
+        title: t('sidebar.gameWorlds'),
+        description: t('dashboard.quickActions.gameWorldsDesc'),
+        icon: <GamesIcon />,
+        path: '/admin/game-worlds',
+      });
+    }
+
+    if (hasPermission(PERMISSIONS.SERVERS_VIEW)) {
+      actions.push({
+        key: 'servers',
+        title: t('sidebar.servers'),
+        description: t('dashboard.quickActions.serversDesc'),
+        icon: <CloudQueueIcon />,
+        path: '/admin/servers',
       });
     }
 
@@ -307,6 +374,16 @@ const DashboardPage: React.FC = () => {
       });
     }
 
+    if (hasPermission(PERMISSIONS.INGAME_POPUP_NOTICES_VIEW)) {
+      actions.push({
+        key: 'ingamePopupNotices',
+        title: t('sidebar.ingamePopupNotices'),
+        description: t('dashboard.quickActions.ingamePopupNoticesDesc'),
+        icon: <NotificationsIcon />,
+        path: '/game/ingame-popup-notices',
+      });
+    }
+
     if (hasPermission(PERMISSIONS.COUPONS_VIEW)) {
       actions.push({
         key: 'coupons',
@@ -327,6 +404,16 @@ const DashboardPage: React.FC = () => {
       });
     }
 
+    if (hasPermission(PERMISSIONS.OPERATION_EVENTS_VIEW)) {
+      actions.push({
+        key: 'operationEvents',
+        title: t('sidebar.operationEvents'),
+        description: t('dashboard.quickActions.operationEventsDesc'),
+        icon: <EventNoteIcon />,
+        path: '/game/operation-events',
+      });
+    }
+
     if (hasPermission(PERMISSIONS.BANNERS_VIEW)) {
       actions.push({
         key: 'banners',
@@ -334,6 +421,16 @@ const DashboardPage: React.FC = () => {
         description: t('dashboard.quickActions.bannersDesc'),
         icon: <ImageIcon />,
         path: '/game/banners',
+      });
+    }
+
+    if (hasPermission(PERMISSIONS.PLANNING_DATA_VIEW)) {
+      actions.push({
+        key: 'planningData',
+        title: t('sidebar.planningData'),
+        description: t('dashboard.quickActions.planningDataDesc'),
+        icon: <DescriptionIcon />,
+        path: '/game/planning-data',
       });
     }
 
@@ -368,6 +465,17 @@ const DashboardPage: React.FC = () => {
         path: '/admin/grafana-dashboard',
         color: alertsSummary.firing > 0 ? theme.palette.error.main : undefined,
         badge: alertsSummary.firing > 0 ? alertsSummary.firing : undefined,
+      });
+    }
+
+    // Settings actions
+    if (hasPermission(PERMISSIONS.ENVIRONMENTS_VIEW)) {
+      actions.push({
+        key: 'environments',
+        title: t('sidebar.environments'),
+        description: t('dashboard.quickActions.environmentsDesc'),
+        icon: <PublicIcon />,
+        path: '/settings/environments',
       });
     }
 
@@ -448,6 +556,87 @@ const DashboardPage: React.FC = () => {
     return () => { isMounted = false; };
   }, [isAdminUser, hasPermission]);
 
+  // Load environment data counts
+  useEffect(() => {
+    if (!isAdminUser) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadEnvironmentCounts = async () => {
+      try {
+        setEnvCountsLoading(true);
+
+        // First get user's accessible environments
+        const [accessResponse, envsResponse] = await Promise.all([
+          api.get('/admin/users/me/environments'),
+          api.get('/admin/environments'),
+        ]);
+
+        if (!isMounted) return;
+
+        const access = accessResponse?.data;
+        const allEnvs: Environment[] = envsResponse?.data || [];
+
+        // Filter to accessible environments
+        const accessibleEnvs = access?.allowAllEnvironments
+          ? allEnvs
+          : allEnvs.filter((env: Environment) => access?.environmentIds?.includes(env.id));
+
+        // Limit to first 4 environments for dashboard display
+        const displayEnvs = accessibleEnvs.slice(0, 4);
+
+        // Initialize with loading state
+        setEnvironmentsWithCounts(displayEnvs.map((env: Environment) => ({ ...env, loading: true })));
+
+        // Fetch counts for each environment
+        const countsPromises = displayEnvs.map(async (env: Environment) => {
+          try {
+            const res = await api.get(`/admin/environments/${env.id}/related-data`);
+            const rawData = res?.data?.relatedData;
+            // Extract count from each { count, items } object
+            const counts = rawData ? {
+              templates: rawData.templates?.count ?? 0,
+              gameWorlds: rawData.gameWorlds?.count ?? 0,
+              segments: rawData.segments?.count ?? 0,
+              tags: rawData.tags?.count ?? 0,
+              vars: rawData.vars?.count ?? 0,
+              messageTemplates: rawData.messageTemplates?.count ?? 0,
+              serviceNotices: rawData.serviceNotices?.count ?? 0,
+              ingamePopups: rawData.ingamePopups?.count ?? 0,
+              surveys: rawData.surveys?.count ?? 0,
+              coupons: rawData.coupons?.count ?? 0,
+              banners: rawData.banners?.count ?? 0,
+              jobs: rawData.jobs?.count ?? 0,
+              clientVersions: rawData.clientVersions?.count ?? 0,
+              apiTokens: rawData.apiTokens?.count ?? 0,
+              total: rawData.total ?? 0,
+            } : null;
+            return {
+              ...env,
+              counts,
+              loading: false,
+            };
+          } catch {
+            return { ...env, counts: null, loading: false };
+          }
+        });
+
+        const envsWithCounts = await Promise.all(countsPromises);
+        if (isMounted) {
+          setEnvironmentsWithCounts(envsWithCounts);
+        }
+      } catch {
+        // Silently fail
+      } finally {
+        if (isMounted) setEnvCountsLoading(false);
+      }
+    };
+
+    loadEnvironmentCounts();
+    return () => { isMounted = false; };
+  }, [isAdminUser]);
 
   // Get time-based greeting
   const getGreeting = () => {
@@ -541,7 +730,7 @@ const DashboardPage: React.FC = () => {
             </Tooltip>
           </Box>
           <Grid container spacing={2}>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ xs: 6, sm: 2.4 }}>
               <StatsCard
                 title={t('dashboard.totalUsers')}
                 value={stats.total}
@@ -551,16 +740,17 @@ const DashboardPage: React.FC = () => {
                 onClick={() => navigate('/admin/users')}
               />
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ xs: 6, sm: 2.4 }}>
               <StatsCard
                 title={t('dashboard.activeUsers')}
                 value={stats.active}
                 icon={<TrendingUpIcon />}
                 color="success"
                 loading={statsLoading}
+                onClick={() => navigate('/admin/users?status=active')}
               />
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ xs: 6, sm: 2.4 }}>
               <StatsCard
                 title={t('dashboard.pendingApproval')}
                 value={stats.pending}
@@ -571,13 +761,24 @@ const DashboardPage: React.FC = () => {
                 onClick={stats.pending > 0 ? () => navigate('/admin/users?status=pending') : undefined}
               />
             </Grid>
-            <Grid size={{ xs: 6, sm: 3 }}>
+            <Grid size={{ xs: 6, sm: 2.4 }}>
+              <StatsCard
+                title={t('dashboard.suspendedUsers')}
+                value={stats.suspended}
+                icon={<BlockIcon />}
+                color="error"
+                loading={statsLoading}
+                onClick={stats.suspended > 0 ? () => navigate('/admin/users?status=suspended') : undefined}
+              />
+            </Grid>
+            <Grid size={{ xs: 6, sm: 2.4 }}>
               <StatsCard
                 title={t('dashboard.administrators')}
                 value={stats.admins}
                 icon={<SecurityIcon />}
                 color="info"
                 loading={statsLoading}
+                onClick={() => navigate('/admin/users?role=admin')}
               />
             </Grid>
           </Grid>
@@ -620,6 +821,111 @@ const DashboardPage: React.FC = () => {
                 onClick={() => navigate('/admin/grafana-dashboard')}
               />
             </Grid>
+          </Grid>
+        </Box>
+      )}
+
+      {/* Environment Data Overview - Only for Admins */}
+      {isAdminUser && environmentsWithCounts.length > 0 && (
+        <Box sx={{ mb: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+            <Typography variant="h6" fontWeight={600}>
+              {t('dashboard.environmentOverview')}
+            </Typography>
+            <Tooltip title={t('sidebar.environments')}>
+              <IconButton size="small" onClick={() => navigate('/settings/environments')}>
+                <OpenInNewIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+          <Grid container spacing={2}>
+            {environmentsWithCounts.map((env) => (
+              <Grid key={env.id} size={{ xs: 12, sm: 6, md: 3 }}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    borderTop: `3px solid ${env.color || theme.palette.primary.main}`,
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: env.color || theme.palette.primary.main,
+                          mr: 1,
+                        }}
+                      />
+                      <Typography variant="subtitle2" fontWeight={600} noWrap>
+                        {env.displayName || env.environmentName}
+                      </Typography>
+                    </Box>
+                    {env.loading || envCountsLoading ? (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                        <Skeleton width="80%" height={20} />
+                        <Skeleton width="60%" height={20} />
+                        <Skeleton width="70%" height={20} />
+                      </Box>
+                    ) : env.counts ? (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {t('dashboard.envTemplates')}
+                          </Typography>
+                          <Typography variant="caption" fontWeight={600}>
+                            {env.counts.templates}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {t('dashboard.envGameWorlds')}
+                          </Typography>
+                          <Typography variant="caption" fontWeight={600}>
+                            {env.counts.gameWorlds}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {t('dashboard.envNotices')}
+                          </Typography>
+                          <Typography variant="caption" fontWeight={600}>
+                            {env.counts.serviceNotices + env.counts.ingamePopups}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {t('dashboard.envBanners')}
+                          </Typography>
+                          <Typography variant="caption" fontWeight={600}>
+                            {env.counts.banners}
+                          </Typography>
+                        </Box>
+                        <Divider sx={{ my: 0.5 }} />
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                            {t('dashboard.envTotal')}
+                          </Typography>
+                          <Typography variant="caption" fontWeight={700} color="primary.main">
+                            {env.counts.total}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Typography variant="caption" color="text.secondary">
+                        {t('dashboard.envNoData')}
+                      </Typography>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
           </Grid>
         </Box>
       )}
