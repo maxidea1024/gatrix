@@ -62,6 +62,26 @@ export interface ServiceDiscoveryConfig {
 }
 
 /**
+ * Features Configuration
+ * Toggle caching features on/off based on server needs.
+ * Existing features default to true for backward compatibility.
+ * New features (for Edge server) default to false.
+ */
+export interface FeaturesConfig {
+  // Existing features - default: true (backward compatible)
+  gameWorld?: boolean; // Game world caching (default: true)
+  popupNotice?: boolean; // Popup notice caching (default: true)
+  survey?: boolean; // Survey caching (default: true)
+  whitelist?: boolean; // Whitelist caching (default: true)
+  serviceMaintenance?: boolean; // Service maintenance caching (default: true)
+
+  // New features for Edge server - default: false
+  clientVersion?: boolean; // Client version caching (default: false)
+  serviceNotice?: boolean; // Service notice caching (default: false)
+  banner?: boolean; // Banner caching (default: false)
+}
+
+/**
  * Main SDK Configuration
  */
 export interface GatrixSDKConfig {
@@ -90,5 +110,15 @@ export interface GatrixSDKConfig {
 
   // Optional - Service discovery settings (auto-registration)
   serviceDiscovery?: ServiceDiscoveryConfig;
+
+  // Optional - Feature toggles (for selective caching)
+  features?: FeaturesConfig;
+
+  // Optional - Target environments (for Edge server)
+  // When specified, SDK loads data for these environments instead of just the current one
+  // Edge server uses this to serve requests for multiple environments
+  // Example: ['env_prod', 'env_staging', 'env_dev']
+  // If not specified or empty, SDK operates in single-environment mode
+  environments?: string[];
 }
 

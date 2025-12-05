@@ -21,6 +21,144 @@ export interface ApiResponse<T = any> {
 }
 
 // ============================================================================
+// Client Version Types
+// ============================================================================
+
+export type ClientStatus = 'ONLINE' | 'OFFLINE' | 'MAINTENANCE' | 'UPDATE_REQUIRED';
+
+export interface ClientVersionMaintenanceLocale {
+  lang: string;
+  message: string;
+}
+
+export interface ClientVersion {
+  id: number;
+  environmentId?: string; // Environment ID for multi-environment support
+  platform: string;
+  clientVersion: string;
+  clientStatus: ClientStatus;
+  gameServerAddress: string;
+  gameServerAddressForWhiteList?: string;
+  patchAddress: string;
+  patchAddressForWhiteList?: string;
+  guestModeAllowed: boolean;
+  externalClickLink?: string;
+  memo?: string;
+  customPayload?: Record<string, any>;
+  maintenanceStartDate?: string;
+  maintenanceEndDate?: string;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
+  maintenanceLocales?: ClientVersionMaintenanceLocale[];
+  tags?: { id: number; name: string; color: string }[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ClientVersionListResponse {
+  clientVersions: ClientVersion[];
+  total: number;
+}
+
+// ============================================================================
+// Service Notice Types
+// ============================================================================
+
+export type ServiceNoticeCategory = 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
+
+export interface ServiceNotice {
+  id: number;
+  environmentId?: string;
+  isActive: boolean;
+  category: ServiceNoticeCategory;
+  platforms: string[];
+  channels?: string[];
+  subchannels?: string[];
+  startDate: string | null;
+  endDate: string | null;
+  tabTitle?: string | null;
+  title: string;
+  content: string;
+  description?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ServiceNoticeListResponse {
+  notices: ServiceNotice[];
+  total: number;
+}
+
+// ============================================================================
+// Banner Types
+// ============================================================================
+
+export type BannerStatus = 'draft' | 'published' | 'archived';
+export type FrameActionType = 'openUrl' | 'command' | 'deepLink' | 'none';
+export type FrameActionTarget = 'webview' | 'external';
+export type TransitionType = 'fade' | 'slide' | 'crossfade' | 'none';
+export type LoopModeType = 'loop' | 'pingpong' | 'once';
+export type FrameType = 'jpg' | 'png' | 'gif' | 'mp4';
+
+export interface FrameAction {
+  type: FrameActionType;
+  target?: FrameActionTarget;
+  value?: string;
+}
+
+export interface FrameTransition {
+  type: TransitionType;
+  duration: number;
+}
+
+export interface Frame {
+  frameId: string;
+  imageUrl: string;
+  type: FrameType;
+  delay: number;
+  loop?: boolean;
+  action?: FrameAction;
+  transition?: FrameTransition;
+  meta?: Record<string, any>;
+}
+
+export interface SequenceTransition {
+  type: TransitionType;
+  duration: number;
+}
+
+export interface Sequence {
+  sequenceId: string;
+  name: string;
+  speedMultiplier: number;
+  loopMode: LoopModeType;
+  transition?: SequenceTransition;
+  frames: Frame[];
+}
+
+export interface Banner {
+  bannerId: string;
+  environmentId?: string; // Environment ID for multi-environment support
+  name: string;
+  description?: string;
+  width: number;
+  height: number;
+  metadata?: Record<string, any>;
+  playbackSpeed: number;
+  shuffle: boolean;
+  sequences: Sequence[];
+  version: number;
+  status: BannerStatus;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface BannerListResponse {
+  banners: Banner[];
+  total: number;
+}
+
+// ============================================================================
 // Coupon Types
 // ============================================================================
 

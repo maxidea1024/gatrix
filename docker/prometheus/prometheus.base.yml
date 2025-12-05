@@ -14,6 +14,16 @@ scrape_configs:
         labels:
           service: chat
 
+  # Edge Server metrics (internal port only)
+  - job_name: 'gatrix-edge'
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - edge__SERVICE_SUFFIX__:9337
+        labels:
+          service: edge
+          instance: edge
+
   # Discovered services via Backend HTTP-SD
   - job_name: 'gatrix-discovered'
     metrics_path: /metrics

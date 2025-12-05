@@ -296,6 +296,21 @@ export const SERVER_SDK_ETAG = {
    * Survey settings for server SDK
    */
   SURVEY_SETTINGS: 'server_sdk:etag:survey_settings',
+
+  /**
+   * Client versions for server SDK (Edge)
+   */
+  CLIENT_VERSIONS: 'server_sdk:etag:client_versions',
+
+  /**
+   * Service notices for server SDK (Edge)
+   */
+  SERVICE_NOTICES: 'server_sdk:etag:service_notices',
+
+  /**
+   * Banners for server SDK (Edge)
+   */
+  BANNERS: 'server_sdk:etag:banners',
 } as const;
 
 /**
@@ -545,4 +560,14 @@ export const DEFAULT_CONFIG = {
    * 번역 결과/언어 감지 TTL
    */
   TRANSLATION_TTL: TTL.ONE_DAY,
+
+  /**
+   * 서비스 공지 TTL (Server SDK용 - Edge)
+   */
+  SERVICE_NOTICE_TTL: TTL.ONE_MINUTE,
+
+  /**
+   * 배너 TTL (Server SDK용 - Edge)
+   */
+  BANNER_TTL: TTL.FIVE_MINUTES,
 } as const;

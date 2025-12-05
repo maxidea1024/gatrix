@@ -1,29 +1,37 @@
 /**
  * Cache Manager
- * Manages in-memory caching for game worlds, popup notices, and surveys
+ * Manages in-memory caching for game worlds, popup notices, surveys, and Edge-specific data
  */
 
 import { Logger } from '../utils/logger';
-import { CacheConfig } from '../types/config';
+import { CacheConfig, FeaturesConfig } from '../types/config';
 import { GameWorldService } from '../services/GameWorldService';
 import { PopupNoticeService } from '../services/PopupNoticeService';
 import { SurveyService } from '../services/SurveyService';
 import { WhitelistService } from '../services/WhitelistService';
 import { ServiceMaintenanceService } from '../services/ServiceMaintenanceService';
+import { ClientVersionService } from '../services/ClientVersionService';
+import { ServiceNoticeService } from '../services/ServiceNoticeService';
+import { BannerService } from '../services/BannerService';
 import { ApiClient } from '../client/ApiClient';
 import { SdkMetrics } from '../utils/sdkMetrics';
-import { MaintenanceStatus } from '../types/api';
+import { MaintenanceStatus, ClientVersion, ServiceNotice, Banner } from '../types/api';
 import { sleep } from '../utils/time';
 import { MaintenanceWatcher, MaintenanceEventCallback } from './MaintenanceWatcher';
 
 export class CacheManager {
   private logger: Logger;
   private config: CacheConfig;
+  private features: FeaturesConfig;
   private gameWorldService: GameWorldService;
   private popupNoticeService: PopupNoticeService;
   private surveyService: SurveyService;
   private whitelistService: WhitelistService;
   private serviceMaintenanceService: ServiceMaintenanceService;
+  // New services for Edge
+  private clientVersionService?: ClientVersionService;
+  private serviceNoticeService?: ServiceNoticeService;
+  private bannerService?: BannerService;
   private apiClient: ApiClient;
   private refreshInterval?: NodeJS.Timeout;
   private refreshCallbacks: Array<(type: string, data: any) => void> = [];
@@ -40,18 +48,38 @@ export class CacheManager {
     apiClient: ApiClient,
     logger: Logger,
     metrics?: SdkMetrics,
-    configWorldId?: string
+    configWorldId?: string,
+    features?: FeaturesConfig,
+    environments?: string[],
+    // New services for Edge (created internally if enabled)
+    clientVersionService?: ClientVersionService,
+    serviceNoticeService?: ServiceNoticeService,
+    bannerService?: BannerService
   ) {
     this.config = {
       enabled: config.enabled !== false,
       ttl: config.ttl || 300,
       refreshMethod: config.refreshMethod ?? 'polling', // Default: polling
     };
+    this.features = features || {};
     this.gameWorldService = gameWorldService;
     this.popupNoticeService = popupNoticeService;
     this.surveyService = surveyService;
     this.whitelistService = whitelistService;
     this.serviceMaintenanceService = serviceMaintenanceService;
+
+    // Create new services if enabled (with environments support)
+    const targetEnvs = environments || [];
+    if (this.features.clientVersion === true) {
+      this.clientVersionService = clientVersionService || new ClientVersionService(apiClient, logger, targetEnvs);
+    }
+    if (this.features.serviceNotice === true) {
+      this.serviceNoticeService = serviceNoticeService || new ServiceNoticeService(apiClient, logger, targetEnvs);
+    }
+    if (this.features.banner === true) {
+      this.bannerService = bannerService || new BannerService(apiClient, logger, targetEnvs);
+    }
+
     this.apiClient = apiClient;
     this.logger = logger;
     this.metrics = metrics;
@@ -94,6 +122,7 @@ export class CacheManager {
 
   /**
    * Initialize cache by loading all data with retry logic
+   * Respects features config for conditional loading
    */
   async initialize(): Promise<void> {
     if (!this.config.enabled) {
@@ -105,27 +134,90 @@ export class CacheManager {
       // Wait for backend to be ready with retry logic
       await this.waitForBackendReady();
 
-      // Load all data in parallel
-      await Promise.all([
-        this.gameWorldService.list(),
-        this.popupNoticeService.list(),
-        // Note: Survey endpoint might need admin auth, handle gracefully
-        this.surveyService.list({ isActive: true }).catch((_error) => {
-          return { surveys: [], settings: null };
-        }),
-        this.whitelistService.list().catch((error) => {
-          this.logger.warn('Failed to load whitelists', { error: error.message });
-          return { ipWhitelist: [], accountWhitelist: [] };
-        }),
-        this.refreshServiceMaintenanceInternal().catch((error) => {
-          this.logger.warn('Failed to load service maintenance status', { error: error.message });
-        }),
-      ]);
+      // Build list of promises based on enabled features
+      const promises: Promise<any>[] = [];
+      const featureTypes: string[] = [];
+
+      // Existing features - default: true (backward compatible)
+      // Use !== false check to maintain backward compatibility
+      if (this.features.gameWorld !== false) {
+        promises.push(this.gameWorldService.list());
+        featureTypes.push('gameWorld');
+      }
+
+      if (this.features.popupNotice !== false) {
+        promises.push(this.popupNoticeService.list());
+        featureTypes.push('popupNotice');
+      }
+
+      if (this.features.survey !== false) {
+        promises.push(
+          this.surveyService.list({ isActive: true }).catch((_error) => {
+            return { surveys: [], settings: null };
+          })
+        );
+        featureTypes.push('survey');
+      }
+
+      if (this.features.whitelist !== false) {
+        promises.push(
+          this.whitelistService.list().catch((error) => {
+            this.logger.warn('Failed to load whitelists', { error: error.message });
+            return { ipWhitelist: [], accountWhitelist: [] };
+          })
+        );
+        featureTypes.push('whitelist');
+      }
+
+      if (this.features.serviceMaintenance !== false) {
+        promises.push(
+          this.refreshServiceMaintenanceInternal().catch((error) => {
+            this.logger.warn('Failed to load service maintenance status', { error: error.message });
+          })
+        );
+        featureTypes.push('serviceMaintenance');
+      }
+
+      // New features for Edge - default: false (explicit enable required)
+      if (this.features.clientVersion === true && this.clientVersionService) {
+        promises.push(
+          this.clientVersionService.list().catch((error) => {
+            this.logger.warn('Failed to load client versions', { error: error.message });
+            return [];
+          })
+        );
+        featureTypes.push('clientVersion');
+      }
+
+      if (this.features.serviceNotice === true && this.serviceNoticeService) {
+        promises.push(
+          this.serviceNoticeService.list().catch((error) => {
+            this.logger.warn('Failed to load service notices', { error: error.message });
+            return [];
+          })
+        );
+        featureTypes.push('serviceNotice');
+      }
+
+      if (this.features.banner === true && this.bannerService) {
+        promises.push(
+          this.bannerService.list().catch((error) => {
+            this.logger.warn('Failed to load banners', { error: error.message });
+            return [];
+          })
+        );
+        featureTypes.push('banner');
+      }
+
+      // Load all enabled features in parallel
+      await Promise.all(promises);
+
+      this.logger.info('SDK cache initialized', { enabledFeatures: featureTypes });
 
       // Initialize maintenance watcher with current state (no events emitted on first check)
-      this.checkMaintenanceStateChanges();
-
-      this.logger.info('SDK cache initialized');
+      if (this.features.serviceMaintenance !== false || this.features.gameWorld !== false) {
+        this.checkMaintenanceStateChanges();
+      }
 
       // Setup auto-refresh if using polling method
       if (this.config.refreshMethod === 'polling' && this.config.ttl) {
@@ -201,26 +293,83 @@ export class CacheManager {
   }
 
   /**
-   * Refresh all cached data
+   * Refresh all cached data based on enabled features
    */
   async refreshAll(): Promise<void> {
     this.logger.info('Refreshing all caches...');
 
     const start = process.hrtime.bigint();
     try {
-      await Promise.all([
-        this.gameWorldService.refresh(),
-        this.popupNoticeService.refresh(),
-        this.surveyService.refresh({ isActive: true }).catch((error) => {
-          this.logger.warn('Failed to refresh surveys', { error: error.message });
-        }),
-        this.whitelistService.refresh().catch((error) => {
-          this.logger.warn('Failed to refresh whitelists', { error: error.message });
-        }),
-        this.refreshServiceMaintenanceInternal().catch((error) => {
-          this.logger.warn('Failed to refresh service maintenance', { error: error.message });
-        }),
-      ]);
+      const promises: Promise<any>[] = [];
+      const refreshedTypes: string[] = [];
+
+      // Existing features - default: true (backward compatible)
+      if (this.features.gameWorld !== false) {
+        promises.push(this.gameWorldService.refresh());
+        refreshedTypes.push('gameWorld');
+      }
+
+      if (this.features.popupNotice !== false) {
+        promises.push(this.popupNoticeService.refresh());
+        refreshedTypes.push('popupNotice');
+      }
+
+      if (this.features.survey !== false) {
+        promises.push(
+          this.surveyService.refresh({ isActive: true }).catch((error) => {
+            this.logger.warn('Failed to refresh surveys', { error: error.message });
+          })
+        );
+        refreshedTypes.push('survey');
+      }
+
+      if (this.features.whitelist !== false) {
+        promises.push(
+          this.whitelistService.refresh().catch((error) => {
+            this.logger.warn('Failed to refresh whitelists', { error: error.message });
+          })
+        );
+        refreshedTypes.push('whitelist');
+      }
+
+      if (this.features.serviceMaintenance !== false) {
+        promises.push(
+          this.refreshServiceMaintenanceInternal().catch((error) => {
+            this.logger.warn('Failed to refresh service maintenance', { error: error.message });
+          })
+        );
+        refreshedTypes.push('serviceMaintenance');
+      }
+
+      // New features for Edge - default: false (explicit enable required)
+      if (this.features.clientVersion === true && this.clientVersionService) {
+        promises.push(
+          this.clientVersionService.refresh().catch((error) => {
+            this.logger.warn('Failed to refresh client versions', { error: error.message });
+          })
+        );
+        refreshedTypes.push('clientVersion');
+      }
+
+      if (this.features.serviceNotice === true && this.serviceNoticeService) {
+        promises.push(
+          this.serviceNoticeService.refresh().catch((error) => {
+            this.logger.warn('Failed to refresh service notices', { error: error.message });
+          })
+        );
+        refreshedTypes.push('serviceNotice');
+      }
+
+      if (this.features.banner === true && this.bannerService) {
+        promises.push(
+          this.bannerService.refresh().catch((error) => {
+            this.logger.warn('Failed to refresh banners', { error: error.message });
+          })
+        );
+        refreshedTypes.push('banner');
+      }
+
+      await Promise.all(promises);
 
       try {
         const duration = Number(process.hrtime.bigint() - start) / 1e9;
@@ -229,16 +378,18 @@ export class CacheManager {
         this.metrics?.setLastRefresh('all');
       } catch (_) {}
 
-      this.logger.info('All caches refreshed successfully');
+      this.logger.info('All caches refreshed successfully', { types: refreshedTypes });
 
       // Check and emit maintenance state changes
-      this.checkMaintenanceStateChanges();
+      if (this.features.serviceMaintenance !== false || this.features.gameWorld !== false) {
+        this.checkMaintenanceStateChanges();
+      }
 
       // Emit refresh events for polling method
       if (this.config.refreshMethod === 'polling') {
         this.emitRefreshEvent('cache.refreshed', {
           timestamp: new Date().toISOString(),
-          types: ['gameworld', 'popup', 'survey', 'whitelist', 'serviceMaintenance'],
+          types: refreshedTypes,
         });
       }
     } catch (error: any) {
@@ -457,6 +608,55 @@ export class CacheManager {
     return state?.worldActualStartTimes.get(worldId);
   }
 
+  // ==================== NEW SERVICE GETTERS (Edge features) ====================
+
+  /**
+   * Get cached client versions
+   * @param environmentId Only used in multi-environment mode (Edge)
+   */
+  getClientVersions(environmentId?: string): ClientVersion[] {
+    return this.clientVersionService?.getCached(environmentId) || [];
+  }
+
+  /**
+   * Get cached service notices
+   * @param environmentId Only used in multi-environment mode (Edge)
+   */
+  getServiceNotices(environmentId?: string): ServiceNotice[] {
+    return this.serviceNoticeService?.getCached(environmentId) || [];
+  }
+
+  /**
+   * Get cached banners
+   * @param environmentId Only used in multi-environment mode (Edge)
+   */
+  getBanners(environmentId?: string): Banner[] {
+    return this.bannerService?.getCached(environmentId) || [];
+  }
+
+  /**
+   * Get ClientVersionService instance (for advanced usage)
+   */
+  getClientVersionService(): ClientVersionService | undefined {
+    return this.clientVersionService;
+  }
+
+  /**
+   * Get ServiceNoticeService instance (for advanced usage)
+   */
+  getServiceNoticeService(): ServiceNoticeService | undefined {
+    return this.serviceNoticeService;
+  }
+
+  /**
+   * Get BannerService instance (for advanced usage)
+   */
+  getBannerService(): BannerService | undefined {
+    return this.bannerService;
+  }
+
+  // ==================== CACHE MANAGEMENT ====================
+
   /**
    * Clear all caches
    */
@@ -467,6 +667,7 @@ export class CacheManager {
     this.surveyService.updateCache([]);
     this.whitelistService.updateCache({ ipWhitelist: [], accountWhitelist: [] });
     this.serviceMaintenanceService.updateCache(null);
+    // Note: New services use Map internally, no need to clear explicitly
   }
 
   /**

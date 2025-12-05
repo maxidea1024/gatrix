@@ -32,6 +32,9 @@ import {
   GetServicesParams,
   MaintenanceInfo,
   CurrentMaintenanceStatus,
+  ClientVersion,
+  ServiceNotice,
+  Banner,
 } from './types/api';
 
 /**
@@ -268,7 +271,9 @@ export class GatrixServerSDK {
         this.apiClient,
         this.logger,
         this.metrics,
-        this.config.worldId // Pass worldId for maintenance watcher
+        this.config.worldId, // Pass worldId for maintenance watcher
+        this.config.features, // Pass features config for conditional loading
+        this.config.environments // Pass target environments for Edge mode
       );
 
       // Register maintenance state change listener to emit SDK events
@@ -1015,6 +1020,81 @@ export class GatrixServerSDK {
       });
       throw error;
     }
+  }
+
+  // ============================================================================
+  // Client Version Methods (Edge feature)
+  // ============================================================================
+
+  /**
+   * Get cached client versions
+   * Only available when features.clientVersion is enabled
+   * @param environmentId Only used in multi-environment mode (Edge)
+   */
+  getClientVersions(environmentId?: string): ClientVersion[] {
+    if (!this.cacheManager) {
+      this.logger.warn('SDK not initialized');
+      return [];
+    }
+    return this.cacheManager.getClientVersions(environmentId);
+  }
+
+  /**
+   * Get ClientVersionService for advanced operations
+   * Returns undefined if features.clientVersion is not enabled
+   */
+  getClientVersionService() {
+    return this.cacheManager?.getClientVersionService();
+  }
+
+  // ============================================================================
+  // Service Notice Methods (Edge feature)
+  // ============================================================================
+
+  /**
+   * Get cached service notices
+   * Only available when features.serviceNotice is enabled
+   * @param environmentId Only used in multi-environment mode (Edge)
+   */
+  getServiceNotices(environmentId?: string): ServiceNotice[] {
+    if (!this.cacheManager) {
+      this.logger.warn('SDK not initialized');
+      return [];
+    }
+    return this.cacheManager.getServiceNotices(environmentId);
+  }
+
+  /**
+   * Get ServiceNoticeService for advanced operations
+   * Returns undefined if features.serviceNotice is not enabled
+   */
+  getServiceNoticeService() {
+    return this.cacheManager?.getServiceNoticeService();
+  }
+
+  // ============================================================================
+  // Banner Methods (Edge feature)
+  // ============================================================================
+
+  /**
+   * Get cached banners
+   * Only available when features.banner is enabled
+   * @param environmentId Only used in multi-environment mode (Edge)
+   */
+  getBanners(environmentId?: string): Banner[] {
+    if (!this.cacheManager) {
+      this.logger.warn('SDK not initialized');
+      return [];
+    }
+    return this.cacheManager.getBanners(environmentId);
+  }
+
+  /**
+   * Get BannerService for advanced operations
+   * Returns undefined if features.banner is not enabled
+   */
+  getBannerService() {
+    return this.cacheManager?.getBannerService();
   }
 
   // ============================================================================
