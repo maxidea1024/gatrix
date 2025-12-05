@@ -124,13 +124,6 @@ const SidePanel: React.FC<SidePanelProps> = ({
 };
 
 // Types
-interface Environment {
-  id: number;
-  environmentName: string;
-  displayName: string;
-  description: string;
-}
-
 interface Config {
   id: string;
   key: string;
@@ -202,21 +195,6 @@ interface Variant {
 
 // Use types from service
 type DeploymentHistory = DeploymentHistoryItem;
-
-// Environment Context
-interface EnvironmentContextType {
-  currentEnvironment: Environment | null;
-  environments: Environment[];
-  switchEnvironment: (environmentId: number) => void;
-  isLoading: boolean;
-}
-
-const EnvironmentContext = createContext<EnvironmentContextType>({
-  currentEnvironment: null,
-  environments: [],
-  switchEnvironment: () => {},
-  isLoading: false
-});
 
 // Version Management Context
 interface PendingChange {
@@ -497,86 +475,9 @@ export const VersionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 };
 
-// Environment Provider
-export const EnvironmentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentEnvironment, setCurrentEnvironment] = useState<Environment | null>(null);
-  const [environments, setEnvironments] = useState<Environment[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    loadEnvironments();
-  }, []);
-
-  const loadEnvironments = async () => {
-    try {
-      setIsLoading(true);
-      // TODO: Replace with actual API call
-      const mockEnvironments: Environment[] = [
-        {
-          id: 1,
-          environmentName: 'development',
-          displayName: 'Development',
-          description: 'Development environment'
-        },
-        {
-          id: 2,
-          environmentName: 'staging',
-          displayName: 'Staging',
-          description: 'Staging environment'
-        },
-        {
-          id: 3,
-          environmentName: 'production',
-          displayName: 'Production',
-          description: 'Production environment'
-        }
-      ];
-      
-      setEnvironments(mockEnvironments);
-      
-      // Set default environment
-      const savedEnvId = localStorage.getItem('selectedEnvironmentId');
-      if (savedEnvId) {
-        const savedEnv = mockEnvironments.find(env => env.id === parseInt(savedEnvId));
-        if (savedEnv) {
-          setCurrentEnvironment(savedEnv);
-        } else {
-          setCurrentEnvironment(mockEnvironments[0]);
-        }
-      } else {
-        setCurrentEnvironment(mockEnvironments[0]);
-      }
-    } catch (error) {
-      console.error('Failed to load environments:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const switchEnvironment = (environmentId: number) => {
-    const environment = environments.find(env => env.id === environmentId);
-    if (environment) {
-      setCurrentEnvironment(environment);
-      localStorage.setItem('selectedEnvironmentId', environmentId.toString());
-    }
-  };
-
-  return (
-    <EnvironmentContext.Provider value={{
-      currentEnvironment,
-      environments,
-      switchEnvironment,
-      isLoading
-    }}>
-      {children}
-    </EnvironmentContext.Provider>
-  );
-};
-
-// Simple Environment Selector with Version Management
-const EnvironmentSelector: React.FC = () => {
+// Page Header with Version Management
+const PageHeader: React.FC = () => {
   const { t } = useTranslation();
-  const { currentEnvironment, environments, switchEnvironment, isLoading } = useContext(EnvironmentContext);
   const { hasChanges, pendingChanges, showDiscardDialog, showDeployDialog } = useContext(VersionContext);
 
   return (
@@ -588,7 +489,7 @@ const EnvironmentSelector: React.FC = () => {
         mb: 3,
         position: 'sticky',
         top: 0,
-        zIndex: 1200, // Higher than Drawer's default z-index (1300) but below modal backdrop
+        zIndex: 1200,
         backgroundColor: 'background.paper'
       }}
     >
@@ -631,28 +532,6 @@ const EnvironmentSelector: React.FC = () => {
                   </Button>
                 </>
               )}
-              <FormControl size="small" sx={{ minWidth: 200 }}>
-                <InputLabel>{t('remoteConfig.environment')}</InputLabel>
-                <Select
-                  value={currentEnvironment?.id || ''}
-                  onChange={(e) => switchEnvironment(Number(e.target.value))}
-                  disabled={isLoading}
-                  label={t('remoteConfig.environment')}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        zIndex: 9999
-                      }
-                    }
-                  }}
-                >
-                  {environments.map((env) => (
-                    <MenuItem key={env.id} value={env.id}>
-                      {env.displayName}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
             </Box>
           </Grid>
         </Grid>
@@ -664,7 +543,6 @@ const EnvironmentSelector: React.FC = () => {
 // Configs Management Component
 const ConfigsManagement: React.FC = () => {
   const { t } = useTranslation();
-  const { currentEnvironment } = useContext(EnvironmentContext);
   const { markAsChanged } = useContext(VersionContext);
   const [configs, setConfigs] = useState<Config[]>([]);
   const [loading, setLoading] = useState(false);
@@ -686,10 +564,8 @@ const ConfigsManagement: React.FC = () => {
   });
 
   useEffect(() => {
-    if (currentEnvironment) {
-      loadConfigs();
-    }
-  }, [currentEnvironment]);
+    loadConfigs();
+  }, []);
 
   const loadConfigs = async () => {
     try {
@@ -1178,7 +1054,6 @@ const ConfigsManagement: React.FC = () => {
 // Campaigns Management Component
 const CampaignsManagement: React.FC = () => {
   const { t } = useTranslation();
-  const { currentEnvironment } = useContext(EnvironmentContext);
   const { markAsChanged } = useContext(VersionContext);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [availableParameters, setAvailableParameters] = useState<Config[]>([]);
@@ -1205,11 +1080,9 @@ const CampaignsManagement: React.FC = () => {
   });
 
   useEffect(() => {
-    if (currentEnvironment) {
-      loadCampaigns();
-      loadAvailableParameters();
-    }
-  }, [currentEnvironment]);
+    loadCampaigns();
+    loadAvailableParameters();
+  }, []);
 
   const loadAvailableParameters = async () => {
     try {
@@ -1652,7 +1525,6 @@ const CampaignsManagement: React.FC = () => {
 // Context Fields Management Component
 const ContextFieldsManagement: React.FC = () => {
   const { t } = useTranslation();
-  const { currentEnvironment } = useContext(EnvironmentContext);
   const { markAsChanged } = useContext(VersionContext);
   const [contextFields, setContextFields] = useState<ContextField[]>([]);
   const [loading, setLoading] = useState(false);
@@ -1675,10 +1547,8 @@ const ContextFieldsManagement: React.FC = () => {
   const [newValue, setNewValue] = useState('');
 
   useEffect(() => {
-    if (currentEnvironment) {
-      loadContextFields();
-    }
-  }, [currentEnvironment]);
+    loadContextFields();
+  }, []);
 
   const loadContextFields = async () => {
     try {
@@ -2056,7 +1926,6 @@ const ContextFieldsManagement: React.FC = () => {
 // Segments Management Component
 const SegmentsManagement: React.FC = () => {
   const { t } = useTranslation();
-  const { currentEnvironment } = useContext(EnvironmentContext);
   const { markAsChanged } = useContext(VersionContext);
   const [segments, setSegments] = useState<Segment[]>([]);
   const [loading, setLoading] = useState(false);
@@ -2079,10 +1948,8 @@ const SegmentsManagement: React.FC = () => {
   });
 
   useEffect(() => {
-    if (currentEnvironment) {
-      loadSegments();
-    }
-  }, [currentEnvironment]);
+    loadSegments();
+  }, []);
 
   const loadSegments = async () => {
     try {
@@ -2502,7 +2369,6 @@ const SegmentsManagement: React.FC = () => {
 // Variants Management Component
 const VariantsManagement: React.FC = () => {
   const { t } = useTranslation();
-  const { currentEnvironment } = useContext(EnvironmentContext);
   const { markAsChanged } = useContext(VersionContext);
   const [variants, setVariants] = useState<Variant[]>([]);
   const [loading, setLoading] = useState(false);
@@ -2526,10 +2392,8 @@ const VariantsManagement: React.FC = () => {
   });
 
   useEffect(() => {
-    if (currentEnvironment) {
-      loadVariants();
-    }
-  }, [currentEnvironment]);
+    loadVariants();
+  }, []);
 
   const loadVariants = async () => {
     try {
@@ -2915,7 +2779,6 @@ const VariantsManagement: React.FC = () => {
 // Deployment History Management Component
 const DeploymentHistoryManagement: React.FC = () => {
   const { t } = useTranslation();
-  const { currentEnvironment } = useContext(EnvironmentContext);
   const [deployments, setDeployments] = useState<DeploymentHistory[]>([]);
   const [currentVersion, setCurrentVersion] = useState<DeploymentHistory | null>(null);
   const [loading, setLoading] = useState(false);
@@ -2928,10 +2791,8 @@ const DeploymentHistoryManagement: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    if (currentEnvironment) {
-      loadDeployments();
-    }
-  }, [currentEnvironment, page, rowsPerPage]);
+    loadDeployments();
+  }, [page, rowsPerPage]);
 
   const loadDeployments = async () => {
     try {
@@ -3457,38 +3318,37 @@ const RemoteConfigParametersPage: React.FC = () => {
 
   return (
     <VersionProvider>
-      <EnvironmentProvider>
-        <Box sx={{ p: 3 }}>
-          {/* Simple Environment Selector */}
-          <EnvironmentSelector />
+      <Box sx={{ p: 3 }}>
+        {/* Page Header with Version Management */}
+        <PageHeader />
 
-          {/* Main Content Tabs */}
-          <Paper sx={{ width: '100%' }}>
-            <Tabs
-              value={tabValue}
-              onChange={handleTabChange}
-              sx={{ borderBottom: 1, borderColor: 'divider' }}
-            >
-              <Tab
-                label={t('remoteConfig.parameters')}
-                icon={<CodeIcon />}
-                iconPosition="start"
-              />
-              <Tab
-                label={t('remoteConfig.campaigns')}
-                icon={<CampaignIcon />}
-                iconPosition="start"
-              />
-              <Tab
-                label={t('remoteConfig.contextFields')}
-                icon={<TuneIcon />}
-                iconPosition="start"
-              />
-              <Tab
-                label={t('remoteConfig.segments')}
-                icon={<SettingsIcon />}
-                iconPosition="start"
-              />
+        {/* Main Content Tabs */}
+        <Paper sx={{ width: '100%' }}>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            sx={{ borderBottom: 1, borderColor: 'divider' }}
+          >
+            <Tab
+              label={t('remoteConfig.parameters')}
+              icon={<CodeIcon />}
+              iconPosition="start"
+            />
+            <Tab
+              label={t('remoteConfig.campaigns')}
+              icon={<CampaignIcon />}
+              iconPosition="start"
+            />
+            <Tab
+              label={t('remoteConfig.contextFields')}
+              icon={<TuneIcon />}
+              iconPosition="start"
+            />
+            <Tab
+              label={t('remoteConfig.segments')}
+              icon={<SettingsIcon />}
+              iconPosition="start"
+            />
             <Tab
               label={t('remoteConfig.variants')}
               icon={<VariantsIcon />}
@@ -3499,19 +3359,18 @@ const RemoteConfigParametersPage: React.FC = () => {
               icon={<HistoryIcon />}
               iconPosition="start"
             />
-            </Tabs>
+          </Tabs>
 
-            <Box sx={{ p: 3 }}>
-              {tabValue === 0 && <ConfigsManagement />}
-              {tabValue === 1 && <CampaignsManagement />}
-              {tabValue === 2 && <ContextFieldsManagement />}
-              {tabValue === 3 && <SegmentsManagement />}
-              {tabValue === 4 && <VariantsManagement />}
-              {tabValue === 5 && <DeploymentHistoryManagement />}
-            </Box>
-          </Paper>
-        </Box>
-      </EnvironmentProvider>
+          <Box sx={{ p: 3 }}>
+            {tabValue === 0 && <ConfigsManagement />}
+            {tabValue === 1 && <CampaignsManagement />}
+            {tabValue === 2 && <ContextFieldsManagement />}
+            {tabValue === 3 && <SegmentsManagement />}
+            {tabValue === 4 && <VariantsManagement />}
+            {tabValue === 5 && <DeploymentHistoryManagement />}
+          </Box>
+        </Paper>
+      </Box>
     </VersionProvider>
   );
 };

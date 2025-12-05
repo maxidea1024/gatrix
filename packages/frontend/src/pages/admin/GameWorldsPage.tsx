@@ -95,6 +95,7 @@ import 'dayjs/locale/zh-cn';
 import { gameWorldService } from '../../services/gameWorldService';
 import { tagService, Tag } from '@/services/tagService';
 import { GameWorld, CreateGameWorldData, GameWorldMaintenanceLocale } from '../../types/gameWorld';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import { computeMaintenanceStatus, getMaintenanceStatusDisplay, MaintenanceStatusType } from '@/utils/maintenanceStatusUtils';
@@ -300,8 +301,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
 const GameWorldsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-
-
+  const { currentEnvironmentId } = useEnvironment();
 
   const [worlds, setWorlds] = useState<GameWorld[]>([]);
   const [loading, setLoading] = useState(false);
@@ -620,7 +620,7 @@ const GameWorldsPage: React.FC = () => {
     };
 
 
-  }, [debouncedSearch, activeFilters, allRegistryTags.length]);
+  }, [debouncedSearch, activeFilters, allRegistryTags.length, currentEnvironmentId]);
 
 
   // Scroll moved row into view when worlds reload and highlight is set

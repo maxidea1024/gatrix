@@ -10,7 +10,7 @@ export type ChangeRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancell
 export interface RemoteConfigChangeRequestData {
   id?: number;
   templateId: number;
-  environmentId: number;
+  environmentId: string; // ULID
   requestType: ChangeRequestType;
   status: ChangeRequestStatus;
   proposedChanges: any;
@@ -29,7 +29,7 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
 
   id!: number;
   templateId!: number;
-  environmentId!: number;
+  environmentId!: string; // ULID
   requestType!: ChangeRequestType;
   status!: ChangeRequestStatus;
   proposedChanges!: any;
@@ -55,7 +55,7 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
       properties: {
         id: { type: 'integer' },
         templateId: { type: 'integer' },
-        environmentId: { type: 'integer' },
+        environmentId: { type: 'string', minLength: 26, maxLength: 26 }, // ULID
         requestType: { type: 'string', enum: ['create', 'update', 'delete', 'import'] },
         status: { type: 'string', enum: ['pending', 'approved', 'rejected', 'cancelled'] },
         proposedChanges: { type: 'object' },

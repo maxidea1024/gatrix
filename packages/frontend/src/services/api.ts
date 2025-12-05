@@ -43,35 +43,26 @@ class ApiService {
   }
 
   private setupInterceptors() {
-    // Request interceptor to add auth token
+    // Request interceptor to add auth token and environment ID
     this.api.interceptors.request.use(
       (config) => {
-        // console.log('Request interceptor called:', {
-        //   url: config.url,
-        //   method: config.method,
-        //   hasToken: !!this.accessToken,
-        //   headers: config.headers,
-        //   baseURL: config.baseURL,
-        //   fullURL: config.url
-        // });
-
-        if (this.accessToken) {
-          if (!config.headers) {
-            config.headers = {};
-          }
-          config.headers.Authorization = `Bearer ${this.accessToken}`;
-          // console.log('Request interceptor - Token added:', {
-          //   url: config.url,
-          //   method: config.method,
-          //   tokenPrefix: this.accessToken.substring(0, 20) + '...',
-          //   authHeader: config.headers.Authorization?.substring(0, 30) + '...'
-          // });
-        } else {
-          // console.log('Request interceptor - No token available for:', {
-          //   url: config.url,
-          //   method: config.method
-          // });
+        if (!config.headers) {
+          config.headers = {} as any;
         }
+
+        // Add authorization header
+        if (this.accessToken) {
+          config.headers.Authorization = `Bearer ${this.accessToken}`;
+        }
+
+        // Add environment ID header for multi-environment support
+        const environmentId = typeof window !== 'undefined'
+          ? localStorage.getItem('gatrix_selected_environment_id')
+          : null;
+        if (environmentId) {
+          config.headers['X-Environment-Id'] = environmentId;
+        }
+
         return config;
       },
       (error) => {

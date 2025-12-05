@@ -6,32 +6,19 @@ import {
   Typography,
   Grid,
   Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Chip,
   IconButton,
-  Tooltip,
-  Alert
+  Tooltip
 } from '@mui/material';
 import {
   Add as AddIcon,
   Refresh as RefreshIcon,
-  Settings as SettingsIcon,
   Visibility as ViewIcon,
   Edit as EditIcon,
   Archive as ArchiveIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
-
-interface Environment {
-  id: number;
-  name: string;
-  description: string;
-  isActive: boolean;
-}
 
 interface Template {
   id: number;
@@ -45,19 +32,11 @@ interface Template {
 
 const RemoteConfigDashboard: React.FC = () => {
   const { t } = useTranslation();
-  const [selectedEnvironment, setSelectedEnvironment] = useState<number>(1);
-  const [environments, setEnvironments] = useState<Environment[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Mock data for demonstration
   useEffect(() => {
-    setEnvironments([
-      { id: 1, name: 'development', description: 'Development Environment', isActive: true },
-      { id: 2, name: 'staging', description: 'Staging Environment', isActive: true },
-      { id: 3, name: 'production', description: 'Production Environment', isActive: true }
-    ]);
-
     setTemplates([
       {
         id: 1,
@@ -184,28 +163,12 @@ const RemoteConfigDashboard: React.FC = () => {
           {t('remoteConfig.title')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          {/* Environment Selector - Always visible at top */}
-          <FormControl size="small" sx={{ minWidth: 200 }}>
-            <InputLabel>{t('remoteConfig.environment')}</InputLabel>
-            <Select
-              value={selectedEnvironment}
-              label={t('remoteConfig.environment')}
-              onChange={(e) => setSelectedEnvironment(e.target.value as number)}
-            >
-              {environments.map((env) => (
-                <MenuItem key={env.id} value={env.id}>
-                  {env.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          
           <Tooltip title={t('common.refresh')}>
             <IconButton onClick={handleRefresh} disabled={loading}>
               <RefreshIcon />
             </IconButton>
           </Tooltip>
-          
+
           <Button
             variant="contained"
             startIcon={<AddIcon />}
@@ -213,23 +176,8 @@ const RemoteConfigDashboard: React.FC = () => {
           >
             {t('remoteConfig.createTemplate')}
           </Button>
-          
-          <Tooltip title={t('remoteConfig.environmentSettings')}>
-            <IconButton onClick={() => console.log('Environment settings')}>
-              <SettingsIcon />
-            </IconButton>
-          </Tooltip>
         </Box>
       </Box>
-
-      {/* Environment Info */}
-      <Alert severity="info" sx={{ mb: 3 }}>
-        {t('remoteConfig.currentEnvironment')}: <strong>
-          {environments.find(env => env.id === selectedEnvironment)?.name}
-        </strong>
-        {' - '}
-        {environments.find(env => env.id === selectedEnvironment)?.description}
-      </Alert>
 
       {/* Statistics Cards */}
       <Grid container spacing={3} sx={{ mb: 3 }}>

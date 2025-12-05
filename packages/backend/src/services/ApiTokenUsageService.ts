@@ -79,7 +79,7 @@ export class ApiTokenUsageService {
   /**
    * 토큰 사용 기록 (캐시에 저장)
    */
-  async recordTokenUsage(tokenId: number): Promise<void> {
+  async recordTokenUsage(tokenId: string): Promise<void> {
     try {
       const cacheKey = this.getTokenUsageCacheKey(tokenId);
       const now = new Date();
@@ -298,7 +298,7 @@ export class ApiTokenUsageService {
   /**
    * 토큰 사용량 캐시 키 생성
    */
-  private getTokenUsageCacheKey(tokenId: number): string {
+  private getTokenUsageCacheKey(tokenId: string): string {
     return `token_usage:${tokenId}:${getInstanceId()}`;
   }
 

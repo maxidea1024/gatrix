@@ -1,8 +1,9 @@
 import { Model } from 'objection';
 import { User } from './User';
+import { ulid } from 'ulid';
 
 export interface ProjectData {
-  id?: number;
+  id?: string; // ULID (26 characters)
   projectName: string;
   displayName: string;
   description?: string;
@@ -17,7 +18,7 @@ export interface ProjectData {
 export class Project extends Model implements ProjectData {
   static tableName = 'g_projects';
 
-  id!: number;
+  id!: string; // ULID
   projectName!: string;
   displayName!: string;
   description?: string;
@@ -37,10 +38,10 @@ export class Project extends Model implements ProjectData {
       type: 'object',
       required: ['projectName', 'displayName', 'createdBy'],
       properties: {
-        id: { type: 'integer' },
-        projectName: { 
-          type: 'string', 
-          minLength: 1, 
+        id: { type: 'string', minLength: 26, maxLength: 26 }, // ULID
+        projectName: {
+          type: 'string',
+          minLength: 1,
           maxLength: 100,
           pattern: '^[a-z0-9_-]+$'
         },
@@ -87,6 +88,9 @@ export class Project extends Model implements ProjectData {
   }
 
   $beforeInsert() {
+    if (!this.id) {
+      this.id = ulid();
+    }
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }

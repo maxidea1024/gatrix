@@ -40,6 +40,15 @@ router.post('/users/:id/promote', auditUserPromote as any, AdminController.promo
 router.post('/users/:id/demote', auditUserDemote as any, AdminController.demoteFromAdmin as any);
 router.post('/users/:id/verify-email', AdminController.verifyUserEmail as any);
 
+// User environment access
+router.get('/users/:id/environments', AdminController.getUserEnvironmentAccess as any);
+router.put('/users/:id/environments', AdminController.setUserEnvironmentAccess as any);
+
+// User permissions (RBAC)
+router.get('/permissions', AdminController.getAllPermissions as any);
+router.get('/users/:id/permissions', AdminController.getUserPermissions as any);
+router.put('/users/:id/permissions', AdminController.setUserPermissions as any);
+
 // Bulk user operations
 router.post('/users/bulk/status', AdminController.bulkUpdateUserStatus as any);
 router.post('/users/bulk/role', AdminController.bulkUpdateUserRole as any);

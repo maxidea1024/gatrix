@@ -22,7 +22,7 @@ export interface TemplateData {
 
 export interface RemoteConfigTemplateData {
   id?: number;
-  environmentId: number;
+  environmentId: string; // ULID
   templateName: string;
   displayName: string;
   description?: string;
@@ -44,7 +44,7 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
   static tableName = 'g_remote_config_templates';
 
   id!: number;
-  environmentId!: number;
+  environmentId!: string; // ULID
   templateName!: string;
   displayName!: string;
   description?: string;
@@ -170,7 +170,7 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
   /**
    * Get template by environment and name
    */
-  static async getByEnvironmentAndName(environmentId: number, templateName: string): Promise<RemoteConfigTemplate | undefined> {
+  static async getByEnvironmentAndName(environmentId: string, templateName: string): Promise<RemoteConfigTemplate | undefined> {
     return await this.query()
       .where('environmentId', environmentId)
       .where('templateName', templateName)
@@ -180,7 +180,7 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
   /**
    * Get published templates for environment
    */
-  static async getPublishedByEnvironment(environmentId: number, templateType?: TemplateType): Promise<RemoteConfigTemplate[]> {
+  static async getPublishedByEnvironment(environmentId: string, templateType?: TemplateType): Promise<RemoteConfigTemplate[]> {
     let query = this.query()
       .where('environmentId', environmentId)
       .where('status', 'published');

@@ -1,5 +1,6 @@
 import express from 'express';
 import { authenticate, requireAdmin } from '../../middleware/auth';
+import { environmentContextMiddleware } from '../../middleware/environmentMiddleware';
 
 // Import all admin-related route modules
 import adminRoutes from './admin';
@@ -20,6 +21,7 @@ import notificationRoutes from './notifications';
 import platformDefaultRoutes from './platformDefaults';
 import remoteConfigRoutes from './remoteConfig';
 import remoteConfigV2Routes from './remoteConfigV2';
+import environmentRoutes from './environments';
 import jobRoutes from './jobs';
 import maintenanceRoutes from './maintenance';
 import invitationRoutes from './invitations';
@@ -43,9 +45,17 @@ const router = express.Router();
 router.use('/notifications', notificationRoutes);
 router.use('/services', serviceDiscoveryRoutes);
 
+// Self-service routes for authenticated users (not requiring admin role)
+// These must be mounted BEFORE requireAdmin middleware
+import { UserController } from '../../controllers/UserController';
+router.get('/users/me/environments', authenticate as any, UserController.getMyEnvironmentAccess);
+
 // Apply authentication middleware to all other admin routes
 router.use(authenticate as any);
 router.use(requireAdmin as any);
+
+// Apply environment context middleware to set current environment from X-Environment-Id header
+router.use(environmentContextMiddleware as any);
 
 // Mount all other admin routes
 router.use('/', adminRoutes);
@@ -65,6 +75,7 @@ router.use('/context-fields', contextFieldRoutes);
 router.use('/platform-defaults', platformDefaultRoutes);
 router.use('/remote-config', remoteConfigRoutes);
 router.use('/remote-config-v2', remoteConfigV2Routes);
+router.use('/environments', environmentRoutes);
 router.use('/jobs', jobRoutes);
 router.use('/maintenance', maintenanceRoutes);
 router.use('/invitations', invitationRoutes);

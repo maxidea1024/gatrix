@@ -32,6 +32,7 @@ import Editor from '@monaco-editor/react';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../common/ResizableDrawer';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 
 interface IngamePopupNoticeGuideDrawerProps {
   open: boolean;
@@ -43,6 +44,7 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const { enqueueSnackbar } = useSnackbar();
+  const { currentEnvironmentId } = useEnvironment();
 
   const [mainTabValue, setMainTabValue] = useState(0);
   const [errorTabValue, setErrorTabValue] = useState(0);
@@ -109,11 +111,14 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
     try {
       const startTime = performance.now();
 
-      const headers = {
+      const headers: Record<string, string> = {
         'Content-Type': 'application/json',
         'X-Application-Name': applicationName,
         'X-API-Token': apiToken,
       };
+      if (currentEnvironmentId) {
+        headers['X-Environment-Id'] = currentEnvironmentId;
+      }
 
       setRequestHeaders(headers);
 
@@ -215,7 +220,8 @@ const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> 
 curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameServer" \\
-  -H "X-API-Token: your-server-api-token-here"`;
+  -H "X-API-Token: your-server-api-token-here" \\
+  -H "X-Environment-Id: ${currentEnvironmentId || 'your-environment-id'}"`;
 
   const jsonResponse = `{
   "success": true,
@@ -309,6 +315,9 @@ curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
                 </Typography>
                 <Typography variant="body2">
                   • <strong>X-Application-Name</strong>: {t('ingamePopupNotices.sdkGuideDrawer.headerAppName')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>X-Environment-Id</strong>: {t('common.sdkGuide.headerEnvironmentId')}
                 </Typography>
                 <Typography variant="body2">
                   • <strong>Content-Type</strong>: {t('ingamePopupNotices.sdkGuideDrawer.headerContentType')}

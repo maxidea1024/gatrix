@@ -12,9 +12,9 @@ services:
       MYSQL_USER: ${DB_USER:-gatrix_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
     ports:
-      - "0.0.0.0:${MYSQL_HOST_PORT:-53306}:3306"
+      - "0.0.0.0:${MYSQL_HOST_PORT:-43306}:3306"
     volumes:
-      - ${DATA_ROOT:-./data}/mysql:/var/lib/mysql
+      - gatrix_mysql_dev_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
     networks:
@@ -505,3 +505,6 @@ networks:
     ipam:
       config:
         - subnet: 172.23.0.0/16
+
+volumes:
+  gatrix_mysql_dev_data:

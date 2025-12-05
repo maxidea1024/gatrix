@@ -28,6 +28,7 @@ import { I18nProvider, useI18n } from './contexts/I18nContext';
 import { PlatformConfigProvider } from './contexts/PlatformConfigContext';
 import { GameWorldProvider } from './contexts/GameWorldContext';
 import { PlanningDataProvider } from './contexts/PlanningDataContext';
+import { EnvironmentProvider } from './contexts/EnvironmentContext';
 
 // Components
 import { LoadingIndicator } from './components/LoadingIndicator';
@@ -36,6 +37,8 @@ import { useAuth } from './contexts/AuthContext';
 
 // Layout Components
 import { MainLayout } from './components/layout/MainLayout';
+import { EnvironmentAwareLayout } from './components/layout/EnvironmentAwareLayout';
+import { EnvironmentChangeOverlay } from './components/EnvironmentChangeOverlay';
 
 // Pages - Auth
 import LoginPage from './pages/auth/LoginPage';
@@ -91,6 +94,7 @@ import OpenApiPage from './pages/admin/OpenApiPage';
 import GrafanaDashboardPage from './pages/admin/GrafanaDashboardPage';
 import EventLensProjectsPage from './pages/admin/EventLensProjectsPage';
 import DataManagementPage from './pages/admin/DataManagementPage';
+import EnvironmentsPage from './pages/settings/EnvironmentsPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Pages - Game
@@ -253,10 +257,12 @@ const AppContent: React.FC = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <PlatformConfigProvider>
-          <GameWorldProvider>
-            <AuthInitializer>
-              <LocalizedDatePickers>
+        <EnvironmentProvider>
+          <EnvironmentChangeOverlay />
+          <PlatformConfigProvider>
+            <GameWorldProvider>
+              <AuthInitializer>
+                <LocalizedDatePickers>
                 <CssBaseline />
                 {/* Global scrollbar styles */}
                 <GlobalStyles
@@ -357,15 +363,22 @@ const AppContent: React.FC = () => {
                       {/* Settings Routes */}
                       <Route path="/settings" element={
                         <ProtectedRoute>
-                          <MainLayout>
+                          <EnvironmentAwareLayout>
                             <SettingsPage />
-                          </MainLayout>
+                          </EnvironmentAwareLayout>
                         </ProtectedRoute>
                       } />
                       <Route path="/settings/tags" element={
                         <ProtectedRoute>
-                          <MainLayout>
+                          <EnvironmentAwareLayout>
                             <TagsPage />
+                          </EnvironmentAwareLayout>
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/settings/environments" element={
+                        <ProtectedRoute requiredRoles={['admin']}>
+                          <MainLayout>
+                            <EnvironmentsPage />
                           </MainLayout>
                         </ProtectedRoute>
                       } />
@@ -375,7 +388,7 @@ const AppContent: React.FC = () => {
                       {/* Admin Routes */}
                       <Route path="/admin/*" element={
                         <ProtectedRoute requiredRoles={['admin']}>
-                          <MainLayout>
+                          <EnvironmentAwareLayout>
                             <Routes>
                               <Route index element={<Navigate to="/admin/users" replace />} />
                               <Route path="users" element={<UsersManagementPage />} />
@@ -402,7 +415,7 @@ const AppContent: React.FC = () => {
                               <Route path="event-lens/projects" element={<EventLensProjectsPage />} />
                               <Route path="data-management" element={<DataManagementPage />} />
                             </Routes>
-                          </MainLayout>
+                          </EnvironmentAwareLayout>
                         </ProtectedRoute>
                       } />
 
@@ -429,7 +442,7 @@ const AppContent: React.FC = () => {
                       <Route path="/game/*" element={
                         <ProtectedRoute requiredRoles={['admin']}>
                           <PlanningDataProvider>
-                            <MainLayout>
+                            <EnvironmentAwareLayout>
                               <Routes>
                                 <Route path="service-notices" element={<ServiceNoticesPage />} />
                                 <Route path="ingame-popup-notices" element={<IngamePopupNoticesPage />} />
@@ -443,7 +456,7 @@ const AppContent: React.FC = () => {
                                 <Route path="live-event" element={<LiveEventPage />} />
                                 <Route path="planning-data" element={<PlanningDataPage />} />
                               </Routes>
-                            </MainLayout>
+                            </EnvironmentAwareLayout>
                           </PlanningDataProvider>
                         </ProtectedRoute>
                       } />
@@ -453,10 +466,11 @@ const AppContent: React.FC = () => {
                     </Routes>
                   </Router>
                 </SnackbarProvider>
-              </LocalizedDatePickers>
-            </AuthInitializer>
-          </GameWorldProvider>
-        </PlatformConfigProvider>
+                </LocalizedDatePickers>
+              </AuthInitializer>
+            </GameWorldProvider>
+          </PlatformConfigProvider>
+        </EnvironmentProvider>
       </AuthProvider>
     </ThemeProvider>
   );

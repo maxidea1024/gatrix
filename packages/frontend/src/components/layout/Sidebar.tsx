@@ -12,6 +12,7 @@ import {
   Box,
   Typography,
 } from '@mui/material';
+import { useEnvironment } from '@/contexts/EnvironmentContext';
 import {
   Dashboard,
   People,
@@ -49,12 +50,18 @@ import {
   Celebration,
   Dns,
   Api,
+  Notifications,
+  Announcement,
+  Insights,
+  Folder,
+  ViewCarousel,
+  Layers,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { NavItem } from '@/types';
 import { useTranslation } from 'react-i18next';
-import { getNavigationItems } from '@/config/navigation';
+import { getMenuCategories, MenuItem, MenuCategory } from '@/config/navigation';
+import { Permission } from '@/types/permissions';
 
 
 interface SidebarProps {
@@ -99,6 +106,21 @@ const iconMap: Record<string, React.ReactElement> = {
   Celebration: <Celebration />,
   Dns: <Dns />,
   Api: <Api />,
+  Notifications: <Notifications />,
+  Announcement: <Announcement />,
+  Insights: <Insights />,
+  Folder: <Folder />,
+  ViewCarousel: <ViewCarousel />,
+  Layers: <Layers />,
+};
+
+// Helper to get icon name from React element
+const getIconName = (icon: React.ReactElement): string => {
+  const typeName = (icon.type as any)?.type?.render?.displayName ||
+                   (icon.type as any)?.displayName ||
+                   (icon.type as any)?.name ||
+                   'Dashboard';
+  return typeName.replace('Icon', '');
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
@@ -106,13 +128,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
   const { t } = useTranslation();
 
   const location = useLocation();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, hasPermission } = useAuth();
+  const { environments, isLoading: environmentsLoading } = useEnvironment();
 
   const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
 
-  const navigationItems = getNavigationItems(isAdmin());
+  // Admin users without any environment access should see only base menu (like regular users)
+  const hasEnvironmentAccess = environmentsLoading || environments.length > 0;
+  const effectiveIsAdmin = isAdmin() && hasEnvironmentAccess;
+  const menuCategories = getMenuCategories(effectiveIsAdmin);
 
-  const handleItemClick = (item: NavItem) => {
+  const handleItemClick = (item: MenuItem) => {
     if (item.path) {
       // Open external links in a new tab
       if (/^https?:\/\//i.test(item.path)) {
@@ -124,28 +150,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
       onClose(); // Close sidebar on mobile after navigation
     } else if (item.children) {
       // Toggle expansion for items with children
+      const itemId = item.text;
       setExpandedItems(prev =>
-        prev.includes(item.id)
-          ? prev.filter(id => id !== item.id)
-          : [...prev, item.id]
+        prev.includes(itemId)
+          ? prev.filter(id => id !== itemId)
+          : [...prev, itemId]
       );
     }
   };
 
-  const isItemActive = (item: NavItem): boolean => {
-    // If item has a path, check if it matches current location
+  const isItemActive = (item: MenuItem): boolean => {
     if (item.path) {
       return location.pathname === item.path;
     }
-    // If item has children but no path (parent menu), don't mark as active
-    // Only child items should be marked as active
     if (item.children) {
       return false;
     }
     return false;
   };
 
-  const hasActiveChild = (item: NavItem): boolean => {
+  const hasActiveChild = (item: MenuItem): boolean => {
     if (!item.children) {
       return false;
     }
@@ -157,33 +181,59 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
     });
   };
 
-  const isItemExpanded = (item: NavItem): boolean => {
-    return expandedItems.includes(item.id);
+  const isItemExpanded = (item: MenuItem): boolean => {
+    return expandedItems.includes(item.text);
   };
 
-  const canAccessItem = (item: NavItem): boolean => {
-    if (!item.roles || item.roles.length === 0) {
+  // Check if user can access a menu item based on permissions
+  const canAccessItem = (item: MenuItem): boolean => {
+    // Check admin-only restriction
+    if (item.adminOnly && !effectiveIsAdmin) {
+      return false;
+    }
+
+    // Check permission-based access
+    if (item.requiredPermission) {
+      const permissions = Array.isArray(item.requiredPermission)
+        ? item.requiredPermission
+        : [item.requiredPermission];
+      return hasPermission(permissions as Permission[]);
+    }
+
+    return true;
+  };
+
+  // Filter menu items based on permissions
+  const filterMenuItems = (items: MenuItem[]): MenuItem[] => {
+    return items.filter(item => {
+      if (!canAccessItem(item)) {
+        return false;
+      }
+      // If item has children, filter them too
+      if (item.children) {
+        const filteredChildren = filterMenuItems(item.children);
+        // Only show parent if it has accessible children
+        return filteredChildren.length > 0;
+      }
       return true;
-    }
-    const hasAccess = item.roles.includes(user?.role || '');
-    console.log(`canAccessItem - item: ${item.id}, userRole: ${user?.role}, itemRoles:`, item.roles, 'hasAccess:', hasAccess);
-    return hasAccess;
+    }).map(item => {
+      if (item.children) {
+        return { ...item, children: filterMenuItems(item.children) };
+      }
+      return item;
+    });
   };
 
-  const renderNavItem = (item: NavItem, level: number = 0) => {
-    if (!canAccessItem(item)) {
-      return null;
-    }
-
+  const renderMenuItem = (item: MenuItem, level: number = 0) => {
     const isActive = isItemActive(item);
     const isExpanded = isItemExpanded(item);
     const hasChildren = item.children && item.children.length > 0;
     const childActive = hasActiveChild(item);
+    const iconName = getIconName(item.icon);
 
     return (
-      <React.Fragment key={item.id}>
-        {/* Divider before this item if specified */}
-        {(item as any).divider && <Divider sx={{ my: 1 }} />}
+      <React.Fragment key={item.text}>
+        {item.divider && <Divider sx={{ my: 1 }} />}
 
         <ListItem disablePadding sx={{ pl: level * 2 }}>
           <ListItemButton
@@ -207,10 +257,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
             }}
           >
             <ListItemIcon sx={{ minWidth: 40 }}>
-              {iconMap[item.icon || 'Dashboard']}
+              {iconMap[iconName] || item.icon}
             </ListItemIcon>
             <ListItemText
-              primary={t(item.label)}
+              primary={t(item.text)}
               primaryTypographyProps={{
                 fontSize: '0.875rem',
                 fontWeight: isActive || childActive ? 600 : 400,
@@ -225,10 +275,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
         {hasChildren && (
           <Collapse in={isExpanded} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              {item.children!.map(child => renderNavItem(child, level + 1))}
+              {item.children!.map(child => renderMenuItem(child, level + 1))}
             </List>
           </Collapse>
         )}
+      </React.Fragment>
+    );
+  };
+
+  const renderCategory = (category: MenuCategory) => {
+    const filteredItems = filterMenuItems(category.children);
+    if (filteredItems.length === 0) {
+      return null;
+    }
+
+    return (
+      <React.Fragment key={category.id}>
+        <Typography
+          variant="overline"
+          sx={{
+            px: 3,
+            pt: 2,
+            pb: 1,
+            display: 'block',
+            color: 'text.secondary',
+            fontWeight: 600,
+          }}
+        >
+          {t(category.text)}
+        </Typography>
+        <List disablePadding>
+          {filteredItems.map(item => renderMenuItem(item))}
+        </List>
       </React.Fragment>
     );
   };
@@ -247,9 +325,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
       <Divider />
 
       <Box sx={{ flex: 1, overflow: 'auto', py: 1 }}>
-        <List>
-          {navigationItems.map(item => renderNavItem(item))}
-        </List>
+        {menuCategories.map(category => renderCategory(category))}
       </Box>
 
       {user && (
@@ -296,71 +372,109 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
 export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, hasPermission } = useAuth();
+  const { environments, isLoading: environmentsLoading } = useEnvironment();
 
   const { t } = useTranslation();
 
   const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
 
-  const navigationItems = getNavigationItems(isAdmin());
+  // Admin users without any environment access should see only base menu (like regular users)
+  const hasEnvironmentAccess = environmentsLoading || environments.length > 0;
+  const effectiveIsAdmin = isAdmin() && hasEnvironmentAccess;
+  const menuCategories = getMenuCategories(effectiveIsAdmin);
 
-  const handleItemClick = (item: NavItem) => {
+  const handleItemClick = (item: MenuItem) => {
     if (item.path) {
-      // Open external links in a new tab
       if (/^https?:\/\//i.test(item.path)) {
         window.open(item.path, '_blank', 'noopener,noreferrer');
         return;
       }
       navigate(item.path);
     } else if (item.children) {
+      const itemId = item.text;
       setExpandedItems(prev =>
-        prev.includes(item.id)
-          ? prev.filter(id => id !== item.id)
-          : [...prev, item.id]
+        prev.includes(itemId)
+          ? prev.filter(id => id !== itemId)
+          : [...prev, itemId]
       );
     }
   };
 
-  const isItemActive = (item: NavItem): boolean => {
+  const isItemActive = (item: MenuItem): boolean => {
     if (item.path) {
       return location.pathname === item.path;
-    }
-    if (item.children) {
-      return item.children.some(child => child.path === location.pathname);
     }
     return false;
   };
 
-  const isItemExpanded = (item: NavItem): boolean => {
-    return expandedItems.includes(item.id);
+  const hasActiveChild = (item: MenuItem): boolean => {
+    if (!item.children) {
+      return false;
+    }
+    return item.children.some(child => {
+      if (child.path === location.pathname) {
+        return true;
+      }
+      return hasActiveChild(child);
+    });
   };
 
-  const canAccessItem = (item: NavItem): boolean => {
-    if (!item.roles || item.roles.length === 0) {
+  const isItemExpanded = (item: MenuItem): boolean => {
+    return expandedItems.includes(item.text);
+  };
+
+  const canAccessItem = (item: MenuItem): boolean => {
+    if (item.adminOnly && !effectiveIsAdmin) {
+      return false;
+    }
+    if (item.requiredPermission) {
+      const permissions = Array.isArray(item.requiredPermission)
+        ? item.requiredPermission
+        : [item.requiredPermission];
+      return hasPermission(permissions as Permission[]);
+    }
+    return true;
+  };
+
+  const filterMenuItems = (items: MenuItem[]): MenuItem[] => {
+    return items.filter(item => {
+      if (!canAccessItem(item)) {
+        return false;
+      }
+      if (item.children) {
+        const filteredChildren = filterMenuItems(item.children);
+        return filteredChildren.length > 0;
+      }
       return true;
-    }
-    return item.roles.includes(user?.role || '');
+    }).map(item => {
+      if (item.children) {
+        return { ...item, children: filterMenuItems(item.children) };
+      }
+      return item;
+    });
   };
 
-  const renderNavItem = (item: NavItem, level: number = 0) => {
-    if (!canAccessItem(item)) {
-      return null;
-    }
-
+  const renderMenuItem = (item: MenuItem, level: number = 0) => {
     const isActive = isItemActive(item);
     const isExpanded = isItemExpanded(item);
     const hasChildren = item.children && item.children.length > 0;
+    const childActive = hasActiveChild(item);
+    const iconName = getIconName(item.icon);
 
     return (
-      <React.Fragment key={item.id}>
+      <React.Fragment key={item.text}>
+        {item.divider && <Divider sx={{ my: 1 }} />}
+
         <ListItem disablePadding sx={{ pl: level * 2 }}>
           <ListItemButton
-            selected={isActive}
+            selected={isActive && !hasChildren}
             onClick={() => handleItemClick(item)}
             sx={{
               minHeight: 48,
               borderRadius: 1,
               mx: 1,
+              backgroundColor: childActive && hasChildren ? 'rgba(25, 118, 210, 0.08)' : 'transparent',
               '&.Mui-selected': {
                 backgroundColor: 'primary.main',
                 color: 'primary.contrastText',
@@ -374,13 +488,13 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
             }}
           >
             <ListItemIcon sx={{ minWidth: 40 }}>
-              {iconMap[item.icon || 'Dashboard']}
+              {iconMap[iconName] || item.icon}
             </ListItemIcon>
             <ListItemText
-              primary={t(item.label)}
+              primary={t(item.text)}
               primaryTypographyProps={{
                 fontSize: '0.875rem',
-                fontWeight: isActive ? 600 : 400,
+                fontWeight: isActive || childActive ? 600 : 400,
               }}
             />
             {hasChildren && (
@@ -392,10 +506,38 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
         {hasChildren && (
           <Collapse in={isExpanded} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              {item.children!.map(child => renderNavItem(child, level + 1))}
+              {item.children!.map(child => renderMenuItem(child, level + 1))}
             </List>
           </Collapse>
         )}
+      </React.Fragment>
+    );
+  };
+
+  const renderCategory = (category: MenuCategory) => {
+    const filteredItems = filterMenuItems(category.children);
+    if (filteredItems.length === 0) {
+      return null;
+    }
+
+    return (
+      <React.Fragment key={category.id}>
+        <Typography
+          variant="overline"
+          sx={{
+            px: 3,
+            pt: 2,
+            pb: 1,
+            display: 'block',
+            color: 'text.secondary',
+            fontWeight: 600,
+          }}
+        >
+          {t(category.text)}
+        </Typography>
+        <List disablePadding>
+          {filteredItems.map(item => renderMenuItem(item))}
+        </List>
       </React.Fragment>
     );
   };
@@ -423,9 +565,7 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
       <Divider />
 
       <Box sx={{ flex: 1, overflow: 'auto', py: 1 }}>
-        <List>
-          {navigationItems.map(item => renderNavItem(item))}
-        </List>
+        {menuCategories.map(category => renderCategory(category))}
       </Box>
 
       {user && (

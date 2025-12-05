@@ -5,6 +5,61 @@
  * 모든 캐시 키는 이 파일에서 관리하여 일관성과 유지보수성을 향상시킵니다.
  */
 
+import {
+  getCurrentEnvironmentId,
+  isDefaultEnvironmentInitialized
+} from '../utils/environmentContext';
+
+/**
+ * Environment-scoped cache key prefix
+ * Used for data that varies by environment (game worlds, client versions, etc.)
+ * Format: env:{environmentId}:{originalKey}
+ */
+export const ENV_PREFIX = 'env';
+
+/**
+ * Create an environment-scoped cache key
+ * @param environmentId - The environment ULID
+ * @param key - The original cache key
+ * @returns Environment-prefixed cache key
+ */
+export function withEnvironment(environmentId: string, key: string): string {
+  return `${ENV_PREFIX}:${environmentId}:${key}`;
+}
+
+/**
+ * Create an environment-scoped cache key using current context
+ * Falls back to the original key if environment context is not initialized
+ * @param key - The original cache key
+ * @returns Environment-prefixed cache key if context available, otherwise original key
+ */
+export function withCurrentEnvironment(key: string): string {
+  if (!isDefaultEnvironmentInitialized()) {
+    // During initialization, return the key without environment prefix
+    return key;
+  }
+  const envId = getCurrentEnvironmentId();
+  return `${ENV_PREFIX}:${envId}:${key}`;
+}
+
+/**
+ * Create a pattern for matching all environment-scoped keys with a given base pattern
+ * @param pattern - The base pattern (e.g., 'game_world*')
+ * @returns Pattern that matches all environments
+ */
+export function allEnvironmentsPattern(pattern: string): string {
+  return `${ENV_PREFIX}:*:${pattern}`;
+}
+
+/**
+ * Create a pattern for matching all keys in a specific environment
+ * @param environmentId - The environment ULID
+ * @returns Pattern that matches all keys in the environment
+ */
+export function environmentPattern(environmentId: string): string {
+  return `${ENV_PREFIX}:${environmentId}:*`;
+}
+
 /**
  * 게임월드 관련 캐시 키
  */
@@ -243,6 +298,95 @@ export const SERVER_SDK_ETAG = {
   SURVEY_SETTINGS: 'server_sdk:etag:survey_settings',
 } as const;
 
+/**
+ * Environment-scoped cache keys
+ * These keys are automatically prefixed with the environment ID
+ * Use with withEnvironment() function
+ */
+export const ENV_SCOPED = {
+  /**
+   * Game worlds related (environment-specific)
+   */
+  GAME_WORLDS: {
+    PUBLIC: 'game_worlds:public',
+    ADMIN: 'game_worlds:admin',
+    DETAIL: (id: number) => `game_world:${id}`,
+    BY_WORLD_ID: (worldId: string) => `game_world:world_id:${worldId}`,
+  },
+
+  /**
+   * Client versions (environment-specific)
+   */
+  CLIENT_VERSION: {
+    BY_CHANNEL: (channel: string, subChannel: string) => `client_version:${channel}:${subChannel}`,
+    ALL: 'client_versions:all',
+    ACTIVE: 'client_versions:active',
+  },
+
+  /**
+   * Whitelists (environment-specific)
+   */
+  WHITELIST: {
+    ALL: 'whitelist:all',
+    ACTIVE: 'whitelist:active',
+    BY_IP: (ip: string) => `whitelist:ip:${ip}`,
+  },
+
+  /**
+   * Maintenance (environment-specific)
+   */
+  MAINTENANCE: {
+    STATUS: 'maintenance:status',
+    TEMPLATES: 'maintenance:templates',
+  },
+
+  /**
+   * Server SDK ETags (environment-specific)
+   */
+  SDK_ETAG: {
+    GAME_WORLDS: 'server_sdk:etag:game_worlds',
+    POPUP_NOTICES: 'server_sdk:etag:popup_notices',
+    WHITELISTS: 'server_sdk:etag:whitelists',
+    MAINTENANCE: 'server_sdk:etag:maintenance',
+    SURVEYS: 'server_sdk:etag:surveys',
+    SURVEY_SETTINGS: 'server_sdk:etag:survey_settings',
+  },
+
+  /**
+   * Banners (environment-specific)
+   */
+  BANNERS: {
+    ALL: 'banners:all',
+    ACTIVE: 'banners:active',
+    BY_ID: (id: string) => `banner:${id}`,
+  },
+
+  /**
+   * Service notices (environment-specific)
+   */
+  SERVICE_NOTICES: {
+    ALL: 'service_notices:all',
+    ACTIVE: 'service_notices:active',
+  },
+
+  /**
+   * Surveys (environment-specific)
+   */
+  SURVEYS: {
+    ALL: 'surveys:all',
+    ACTIVE: 'surveys:active',
+    SETTINGS: 'surveys:settings',
+  },
+
+  /**
+   * Ingame popup notices (environment-specific)
+   */
+  POPUP_NOTICES: {
+    ALL: 'popup_notices:all',
+    ACTIVE: 'popup_notices:active',
+  },
+} as const;
+
 
 
 /**
@@ -299,6 +443,18 @@ export const PATTERNS = {
    * 모든 번역 관련 캐시
    */
   TRANSLATION: 'translate*',
+
+  /**
+   * 특정 환경의 모든 캐시
+   * @param environmentId 환경 ULID
+   */
+  ENVIRONMENT: (environmentId: string) => `${ENV_PREFIX}:${environmentId}:*`,
+
+  /**
+   * 모든 환경의 특정 패턴 캐시
+   * @param pattern 캐시 패턴
+   */
+  ALL_ENVIRONMENTS: (pattern: string) => `${ENV_PREFIX}:*:${pattern}`,
 } as const;
 
 /**

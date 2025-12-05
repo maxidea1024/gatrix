@@ -1,13 +1,14 @@
 export type TokenType = 'client' | 'server';
 
 export interface ApiAccessToken {
-  id: number;
+  id: string; // ULID (26 characters)
   tokenName: string;
   description?: string;
   tokenHash: string;
   tokenValue?: string; // Original token value for copying (only in list response)
   tokenType: TokenType;
-  environmentId?: number;
+  allowAllEnvironments: boolean;
+  environmentIds?: string[]; // Environment IDs (frontend maps to names)
   expiresAt?: string;
   lastUsedAt?: string;
   usageCount?: number;
@@ -17,10 +18,6 @@ export interface ApiAccessToken {
   updatedAt: string;
 
   // Relations
-  environment?: {
-    id: number;
-    environmentName: string;
-  };
   creator?: {
     name: string;
     email: string;
@@ -36,20 +33,23 @@ export interface CreateTokenRequest {
   tokenName: string;
   description?: string;
   tokenType: TokenType;
-  environmentId?: number;
+  allowAllEnvironments?: boolean;
+  environmentIds?: string[];
   expiresAt?: string;
 }
 
 export interface UpdateTokenRequest {
   tokenName?: string;
   description?: string;
+  allowAllEnvironments?: boolean;
+  environmentIds?: string[];
   expiresAt?: string;
 }
 
 export interface CreateTokenResponse {
   success: boolean;
   data: {
-    id: number;
+    id: string; // ULID
     tokenName: string;
     tokenType: string;
     tokenValue: string; // 백엔드에서 반환하는 실제 필드명

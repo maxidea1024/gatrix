@@ -1,13 +1,16 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User } from '@/types';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import { User, Permission } from '@/types';
 import { AuthService } from '@/services/auth';
 import { devLogger } from '@/utils/logger';
+import api from '@/services/api';
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   error: string | null;
+  permissions: Permission[];
+  permissionsLoading: boolean;
   login: (credentials: { email: string; password: string; rememberMe?: boolean }) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<void>;
@@ -18,6 +21,8 @@ interface AuthContextType {
   isAdmin: () => boolean;
   canAccess: (requiredRoles?: string[]) => boolean;
   getToken: () => string | null;
+  hasPermission: (permission: Permission | Permission[]) => boolean;
+  refreshPermissions: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,8 +35,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [permissionsLoading, setPermissionsLoading] = useState(false);
 
   const isAuthenticated = !!user;
+
+  // Fetch user permissions from the server
+  const fetchPermissions = useCallback(async (userId: number) => {
+    try {
+      setPermissionsLoading(true);
+      const response = await api.get<{ userId: number; permissions: Permission[] }>(
+        `/admin/users/${userId}/permissions`
+      );
+      setPermissions(response.data?.permissions || []);
+    } catch (error) {
+      devLogger.error('Failed to fetch permissions:', error);
+      setPermissions([]);
+    } finally {
+      setPermissionsLoading(false);
+    }
+  }, []);
+
+  // Refresh permissions
+  const refreshPermissions = useCallback(async () => {
+    if (user?.id) {
+      await fetchPermissions(user.id);
+    }
+  }, [user?.id, fetchPermissions]);
 
   const login = async (credentials: { email: string; password: string; rememberMe?: boolean }): Promise<void> => {
     try {
@@ -53,6 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       devLogger.error('Logout error:', error);
     } finally {
       setUser(null);
+      setPermissions([]);
     }
   };
 
@@ -140,6 +171,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const getToken = (): string | null => {
     return AuthService.getStoredToken();
   };
+
+  // Check if user has a specific permission or any of the permissions
+  const hasPermission = useCallback((permission: Permission | Permission[]): boolean => {
+    if (!isAuthenticated || !user) {
+      return false;
+    }
+
+    // Admin users with role 'admin' need to have permissions assigned
+    if (user.role !== 'admin') {
+      return false;
+    }
+
+    const requiredPermissions = Array.isArray(permission) ? permission : [permission];
+    return requiredPermissions.some(p => permissions.includes(p));
+  }, [isAuthenticated, user, permissions]);
+
+  // Fetch permissions when user changes
+  useEffect(() => {
+    if (user?.id && user.role === 'admin') {
+      fetchPermissions(user.id);
+    } else {
+      setPermissions([]);
+    }
+  }, [user?.id, user?.role, fetchPermissions]);
 
   useEffect(() => {
     // Initialize auth state from localStorage only
@@ -235,6 +290,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     isAuthenticated,
     error,
+    permissions,
+    permissionsLoading,
     login,
     register,
     logout,
@@ -243,6 +300,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAdmin,
     canAccess,
     getToken,
+    hasPermission,
+    refreshPermissions,
   };
 
   return (

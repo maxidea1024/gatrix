@@ -81,6 +81,7 @@ import { useTheme as useCustomTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import TimezoneSelector from '../common/TimezoneSelector';
+import EnvironmentSelector from '@/components/EnvironmentSelector';
 import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
@@ -347,20 +348,19 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
 
   const isActivePath = (path: string) => {
-    // 정확한 경로 매칭을 위해 수정
+    // 정확한 경로 매칭
     if (location.pathname === path) {
       return true;
+    }
+    // /settings 경로들은 정확한 매칭만 사용 (prefix 매칭 안 함)
+    if (path.startsWith('/settings')) {
+      return false;
     }
     // 하위 경로인 경우에만 true (단, 정확히 '/'로 구분되는 경우만)
     if (path !== '/' && location.pathname.startsWith(path + '/')) {
       return true;
     }
     return false;
-  };
-
-  // 설정 메뉴 전용 활성화 체크 (정확한 매칭만)
-  const isActiveSettingsPath = (path: string) => {
-    return location.pathname === path;
   };
 
   // Check if any child item is active
@@ -390,10 +390,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     if (item.children) {
       const submenuKey = `submenu-${index}`;
       const isExpanded = expandedSubmenus[submenuKey];
-      // For settings menu, use exact path matching only
-      const isSettingsMenu = item.text === 'sidebar.settings';
       const hasActiveChild = item.children.some((child: any) =>
-        isSettingsMenu ? isActiveSettingsPath(child.path) : isActivePath(child.path)
+        isActivePath(child.path)
       );
 
       const toggleSubmenu = () => {
@@ -456,9 +454,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <Divider sx={{ my: 0.5 }} />
 
               {item.children.map((child: any, childIndex: number) => {
-                // For settings menu, use exact path matching only
-                const isSettingsMenu = item.text === 'sidebar.settings';
-                const isChildActive = isSettingsMenu ? isActiveSettingsPath(child.path) : isActivePath(child.path);
+                const isChildActive = isActivePath(child.path);
 
                 return (
                   <Tooltip
@@ -502,9 +498,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <Collapse in={isExpanded} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {item.children.map((child: any, childIndex: number) => {
-                  // For settings menu, use exact path matching only
-                  const isSettingsMenu = item.text === 'sidebar.settings';
-                  const isChildActive = isSettingsMenu ? isActiveSettingsPath(child.path) : isActivePath(child.path);
+                  const isChildActive = isActivePath(child.path);
 
                   return (
                     <ListItemButton
@@ -1339,15 +1333,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               }}
             />
 
-            <Tooltip title="Open API">
-              <IconButton
-                onClick={() => navigate('/admin/open-api')}
-                color="inherit"
-              >
-                <ApiIcon />
-              </IconButton>
-            </Tooltip>
-
             <IconButton onClick={toggleTheme} color="inherit">
               {isDark ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
@@ -1383,6 +1368,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             </IconButton>
 
             <LanguageSelector variant="text" size="medium" />
+
+            {/* 구분선 */}
+            <Box
+              sx={{
+                width: '1px',
+                height: '24px',
+                bgcolor: theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.2)'
+                  : 'rgba(0, 0, 0, 0.2)',
+                mx: 1
+              }}
+            />
+
+            {/* Environment Selector - 맨 오른쪽 */}
+            <EnvironmentSelector size="small" />
 
             <Menu
               anchorEl={userMenuAnchor}

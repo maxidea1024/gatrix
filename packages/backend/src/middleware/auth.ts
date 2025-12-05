@@ -121,6 +121,42 @@ export const requireRole = (roles: string | string[]) => {
 
 export const requireAdmin = requireRole('admin');
 
+/**
+ * Middleware to require specific permission(s)
+ * Checks if the authenticated user has the required permission(s)
+ */
+export const requirePermission = (permissions: string | string[]) => {
+  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    if (!req.user) {
+      next(new GatrixError('Authentication required', 401));
+      return;
+    }
+
+    const userId = (req.user as any)?.id ?? (req.user as any)?.userId;
+    const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
+
+    try {
+      // Check if user has any of the required permissions
+      const hasPermission = await UserModel.hasAnyPermission(userId, requiredPermissions);
+
+      if (!hasPermission) {
+        logger.warn('Permission denied for user:', {
+          userId,
+          requiredPermissions,
+          endpoint: req.path,
+        });
+        next(new GatrixError('Insufficient permissions', 403));
+        return;
+      }
+
+      next();
+    } catch (error) {
+      logger.error('Error checking permissions:', error);
+      next(new GatrixError('Error checking permissions', 500));
+    }
+  };
+};
+
 export const optionalAuth = async (
   req: AuthenticatedRequest,
   res: Response,

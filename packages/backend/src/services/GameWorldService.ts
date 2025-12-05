@@ -6,7 +6,11 @@ import {
   GameWorldListParams
 } from '../models/GameWorld';
 import { GatrixError } from '../middleware/errorHandler';
-import { GAME_WORLDS, SERVER_SDK_ETAG } from '../constants/cacheKeys';
+import {
+  ENV_SCOPED,
+  withCurrentEnvironment,
+  allEnvironmentsPattern
+} from '../constants/cacheKeys';
 import { createLogger } from '../config/logger';
 import { pubSubService } from './PubSubService';
 
@@ -93,9 +97,9 @@ export class GameWorldService {
 
       const result = await GameWorldModel.create(normalized);
 
-      // Invalidate game worlds cache
-      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
+      // Invalidate game worlds cache (environment-scoped)
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -138,9 +142,9 @@ export class GameWorldService {
         throw new GatrixError('Failed to update game world', 500);
       }
 
-      // Invalidate game worlds cache
-      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
+      // Invalidate game worlds cache (environment-scoped)
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -175,9 +179,9 @@ export class GameWorldService {
         throw new GatrixError('Failed to delete game world', 500);
       }
 
-      // Invalidate game worlds cache
-      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
+      // Invalidate game worlds cache (environment-scoped)
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -213,10 +217,11 @@ export class GameWorldService {
 
       logger.info(`Visibility toggled for ${world.worldId}: ${world.isVisible} -> ${!world.isVisible}`);
 
-      // Invalidate game worlds cache
-      logger.info(`Calling cache invalidation for ${GAME_WORLDS.PUBLIC}`);
-      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
+      // Invalidate game worlds cache (environment-scoped)
+      const cacheKey = withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC);
+      logger.info(`Calling cache invalidation for ${cacheKey}`);
+      await pubSubService.invalidateKey(cacheKey);
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
       logger.info('Cache invalidation completed');
 
       // Publish event for SDK real-time updates
@@ -254,9 +259,9 @@ export class GameWorldService {
         throw new GatrixError('Failed to toggle maintenance status', 500);
       }
 
-      // Invalidate game worlds cache
-      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
+      // Invalidate game worlds cache (environment-scoped)
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
 
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
@@ -278,10 +283,10 @@ export class GameWorldService {
     try {
       await GameWorldModel.updateDisplayOrders(orderUpdates);
 
-      // Invalidate all game worlds cache (both public and admin)
-      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
-      await pubSubService.invalidateKey(GAME_WORLDS.ADMIN);
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
+      // Invalidate all game worlds cache (both public and admin, environment-scoped)
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.ADMIN));
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
 
       // Publish event for SDK to clear entire game worlds cache
       await pubSubService.publishSDKEvent({
@@ -301,9 +306,9 @@ export class GameWorldService {
     try {
       const result = await GameWorldModel.moveUp(id);
 
-      // Invalidate game worlds cache
-      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
+      // Invalidate game worlds cache (environment-scoped)
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
 
       return result;
     } catch (error) {
@@ -316,9 +321,9 @@ export class GameWorldService {
     try {
       const result = await GameWorldModel.moveDown(id);
 
-      // Invalidate game worlds cache
-      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
+      // Invalidate game worlds cache (environment-scoped)
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
 
       return result;
     } catch (error) {
@@ -329,12 +334,27 @@ export class GameWorldService {
 
   static async invalidateCache(): Promise<void> {
     try {
-      // Invalidate game worlds cache
-      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
-      await pubSubService.invalidateKey(SERVER_SDK_ETAG.GAME_WORLDS);
+      // Invalidate game worlds cache (environment-scoped)
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
+      await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
     } catch (error) {
       logger.error('Error in invalidateCache service:', error);
       throw new GatrixError('Failed to invalidate cache', 500);
+    }
+  }
+
+  /**
+   * Invalidate cache for all environments
+   * Used when data changes affect all environments
+   */
+  static async invalidateCacheAllEnvironments(): Promise<void> {
+    try {
+      // Invalidate game worlds cache for all environments
+      await pubSubService.invalidateByPattern(allEnvironmentsPattern('game_world*'));
+      await pubSubService.invalidateByPattern(allEnvironmentsPattern('server_sdk:etag:game_worlds'));
+    } catch (error) {
+      logger.error('Error in invalidateCacheAllEnvironments service:', error);
+      throw new GatrixError('Failed to invalidate cache for all environments', 500);
     }
   }
 

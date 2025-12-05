@@ -137,5 +137,6 @@ router.use(authenticate as any);
 router.get('/me', UserController.getCurrentUser);
 router.put('/me', UserController.updateCurrentUser);
 router.put('/me/language', UserController.updateLanguage);
+router.get('/me/environments', UserController.getMyEnvironmentAccess);
 
 export default router;

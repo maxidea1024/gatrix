@@ -40,37 +40,14 @@ export class PlanningDataService {
   // Source CMS files (read-only, from src/contents/cms)
   private static sourceCmsPath = path.join(__dirname, '../contents/cms');
 
-  // Runtime data path (read-write, for dynamically generated files)
-  private static runtimeDataPath = path.join(__dirname, '../../data/planning');
+  // Base runtime data path (read-write, for dynamically generated files)
+  // Now environment-specific: data/planning/{environmentId}/
+  private static baseRuntimeDataPath = path.join(__dirname, '../../data/planning');
 
-  // Paths for dynamically generated files (stored in runtime data directory)
-  // Language-specific reward lookup files
-  private static rewardLookupKrPath = path.join(PlanningDataService.runtimeDataPath, 'reward-lookup-kr.json');
-  private static rewardLookupEnPath = path.join(PlanningDataService.runtimeDataPath, 'reward-lookup-en.json');
-  private static rewardLookupZhPath = path.join(PlanningDataService.runtimeDataPath, 'reward-lookup-zh.json');
-  private static rewardTypeListPath = path.join(PlanningDataService.runtimeDataPath, 'reward-type-list.json');
-  private static uiListDataKrPath = path.join(PlanningDataService.runtimeDataPath, 'ui-list-data-kr.json');
-  private static uiListDataEnPath = path.join(PlanningDataService.runtimeDataPath, 'ui-list-data-en.json');
-  private static uiListDataZhPath = path.join(PlanningDataService.runtimeDataPath, 'ui-list-data-zh.json');
-  // Language-specific event lookup files
-  private static hotTimeBuffKrPath = path.join(PlanningDataService.runtimeDataPath, 'hottimebuff-lookup-kr.json');
-  private static hotTimeBuffEnPath = path.join(PlanningDataService.runtimeDataPath, 'hottimebuff-lookup-en.json');
-  private static hotTimeBuffZhPath = path.join(PlanningDataService.runtimeDataPath, 'hottimebuff-lookup-zh.json');
-  private static eventPageKrPath = path.join(PlanningDataService.runtimeDataPath, 'eventpage-lookup-kr.json');
-  private static eventPageEnPath = path.join(PlanningDataService.runtimeDataPath, 'eventpage-lookup-en.json');
-  private static eventPageZhPath = path.join(PlanningDataService.runtimeDataPath, 'eventpage-lookup-zh.json');
-  private static liveEventKrPath = path.join(PlanningDataService.runtimeDataPath, 'liveevent-lookup-kr.json');
-  private static liveEventEnPath = path.join(PlanningDataService.runtimeDataPath, 'liveevent-lookup-en.json');
-  private static liveEventZhPath = path.join(PlanningDataService.runtimeDataPath, 'liveevent-lookup-zh.json');
-  private static mateRecruitingGroupKrPath = path.join(PlanningDataService.runtimeDataPath, 'materecruiting-lookup-kr.json');
-  private static mateRecruitingGroupEnPath = path.join(PlanningDataService.runtimeDataPath, 'materecruiting-lookup-en.json');
-  private static mateRecruitingGroupZhPath = path.join(PlanningDataService.runtimeDataPath, 'materecruiting-lookup-zh.json');
-  private static oceanNpcAreaSpawnerKrPath = path.join(PlanningDataService.runtimeDataPath, 'oceannpcarea-lookup-kr.json');
-  private static oceanNpcAreaSpawnerEnPath = path.join(PlanningDataService.runtimeDataPath, 'oceannpcarea-lookup-en.json');
-  private static oceanNpcAreaSpawnerZhPath = path.join(PlanningDataService.runtimeDataPath, 'oceannpcarea-lookup-zh.json');
   private static initialized = false;
 
-  // Redis cache keys for multi-instance support
+  // Redis cache key prefixes for environment-scoped data
+  private static readonly CACHE_KEY_PREFIX = 'env';
   private static readonly CACHE_KEYS = {
     REWARD_LOOKUP_KR: 'planning:reward-lookup-kr',
     REWARD_LOOKUP_EN: 'planning:reward-lookup-en',
@@ -83,6 +60,27 @@ export class PlanningDataService {
     MATE_RECRUITING: 'planning:materecruiting-lookup',
     OCEAN_NPC_AREA: 'planning:oceannpcarea-lookup',
   };
+
+  /**
+   * Get environment-specific runtime data path
+   */
+  private static getEnvironmentDataPath(environmentId: string): string {
+    return path.join(this.baseRuntimeDataPath, environmentId);
+  }
+
+  /**
+   * Get environment-scoped cache key
+   */
+  private static getEnvCacheKey(environmentId: string, key: string): string {
+    return `${this.CACHE_KEY_PREFIX}:${environmentId}:${key}`;
+  }
+
+  /**
+   * Get file path for environment-specific planning data
+   */
+  private static getFilePath(environmentId: string, fileName: string): string {
+    return path.join(this.getEnvironmentDataPath(environmentId), fileName);
+  }
 
   // Cache TTL: 24 hours (in milliseconds)
 
@@ -97,53 +95,9 @@ export class PlanningDataService {
     }
 
     try {
-      // Ensure runtime data directory exists
-      await fs.mkdir(this.runtimeDataPath, { recursive: true });
-      logger.info('Runtime data directory ready', { path: this.runtimeDataPath });
-
-      // Check if reward lookup files exist (all language versions)
-      const lookupKrExists = await fs.access(this.rewardLookupKrPath).then(() => true).catch(() => false);
-      const lookupEnExists = await fs.access(this.rewardLookupEnPath).then(() => true).catch(() => false);
-      const lookupZhExists = await fs.access(this.rewardLookupZhPath).then(() => true).catch(() => false);
-      const typeListExists = await fs.access(this.rewardTypeListPath).then(() => true).catch(() => false);
-
-      if (!lookupKrExists || !lookupEnExists || !lookupZhExists || !typeListExists) {
-        logger.warn('Planning data files not found. Please upload planning data via API endpoint: POST /api/v1/admin/planning-data/rebuild');
-      } else {
-        logger.info('Planning data files found. Ready to serve.');
-      }
-
-      // Ensure existing planning cache keys (if any) become persistent (no TTL)
-      try {
-        const keysToPersist = [
-          this.CACHE_KEYS.REWARD_LOOKUP_KR,
-          this.CACHE_KEYS.REWARD_LOOKUP_EN,
-          this.CACHE_KEYS.REWARD_LOOKUP_ZH,
-          this.CACHE_KEYS.REWARD_TYPE_LIST,
-          `${this.CACHE_KEYS.UI_LIST_DATA}:kr`,
-          `${this.CACHE_KEYS.UI_LIST_DATA}:en`,
-          `${this.CACHE_KEYS.UI_LIST_DATA}:zh`,
-          `${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`,
-          `${this.CACHE_KEYS.HOT_TIME_BUFF}:en`,
-          `${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`,
-          `${this.CACHE_KEYS.EVENT_PAGE}:kr`,
-          `${this.CACHE_KEYS.EVENT_PAGE}:en`,
-          `${this.CACHE_KEYS.EVENT_PAGE}:zh`,
-          `${this.CACHE_KEYS.LIVE_EVENT}:kr`,
-          `${this.CACHE_KEYS.LIVE_EVENT}:en`,
-          `${this.CACHE_KEYS.LIVE_EVENT}:zh`,
-          `${this.CACHE_KEYS.MATE_RECRUITING}:kr`,
-          `${this.CACHE_KEYS.MATE_RECRUITING}:en`,
-          `${this.CACHE_KEYS.MATE_RECRUITING}:zh`,
-          `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`,
-          `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`,
-          `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
-        ];
-        const persisted = await cacheService.persistKeys(keysToPersist);
-        logger.info('Planning cache keys persisted (no TTL)', { persisted });
-      } catch (persistErr) {
-        logger.warn('Failed to persist planning cache keys (no TTL)', { error: persistErr });
-      }
+      // Ensure base runtime data directory exists
+      await fs.mkdir(this.baseRuntimeDataPath, { recursive: true });
+      logger.info('Runtime data directory ready', { path: this.baseRuntimeDataPath });
 
       this.initialized = true;
     } catch (error) {
@@ -153,87 +107,102 @@ export class PlanningDataService {
   }
 
   /**
+   * Ensure environment-specific data directory exists
+   */
+  static async ensureEnvironmentDataDir(environmentId: string): Promise<void> {
+    const envDataPath = this.getEnvironmentDataPath(environmentId);
+    await fs.mkdir(envDataPath, { recursive: true });
+  }
+
+  /**
    * Get reward lookup data (cached in Redis for multi-instance support)
    * Data is already localized at generation time, so just load the appropriate language file
+   * @param environmentId Environment ULID
    * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getRewardLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<RewardLookupData> {
+  static async getRewardLookup(environmentId: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<RewardLookupData> {
     try {
       // Determine cache key and file path based on language
-      let cacheKey: string;
-      let filePath: string;
-
-      if (lang === 'en') {
-        cacheKey = this.CACHE_KEYS.REWARD_LOOKUP_EN;
-        filePath = PlanningDataService.rewardLookupEnPath;
-      } else if (lang === 'zh') {
-        cacheKey = this.CACHE_KEYS.REWARD_LOOKUP_ZH;
-        filePath = PlanningDataService.rewardLookupZhPath;
-      } else {
-        cacheKey = this.CACHE_KEYS.REWARD_LOOKUP_KR;
-        filePath = PlanningDataService.rewardLookupKrPath;
-      }
+      const baseCacheKey = lang === 'en' ? this.CACHE_KEYS.REWARD_LOOKUP_EN :
+                           lang === 'zh' ? this.CACHE_KEYS.REWARD_LOOKUP_ZH :
+                           this.CACHE_KEYS.REWARD_LOOKUP_KR;
+      const cacheKey = this.getEnvCacheKey(environmentId, baseCacheKey);
+      const filePath = this.getFilePath(environmentId, `reward-lookup-${lang}.json`);
 
       // Try to get from Redis cache first
       const cached = await cacheService.get<RewardLookupData>(cacheKey);
       if (cached) {
-        // Ensure no TTL remains on cached keys
         await cacheService.setWithoutTTL(cacheKey, cached);
-        logger.debug(`Reward lookup data (${lang}) retrieved from cache`);
+        logger.debug(`Reward lookup data (${lang}) retrieved from cache`, { environmentId });
         return cached;
       }
 
       // If not in cache, read from file
+      const exists = await fs.access(filePath).then(() => true).catch(() => false);
+      if (!exists) {
+        return {};
+      }
+
       const data = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
       await cacheService.setWithoutTTL(cacheKey, parsed);
 
-      logger.debug(`Reward lookup data (${lang}) loaded from file and cached`);
+      logger.debug(`Reward lookup data (${lang}) loaded from file and cached`, { environmentId });
       return parsed;
     } catch (error) {
-      logger.error('Failed to read reward lookup data', { error, lang });
+      logger.error('Failed to read reward lookup data', { error, lang, environmentId });
       throw new GatrixError('Failed to load reward lookup data', 500);
     }
   }
 
   /**
    * Get reward type list (cached in Redis for multi-instance support)
+   * @param environmentId Environment ULID
    */
-  static async getRewardTypeList(): Promise<RewardTypeInfo[]> {
+  static async getRewardTypeList(environmentId: string): Promise<RewardTypeInfo[]> {
     try {
+      const cacheKey = this.getEnvCacheKey(environmentId, this.CACHE_KEYS.REWARD_TYPE_LIST);
+      const filePath = this.getFilePath(environmentId, 'reward-type-list.json');
+
       // Try to get from Redis cache first
-      const cached = await cacheService.get<RewardTypeInfo[]>(this.CACHE_KEYS.REWARD_TYPE_LIST);
+      const cached = await cacheService.get<RewardTypeInfo[]>(cacheKey);
       if (cached) {
-        await cacheService.setWithoutTTL(this.CACHE_KEYS.REWARD_TYPE_LIST, cached);
-        logger.debug('Reward type list retrieved from cache');
+        await cacheService.setWithoutTTL(cacheKey, cached);
+        logger.debug('Reward type list retrieved from cache', { environmentId });
         return cached;
       }
 
       // If not in cache, read from file
-      const data = await fs.readFile(PlanningDataService.rewardTypeListPath, 'utf-8');
+      const exists = await fs.access(filePath).then(() => true).catch(() => false);
+      if (!exists) {
+        return [];
+      }
+
+      const data = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(this.CACHE_KEYS.REWARD_TYPE_LIST, parsed);
+      await cacheService.setWithoutTTL(cacheKey, parsed);
 
       return parsed;
     } catch (error) {
-      logger.error('Failed to read reward type list', { error });
+      logger.error('Failed to read reward type list', { error, environmentId });
       throw new GatrixError('Failed to load reward type list', 500);
     }
   }
 
   /**
    * Get items for a specific reward type with localized names
+   * @param environmentId Environment ULID
    * @param rewardType - Reward type number
    * @param language - Language code (kr, en, zh)
    */
-  static async getRewardTypeItems(rewardType: number, language: 'kr' | 'en' | 'zh' = 'kr'): Promise<RewardItem[]> {
+  static async getRewardTypeItems(environmentId: string, rewardType: number, language: 'kr' | 'en' | 'zh' = 'kr'): Promise<RewardItem[]> {
     try {
       // Load the language-specific reward lookup data
-      const lookupData = await PlanningDataService.getRewardLookup(language);
+      const lookupData = await PlanningDataService.getRewardLookup(environmentId, language);
       const typeData = lookupData[rewardType.toString()];
 
       if (!typeData) {
@@ -252,140 +221,24 @@ export class PlanningDataService {
   }
 
   /**
-   * Rebuild all planning data from CMS files using adminToolDataBuilder.js
-   * This should be called when CMS files are updated
-   */
-  static async rebuildRewardLookup(): Promise<{ success: boolean; message: string; stats?: any }> {
-    try {
-      logger.info('Starting planning data rebuild using adminToolDataBuilder.js...');
-
-      // Check if adminToolDataBuilder.js exists
-      const builderPath = path.join(PlanningDataService.sourceCmsPath, 'adminToolDataBuilder.js');
-
-      try {
-        await fs.access(builderPath);
-      } catch {
-        throw new GatrixError('Admin tool data builder not found', 500);
-      }
-
-      // Get the actual CMS directory path (where Point.json, Item.json, etc. are located)
-      // The CMS files are in packages/backend/cms directory
-      const actualCmsDir = path.join(__dirname, '../../cms');
-
-      // Execute the builder with the correct CMS directory
-      // This will generate all 7 files: reward-lookup.json, reward-type-list.json,
-      // reward-localization-kr/us/cn.json, ui-list-data.json, loctab.json
-      // Output to runtime data directory (not source directory)
-      const { execSync } = require('child_process');
-      const output = execSync(`node "${builderPath}" --all --cms-dir "${actualCmsDir}" --output-dir "${PlanningDataService.runtimeDataPath}"`, {
-        cwd: PlanningDataService.sourceCmsPath,
-        encoding: 'utf-8',
-      });
-
-      logger.info('Planning data rebuild completed', { output });
-
-      // Verify the core files were created (all language versions)
-      try {
-        await fs.access(PlanningDataService.rewardLookupKrPath);
-        await fs.access(PlanningDataService.rewardLookupEnPath);
-        await fs.access(PlanningDataService.rewardLookupZhPath);
-        await fs.access(PlanningDataService.rewardTypeListPath);
-      } catch {
-        throw new GatrixError('Planning data files were not created', 500);
-      }
-
-      // Invalidate Redis cache for all instances
-      logger.info('Invalidating Redis cache for planning data...');
-      await Promise.all([
-        cacheService.delete(this.CACHE_KEYS.REWARD_LOOKUP_KR),
-        cacheService.delete(this.CACHE_KEYS.REWARD_LOOKUP_EN),
-        cacheService.delete(this.CACHE_KEYS.REWARD_LOOKUP_ZH),
-        cacheService.delete(this.CACHE_KEYS.REWARD_TYPE_LIST),
-        // UI list per language
-        cacheService.delete(`${this.CACHE_KEYS.UI_LIST_DATA}:kr`),
-        cacheService.delete(`${this.CACHE_KEYS.UI_LIST_DATA}:en`),
-        cacheService.delete(`${this.CACHE_KEYS.UI_LIST_DATA}:zh`),
-        // Event lookups per language
-        cacheService.delete(`${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`),
-        cacheService.delete(`${this.CACHE_KEYS.HOT_TIME_BUFF}:en`),
-        cacheService.delete(`${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`),
-        cacheService.delete(`${this.CACHE_KEYS.EVENT_PAGE}:kr`),
-        cacheService.delete(`${this.CACHE_KEYS.EVENT_PAGE}:en`),
-        cacheService.delete(`${this.CACHE_KEYS.EVENT_PAGE}:zh`),
-        cacheService.delete(`${this.CACHE_KEYS.LIVE_EVENT}:kr`),
-        cacheService.delete(`${this.CACHE_KEYS.LIVE_EVENT}:en`),
-        cacheService.delete(`${this.CACHE_KEYS.LIVE_EVENT}:zh`),
-        cacheService.delete(`${this.CACHE_KEYS.MATE_RECRUITING}:kr`),
-        cacheService.delete(`${this.CACHE_KEYS.MATE_RECRUITING}:en`),
-        cacheService.delete(`${this.CACHE_KEYS.MATE_RECRUITING}:zh`),
-        cacheService.delete(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`),
-        cacheService.delete(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`),
-        cacheService.delete(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`),
-      ]);
-      logger.info('Redis cache invalidated successfully');
-
-      // Get stats (this will reload from files and repopulate cache)
-      const lookupData = await PlanningDataService.getRewardLookup('kr');
-      const typeList = await PlanningDataService.getRewardTypeList();
-      const uiListData = await PlanningDataService.getUIListData();
-
-      const stats = {
-        totalRewardTypes: typeList.length,
-        rewardTypesWithTable: typeList.filter(t => t.hasTable).length,
-        totalItems: Object.values(lookupData).reduce((sum, type) => sum + type.itemCount, 0),
-        uiListCounts: {
-          nations: uiListData.nations?.length || 0,
-          towns: uiListData.towns?.length || 0,
-          villages: uiListData.villages?.length || 0,
-        },
-      };
-
-      return {
-        success: true,
-        message: 'All planning data rebuilt successfully (7 files generated)',
-        stats,
-      };
-    } catch (error) {
-      if (error instanceof GatrixError) {
-        throw error;
-      }
-      logger.error('Failed to rebuild planning data', { error });
-      throw new GatrixError('Failed to rebuild planning data', 500);
-    }
-  }
-
-  /**
    * Get UI list data (nations, towns, villages) - cached in Redis for multi-instance support
+   * @param environmentId Environment ULID
    * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getUIListData(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<any> {
+  static async getUIListData(environmentId: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<any> {
     try {
+      const cacheKey = this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.UI_LIST_DATA}:${lang}`);
+      const filePath = this.getFilePath(environmentId, `ui-list-data-${lang}.json`);
+
       // Try to get from Redis cache first
-      const cacheKey = `${this.CACHE_KEYS.UI_LIST_DATA}:${lang}`;
       const cached = await cacheService.get<any>(cacheKey);
       if (cached) {
         await cacheService.setWithoutTTL(cacheKey, cached);
-        logger.debug(`UI list data (${lang}) retrieved from cache`);
+        logger.debug(`UI list data (${lang}) retrieved from cache`, { environmentId });
         return cached;
       }
 
-      // Determine file path based on language
-      let filePath: string;
-      switch (lang) {
-        case 'en':
-          filePath = this.uiListDataEnPath;
-          break;
-        case 'zh':
-          filePath = this.uiListDataZhPath;
-          break;
-        case 'kr':
-        default:
-          filePath = this.uiListDataKrPath;
-          break;
-      }
-
       const exists = await fs.access(filePath).then(() => true).catch(() => false);
-
       if (!exists) {
         return { nations: [], towns: [], villages: [] };
       }
@@ -398,54 +251,57 @@ export class PlanningDataService {
 
       return parsed;
     } catch (error) {
-      logger.error('Failed to read UI list data', { error });
+      logger.error('Failed to read UI list data', { error, environmentId });
       throw new GatrixError('Failed to load UI list data', 500);
     }
   }
 
   /**
    * Get UI list items for a specific category with language support
+   * @param environmentId Environment ULID
    * @param category - Category name (nations, towns, villages, ships, mates, etc.)
    * @param language - Language code (kr, en, zh)
    */
-  static async getUIListItems(category: string, language: 'kr' | 'en' | 'zh' = 'kr'): Promise<any[]> {
+  static async getUIListItems(environmentId: string, category: string, language: 'kr' | 'en' | 'zh' = 'kr'): Promise<any[]> {
     try {
-      const uiListData = await PlanningDataService.getUIListData(language);
+      const uiListData = await PlanningDataService.getUIListData(environmentId, language);
 
       if (!uiListData[category]) {
         throw new GatrixError(`Category '${category}' not found`, 404);
       }
 
-      // Data is already localized at generation time, so just return items as-is
       return uiListData[category];
     } catch (error) {
       if (error instanceof GatrixError) {
         throw error;
       }
-      logger.error('Failed to get UI list items', { error, category, language });
+      logger.error('Failed to get UI list items', { error, category, language, environmentId });
       throw new GatrixError('Failed to load UI list items', 500);
     }
   }
 
   /**
    * Get planning data statistics
+   * @param environmentId Environment ULID
    */
-  static async getStats(): Promise<any> {
+  static async getStats(environmentId: string): Promise<any> {
     try {
-      const lookupData = await PlanningDataService.getRewardLookup();
-      const typeList = await PlanningDataService.getRewardTypeList();
-      const uiListData = await PlanningDataService.getUIListData();
+      const lookupData = await PlanningDataService.getRewardLookup(environmentId);
+      const typeList = await PlanningDataService.getRewardTypeList(environmentId);
+      const uiListData = await PlanningDataService.getUIListData(environmentId);
+
+      const envDataPath = this.getEnvironmentDataPath(environmentId);
 
       // Check which files exist
       const filesExist = {
-        rewardLookupKo: await fs.access(this.rewardLookupKrPath).then(() => true).catch(() => false),
-        rewardLookupEn: await fs.access(this.rewardLookupEnPath).then(() => true).catch(() => false),
-        rewardLookupZh: await fs.access(this.rewardLookupZhPath).then(() => true).catch(() => false),
-        rewardTypeList: await fs.access(this.rewardTypeListPath).then(() => true).catch(() => false),
-        uiListData: await fs.access(this.uiListDataKrPath).then(() => true).catch(() => false),
+        rewardLookupKo: await fs.access(path.join(envDataPath, 'reward-lookup-kr.json')).then(() => true).catch(() => false),
+        rewardLookupEn: await fs.access(path.join(envDataPath, 'reward-lookup-en.json')).then(() => true).catch(() => false),
+        rewardLookupZh: await fs.access(path.join(envDataPath, 'reward-lookup-zh.json')).then(() => true).catch(() => false),
+        rewardTypeList: await fs.access(path.join(envDataPath, 'reward-type-list.json')).then(() => true).catch(() => false),
+        uiListData: await fs.access(path.join(envDataPath, 'ui-list-data-kr.json')).then(() => true).catch(() => false),
       };
 
-      // Calculate UI list counts (keys are already in SNAKE_CASE_UPPER from build)
+      // Calculate UI list counts
       const uiListCounts: Record<string, number> = {};
       for (const [key, value] of Object.entries(uiListData)) {
         if (Array.isArray(value)) {
@@ -476,30 +332,23 @@ export class PlanningDataService {
 
   /**
    * Get HotTimeBuff lookup data (cached in Redis for multi-instance support)
+   * @param environmentId Environment ULID
    * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getHotTimeBuffLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
+  static async getHotTimeBuffLookup(environmentId: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
+      const cacheKey = this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`);
+      const filePath = this.getFilePath(environmentId, `hottimebuff-lookup-${lang}.json`);
+
       // Try to get from Redis cache first
-      const cached = await cacheService.get<Record<string, any>>(`${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`);
+      const cached = await cacheService.get<Record<string, any>>(cacheKey);
       if (cached) {
-        await cacheService.setWithoutTTL(`${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`, cached);
-        logger.debug(`HotTimeBuff lookup data (${lang}) retrieved from cache`);
+        await cacheService.setWithoutTTL(cacheKey, cached);
+        logger.debug(`HotTimeBuff lookup data (${lang}) retrieved from cache`, { environmentId });
         return cached;
       }
 
-      // Determine file path based on language
-      let filePath: string;
-      if (lang === 'en') {
-        filePath = this.hotTimeBuffEnPath;
-      } else if (lang === 'zh') {
-        filePath = this.hotTimeBuffZhPath;
-      } else {
-        filePath = this.hotTimeBuffKrPath;
-      }
-
       const exists = await fs.access(filePath).then(() => true).catch(() => false);
-
       if (!exists) {
         return {};
       }
@@ -508,131 +357,33 @@ export class PlanningDataService {
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(`${this.CACHE_KEYS.HOT_TIME_BUFF}:${lang}`, parsed);
+      await cacheService.setWithoutTTL(cacheKey, parsed);
 
       return parsed;
     } catch (error) {
-      logger.error('Failed to read HotTimeBuff lookup data', { error });
+      logger.error('Failed to read HotTimeBuff lookup data', { error, environmentId });
       throw new GatrixError('Failed to load HotTimeBuff lookup data', 500);
     }
   }
 
-  /**
-   * Build HotTimeBuff lookup data from CMS file
-   */
-  static async buildHotTimeBuffLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
-    try {
-      logger.info('Building HotTimeBuff lookup data...');
 
-      // Read HotTimeBuff.json from cms directory
-      const cmsDir = path.join(__dirname, '../../cms');
-      const hotTimeBuffSourcePath = path.join(cmsDir, 'HotTimeBuff.json');
-      const worldBuffSourcePath = path.join(cmsDir, 'WorldBuff.json');
-
-      try {
-        await fs.access(hotTimeBuffSourcePath);
-      } catch {
-        throw new GatrixError('HotTimeBuff.json not found in cms directory', 500);
-      }
-
-      // Load WorldBuff data for name mapping
-      const worldBuffMap: Record<number, string> = {};
-      try {
-        const worldBuffData = await fs.readFile(worldBuffSourcePath, 'utf-8');
-        const worldBuffParsed = JSON.parse(worldBuffData);
-        const worldBuffs = worldBuffParsed.WorldBuff || {};
-
-        // Create a map of WorldBuff ID to name
-        Object.values(worldBuffs).forEach((buff: any) => {
-          if (buff.id && buff.name) {
-            worldBuffMap[buff.id] = buff.name;
-          }
-        });
-      } catch (error) {
-        logger.warn('Could not load WorldBuff data for name mapping', { error });
-      }
-
-      const sourceData = await fs.readFile(hotTimeBuffSourcePath, 'utf-8');
-      const parsedData = JSON.parse(sourceData);
-
-      // Extract HotTimeBuff data (skip metadata)
-      const hotTimeBuffData = parsedData.HotTimeBuff || {};
-
-      // Convert to array format for easier processing
-      const items = Object.values(hotTimeBuffData).map((item: any) => {
-        // Convert UTC dates to ISO8601 format
-        const startDateISO = item.startDate ? new Date(item.startDate).toISOString() : null;
-        const endDateISO = item.endDate ? new Date(item.endDate).toISOString() : null;
-
-        // Get world buff names
-        const worldBuffNames = (item.worldBuffId || []).map((id: number) => worldBuffMap[id] || `Unknown (${id})`);
-
-        // Build name from world buff names
-        const name = worldBuffNames.length > 0 ? worldBuffNames.join(', ') : `HotTimeBuff ${item.id}`;
-
-        return {
-          id: item.id,
-          name, // Display name based on world buffs
-          // icon field removed - not needed
-          startDate: startDateISO,
-          endDate: endDateISO,
-          localBitflag: item.localBitflag,
-          startHour: item.startHour, // UTC hour (0-23)
-          endHour: item.endHour, // UTC hour (0-23)
-          minLv: item.minLv,
-          maxLv: item.maxLv,
-          bitFlagDayOfWeek: item.bitFlagDayOfWeek,
-          worldBuffId: item.worldBuffId || [],
-          // Add world buff names for display
-          worldBuffNames,
-        };
-      });
-
-      // Note: Data is now generated by adminToolDataBuilder.js and uploaded via API
-      // No need to save here - just invalidate cache
-      // await fs.writeFile(this.hotTimeBuffKrPath, JSON.stringify(lookupData, null, 2), 'utf-8');
-
-      // Invalidate Redis cache for all instances
-      await cacheService.delete(this.CACHE_KEYS.HOT_TIME_BUFF);
-
-      logger.info('HotTimeBuff lookup data built successfully', { itemCount: items.length });
-
-      return {
-        success: true,
-        message: 'HotTimeBuff lookup data built successfully',
-        itemCount: items.length,
-      };
-    } catch (error) {
-      if (error instanceof GatrixError) {
-        throw error;
-      }
-      logger.error('Failed to build HotTimeBuff lookup data', { error });
-      throw new GatrixError('Failed to build HotTimeBuff lookup data', 500);
-    }
-  }
 
   /**
    * Get EventPage lookup data (cached in Redis for multi-instance support)
+   * @param environmentId Environment ULID
    * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getEventPageLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
+  static async getEventPageLookup(environmentId: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
-      // Try to get from Redis cache first
-      const cached = await cacheService.get<Record<string, any>>(`${this.CACHE_KEYS.EVENT_PAGE}:${lang}`);
-      if (cached) {
-        await cacheService.setWithoutTTL(`${this.CACHE_KEYS.EVENT_PAGE}:${lang}`, cached);
-        logger.debug(`EventPage lookup data (${lang}) retrieved from cache`);
-        return cached;
-      }
+      const cacheKey = this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.EVENT_PAGE}:${lang}`);
+      const filePath = this.getFilePath(environmentId, `eventpage-lookup-${lang}.json`);
 
-      // Determine file path based on language
-      let filePath: string;
-      if (lang === 'en') {
-        filePath = this.eventPageEnPath;
-      } else if (lang === 'zh') {
-        filePath = this.eventPageZhPath;
-      } else {
-        filePath = this.eventPageKrPath;
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<Record<string, any>>(cacheKey);
+      if (cached) {
+        await cacheService.setWithoutTTL(cacheKey, cached);
+        logger.debug(`EventPage lookup data (${lang}) retrieved from cache`, { environmentId });
+        return cached;
       }
 
       const exists = await fs.access(filePath).then(() => true).catch(() => false);
@@ -642,103 +393,31 @@ export class PlanningDataService {
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(`${this.CACHE_KEYS.EVENT_PAGE}:${lang}`, parsed);
+      await cacheService.setWithoutTTL(cacheKey, parsed);
 
       return parsed;
     } catch (error) {
-      logger.error('Failed to read EventPage lookup data', { error });
+      logger.error('Failed to read EventPage lookup data', { error, environmentId });
       throw new GatrixError('Failed to load EventPage lookup data', 500);
     }
   }
 
   /**
-   * Build EventPage lookup data from CMS file
-   */
-  static async buildEventPageLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
-    try {
-      logger.info('Building EventPage lookup data...');
-      const cmsDir = path.join(__dirname, '../../cms');
-      const sourceFilePath = path.join(cmsDir, 'EventPage.json');
-      try {
-        await fs.access(sourceFilePath);
-      } catch {
-        throw new GatrixError('EventPage.json not found in cms directory', 500);
-      }
-
-      // PageGroup and Type name mappings
-      const pageGroupNames: Record<number, string> = {
-        0: 'Normal',
-        1: 'Attendance',
-        2: 'Mission',
-        3: 'Ranking',
-        4: 'Special',
-      };
-
-      const typeNames: Record<number, string> = {
-        1: 'Daily',
-        2: 'Weekly',
-        3: 'Monthly',
-        4: 'Seasonal',
-        5: 'Limited',
-        6: 'Special',
-        7: 'Ranking',
-        8: 'Attendance',
-        9: 'Mission',
-        10: 'Challenge',
-        11: 'Event',
-        12: 'Promotion',
-        13: 'Maintenance',
-        14: 'Update',
-        15: 'Patch',
-        16: 'Hotfix',
-        17: 'Emergency',
-      };
-
-      const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
-      const parsedData = JSON.parse(sourceData);
-      const eventPageData = parsedData.EventPage || {};
-      const items = Object.values(eventPageData).map((item: any) => ({
-        ...item,
-        pageGroupName: pageGroupNames[item.pageGroup] || `Unknown (${item.pageGroup})`,
-        typeName: typeNames[item.type] || `Unknown (${item.type})`,
-      }));
-      // Note: Data is now generated by adminToolDataBuilder.js and uploaded via API
-      // await fs.writeFile(this.eventPageKrPath, JSON.stringify(lookupData, null, 2), 'utf-8');
-
-      // Invalidate Redis cache for all instances
-      await cacheService.delete(this.CACHE_KEYS.EVENT_PAGE);
-
-      logger.info('EventPage lookup data built successfully', { itemCount: items.length });
-      return { success: true, message: 'EventPage lookup data built successfully', itemCount: items.length };
-    } catch (error) {
-      if (error instanceof GatrixError) throw error;
-      logger.error('Failed to build EventPage lookup data', { error });
-      throw new GatrixError('Failed to build EventPage lookup data', 500);
-    }
-  }
-
-  /**
    * Get LiveEvent lookup data (cached in Redis for multi-instance support)
+   * @param environmentId Environment ULID
    * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getLiveEventLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
+  static async getLiveEventLookup(environmentId: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
-      // Try to get from Redis cache first
-      const cached = await cacheService.get<Record<string, any>>(`${this.CACHE_KEYS.LIVE_EVENT}:${lang}`);
-      if (cached) {
-        await cacheService.setWithoutTTL(`${this.CACHE_KEYS.LIVE_EVENT}:${lang}`, cached);
-        logger.debug(`LiveEvent lookup data (${lang}) retrieved from cache`);
-        return cached;
-      }
+      const cacheKey = this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.LIVE_EVENT}:${lang}`);
+      const filePath = this.getFilePath(environmentId, `liveevent-lookup-${lang}.json`);
 
-      // Determine file path based on language
-      let filePath: string;
-      if (lang === 'en') {
-        filePath = this.liveEventEnPath;
-      } else if (lang === 'zh') {
-        filePath = this.liveEventZhPath;
-      } else {
-        filePath = this.liveEventKrPath;
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<Record<string, any>>(cacheKey);
+      if (cached) {
+        await cacheService.setWithoutTTL(cacheKey, cached);
+        logger.debug(`LiveEvent lookup data (${lang}) retrieved from cache`, { environmentId });
+        return cached;
       }
 
       const exists = await fs.access(filePath).then(() => true).catch(() => false);
@@ -748,87 +427,31 @@ export class PlanningDataService {
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(`${this.CACHE_KEYS.LIVE_EVENT}:${lang}`, parsed);
+      await cacheService.setWithoutTTL(cacheKey, parsed);
 
       return parsed;
     } catch (error) {
-      logger.error('Failed to read LiveEvent lookup data', { error });
+      logger.error('Failed to read LiveEvent lookup data', { error, environmentId });
       throw new GatrixError('Failed to load LiveEvent lookup data', 500);
     }
   }
 
   /**
-   * Build LiveEvent lookup data from CMS file
-   */
-  static async buildLiveEventLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
-    try {
-      logger.info('Building LiveEvent lookup data...');
-      const cmsDir = path.join(__dirname, '../../cms');
-      const sourceFilePath = path.join(cmsDir, 'LiveEvent.json');
-      try {
-        await fs.access(sourceFilePath);
-      } catch {
-        throw new GatrixError('LiveEvent.json not found in cms directory', 500);
-      }
-      const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
-      const parsedData = JSON.parse(sourceData);
-      const liveEventData = parsedData.LiveEvent || {};
-
-      // Use name from source data directly (client table data includes name field)
-      // Remove loginBgmTag field - not needed
-      // Convert dates to ISO8601 format
-      const items = Object.values(liveEventData).map((item: any) => {
-        const { loginBgmTag: _loginBgmTag, ...rest } = item;
-
-        // Convert startDate and endDate to ISO8601 format if they exist
-        const startDateISO = item.startDate ? new Date(item.startDate).toISOString() : null;
-        const endDateISO = item.endDate ? new Date(item.endDate).toISOString() : null;
-
-        return {
-          ...rest,
-          name: item.name || `LiveEvent ${item.id}`, // Fallback to ID if name is missing
-          startDate: startDateISO,
-          endDate: endDateISO,
-        };
-      });
-
-      // Note: Data is now generated by adminToolDataBuilder.js and uploaded via API
-      // await fs.writeFile(this.liveEventKrPath, JSON.stringify(lookupData, null, 2), 'utf-8');
-
-      // Invalidate Redis cache for all instances
-      await cacheService.delete(this.CACHE_KEYS.LIVE_EVENT);
-
-      logger.info('LiveEvent lookup data built successfully', { itemCount: items.length });
-      return { success: true, message: 'LiveEvent lookup data built successfully', itemCount: items.length };
-    } catch (error) {
-      if (error instanceof GatrixError) throw error;
-      logger.error('Failed to build LiveEvent lookup data', { error });
-      throw new GatrixError('Failed to build LiveEvent lookup data', 500);
-    }
-  }
-
-  /**
    * Get MateRecruitingGroup lookup data (cached in Redis for multi-instance support)
+   * @param environmentId Environment ULID
    * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getMateRecruitingGroupLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
+  static async getMateRecruitingGroupLookup(environmentId: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
-      // Try to get from Redis cache first
-      const cached = await cacheService.get<Record<string, any>>(`${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`);
-      if (cached) {
-        await cacheService.setWithoutTTL(`${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`, cached);
-        logger.debug(`MateRecruitingGroup lookup data (${lang}) retrieved from cache`);
-        return cached;
-      }
+      const cacheKey = this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`);
+      const filePath = this.getFilePath(environmentId, `materecruiting-lookup-${lang}.json`);
 
-      // Determine file path based on language
-      let filePath: string;
-      if (lang === 'en') {
-        filePath = this.mateRecruitingGroupEnPath;
-      } else if (lang === 'zh') {
-        filePath = this.mateRecruitingGroupZhPath;
-      } else {
-        filePath = this.mateRecruitingGroupKrPath;
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<Record<string, any>>(cacheKey);
+      if (cached) {
+        await cacheService.setWithoutTTL(cacheKey, cached);
+        logger.debug(`MateRecruitingGroup lookup data (${lang}) retrieved from cache`, { environmentId });
+        return cached;
       }
 
       const exists = await fs.access(filePath).then(() => true).catch(() => false);
@@ -838,79 +461,31 @@ export class PlanningDataService {
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(`${this.CACHE_KEYS.MATE_RECRUITING}:${lang}`, parsed);
+      await cacheService.setWithoutTTL(cacheKey, parsed);
 
       return parsed;
     } catch (error) {
-      logger.error('Failed to read MateRecruitingGroup lookup data', { error });
+      logger.error('Failed to read MateRecruitingGroup lookup data', { error, environmentId });
       throw new GatrixError('Failed to load MateRecruitingGroup lookup data', 500);
     }
   }
 
   /**
-   * Build MateRecruitingGroup lookup data from CMS file
-   * NOTE: This method is deprecated. Use adminToolDataBuilder.js instead.
-   */
-  static async buildMateRecruitingGroupLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
-    try {
-      logger.info('Building MateRecruitingGroup lookup data...');
-      const cmsDir = path.join(__dirname, '../../cms');
-      const sourceFilePath = path.join(cmsDir, 'MateRecruitingGroup.json');
-      const mateTemplateFilePath = path.join(cmsDir, 'MateTemplate.json');
-      const townFilePath = path.join(cmsDir, 'Town.json');
-
-      try {
-        await fs.access(sourceFilePath);
-        await fs.access(mateTemplateFilePath);
-        await fs.access(townFilePath);
-      } catch {
-        throw new GatrixError('Required JSON files not found in cms directory', 500);
-      }
-
-      // This method is deprecated. Data should be built using adminToolDataBuilder.js
-      // For now, just return a message indicating this is deprecated
-      logger.warn('buildMateRecruitingGroupLookup is deprecated. Use adminToolDataBuilder.js instead.');
-
-      // Check if the file exists
-      const exists = await fs.access(this.mateRecruitingGroupKrPath).then(() => true).catch(() => false);
-      if (!exists) {
-        throw new GatrixError('MateRecruitingGroup lookup file not found. Please run adminToolDataBuilder.js', 500);
-      }
-
-      // Invalidate Redis cache for all instances
-      await cacheService.delete(this.CACHE_KEYS.MATE_RECRUITING);
-
-      logger.info('MateRecruitingGroup cache invalidated');
-      return { success: true, message: 'MateRecruitingGroup cache invalidated (data should be built using adminToolDataBuilder.js)', itemCount: 0 };
-    } catch (error) {
-      if (error instanceof GatrixError) throw error;
-      logger.error('Failed to build MateRecruitingGroup lookup data', { error });
-      throw new GatrixError('Failed to build MateRecruitingGroup lookup data', 500);
-    }
-  }
-
-  /**
    * Get OceanNpcAreaSpawner lookup data (cached in Redis for multi-instance support)
+   * @param environmentId Environment ULID
    * @param lang Language code: 'kr', 'en', 'zh'
    */
-  static async getOceanNpcAreaSpawnerLookup(lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
+  static async getOceanNpcAreaSpawnerLookup(environmentId: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
     try {
-      // Try to get from Redis cache first
-      const cached = await cacheService.get<Record<string, any>>(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`);
-      if (cached) {
-        await cacheService.setWithoutTTL(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`, cached);
-        logger.debug(`OceanNpcAreaSpawner lookup data (${lang}) retrieved from cache`);
-        return cached;
-      }
+      const cacheKey = this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`);
+      const filePath = this.getFilePath(environmentId, `oceannpcarea-lookup-${lang}.json`);
 
-      // Determine file path based on language
-      let filePath: string;
-      if (lang === 'en') {
-        filePath = this.oceanNpcAreaSpawnerEnPath;
-      } else if (lang === 'zh') {
-        filePath = this.oceanNpcAreaSpawnerZhPath;
-      } else {
-        filePath = this.oceanNpcAreaSpawnerKrPath;
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<Record<string, any>>(cacheKey);
+      if (cached) {
+        await cacheService.setWithoutTTL(cacheKey, cached);
+        logger.debug(`OceanNpcAreaSpawner lookup data (${lang}) retrieved from cache`, { environmentId });
+        return cached;
       }
 
       const exists = await fs.access(filePath).then(() => true).catch(() => false);
@@ -920,55 +495,28 @@ export class PlanningDataService {
       const parsed = JSON.parse(data);
 
       // Store in Redis cache for other instances
-      await cacheService.setWithoutTTL(`${this.CACHE_KEYS.OCEAN_NPC_AREA}:${lang}`, parsed);
+      await cacheService.setWithoutTTL(cacheKey, parsed);
 
       return parsed;
     } catch (error) {
-      logger.error('Failed to read OceanNpcAreaSpawner lookup data', { error });
+      logger.error('Failed to read OceanNpcAreaSpawner lookup data', { error, environmentId });
       throw new GatrixError('Failed to load OceanNpcAreaSpawner lookup data', 500);
     }
   }
 
   /**
-   * Build OceanNpcAreaSpawner lookup data from CMS file
-   * NOTE: This method is deprecated. Use adminToolDataBuilder.js instead.
-   */
-  static async buildOceanNpcAreaSpawnerLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
-    try {
-      logger.info('Building OceanNpcAreaSpawner lookup data...');
-
-      // This method is deprecated. Data should be built using adminToolDataBuilder.js
-      // For now, just return a message indicating this is deprecated
-      logger.warn('buildOceanNpcAreaSpawnerLookup is deprecated. Use adminToolDataBuilder.js instead.');
-
-      // Check if the file exists
-      const exists = await fs.access(this.oceanNpcAreaSpawnerKrPath).then(() => true).catch(() => false);
-      if (!exists) {
-        throw new GatrixError('OceanNpcAreaSpawner lookup file not found. Please run adminToolDataBuilder.js', 500);
-      }
-
-      // Invalidate Redis cache for all instances
-      await cacheService.delete(this.CACHE_KEYS.OCEAN_NPC_AREA);
-
-      logger.info('OceanNpcAreaSpawner cache invalidated');
-      return { success: true, message: 'OceanNpcAreaSpawner cache invalidated (data should be built using adminToolDataBuilder.js)', itemCount: 0 };
-    } catch (error) {
-      if (error instanceof GatrixError) throw error;
-      logger.error('Failed to build OceanNpcAreaSpawner lookup data', { error });
-      throw new GatrixError('Failed to build OceanNpcAreaSpawner lookup data', 500);
-    }
-  }
-
-  /**
    * Upload planning data files (drag & drop)
-   * Saves files to data/planning/ and caches them in Redis
+   * Saves files to data/planning/{environmentId}/ and caches them in Redis
+   * @param environmentId Environment ULID
+   * @param files Uploaded files
    */
-  static async uploadPlanningData(files: any): Promise<{ success: boolean; message: string; filesUploaded: string[]; stats: any }> {
+  static async uploadPlanningData(environmentId: string, files: any): Promise<{ success: boolean; message: string; filesUploaded: string[]; stats: any }> {
     try {
-      logger.info('Starting planning data upload...');
+      logger.info('Starting planning data upload...', { environmentId });
 
-      // Ensure runtime data directory exists
-      await fs.mkdir(this.runtimeDataPath, { recursive: true });
+      // Ensure environment-specific data directory exists
+      const envDataPath = this.getEnvironmentDataPath(environmentId);
+      await fs.mkdir(envDataPath, { recursive: true });
 
       // Expected file names
       const expectedFiles = [
@@ -1038,8 +586,8 @@ export class PlanningDataService {
           throw new GatrixError(`File ${fileName} is not valid JSON`, 400);
         }
 
-        // Save file to disk
-        const filePath = path.join(this.runtimeDataPath, fileName);
+        // Save file to disk (environment-specific path)
+        const filePath = path.join(envDataPath, fileName);
         await fs.writeFile(filePath, file.buffer);
 
         uploadedFiles.push(fileName);
@@ -1048,7 +596,7 @@ export class PlanningDataService {
           path: filePath,
         };
 
-        logger.info(`File saved: ${fileName}`, { size: file.size });
+        logger.info(`File saved: ${fileName}`, { size: file.size, environmentId });
       }
 
       if (uploadedFiles.length === 0) {
@@ -1058,8 +606,8 @@ export class PlanningDataService {
         throw new GatrixError('No valid files were uploaded', 400);
       }
 
-      // Cache all uploaded files in Redis
-      await this.cacheUploadedFiles(uploadedFiles);
+      // Cache all uploaded files in Redis (environment-scoped)
+      await this.cacheUploadedFiles(environmentId, uploadedFiles);
 
       logger.info('Planning data uploaded and cached successfully', { filesUploaded: uploadedFiles });
 
@@ -1081,14 +629,16 @@ export class PlanningDataService {
   }
 
   /**
-   * Cache uploaded files in Redis
+   * Cache uploaded files in Redis (environment-scoped)
    * This ensures all instances have access to the latest data
+   * @param environmentId Environment ULID
+   * @param uploadedFiles List of uploaded file names
    */
-  private static async cacheUploadedFiles(uploadedFiles: string[]): Promise<void> {
+  private static async cacheUploadedFiles(environmentId: string, uploadedFiles: string[]): Promise<void> {
     try {
-      logger.info('Caching uploaded files in Redis...');
+      logger.info('Caching uploaded files in Redis...', { environmentId });
 
-      // Map file names to cache keys
+      // Map file names to base cache keys
       const fileKeyMap: Record<string, string> = {
         'reward-lookup-kr.json': this.CACHE_KEYS.REWARD_LOOKUP_KR,
         'reward-lookup-en.json': this.CACHE_KEYS.REWARD_LOOKUP_EN,
@@ -1114,28 +664,137 @@ export class PlanningDataService {
         'oceannpcarea-lookup-zh.json': `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`,
       };
 
+      const envDataPath = this.getEnvironmentDataPath(environmentId);
+
       // Cache each file
       for (const fileName of uploadedFiles) {
-        const cacheKey = fileKeyMap[fileName];
-        if (!cacheKey) {
+        const baseCacheKey = fileKeyMap[fileName];
+        if (!baseCacheKey) {
           logger.warn(`No cache key mapping for file: ${fileName}`);
           continue;
         }
 
-        const filePath = path.join(this.runtimeDataPath, fileName);
+        // Use environment-scoped cache key
+        const cacheKey = this.getEnvCacheKey(environmentId, baseCacheKey);
+        const filePath = path.join(envDataPath, fileName);
         const content = await fs.readFile(filePath, 'utf-8');
         const data = JSON.parse(content);
 
         // Cache in Redis without TTL (persistent)
         await cacheService.setWithoutTTL(cacheKey, data);
 
-        logger.info(`File cached in Redis: ${fileName}`, { cacheKey });
+        logger.info(`File cached in Redis: ${fileName}`, { cacheKey, environmentId });
       }
 
-      logger.info('All uploaded files cached in Redis successfully');
+      logger.info('All uploaded files cached in Redis successfully', { environmentId });
     } catch (error) {
-      logger.error('Failed to cache uploaded files in Redis', { error });
+      logger.error('Failed to cache uploaded files in Redis', { error, environmentId });
       throw new GatrixError('Failed to cache planning data', 500);
+    }
+  }
+
+  /**
+   * Copy planning data from one environment to another
+   * Copies both files and Redis cache
+   * @param sourceEnvId Source environment ULID
+   * @param targetEnvId Target environment ULID
+   */
+  static async copyPlanningData(sourceEnvId: string, targetEnvId: string): Promise<{ success: boolean; filesCopied: number }> {
+    try {
+      logger.info('Copying planning data between environments...', { sourceEnvId, targetEnvId });
+
+      const sourceDataPath = this.getEnvironmentDataPath(sourceEnvId);
+      const targetDataPath = this.getEnvironmentDataPath(targetEnvId);
+
+      // Ensure target directory exists
+      await fs.mkdir(targetDataPath, { recursive: true });
+
+      // Check if source directory exists
+      const sourceExists = await fs.access(sourceDataPath).then(() => true).catch(() => false);
+      if (!sourceExists) {
+        logger.info('Source environment has no planning data to copy', { sourceEnvId });
+        return { success: true, filesCopied: 0 };
+      }
+
+      // Get list of files in source directory
+      const files = await fs.readdir(sourceDataPath);
+      let filesCopied = 0;
+
+      for (const fileName of files) {
+        if (!fileName.endsWith('.json')) continue;
+
+        const sourceFilePath = path.join(sourceDataPath, fileName);
+        const targetFilePath = path.join(targetDataPath, fileName);
+
+        // Copy file
+        const content = await fs.readFile(sourceFilePath, 'utf-8');
+        await fs.writeFile(targetFilePath, content, 'utf-8');
+        filesCopied++;
+
+        logger.debug(`Copied planning file: ${fileName}`, { sourceEnvId, targetEnvId });
+      }
+
+      // Cache all copied files in Redis for target environment
+      if (filesCopied > 0) {
+        await this.cacheUploadedFiles(targetEnvId, files.filter(f => f.endsWith('.json')));
+      }
+
+      logger.info('Planning data copied successfully', { sourceEnvId, targetEnvId, filesCopied });
+      return { success: true, filesCopied };
+    } catch (error) {
+      logger.error('Failed to copy planning data', { error, sourceEnvId, targetEnvId });
+      throw new GatrixError('Failed to copy planning data', 500);
+    }
+  }
+
+  /**
+   * Delete all planning data for an environment
+   * @param environmentId Environment ULID
+   */
+  static async deletePlanningData(environmentId: string): Promise<void> {
+    try {
+      logger.info('Deleting planning data for environment...', { environmentId });
+
+      const envDataPath = this.getEnvironmentDataPath(environmentId);
+
+      // Delete directory if exists
+      const exists = await fs.access(envDataPath).then(() => true).catch(() => false);
+      if (exists) {
+        await fs.rm(envDataPath, { recursive: true, force: true });
+      }
+
+      // Delete all cache keys for this environment
+      const cacheKeysToDelete = [
+        this.getEnvCacheKey(environmentId, this.CACHE_KEYS.REWARD_LOOKUP_KR),
+        this.getEnvCacheKey(environmentId, this.CACHE_KEYS.REWARD_LOOKUP_EN),
+        this.getEnvCacheKey(environmentId, this.CACHE_KEYS.REWARD_LOOKUP_ZH),
+        this.getEnvCacheKey(environmentId, this.CACHE_KEYS.REWARD_TYPE_LIST),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.UI_LIST_DATA}:kr`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.UI_LIST_DATA}:en`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.UI_LIST_DATA}:zh`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.HOT_TIME_BUFF}:kr`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.HOT_TIME_BUFF}:en`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.HOT_TIME_BUFF}:zh`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.EVENT_PAGE}:kr`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.EVENT_PAGE}:en`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.EVENT_PAGE}:zh`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.LIVE_EVENT}:kr`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.LIVE_EVENT}:en`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.LIVE_EVENT}:zh`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.MATE_RECRUITING}:kr`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.MATE_RECRUITING}:en`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.MATE_RECRUITING}:zh`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.OCEAN_NPC_AREA}:kr`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.OCEAN_NPC_AREA}:en`),
+        this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.OCEAN_NPC_AREA}:zh`),
+      ];
+
+      await Promise.all(cacheKeysToDelete.map(key => cacheService.delete(key)));
+
+      logger.info('Planning data deleted successfully', { environmentId });
+    } catch (error) {
+      logger.error('Failed to delete planning data', { error, environmentId });
+      throw new GatrixError('Failed to delete planning data', 500);
     }
   }
 }

@@ -89,10 +89,12 @@ import {
   Refresh as RefreshIcon,
   ViewColumn as ViewColumnIcon,
   DragIndicator as DragIndicatorIcon,
+  Preview as PreviewIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import { User, Tag } from '@/types';
+import { User, Tag, Permission } from '@/types';
 import { apiService } from '@/services/api';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
 import { tagService } from '@/services/tagService';
@@ -101,6 +103,7 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import SimplePagination from '../../components/common/SimplePagination';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { invitationService } from '../../services/invitationService';
 import { Invitation, CreateInvitationRequest } from '../../types/invitation';
 import InvitationForm from '../../components/admin/InvitationForm';
@@ -110,6 +113,8 @@ import { useDebounce } from '../../hooks/useDebounce';
 import { usePageState } from '../../hooks/usePageState';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import { usePaginatedApi, useTags } from '../../hooks/useSWR';
+import { useEnvironments } from '../../contexts/EnvironmentContext';
+import PermissionSelector from '../../components/common/PermissionSelector';
 // SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
@@ -189,6 +194,7 @@ const UsersManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { user: currentUser, isLoading: authLoading } = useAuth();
+  const { environments } = useEnvironments();
 
   // Helper function to check if user is current user
   const isCurrentUser = (user: User | null): boolean => {
@@ -305,6 +311,7 @@ const UsersManagementPage: React.FC = () => {
     message: '',
     action: () => {},
   });
+  const [confirmDialogLoading, setConfirmDialogLoading] = useState(false);
 
   // 초대 관련 상태
   const [invitationDialogOpen, setInvitationDialogOpen] = useState(false);
@@ -326,6 +333,10 @@ const UsersManagementPage: React.FC = () => {
     email: '',
     password: '',
   });
+
+  // Environment access state for new user
+  const [newUserAllowAllEnvs, setNewUserAllowAllEnvs] = useState(false);
+  const [newUserEnvIds, setNewUserEnvIds] = useState<string[]>([]);
 
   // Delete confirmation state
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState({
@@ -354,6 +365,50 @@ const UsersManagementPage: React.FC = () => {
     email: '',
   });
 
+  // Environment access state
+  const [editUserAllowAllEnvs, setEditUserAllowAllEnvs] = useState(false);
+  const [editUserEnvIds, setEditUserEnvIds] = useState<string[]>([]);
+
+  // Permission state
+  const [editUserPermissions, setEditUserPermissions] = useState<Permission[]>([]);
+  const [permissionsLoading, setPermissionsLoading] = useState(false);
+
+  // Original user data for comparison in review
+  const [originalUserData, setOriginalUserData] = useState<{
+    name: string;
+    email: string;
+    role: 'admin' | 'user';
+    status: 'pending' | 'active' | 'suspended' | 'deleted';
+    tags: Tag[];
+    allowAllEnvs: boolean;
+    envIds: string[];
+    permissions: Permission[];
+  } | null>(null);
+
+  // Review dialog state
+  const [reviewDialog, setReviewDialog] = useState<{
+    open: boolean;
+    saving: boolean;
+  }>({
+    open: false,
+    saving: false,
+  });
+
+  // Promote user dialog state
+  const [promoteDialog, setPromoteDialog] = useState<{
+    open: boolean;
+    user: User | null;
+    permissions: Permission[];
+    loading: boolean;
+    showReview: boolean;
+  }>({
+    open: false,
+    user: null,
+    permissions: [],
+    loading: false,
+    showReview: false,
+  });
+
   // 이메일 인증 관련 상태
   const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
 
@@ -364,6 +419,7 @@ const UsersManagementPage: React.FC = () => {
     { id: 'emailVerified', labelKey: 'users.emailVerified', visible: true },
     { id: 'role', labelKey: 'users.role', visible: true },
     { id: 'status', labelKey: 'users.status', visible: true },
+    { id: 'environments', labelKey: 'users.environmentAccess', visible: true },
     { id: 'tags', labelKey: 'users.tags', visible: true },
     { id: 'joinDate', labelKey: 'users.joinDate', visible: true },
     { id: 'lastLogin', labelKey: 'users.lastLogin', visible: true },
@@ -691,14 +747,18 @@ const UsersManagementPage: React.FC = () => {
       title: t('common.suspendUser'),
       message: t('common.suspendUserConfirm', { name: user.name }),
       action: async () => {
+        if (confirmDialogLoading) return; // Prevent double click
+        setConfirmDialogLoading(true);
         try {
           await apiService.post(`/admin/users/${user.id}/suspend`);
           enqueueSnackbar(t('common.userSuspended'), { variant: 'success' });
           mutateUsers(); // SWR cache 갱신
         } catch (error: any) {
           enqueueSnackbar(error.message || t('common.userSuspendFailed'), { variant: 'error' });
+        } finally {
+          setConfirmDialogLoading(false);
+          setConfirmDialog(prev => ({ ...prev, open: false }));
         }
-        setConfirmDialog(prev => ({ ...prev, open: false }));
       },
     });
   };
@@ -709,34 +769,69 @@ const UsersManagementPage: React.FC = () => {
       title: t('common.activateUser'),
       message: t('common.activateUserConfirm', { name: user.name }),
       action: async () => {
+        if (confirmDialogLoading) return; // Prevent double click
+        setConfirmDialogLoading(true);
         try {
           await apiService.post(`/admin/users/${user.id}/activate`);
           enqueueSnackbar(t('common.userActivated'), { variant: 'success' });
           mutateUsers(); // SWR cache 갱신
         } catch (error: any) {
           enqueueSnackbar(error.message || t('common.userActivateFailed'), { variant: 'error' });
+        } finally {
+          setConfirmDialogLoading(false);
+          setConfirmDialog(prev => ({ ...prev, open: false }));
         }
-        setConfirmDialog(prev => ({ ...prev, open: false }));
       },
     });
   };
 
   const handlePromoteUser = (user: User) => {
-    setConfirmDialog({
+    // Open promote dialog with permission selector
+    setPromoteDialog({
       open: true,
-      title: t('common.promoteUser'),
-      message: t('common.promoteUserConfirm', { name: user.name }),
-      action: async () => {
-        try {
-          await apiService.post(`/admin/users/${user.id}/promote`);
-          enqueueSnackbar(t('common.userPromoted'), { variant: 'success' });
-          mutateUsers(); // SWR cache 갱신
-        } catch (error: any) {
-          enqueueSnackbar(error.message || t('common.userPromoteFailed'), { variant: 'error' });
-        }
-        setConfirmDialog(prev => ({ ...prev, open: false }));
-      },
+      user,
+      permissions: [],
+      loading: false,
+      showReview: false,
     });
+  };
+
+  // Show review step for promotion
+  const handlePromoteReview = () => {
+    setPromoteDialog(prev => ({ ...prev, showReview: true }));
+  };
+
+  // Go back to permission selection
+  const handlePromoteBackToEdit = () => {
+    setPromoteDialog(prev => ({ ...prev, showReview: false }));
+  };
+
+  const handlePromoteConfirm = async () => {
+    if (!promoteDialog.user || promoteDialog.loading) return;
+
+    setPromoteDialog(prev => ({ ...prev, loading: true }));
+    try {
+      // First promote the user
+      await apiService.post(`/admin/users/${promoteDialog.user.id}/promote`);
+
+      // Then set the permissions
+      if (promoteDialog.permissions.length > 0) {
+        await apiService.put(`/admin/users/${promoteDialog.user.id}/permissions`, {
+          permissions: promoteDialog.permissions
+        });
+      }
+
+      enqueueSnackbar(t('common.userPromoted'), { variant: 'success' });
+      mutateUsers();
+      setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false });
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('common.userPromoteFailed'), { variant: 'error' });
+      setPromoteDialog(prev => ({ ...prev, loading: false }));
+    }
+  };
+
+  const handlePromoteCancel = () => {
+    setPromoteDialog({ open: false, user: null, permissions: [], loading: false, showReview: false });
   };
 
   const handleDemoteUser = (user: User) => {
@@ -745,14 +840,18 @@ const UsersManagementPage: React.FC = () => {
       title: t('common.demoteUser'),
       message: t('common.demoteUserConfirm', { name: user.name }),
       action: async () => {
+        if (confirmDialogLoading) return; // Prevent double click
+        setConfirmDialogLoading(true);
         try {
           await apiService.post(`/admin/users/${user.id}/demote`);
           enqueueSnackbar(t('common.userDemoted'), { variant: 'success' });
           mutateUsers(); // SWR cache 갱신
         } catch (error: any) {
           enqueueSnackbar(error.message || t('common.userDemoteFailed'), { variant: 'error' });
+        } finally {
+          setConfirmDialogLoading(false);
+          setConfirmDialog(prev => ({ ...prev, open: false }));
         }
-        setConfirmDialog(prev => ({ ...prev, open: false }));
       },
     });
   };
@@ -799,7 +898,9 @@ const UsersManagementPage: React.FC = () => {
     handleMenuClose();
   };
 
-  const handleEditUser = (user: User) => {
+  const handleEditUser = async (user: User) => {
+    const userWithEnv = user as User & { allowAllEnvironments?: boolean; environmentIds?: string[] };
+
     setEditUserData({
       name: user.name,
       email: user.email,
@@ -811,7 +912,42 @@ const UsersManagementPage: React.FC = () => {
       name: '',
       email: '',
     });
-    setEditUserDialog({ open: true, user });
+
+    // Load environment access from user data (already included in list response)
+    setEditUserAllowAllEnvs(userWithEnv.allowAllEnvironments || false);
+    setEditUserEnvIds(userWithEnv.environmentIds || []);
+
+    // Load user permissions
+    let loadedPermissions: Permission[] = [];
+    setEditUserPermissions([]);
+    if (user.role === 'admin') {
+      setPermissionsLoading(true);
+      try {
+        const response = await apiService.get<{ userId: number; permissions: Permission[] }>(
+          `/admin/users/${user.id}/permissions`
+        );
+        loadedPermissions = response.data?.permissions || [];
+        setEditUserPermissions(loadedPermissions);
+      } catch (error) {
+        console.error('Failed to load user permissions:', error);
+        setEditUserPermissions([]);
+      } finally {
+        setPermissionsLoading(false);
+      }
+    }
+
+    // Save original data for comparison
+    setOriginalUserData({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+      tags: user.tags || [],
+      allowAllEnvs: userWithEnv.allowAllEnvironments || false,
+      envIds: userWithEnv.environmentIds || [],
+      permissions: loadedPermissions,
+    });
+
     setEditUserDialog({
       open: true,
       user,
@@ -835,13 +971,109 @@ const UsersManagementPage: React.FC = () => {
     return !errors.name && !errors.email;
   };
 
-  const handleSaveEditUser = async () => {
+  // Open review dialog (called when "Review" button is clicked)
+  const handleOpenReview = () => {
+    if (!editUserDialog.user) return;
+    if (!validateEditUserForm()) return;
+    setReviewDialog({ open: true, saving: false });
+  };
+
+  // Close review dialog and go back to edit
+  const handleCloseReview = () => {
+    setReviewDialog({ open: false, saving: false });
+  };
+
+  // Get changes for review
+  const getChanges = () => {
+    if (!originalUserData || !editUserDialog.user) return [];
+
+    const changes: { field: string; from: string; to: string }[] = [];
+    const isOwnAccount = isCurrentUser(editUserDialog.user);
+
+    if (editUserData.name !== originalUserData.name) {
+      changes.push({ field: t('users.name'), from: originalUserData.name, to: editUserData.name });
+    }
+
+    if (!isOwnAccount) {
+      if (editUserData.email !== originalUserData.email) {
+        changes.push({ field: t('users.email'), from: originalUserData.email, to: editUserData.email });
+      }
+      if (editUserData.role !== originalUserData.role) {
+        changes.push({
+          field: t('users.role'),
+          from: t(`users.roles.${originalUserData.role}`),
+          to: t(`users.roles.${editUserData.role}`)
+        });
+      }
+      if (editUserData.status !== originalUserData.status) {
+        changes.push({
+          field: t('users.status'),
+          from: t(`users.statuses.${originalUserData.status}`),
+          to: t(`users.statuses.${editUserData.status}`)
+        });
+      }
+
+      // Tags
+      const origTagNames = originalUserData.tags.map(t => t.name).sort().join(', ') || '-';
+      const newTagNames = editUserTags.map(t => t.name).sort().join(', ') || '-';
+      if (origTagNames !== newTagNames) {
+        changes.push({ field: t('users.tags'), from: origTagNames, to: newTagNames });
+      }
+
+      // Environment access
+      if (editUserAllowAllEnvs !== originalUserData.allowAllEnvs) {
+        changes.push({
+          field: t('users.environmentAccess'),
+          from: originalUserData.allowAllEnvs ? t('common.all') : t('users.specificEnvironments'),
+          to: editUserAllowAllEnvs ? t('common.all') : t('users.specificEnvironments')
+        });
+      } else if (!editUserAllowAllEnvs) {
+        const origEnvs = originalUserData.envIds.sort().join(',');
+        const newEnvs = editUserEnvIds.sort().join(',');
+        if (origEnvs !== newEnvs) {
+          const getEnvNames = (ids: string[]) =>
+            ids.map(id => environments.find(e => e.id === id)?.name || id).join(', ') || '-';
+          changes.push({
+            field: t('users.environmentAccess'),
+            from: getEnvNames(originalUserData.envIds),
+            to: getEnvNames(editUserEnvIds)
+          });
+        }
+      }
+
+      // Permissions (only for admin role)
+      if (editUserData.role === 'admin') {
+        const origPerms = [...originalUserData.permissions].sort().join(',');
+        const newPerms = [...editUserPermissions].sort().join(',');
+        if (origPerms !== newPerms) {
+          const addedPerms = editUserPermissions.filter(p => !originalUserData.permissions.includes(p));
+          const removedPerms = originalUserData.permissions.filter(p => !editUserPermissions.includes(p));
+
+          let permChange = '';
+          if (addedPerms.length > 0) {
+            permChange += `+${addedPerms.length} ${t('users.added')}`;
+          }
+          if (removedPerms.length > 0) {
+            if (permChange) permChange += ', ';
+            permChange += `-${removedPerms.length} ${t('users.removed')}`;
+          }
+          changes.push({
+            field: t('users.permissions'),
+            from: `${originalUserData.permissions.length} ${t('users.permissionsCount')}`,
+            to: `${editUserPermissions.length} ${t('users.permissionsCount')} (${permChange})`
+          });
+        }
+      }
+    }
+
+    return changes;
+  };
+
+  // Confirm and save from review dialog
+  const handleConfirmSave = async () => {
     if (!editUserDialog.user) return;
 
-    // 폼 검증
-    if (!validateEditUserForm()) {
-      return;
-    }
+    setReviewDialog(prev => ({ ...prev, saving: true }));
 
     try {
       // For own account, only allow name changes
@@ -857,15 +1089,30 @@ const UsersManagementPage: React.FC = () => {
           tagIds: editUserTags.map(tag => tag.id)
         };
         await apiService.put(`/admin/users/${editUserDialog.user.id}`, updateData);
+
+        // Update environment access separately
+        await apiService.put(`/admin/users/${editUserDialog.user.id}/environments`, {
+          allowAllEnvironments: editUserAllowAllEnvs,
+          environmentIds: editUserAllowAllEnvs ? [] : editUserEnvIds
+        });
+
+        // Update permissions for admin users
+        if (editUserData.role === 'admin') {
+          await apiService.put(`/admin/users/${editUserDialog.user.id}/permissions`, {
+            permissions: editUserPermissions
+          });
+        }
       }
 
       enqueueSnackbar(t('users.userUpdated'), { variant: 'success' });
       mutateUsers(); // SWR cache 갱신
+      setReviewDialog({ open: false, saving: false });
       setEditUserDialog({ open: false, user: null });
     } catch (error: any) {
       // API 오류 응답에서 구체적인 메시지 추출
       const errorMessage = error.error?.message || error.message || t('users.updateError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
+      setReviewDialog(prev => ({ ...prev, saving: false }));
     }
   };
 
@@ -943,6 +1190,8 @@ const UsersManagementPage: React.FC = () => {
       role: 'user',
     });
     setNewUserTags([]);
+    setNewUserAllowAllEnvs(false);
+    setNewUserEnvIds([]);
     setAddUserDialog(true);
 
     // 브라우저 자동완성을 방지하기 위해 약간의 지연 후 다시 초기화
@@ -967,6 +1216,8 @@ const UsersManagementPage: React.FC = () => {
       role: 'user',
     });
     setNewUserTags([]);
+    setNewUserAllowAllEnvs(false);
+    setNewUserEnvIds([]);
     setNewUserErrors({
       name: '',
       email: '',
@@ -1004,7 +1255,9 @@ const UsersManagementPage: React.FC = () => {
     try {
       const userData = {
         ...newUserData,
-        tagIds: newUserTags.map(tag => tag.id)
+        tagIds: newUserTags.map(tag => tag.id),
+        allowAllEnvironments: newUserAllowAllEnvs,
+        environmentIds: newUserAllowAllEnvs ? [] : newUserEnvIds,
       };
       await apiService.post('/admin/users', userData);
       enqueueSnackbar(t('users.userCreated'), { variant: 'success' });
@@ -1157,6 +1410,53 @@ const UsersManagementPage: React.FC = () => {
             size="small"
           />
         );
+      case 'environments': {
+        const userWithEnv = user as User & { allowAllEnvironments?: boolean; environmentIds?: string[] };
+        if (userWithEnv.allowAllEnvironments) {
+          return (
+            <Chip
+              label={t('users.allEnvironments')}
+              color="warning"
+              size="small"
+              sx={{ borderRadius: 1 }}
+            />
+          );
+        }
+        const userEnvIds = userWithEnv.environmentIds || [];
+        if (userEnvIds.length === 0) {
+          return (
+            <Typography variant="body2" color="text.secondary">
+              {t('users.noEnvironments')}
+            </Typography>
+          );
+        }
+        return (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {userEnvIds.slice(0, 3).map((envId) => {
+              const env = environments.find(e => e.id === envId);
+              return (
+                <Chip
+                  key={envId}
+                  label={env?.displayName || env?.environmentName || envId}
+                  size="small"
+                  sx={{
+                    borderRadius: 1,
+                    bgcolor: env?.color || '#666',
+                    color: '#fff',
+                  }}
+                />
+              );
+            })}
+            {userEnvIds.length > 3 && (
+              <Chip
+                label={`+${userEnvIds.length - 3}`}
+                size="small"
+                sx={{ borderRadius: 1 }}
+              />
+            )}
+          </Box>
+        );
+      }
       case 'tags':
         return (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -1653,53 +1953,16 @@ const UsersManagementPage: React.FC = () => {
       </Menu>
 
       {/* Add User Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={addUserDialog}
         onClose={handleCloseAddUserDialog}
-        PaperProps={{
-          sx: {
-            width: { xs: '100%', sm: 600 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
-        ModalProps={{
-          keepMounted: false
-        }}
+        title={t('users.addUserDialogTitle')}
+        subtitle={t('users.addUserDialogDescription')}
+        storageKey="usersAddFormDrawerWidth"
+        defaultWidth={600}
+        minWidth={450}
+        zIndex={1300}
       >
-        {/* Header */}
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper'
-        }}>
-          <Box>
-            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {t('users.addUserDialogTitle')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              {t('users.addUserDialogDescription')}
-            </Typography>
-          </Box>
-          <IconButton
-            onClick={handleCloseAddUserDialog}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
         {/* Content */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Box
@@ -1832,6 +2095,100 @@ const UsersManagementPage: React.FC = () => {
                 }}
               />
             </Box>
+
+            {/* Environment Access */}
+            <Box>
+              <Typography variant="subtitle2" gutterBottom sx={{ mt: 2, fontWeight: 600 }}>
+                {t('users.environmentAccess')}
+              </Typography>
+              <Box sx={{
+                p: 2,
+                bgcolor: 'background.paper',
+                borderRadius: 1,
+                border: 1,
+                borderColor: 'divider'
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Checkbox
+                    checked={newUserAllowAllEnvs}
+                    onChange={(e) => setNewUserAllowAllEnvs(e.target.checked)}
+                  />
+                  <Typography variant="body2">
+                    {t('users.allowAllEnvironments')}
+                  </Typography>
+                </Box>
+                {newUserAllowAllEnvs && (
+                  <Alert severity="warning" sx={{ mb: 2 }}>
+                    {t('users.allowAllEnvironmentsWarning')}
+                  </Alert>
+                )}
+                {!newUserAllowAllEnvs && (
+                  <Autocomplete
+                    multiple
+                    options={environments}
+                    getOptionLabel={(option) => option.displayName || option.environmentName}
+                    filterSelectedOptions
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    value={environments.filter(env => newUserEnvIds.includes(env.id))}
+                    onChange={(_, value) => setNewUserEnvIds(value.map(v => v.id))}
+                    slotProps={{
+                      popper: {
+                        style: {
+                          zIndex: 9999
+                        }
+                      }
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={t('users.selectEnvironments')}
+                        placeholder={newUserEnvIds.length === 0 ? t('users.selectEnvironmentsPlaceholder') : ''}
+                        helperText={t('users.selectEnvironmentsHelp')}
+                      />
+                    )}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => {
+                        const { key, ...chipProps } = getTagProps({ index });
+                        return (
+                          <Chip
+                            key={option.id}
+                            label={option.displayName || option.environmentName}
+                            size="small"
+                            {...chipProps}
+                            sx={{
+                              borderRadius: 1,
+                              bgcolor: option.color || '#666',
+                              color: '#fff',
+                              '& .MuiChip-deleteIcon': {
+                                color: 'rgba(255,255,255,0.7)',
+                                '&:hover': { color: '#fff' }
+                              }
+                            }}
+                          />
+                        );
+                      })
+                    }
+                    renderOption={(props, option) => {
+                      const { key, ...otherProps } = props;
+                      return (
+                        <Box component="li" key={key} {...otherProps}>
+                          <Box
+                            sx={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: 0.5,
+                              bgcolor: option.color || '#666',
+                              mr: 1
+                            }}
+                          />
+                          {option.displayName || option.environmentName}
+                        </Box>
+                      );
+                    }}
+                  />
+                )}
+              </Box>
+            </Box>
           </Box>
         </Box>
 
@@ -1860,7 +2217,7 @@ const UsersManagementPage: React.FC = () => {
             {t('users.addUser')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* Confirmation Drawer */}
       <Drawer
@@ -1921,6 +2278,7 @@ const UsersManagementPage: React.FC = () => {
           <Button
             onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
             variant="outlined"
+            disabled={confirmDialogLoading}
           >
             {t('common.cancel')}
           </Button>
@@ -1928,8 +2286,9 @@ const UsersManagementPage: React.FC = () => {
             onClick={confirmDialog.action}
             color="error"
             variant="contained"
+            disabled={confirmDialogLoading}
           >
-            {t('common.confirm')}
+            {confirmDialogLoading ? <CircularProgress size={20} color="inherit" /> : t('common.confirm')}
           </Button>
         </Box>
       </Drawer>
@@ -2025,54 +2384,106 @@ const UsersManagementPage: React.FC = () => {
         </Box>
       </Drawer>
 
-      {/* Edit User Drawer */}
+      {/* Promote User Drawer */}
       <Drawer
         anchor="right"
-        open={editUserDialog.open}
-        onClose={() => setEditUserDialog({ open: false, user: null })}
-        PaperProps={{
-          sx: {
+        open={promoteDialog.open}
+        onClose={handlePromoteCancel}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
             width: { xs: '100%', sm: 600 },
             maxWidth: '100vw',
             display: 'flex',
             flexDirection: 'column'
           }
         }}
-        ModalProps={{
-          keepMounted: false
-        }}
       >
         {/* Header */}
         <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
           p: 2,
           borderBottom: '1px solid',
           borderColor: 'divider',
-          bgcolor: 'background.paper'
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
         }}>
-          <Box>
-            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {t('users.editUserDialogTitle')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              {t('users.editUserDialogDescription')}
-            </Typography>
-          </Box>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('common.promoteUser')}
+          </Typography>
           <IconButton
-            onClick={() => setEditUserDialog({ open: false, user: null })}
+            onClick={handlePromoteCancel}
             size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
+            sx={{ '&:hover': { backgroundColor: 'action.hover' } }}
           >
             <CloseIcon />
           </IconButton>
         </Box>
 
+        {/* Content */}
+        <Box sx={{ flex: 1, p: 2, overflow: 'auto' }}>
+          {promoteDialog.user && (
+            <>
+              <Alert severity="info" sx={{ mb: 2 }}>
+                {t('common.promoteUserConfirm', { name: promoteDialog.user.name })}
+              </Alert>
+
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                {t('users.selectPermissions')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('users.selectPermissionsDesc')}
+              </Typography>
+
+              <PermissionSelector
+                permissions={promoteDialog.permissions}
+                onChange={(permissions) => setPromoteDialog(prev => ({ ...prev, permissions }))}
+                showTitle={false}
+              />
+            </>
+          )}
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={handlePromoteCancel}
+            variant="outlined"
+            disabled={promoteDialog.loading}
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={handlePromoteConfirm}
+            color="primary"
+            variant="contained"
+            disabled={promoteDialog.loading}
+            startIcon={promoteDialog.loading ? <CircularProgress size={16} color="inherit" /> : <SecurityIcon />}
+          >
+            {t('common.promoteToAdmin')}
+          </Button>
+        </Box>
+      </Drawer>
+
+      {/* Edit User Drawer */}
+      <ResizableDrawer
+        open={editUserDialog.open}
+        onClose={() => setEditUserDialog({ open: false, user: null })}
+        title={t('users.editUserDialogTitle')}
+        subtitle={t('users.editUserDialogDescription')}
+        storageKey="usersEditFormDrawerWidth"
+        defaultWidth={600}
+        minWidth={450}
+        zIndex={1300}
+      >
         {/* Content */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
@@ -2226,6 +2637,107 @@ const UsersManagementPage: React.FC = () => {
                 }}
               />
             </Box>
+
+            {/* Environment Access Section */}
+            {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                  {t('users.environmentAccess')}
+                </Typography>
+                <Box sx={{
+                  p: 2,
+                  bgcolor: 'background.paper',
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: 'divider'
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <Checkbox
+                      checked={editUserAllowAllEnvs}
+                      onChange={(e) => setEditUserAllowAllEnvs(e.target.checked)}
+                    />
+                    <Typography variant="body2">
+                      {t('users.allowAllEnvironments')}
+                    </Typography>
+                  </Box>
+                  {editUserAllowAllEnvs && (
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                      {t('users.allowAllEnvironmentsWarning')}
+                    </Alert>
+                  )}
+                  {!editUserAllowAllEnvs && (
+                    <Autocomplete
+                      multiple
+                      options={environments}
+                      getOptionLabel={(option) => option.displayName || option.environmentName}
+                      filterSelectedOptions
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      value={environments.filter(env => editUserEnvIds.includes(env.id))}
+                      onChange={(_, value) => setEditUserEnvIds(value.map(v => v.id))}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={t('users.selectEnvironments')}
+                          placeholder={editUserEnvIds.length === 0 ? t('users.selectEnvironmentsPlaceholder') : ''}
+                          helperText={t('users.selectEnvironmentsHelp')}
+                        />
+                      )}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => {
+                          const { key, ...tagProps } = getTagProps({ index });
+                          return (
+                            <Chip
+                              key={key}
+                              label={option.displayName || option.environmentName}
+                              size="small"
+                              {...tagProps}
+                              sx={{
+                                borderRadius: 1,
+                                bgcolor: option.color || '#666',
+                                color: '#fff',
+                                '& .MuiChip-deleteIcon': {
+                                  color: 'rgba(255,255,255,0.7)',
+                                  '&:hover': { color: '#fff' }
+                                }
+                              }}
+                            />
+                          );
+                        })
+                      }
+                      renderOption={(props, option) => {
+                        const { key, ...otherProps } = props;
+                        return (
+                          <Box component="li" key={key} {...otherProps}>
+                            <Box
+                              sx={{
+                                width: 12,
+                                height: 12,
+                                borderRadius: 0.5,
+                                bgcolor: option.color || '#666',
+                                mr: 1
+                              }}
+                            />
+                            {option.displayName || option.environmentName}
+                          </Box>
+                        );
+                      }}
+                    />
+                  )}
+                </Box>
+              </Box>
+            )}
+
+            {/* Permissions Section - Only for admin users */}
+            {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && editUserData.role === 'admin' && (
+              <Box sx={{ mt: 2 }}>
+                <PermissionSelector
+                  permissions={editUserPermissions}
+                  onChange={setEditUserPermissions}
+                  loading={permissionsLoading}
+                />
+              </Box>
+            )}
+
             {editUserDialog.user && isCurrentUser(editUserDialog.user) && (
               <Alert severity="info">
                 {t('users.canOnlyModifyOwnName')}
@@ -2252,14 +2764,129 @@ const UsersManagementPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button
-            onClick={handleSaveEditUser}
+            onClick={handleOpenReview}
             variant="contained"
-            startIcon={<SaveIcon />}
+            startIcon={<PreviewIcon />}
           >
-            {t('common.save')}
+            {t('common.review')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
+
+      {/* Review Changes Dialog */}
+      <Dialog
+        open={reviewDialog.open}
+        onClose={handleCloseReview}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 2 }
+        }}
+      >
+        <DialogTitle sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          borderBottom: 1,
+          borderColor: 'divider',
+        }}>
+          <PreviewIcon color="primary" />
+          {t('users.reviewChanges')}
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          {(() => {
+            const changes = getChanges();
+            if (changes.length === 0) {
+              return (
+                <Alert severity="info" sx={{ mt: 1 }}>
+                  {t('users.noChanges')}
+                </Alert>
+              );
+            }
+            return (
+              <Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('users.reviewChangesDesc')}
+                </Typography>
+                <Box sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.5,
+                  p: 2,
+                  bgcolor: 'background.default',
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: 'divider',
+                }}>
+                  {changes.map((change, index) => (
+                    <Box key={index} sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 0.5,
+                      pb: index < changes.length - 1 ? 1.5 : 0,
+                      borderBottom: index < changes.length - 1 ? 1 : 0,
+                      borderColor: 'divider',
+                    }}>
+                      <Typography variant="subtitle2" fontWeight={600} color="text.primary">
+                        {change.field}
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            textDecoration: 'line-through',
+                            color: 'error.main',
+                            bgcolor: 'error.main',
+                            backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(211, 47, 47, 0.15)' : 'rgba(211, 47, 47, 0.08)',
+                            px: 1,
+                            py: 0.25,
+                            borderRadius: 0.5,
+                          }}
+                        >
+                          {change.from}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">→</Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: 'success.main',
+                            bgcolor: 'success.main',
+                            backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(46, 125, 50, 0.15)' : 'rgba(46, 125, 50, 0.08)',
+                            px: 1,
+                            py: 0.25,
+                            borderRadius: 0.5,
+                            fontWeight: 500,
+                          }}
+                        >
+                          {change.to}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            );
+          })()}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2, borderTop: 1, borderColor: 'divider' }}>
+          <Button
+            onClick={handleCloseReview}
+            startIcon={<ArrowBackIcon />}
+            variant="outlined"
+            disabled={reviewDialog.saving}
+          >
+            {t('common.back')}
+          </Button>
+          <Button
+            onClick={handleConfirmSave}
+            variant="contained"
+            startIcon={reviewDialog.saving ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
+            disabled={reviewDialog.saving || getChanges().length === 0}
+          >
+            {reviewDialog.saving ? t('common.saving') : t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Bulk Action Drawer */}
       <Drawer

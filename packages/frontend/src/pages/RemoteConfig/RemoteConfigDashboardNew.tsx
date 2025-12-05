@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, createContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -6,18 +6,10 @@ import {
   Typography,
   Grid,
   Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Chip,
   IconButton,
   Tooltip,
-  AppBar,
-  Toolbar,
-  Container,
   Paper,
-  Alert,
   CircularProgress,
   Dialog,
   DialogTitle,
@@ -27,8 +19,7 @@ import {
   Switch,
   FormControlLabel,
   Tabs,
-  Tab,
-  Divider
+  Tab
 } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import {
@@ -37,30 +28,14 @@ import {
   Delete as DeleteIcon,
   Publish as PublishIcon,
   Archive as ArchiveIcon,
-  Settings as SettingsIcon,
-  Campaign as CampaignIcon,
   Code as CodeIcon,
   Visibility as ViewIcon,
   CheckCircle as ApproveIcon,
-  Cancel as RejectIcon,
-  History as HistoryIcon,
-  Download as ExportIcon,
-  Upload as ImportIcon,
-  Refresh as RefreshIcon
+  Cancel as RejectIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 // Types
-interface Environment {
-  id: number;
-  environmentName: string;
-  displayName: string;
-  description: string;
-  isDefault: boolean;
-  requiresApproval: boolean;
-  requiredApprovers: number;
-}
-
 interface Template {
   id: number;
   templateName: string;
@@ -86,165 +61,16 @@ interface ChangeRequest {
   createdBy: string;
 }
 
-// Environment Context
-interface EnvironmentContextType {
-  currentEnvironment: Environment | null;
-  environments: Environment[];
-  switchEnvironment: (environmentId: number) => void;
-  isLoading: boolean;
-}
-
-const EnvironmentContext = createContext<EnvironmentContextType>({
-  currentEnvironment: null,
-  environments: [],
-  switchEnvironment: () => {},
-  isLoading: false
-});
-
-// Environment Provider
-export const EnvironmentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentEnvironment, setCurrentEnvironment] = useState<Environment | null>(null);
-  const [environments, setEnvironments] = useState<Environment[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    loadEnvironments();
-  }, []);
-
-  const loadEnvironments = async () => {
-    try {
-      setIsLoading(true);
-      // TODO: Replace with actual API call
-      const mockEnvironments: Environment[] = [
-        {
-          id: 1,
-          environmentName: 'development',
-          displayName: 'Development',
-          description: 'Development environment for testing',
-          isDefault: true,
-          requiresApproval: false,
-          requiredApprovers: 1
-        },
-        {
-          id: 2,
-          environmentName: 'staging',
-          displayName: 'Staging',
-          description: 'Staging environment for pre-production testing',
-          isDefault: false,
-          requiresApproval: true,
-          requiredApprovers: 1
-        },
-        {
-          id: 3,
-          environmentName: 'production',
-          displayName: 'Production',
-          description: 'Production environment for live users',
-          isDefault: false,
-          requiresApproval: true,
-          requiredApprovers: 2
-        }
-      ];
-      
-      setEnvironments(mockEnvironments);
-      
-      // Set default environment
-      const savedEnvId = localStorage.getItem('selectedEnvironmentId');
-      if (savedEnvId) {
-        const savedEnv = mockEnvironments.find(env => env.id === parseInt(savedEnvId));
-        if (savedEnv) {
-          setCurrentEnvironment(savedEnv);
-        } else {
-          setCurrentEnvironment(mockEnvironments[0]);
-        }
-      } else {
-        setCurrentEnvironment(mockEnvironments[0]);
-      }
-    } catch (error) {
-      console.error('Failed to load environments:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const switchEnvironment = (environmentId: number) => {
-    const environment = environments.find(env => env.id === environmentId);
-    if (environment) {
-      setCurrentEnvironment(environment);
-      localStorage.setItem('selectedEnvironmentId', environmentId.toString());
-    }
-  };
-
-  return (
-    <EnvironmentContext.Provider value={{
-      currentEnvironment,
-      environments,
-      switchEnvironment,
-      isLoading
-    }}>
-      {children}
-    </EnvironmentContext.Provider>
-  );
-};
-
-// Environment Selector Component
-const EnvironmentSelector: React.FC = () => {
+// Page Header Component
+const PageHeader: React.FC = () => {
   const { t } = useTranslation();
-  const { currentEnvironment, environments, switchEnvironment, isLoading } = useContext(EnvironmentContext);
-
-  const getEnvironmentColor = (envName: string) => {
-    switch (envName.toLowerCase()) {
-      case 'development': return 'success';
-      case 'staging': return 'warning';
-      case 'production': return 'error';
-      default: return 'default';
-    }
-  };
 
   return (
     <Paper elevation={1} sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
       <Box sx={{ px: 3, py: 2 }}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
-              {t('remoteConfig.title')}
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                {t('remoteConfig.currentEnvironment')}:
-              </Typography>
-              <FormControl size="small" sx={{ minWidth: 200 }}>
-                <Select
-                  value={currentEnvironment?.id || ''}
-                  onChange={(e) => switchEnvironment(Number(e.target.value))}
-                  disabled={isLoading}
-                  displayEmpty
-                >
-                  {environments.map((env) => (
-                    <MenuItem key={env.id} value={env.id}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Chip
-                          label={env.displayName}
-                          size="small"
-                          color={getEnvironmentColor(env.environmentName) as any}
-                          variant="outlined"
-                        />
-                        {env.requiresApproval && (
-                          <Chip
-                            label={`${env.requiredApprovers} approver${env.requiredApprovers > 1 ? 's' : ''}`}
-                            size="small"
-                            variant="outlined"
-                          />
-                        )}
-                      </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-          </Grid>
-        </Grid>
+        <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
+          {t('remoteConfig.title')}
+        </Typography>
       </Box>
     </Paper>
   );
@@ -335,7 +161,6 @@ const StatisticsCards: React.FC = () => {
 // Templates Management Component
 const TemplatesManagement: React.FC = () => {
   const { t } = useTranslation();
-  const { currentEnvironment } = useContext(EnvironmentContext);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
@@ -343,10 +168,8 @@ const TemplatesManagement: React.FC = () => {
   const [dialogType, setDialogType] = useState<'create' | 'edit' | 'view'>('create');
 
   useEffect(() => {
-    if (currentEnvironment) {
-      loadTemplates();
-    }
-  }, [currentEnvironment]);
+    loadTemplates();
+  }, []);
 
   const loadTemplates = async () => {
     try {
@@ -540,15 +363,12 @@ const TemplatesManagement: React.FC = () => {
 // Change Requests Management Component
 const ChangeRequestsManagement: React.FC = () => {
   const { t } = useTranslation();
-  const { currentEnvironment } = useContext(EnvironmentContext);
   const [changeRequests, setChangeRequests] = useState<ChangeRequest[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (currentEnvironment) {
-      loadChangeRequests();
-    }
-  }, [currentEnvironment]);
+    loadChangeRequests();
+  }, []);
 
   const loadChangeRequests = async () => {
     try {
@@ -717,50 +537,38 @@ const RemoteConfigDashboard: React.FC = () => {
   };
 
   return (
-    <EnvironmentProvider>
-      <Box sx={{ p: 3 }}>
-        {/* Fixed Environment Selector */}
-        <EnvironmentSelector />
+    <Box sx={{ p: 3 }}>
+      {/* Page Header */}
+      <PageHeader />
 
-        {/* Statistics Cards */}
-        <StatisticsCards />
+      {/* Statistics Cards */}
+      <StatisticsCards />
 
-        {/* Main Content Tabs */}
-        <Paper sx={{ width: '100%' }}>
-          <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
-            sx={{ borderBottom: 1, borderColor: 'divider' }}
-          >
-            <Tab
-              label={t('remoteConfig.templates')}
-              icon={<CodeIcon />}
-              iconPosition="start"
-            />
-            <Tab
-              label={t('remoteConfig.changeRequests')}
-              icon={<ApproveIcon />}
-              iconPosition="start"
-            />
-            <Tab
-              label={t('remoteConfig.environmentSettings')}
-              icon={<SettingsIcon />}
-              iconPosition="start"
-            />
-          </Tabs>
+      {/* Main Content Tabs */}
+      <Paper sx={{ width: '100%' }}>
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          sx={{ borderBottom: 1, borderColor: 'divider' }}
+        >
+          <Tab
+            label={t('remoteConfig.templates')}
+            icon={<CodeIcon />}
+            iconPosition="start"
+          />
+          <Tab
+            label={t('remoteConfig.changeRequests')}
+            icon={<ApproveIcon />}
+            iconPosition="start"
+          />
+        </Tabs>
 
-          <Box sx={{ p: 3 }}>
-            {tabValue === 0 && <TemplatesManagement />}
-            {tabValue === 1 && <ChangeRequestsManagement />}
-            {tabValue === 2 && (
-              <Alert severity="info">
-                {t('remoteConfig.environmentSettingsComingSoon')}
-              </Alert>
-            )}
-          </Box>
-        </Paper>
-      </Box>
-    </EnvironmentProvider>
+        <Box sx={{ p: 3 }}>
+          {tabValue === 0 && <TemplatesManagement />}
+          {tabValue === 1 && <ChangeRequestsManagement />}
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 

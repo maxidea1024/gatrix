@@ -165,6 +165,17 @@ const startServer = async () => {
       throw error;
     }
 
+    // Initialize default environment for multi-environment support
+    try {
+      const { initializeDefaultEnvironment } = await import('./utils/environmentContext');
+      const db = (await import('./config/knex')).default;
+      const defaultEnvId = await initializeDefaultEnvironment(db);
+      logger.info('Default environment initialized successfully', { defaultEnvId });
+    } catch (error) {
+      logger.error('Failed to initialize default environment:', error);
+      throw error;
+    }
+
     // Check and configure database timezone
     try {
       await setDatabaseTimezoneToUTC();

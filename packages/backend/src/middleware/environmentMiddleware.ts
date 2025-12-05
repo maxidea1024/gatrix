@@ -1,6 +1,6 @@
 /**
  * Environment Middleware
- * 
+ *
  * Middleware for handling environment context in multi-environment setup.
  * This middleware:
  * - Extracts environment ID from request (header, query, or body)
@@ -15,15 +15,16 @@ import logger from '../config/logger';
 import {
   getEnvironmentIdFromRequest,
   runWithEnvironmentAsync,
-  DEFAULT_ENVIRONMENT_ID,
-  validateEnvironmentId
+  getDefaultEnvironmentId,
+  validateEnvironmentId,
+  isDefaultEnvironmentInitialized
 } from '../utils/environmentContext';
 
 // Extend Express Request to include environment info
 declare global {
   namespace Express {
     interface Request {
-      environmentId?: number;
+      environmentId?: string; // ULID
       environmentName?: string;
     }
   }
@@ -39,28 +40,36 @@ export const environmentContextMiddleware = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    // Check if default environment is initialized
+    if (!isDefaultEnvironmentInitialized()) {
+      logger.warn('Default environment not initialized, skipping environment context');
+      next();
+      return;
+    }
+
     const environmentId = getEnvironmentIdFromRequest(req);
-    
+    const defaultEnvId = getDefaultEnvironmentId();
+
     // Validate environment exists
     const isValid = await validateEnvironmentId(db, environmentId);
     if (!isValid) {
       logger.warn(`Invalid environment ID requested: ${environmentId}`);
       // Fall back to default environment instead of failing
-      req.environmentId = DEFAULT_ENVIRONMENT_ID;
+      req.environmentId = defaultEnvId;
     } else {
       req.environmentId = environmentId;
     }
-    
+
     // Get environment name for logging
     const environment = await db('g_remote_config_environments')
       .where('id', req.environmentId)
       .select('environmentName')
       .first();
-    
+
     if (environment) {
       req.environmentName = environment.environmentName;
     }
-    
+
     // Run the rest of the request with environment context
     await runWithEnvironmentAsync(req.environmentId, async () => {
       next();
@@ -68,7 +77,9 @@ export const environmentContextMiddleware = async (
   } catch (error) {
     logger.error('Error in environment middleware:', error);
     // Don't fail the request, just use default environment
-    req.environmentId = DEFAULT_ENVIRONMENT_ID;
+    if (isDefaultEnvironmentInitialized()) {
+      req.environmentId = getDefaultEnvironmentId();
+    }
     next();
   }
 };
@@ -80,13 +91,13 @@ export const environmentContextMiddleware = async (
 export const requireEnvironmentType = (allowedTypes: string[]) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const environmentId = req.environmentId ?? DEFAULT_ENVIRONMENT_ID;
-      
+      const environmentId = req.environmentId ?? getDefaultEnvironmentId();
+
       const environment = await db('g_remote_config_environments')
         .where('id', environmentId)
         .select('environmentType')
         .first();
-      
+
       if (!environment || !allowedTypes.includes(environment.environmentType)) {
         res.status(403).json({
           success: false,
@@ -94,7 +105,7 @@ export const requireEnvironmentType = (allowedTypes: string[]) => {
         });
         return;
       }
-      
+
       next();
     } catch (error) {
       logger.error('Error in requireEnvironmentType middleware:', error);
@@ -116,13 +127,13 @@ export const preventProductionModification = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const environmentId = req.environmentId ?? DEFAULT_ENVIRONMENT_ID;
-    
+    const environmentId = req.environmentId ?? getDefaultEnvironmentId();
+
     const environment = await db('g_remote_config_environments')
       .where('id', environmentId)
       .select('environmentType', 'requiresApproval')
       .first();
-    
+
     if (environment?.environmentType === 'production') {
       // For production, check if approval is required
       if (environment.requiresApproval) {
@@ -131,7 +142,7 @@ export const preventProductionModification = async (
         logger.warn(`Production modification attempted without approval workflow`);
       }
     }
-    
+
     next();
   } catch (error) {
     logger.error('Error in preventProductionModification middleware:', error);

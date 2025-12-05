@@ -67,22 +67,27 @@ export class CouponGenerationJob {
         ['IN_PROGRESS', jobIdForDb, settingId]
       );
 
-      // Get codePattern from settings
+      // Get codePattern and environmentId from settings
       const [settings] = await pool.execute<RowDataPacket[]>(
-        'SELECT codePattern FROM g_coupon_settings WHERE id = ?',
+        'SELECT codePattern, environmentId FROM g_coupon_settings WHERE id = ?',
         [settingId]
       );
       const codePattern = (settings[0]?.codePattern || 'ALPHANUMERIC_8') as CodePattern;
+      const environmentId = settings[0]?.environmentId;
+
+      if (!environmentId) {
+        throw new Error('Setting not found or missing environmentId');
+      }
 
       // Generate and insert codes in streaming batches
       const localSet = new Set<string>();
       let totalGenerated = 0;
       let lastProgressUpdate = 0;
 
-      logger.info('Starting streaming batch generation', { settingId, quantity, codePattern });
+      logger.info('Starting streaming batch generation', { settingId, quantity, codePattern, environmentId });
 
       for (let i = 0; i < quantity; i += this.BATCH_SIZE) {
-        const batchCodes: Array<[string, string, string]> = [];
+        const batchCodes: Array<[string, string, string, string]> = [];
         const batchSize = Math.min(this.BATCH_SIZE, quantity - i);
 
         // Generate codes for this batch
@@ -117,14 +122,14 @@ export class CouponGenerationJob {
           }
 
           localSet.add(code!);
-          batchCodes.push([ulid(), settingId, code!]);
+          batchCodes.push([ulid(), settingId, code!, environmentId]);
         }
 
         // Insert batch immediately (streaming approach)
         if (batchCodes.length > 0) {
-          const placeholders = batchCodes.map(() => '(?, ?, ?)').join(',');
+          const placeholders = batchCodes.map(() => '(?, ?, ?, ?)').join(',');
           await pool.execute(
-            `INSERT INTO g_coupons (id, settingId, code) VALUES ${placeholders}`,
+            `INSERT INTO g_coupons (id, settingId, code, environmentId) VALUES ${placeholders}`,
             batchCodes.flat()
           );
 

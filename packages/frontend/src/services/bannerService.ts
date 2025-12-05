@@ -36,6 +36,30 @@ export interface FrameTransition {
   duration: number;
 }
 
+// Frame filter logic type
+export type FrameFilterLogic = 'and' | 'or';
+
+// Frame targeting/filtering options
+export interface FrameTargeting {
+  // Target platforms (e.g., 'pc', 'ios', 'android')
+  platforms?: string[];
+  platformsInverted?: boolean;
+  // Target channel/subchannels
+  channelSubchannels?: Array<{ channel: string; subchannels: string[] }>;
+  channelSubchannelsInverted?: boolean;
+  // Target worlds
+  worlds?: string[];
+  worldsInverted?: boolean;
+  // User level range
+  levelMin?: number;
+  levelMax?: number;
+  // Days since joining range
+  joinDaysMin?: number;
+  joinDaysMax?: number;
+  // Logic for combining conditions (AND = all conditions must match, OR = any condition matches)
+  filterLogic?: FrameFilterLogic;
+}
+
 export interface Frame {
   frameId: string;
   imageUrl: string;
@@ -46,6 +70,8 @@ export interface Frame {
   effects?: FrameEffects;
   transition?: FrameTransition;
   meta?: Record<string, any>;
+  // Frame targeting/filtering
+  targeting?: FrameTargeting;
 }
 
 export interface SequenceTransition {
@@ -70,6 +96,7 @@ export interface Banner {
   height: number;
   metadata?: Record<string, any>;
   playbackSpeed: number;
+  shuffle: boolean;
   sequences: Sequence[];
   version: number;
   status: BannerStatus;
@@ -90,6 +117,7 @@ export interface CreateBannerInput {
   height: number;
   metadata?: Record<string, any>;
   playbackSpeed?: number;
+  shuffle?: boolean;
   sequences?: Sequence[];
 }
 
@@ -100,6 +128,7 @@ export interface UpdateBannerInput {
   height?: number;
   metadata?: Record<string, any>;
   playbackSpeed?: number;
+  shuffle?: boolean;
   sequences?: Sequence[];
 }
 

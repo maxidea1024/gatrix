@@ -150,3 +150,6 @@ export interface Notification {
   message: string;
   duration?: number;
 }
+
+// Permission types
+export * from './permissions';

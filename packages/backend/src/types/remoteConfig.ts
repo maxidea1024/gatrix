@@ -281,6 +281,7 @@ export interface RemoteConfigListResponse {
 }
 
 export interface RemoteConfigFilters {
+  environmentId?: string;
   search?: string;
   valueType?: ConfigValueType;
   isActive?: boolean;

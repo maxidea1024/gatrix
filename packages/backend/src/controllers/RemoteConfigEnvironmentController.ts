@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
 import { RemoteConfigEnvironment } from '../models/RemoteConfigEnvironment';
 import { RemoteConfigSegment } from '../models/RemoteConfigSegment';
+import { RemoteConfigTemplate } from '../models/RemoteConfigTemplate';
+import { GameWorldModel } from '../models/GameWorld';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import logger from '../config/logger';
+import knex from '../config/knex';
+import { EnvironmentCopyService, CopyOptions } from '../services/EnvironmentCopyService';
 
 export class RemoteConfigEnvironmentController {
   /**
@@ -73,7 +77,8 @@ export class RemoteConfigEnvironmentController {
       displayOrder,
       projectId,
       requiresApproval,
-      requiredApprovers
+      requiredApprovers,
+      baseEnvironmentId
     } = req.body;
     const userId = (req.user as any)?.userId;
 
@@ -82,6 +87,17 @@ export class RemoteConfigEnvironmentController {
         success: false,
         message: 'User not authenticated'
       });
+    }
+
+    // Validate base environment if provided
+    if (baseEnvironmentId) {
+      const baseEnv = await RemoteConfigEnvironment.query().findById(baseEnvironmentId);
+      if (!baseEnv) {
+        return res.status(400).json({
+          success: false,
+          message: 'Base environment not found'
+        });
+      }
     }
 
     try {
@@ -100,15 +116,58 @@ export class RemoteConfigEnvironmentController {
         createdBy: userId
       });
 
-      // Create predefined segments for the new environment
-      await RemoteConfigSegment.createPredefinedSegments(environment.id, userId);
+      // Create predefined segments for the new environment (only if no base environment)
+      if (!baseEnvironmentId) {
+        await RemoteConfigSegment.createPredefinedSegments(environment.id, userId);
+      }
+
+      // Copy data from base environment if provided
+      let copyResult = null;
+      if (baseEnvironmentId) {
+        logger.info(`Copying data from base environment ${baseEnvironmentId} to new environment ${environment.id}`);
+
+        const copyOptions: CopyOptions = {
+          copyTemplates: true,
+          copyGameWorlds: true,
+          copySegments: true,
+          copyBanners: true,
+          copyClientVersions: true,
+          copyCoupons: true,
+          copyIngamePopupNotices: true,
+          copyMessageTemplates: true,
+          copyRewardTemplates: true,
+          copyServiceMaintenance: true,
+          copyServiceNotices: true,
+          copySurveys: true,
+          copyVars: true,
+          copyContextFields: true,
+          copyCampaigns: true,
+          copyAccountWhitelist: true,
+          copyIpWhitelist: true,
+          copyJobs: true,
+          copyPlanningData: true,
+          overwriteExisting: false
+        };
+
+        copyResult = await EnvironmentCopyService.copyEnvironmentData(
+          baseEnvironmentId,
+          environment.id,
+          copyOptions,
+          userId
+        );
+
+        logger.info(`Data copied from base environment to ${environmentName}`, { copyResult });
+      }
 
       logger.info(`Environment created: ${environmentName} by user ${userId}`);
 
       res.status(201).json({
         success: true,
         data: environment,
-        message: 'Environment created successfully'
+        copyResult,
+        message: baseEnvironmentId
+          ? 'Environment created and data copied from base environment successfully'
+          : 'Environment created successfully'
       });
     } catch (error) {
       logger.error('Error creating environment:', error);
@@ -168,10 +227,44 @@ export class RemoteConfigEnvironmentController {
   });
 
   /**
+   * Get related data details for an environment (for delete confirmation)
+   */
+  static getEnvironmentRelatedData = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const environment = await RemoteConfigEnvironment.query().findById(id);
+    if (!environment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Environment not found'
+      });
+    }
+
+    const relatedData = await environment.getRelatedDataDetails();
+
+    res.json({
+      success: true,
+      data: {
+        environment: {
+          id: environment.id,
+          environmentName: environment.environmentName,
+          displayName: environment.displayName,
+          isSystemDefined: environment.isSystemDefined,
+          isDefault: environment.isDefault,
+        },
+        relatedData,
+        canDelete: !environment.isSystemDefined && !environment.isDefault,
+        hasData: relatedData.total > 0,
+      }
+    });
+  });
+
+  /**
    * Delete environment
    */
   static deleteEnvironment = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
+    const { force } = req.body || {};
     const userId = (req.user as any)?.userId;
 
     if (!userId) {
@@ -190,16 +283,46 @@ export class RemoteConfigEnvironmentController {
     }
 
     try {
-      await environment.deleteEnvironment();
+      await environment.deleteEnvironment(force === true);
 
-      logger.info(`Environment deleted: ${environment.environmentName} by user ${userId}`);
+      logger.info(`Environment deleted: ${environment.environmentName} by user ${userId}`, {
+        force,
+        environmentId: id
+      });
 
       res.json({
         success: true,
         message: 'Environment deleted successfully'
       });
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Error deleting environment:', error);
+
+      // Handle specific error types
+      if (error.message === 'CANNOT_DELETE_SYSTEM_ENVIRONMENT') {
+        return res.status(400).json({
+          success: false,
+          code: 'CANNOT_DELETE_SYSTEM_ENVIRONMENT',
+          message: 'Cannot delete system-defined environment'
+        });
+      }
+
+      if (error.message === 'CANNOT_DELETE_DEFAULT_ENVIRONMENT') {
+        return res.status(400).json({
+          success: false,
+          code: 'CANNOT_DELETE_DEFAULT_ENVIRONMENT',
+          message: 'Cannot delete default environment'
+        });
+      }
+
+      if (error.message === 'ENVIRONMENT_HAS_RELATED_DATA') {
+        return res.status(400).json({
+          success: false,
+          code: 'ENVIRONMENT_HAS_RELATED_DATA',
+          message: 'Environment has related data. Use force=true to delete all data.',
+          relatedData: error.relatedData
+        });
+      }
+
       res.status(400).json({
         success: false,
         message: error instanceof Error ? error.message : 'Failed to delete environment'
@@ -325,6 +448,127 @@ export class RemoteConfigEnvironmentController {
       success: true,
       message: 'Environment name is valid and available'
     });
+  });
+
+  /**
+   * Copy data from one environment to another
+   */
+  static copyEnvironmentData = asyncHandler(async (req: Request, res: Response) => {
+    const { sourceEnvironmentId, targetEnvironmentId } = req.params;
+    const options = req.body as CopyOptions;
+    const userId = (req.user as any)?.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+    }
+
+    // Validate source environment
+    const sourceEnv = await RemoteConfigEnvironment.query().findById(sourceEnvironmentId);
+    if (!sourceEnv) {
+      return res.status(404).json({
+        success: false,
+        message: 'Source environment not found'
+      });
+    }
+
+    // Validate target environment
+    const targetEnv = await RemoteConfigEnvironment.query().findById(targetEnvironmentId);
+    if (!targetEnv) {
+      return res.status(404).json({
+        success: false,
+        message: 'Target environment not found'
+      });
+    }
+
+    if (sourceEnvironmentId === targetEnvironmentId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Source and target environments cannot be the same'
+      });
+    }
+
+    try {
+      const result = await EnvironmentCopyService.copyEnvironmentData(
+        sourceEnvironmentId,
+        targetEnvironmentId,
+        options,
+        userId
+      );
+
+      logger.info(`Environment data copied from ${sourceEnv.environmentName} to ${targetEnv.environmentName} by user ${userId}`, {
+        result
+      });
+
+      res.json({
+        success: true,
+        data: result,
+        message: `Data copied from ${sourceEnv.displayName} to ${targetEnv.displayName}`
+      });
+    } catch (error) {
+      logger.error('Error copying environment data:', error);
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to copy environment data'
+      });
+    }
+  });
+
+  /**
+   * Get preview of data to be copied
+   */
+  static getCopyPreview = asyncHandler(async (req: Request, res: Response) => {
+    const { sourceEnvironmentId, targetEnvironmentId } = req.params;
+
+    // Validate source environment
+    const sourceEnv = await RemoteConfigEnvironment.query().findById(sourceEnvironmentId);
+    if (!sourceEnv) {
+      return res.status(404).json({
+        success: false,
+        message: 'Source environment not found'
+      });
+    }
+
+    // Validate target environment
+    const targetEnv = await RemoteConfigEnvironment.query().findById(targetEnvironmentId);
+    if (!targetEnv) {
+      return res.status(404).json({
+        success: false,
+        message: 'Target environment not found'
+      });
+    }
+
+    try {
+      const preview = await EnvironmentCopyService.getCopyPreview(
+        sourceEnvironmentId,
+        targetEnvironmentId
+      );
+
+      // Fill in environment info
+      preview.source = {
+        id: sourceEnv.id,
+        name: sourceEnv.displayName,
+        environmentName: sourceEnv.environmentName
+      };
+      preview.target = {
+        id: targetEnv.id,
+        name: targetEnv.displayName,
+        environmentName: targetEnv.environmentName
+      };
+
+      res.json({
+        success: true,
+        data: preview
+      });
+    } catch (error) {
+      logger.error('Error getting copy preview:', error);
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to get copy preview'
+      });
+    }
   });
 }
 

@@ -5,6 +5,7 @@ import { convertToMySQLDateTime } from '../utils/dateUtils';
 import { queueService } from './QueueService';
 import logger from '../config/logger';
 import { generateCouponCode, CodePattern } from '../utils/couponCodeGenerator';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export type CouponType = 'SPECIAL' | 'NORMAL';
 export type CouponStatus = 'ACTIVE' | 'DISABLED' | 'DELETED';
@@ -12,6 +13,7 @@ export type UsageLimitType = 'USER' | 'CHARACTER';
 
 export interface CouponSetting {
   id: string;
+  environmentId?: string;
   code: string | null;
   type: CouponType;
   name: string;
@@ -90,13 +92,15 @@ export class CouponSettingsService {
     search?: string;
     type?: CouponType;
     status?: CouponStatus;
+    environmentId?: string;
   }): Promise<{ settings: any[]; total: number; page: number; limit: number }> {
     const page = params.page || 1;
     const limit = params.limit || 20;
     const offset = (page - 1) * limit;
+    const envId = params.environmentId ?? getCurrentEnvironmentId();
 
-    // Build query
-    const query = db('g_coupon_settings');
+    // Build query with environment filter
+    const query = db('g_coupon_settings').where('environmentId', envId);
 
     if (params.type) {
       query.where('type', params.type);
@@ -130,8 +134,9 @@ export class CouponSettingsService {
   }
 
   // Get single setting with targeting arrays
-  static async getSettingById(id: string): Promise<any> {
-    const base = await db('g_coupon_settings').where('id', id).first();
+  static async getSettingById(id: string, environmentId?: string): Promise<any> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
+    const base = await db('g_coupon_settings').where('id', id).where('environmentId', envId).first();
     if (!base) throw new GatrixError('Coupon setting not found', 404);
 
     base.tags = typeof base.tags === 'string' ? JSON.parse(base.tags) : base.tags;
@@ -186,9 +191,12 @@ export class CouponSettingsService {
       throw new GatrixError('Invalid code pattern', 400);
     }
 
+    const envId = getCurrentEnvironmentId();
+
     // Insert main row
     await db('g_coupon_settings').insert({
       id,
+      environmentId: envId,
       code: settingCode,
       type: input.type,
       name: input.name,
@@ -266,9 +274,10 @@ export class CouponSettingsService {
   }
 
   // Update existing setting (replace targeting if provided)
-  static async updateSetting(id: string, input: UpdateCouponSettingInput): Promise<any> {
+  static async updateSetting(id: string, input: UpdateCouponSettingInput, environmentId?: string): Promise<any> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     // Ensure exists
-    await this.getSettingById(id);
+    await this.getSettingById(id, envId);
 
     if (input.rewardTemplateId && input.rewardData) {
       throw new GatrixError('Use either rewardTemplateId or rewardData, not both', 400);
@@ -310,7 +319,7 @@ export class CouponSettingsService {
     if (input.updatedBy !== undefined) updates.updatedBy = input.updatedBy;
 
     if (Object.keys(updates).length > 0) {
-      await db('g_coupon_settings').where('id', id).update(updates);
+      await db('g_coupon_settings').where('id', id).where('environmentId', envId).update(updates);
     }
 
     // Replace targeting if provided
@@ -320,7 +329,7 @@ export class CouponSettingsService {
     await this.replaceTargetsWithChannel('g_coupon_target_subchannels', 'subchannel', id, input.targetSubchannels);
     await this.replaceTargets('g_coupon_target_users', 'userId', id, input.targetUsers);
 
-    return await this.getSettingById(id);
+    return await this.getSettingById(id, envId);
   }
 
   // Helper to replace targeting arrays
@@ -340,9 +349,11 @@ export class CouponSettingsService {
   }
 
   // Soft delete setting
-  static async deleteSetting(id: string): Promise<void> {
+  static async deleteSetting(id: string, environmentId?: string): Promise<void> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     const setting = await db('g_coupon_settings')
       .where('id', id)
+      .where('environmentId', envId)
       .select('generationJobId', 'generationStatus')
       .first();
 
@@ -367,6 +378,7 @@ export class CouponSettingsService {
     // Update status to DELETED and reset cache
     const affectedRows = await db('g_coupon_settings')
       .where('id', id)
+      .where('environmentId', envId)
       .update({ status: 'DELETED', generationStatus: 'FAILED', issuedCount: 0, usedCount: 0 });
 
     if (affectedRows === 0) throw new GatrixError('Coupon setting not found', 404);
@@ -390,10 +402,11 @@ export class CouponSettingsService {
   }
 
   // Usage listing by setting (or all settings if id is not provided)
-  static async getUsageBySetting(id: string | undefined, query: CouponUsageQuery) {
+  static async getUsageBySetting(id: string | undefined, query: CouponUsageQuery, environmentId?: string) {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     // If id is provided, ensure setting exists
     if (id) {
-      await this.getSettingById(id);
+      await this.getSettingById(id, envId);
     }
 
     const page = query.page || 1;
@@ -741,11 +754,16 @@ export class CouponSettingsService {
     const DUPLICATE_CHECK_BATCH = 100;
     const localSet = new Set<string>();
 
-    // Get codePattern from settings
-    const setting = await db('g_coupon_settings').where('id', settingId).select('codePattern').first();
+    // Get codePattern and environmentId from settings
+    const setting = await db('g_coupon_settings').where('id', settingId).select('codePattern', 'environmentId').first();
     const codePattern = (setting?.codePattern || 'ALPHANUMERIC_8') as CodePattern;
+    const environmentId = setting?.environmentId;
 
-    const codes: Array<{ id: string; settingId: string; code: string }> = [];
+    if (!environmentId) {
+      throw new GatrixError('Setting not found or missing environmentId', 404);
+    }
+
+    const codes: Array<{ id: string; settingId: string; code: string; environmentId: string }> = [];
 
     // Generate all codes
     for (let i = 0; i < quantity; i++) {
@@ -776,7 +794,7 @@ export class CouponSettingsService {
       }
 
       localSet.add(code);
-      codes.push({ id: ulid(), settingId, code });
+      codes.push({ id: ulid(), settingId, code, environmentId });
     }
 
     // Insert codes in batches

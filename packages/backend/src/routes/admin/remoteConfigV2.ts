@@ -20,6 +20,10 @@ router.post('/environments/:id/segments/predefined', requireAdmin, RemoteConfigE
 router.get('/environments/:id/stats', requireAdmin, RemoteConfigEnvironmentController.getEnvironmentStats);
 router.post('/environments/validate-name', requireAdmin, RemoteConfigEnvironmentController.validateEnvironmentName);
 
+// Environment copy routes (admin only)
+router.get('/environments/:sourceEnvironmentId/copy/:targetEnvironmentId/preview', requireAdmin, RemoteConfigEnvironmentController.getCopyPreview);
+router.post('/environments/:sourceEnvironmentId/copy/:targetEnvironmentId', requireAdmin, RemoteConfigEnvironmentController.copyEnvironmentData);
+
 // Template routes
 router.get('/environments/:environmentId/templates', RemoteConfigTemplateController.getTemplates);
 router.get('/templates/:id', RemoteConfigTemplateController.getTemplate);

@@ -21,12 +21,12 @@ const convertBitToBoolean = (obj: any): any => {
   if (typeof obj === 'object') {
     const converted: any = {};
     for (const [key, value] of Object.entries(obj)) {
-      // Convert common boolean field names from 0/1 to true/false
-      if ((key === 'isVisible' || key === 'isActive' || key === 'isMaintenance' ||
-           key === 'isEnabled' || key === 'supportsMultiLanguage' || key === 'emailVerified' ||
-           key === 'showOnce' || key === 'targetPlatformsInverted' || key === 'targetChannelsInverted' ||
-           key === 'targetSubchannelsInverted' || key === 'targetWorldsInverted' || key === 'targetUserIdsInverted') &&
-          (value === 0 || value === 1)) {
+      // Convert boolean field names from 0/1 to true/false
+      // Pattern: fields starting with 'is' or other known boolean fields
+      const isBooleanField = key.startsWith('is') ||
+           key === 'supportsMultiLanguage' || key === 'emailVerified' ||
+           key === 'showOnce' || key.endsWith('Inverted');
+      if (isBooleanField && (value === 0 || value === 1)) {
         converted[key] = value === 1;
       } else if (value instanceof Date || value instanceof Buffer) {
         // Preserve Date and Buffer objects as-is

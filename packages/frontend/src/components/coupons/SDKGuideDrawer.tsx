@@ -26,6 +26,7 @@ import Editor from '@monaco-editor/react';
 import { useSnackbar } from 'notistack';
 import ResizableDrawer from '../common/ResizableDrawer';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 
 // Generate ULID format request ID
 function generateULID(): string {
@@ -44,6 +45,7 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const { enqueueSnackbar } = useSnackbar();
+  const { currentEnvironmentId } = useEnvironment();
 
   // State for main tabs (Guide vs Test)
   const [mainTabValue, setMainTabValue] = useState(0);
@@ -119,6 +121,7 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
   -H "X-API-Token: your-api-token-here" \\
+  -H "X-Environment-Id: ${currentEnvironmentId || 'your-environment-id'}" \\
   -d '{
     "userId": "user123",
     "userName": "John Doe",
@@ -282,6 +285,7 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
             'X-Application-Name': 'AdminTestClient',
             'X-API-Token': apiToken,
             'X-Request-Id': requestId,
+            ...(currentEnvironmentId && { 'X-Environment-Id': currentEnvironmentId }),
           },
           body: JSON.stringify({
             userId,
@@ -309,6 +313,7 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
         'X-Application-Name': 'AdminTestClient',
         'X-API-Token': apiToken,
         'X-Request-Id': requestId,
+        ...(currentEnvironmentId && { 'X-Environment-Id': currentEnvironmentId }),
       });
 
       // Set response headers (basic info)
@@ -486,6 +491,9 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
           </Typography>
           <Typography variant="body2">
             • <strong>X-Application-Name</strong>: {t('coupons.couponSettings.sdkGuideDrawer.headerAppName')}
+          </Typography>
+          <Typography variant="body2">
+            • <strong>X-Environment-Id</strong>: {t('common.sdkGuide.headerEnvironmentId')}
           </Typography>
           <Typography variant="body2">
             • <strong>Content-Type</strong>: {t('coupons.couponSettings.sdkGuideDrawer.headerContentType')}

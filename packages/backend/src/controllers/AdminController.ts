@@ -3,10 +3,17 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import { UserService } from '../services/userService';
 import { UserTagService } from '../services/UserTagService';
 import { AuditLogModel } from '../models/AuditLog';
+import { UserModel } from '../models/User';
 import { GatrixError } from '../middleware/errorHandler';
 import { clearAllCache } from '../middleware/responseCache';
 import logger from '../config/logger';
 import db from '../config/knex';
+import Joi from 'joi';
+
+const setEnvironmentAccessSchema = Joi.object({
+  allowAllEnvironments: Joi.boolean().required(),
+  environmentIds: Joi.array().items(Joi.string().length(26)).default([]),
+});
 
 export class AdminController {
   // Dashboard and statistics
@@ -131,7 +138,7 @@ export class AdminController {
 
   static async createUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { name, email, password, role, tagIds } = req.body;
+      const { name, email, password, role, tagIds, allowAllEnvironments, environmentIds } = req.body;
 
       if (!req.user?.userId) {
         throw new GatrixError('User not authenticated', 401);
@@ -152,6 +159,7 @@ export class AdminController {
         status: 'active' as const, // Admin-created users are active by default
         emailVerified: true, // Admin-created users are verified by default
         createdBy, // Set the creator
+        allowAllEnvironments: allowAllEnvironments || false, // Default to no access
       };
 
       let user = await UserService.createUser(userData);
@@ -159,10 +167,20 @@ export class AdminController {
       // 태그 설정
       if (tagIds && tagIds.length > 0) {
         await UserTagService.setUserTags(user.id, tagIds, req.user.userId);
-
-        // 태그 설정 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
-        user = await UserService.getUserById(user.id);
       }
+
+      // 환경 접근 권한 설정
+      if (environmentIds && environmentIds.length > 0 && !allowAllEnvironments) {
+        await UserModel.setEnvironmentAccess(
+          user.id,
+          false,
+          environmentIds,
+          createdBy
+        );
+      }
+
+      // Reload user to get all updated info
+      user = await UserService.getUserById(user.id);
 
       res.status(201).json({
         success: true,
@@ -891,6 +909,174 @@ export class AdminController {
       res.json({
         success: true,
         message: `Deleted ${userIds.length} users`
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // User environment access
+
+  /**
+   * Get user's environment access settings
+   */
+  static async getUserEnvironmentAccess(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        throw new GatrixError('Invalid user ID', 400);
+      }
+
+      const access = await UserModel.getEnvironmentAccess(userId);
+
+      res.json({
+        success: true,
+        data: access
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Set user's environment access
+   */
+  static async setUserEnvironmentAccess(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        throw new GatrixError('Invalid user ID', 400);
+      }
+
+      const { error, value } = setEnvironmentAccessSchema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
+
+      const { allowAllEnvironments, environmentIds } = value;
+      const updatedBy = req.user!.userId;
+
+      await UserModel.setEnvironmentAccess(userId, allowAllEnvironments, environmentIds, updatedBy);
+
+      res.json({
+        success: true,
+        message: 'Environment access updated successfully'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Permission management
+
+  /**
+   * Get all available permissions
+   */
+  static async getAllPermissions(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      // Dynamic import to avoid circular dependencies
+      const { ALL_PERMISSIONS, PERMISSION_CATEGORIES } = await import('../types/permissions');
+
+      res.json({
+        success: true,
+        data: {
+          permissions: ALL_PERMISSIONS,
+          categories: PERMISSION_CATEGORIES
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Get permissions for a specific user
+   */
+  static async getUserPermissions(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = parseInt(req.params.id);
+
+      if (isNaN(userId)) {
+        throw new GatrixError('Invalid user ID', 400);
+      }
+
+      // Check if user exists
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        throw new GatrixError('User not found', 404);
+      }
+
+      const permissions = await UserModel.getPermissions(userId);
+
+      res.json({
+        success: true,
+        data: {
+          userId,
+          permissions
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Set permissions for a specific user
+   */
+  static async setUserPermissions(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = parseInt(req.params.id);
+
+      if (isNaN(userId)) {
+        throw new GatrixError('Invalid user ID', 400);
+      }
+
+      // Validate request body
+      const schema = Joi.object({
+        permissions: Joi.array().items(Joi.string()).required()
+      });
+
+      const { error, value } = schema.validate(req.body);
+      if (error) {
+        throw new GatrixError(error.details[0].message, 400);
+      }
+
+      // Check if user exists
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        throw new GatrixError('User not found', 404);
+      }
+
+      // Validate that all permissions are valid
+      const { ALL_PERMISSIONS } = await import('../types/permissions');
+      const invalidPermissions = value.permissions.filter((p: string) => !ALL_PERMISSIONS.includes(p as any));
+      if (invalidPermissions.length > 0) {
+        throw new GatrixError(`Invalid permissions: ${invalidPermissions.join(', ')}`, 400);
+      }
+
+      await UserModel.setPermissions(userId, value.permissions);
+
+      // Log audit
+      const actorId = (req.user as any)?.id ?? (req.user as any)?.userId;
+      await AuditLogModel.create({
+        action: 'user.permissions_updated',
+        resourceType: 'user',
+        resourceId: userId.toString(),
+        userId: actorId,
+        newValues: {
+          permissions: value.permissions
+        },
+        ipAddress: req.ip || 'unknown',
+        userAgent: req.headers['user-agent'] || 'unknown'
+      });
+
+      res.json({
+        success: true,
+        message: 'Permissions updated successfully',
+        data: {
+          userId,
+          permissions: value.permissions
+        }
       });
     } catch (error) {
       next(error);

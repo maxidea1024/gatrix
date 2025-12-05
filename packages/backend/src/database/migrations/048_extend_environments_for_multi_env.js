@@ -13,6 +13,15 @@
  * 4. Creates predefined environments (development, qa, production)
  */
 
+// Helper function to check if a column exists
+async function columnExists(connection, tableName, columnName) {
+  const [rows] = await connection.execute(`
+    SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?
+  `, [tableName, columnName]);
+  return rows[0].cnt > 0;
+}
+
 // Simple ULID generator for migration (no external dependencies)
 function generateUlid() {
   const ENCODING = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
@@ -91,7 +100,8 @@ exports.up = async function(connection) {
     { table: 'g_remote_config_change_requests', fk: 'fk_rc_cr_target_environment', column: 'targetEnvironmentId' },
     { table: 'g_remote_config_change_requests', fk: 'fk_rc_cr_source_environment', column: 'sourceEnvironmentId' },
     { table: 'g_remote_config_promotions', fk: 'fk_rc_promo_source_env', column: 'sourceEnvironmentId' },
-    { table: 'g_remote_config_promotions', fk: 'fk_rc_promo_target_env', column: 'targetEnvironmentId' }
+    { table: 'g_remote_config_promotions', fk: 'fk_rc_promo_target_env', column: 'targetEnvironmentId' },
+    { table: 'g_remote_config_metrics', fk: 'fk_rc_metrics_environment', column: 'environmentId' }
   ];
 
   // 2.3 Drop foreign keys referencing g_remote_config_environments
@@ -117,11 +127,13 @@ exports.up = async function(connection) {
     idMapping[env.id] = generateUlid();
   }
 
-  // 2.5 Add new ULID column to g_remote_config_environments
-  await connection.execute(`
-    ALTER TABLE g_remote_config_environments
-    ADD COLUMN newId CHAR(26) NULL AFTER id
-  `);
+  // 2.5 Add new ULID column to g_remote_config_environments (if not exists)
+  if (!await columnExists(connection, 'g_remote_config_environments', 'newId')) {
+    await connection.execute(`
+      ALTER TABLE g_remote_config_environments
+      ADD COLUMN newId CHAR(26) NULL AFTER id
+    `);
+  }
 
   // 2.6 Populate new ULID values
   for (const [oldId, newId] of Object.entries(idMapping)) {
@@ -138,36 +150,79 @@ exports.up = async function(connection) {
         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
       `, [ref.table]);
 
-      if (tableExists[0].cnt > 0) {
-        // Add new ULID column
+      if (tableExists[0].cnt === 0) {
+        console.log(`Table ${ref.table} does not exist, skipping...`);
+        continue;
+      }
+
+      // Check if the column exists before trying to migrate
+      if (!await columnExists(connection, ref.table, ref.column)) {
+        console.log(`Column ${ref.column} does not exist in ${ref.table}, skipping...`);
+        continue;
+      }
+
+      // Add new ULID column (if not exists)
+      if (!await columnExists(connection, ref.table, `${ref.column}New`)) {
         await connection.execute(`
           ALTER TABLE ${ref.table}
           ADD COLUMN ${ref.column}New CHAR(26) NULL AFTER ${ref.column}
         `);
-
-        // Migrate data
-        for (const [oldId, newId] of Object.entries(idMapping)) {
-          await connection.execute(`
-            UPDATE ${ref.table} SET ${ref.column}New = ? WHERE ${ref.column} = ?
-          `, [newId, oldId]);
-        }
-
-        // Drop old column and rename new column
-        await connection.execute(`ALTER TABLE ${ref.table} DROP COLUMN ${ref.column}`);
-        await connection.execute(`ALTER TABLE ${ref.table} CHANGE ${ref.column}New ${ref.column} CHAR(26) NOT NULL`);
-
-        console.log(`✓ Migrated ${ref.table}.${ref.column} to ULID`);
       }
+
+      // Migrate data
+      for (const [oldId, newId] of Object.entries(idMapping)) {
+        await connection.execute(`
+          UPDATE ${ref.table} SET ${ref.column}New = ? WHERE ${ref.column} = ?
+        `, [newId, oldId]);
+      }
+
+      // Drop old column and rename new column (if old column still exists)
+      if (await columnExists(connection, ref.table, ref.column)) {
+        await connection.execute(`ALTER TABLE ${ref.table} DROP COLUMN ${ref.column}`);
+      }
+      if (await columnExists(connection, ref.table, `${ref.column}New`)) {
+        await connection.execute(`ALTER TABLE ${ref.table} CHANGE ${ref.column}New ${ref.column} CHAR(26) NOT NULL`);
+      }
+
+      console.log(`✓ Migrated ${ref.table}.${ref.column} to ULID`);
     } catch (e) {
       console.log(`Error migrating ${ref.table}.${ref.column}:`, e.message);
     }
   }
 
-  // 2.8 Drop old primary key and set new one
-  await connection.execute(`ALTER TABLE g_remote_config_environments DROP PRIMARY KEY`);
-  await connection.execute(`ALTER TABLE g_remote_config_environments DROP COLUMN id`);
-  await connection.execute(`ALTER TABLE g_remote_config_environments CHANGE newId id CHAR(26) NOT NULL`);
-  await connection.execute(`ALTER TABLE g_remote_config_environments ADD PRIMARY KEY (id)`);
+  // 2.8 Drop old primary key and set new one (if newId column exists)
+  if (await columnExists(connection, 'g_remote_config_environments', 'newId')) {
+    // Check if old id column still exists (INT type)
+    const [oldIdInfo] = await connection.execute(`
+      SELECT DATA_TYPE, EXTRA FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'g_remote_config_environments'
+      AND COLUMN_NAME = 'id'
+    `);
+
+    if (oldIdInfo.length > 0 && oldIdInfo[0].DATA_TYPE === 'int') {
+      // First, remove AUTO_INCREMENT before dropping PRIMARY KEY
+      if (oldIdInfo[0].EXTRA && oldIdInfo[0].EXTRA.includes('auto_increment')) {
+        await connection.execute(`ALTER TABLE g_remote_config_environments MODIFY id INT NOT NULL`);
+      }
+      await connection.execute(`ALTER TABLE g_remote_config_environments DROP PRIMARY KEY`);
+      await connection.execute(`ALTER TABLE g_remote_config_environments DROP COLUMN id`);
+    }
+
+    await connection.execute(`ALTER TABLE g_remote_config_environments CHANGE newId id CHAR(26) NOT NULL`);
+
+    // Check if primary key exists
+    const [pkExists] = await connection.execute(`
+      SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'g_remote_config_environments'
+      AND CONSTRAINT_TYPE = 'PRIMARY KEY'
+    `);
+
+    if (pkExists[0].cnt === 0) {
+      await connection.execute(`ALTER TABLE g_remote_config_environments ADD PRIMARY KEY (id)`);
+    }
+  }
 
   console.log('✓ Migrated g_remote_config_environments.id to ULID');
 
@@ -179,13 +234,21 @@ exports.up = async function(connection) {
         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
       `, [ref.table]);
 
-      if (tableExists[0].cnt > 0) {
-        await connection.execute(`
-          ALTER TABLE ${ref.table}
-          ADD CONSTRAINT ${ref.fk} FOREIGN KEY (${ref.column}) REFERENCES g_remote_config_environments(id)
-        `);
-        console.log(`✓ Recreated FK ${ref.fk} on ${ref.table}`);
+      if (tableExists[0].cnt === 0) {
+        continue;
       }
+
+      // Check if the column exists before trying to add FK
+      if (!await columnExists(connection, ref.table, ref.column)) {
+        console.log(`Column ${ref.column} does not exist in ${ref.table}, skipping FK creation...`);
+        continue;
+      }
+
+      await connection.execute(`
+        ALTER TABLE ${ref.table}
+        ADD CONSTRAINT ${ref.fk} FOREIGN KEY (${ref.column}) REFERENCES g_remote_config_environments(id)
+      `);
+      console.log(`✓ Recreated FK ${ref.fk} on ${ref.table}`);
     } catch (e) {
       console.log(`Error recreating FK ${ref.fk}:`, e.message);
     }

@@ -3,6 +3,7 @@ import database from '../config/database';
 import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { TagService } from './TagService';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface ParticipationReward {
   rewardType: string;
@@ -39,6 +40,7 @@ export interface UpdateRewardTemplateInput {
 }
 
 export interface GetRewardTemplatesParams {
+  environmentId?: string;
   page?: number;
   limit?: number;
   search?: string;
@@ -64,19 +66,20 @@ class RewardTemplateService {
     const search = params?.search || '';
     const sortBy = params?.sortBy || 'createdAt';
     const sortOrder = (params?.sortOrder || 'desc').toUpperCase();
+    const envId = params?.environmentId ?? getCurrentEnvironmentId();
 
     const offset = (page - 1) * limit;
 
     try {
-      const whereConditions: string[] = [];
-      const queryParams: any[] = [];
+      const whereConditions: string[] = ['environmentId = ?'];
+      const queryParams: any[] = [envId];
 
       if (search) {
         whereConditions.push('(name LIKE ? OR description LIKE ?)');
         queryParams.push(`%${search}%`, `%${search}%`);
       }
 
-      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+      const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
 
       // Validate sortBy to prevent SQL injection
       const validSortColumns = ['name', 'createdAt', 'updatedAt'];
@@ -122,12 +125,13 @@ class RewardTemplateService {
   /**
    * Get reward template by ID
    */
-  static async getRewardTemplateById(id: string): Promise<RewardTemplate> {
+  static async getRewardTemplateById(id: string, environmentId?: string): Promise<RewardTemplate> {
     const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
     try {
       const [templates] = await pool.execute<any[]>(
-        'SELECT * FROM g_reward_templates WHERE id = ?',
-        [id]
+        'SELECT * FROM g_reward_templates WHERE id = ? AND environmentId = ?',
+        [id, envId]
       );
 
       if (templates.length === 0) {
@@ -154,14 +158,16 @@ class RewardTemplateService {
   static async createRewardTemplate(input: CreateRewardTemplateInput): Promise<RewardTemplate> {
     const pool = database.getPool();
     const id = ulid();
+    const envId = getCurrentEnvironmentId();
 
     try {
       await pool.execute(
         `INSERT INTO g_reward_templates
-         (id, name, description, rewardItems, tags, createdBy, createdAt, updatedAt)
-         VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+         (id, environmentId, name, description, rewardItems, tags, createdBy, createdAt, updatedAt)
+         VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
         [
           id,
+          envId,
           input.name,
           input.description || null,
           JSON.stringify(input.rewardItems),
@@ -170,7 +176,7 @@ class RewardTemplateService {
         ]
       );
 
-      return this.getRewardTemplateById(id);
+      return this.getRewardTemplateById(id, envId);
     } catch (error) {
       logger.error('Failed to create reward template', { error, input });
       throw new GatrixError('Failed to create reward template', 500);
@@ -180,11 +186,12 @@ class RewardTemplateService {
   /**
    * Update a reward template
    */
-  static async updateRewardTemplate(id: string, input: UpdateRewardTemplateInput): Promise<RewardTemplate> {
+  static async updateRewardTemplate(id: string, input: UpdateRewardTemplateInput, environmentId?: string): Promise<RewardTemplate> {
     const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
     try {
       // Check if template exists
-      await this.getRewardTemplateById(id);
+      await this.getRewardTemplateById(id, envId);
 
       const updates: string[] = [];
       const params: any[] = [];
@@ -216,14 +223,14 @@ class RewardTemplateService {
 
       updates.push('updatedAt = NOW()');
 
-      params.push(id);
+      params.push(id, envId);
 
       await pool.execute(
-        `UPDATE g_reward_templates SET ${updates.join(', ')} WHERE id = ?`,
+        `UPDATE g_reward_templates SET ${updates.join(', ')} WHERE id = ? AND environmentId = ?`,
         params
       );
 
-      return this.getRewardTemplateById(id);
+      return this.getRewardTemplateById(id, envId);
     } catch (error) {
       if (error instanceof GatrixError) throw error;
       logger.error('Failed to update reward template', { error, id, input });
@@ -234,15 +241,16 @@ class RewardTemplateService {
   /**
    * Check if a reward template is referenced by surveys or coupons
    */
-  static async checkReferences(templateId: string): Promise<{ surveys: any[], coupons: any[] }> {
+  static async checkReferences(templateId: string, environmentId?: string): Promise<{ surveys: any[], coupons: any[] }> {
     const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
     try {
       // Check coupons that reference this template
       const [coupons] = await pool.execute<any[]>(
         `SELECT id, code, type, name, rewardTemplateId
          FROM g_coupon_settings
-         WHERE rewardTemplateId = ?`,
-        [templateId]
+         WHERE rewardTemplateId = ? AND environmentId = ?`,
+        [templateId, envId]
       );
 
       return {
@@ -264,15 +272,16 @@ class RewardTemplateService {
   /**
    * Delete a reward template
    */
-  static async deleteRewardTemplate(id: string): Promise<void> {
+  static async deleteRewardTemplate(id: string, environmentId?: string): Promise<void> {
     const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
     try {
       // Check if template exists
-      await this.getRewardTemplateById(id);
+      await this.getRewardTemplateById(id, envId);
 
       await pool.execute(
-        'DELETE FROM g_reward_templates WHERE id = ?',
-        [id]
+        'DELETE FROM g_reward_templates WHERE id = ? AND environmentId = ?',
+        [id, envId]
       );
     } catch (error) {
       if (error instanceof GatrixError) throw error;

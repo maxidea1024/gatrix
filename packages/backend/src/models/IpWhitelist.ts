@@ -1,7 +1,9 @@
 import db from '../config/knex';
 import logger from '../config/logger';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface IpWhitelistFilters {
+  environmentId?: string;
   ipAddress?: string;
   purpose?: string;
   isEnabled?: boolean;
@@ -20,6 +22,7 @@ export interface IpWhitelistListResponse {
 
 export interface IpWhitelist {
   id?: number;
+  environmentId?: string;
   ipAddress: string;
   purpose?: string;
   isEnabled: boolean;
@@ -51,11 +54,13 @@ export class IpWhitelistModel {
       const pageNum = Number(page) || 1;
       const limitNum = Number(limit) || 10;
       const offset = (pageNum - 1) * limitNum;
+      const envId = filters.environmentId ?? getCurrentEnvironmentId();
 
-      // 기본 쿼리 빌더
+      // 기본 쿼리 빌더 with environment filter
       const baseQuery = () => db('g_ip_whitelist as iw')
         .leftJoin('g_users as creator', 'iw.createdBy', 'creator.id')
-        .leftJoin('g_users as updater', 'iw.updatedBy', 'updater.id');
+        .leftJoin('g_users as updater', 'iw.updatedBy', 'updater.id')
+        .where('iw.environmentId', envId);
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
@@ -124,8 +129,9 @@ export class IpWhitelistModel {
     }
   }
 
-  static async findById(id: number): Promise<any | null> {
+  static async findById(id: number, environmentId?: string): Promise<any | null> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const ipWhitelist = await db('g_ip_whitelist as iw')
         .leftJoin('g_users as creator', 'iw.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'iw.updatedBy', 'updater.id')
@@ -135,6 +141,7 @@ export class IpWhitelistModel {
           'updater.name as updatedByName'
         ])
         .where('iw.id', id)
+        .where('iw.environmentId', envId)
         .first();
 
       return ipWhitelist ? this.mapRowToIpWhitelist(ipWhitelist) : null;
@@ -144,40 +151,45 @@ export class IpWhitelistModel {
     }
   }
 
-  static async create(data: any): Promise<any> {
+  static async create(data: any, environmentId?: string): Promise<any> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const [insertId] = await db('g_ip_whitelist').insert({
         ...data,
+        environmentId: envId,
         createdAt: new Date(),
         updatedAt: new Date()
       });
 
-      return await this.findById(insertId);
+      return await this.findById(insertId, envId);
     } catch (error) {
       logger.error('Error creating IP whitelist:', error);
       throw error;
     }
   }
 
-  static async update(id: number, data: any): Promise<any> {
+  static async update(id: number, data: any, environmentId?: string): Promise<any> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       await db('g_ip_whitelist')
         .where('id', id)
+        .where('environmentId', envId)
         .update({
           ...data,
           updatedAt: new Date()
         });
 
-      return await this.findById(id);
+      return await this.findById(id, envId);
     } catch (error) {
       logger.error('Error updating IP whitelist:', error);
       throw error;
     }
   }
 
-  static async delete(id: number): Promise<void> {
+  static async delete(id: number, environmentId?: string): Promise<void> {
     try {
-      await db('g_ip_whitelist').where('id', id).del();
+      const envId = environmentId ?? getCurrentEnvironmentId();
+      await db('g_ip_whitelist').where('id', id).where('environmentId', envId).del();
     } catch (error) {
       logger.error('Error deleting IP whitelist:', error);
       throw error;
@@ -203,10 +215,12 @@ export class IpWhitelistModel {
   }
 
   // 추가 메서드들
-  static async findByIpAddress(ip: string): Promise<any | null> {
+  static async findByIpAddress(ip: string, environmentId?: string): Promise<any | null> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       return await db('g_ip_whitelist')
         .where('ipAddress', ip)
+        .where('environmentId', envId)
         .first();
     } catch (error) {
       logger.error('Error finding IP whitelist by IP address:', error);

@@ -53,6 +53,11 @@ export const API_HEADERS = {
   X_APPLICATION_NAME: 'x-application-name',
 
   /**
+   * 환경 ID 헤더 (멀티 환경 지원)
+   */
+  X_ENVIRONMENT_ID: 'x-environment-id',
+
+  /**
    * 사용자 ID 헤더 (Chat Server용)
    */
   X_USER_ID: 'x-user-id',
@@ -189,6 +194,7 @@ export const ALLOWED_HEADERS: string[] = [
   HEADERS.X_USER_ID,
   HEADERS.X_APPLICATION_NAME,
   HEADERS.X_REQUEST_ID,
+  HEADERS.X_ENVIRONMENT_ID,
 ];
 
 export default HEADERS;

@@ -662,8 +662,18 @@ const CouponSettingsPage: React.FC = () => {
 
   const handleSave = async () => {
     // Basic validation
-    if (!form.name || !form.expiresAt) return;
-    if (codeError || quantityError || maxTotalUsesError || perUserLimitError) return;
+    if (!form.name) {
+      enqueueSnackbar(t('coupons.couponSettings.form.nameRequired'), { variant: 'error' });
+      return;
+    }
+    if (!form.expiresAt) {
+      enqueueSnackbar(t('coupons.couponSettings.form.expiresAtRequired'), { variant: 'error' });
+      return;
+    }
+    if (codeError || quantityError || maxTotalUsesError || perUserLimitError) {
+      enqueueSnackbar(t('common.fixValidationErrors'), { variant: 'error' });
+      return;
+    }
 
     // Validate reward email fields
     if (!form.rewardEmailTitle || form.rewardEmailTitle.trim() === '') {
