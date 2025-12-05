@@ -983,11 +983,22 @@ const UsersManagementPage: React.FC = () => {
     setReviewDialog({ open: false, saving: false });
   };
 
+  // Change item type with optional details
+  interface ChangeItem {
+    field: string;
+    from: string;
+    to: string;
+    details?: {
+      added?: string[];
+      removed?: string[];
+    };
+  }
+
   // Get changes for review
-  const getChanges = () => {
+  const getChanges = (): ChangeItem[] => {
     if (!originalUserData || !editUserDialog.user) return [];
 
-    const changes: { field: string; from: string; to: string }[] = [];
+    const changes: ChangeItem[] = [];
     const isOwnAccount = isCurrentUser(editUserDialog.user);
 
     if (editUserData.name !== originalUserData.name) {
@@ -1014,8 +1025,8 @@ const UsersManagementPage: React.FC = () => {
       }
 
       // Tags
-      const origTagNames = originalUserData.tags.map(t => t.name).sort().join(', ') || '-';
-      const newTagNames = editUserTags.map(t => t.name).sort().join(', ') || '-';
+      const origTagNames = originalUserData.tags.map(tag => tag.name).sort().join(', ') || '-';
+      const newTagNames = editUserTags.map(tag => tag.name).sort().join(', ') || '-';
       if (origTagNames !== newTagNames) {
         changes.push({ field: t('users.tags'), from: origTagNames, to: newTagNames });
       }
@@ -1060,7 +1071,11 @@ const UsersManagementPage: React.FC = () => {
           changes.push({
             field: t('users.permissions'),
             from: `${originalUserData.permissions.length} ${t('users.permissionsCount')}`,
-            to: `${editUserPermissions.length} ${t('users.permissionsCount')} (${permChange})`
+            to: `${editUserPermissions.length} ${t('users.permissionsCount')} (${permChange})`,
+            details: {
+              added: addedPerms.map(p => t(`permissions.${p.replace('.', '_')}`)),
+              removed: removedPerms.map(p => t(`permissions.${p.replace('.', '_')}`))
+            }
           });
         }
       }
@@ -2408,9 +2423,14 @@ const UsersManagementPage: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('common.promoteUser')}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {promoteDialog.showReview && (
+              <PreviewIcon color="primary" />
+            )}
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {promoteDialog.showReview ? t('users.reviewChanges') : t('common.promoteUser')}
+            </Typography>
+          </Box>
           <IconButton
             onClick={handlePromoteCancel}
             size="small"
@@ -2422,7 +2442,7 @@ const UsersManagementPage: React.FC = () => {
 
         {/* Content */}
         <Box sx={{ flex: 1, p: 2, overflow: 'auto' }}>
-          {promoteDialog.user && (
+          {promoteDialog.user && !promoteDialog.showReview && (
             <>
               <Alert severity="info" sx={{ mb: 2 }}>
                 {t('common.promoteUserConfirm', { name: promoteDialog.user.name })}
@@ -2442,6 +2462,78 @@ const UsersManagementPage: React.FC = () => {
               />
             </>
           )}
+
+          {promoteDialog.user && promoteDialog.showReview && (
+            <Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('users.reviewChangesDesc')}
+              </Typography>
+              <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                p: 2,
+                bgcolor: 'background.default',
+                borderRadius: 1,
+                border: 1,
+                borderColor: 'divider',
+              }}>
+                {/* User Info */}
+                <Box sx={{ pb: 2, borderBottom: 1, borderColor: 'divider' }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                    {t('users.user')}
+                  </Typography>
+                  <Typography variant="body2" fontWeight={500}>
+                    {promoteDialog.user.name} ({promoteDialog.user.email})
+                  </Typography>
+                </Box>
+
+                {/* Role Change */}
+                <Box sx={{ pb: 2, borderBottom: 1, borderColor: 'divider' }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                    {t('users.role')}
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" color="text.disabled" sx={{ textDecoration: 'line-through' }}>
+                      {t('users.roles.user')}
+                    </Typography>
+                    <ArrowForwardIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
+                    <Chip
+                      label={t('users.roles.admin')}
+                      size="small"
+                      color="primary"
+                      variant="filled"
+                    />
+                  </Box>
+                </Box>
+
+                {/* Permissions */}
+                <Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                    {t('users.permissions')} ({promoteDialog.permissions.length} {t('users.permissionsCount')})
+                  </Typography>
+                  {promoteDialog.permissions.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary" fontStyle="italic">
+                      {t('users.noPermissionsSelected')}
+                    </Typography>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {promoteDialog.permissions.map(perm => (
+                        <Chip
+                          key={perm}
+                          label={t(`permissions.${perm.replace('.', '_')}`)}
+                          size="small"
+                          color="success"
+                          variant="outlined"
+                          sx={{ fontSize: '0.75rem' }}
+                        />
+                      ))}
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+            </Box>
+          )}
         </Box>
 
         {/* Footer */}
@@ -2454,22 +2546,45 @@ const UsersManagementPage: React.FC = () => {
           gap: 2,
           justifyContent: 'flex-end'
         }}>
-          <Button
-            onClick={handlePromoteCancel}
-            variant="outlined"
-            disabled={promoteDialog.loading}
-          >
-            {t('common.cancel')}
-          </Button>
-          <Button
-            onClick={handlePromoteConfirm}
-            color="primary"
-            variant="contained"
-            disabled={promoteDialog.loading}
-            startIcon={promoteDialog.loading ? <CircularProgress size={16} color="inherit" /> : <SecurityIcon />}
-          >
-            {t('common.promoteToAdmin')}
-          </Button>
+          {!promoteDialog.showReview ? (
+            <>
+              <Button
+                onClick={handlePromoteCancel}
+                variant="outlined"
+                disabled={promoteDialog.loading}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                onClick={handlePromoteReview}
+                color="primary"
+                variant="contained"
+                startIcon={<PreviewIcon />}
+              >
+                {t('common.review')}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                onClick={handlePromoteBackToEdit}
+                variant="outlined"
+                disabled={promoteDialog.loading}
+                startIcon={<ArrowBackIcon />}
+              >
+                {t('common.reReview')}
+              </Button>
+              <Button
+                onClick={handlePromoteConfirm}
+                color="primary"
+                variant="contained"
+                disabled={promoteDialog.loading}
+                startIcon={promoteDialog.loading ? <CircularProgress size={16} color="inherit" /> : <SecurityIcon />}
+              >
+                {promoteDialog.loading ? t('common.saving') : t('common.apply')}
+              </Button>
+            </>
+          )}
         </Box>
       </Drawer>
 
@@ -2861,6 +2976,35 @@ const UsersManagementPage: React.FC = () => {
                           {change.to}
                         </Typography>
                       </Box>
+                      {/* Show permission details if available */}
+                      {change.details && (
+                        <Box sx={{ mt: 1, pl: 1, borderLeft: 2, borderColor: 'divider' }}>
+                          {change.details.added && change.details.added.length > 0 && (
+                            <Box sx={{ mb: 0.5 }}>
+                              <Typography variant="caption" color="success.main" sx={{ display: 'block', mb: 0.5, fontWeight: 600 }}>
+                                + {t('users.added')}:
+                              </Typography>
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {change.details.added.map((perm, i) => (
+                                  <Chip key={i} label={perm} size="small" color="success" variant="outlined" sx={{ fontSize: '0.7rem', height: 22 }} />
+                                ))}
+                              </Box>
+                            </Box>
+                          )}
+                          {change.details.removed && change.details.removed.length > 0 && (
+                            <Box>
+                              <Typography variant="caption" color="error.main" sx={{ display: 'block', mb: 0.5, fontWeight: 600 }}>
+                                - {t('users.removed')}:
+                              </Typography>
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {change.details.removed.map((perm, i) => (
+                                  <Chip key={i} label={perm} size="small" color="error" variant="outlined" sx={{ fontSize: '0.7rem', height: 22 }} />
+                                ))}
+                              </Box>
+                            </Box>
+                          )}
+                        </Box>
+                      )}
                     </Box>
                   ))}
                 </Box>
@@ -2875,7 +3019,7 @@ const UsersManagementPage: React.FC = () => {
             variant="outlined"
             disabled={reviewDialog.saving}
           >
-            {t('common.back')}
+            {t('common.reReview')}
           </Button>
           <Button
             onClick={handleConfirmSave}
@@ -2883,7 +3027,7 @@ const UsersManagementPage: React.FC = () => {
             startIcon={reviewDialog.saving ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
             disabled={reviewDialog.saving || getChanges().length === 0}
           >
-            {reviewDialog.saving ? t('common.saving') : t('common.save')}
+            {reviewDialog.saving ? t('common.saving') : t('common.apply')}
           </Button>
         </DialogActions>
       </Dialog>
