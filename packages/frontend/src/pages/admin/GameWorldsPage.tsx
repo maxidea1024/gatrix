@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useAuth } from '../../hooks/useAuth';
+import { PERMISSIONS } from '../../types/permissions';
 import {
   Box,
   Typography,
@@ -188,6 +190,7 @@ interface SortableRowProps {
   onToggleMaintenance: (worldId: number) => void;
   onCopy: (text: string, type: string) => void;
   onDuplicate: (world: GameWorld) => void;
+  canManage?: boolean;
 }
 
 const SortableRow: React.FC<SortableRowProps> = ({
@@ -203,6 +206,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
   index,
   total,
   highlight,
+  canManage = true,
 }) => {
   const {
     attributes,
@@ -271,29 +275,31 @@ const SortableRow: React.FC<SortableRowProps> = ({
           </Typography>
         )}
       </TableCell>
-      <TableCell align="center">
-        {/* Duplicate world (copy values into new form, worldId cleared) */}
-        <Tooltip title={t('common.copy')}>
-          <IconButton size="small" onClick={() => onDuplicate(world)}>
-            <CopyIcon />
-          </IconButton>
-        </Tooltip>
+      {canManage && (
+        <TableCell align="center">
+          {/* Duplicate world (copy values into new form, worldId cleared) */}
+          <Tooltip title={t('common.copy')}>
+            <IconButton size="small" onClick={() => onDuplicate(world)}>
+              <CopyIcon />
+            </IconButton>
+          </Tooltip>
 
-        <Tooltip title={t('gameWorlds.editGameWorld')}>
-          <IconButton size="small" onClick={() => onEdit(world)}>
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t('gameWorlds.deleteGameWorld')}>
-          <IconButton
-            size="small"
-            onClick={() => onDelete(world.id)}
-            color="error"
-          >
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      </TableCell>
+          <Tooltip title={t('gameWorlds.editGameWorld')}>
+            <IconButton size="small" onClick={() => onEdit(world)}>
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t('gameWorlds.deleteGameWorld')}>
+            <IconButton
+              size="small"
+              onClick={() => onDelete(world.id)}
+              color="error"
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </TableCell>
+      )}
     </TableRow>
   );
 };
@@ -302,6 +308,8 @@ const GameWorldsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { currentEnvironmentId } = useEnvironment();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.GAME_WORLDS_MANAGE]);
 
   const [worlds, setWorlds] = useState<GameWorld[]>([]);
   const [loading, setLoading] = useState(false);
@@ -1367,14 +1375,18 @@ const GameWorldsPage: React.FC = () => {
           </Box>
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddWorld}
-          >
-            {t('gameWorlds.addGameWorld')}
-          </Button>
-          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+          {canManage && (
+            <>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAddWorld}
+              >
+                {t('gameWorlds.addGameWorld')}
+              </Button>
+              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+            </>
+          )}
           <Button
             variant="outlined"
             startIcon={<CodeIcon />}
@@ -1490,7 +1502,7 @@ const GameWorldsPage: React.FC = () => {
                       </TableCell>
                     ))}
                     <TableCell>{t('gameWorlds.creator')}</TableCell>
-                    <TableCell align="center">{t('gameWorlds.actions')}</TableCell>
+                    {canManage && <TableCell align="center">{t('gameWorlds.actions')}</TableCell>}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1521,6 +1533,7 @@ const GameWorldsPage: React.FC = () => {
                           onToggleMaintenance={handleToggleMaintenance}
                           onCopy={handleCopy}
                           onDuplicate={handleDuplicateWorld}
+                          canManage={canManage}
                         />
                       ))}
                     </SortableContext>

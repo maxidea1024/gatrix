@@ -374,9 +374,9 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
     } else {
       valueToAdd = elementType === 'number' ? 0
         : elementType === 'boolean' ? false
-        : elementType === 'color' ? '#000000'
-        : elementType === 'object' ? {}
-        : '';
+          : elementType === 'color' ? '#000000'
+            : elementType === 'object' ? {}
+              : '';
     }
 
     const newItem: ArrayItem = {
@@ -487,9 +487,9 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
         ? items[items.length - 1].value
         : (elementType === 'number' ? 0
           : elementType === 'boolean' ? false
-          : elementType === 'color' ? '#000000'
-          : elementType === 'object' ? {}
-          : '');
+            : elementType === 'color' ? '#000000'
+              : elementType === 'object' ? {}
+                : '');
 
       const newItems = [...items];
       for (let i = currentSize; i < targetSize; i++) {
@@ -520,9 +520,9 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
     // Set default fill value based on element type
     const defaultValue = elementType === 'number' ? '0'
       : elementType === 'boolean' ? 'false'
-      : elementType === 'color' ? '#000000'
-      : elementType === 'object' ? '{}'
-      : '';
+        : elementType === 'color' ? '#000000'
+          : elementType === 'object' ? '{}'
+            : '';
     setFillValue(defaultValue);
     setFillDialogOpen(true);
   };
@@ -624,28 +624,6 @@ const ArrayEditor: React.FC<ArrayEditorProps> = ({
             overflowY: 'auto',
             overflowX: 'hidden',
             mb: items.length > 0 ? 1 : 0,
-            // Custom scrollbar styling matching chat message list
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'transparent',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-              borderRadius: '4px',
-              '&:hover': {
-                background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-              },
-            },
-            '&::-webkit-scrollbar-thumb:active': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-            },
-            // Firefox scrollbar styling
-            scrollbarWidth: 'thin',
-            scrollbarColor: theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.2) transparent'
-              : 'rgba(0, 0, 0, 0.2) transparent',
           }}
         >
           <DndContext

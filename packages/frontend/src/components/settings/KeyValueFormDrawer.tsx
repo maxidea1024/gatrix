@@ -322,21 +322,6 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
           p: 3,
           flexGrow: 1,
           overflow: 'auto',
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-          },
         }}
       >
         <Stack spacing={3}>
@@ -367,10 +352,10 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
                 ...formData,
                 valueType: newType,
                 varValue: newType === 'boolean' ? 'false' :
-                         newType === 'number' ? '0' :
-                         newType === 'color' ? '#000000' :
-                         newType === 'object' ? '{}' :
-                         newType === 'array' ? '[]' : '',
+                  newType === 'number' ? '0' :
+                    newType === 'color' ? '#000000' :
+                      newType === 'object' ? '{}' :
+                        newType === 'array' ? '[]' : '',
                 arrayElementType: newType === 'array' ? 'string' : undefined,
               });
             }}
@@ -405,9 +390,9 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
                       // Reset array values to default values for the new type
                       const defaultValue = newElementType === 'number' ? 0
                         : newElementType === 'boolean' ? false
-                        : newElementType === 'color' ? '#000000'
-                        : newElementType === 'object' ? {}
-                        : '';
+                          : newElementType === 'color' ? '#000000'
+                            : newElementType === 'object' ? {}
+                              : '';
 
                       const newArray = new Array(currentArray.length).fill(defaultValue);
                       setFormData({
@@ -475,7 +460,7 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
           {item?.id ? t('common.update') : t('common.create')}
         </Button>
       </Box>
-    </ResizableDrawer>
+    </ResizableDrawer >
   );
 };
 

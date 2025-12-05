@@ -321,7 +321,7 @@ const MailboxPage: React.FC = () => {
 
   // Handle checkbox toggle
   const handleCheckboxToggle = (mailId: number) => {
-    setSelectedMailIds(prev => 
+    setSelectedMailIds(prev =>
       prev.includes(mailId)
         ? prev.filter(id => id !== mailId)
         : [...prev, mailId]
@@ -678,8 +678,8 @@ const MailboxPage: React.FC = () => {
                   color="error"
                   disabled={!stats || (
                     filter === 'unread' ? stats.unreadCount === 0 :
-                    filter === 'starred' ? stats.starredCount === 0 :
-                    stats.totalCount === 0
+                      filter === 'starred' ? stats.starredCount === 0 :
+                        stats.totalCount === 0
                   )}
                 >
                   <DeleteSweepIcon />
@@ -709,124 +709,103 @@ const MailboxPage: React.FC = () => {
             borderTopRightRadius: 0,
           }}>
             {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-              <CircularProgress
-                size={32}
-                thickness={2.5}
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                <CircularProgress
+                  size={32}
+                  thickness={2.5}
+                  sx={{
+                    color: 'primary.main',
+                    opacity: 0.6,
+                  }}
+                />
+              </Box>
+            ) : mails.length === 0 ? (
+              <Box sx={{ p: 4, textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  {filter === 'unread' ? t('mailbox.noUnreadMails') :
+                    filter === 'starred' ? t('mailbox.noStarredMails') :
+                      currentTab === 'sent' ? t('mailbox.noSentMails') :
+                        t('mailbox.noMails')}
+                </Typography>
+              </Box>
+            ) : (
+              <Box
+                ref={parentRef}
                 sx={{
-                  color: 'primary.main',
-                  opacity: 0.6,
-                }}
-              />
-            </Box>
-          ) : mails.length === 0 ? (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
-                {filter === 'unread' ? t('mailbox.noUnreadMails') :
-                 filter === 'starred' ? t('mailbox.noStarredMails') :
-                 currentTab === 'sent' ? t('mailbox.noSentMails') :
-                 t('mailbox.noMails')}
-              </Typography>
-            </Box>
-          ) : (
-            <Box
-              ref={parentRef}
-              sx={{
-                flex: 1,
-                overflow: 'auto',
-                // Chat scrollbar style
-                '&::-webkit-scrollbar': {
-                  width: '8px',
-                },
-                '&::-webkit-scrollbar-track': {
-                  background: 'transparent',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-                  borderRadius: '4px',
-                  '&:hover': {
-                    background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-                  },
-                },
-                '&::-webkit-scrollbar-thumb:active': {
-                  background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-                },
-                scrollbarWidth: 'thin',
-                scrollbarColor: (theme) => theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.2) transparent'
-                  : 'rgba(0, 0, 0, 0.2) transparent',
-              }}
-            >
-              <List
-                sx={{
-                  height: `${rowVirtualizer.getTotalSize()}px`,
-                  width: '100%',
-                  position: 'relative',
+                  flex: 1,
+                  overflow: 'auto',
                 }}
               >
-                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                  const index = virtualRow.index;
+                <List
+                  sx={{
+                    height: `${rowVirtualizer.getTotalSize()}px`,
+                    width: '100%',
+                    position: 'relative',
+                  }}
+                >
+                  {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                    const index = virtualRow.index;
 
-                  if (index >= mails.length) {
+                    if (index >= mails.length) {
+                      return (
+                        <Box
+                          key="loading"
+                          sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: `${virtualRow.size}px`,
+                            transform: `translateY(${virtualRow.start}px)`,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            py: 2,
+                          }}
+                        >
+                          <CircularProgress
+                            size={20}
+                            thickness={2}
+                            sx={{
+                              color: 'text.disabled',
+                              opacity: 0.5,
+                            }}
+                          />
+                        </Box>
+                      );
+                    }
+
+                    const mail = mails[index];
+
+                    // Check if this item should be animated (only once)
+                    const shouldAnimate = !animatedItemsRef.current.has(mail.id);
+                    if (shouldAnimate) {
+                      animatedItemsRef.current.add(mail.id);
+                    }
+
                     return (
                       <Box
-                        key="loading"
+                        key={virtualRow.key}
+                        data-index={virtualRow.index}
+                        ref={rowVirtualizer.measureElement}
                         sx={{
                           position: 'absolute',
                           top: 0,
                           left: 0,
                           width: '100%',
-                          height: `${virtualRow.size}px`,
                           transform: `translateY(${virtualRow.start}px)`,
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          py: 2,
+                          opacity: shouldAnimate ? 0 : 1,
+                          animation: shouldAnimate ? 'fadeInSlide 0.3s ease-out forwards' : 'none',
+                          '@keyframes fadeInSlide': {
+                            '0%': {
+                              opacity: 0,
+                            },
+                            '100%': {
+                              opacity: 1,
+                            },
+                          },
                         }}
                       >
-                        <CircularProgress
-                          size={20}
-                          thickness={2}
-                          sx={{
-                            color: 'text.disabled',
-                            opacity: 0.5,
-                          }}
-                        />
-                      </Box>
-                    );
-                  }
-
-                  const mail = mails[index];
-
-                  // Check if this item should be animated (only once)
-                  const shouldAnimate = !animatedItemsRef.current.has(mail.id);
-                  if (shouldAnimate) {
-                    animatedItemsRef.current.add(mail.id);
-                  }
-
-                  return (
-                    <Box
-                      key={virtualRow.key}
-                      data-index={virtualRow.index}
-                      ref={rowVirtualizer.measureElement}
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        transform: `translateY(${virtualRow.start}px)`,
-                        opacity: shouldAnimate ? 0 : 1,
-                        animation: shouldAnimate ? 'fadeInSlide 0.3s ease-out forwards' : 'none',
-                        '@keyframes fadeInSlide': {
-                          '0%': {
-                            opacity: 0,
-                          },
-                          '100%': {
-                            opacity: 1,
-                          },
-                        },
-                      }}
-                    >
                         {index > 0 && <Divider />}
                         <ListItem
                           disablePadding
@@ -915,11 +894,11 @@ const MailboxPage: React.FC = () => {
                         </ListItem>
                       </Box>
                     );
-                })}
-              </List>
-            </Box>
-          )}
-        </Paper>
+                  })}
+                </List>
+              </Box>
+            )}
+          </Paper>
 
           {/* Mail Detail */}
           <Paper sx={{
@@ -1148,8 +1127,8 @@ const MailboxPage: React.FC = () => {
           <Typography>
             {t('mailbox.emptyMailboxConfirmMessage', {
               count: filter === 'unread' ? (stats?.unreadCount || 0) :
-                     filter === 'starred' ? (stats?.starredCount || 0) :
-                     (stats?.totalCount || 0)
+                filter === 'starred' ? (stats?.starredCount || 0) :
+                  (stats?.totalCount || 0)
             })}
           </Typography>
         </DialogContent>
@@ -1175,8 +1154,8 @@ const MailboxPage: React.FC = () => {
           <Typography>
             {t('mailbox.markAllAsReadConfirmMessage', {
               count: filter === 'unread' ? (stats?.unreadCount || 0) :
-                     filter === 'starred' ? (stats?.starredCount || 0) :
-                     (stats?.totalCount || 0)
+                filter === 'starred' ? (stats?.starredCount || 0) :
+                  (stats?.totalCount || 0)
             })}
           </Typography>
         </DialogContent>

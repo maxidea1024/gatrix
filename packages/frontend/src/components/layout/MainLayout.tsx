@@ -838,25 +838,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           flexDirection: 'column',
           overflow: 'auto',
           minHeight: 0,
-          // Dark theme scrollbar (sidebar is always dark)
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: 'rgba(255, 255, 255, 0.2)',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: 'rgba(255, 255, 255, 0.3)',
-          },
-          '&::-webkit-scrollbar-thumb:active': {
-            background: 'rgba(255, 255, 255, 0.4)',
-          },
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent',
         }}
         onClick={(e) => {
           // Expand sidebar when clicking on empty space in menu area
@@ -874,99 +855,133 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             }
           }}
         >
-        <Box
-          sx={{
-            opacity: selectedCategory ? 0 : 1,
-            visibility: selectedCategory ? 'hidden' : 'visible',
-            transform: selectedCategory ? 'scale(0.92)' : 'scale(1)',
-            transition: 'opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            position: selectedCategory ? 'absolute' : 'relative',
-          }}
-        >
-          {/* Show main categories */}
-          {getFilteredMenuCategories().map((category) => {
-            const categoryButton = (
-              <ListItemButton
-                key={category.id}
-                onClick={() => {
-                  setSelectedCategory(category.id);
-                  try {
-                    localStorage.setItem('sidebarSelectedCategory', category.id);
-                  } catch (error) {
-                    console.warn('Failed to save selected category:', error);
-                  }
-                }}
-                sx={{
-                  color: theme.palette.text.secondary,
-                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-                  px: sidebarCollapsed ? 0 : 2,
-                  pl: sidebarCollapsed ? 0 : 2,
-                  borderRadius: 1,
-                  py: 0.75,
-                  my: 0.5,
-                  '&:hover': {
-                    backgroundColor: theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.1)'
-                      : 'rgba(0,0,0,0.08)'
-                  }
-                }}
-              >
-                <ListItemIcon sx={{
-                  color: 'inherit',
-                  minWidth: sidebarCollapsed ? 0 : 40,
-                  justifyContent: 'center'
-                }}>
-                  {category.icon}
-                </ListItemIcon>
-                {!sidebarCollapsed && (
-                  <ListItemText
-                    primary={t(category.text)}
-                    primaryTypographyProps={{
-                      fontSize: '0.875rem',
-                      fontWeight: 500
-                    }}
-                  />
-                )}
-              </ListItemButton>
-            );
-
-            // Show tooltip when sidebar is collapsed
-            if (sidebarCollapsed) {
-              return (
-                <Tooltip
+          <Box
+            sx={{
+              opacity: selectedCategory ? 0 : 1,
+              visibility: selectedCategory ? 'hidden' : 'visible',
+              transform: selectedCategory ? 'scale(0.92)' : 'scale(1)',
+              transition: 'opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              position: selectedCategory ? 'absolute' : 'relative',
+            }}
+          >
+            {/* Show main categories */}
+            {getFilteredMenuCategories().map((category) => {
+              const categoryButton = (
+                <ListItemButton
                   key={category.id}
-                  title={t(category.text)}
-                  placement="right"
-                  arrow
+                  onClick={() => {
+                    setSelectedCategory(category.id);
+                    try {
+                      localStorage.setItem('sidebarSelectedCategory', category.id);
+                    } catch (error) {
+                      console.warn('Failed to save selected category:', error);
+                    }
+                  }}
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                    px: sidebarCollapsed ? 0 : 2,
+                    pl: sidebarCollapsed ? 0 : 2,
+                    borderRadius: 1,
+                    py: 0.75,
+                    my: 0.5,
+                    '&:hover': {
+                      backgroundColor: theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.1)'
+                        : 'rgba(0,0,0,0.08)'
+                    }
+                  }}
                 >
-                  {categoryButton}
-                </Tooltip>
+                  <ListItemIcon sx={{
+                    color: 'inherit',
+                    minWidth: sidebarCollapsed ? 0 : 40,
+                    justifyContent: 'center'
+                  }}>
+                    {category.icon}
+                  </ListItemIcon>
+                  {!sidebarCollapsed && (
+                    <ListItemText
+                      primary={t(category.text)}
+                      primaryTypographyProps={{
+                        fontSize: '0.875rem',
+                        fontWeight: 500
+                      }}
+                    />
+                  )}
+                </ListItemButton>
               );
-            }
 
-            return categoryButton;
-          })}
-        </Box>
+              // Show tooltip when sidebar is collapsed
+              if (sidebarCollapsed) {
+                return (
+                  <Tooltip
+                    key={category.id}
+                    title={t(category.text)}
+                    placement="right"
+                    arrow
+                  >
+                    {categoryButton}
+                  </Tooltip>
+                );
+              }
 
-        <Box
-          sx={{
-            opacity: selectedCategory ? 1 : 0,
-            visibility: selectedCategory ? 'visible' : 'hidden',
-            transform: selectedCategory ? 'scale(1)' : 'scale(0.92)',
-            transition: 'opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            position: selectedCategory ? 'relative' : 'absolute',
-          }}
-        >
-          {/* Show selected category's submenu */}
-          {selectedCategory && (
-            <>
-              {/* Back to main button */}
-              {sidebarCollapsed ? (
-                <Tooltip
-                  title={t('sidebar.backToMain')}
-                  placement="right"
-                  arrow
-                >
+              return categoryButton;
+            })}
+          </Box>
+
+          <Box
+            sx={{
+              opacity: selectedCategory ? 1 : 0,
+              visibility: selectedCategory ? 'visible' : 'hidden',
+              transform: selectedCategory ? 'scale(1)' : 'scale(0.92)',
+              transition: 'opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              position: selectedCategory ? 'relative' : 'absolute',
+            }}
+          >
+            {/* Show selected category's submenu */}
+            {selectedCategory && (
+              <>
+                {/* Back to main button */}
+                {sidebarCollapsed ? (
+                  <Tooltip
+                    title={t('sidebar.backToMain')}
+                    placement="right"
+                    arrow
+                  >
+                    <ListItemButton
+                      onClick={() => {
+                        setSelectedCategory(null);
+                        try {
+                          localStorage.removeItem('sidebarSelectedCategory');
+                        } catch (error) {
+                          console.warn('Failed to clear selected category:', error);
+                        }
+                      }}
+                      sx={{
+                        color: theme.palette.text.secondary,
+                        mb: 2,
+                        borderRadius: 1,
+                        py: 0.75,
+                        justifyContent: 'center',
+                        px: 0,
+                        pl: 0,
+                        '&:hover': {
+                          backgroundColor: theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.1)'
+                            : 'rgba(0,0,0,0.08)'
+                        }
+                      }}
+                    >
+                      <ListItemIcon sx={{
+                        color: 'inherit',
+                        minWidth: 0,
+                        justifyContent: 'center'
+                      }}>
+                        <ArrowBackIcon />
+                      </ListItemIcon>
+                    </ListItemButton>
+                  </Tooltip>
+                ) : (
                   <ListItemButton
                     onClick={() => {
                       setSelectedCategory(null);
@@ -981,9 +996,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       mb: 2,
                       borderRadius: 1,
                       py: 0.75,
-                      justifyContent: 'center',
-                      px: 0,
-                      pl: 0,
+                      justifyContent: 'flex-start',
+                      px: 2,
+                      pl: 2,
                       '&:hover': {
                         backgroundColor: theme.palette.mode === 'dark'
                           ? 'rgba(255,255,255,0.1)'
@@ -993,96 +1008,62 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   >
                     <ListItemIcon sx={{
                       color: 'inherit',
-                      minWidth: 0,
+                      minWidth: 40,
                       justifyContent: 'center'
                     }}>
                       <ArrowBackIcon />
                     </ListItemIcon>
+                    <ListItemText
+                      primary={t('sidebar.backToMain')}
+                      primaryTypographyProps={{ fontSize: '0.875rem' }}
+                    />
                   </ListItemButton>
-                </Tooltip>
-              ) : (
-                <ListItemButton
-                  onClick={() => {
-                    setSelectedCategory(null);
-                    try {
-                      localStorage.removeItem('sidebarSelectedCategory');
-                    } catch (error) {
-                      console.warn('Failed to clear selected category:', error);
-                    }
-                  }}
-                  sx={{
-                    color: theme.palette.text.secondary,
-                    mb: 2,
-                    borderRadius: 1,
-                    py: 0.75,
-                    justifyContent: 'flex-start',
-                    px: 2,
-                    pl: 2,
-                    '&:hover': {
-                      backgroundColor: theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.1)'
-                        : 'rgba(0,0,0,0.08)'
-                    }
-                  }}
-                >
-                  <ListItemIcon sx={{
-                    color: 'inherit',
-                    minWidth: 40,
-                    justifyContent: 'center'
-                  }}>
-                    <ArrowBackIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t('sidebar.backToMain')}
-                    primaryTypographyProps={{ fontSize: '0.875rem' }}
-                  />
-                </ListItemButton>
-              )}
+                )}
 
-              {/* Divider after back to main button */}
-              <Divider sx={{ my: 1 }} />
+                {/* Divider after back to main button */}
+                <Divider sx={{ my: 1 }} />
 
-              {/* Category title */}
-              {!sidebarCollapsed && (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    px: 2,
-                    py: 1,
-                    display: 'block',
-                    color: theme.palette.text.secondary,
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    fontSize: '0.7rem'
-                  }}
-                >
-                  {t(getFilteredMenuCategories().find(c => c.id === selectedCategory)?.text || '')}
-                </Typography>
-              )}
+                {/* Category title */}
+                {!sidebarCollapsed && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      display: 'block',
+                      color: theme.palette.text.secondary,
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      fontSize: '0.7rem'
+                    }}
+                  >
+                    {t(getFilteredMenuCategories().find(c => c.id === selectedCategory)?.text || '')}
+                  </Typography>
+                )}
 
-              {/* Submenu items */}
-              {getFilteredMenuCategories()
-                .find(c => c.id === selectedCategory)
-                ?.children.map((item, index, items) => {
-                  // Check if previous item has children (is a submenu group)
-                  const prevItem = index > 0 ? items[index - 1] : null;
-                  const prevHasChildren = prevItem?.children && prevItem.children.length > 0;
-                  const currentHasChildren = item.children && item.children.length > 0;
+                {/* Submenu items */}
+                {getFilteredMenuCategories()
+                  .find(c => c.id === selectedCategory)
+                  ?.children.map((item, index, items) => {
+                    // Check if previous item has children (is a submenu group)
+                    const prevItem = index > 0 ? items[index - 1] : null;
+                    const prevHasChildren = prevItem?.children && prevItem.children.length > 0;
+                    const currentHasChildren = item.children && item.children.length > 0;
 
-                  // Add divider if current item is regular (no children) and previous item is a submenu group
-                  const showDivider = !currentHasChildren && prevHasChildren && sidebarCollapsed;
+                    // Add divider if current item is regular (no children) and previous item is a submenu group
+                    const showDivider = !currentHasChildren && prevHasChildren && sidebarCollapsed;
 
-                  return (
-                    <React.Fragment key={index}>
-                      {showDivider && <Divider sx={{ my: 0.5 }} />}
-                      {renderMenuItem(item, index)}
-                    </React.Fragment>
-                  );
-                })}
-            </>
-          )}
-        </Box>
+                    return (
+                      <React.Fragment key={index}>
+                        {showDivider && <Divider sx={{ my: 0.5 }} />}
+                        {renderMenuItem(item, index)}
+                      </React.Fragment>
+                    );
+                  })}
+              </>
+            )}
+          </Box>
         </List>
       </Box>
     </Box>
@@ -1396,135 +1377,135 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               />
             )}
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {/* Chat button - only visible for admin users with chat permission */}
-            {isAdmin() && hasPermission(PERMISSIONS.CHAT_ACCESS) && (
-              <Tooltip title={t('sidebar.chat')}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {/* Chat button - only visible for admin users with chat permission */}
+              {isAdmin() && hasPermission(PERMISSIONS.CHAT_ACCESS) && (
+                <Tooltip title={t('sidebar.chat')}>
+                  <IconButton
+                    color="inherit"
+                    onClick={() => navigate('/chat')}
+                  >
+                    <ChatIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+
+              <Tooltip title={t('mailbox.title')}>
                 <IconButton
                   color="inherit"
-                  onClick={() => navigate('/chat')}
+                  onClick={() => navigate('/mailbox')}
                 >
-                  <ChatIcon />
+                  <Badge badgeContent={unreadMailCount} color="error">
+                    <MailIcon />
+                  </Badge>
                 </IconButton>
               </Tooltip>
-            )}
 
-            <Tooltip title={t('mailbox.title')}>
-              <IconButton
-                color="inherit"
-                onClick={() => navigate('/mailbox')}
-              >
-                <Badge badgeContent={unreadMailCount} color="error">
-                  <MailIcon />
-                </Badge>
+              {/* 구분선 */}
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '24px',
+                  bgcolor: theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.2)'
+                    : 'rgba(0, 0, 0, 0.2)',
+                  mx: 1
+                }}
+              />
+
+              <TimezoneSelector />
+
+              {/* 구분선 */}
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '24px',
+                  bgcolor: theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.2)'
+                    : 'rgba(0, 0, 0, 0.2)',
+                  mx: 1
+                }}
+              />
+
+              <IconButton onClick={toggleTheme} color="inherit">
+                {isDark ? <LightModeIcon /> : <DarkModeIcon />}
               </IconButton>
-            </Tooltip>
 
-            {/* 구분선 */}
-            <Box
-              sx={{
-                width: '1px',
-                height: '24px',
-                bgcolor: theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.2)'
-                  : 'rgba(0, 0, 0, 0.2)',
-                mx: 1
-              }}
-            />
+              <IconButton
+                onClick={handleUserMenuOpen}
+                color="inherit"
+              >
+                {user?.avatarUrl && !avatarImageError ? (
+                  <Avatar
+                    src={user.avatarUrl}
+                    alt={user.name || user.email}
+                    sx={{
+                      width: 32,
+                      height: 32,
+                    }}
+                    onError={() => {
+                      // 이미지 로드 실패 시 AccountCircle 아이콘으로 대체
+                      setAvatarImageError(true);
+                    }}
+                  >
+                    {user?.name?.charAt(0) || user?.email?.charAt(0)}
+                  </Avatar>
+                ) : (
+                  <AccountCircle
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      color: 'inherit'
+                    }}
+                  />
+                )}
+              </IconButton>
 
-            <TimezoneSelector />
+              <LanguageSelector variant="text" size="medium" />
 
-            {/* 구분선 */}
-            <Box
-              sx={{
-                width: '1px',
-                height: '24px',
-                bgcolor: theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.2)'
-                  : 'rgba(0, 0, 0, 0.2)',
-                mx: 1
-              }}
-            />
-
-            <IconButton onClick={toggleTheme} color="inherit">
-              {isDark ? <LightModeIcon /> : <DarkModeIcon />}
-            </IconButton>
-
-            <IconButton
-              onClick={handleUserMenuOpen}
-              color="inherit"
-            >
-              {user?.avatarUrl && !avatarImageError ? (
-                <Avatar
-                  src={user.avatarUrl}
-                  alt={user.name || user.email}
-                  sx={{
-                    width: 32,
-                    height: 32,
-                  }}
-                  onError={() => {
-                    // 이미지 로드 실패 시 AccountCircle 아이콘으로 대체
-                    setAvatarImageError(true);
-                  }}
-                >
-                  {user?.name?.charAt(0) || user?.email?.charAt(0)}
-                </Avatar>
-              ) : (
-                <AccountCircle
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    color: 'inherit'
-                  }}
-                />
+              {/* Environment Selector with Divider - Only for admin users with environments */}
+              {hasEnvironmentAccess && (
+                <>
+                  {/* 구분선 */}
+                  <Box
+                    sx={{
+                      width: '1px',
+                      height: '24px',
+                      bgcolor: theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.2)'
+                        : 'rgba(0, 0, 0, 0.2)',
+                      mx: 1
+                    }}
+                  />
+                  <EnvironmentSelector size="small" />
+                </>
               )}
-            </IconButton>
 
-            <LanguageSelector variant="text" size="medium" />
-
-            {/* Environment Selector with Divider - Only for admin users with environments */}
-            {hasEnvironmentAccess && (
-              <>
-                {/* 구분선 */}
-                <Box
-                  sx={{
-                    width: '1px',
-                    height: '24px',
-                    bgcolor: theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.2)'
-                      : 'rgba(0, 0, 0, 0.2)',
-                    mx: 1
-                  }}
-                />
-                <EnvironmentSelector size="small" />
-              </>
-            )}
-
-            <Menu
-              anchorEl={userMenuAnchor}
-              open={Boolean(userMenuAnchor)}
-              onClose={handleUserMenuClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-            >
-              <MenuItem onClick={() => { navigate('/profile'); handleUserMenuClose(); }}>
-                <PersonIcon sx={{ mr: 1 }} />
-                {t('sidebar.profile')}
-              </MenuItem>
-              <MenuItem onClick={handleLogoutClick}>
-                <LogoutIcon sx={{ mr: 1 }} />
-                {t('sidebar.logout')}
-              </MenuItem>
-            </Menu>
-          </Box>
-        </Toolbar>
-      </AppBar>
+              <Menu
+                anchorEl={userMenuAnchor}
+                open={Boolean(userMenuAnchor)}
+                onClose={handleUserMenuClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+              >
+                <MenuItem onClick={() => { navigate('/profile'); handleUserMenuClose(); }}>
+                  <PersonIcon sx={{ mr: 1 }} />
+                  {t('sidebar.profile')}
+                </MenuItem>
+                <MenuItem onClick={handleLogoutClick}>
+                  <LogoutIcon sx={{ mr: 1 }} />
+                  {t('sidebar.logout')}
+                </MenuItem>
+              </Menu>
+            </Box>
+          </Toolbar>
+        </AppBar>
 
         {/* 메인 컨텐츠 */}
         <Box
@@ -1544,26 +1525,51 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
       {/* Role/Permission Change Floating Button */}
       <Zoom in={roleChangeDialogOpen}>
-        <Tooltip title={t('common.roleChangeMessage')} placement="left" arrow>
-          <Fab
-            color="warning"
-            onClick={handleRoleChangeConfirm}
-            sx={{
-              position: 'fixed',
-              bottom: 24,
-              right: 24,
-              zIndex: 9999,
-              animation: `${wiggleAnimation} 1s ease-in-out infinite`,
-              boxShadow: '0 4px 20px rgba(237, 108, 2, 0.4)',
-              '&:hover': {
-                animation: 'none',
-                transform: 'scale(1.1)',
-              },
-            }}
-          >
-            <RefreshIcon />
-          </Fab>
-        </Tooltip>
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            zIndex: 9999,
+            width: 56,
+            height: 56,
+          }}
+        >
+          {/* Ripple pulse effect rings */}
+          {[0, 0.5, 1].map((delay, index) => (
+            <Box
+              key={index}
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                border: '2px solid',
+                borderColor: 'warning.main',
+                animation: `${ripplePulseAnimation} 2s ease-out infinite ${delay}s`,
+                pointerEvents: 'none',
+              }}
+            />
+          ))}
+          <Tooltip title={t('common.roleChangeMessage')} placement="left" arrow>
+            <Fab
+              color="warning"
+              onClick={handleRoleChangeConfirm}
+              sx={{
+                animation: `${wiggleAnimation} 1s ease-in-out infinite`,
+                boxShadow: '0 4px 20px rgba(237, 108, 2, 0.4)',
+                '&:hover': {
+                  animation: 'none',
+                  transform: 'scale(1.1)',
+                },
+              }}
+            >
+              <RefreshIcon />
+            </Fab>
+          </Tooltip>
+        </Box>
       </Zoom>
     </Box>
   );

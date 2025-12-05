@@ -91,6 +91,8 @@ import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import { useI18n } from '@/contexts/I18nContext';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 
 interface CreateTokenData {
   tokenName: string;
@@ -189,6 +191,11 @@ const ApiTokensPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { language } = useI18n();
+  const { hasPermission } = useAuth();
+
+  // Check if user can manage (create/edit/delete) tokens
+  const canManage = hasPermission([PERMISSIONS.SECURITY_MANAGE]);
+
   const [tokens, setTokens] = useState<ApiAccessToken[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -852,16 +859,18 @@ const ApiTokensPage: React.FC = () => {
                 </Typography>
               </Box>
             </Box>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateDialog}>
-              {t('apiTokens.createToken')}
-            </Button>
+            {canManage && (
+              <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateDialog}>
+                {t('apiTokens.createToken')}
+              </Button>
+            )}
           </Box>
         </Box>
 
 
 
       {/* Bulk Actions */}
-      {selectedTokenIds.length > 0 && (
+      {canManage && selectedTokenIds.length > 0 && (
         <Box sx={{
           mb: 2,
           p: 2,
@@ -963,14 +972,16 @@ const ApiTokensPage: React.FC = () => {
           <Table stickyHeader sx={{ tableLayout: 'auto' }}>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox" sx={{ width: 50 }}>
-                  <Checkbox
-                    checked={selectAll}
-                    indeterminate={selectedTokenIds.length > 0 && selectedTokenIds.length < filteredTokens.length}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    disabled={filteredTokens.length === 0}
-                  />
-                </TableCell>
+                {canManage && (
+                  <TableCell padding="checkbox" sx={{ width: 50 }}>
+                    <Checkbox
+                      checked={selectAll}
+                      indeterminate={selectedTokenIds.length > 0 && selectedTokenIds.length < filteredTokens.length}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      disabled={filteredTokens.length === 0}
+                    />
+                  </TableCell>
+                )}
                 {columns.filter(col => col.visible).map((column) => (
                   <TableCell key={column.id}>
                     {t(column.labelKey)}
@@ -982,7 +993,7 @@ const ApiTokensPage: React.FC = () => {
             <TableBody>
               {!filteredTokens || filteredTokens.length === 0 ? (
                 <EmptyTableRow
-                  colSpan={columns.filter(col => col.visible).length + 2}
+                  colSpan={columns.filter(col => col.visible).length + (canManage ? 2 : 1)}
                   loading={loading}
                   message={searchTerm ? t('common.noSearchResults') : t('apiTokens.noTokens')}
                   loadingMessage={t('common.loadingData')}
@@ -990,12 +1001,14 @@ const ApiTokensPage: React.FC = () => {
               ) : (
                 filteredTokens.map((token) => (
                   <TableRow key={token.id} hover selected={selectedTokenIds.includes(token.id)}>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedTokenIds.includes(token.id)}
-                        onChange={(e) => handleSelectToken(token.id, e.target.checked)}
-                      />
-                    </TableCell>
+                    {canManage && (
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedTokenIds.includes(token.id)}
+                          onChange={(e) => handleSelectToken(token.id, e.target.checked)}
+                        />
+                      </TableCell>
+                    )}
                     {columns.filter(col => col.visible).map((column) => (
                       <TableCell key={column.id}>
                         {renderCellContent(token, column.id)}
@@ -1008,21 +1021,25 @@ const ApiTokensPage: React.FC = () => {
                             <CopyIcon />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton size="small" onClick={() => openEditDialog(token)}>
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('apiTokens.regenerateToken')}>
-                          <IconButton size="small" onClick={() => openRegenerateDialog(token)}>
-                            <RefreshIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.delete')}>
-                          <IconButton size="small" onClick={() => openDeleteDialog(token)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
+                        {canManage && (
+                          <>
+                            <Tooltip title={t('common.edit')}>
+                              <IconButton size="small" onClick={() => openEditDialog(token)}>
+                                <EditIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('apiTokens.regenerateToken')}>
+                              <IconButton size="small" onClick={() => openRegenerateDialog(token)}>
+                                <RefreshIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('common.delete')}>
+                              <IconButton size="small" onClick={() => openDeleteDialog(token)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            </Tooltip>
+                          </>
+                        )}
                       </Box>
                     </TableCell>
                   </TableRow>

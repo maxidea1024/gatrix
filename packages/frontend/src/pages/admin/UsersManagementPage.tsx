@@ -398,7 +398,7 @@ const UsersManagementPage: React.FC = () => {
     open: false,
     title: '',
     message: '',
-    action: () => {},
+    action: () => { },
   });
   const [confirmDialogLoading, setConfirmDialogLoading] = useState(false);
 
@@ -917,9 +917,10 @@ const UsersManagementPage: React.FC = () => {
       }
 
       // Set environment access
+      const promoteAllowAll = Boolean(promoteDialog.allowAllEnvs);
       await apiService.put(`/admin/users/${promoteDialog.user.id}/environments`, {
-        allowAllEnvironments: promoteDialog.allowAllEnvs,
-        environmentIds: promoteDialog.allowAllEnvs ? [] : promoteDialog.envIds
+        allowAllEnvironments: promoteAllowAll,
+        environmentIds: promoteAllowAll ? [] : promoteDialog.envIds
       });
 
       enqueueSnackbar(t('common.userPromoted'), { variant: 'success' });
@@ -1235,9 +1236,10 @@ const UsersManagementPage: React.FC = () => {
         await apiService.put(`/admin/users/${editUserDialog.user.id}`, updateData);
 
         // Update environment access separately
+        const allowAll = Boolean(editUserAllowAllEnvs);
         await apiService.put(`/admin/users/${editUserDialog.user.id}/environments`, {
-          allowAllEnvironments: editUserAllowAllEnvs,
-          environmentIds: editUserAllowAllEnvs ? [] : editUserEnvIds
+          allowAllEnvironments: allowAll,
+          environmentIds: allowAll ? [] : editUserEnvIds
         });
 
         // Update permissions for admin users
@@ -1927,48 +1929,48 @@ const UsersManagementPage: React.FC = () => {
                   />
                 ) : (
                   users.map((user) => (
-                  <TableRow key={user.id} hover>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedUsers.has(user.id)}
-                        onChange={() => handleSelectUser(user.id)}
-                      />
-                    </TableCell>
-                    {columns.filter(col => col.visible).map((column) => (
-                      <TableCell
-                        key={column.id}
-                        align={column.id === 'emailVerified' ? 'center' : 'left'}
-                        width={column.width}
-                      >
-                        {renderCellContent(user, column.id)}
+                    <TableRow key={user.id} hover>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedUsers.has(user.id)}
+                          onChange={() => handleSelectUser(user.id)}
+                        />
                       </TableCell>
-                    ))}
-                    <TableCell>
-                      {user.createdByName ? (
-                        <Box>
-                          <Typography variant="body2" fontWeight="medium">
-                            {user.createdByName}
-                          </Typography>
-                          {user.createdByEmail && (
-                            <Typography variant="caption" color="text.secondary">
-                              {user.createdByEmail}
+                      {columns.filter(col => col.visible).map((column) => (
+                        <TableCell
+                          key={column.id}
+                          align={column.id === 'emailVerified' ? 'center' : 'left'}
+                          width={column.width}
+                        >
+                          {renderCellContent(user, column.id)}
+                        </TableCell>
+                      ))}
+                      <TableCell>
+                        {user.createdByName ? (
+                          <Box>
+                            <Typography variant="body2" fontWeight="medium">
+                              {user.createdByName}
                             </Typography>
-                          )}
-                        </Box>
-                      ) : (
-                        '-'
-                      )}
-                    </TableCell>
-                    <TableCell align="center">
-                      <IconButton
-                        onClick={(event) => handleMenuOpen(event, user)}
-                        size="small"
-                        title={t('common.actions')}
-                      >
-                        <MoreVertIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
+                            {user.createdByEmail && (
+                              <Typography variant="caption" color="text.secondary">
+                                {user.createdByEmail}
+                              </Typography>
+                            )}
+                          </Box>
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <IconButton
+                          onClick={(event) => handleMenuOpen(event, user)}
+                          size="small"
+                          title={t('common.actions')}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
                   ))
                 )}
               </TableBody>
@@ -2236,7 +2238,7 @@ const UsersManagementPage: React.FC = () => {
             <Box sx={{ mt: 2 }}>
               <PermissionSelector
                 permissions={[]}
-                onChange={() => {}}
+                onChange={() => { }}
                 showTitle={false}
                 showSelectAll={false}
                 showEnvironments={true}
@@ -3393,20 +3395,6 @@ const UsersManagementPage: React.FC = () => {
         <Box sx={{
           flex: 1,
           overflow: 'auto',
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#f1f1f1',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#c1c1c1',
-            borderRadius: '4px',
-            '&:hover': {
-              background: '#a8a8a8',
-            },
-          },
         }}>
           <InvitationForm
             onSubmit={handleCreateInvitation}

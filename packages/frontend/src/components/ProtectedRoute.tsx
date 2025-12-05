@@ -6,15 +6,17 @@ import { Box, CircularProgress } from '@mui/material';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRoles?: string[];
+  requiredPermissions?: string[];
   requireActive?: boolean;
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredRoles,
+  requiredPermissions,
   requireActive = true,
 }) => {
-  const { isAuthenticated, isLoading, user, canAccess } = useAuth();
+  const { isAuthenticated, isLoading, user, canAccess, hasPermission } = useAuth();
   const location = useLocation();
 
   // Show loading spinner while checking authentication
@@ -36,6 +38,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Check if user is suspended
+  if (user?.status === 'suspended') {
+    return <Navigate to="/account-suspended" replace />;
+  }
+
   // Check if user account is active (if required)
   if (requireActive && user?.status !== 'active') {
     return <Navigate to="/pending" replace />;
@@ -43,7 +50,31 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Check role-based access
   if (!canAccess(requiredRoles)) {
-    return <Navigate to="/unauthorized" replace />;
+    return (
+      <Navigate
+        to="/unauthorized"
+        state={{
+          requiredRole: requiredRoles?.[0],
+          requiredPermissions: requiredPermissions
+        }}
+        replace
+      />
+    );
+  }
+
+  // Check permission-based access
+  if (requiredPermissions && requiredPermissions.length > 0) {
+    if (!hasPermission(requiredPermissions)) {
+      return (
+        <Navigate
+          to="/unauthorized"
+          state={{
+            requiredPermissions
+          }}
+          replace
+        />
+      );
+    }
   }
 
   return <>{children}</>;
@@ -54,6 +85,7 @@ export const withProtectedRoute = (
   Component: React.ComponentType<any>,
   options?: {
     requiredRoles?: string[];
+    requiredPermissions?: string[];
     requireActive?: boolean;
   }
 ) => {

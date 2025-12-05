@@ -120,9 +120,19 @@ export interface AuditLog {
   userId?: number;
   userName?: string;
   userEmail?: string;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+    avatarUrl?: string;
+  };
   action: string;
   resourceType?: string;
   resourceId?: string;
+  entityType?: string;
+  entityId?: string | number;
+  oldValues?: any;
+  newValues?: any;
   details?: any;
   ipAddress?: string;
   userAgent?: string;

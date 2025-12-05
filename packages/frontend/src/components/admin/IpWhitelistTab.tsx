@@ -58,7 +58,11 @@ import FormDialogHeader from '../common/FormDialogHeader';
 import EmptyTableRow from '../common/EmptyTableRow';
 import dayjs from 'dayjs';
 
-const IpWhitelistTab: React.FC = () => {
+interface IpWhitelistTabProps {
+  canManage?: boolean;
+}
+
+const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({ canManage = true }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -337,22 +341,24 @@ const IpWhitelistTab: React.FC = () => {
   return (
     <>
       {/* Action Buttons */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'flex-end' }}>
-        <Button
-          variant="outlined"
-          startIcon={<UploadIcon />}
-          onClick={() => setBulkDialog(true)}
-        >
-          {t('ipWhitelist.bulkImport')}
-        </Button>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAdd}
-        >
-          {t('ipWhitelist.addEntry')}
-        </Button>
-      </Box>
+      {canManage && (
+        <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'flex-end' }}>
+          <Button
+            variant="outlined"
+            startIcon={<UploadIcon />}
+            onClick={() => setBulkDialog(true)}
+          >
+            {t('ipWhitelist.bulkImport')}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAdd}
+          >
+            {t('ipWhitelist.addEntry')}
+          </Button>
+        </Box>
+      )}
 
       {/* Search & Filters */}
       <Card variant="outlined" sx={{ mb: 3 }}>
@@ -501,14 +507,18 @@ const IpWhitelistTab: React.FC = () => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={handleEdit}>
-          <EditIcon sx={{ mr: 1 }} />
-          {t('common.edit')}
-        </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
-          <DeleteIcon sx={{ mr: 1 }} />
-          {t('common.delete')}
-        </MenuItem>
+        {canManage && (
+          <MenuItem onClick={handleEdit}>
+            <EditIcon sx={{ mr: 1 }} />
+            {t('common.edit')}
+          </MenuItem>
+        )}
+        {canManage && (
+          <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
+            <DeleteIcon sx={{ mr: 1 }} />
+            {t('common.delete')}
+          </MenuItem>
+        )}
       </Menu>
 
       {/* Add/Edit Drawer */}
