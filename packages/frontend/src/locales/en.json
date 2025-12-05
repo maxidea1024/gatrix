@@ -2287,7 +2287,7 @@
     "pendingApproval": "pendingApproval",
     "profileManagement": "Profile Management",
     "profileManagementDesc": "Update your profile information, change password, and manage account settings.",
-    "quickActions": "Quick Actions",
+    "quickActionsTitle": "Quick Actions",
     "recentActivity": "Recent Activity",
     "recentActivityPlaceholder": "No recent activity to display.",
     "requiresAttention": "Requires attention",

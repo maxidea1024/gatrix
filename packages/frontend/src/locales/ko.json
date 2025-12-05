@@ -2287,7 +2287,7 @@
     "pendingApproval": "승인 대기",
     "profileManagement": "프로필 관리",
     "profileManagementDesc": "개인 정보 및 계정 설정을 관리하세요",
-    "quickActions": "빠른 작업",
+    "quickActionsTitle": "빠른 작업",
     "recentActivity": "최근 활동",
     "recentActivityPlaceholder": "최근 활동이 없습니다",
     "requiresAttention": "주의 필요",

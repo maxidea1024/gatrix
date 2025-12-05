@@ -630,7 +630,7 @@ const DashboardPage: React.FC = () => {
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                {t('dashboard.quickActions')}
+                {t('dashboard.quickActionsTitle')}
               </Typography>
               <Grid container spacing={2}>
                 {quickActions.slice(0, 8).map((action) => (

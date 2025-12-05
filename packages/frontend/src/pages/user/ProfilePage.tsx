@@ -425,8 +425,11 @@ const ProfilePage: React.FC = () => {
                             {categoryPermissions.map((permission) => {
                               const isManage = permission.includes('.manage');
                               const permissionLabel = t(getPermissionLabelKey(permission as Permission));
+                              // Get localized description for tooltip (e.g., permissions.users_view_desc)
+                              const descKey = `permissions.${permission.replace('.', '_')}_desc`;
+                              const permissionDesc = t(descKey, { defaultValue: '' });
                               return (
-                                <Tooltip key={permission} title={permission} arrow placement="top">
+                                <Tooltip key={permission} title={permissionDesc || permissionLabel} arrow placement="top">
                                   <Box
                                     sx={{
                                       px: 1,
@@ -488,17 +491,18 @@ const ProfilePage: React.FC = () => {
               ) : accessibleEnvironments.length > 0 ? (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {accessibleEnvironments.map((env) => (
-                    <Chip
-                      key={env.id}
-                      label={env.displayName || env.environmentName}
-                      size="small"
-                      sx={{
-                        bgcolor: env.color ? alpha(env.color, 0.15) : alpha(theme.palette.info.main, 0.1),
-                        color: env.color || 'info.main',
-                        fontWeight: 500,
-                        borderLeft: `3px solid ${env.color || theme.palette.info.main}`,
-                      }}
-                    />
+                    <Tooltip key={env.id} title={env.description || ''} arrow placement="top">
+                      <Chip
+                        label={env.displayName || env.environmentName}
+                        size="small"
+                        sx={{
+                          bgcolor: env.color ? alpha(env.color, 0.15) : alpha(theme.palette.info.main, 0.1),
+                          color: env.color || 'info.main',
+                          fontWeight: 500,
+                          borderLeft: `3px solid ${env.color || theme.palette.info.main}`,
+                        }}
+                      />
+                    </Tooltip>
                   ))}
                 </Box>
               ) : (
