@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -48,6 +50,8 @@ import RewardDisplay from '../../components/game/RewardDisplay';
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.SURVEYS_MANAGE]);
 
   // State
   const [surveys, setSurveys] = useState<Survey[]>([]);
@@ -317,21 +321,25 @@ const SurveysPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreate}
-          >
-            {t('surveys.createSurvey')}
-          </Button>
-          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-          <Button
-            variant="outlined"
-            startIcon={<SettingsIcon />}
-            onClick={handleConfigOpen}
-          >
-            {t('surveys.config')}
-          </Button>
+          {canManage && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
+              {t('surveys.createSurvey')}
+            </Button>
+          )}
+          {canManage && <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />}
+          {canManage && (
+            <Button
+              variant="outlined"
+              startIcon={<SettingsIcon />}
+              onClick={handleConfigOpen}
+            >
+              {t('surveys.config')}
+            </Button>
+          )}
         </Box>
       </Box>
 
@@ -446,6 +454,7 @@ const SurveysPage: React.FC = () => {
                 <TableRow>
                   {visibleColumns.map((column) => {
                     if (column.id === 'checkbox') {
+                      if (!canManage) return null;
                       return (
                         <TableCell key={column.id} padding="checkbox">
                           <Checkbox
@@ -457,6 +466,7 @@ const SurveysPage: React.FC = () => {
                       );
                     }
                     if (column.id === 'actions') {
+                      if (!canManage) return null;
                       return (
                         <TableCell key={column.id} align="center">
                           {t(column.labelKey)}
@@ -474,14 +484,14 @@ const SurveysPage: React.FC = () => {
               <TableBody>
                 {loading && isInitialLoad ? (
                   <EmptyTableRow
-                    colSpan={visibleColumns.length}
+                    colSpan={visibleColumns.length - (canManage ? 0 : 2)}
                     loading={true}
                     message=""
                     loadingMessage={t('common.loadingData')}
                   />
                 ) : surveys.length === 0 ? (
                   <EmptyTableRow
-                    colSpan={visibleColumns.length}
+                    colSpan={visibleColumns.length - (canManage ? 0 : 2)}
                     loading={false}
                     message={t('surveys.noSurveysFound')}
                     loadingMessage=""
@@ -495,6 +505,7 @@ const SurveysPage: React.FC = () => {
                     >
                       {visibleColumns.map((column) => {
                         if (column.id === 'checkbox') {
+                          if (!canManage) return null;
                           return (
                             <TableCell key={column.id} padding="checkbox">
                               <Checkbox
@@ -612,6 +623,7 @@ const SurveysPage: React.FC = () => {
                           );
                         }
                         if (column.id === 'actions') {
+                          if (!canManage) return null;
                           return (
                             <TableCell key={column.id} align="center">
                               <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>

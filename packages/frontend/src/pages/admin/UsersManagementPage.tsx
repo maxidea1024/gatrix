@@ -102,6 +102,7 @@ import { tagService } from '@/services/tagService';
 import { UserService } from '@/services/users';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import SimplePagination from '../../components/common/SimplePagination';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
@@ -282,8 +283,9 @@ const RoleChipWithTooltip: React.FC<RoleChipWithTooltipProps> = ({ user }) => {
 const UsersManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { user: currentUser, isLoading: authLoading } = useAuth();
+  const { user: currentUser, isLoading: authLoading, hasPermission } = useAuth();
   const { environments } = useEnvironments();
+  const canManage = hasPermission([PERMISSIONS.USERS_MANAGE]);
 
   // Helper function to check if user is current user
   const isCurrentUser = (user: User | null): boolean => {
@@ -1671,23 +1673,25 @@ const UsersManagementPage: React.FC = () => {
         </Box>
 
         {/* 버튼 그룹 */}
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="contained"
-            startIcon={<PersonAddIcon />}
-            onClick={handleAddUser}
-          >
-            {t('users.addUser')}
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<SendIcon />}
-            onClick={() => setInvitationDialogOpen(true)}
-            disabled={!!currentInvitation}
-          >
-            {t('invitations.createInvitation')}
-          </Button>
-        </Box>
+        {canManage && (
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="contained"
+              startIcon={<PersonAddIcon />}
+              onClick={handleAddUser}
+            >
+              {t('users.addUser')}
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<SendIcon />}
+              onClick={() => setInvitationDialogOpen(true)}
+              disabled={!!currentInvitation}
+            >
+              {t('invitations.createInvitation')}
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {/* Filters */}
@@ -2008,16 +2012,16 @@ const UsersManagementPage: React.FC = () => {
           horizontal: 'right',
         }}
       >
-        <MenuItem onClick={() => handleMenuAction('edit')}>
-          <ListItemIcon>
-            <EditIcon />
-          </ListItemIcon>
-          <ListItemText>{t('common.edit')}</ListItemText>
-        </MenuItem>
+        {canManage && (
+          <MenuItem onClick={() => handleMenuAction('edit')}>
+            <ListItemIcon>
+              <EditIcon />
+            </ListItemIcon>
+            <ListItemText>{t('common.edit')}</ListItemText>
+          </MenuItem>
+        )}
 
-
-
-        {selectedUser?.status === 'active' ? (
+        {canManage && (selectedUser?.status === 'active' ? (
           <MenuItem
             onClick={() => handleMenuAction('suspend')}
             disabled={isCurrentUser(selectedUser)}
@@ -2037,9 +2041,9 @@ const UsersManagementPage: React.FC = () => {
             </ListItemIcon>
             <ListItemText>{t('common.activate')}</ListItemText>
           </MenuItem>
-        )}
+        ))}
 
-        {selectedUser?.role === 'user' && selectedUser?.status === 'active' && (
+        {canManage && selectedUser?.role === 'user' && selectedUser?.status === 'active' && (
           <MenuItem onClick={() => handleMenuAction('promote')}>
             <ListItemIcon>
               <SecurityIcon />
@@ -2048,7 +2052,7 @@ const UsersManagementPage: React.FC = () => {
           </MenuItem>
         )}
 
-        {selectedUser?.role === 'admin' && (
+        {canManage && selectedUser?.role === 'admin' && (
           <MenuItem
             onClick={() => handleMenuAction('demote')}
             disabled={isCurrentUser(selectedUser)}
@@ -2061,7 +2065,7 @@ const UsersManagementPage: React.FC = () => {
         )}
 
         {/* 이메일 인증 관련 메뉴 */}
-        {selectedUser && !selectedUser.emailVerified && (
+        {canManage && selectedUser && !selectedUser.emailVerified && (
           <>
             <MenuItem onClick={() => handleMenuAction('verifyEmail')}>
               <ListItemIcon>
@@ -2078,16 +2082,18 @@ const UsersManagementPage: React.FC = () => {
           </>
         )}
 
-        <MenuItem
-          onClick={() => handleMenuAction('delete')}
-          disabled={isCurrentUser(selectedUser)}
-          sx={{ color: 'error.main' }}
-        >
-          <ListItemIcon sx={{ color: 'inherit' }}>
-            <DeleteIcon />
-          </ListItemIcon>
-          <ListItemText>{t('common.delete')}</ListItemText>
-        </MenuItem>
+        {canManage && (
+          <MenuItem
+            onClick={() => handleMenuAction('delete')}
+            disabled={isCurrentUser(selectedUser)}
+            sx={{ color: 'error.main' }}
+          >
+            <ListItemIcon sx={{ color: 'inherit' }}>
+              <DeleteIcon />
+            </ListItemIcon>
+            <ListItemText>{t('common.delete')}</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
 
       {/* Add User Drawer */}

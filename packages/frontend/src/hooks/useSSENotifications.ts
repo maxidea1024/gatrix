@@ -271,6 +271,11 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         window.dispatchEvent(new CustomEvent('user-role-changed', { detail: event.data }));
         break;
 
+      case 'user_suspended':
+        // Dispatch custom event for immediate redirect to suspended page
+        window.dispatchEvent(new CustomEvent('user-suspended', { detail: event.data }));
+        break;
+
       default:
         break;
     }

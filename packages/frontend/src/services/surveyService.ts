@@ -6,10 +6,14 @@ export interface TriggerCondition {
 }
 
 export interface Reward {
-  type: string;
-  id: number;
+  rewardType: string;
+  itemId: string;
   quantity: number;
+  type?: string;
+  id?: number;
 }
+
+export type ParticipationReward = Reward;
 
 export interface ChannelSubchannelData {
   channel: string;

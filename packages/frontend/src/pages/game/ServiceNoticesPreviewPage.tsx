@@ -106,7 +106,8 @@ const getReadNotices = (): Set<number> => {
     }
 
     if (stored) {
-      const readIds = new Set(JSON.parse(stored));
+      const parsed = JSON.parse(stored);
+      const readIds = new Set<number>(Array.isArray(parsed) ? parsed : []);
       console.log('[ReadStatus] Loaded read notices:', Array.from(readIds));
       return readIds;
     }

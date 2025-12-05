@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -71,6 +73,8 @@ const JobsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.SCHEDULER_MANAGE]);
 
   // Column settings state
   const [columns, setColumns] = useState<ColumnConfig[]>(() => {
@@ -372,13 +376,15 @@ const JobsPage: React.FC = () => {
             </Typography>
           </Box>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddJob}
-        >
-          {t('jobs.addJob')}
-        </Button>
+        {canManage && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAddJob}
+          >
+            {t('jobs.addJob')}
+          </Button>
+        )}
       </Box>
 
       {/* Filters */}
@@ -579,13 +585,13 @@ const JobsPage: React.FC = () => {
                   {t(column.labelKey)}
                 </TableCell>
               ))}
-              <TableCell align="right" sx={{ width: 150 }}>{t('common.actions')}</TableCell>
+              {canManage && <TableCell align="right" sx={{ width: 150 }}>{t('common.actions')}</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
             {jobs.length === 0 ? (
               <EmptyTableRow
-                colSpan={columns.filter(col => col.visible).length + 1}
+                colSpan={columns.filter(col => col.visible).length + (canManage ? 1 : 0)}
                 loading={loading}
                 message={t('jobs.noJobsFound')}
                 loadingMessage={t('common.loadingJobs')}
@@ -607,32 +613,34 @@ const JobsPage: React.FC = () => {
                       {renderCellContent(job, column.id)}
                     </TableCell>
                   ))}
-                <TableCell align="right">
-                  <Tooltip title={t('jobs.execute')}>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleExecuteJob(job)}
-                      disabled={!job.isEnabled}
-                    >
-                      <ExecuteIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={t('jobs.viewHistory')}>
-                    <IconButton size="small" onClick={() => handleViewHistory(job)}>
-                      <HistoryIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={t('common.edit')}>
-                    <IconButton size="small" onClick={() => handleEditJob(job)}>
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={t('common.delete')}>
-                    <IconButton size="small" onClick={() => handleDeleteJob(job)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+                  {canManage && (
+                    <TableCell align="right">
+                      <Tooltip title={t('jobs.execute')}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleExecuteJob(job)}
+                          disabled={!job.isEnabled}
+                        >
+                          <ExecuteIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={t('jobs.viewHistory')}>
+                        <IconButton size="small" onClick={() => handleViewHistory(job)}>
+                          <HistoryIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={t('common.edit')}>
+                        <IconButton size="small" onClick={() => handleEditJob(job)}>
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={t('common.delete')}>
+                        <IconButton size="small" onClick={() => handleDeleteJob(job)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  )}
               </TableRow>
               ))
             )}

@@ -132,7 +132,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       setTargetPlatforms(notice.targetPlatforms || []);
       setTargetPlatformsInverted(notice.targetPlatformsInverted || false);
       setTargetChannelSubchannels(targetChannelSubchannels);
-      setTargetChannelSubchannelsInverted(notice.targetChannelSubchannelsInverted || false);
+      setTargetChannelSubchannelsInverted(notice.targetChannelsInverted || false);
       setTargetWorlds(notice.targetWorlds || []);
       setTargetWorldsInverted(notice.targetWorldsInverted || false);
       setTargetUserIds((notice as any).targetUserIds || '');
@@ -278,19 +278,6 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
           flex: 1,
           overflow: 'auto',
           p: 3,
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-            borderRadius: '4px',
-          },
-          scrollbarWidth: 'thin',
-          scrollbarColor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.2) transparent'
-              : 'rgba(0, 0, 0, 0.2) transparent',
         }}
       >
         <Stack spacing={3}>

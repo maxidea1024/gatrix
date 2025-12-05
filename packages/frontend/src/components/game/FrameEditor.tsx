@@ -601,89 +601,89 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
               }}
             />
           )}
-        {/* Image Preview */}
-        {frame.imageUrl ? (
-          imageError ? (
-            <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <BrokenImageIcon color="disabled" />
-            </Box>
-          ) : isVideo && frame.type === 'mp4' ? (
-            <video
-              src={frame.imageUrl}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              muted
-              onError={() => setImageError(true)}
-            />
+          {/* Image Preview */}
+          {frame.imageUrl ? (
+            imageError ? (
+              <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <BrokenImageIcon color="disabled" />
+              </Box>
+            ) : isVideo && frame.type === 'mp4' ? (
+              <video
+                src={frame.imageUrl}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                muted
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <img
+                src={frame.imageUrl}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onError={() => setImageError(true)}
+              />
+            )
           ) : (
-            <img
-              src={frame.imageUrl}
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              onError={() => setImageError(true)}
-            />
-          )
-        ) : (
-          <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ImageIcon color="disabled" sx={{ fontSize: 32 }} />
-          </Box>
-        )}
+            <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ImageIcon color="disabled" sx={{ fontSize: 32 }} />
+            </Box>
+          )}
 
-        {/* Drag Handle (top) */}
-        <Box
-          {...attributes}
-          {...listeners}
-          className="frame-overlay"
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 20,
-            bgcolor: 'rgba(0,0,0,0.6)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: 0,
-            transition: 'opacity 0.2s',
-            cursor: 'grab',
-            '&:active': { cursor: 'grabbing' },
-          }}
-        >
-          <DragIndicatorIcon sx={{ color: 'white', fontSize: 14 }} />
-        </Box>
-
-        {/* Bottom Info Bar */}
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 0,
-            // Add padding to avoid resize grips in timeline mode
-            left: isTimelineMode ? 10 : 0,
-            right: isTimelineMode ? 10 : 0,
-            bgcolor: 'rgba(0,0,0,0.7)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            px: 0.5,
-            py: 0.25,
-          }}
-        >
-          <Typography variant="caption" sx={{ color: 'white', fontSize: '0.65rem', fontWeight: 500 }}>
-            {formatDelayToSeconds(frame.delay)}
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 0 }}>
-            <Tooltip title={t('banners.frameSettings')}>
-              <IconButton size="small" onClick={() => setSettingsOpen(true)} sx={{ color: 'white', p: 0.25 }}>
-                <EditIcon sx={{ fontSize: 14 }} />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('common.delete')}>
-              <IconButton size="small" onClick={onDelete} sx={{ color: 'error.light', p: 0.25 }}>
-                <DeleteIcon sx={{ fontSize: 14 }} />
-              </IconButton>
-            </Tooltip>
+          {/* Drag Handle (top) */}
+          <Box
+            {...attributes}
+            {...listeners}
+            className="frame-overlay"
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 20,
+              bgcolor: 'rgba(0,0,0,0.6)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: 0,
+              transition: 'opacity 0.2s',
+              cursor: 'grab',
+              '&:active': { cursor: 'grabbing' },
+            }}
+          >
+            <DragIndicatorIcon sx={{ color: 'white', fontSize: 14 }} />
           </Box>
-        </Box>
+
+          {/* Bottom Info Bar */}
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              // Add padding to avoid resize grips in timeline mode
+              left: isTimelineMode ? 10 : 0,
+              right: isTimelineMode ? 10 : 0,
+              bgcolor: 'rgba(0,0,0,0.7)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              px: 0.5,
+              py: 0.25,
+            }}
+          >
+            <Typography variant="caption" sx={{ color: 'white', fontSize: '0.65rem', fontWeight: 500 }}>
+              {formatDelayToSeconds(frame.delay)}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 0 }}>
+              <Tooltip title={t('banners.frameSettings')}>
+                <IconButton size="small" onClick={() => setSettingsOpen(true)} sx={{ color: 'white', p: 0.25 }}>
+                  <EditIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('common.delete')}>
+                <IconButton size="small" onClick={onDelete} sx={{ color: 'error.light', p: 0.25 }}>
+                  <DeleteIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
         </Paper>
       </Tooltip>
 
@@ -693,27 +693,6 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
         <DialogContent sx={{
           maxHeight: '70vh',
           overflowY: 'auto',
-          // Chat-style scrollbar
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-          },
-          '&::-webkit-scrollbar-thumb:active': {
-            background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-          },
-          scrollbarWidth: 'thin',
-          scrollbarColor: (theme) => theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, 0.2) transparent'
-            : 'rgba(0, 0, 0, 0.2) transparent',
         }}>
           <Box sx={{ display: 'flex', gap: 3, pt: 1 }}>
             {/* Left: Settings - narrower width */}
@@ -729,108 +708,108 @@ const FrameEditor: React.FC<FrameEditorProps> = ({
                 helperText={editFrame.imageUrl && detectFrameType(editFrame.imageUrl) ? `${t('banners.detectedType')}: ${editFrame.type?.toUpperCase()}` : ''}
               />
 
-                {/* Basic Settings */}
-                <Box sx={{ display: 'flex', gap: 2 }}>
+              {/* Basic Settings */}
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <TextField
+                  label={t('banners.frameTime')}
+                  value={localDelaySeconds}
+                  onChange={(e) => handleDelaySecondsChange(e.target.value)}
+                  size="small"
+                  sx={{ flex: 1 }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">s</InputAdornment>,
+                  }}
+                />
+                {isEditVideo && (
+                  <FormControlLabel
+                    control={<Switch checked={editFrame.loop || false} onChange={(e) => handleLoopChange(e.target.checked)} size="small" />}
+                    label={t('banners.loopVideo')}
+                    sx={{ ml: 1 }}
+                  />
+                )}
+              </Box>
+
+              <Divider />
+
+              {/* Action Settings */}
+              <Typography variant="subtitle2" color="text.secondary">{t('banners.actionSettings')}</Typography>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <FormControl size="small" sx={{ minWidth: 140 }}>
+                  <InputLabel>{t('banners.actionType')}</InputLabel>
+                  <Select value={editFrame.action?.type || 'none'} label={t('banners.actionType')} onChange={(e) => handleActionTypeChange(e.target.value as FrameActionType)}>
+                    <MenuItem value="none">{t('banners.actionTypes.none')}</MenuItem>
+                    <MenuItem value="openUrl">{t('banners.actionTypes.openUrl')}</MenuItem>
+                    <MenuItem value="command">{t('banners.actionTypes.command')}</MenuItem>
+                    <MenuItem value="deepLink">{t('banners.actionTypes.deepLink')}</MenuItem>
+                  </Select>
+                </FormControl>
+                {editFrame.action?.type && editFrame.action.type !== 'none' && (
                   <TextField
-                    label={t('banners.frameTime')}
-                    value={localDelaySeconds}
-                    onChange={(e) => handleDelaySecondsChange(e.target.value)}
+                    label={t('banners.actionValue')}
+                    value={editFrame.action?.value || ''}
+                    onChange={(e) => handleActionValueChange(e.target.value)}
                     size="small"
                     sx={{ flex: 1 }}
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">s</InputAdornment>,
-                    }}
                   />
-                  {isEditVideo && (
-                    <FormControlLabel
-                      control={<Switch checked={editFrame.loop || false} onChange={(e) => handleLoopChange(e.target.checked)} size="small" />}
-                      label={t('banners.loopVideo')}
-                      sx={{ ml: 1 }}
-                    />
-                  )}
-                </Box>
+                )}
+              </Box>
 
-                <Divider />
+              <Divider />
 
-                {/* Action Settings */}
-                <Typography variant="subtitle2" color="text.secondary">{t('banners.actionSettings')}</Typography>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <FormControl size="small" sx={{ minWidth: 140 }}>
-                    <InputLabel>{t('banners.actionType')}</InputLabel>
-                    <Select value={editFrame.action?.type || 'none'} label={t('banners.actionType')} onChange={(e) => handleActionTypeChange(e.target.value as FrameActionType)}>
-                      <MenuItem value="none">{t('banners.actionTypes.none')}</MenuItem>
-                      <MenuItem value="openUrl">{t('banners.actionTypes.openUrl')}</MenuItem>
-                      <MenuItem value="command">{t('banners.actionTypes.command')}</MenuItem>
-                      <MenuItem value="deepLink">{t('banners.actionTypes.deepLink')}</MenuItem>
-                    </Select>
-                  </FormControl>
-                  {editFrame.action?.type && editFrame.action.type !== 'none' && (
-                    <TextField
-                      label={t('banners.actionValue')}
-                      value={editFrame.action?.value || ''}
-                      onChange={(e) => handleActionValueChange(e.target.value)}
-                      size="small"
-                      sx={{ flex: 1 }}
-                    />
-                  )}
-                </Box>
+              {/* Effect Settings */}
+              <Typography variant="subtitle2" color="text.secondary">{t('banners.effectSettings')}</Typography>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <FormControl size="small" sx={{ flex: 1 }}>
+                  <InputLabel>{t('banners.enterEffect')}</InputLabel>
+                  <Select value={editFrame.effects?.enter || 'none'} label={t('banners.enterEffect')} onChange={(e) => handleEffectEnterChange(e.target.value as FrameEffectType)}>
+                    <MenuItem value="none">{t('banners.effects.none')}</MenuItem>
+                    <MenuItem value="fadeIn">{t('banners.effects.fadeIn')}</MenuItem>
+                    <MenuItem value="slideLeft">{t('banners.effects.slideLeft')}</MenuItem>
+                    <MenuItem value="slideRight">{t('banners.effects.slideRight')}</MenuItem>
+                    <MenuItem value="slideUp">{t('banners.effects.slideUp')}</MenuItem>
+                    <MenuItem value="slideDown">{t('banners.effects.slideDown')}</MenuItem>
+                    <MenuItem value="zoomIn">{t('banners.effects.zoomIn')}</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl size="small" sx={{ flex: 1 }}>
+                  <InputLabel>{t('banners.exitEffect')}</InputLabel>
+                  <Select value={editFrame.effects?.exit || 'none'} label={t('banners.exitEffect')} onChange={(e) => handleEffectExitChange(e.target.value as FrameEffectType)}>
+                    <MenuItem value="none">{t('banners.effects.none')}</MenuItem>
+                    <MenuItem value="fadeOut">{t('banners.effects.fadeOut')}</MenuItem>
+                    <MenuItem value="slideLeft">{t('banners.effects.slideLeft')}</MenuItem>
+                    <MenuItem value="slideRight">{t('banners.effects.slideRight')}</MenuItem>
+                    <MenuItem value="slideUp">{t('banners.effects.slideUp')}</MenuItem>
+                    <MenuItem value="slideDown">{t('banners.effects.slideDown')}</MenuItem>
+                    <MenuItem value="zoomOut">{t('banners.effects.zoomOut')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
 
-                <Divider />
+              <Divider />
 
-                {/* Effect Settings */}
-                <Typography variant="subtitle2" color="text.secondary">{t('banners.effectSettings')}</Typography>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <FormControl size="small" sx={{ flex: 1 }}>
-                    <InputLabel>{t('banners.enterEffect')}</InputLabel>
-                    <Select value={editFrame.effects?.enter || 'none'} label={t('banners.enterEffect')} onChange={(e) => handleEffectEnterChange(e.target.value as FrameEffectType)}>
-                      <MenuItem value="none">{t('banners.effects.none')}</MenuItem>
-                      <MenuItem value="fadeIn">{t('banners.effects.fadeIn')}</MenuItem>
-                      <MenuItem value="slideLeft">{t('banners.effects.slideLeft')}</MenuItem>
-                      <MenuItem value="slideRight">{t('banners.effects.slideRight')}</MenuItem>
-                      <MenuItem value="slideUp">{t('banners.effects.slideUp')}</MenuItem>
-                      <MenuItem value="slideDown">{t('banners.effects.slideDown')}</MenuItem>
-                      <MenuItem value="zoomIn">{t('banners.effects.zoomIn')}</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <FormControl size="small" sx={{ flex: 1 }}>
-                    <InputLabel>{t('banners.exitEffect')}</InputLabel>
-                    <Select value={editFrame.effects?.exit || 'none'} label={t('banners.exitEffect')} onChange={(e) => handleEffectExitChange(e.target.value as FrameEffectType)}>
-                      <MenuItem value="none">{t('banners.effects.none')}</MenuItem>
-                      <MenuItem value="fadeOut">{t('banners.effects.fadeOut')}</MenuItem>
-                      <MenuItem value="slideLeft">{t('banners.effects.slideLeft')}</MenuItem>
-                      <MenuItem value="slideRight">{t('banners.effects.slideRight')}</MenuItem>
-                      <MenuItem value="slideUp">{t('banners.effects.slideUp')}</MenuItem>
-                      <MenuItem value="slideDown">{t('banners.effects.slideDown')}</MenuItem>
-                      <MenuItem value="zoomOut">{t('banners.effects.zoomOut')}</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-
-                <Divider />
-
-                {/* Transition Settings */}
-                <Typography variant="subtitle2" color="text.secondary">{t('banners.transitionSettings')}</Typography>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <FormControl size="small" sx={{ flex: 1 }}>
-                    <InputLabel>{t('banners.transitionType')}</InputLabel>
-                    <Select value={editFrame.transition?.type || 'none'} label={t('banners.transitionType')} onChange={(e) => handleTransitionTypeChange(e.target.value as TransitionType)}>
-                      <MenuItem value="none">{t('banners.transitions.none')}</MenuItem>
-                      <MenuItem value="fade">{t('banners.transitions.fade')}</MenuItem>
-                      <MenuItem value="slide">{t('banners.transitions.slide')}</MenuItem>
-                      <MenuItem value="crossfade">{t('banners.transitions.crossfade')}</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <TextField
-                    label={t('banners.transitionDuration')}
-                    value={((editFrame.transition?.duration || 300) / 1000).toFixed(2)}
-                    onChange={(e) => handleTransitionDurationChange(e.target.value)}
-                    size="small"
-                    sx={{ flex: 1 }}
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">s</InputAdornment>,
-                    }}
-                  />
-                </Box>
+              {/* Transition Settings */}
+              <Typography variant="subtitle2" color="text.secondary">{t('banners.transitionSettings')}</Typography>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <FormControl size="small" sx={{ flex: 1 }}>
+                  <InputLabel>{t('banners.transitionType')}</InputLabel>
+                  <Select value={editFrame.transition?.type || 'none'} label={t('banners.transitionType')} onChange={(e) => handleTransitionTypeChange(e.target.value as TransitionType)}>
+                    <MenuItem value="none">{t('banners.transitions.none')}</MenuItem>
+                    <MenuItem value="fade">{t('banners.transitions.fade')}</MenuItem>
+                    <MenuItem value="slide">{t('banners.transitions.slide')}</MenuItem>
+                    <MenuItem value="crossfade">{t('banners.transitions.crossfade')}</MenuItem>
+                  </Select>
+                </FormControl>
+                <TextField
+                  label={t('banners.transitionDuration')}
+                  value={((editFrame.transition?.duration || 300) / 1000).toFixed(2)}
+                  onChange={(e) => handleTransitionDurationChange(e.target.value)}
+                  size="small"
+                  sx={{ flex: 1 }}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">s</InputAdornment>,
+                  }}
+                />
+              </Box>
             </Box>
 
             {/* Right: Preview - fills remaining space */}

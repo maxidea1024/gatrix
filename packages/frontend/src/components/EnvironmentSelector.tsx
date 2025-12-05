@@ -15,6 +15,8 @@ import { Settings as SettingsIcon, Public as EnvironmentIcon } from '@mui/icons-
 import { useNavigate } from 'react-router-dom';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 
 // Shine animation - light sweeping across periodically
 const shineAnimation = keyframes`
@@ -55,6 +57,7 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { hasPermission } = useAuth();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const {
@@ -64,6 +67,8 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
     isLoading,
     switchEnvironment,
   } = useEnvironment();
+
+  const canManageEnvironments = hasPermission([PERMISSIONS.ENVIRONMENTS_MANAGE]);
 
   // Handle tooltip visibility - hide when select is open
   const handleTooltipOpen = useCallback(() => {
@@ -345,15 +350,19 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
               </MenuItem>
             );
           })}
-          <Divider sx={{ my: 0.5 }} />
-          <MenuItem value="__manage__">
-            <ListItemIcon sx={{ minWidth: 28 }}>
-              <SettingsIcon fontSize="small" />
-            </ListItemIcon>
-            <Typography variant="body2">
-              {t('environments.manage')}
-            </Typography>
-          </MenuItem>
+          {canManageEnvironments && (
+            <>
+              <Divider sx={{ my: 0.5 }} />
+              <MenuItem value="__manage__">
+                <ListItemIcon sx={{ minWidth: 28 }}>
+                  <SettingsIcon fontSize="small" />
+                </ListItemIcon>
+                <Typography variant="body2">
+                  {t('environments.manage')}
+                </Typography>
+              </MenuItem>
+            </>
+          )}
         </Select>
       </Box>
     </Tooltip>

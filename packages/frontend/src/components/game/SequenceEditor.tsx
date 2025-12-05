@@ -227,178 +227,178 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
           '&:last-of-type': { mb: 0 },
         }}
       >
-      {/* Drag Handle */}
-      <Box
-        {...attributes}
-        {...listeners}
-        onClick={(e) => e.stopPropagation()}
-        sx={{
-          cursor: 'grab',
-          display: 'flex',
-          alignItems: 'center',
-          px: 0.5,
-          py: 1,
-          mx: -0.5,
-          borderRadius: 0.5,
-          color: 'text.secondary',
-          '&:hover': {
-            color: 'text.primary',
-            bgcolor: 'action.hover',
-          },
-          '&:active': { cursor: 'grabbing' },
-        }}
-      >
-        <DragIndicatorIcon fontSize="small" />
-      </Box>
+        {/* Drag Handle */}
+        <Box
+          {...attributes}
+          {...listeners}
+          onClick={(e) => e.stopPropagation()}
+          sx={{
+            cursor: 'grab',
+            display: 'flex',
+            alignItems: 'center',
+            px: 0.5,
+            py: 1,
+            mx: -0.5,
+            borderRadius: 0.5,
+            color: 'text.secondary',
+            '&:hover': {
+              color: 'text.primary',
+              bgcolor: 'action.hover',
+            },
+            '&:active': { cursor: 'grabbing' },
+          }}
+        >
+          <DragIndicatorIcon fontSize="small" />
+        </Box>
 
-      {/* Frame Index */}
-      <Typography
-        sx={{
-          minWidth: 32,
-          textAlign: 'center',
-          fontWeight: 600,
-          color: 'primary.main',
-        }}
-      >
-        #{frameIndex + 1}
-      </Typography>
-
-      {/* Time Position */}
-      <Box sx={{ minWidth: 100 }}>
-        <Typography variant="caption" color="text.secondary">
-          {t('banners.listViewTime')}
+        {/* Frame Index */}
+        <Typography
+          sx={{
+            minWidth: 32,
+            textAlign: 'center',
+            fontWeight: 600,
+            color: 'primary.main',
+          }}
+        >
+          #{frameIndex + 1}
         </Typography>
-        <Typography variant="body2" fontFamily="monospace">
-          {(startTime / 1000).toFixed(2)}s - {(endTime / 1000).toFixed(2)}s
-        </Typography>
-      </Box>
 
-      {/* Image Preview */}
-      <Box
-        sx={{
-          width: 80,
-          height: 60,
-          borderRadius: 1,
-          overflow: 'hidden',
-          bgcolor: 'grey.900',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        {frame.imageUrl ? (
-          isVideo ? (
-            <video
-              src={frame.imageUrl}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              muted
-            />
+        {/* Time Position */}
+        <Box sx={{ minWidth: 100 }}>
+          <Typography variant="caption" color="text.secondary">
+            {t('banners.listViewTime')}
+          </Typography>
+          <Typography variant="body2" fontFamily="monospace">
+            {(startTime / 1000).toFixed(2)}s - {(endTime / 1000).toFixed(2)}s
+          </Typography>
+        </Box>
+
+        {/* Image Preview */}
+        <Box
+          sx={{
+            width: 80,
+            height: 60,
+            borderRadius: 1,
+            overflow: 'hidden',
+            bgcolor: 'grey.900',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          {frame.imageUrl ? (
+            isVideo ? (
+              <video
+                src={frame.imageUrl}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                muted
+              />
+            ) : (
+              <img
+                src={frame.imageUrl}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).parentElement!.innerHTML = '<span style="color: #999;">Error</span>';
+                }}
+              />
+            )
           ) : (
-            <img
-              src={frame.imageUrl}
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-                (e.target as HTMLImageElement).parentElement!.innerHTML = '<span style="color: #999;">Error</span>';
-              }}
-            />
-          )
-        ) : (
-          <ImageIcon color="disabled" />
-        )}
-      </Box>
-
-      {/* Frame Details */}
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              {t('banners.duration')}
-            </Typography>
-            <Typography variant="body2">
-              {(frame.delay / 1000).toFixed(2)}s ({frame.delay}ms)
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              {t('banners.type')}
-            </Typography>
-            <Typography variant="body2">
-              {frame.imageUrl ? (frame.type?.toUpperCase() || '-') : t('banners.imageNotSet')}
-            </Typography>
-          </Box>
-          {frame.transition && (
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                {t('banners.frameTransition')}
-              </Typography>
-              <Typography variant="body2">
-                {t(`banners.transitions.${frame.transition.type}`)} ({(frame.transition.duration / 1000).toFixed(2)}s)
-              </Typography>
-            </Box>
-          )}
-          {frame.link && (
-            <Box sx={{ flex: 1, minWidth: 150 }}>
-              <Typography variant="caption" color="text.secondary">
-                {t('banners.link')}
-              </Typography>
-              <Typography variant="body2" noWrap title={frame.link}>
-                {frame.link}
-              </Typography>
-            </Box>
+            <ImageIcon color="disabled" />
           )}
         </Box>
-        {frame.imageUrl && (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            title={frame.imageUrl}
-            sx={{
-              mt: 0.5,
-              display: 'block',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              direction: 'rtl',
-              textAlign: 'left',
-            }}
-          >
-            <span style={{ direction: 'ltr', unicodeBidi: 'bidi-override' }}>
-              URL: {frame.imageUrl}
-            </span>
-          </Typography>
-        )}
-      </Box>
 
-      {/* Actions */}
-      <Box sx={{ display: 'flex', gap: 0.5 }} onClick={(e) => e.stopPropagation()}>
-        <Tooltip title={t('banners.contextMenu.edit')}>
-          <IconButton size="small" onClick={onEdit}>
-            <EditIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t('banners.contextMenu.movePrev')}>
-          <span>
-            <IconButton size="small" disabled={frameIndex === 0} onClick={onMovePrev}>
-              <ArrowUpwardIcon fontSize="small" />
+        {/* Frame Details */}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                {t('banners.duration')}
+              </Typography>
+              <Typography variant="body2">
+                {(frame.delay / 1000).toFixed(2)}s ({frame.delay}ms)
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                {t('banners.type')}
+              </Typography>
+              <Typography variant="body2">
+                {frame.imageUrl ? (frame.type?.toUpperCase() || '-') : t('banners.imageNotSet')}
+              </Typography>
+            </Box>
+            {frame.transition && (
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  {t('banners.frameTransition')}
+                </Typography>
+                <Typography variant="body2">
+                  {t(`banners.transitions.${frame.transition.type}`)} ({(frame.transition.duration / 1000).toFixed(2)}s)
+                </Typography>
+              </Box>
+            )}
+            {frame.link && (
+              <Box sx={{ flex: 1, minWidth: 150 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t('banners.link')}
+                </Typography>
+                <Typography variant="body2" noWrap title={frame.link}>
+                  {frame.link}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+          {frame.imageUrl && (
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              title={frame.imageUrl}
+              sx={{
+                mt: 0.5,
+                display: 'block',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                direction: 'rtl',
+                textAlign: 'left',
+              }}
+            >
+              <span style={{ direction: 'ltr', unicodeBidi: 'bidi-override' }}>
+                URL: {frame.imageUrl}
+              </span>
+            </Typography>
+          )}
+        </Box>
+
+        {/* Actions */}
+        <Box sx={{ display: 'flex', gap: 0.5 }} onClick={(e) => e.stopPropagation()}>
+          <Tooltip title={t('banners.contextMenu.edit')}>
+            <IconButton size="small" onClick={onEdit}>
+              <EditIcon fontSize="small" />
             </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip title={t('banners.contextMenu.moveNext')}>
-          <span>
-            <IconButton size="small" disabled={frameIndex === totalFrames - 1} onClick={onMoveNext}>
-              <ArrowDownwardIcon fontSize="small" />
+          </Tooltip>
+          <Tooltip title={t('banners.contextMenu.movePrev')}>
+            <span>
+              <IconButton size="small" disabled={frameIndex === 0} onClick={onMovePrev}>
+                <ArrowUpwardIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={t('banners.contextMenu.moveNext')}>
+            <span>
+              <IconButton size="small" disabled={frameIndex === totalFrames - 1} onClick={onMoveNext}>
+                <ArrowDownwardIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={t('common.delete')}>
+            <IconButton size="small" color="error" onClick={onDelete}>
+              <DeleteIcon fontSize="small" />
             </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip title={t('common.delete')}>
-          <IconButton size="small" color="error" onClick={onDelete}>
-            <DeleteIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      </Box>
+          </Tooltip>
+        </Box>
       </Paper>
 
       {/* Context Menu */}
@@ -1007,8 +1007,8 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
 
       <Collapse in={expanded}>
         <Stack spacing={2} sx={{ mt: 2 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={4}>
+          <Stack direction="row" spacing={2}>
+            <Box sx={{ flex: 1 }}>
               <TextField
                 label={t('banners.sequenceName')}
                 value={sequence.name}
@@ -1016,8 +1016,8 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                 fullWidth
                 size="small"
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Box>
+            <Box sx={{ flex: 1 }}>
               <TextField
                 label={t('banners.speedMultiplier')}
                 value={sequence.speedMultiplier}
@@ -1025,8 +1025,8 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                 fullWidth
                 size="small"
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Box>
+            <Box sx={{ flex: 1 }}>
               <FormControl fullWidth size="small">
                 <InputLabel>{t('banners.loopMode')}</InputLabel>
                 <Select
@@ -1039,8 +1039,8 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                   <MenuItem value="once">{t('banners.loopModes.once')}</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-          </Grid>
+            </Box>
+          </Stack>
 
           {/* Frames */}
           <Box>
@@ -1126,41 +1126,39 @@ const SequenceEditor: React.FC<SequenceEditorProps> = ({
                       bgcolor: (theme) => theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
                       borderRadius: 1,
                       overflowX: 'auto',
-                      '&::-webkit-scrollbar': { height: 8 },
-                      '&::-webkit-scrollbar-thumb': { bgcolor: 'action.hover', borderRadius: 4 },
                     }}
                   >
-                      {sequence.frames.map((frame, frameIndex) => (
-                        <FrameEditor
-                          key={frame.frameId}
-                          frame={frame}
-                          frameIndex={frameIndex}
-                          totalFrames={sequence.frames.length}
-                          onUpdate={(updated) => handleUpdateFrame(frameIndex, updated)}
-                          onDelete={() => handleDeleteFrame(frameIndex)}
-                          onDuplicateBefore={() => handleDuplicateBefore(frameIndex)}
-                          onDuplicateAfter={() => handleDuplicateAfter(frameIndex)}
-                          onCopy={() => handleCopyFrame(frameIndex)}
-                          onPasteBefore={() => handlePasteBefore(frameIndex)}
-                          onPasteAfter={() => handlePasteAfter(frameIndex)}
-                          onPasteReplace={() => handlePasteReplace(frameIndex)}
-                          onMoveFirst={() => handleMoveFirst(frameIndex)}
-                          onMoveLast={() => handleMoveLast(frameIndex)}
-                          onMovePrev={() => handleMovePrev(frameIndex)}
-                          onMoveNext={() => handleMoveNext(frameIndex)}
-                          onAddEmptyBefore={() => handleAddEmptyBefore(frameIndex)}
-                          onAddEmptyAfter={() => handleAddEmptyAfter(frameIndex)}
-                          onAddMultipleEmptyBefore={(count) => handleAddMultipleEmptyBefore(frameIndex, count)}
-                          onAddMultipleEmptyAfter={(count) => handleAddMultipleEmptyAfter(frameIndex, count)}
-                          onAddFromClipboardBefore={(urls) => handleAddFromClipboardBefore(frameIndex, urls)}
-                          onAddFromClipboardAfter={(urls) => handleAddFromClipboardAfter(frameIndex, urls)}
-                          onResizeStart={handleResizeStart}
-                          onFrameClick={() => onFrameSelect?.(index, frameIndex)}
-                          hasClipboard={!!clipboardFrame}
-                          timelineWidth={getFrameWidthForTimeline(frame.delay)}
-                          timelineHeight={TIMELINE_HEIGHT}
-                        />
-                      ))}
+                    {sequence.frames.map((frame, frameIndex) => (
+                      <FrameEditor
+                        key={frame.frameId}
+                        frame={frame}
+                        frameIndex={frameIndex}
+                        totalFrames={sequence.frames.length}
+                        onUpdate={(updated) => handleUpdateFrame(frameIndex, updated)}
+                        onDelete={() => handleDeleteFrame(frameIndex)}
+                        onDuplicateBefore={() => handleDuplicateBefore(frameIndex)}
+                        onDuplicateAfter={() => handleDuplicateAfter(frameIndex)}
+                        onCopy={() => handleCopyFrame(frameIndex)}
+                        onPasteBefore={() => handlePasteBefore(frameIndex)}
+                        onPasteAfter={() => handlePasteAfter(frameIndex)}
+                        onPasteReplace={() => handlePasteReplace(frameIndex)}
+                        onMoveFirst={() => handleMoveFirst(frameIndex)}
+                        onMoveLast={() => handleMoveLast(frameIndex)}
+                        onMovePrev={() => handleMovePrev(frameIndex)}
+                        onMoveNext={() => handleMoveNext(frameIndex)}
+                        onAddEmptyBefore={() => handleAddEmptyBefore(frameIndex)}
+                        onAddEmptyAfter={() => handleAddEmptyAfter(frameIndex)}
+                        onAddMultipleEmptyBefore={(count) => handleAddMultipleEmptyBefore(frameIndex, count)}
+                        onAddMultipleEmptyAfter={(count) => handleAddMultipleEmptyAfter(frameIndex, count)}
+                        onAddFromClipboardBefore={(urls) => handleAddFromClipboardBefore(frameIndex, urls)}
+                        onAddFromClipboardAfter={(urls) => handleAddFromClipboardAfter(frameIndex, urls)}
+                        onResizeStart={handleResizeStart}
+                        onFrameClick={() => onFrameSelect?.(index, frameIndex)}
+                        hasClipboard={!!clipboardFrame}
+                        timelineWidth={getFrameWidthForTimeline(frame.delay)}
+                        timelineHeight={TIMELINE_HEIGHT}
+                      />
+                    ))}
                     <Paper
                       sx={{
                         minWidth: 60,

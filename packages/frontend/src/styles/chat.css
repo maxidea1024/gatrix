@@ -51,18 +51,21 @@
   background-color: var(--mui-palette-background-paper) !important;
   color: var(--mui-palette-text-primary) !important;
   border: 1px solid var(--mui-palette-divider) !important;
-  user-select: text !important; /* 수신 메시지 텍스트 선택 허용 */
+  user-select: text !important;
+  /* 수신 메시지 텍스트 선택 허용 */
 }
 
 .cs-message--outgoing .cs-message__content {
   background-color: var(--mui-palette-primary-main) !important;
   color: var(--mui-palette-primary-contrastText) !important;
-  user-select: text !important; /* 발신 메시지 텍스트 선택 허용 */
+  user-select: text !important;
+  /* 발신 메시지 텍스트 선택 허용 */
 }
 
 .cs-message__content-wrapper {
   max-width: 70% !important;
-  user-select: text !important; /* 메시지 텍스트 선택 허용 */
+  user-select: text !important;
+  /* 메시지 텍스트 선택 허용 */
 }
 
 .cs-message__avatar {
@@ -173,6 +176,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -187,6 +191,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -197,33 +202,18 @@
   .cs-message__content-wrapper {
     max-width: 85% !important;
   }
-  
+
   .cs-conversation-header {
     padding: 8px 16px !important;
   }
-  
+
   .cs-message-input__content-editor-wrapper {
     padding: 6px 12px !important;
   }
 }
 
 /* Scrollbar styling */
-.cs-message-list::-webkit-scrollbar {
-  width: 6px !important;
-}
 
-.cs-message-list::-webkit-scrollbar-track {
-  background: transparent !important;
-}
-
-.cs-message-list::-webkit-scrollbar-thumb {
-  background-color: var(--mui-palette-action-disabled) !important;
-  border-radius: 3px !important;
-}
-
-.cs-message-list::-webkit-scrollbar-thumb:hover {
-  background-color: var(--mui-palette-action-hover) !important;
-}
 
 /* Message status indicators */
 .cs-message__footer {

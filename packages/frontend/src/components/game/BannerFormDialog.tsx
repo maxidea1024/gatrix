@@ -341,27 +341,6 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           p: 3,
           overflow: 'auto',
           flex: 1,
-          // Chat message list scrollbar style
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-          },
-          scrollbarWidth: 'thin',
-          scrollbarColor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.2) transparent'
-              : 'rgba(0, 0, 0, 0.2) transparent',
         }}
       >
         {/* Basic Info Accordion */}
@@ -411,8 +390,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
               />
               <Divider />
               {/* Size row: Preset + (Custom fields if selected) */}
-              <Grid container spacing={2}>
-                <Grid item xs={sizePreset === 'custom' ? 4 : 6}>
+              <Stack direction="row" spacing={2}>
+                <Box sx={{ flex: sizePreset === 'custom' ? 4 : 6 }}>
                   <FormControl fullWidth size="small">
                     <InputLabel>{t('banners.sizePreset')}</InputLabel>
                     <Select
@@ -430,10 +409,10 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                       ))}
                     </Select>
                   </FormControl>
-                </Grid>
+                </Box>
                 {sizePreset === 'custom' && (
                   <>
-                    <Grid item xs={4}>
+                    <Box sx={{ flex: 4 }}>
                       <TextField
                         label={t('banners.width')}
                         value={width}
@@ -447,8 +426,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                           '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
                         }}
                       />
-                    </Grid>
-                    <Grid item xs={4}>
+                    </Box>
+                    <Box sx={{ flex: 4 }}>
                       <TextField
                         label={t('banners.height')}
                         value={height}
@@ -462,12 +441,12 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                           '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
                         }}
                       />
-                    </Grid>
+                    </Box>
                   </>
                 )}
                 {sizePreset !== 'custom' && (
                   <>
-                    <Grid item xs={4}>
+                    <Box sx={{ flex: 4 }}>
                       <TextField
                         label={t('banners.playbackSpeed')}
                         value={playbackSpeed}
@@ -481,16 +460,16 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                           '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
                         }}
                       />
-                    </Grid>
-                    <Grid item xs={2} sx={{ display: 'flex', alignItems: 'center' }}>
+                    </Box>
+                    <Box sx={{ flex: 2, display: 'flex', alignItems: 'center' }}>
                       <FormControlLabel
                         control={<Checkbox checked={shuffle} onChange={(e) => setShuffle(e.target.checked)} size="small" />}
                         label={t('banners.shuffleMode')}
                       />
-                    </Grid>
+                    </Box>
                   </>
                 )}
-              </Grid>
+              </Stack>
               {/* Playback speed and shuffle on separate row when custom size */}
               {sizePreset === 'custom' && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>

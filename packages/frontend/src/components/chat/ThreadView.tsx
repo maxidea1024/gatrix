@@ -124,7 +124,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
   const handleClose = () => {
     try {
       window.dispatchEvent(new CustomEvent('focus-main-chat-input'));
-    } catch {}
+    } catch { }
     onClose();
   };
 
@@ -341,27 +341,6 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
           overflow: 'auto',
           p: 1,
           overflowAnchor: 'none',
-          // 메인 채팅 스크롤바와 동일한 스타일
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-          },
-          '&::-webkit-scrollbar-thumb:active': {
-            background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-          },
-          scrollbarWidth: 'thin',
-          scrollbarColor: theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, 0.2) transparent'
-            : 'rgba(0, 0, 0, 0.2) transparent',
         }}
       >
         {isLoading ? (
@@ -482,7 +461,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
                               backgroundColor: (reactions as any[]).some((r: any) => r.userId === state.user?.id)
                                 ? theme.palette.primary.main + '20'
                                 : (theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)'),
-                              border: `1px solid ${ (reactions as any[]).some((r: any) => r.userId === state.user?.id) ? theme.palette.primary.main : theme.palette.divider }`,
+                              border: `1px solid ${(reactions as any[]).some((r: any) => r.userId === state.user?.id) ? theme.palette.primary.main : theme.palette.divider}`,
                               cursor: 'pointer',
                               '&:hover': { backgroundColor: theme.palette.primary.main + '30' }
                             }}

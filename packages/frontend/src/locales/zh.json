@@ -2311,8 +2311,28 @@
     "monitoringLogsCardDesc": "直接打开后端和基础设施服务的集中日志仪表盘。",
     "monitoringAlertsCardTitle": "管理监控告警",
     "monitoringAlertsCardDesc": "跳转到监控告警页面，查看并管理告警状态。",
-    "monitoringGrafanaCardTitle": "打开 Grafana 仪表盘",
-    "monitoringGrafanaCardDesc": "以全屏方式打开 Grafana 监控仪表盘，查看详细指标。"
+    "monitoringGrafanaCardTitle": "Grafana 仪表盘",
+    "monitoringGrafanaCardDesc": "以全屏方式打开 Grafana 监控仪表盘，查看详细指标。",
+    "greetingMorning": "早上好",
+    "greetingAfternoon": "下午好",
+    "greetingEvening": "晚上好",
+    "noQuickActions": "没有可用的快捷操作",
+    "noRecentActivity": "没有最近的活动",
+    "viewAll": "查看全部",
+    "pendingUsers": "有 {{count}} 位用户正在等待审批",
+    "quickActions": {
+      "usersDesc": "管理用户账户和权限",
+      "maintenanceDesc": "管理服务维护状态",
+      "schedulerDesc": "管理计划任务",
+      "remoteConfigDesc": "管理远程配置",
+      "serviceNoticesDesc": "创建和管理服务公告",
+      "couponsDesc": "定义和管理优惠券",
+      "surveysDesc": "创建和管理问卷调查",
+      "bannersDesc": "管理横幅图片",
+      "securityDesc": "管理 API 令牌和白名单",
+      "auditLogsDesc": "查看系统审计日志",
+      "monitoringDesc": "系统监控仪表盘"
+    }
   },
   "div": "div",
   "errors": {
@@ -2458,7 +2478,15 @@
     "personalInfo": "个人信息",
     "profileUpdated": "个人资料更新成功",
     "security": "安全",
-    "updateFailed": "更新个人资料失败"
+    "updateFailed": "更新个人资料失败",
+    "permissions": "权限",
+    "permissionsDesc": "已授予您的权限列表",
+    "accessibleEnvironments": "可访问环境",
+    "accessibleEnvironmentsDesc": "您有权访问的环境列表",
+    "allEnvironments": "可访问所有环境",
+    "noPermissions": "未授予任何权限",
+    "noEnvironments": "没有可访问的环境",
+    "authType": "认证方式"
   },
   "roles": {
     "admin": "管理员",

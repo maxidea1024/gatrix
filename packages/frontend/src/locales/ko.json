@@ -2307,8 +2307,28 @@
     "monitoringLogsCardDesc": "백엔드 및 인프라 서비스에서 수집된 중앙 로그 대시보드를 바로 확인할 수 있습니다.",
     "monitoringAlertsCardTitle": "모니터링 알림 관리",
     "monitoringAlertsCardDesc": "모니터링 알림 목록 페이지로 이동하여 알림 상태를 확인하고 관리할 수 있습니다.",
-    "monitoringGrafanaCardTitle": "Grafana 대시보드 열기",
-    "monitoringGrafanaCardDesc": "Grafana 모니터링 대시보드를 전체 화면으로 열어 상세 지표를 확인할 수 있습니다."
+    "monitoringGrafanaCardTitle": "Grafana 대시보드",
+    "monitoringGrafanaCardDesc": "Grafana 모니터링 대시보드를 전체 화면으로 열어 상세 지표를 확인할 수 있습니다.",
+    "greetingMorning": "좋은 아침이에요",
+    "greetingAfternoon": "좋은 오후에요",
+    "greetingEvening": "좋은 저녁이에요",
+    "noQuickActions": "접근 가능한 빠른 작업이 없습니다",
+    "noRecentActivity": "최근 활동이 없습니다",
+    "viewAll": "모두 보기",
+    "pendingUsers": "{{count}}명의 사용자가 승인을 기다리고 있습니다",
+    "quickActions": {
+      "usersDesc": "사용자 계정 관리 및 권한 설정",
+      "maintenanceDesc": "서비스 점검 상태 관리",
+      "schedulerDesc": "예약 작업 관리",
+      "remoteConfigDesc": "리모트 설정 관리",
+      "serviceNoticesDesc": "서비스 공지 작성 및 관리",
+      "couponsDesc": "쿠폰 정의 및 관리",
+      "surveysDesc": "설문지 생성 및 관리",
+      "bannersDesc": "배너 이미지 관리",
+      "securityDesc": "API 토큰 및 화이트리스트 관리",
+      "auditLogsDesc": "시스템 감사 로그 조회",
+      "monitoringDesc": "시스템 모니터링 대시보드"
+    }
   },
   "div": "구분",
   "errors": {
@@ -2454,7 +2474,15 @@
     "personalInfo": "개인 정보",
     "profileUpdated": "프로필이 업데이트되었습니다",
     "security": "보안",
-    "updateFailed": "업데이트 실패"
+    "updateFailed": "업데이트 실패",
+    "permissions": "권한",
+    "permissionsDesc": "부여된 권한 목록입니다",
+    "accessibleEnvironments": "접근 가능한 환경",
+    "accessibleEnvironmentsDesc": "접근 권한이 있는 환경 목록입니다",
+    "allEnvironments": "모든 환경 접근 가능",
+    "noPermissions": "부여된 권한이 없습니다",
+    "noEnvironments": "접근 가능한 환경이 없습니다",
+    "authType": "인증 방식"
   },
   "roles": {
     "admin": "관리자",

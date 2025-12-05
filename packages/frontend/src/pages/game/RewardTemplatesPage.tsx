@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -48,6 +50,8 @@ import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../componen
 const RewardTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.REWARD_TEMPLATES_MANAGE]);
 
   // State
   const [templates, setTemplates] = useState<RewardTemplate[]>([]);
@@ -500,15 +504,17 @@ const RewardTemplatesPage: React.FC = () => {
             {t('rewardTemplates.subtitle')}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreate}
-          >
-            {t('rewardTemplates.createTemplate')}
-          </Button>
-        </Box>
+        {canManage && (
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
+              {t('rewardTemplates.createTemplate')}
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {/* Search and Filters */}
@@ -638,6 +644,7 @@ const RewardTemplatesPage: React.FC = () => {
                 <TableRow>
                   {visibleColumns.map((column) => {
                     if (column.id === 'checkbox') {
+                      if (!canManage) return null;
                       return (
                         <TableCell key={column.id} padding="checkbox">
                           <Checkbox
@@ -649,6 +656,7 @@ const RewardTemplatesPage: React.FC = () => {
                       );
                     }
                     if (column.id === 'actions') {
+                      if (!canManage) return null;
                       return (
                         <TableCell key={column.id} align="center">
                           {t(column.labelKey)}
@@ -678,14 +686,14 @@ const RewardTemplatesPage: React.FC = () => {
               <TableBody>
                 {loading && isInitialLoad ? (
                   <EmptyTableRow
-                    colSpan={visibleColumns.length}
+                    colSpan={visibleColumns.length - (canManage ? 0 : 2)}
                     loading={true}
                     message=""
                     loadingMessage={t('common.loadingData')}
                   />
                 ) : templates.length === 0 ? (
                   <EmptyTableRow
-                    colSpan={visibleColumns.length}
+                    colSpan={visibleColumns.length - (canManage ? 0 : 2)}
                     loading={false}
                     message={t('rewardTemplates.noTemplatesFound')}
                     loadingMessage=""
@@ -699,6 +707,7 @@ const RewardTemplatesPage: React.FC = () => {
                     >
                       {visibleColumns.map((column) => {
                         if (column.id === 'checkbox') {
+                          if (!canManage) return null;
                           return (
                             <TableCell key={column.id} padding="checkbox">
                               <Checkbox
@@ -774,6 +783,7 @@ const RewardTemplatesPage: React.FC = () => {
                           );
                         }
                         if (column.id === 'actions') {
+                          if (!canManage) return null;
                           return (
                             <TableCell key={column.id} align="center">
                               <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>

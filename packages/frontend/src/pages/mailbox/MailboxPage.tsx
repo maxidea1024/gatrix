@@ -1056,12 +1056,15 @@ const MailboxPage: React.FC = () => {
         }}
         onSearchUsers={async (query) => {
           const results = await chatService.searchUsers(query);
-          return results;
+          return results.map(u => ({
+            ...u,
+            name: u.name || u.username || u.email.split('@')[0],
+          })) as any;
         }}
         onTranslate={async (content, targetLang) => {
           const result = await translationService.translateText({
             text: content,
-            targetLanguage: targetLang,
+            targetLanguage: targetLang as 'ko' | 'zh' | 'en',
             sourceLanguage: 'auto',
           });
           return result.translatedText;

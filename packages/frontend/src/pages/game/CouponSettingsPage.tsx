@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, Menu, Divider, FormHelperText, Paper, Collapse } from '@mui/material';
 import { Settings as SettingsIcon, Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, List as ListIcon, ContentCopy as ContentCopyIcon, Code as CodeIcon, CardGiftcard as CardGiftcardIcon, HourglassEmpty as HourglassEmptyIcon, Download as DownloadIcon, ArrowDropDown as ArrowDropDownIcon, CheckCircle as CheckCircleIcon, TableChart as TableChartIcon, Description as ExcelIcon, ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +31,8 @@ const CouponSettingsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { platforms, channels } = usePlatformConfig();
   const { worlds } = useGameWorld();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.COUPONS_MANAGE]);
 
   // list state
   const [items, setItems] = useState<CouponSetting[]>([]);
@@ -541,7 +545,7 @@ const CouponSettingsPage: React.FC = () => {
     setPage(0);
   };
 
-  const colCount = visibleColumns.length + 2; // +1 for actions, +1 for selection checkbox
+  const colCount = visibleColumns.length + (canManage ? 2 : 0); // +1 for actions, +1 for selection checkbox (only when canManage)
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -925,10 +929,12 @@ const CouponSettingsPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => { resetForm(); setOpenForm(true); }}>
-            {t('coupons.couponSettings.createCoupon')}
-          </Button>
-          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          {canManage && (
+            <Button variant="contained" startIcon={<AddIcon />} onClick={() => { resetForm(); setOpenForm(true); }}>
+              {t('coupons.couponSettings.createCoupon')}
+            </Button>
+          )}
+          {canManage && <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />}
           <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => setOpenSDKGuide(true)}>
             {t('coupons.couponSettings.sdkGuide')}
           </Button>
@@ -1017,13 +1023,15 @@ const CouponSettingsPage: React.FC = () => {
             <Table size="small">
               <TableHead>
                 <TableRow sx={{ height: 48 }}>
-                  <TableCell padding="checkbox" sx={{ width: 48 }}>
-                    <Checkbox
-                      indeterminate={sortedItems.some((it) => selectedIds.includes(it.id)) && !sortedItems.every((it) => selectedIds.includes(it.id))}
-                      checked={sortedItems.length > 0 && sortedItems.every((it) => selectedIds.includes(it.id))}
-                      onChange={(e) => handleSelectAll(e.target.checked)}
-                    />
-                  </TableCell>
+                  {canManage && (
+                    <TableCell padding="checkbox" sx={{ width: 48 }}>
+                      <Checkbox
+                        indeterminate={sortedItems.some((it) => selectedIds.includes(it.id)) && !sortedItems.every((it) => selectedIds.includes(it.id))}
+                        checked={sortedItems.length > 0 && sortedItems.every((it) => selectedIds.includes(it.id))}
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                      />
+                    </TableCell>
+                  )}
                   {visibleColumns.map((col) => (
                     <TableCell
                       key={col.id}
@@ -1040,7 +1048,7 @@ const CouponSettingsPage: React.FC = () => {
                       </TableSortLabel>
                     </TableCell>
                   ))}
-                  <TableCell align="center" sx={{ py: 1, px: 2 }}>{t('common.actions')}</TableCell>
+                  {canManage && <TableCell align="center" sx={{ py: 1, px: 2 }}>{t('common.actions')}</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -1051,12 +1059,14 @@ const CouponSettingsPage: React.FC = () => {
                 ) : (
                   sortedItems.map((it) => (
                     <TableRow key={it.id} hover sx={{ height: 48 }}>
-                      <TableCell padding="checkbox" sx={{ py: 1, px: 2 }}>
-                        <Checkbox
-                          checked={selectedIds.includes(it.id)}
-                          onChange={(e) => handleSelectOne(it.id, e.target.checked)}
-                        />
-                      </TableCell>
+                      {canManage && (
+                        <TableCell padding="checkbox" sx={{ py: 1, px: 2 }}>
+                          <Checkbox
+                            checked={selectedIds.includes(it.id)}
+                            onChange={(e) => handleSelectOne(it.id, e.target.checked)}
+                          />
+                        </TableCell>
+                      )}
                       {visibleColumns.map((col) => {
                         switch (col.id) {
                           case 'name':
@@ -1309,26 +1319,27 @@ const CouponSettingsPage: React.FC = () => {
                             return null;
                         }
                       })}
-                      <TableCell align="center" sx={{ py: 1, px: 2 }}>
-                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-
-                          <IconButton size="small" onClick={() => handleEdit(it)} color="primary">
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                          <Tooltip title={it.status === 'DELETED' ? t('coupons.couponSettings.alreadyDeleted') : ''}>
-                            <span>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleDeleteClick(it)}
-                                color="error"
-                                disabled={it.status === 'DELETED'}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </span>
-                          </Tooltip>
-                        </Box>
-                      </TableCell>
+                      {canManage && (
+                        <TableCell align="center" sx={{ py: 1, px: 2 }}>
+                          <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                            <IconButton size="small" onClick={() => handleEdit(it)} color="primary">
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                            <Tooltip title={it.status === 'DELETED' ? t('coupons.couponSettings.alreadyDeleted') : ''}>
+                              <span>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleDeleteClick(it)}
+                                  color="error"
+                                  disabled={it.status === 'DELETED'}
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          </Box>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 )}

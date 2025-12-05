@@ -21,6 +21,8 @@ export interface CreateServiceNoticeData {
   isActive: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
+  channels?: string[] | null;
+  subchannels?: string[] | null;
   startDate?: string | null;
   endDate?: string | null;
   tabTitle?: string | null;
@@ -29,7 +31,7 @@ export interface CreateServiceNoticeData {
   description?: string | null;
 }
 
-export interface UpdateServiceNoticeData extends Partial<CreateServiceNoticeData> {}
+export interface UpdateServiceNoticeData extends Partial<CreateServiceNoticeData> { }
 
 export interface ServiceNoticeFilters {
   isActive?: boolean;

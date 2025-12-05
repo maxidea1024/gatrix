@@ -269,6 +269,15 @@ export class AdminController {
 
       await UserService.suspendUser(userId);
 
+      // Send real-time notification to the affected user
+      await pubSubService.publishNotification({
+        type: 'user_suspended',
+        data: {
+          userId,
+        },
+        targetUsers: [userId],
+      });
+
       res.json({
         success: true,
         message: 'User suspended successfully'

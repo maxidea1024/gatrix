@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -14,7 +16,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { varsService } from '@/services/varsService';
-import { useAuth } from '@/contexts/AuthContext';
 import { serviceDiscoveryConfigService, ServiceDiscoveryConfig } from '@/services/serviceDiscoveryConfigService';
 import { useSnackbar } from 'notistack';
 import KeyValuePage from './KeyValuePage';
@@ -22,7 +23,8 @@ import KeyValuePage from './KeyValuePage';
 // System Settings Page - requires admin role + system-settings permission
 const SystemSettingsPage: React.FC = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.SYSTEM_SETTINGS_MANAGE]);
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -129,11 +131,13 @@ const SystemSettingsPage: React.FC = () => {
                   onChange={(e) => setAdmindUrl(e.target.value)}
                   helperText={t('settings.network.admindUrlHelp')}
                 />
-                <Stack direction="row" spacing={1}>
-                  <Button variant="contained" onClick={async () => { await varsService.set('admindUrl', admindUrl || null); }}>
-                    {t('common.save')}
-                  </Button>
-                </Stack>
+                {canManage && (
+                  <Stack direction="row" spacing={1}>
+                    <Button variant="contained" onClick={async () => { await varsService.set('admindUrl', admindUrl || null); }}>
+                      {t('common.save')}
+                    </Button>
+                  </Stack>
+                )}
               </Stack>
             </>
           )}
@@ -160,11 +164,13 @@ const SystemSettingsPage: React.FC = () => {
                   onChange={(e) => setGenericWebhookUrl(e.target.value)}
                   helperText={t('settings.integrations.genericWebhookHelp')}
                 />
-                <Stack direction="row" spacing={1}>
-                  <Button variant="contained" onClick={async () => { await varsService.set('slackWebhookUrl', slackWebhookUrl || null); await varsService.set('genericWebhookUrl', genericWebhookUrl || null); }}>
-                    {t('common.save')}
-                  </Button>
-                </Stack>
+                {canManage && (
+                  <Stack direction="row" spacing={1}>
+                    <Button variant="contained" onClick={async () => { await varsService.set('slackWebhookUrl', slackWebhookUrl || null); await varsService.set('genericWebhookUrl', genericWebhookUrl || null); }}>
+                      {t('common.save')}
+                    </Button>
+                  </Stack>
+                )}
               </Stack>
             </>
           )}
@@ -214,11 +220,13 @@ const SystemSettingsPage: React.FC = () => {
                   inputProps={{ min: 5, max: 60 }}
                 />
 
-                <Stack direction="row" spacing={1}>
-                  <Button variant="contained" onClick={handleSaveServiceDiscoveryConfig}>
-                    {t('common.save')}
-                  </Button>
-                </Stack>
+                {canManage && (
+                  <Stack direction="row" spacing={1}>
+                    <Button variant="contained" onClick={handleSaveServiceDiscoveryConfig}>
+                      {t('common.save')}
+                    </Button>
+                  </Stack>
+                )}
               </Stack>
             </>
           )}

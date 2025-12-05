@@ -242,6 +242,25 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
   }, [user?.id]);
 
+  // Handle account suspension notification - immediately redirect to suspended page
+  useEffect(() => {
+    const handleUserSuspended = (event: CustomEvent) => {
+      const { userId } = event.detail || {};
+      // Only redirect if the notification is for the current user
+      if (userId && user?.id === userId) {
+        // Clear auth data and redirect to account suspended page
+        localStorage.removeItem('user');
+        localStorage.removeItem('accessToken');
+        navigate('/account-suspended');
+      }
+    };
+
+    window.addEventListener('user-suspended', handleUserSuspended as EventListener);
+    return () => {
+      window.removeEventListener('user-suspended', handleUserSuspended as EventListener);
+    };
+  }, [user?.id, navigate]);
+
   // Handle role change dialog confirmation
   const handleRoleChangeConfirm = useCallback(() => {
     setRoleChangeDialogOpen(false);
@@ -1202,8 +1221,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       <Typography variant="body2" sx={{ mb: 1 }}>
                         <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipType')}:</strong> {(() => {
                           switch (maintenanceStatus.detail.type) {
-                            case 'scheduled':
-                              return t('maintenance.scheduledLabel');
                             case 'emergency':
                               return t('maintenance.emergencyLabel');
                             case 'regular':

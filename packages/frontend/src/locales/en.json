@@ -2307,8 +2307,28 @@
     "monitoringLogsCardDesc": "Open the centralized logs dashboard for backend and infrastructure services.",
     "monitoringAlertsCardTitle": "View monitoring alerts",
     "monitoringAlertsCardDesc": "Go to the monitoring alerts page to review and manage alert status.",
-    "monitoringGrafanaCardTitle": "Open Grafana dashboards",
-    "monitoringGrafanaCardDesc": "Open the Grafana monitoring dashboards in a full-screen view."
+    "monitoringGrafanaCardTitle": "Grafana Dashboard",
+    "monitoringGrafanaCardDesc": "Open the Grafana monitoring dashboards in a full-screen view.",
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening",
+    "noQuickActions": "No quick actions available",
+    "noRecentActivity": "No recent activity",
+    "viewAll": "View all",
+    "pendingUsers": "{{count}} users are waiting for approval",
+    "quickActions": {
+      "usersDesc": "Manage user accounts and permissions",
+      "maintenanceDesc": "Manage service maintenance status",
+      "schedulerDesc": "Manage scheduled tasks",
+      "remoteConfigDesc": "Manage remote configuration",
+      "serviceNoticesDesc": "Create and manage service notices",
+      "couponsDesc": "Define and manage coupons",
+      "surveysDesc": "Create and manage surveys",
+      "bannersDesc": "Manage banner images",
+      "securityDesc": "Manage API tokens and whitelists",
+      "auditLogsDesc": "View system audit logs",
+      "monitoringDesc": "System monitoring dashboard"
+    }
   },
   "div": "div",
   "errors": {
@@ -2454,7 +2474,15 @@
     "personalInfo": "Personal Information",
     "profileUpdated": "Profile updated successfully",
     "security": "Security",
-    "updateFailed": "Failed to update profile"
+    "updateFailed": "Failed to update profile",
+    "permissions": "Permissions",
+    "permissionsDesc": "List of permissions granted to you",
+    "accessibleEnvironments": "Accessible Environments",
+    "accessibleEnvironmentsDesc": "List of environments you have access to",
+    "allEnvironments": "All environments accessible",
+    "noPermissions": "No permissions granted",
+    "noEnvironments": "No accessible environments",
+    "authType": "Authentication Type"
   },
   "roles": {
     "admin": "admin",

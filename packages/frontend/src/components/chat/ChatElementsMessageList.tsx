@@ -335,23 +335,7 @@ const createCustomStyles = (isDark: boolean) => `
     height: 100% !important;
   }
 
-  /* 스크롤바 스타일링 */
-  .rce-container-mlist::-webkit-scrollbar {
-    width: 8px;
-  }
 
-  .rce-container-mlist::-webkit-scrollbar-track {
-    background: ${isDark ? '#2a2d3a' : '#f1f1f1'};
-  }
-
-  .rce-container-mlist::-webkit-scrollbar-thumb {
-    background: ${isDark ? '#5f6368' : '#c1c1c1'};
-    border-radius: 4px;
-  }
-
-  .rce-container-mlist::-webkit-scrollbar-thumb:hover {
-    background: ${isDark ? '#9aa0a6' : '#a8a8a8'};
-  }
 
   /* 입력창 스타일 개선 */
   .rce-input {
@@ -375,7 +359,7 @@ const createCustomStyles = (isDark: boolean) => `
 `;
 import { useTranslation } from 'react-i18next';
 import { useChat } from '../../contexts/ChatContext';
-import { MessageType } from '../../types/chat';
+import { MessageType, Message } from '../../types/chat';
 import AdvancedMessageInput from './AdvancedMessageInput';
 
 
@@ -383,7 +367,7 @@ interface ChatElementsMessageListProps {
   channelId: number;
   onSendMessage?: (message: string, attachments?: File[]) => void;
   onInviteUser?: () => void;
-  onOpenThread?: (message: MessageType) => void;
+  onOpenThread?: (message: Message) => void;
   isThreadOpen?: boolean;
 }
 
@@ -966,27 +950,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
           gap: '8px',
           overflowAnchor: 'none', // disable scroll anchoring to prevent jump
           // 커스텀 스크롤바 스타일
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-            borderRadius: '4px',
-            '&:hover': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-            },
-          },
-          '&::-webkit-scrollbar-thumb:active': {
-            background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-          },
-          // Firefox 스크롤바 스타일
-          scrollbarWidth: 'thin',
-          scrollbarColor: theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, 0.2) transparent'
-            : 'rgba(0, 0, 0, 0.2) transparent',
+
         }}
         onClick={handleChatAreaClick}
         onScroll={handleScroll}
@@ -1042,199 +1006,218 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
               )}
 
               {/* 메시지 */}
-            <Box
-              key={message.id}
-              className="message-container"
-              sx={{
-                position: 'relative',
-                display: 'flex',
-                gap: '12px',
-                padding: '8px 12px',
-                borderRadius: '8px',
-                userSelect: 'text', // 메시지 컨테이너에서 텍스트 선택 허용
-                '&:hover': {
-                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'
-                }
-              }}
-            >
-              {/* Avatar */}
-              <Avatar
-                src={userInfo.avatarUrl}
-                alt={userInfo.name}
+              <Box
+                key={message.id}
+                className="message-container"
                 sx={{
-                  width: '36px',
-                  height: '36px',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  backgroundColor: theme.palette.mode === 'dark' ? '#5f6368' : '#e0e0e0',
-                  color: 'white'
+                  position: 'relative',
+                  display: 'flex',
+                  gap: '12px',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  userSelect: 'text', // 메시지 컨테이너에서 텍스트 선택 허용
+                  '&:hover': {
+                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'
+                  }
                 }}
               >
-                {userInfo.name.trim().charAt(0).toUpperCase()}
-              </Avatar>
-
-              {/* Message Content */}
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                {/* Header */}
-                <Box
+                {/* Avatar */}
+                <Avatar
+                  src={userInfo.avatarUrl}
+                  alt={userInfo.name}
                   sx={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    gap: '8px',
-                    marginBottom: '4px'
+                    width: '36px',
+                    height: '36px',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    backgroundColor: theme.palette.mode === 'dark' ? '#5f6368' : '#e0e0e0',
+                    color: 'white'
                   }}
                 >
-                  <Typography
-                    variant="subtitle2"
+                  {userInfo.name.trim().charAt(0).toUpperCase()}
+                </Avatar>
+
+                {/* Message Content */}
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  {/* Header */}
+                  <Box
                     sx={{
-                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      gap: '8px',
+                      marginBottom: '4px'
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        fontWeight: 600,
+                        color: theme.palette.mode === 'dark' ? '#e8eaed' : '#1d1c1d',
+                        fontSize: '15px'
+                      }}
+                    >
+                      {userInfo.name}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: theme.palette.mode === 'dark' ? '#9aa0a6' : '#616061',
+                        fontSize: '12px'
+                      }}
+                    >
+                      {messageTime}
+                    </Typography>
+                  </Box>
+
+                  {/* Message Text */}
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{
                       color: theme.palette.mode === 'dark' ? '#e8eaed' : '#1d1c1d',
-                      fontSize: '15px'
+                      fontSize: '15px',
+                      lineHeight: 1.46,
+                      wordBreak: 'break-word',
+                      whiteSpace: 'pre-wrap',
+                      userSelect: 'text', // 텍스트 선택 허용
+                      cursor: 'text' // 텍스트 커서 표시
                     }}
+                    onClick={(e) => e.stopPropagation()} // 클릭 이벤트 전파 방지
                   >
-                    {userInfo.name}
+                    <MessageWithPreview content={message.content} theme={theme} />
                   </Typography>
-                  <Typography
-                    variant="caption"
+
+                  {/* 리액션 표시 */}
+                  {message.reactions && message.reactions.length > 0 && (
+                    <Box sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 0.5,
+                      mt: 1,
+                      alignItems: 'center'
+                    }}>
+                      {Object.entries(
+                        message.reactions.reduce((acc, reaction) => {
+                          if (!acc[reaction.emoji]) {
+                            acc[reaction.emoji] = [];
+                          }
+                          acc[reaction.emoji].push(reaction);
+                          return acc;
+                        }, {} as Record<string, any[]>)
+                      ).map(([emoji, reactions]) => (
+                        <Box
+                          key={emoji}
+                          onClick={() => {
+                            const userReaction = reactions.find(r => r.userId === state.user?.id);
+                            if (userReaction) {
+                              actions.removeReaction(message.id, emoji);
+                            } else {
+                              actions.addReaction(message.id, emoji);
+                            }
+                          }}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: '12px',
+                            backgroundColor: reactions.some(r => r.userId === state.user?.id)
+                              ? theme.palette.primary.main + '20'
+                              : colors.inputFieldBackground,
+                            border: `1px solid ${reactions.some(r => r.userId === state.user?.id)
+                              ? theme.palette.primary.main
+                              : colors.inputBorder}`,
+                            cursor: 'pointer',
+                            '&:hover': {
+                              backgroundColor: theme.palette.primary.main + '30'
+                            }
+                          }}
+                        >
+                          <Typography sx={{ fontSize: '14px' }}>{emoji}</Typography>
+                          <Typography sx={{
+                            fontSize: '12px',
+                            color: colors.placeholderText,
+                            fontWeight: reactions.some(r => r.userId === state.user?.id) ? 600 : 400
+                          }}>
+                            {reactions.length}
+                          </Typography>
+                        </Box>
+                      ))}
+
+                      {/* 반응 추가 버튼 */}
+                      <Tooltip title={t('chat.addReaction')} arrow>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEmojiAnchorEl(e.currentTarget);
+                            setEmojiPickerMessageId(message.id);
+                          }}
+                          sx={{
+                            width: 28,
+                            height: 28,
+                            backgroundColor: colors.inputFieldBackground,
+                            border: `1px solid ${colors.inputBorder}`,
+                            '&:hover': {
+                              backgroundColor: theme.palette.primary.main + '20',
+                              borderColor: theme.palette.primary.main
+                            }
+                          }}
+                        >
+                          <AddReactionIcon sx={{ fontSize: 16, color: colors.placeholderText }} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  )}
+
+                  {/* 메시지 액션 버튼들 (호버 시 표시) */}
+                  <Box
+                    className="message-actions"
                     sx={{
-                      color: theme.palette.mode === 'dark' ? '#9aa0a6' : '#616061',
-                      fontSize: '12px'
+                      position: 'absolute',
+                      top: -8,
+                      right: 8,
+                      display: 'none',
+                      gap: 0.5,
+                      backgroundColor: colors.inputBackground,
+                      borderRadius: '8px',
+                      border: `1px solid ${colors.inputBorder}`,
+                      boxShadow: theme.palette.mode === 'dark'
+                        ? '0 2px 8px rgba(0,0,0,0.3)'
+                        : '0 2px 8px rgba(0,0,0,0.1)',
+                      '.message-container:hover &': {
+                        display: 'flex'
+                      }
                     }}
                   >
-                    {messageTime}
-                  </Typography>
-                </Box>
-
-                {/* Message Text */}
-                <Typography
-                  variant="body2"
-                  component="div"
-                  sx={{
-                    color: theme.palette.mode === 'dark' ? '#e8eaed' : '#1d1c1d',
-                    fontSize: '15px',
-                    lineHeight: 1.46,
-                    wordBreak: 'break-word',
-                    whiteSpace: 'pre-wrap',
-                    userSelect: 'text', // 텍스트 선택 허용
-                    cursor: 'text' // 텍스트 커서 표시
-                  }}
-                  onClick={(e) => e.stopPropagation()} // 클릭 이벤트 전파 방지
-                >
-                  <MessageWithPreview content={message.content} theme={theme} />
-                </Typography>
-
-                {/* 리액션 표시 */}
-                {message.reactions && message.reactions.length > 0 && (
-                  <Box sx={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 0.5,
-                    mt: 1,
-                    alignItems: 'center'
-                  }}>
-                    {Object.entries(
-                      message.reactions.reduce((acc, reaction) => {
-                        if (!acc[reaction.emoji]) {
-                          acc[reaction.emoji] = [];
-                        }
-                        acc[reaction.emoji].push(reaction);
-                        return acc;
-                      }, {} as Record<string, any[]>)
-                    ).map(([emoji, reactions]) => (
-                      <Box
-                        key={emoji}
-                        onClick={() => {
-                          const userReaction = reactions.find(r => r.userId === state.user?.id);
-                          if (userReaction) {
-                            actions.removeReaction(message.id, emoji);
-                          } else {
-                            actions.addReaction(message.id, emoji);
-                          }
-                        }}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          px: 1,
-                          py: 0.5,
-                          borderRadius: '12px',
-                          backgroundColor: reactions.some(r => r.userId === state.user?.id)
-                            ? theme.palette.primary.main + '20'
-                            : colors.inputFieldBackground,
-                          border: `1px solid ${reactions.some(r => r.userId === state.user?.id)
-                            ? theme.palette.primary.main
-                            : colors.inputBorder}`,
-                          cursor: 'pointer',
-                          '&:hover': {
-                            backgroundColor: theme.palette.primary.main + '30'
-                          }
-                        }}
-                      >
-                        <Typography sx={{ fontSize: '14px' }}>{emoji}</Typography>
-                        <Typography sx={{
-                          fontSize: '12px',
-                          color: colors.placeholderText,
-                          fontWeight: reactions.some(r => r.userId === state.user?.id) ? 600 : 400
-                        }}>
-                          {reactions.length}
-                        </Typography>
-                      </Box>
-                    ))}
-
-                    {/* 반응 추가 버튼 */}
-                    <Tooltip title={t('chat.addReaction')} arrow>
+                    {/* 스레드 시작 버튼 */}
+                    <Tooltip title={t('chat.startThread')} placement="top">
                       <IconButton
                         size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEmojiAnchorEl(e.currentTarget);
-                          setEmojiPickerMessageId(message.id);
+                        onClick={() => {
+                          if (onOpenThread) {
+                            onOpenThread(message);
+                          }
                         }}
                         sx={{
-                          width: 28,
-                          height: 28,
-                          backgroundColor: colors.inputFieldBackground,
-                          border: `1px solid ${colors.inputBorder}`,
+                          p: 0.5,
+                          color: colors.iconColor,
                           '&:hover': {
-                            backgroundColor: theme.palette.primary.main + '20',
-                            borderColor: theme.palette.primary.main
+                            backgroundColor: colors.iconHover
                           }
                         }}
                       >
-                        <AddReactionIcon sx={{ fontSize: 16, color: colors.placeholderText }} />
+                        <ReplyIcon sx={{ fontSize: 16 }} />
                       </IconButton>
                     </Tooltip>
-                  </Box>
-                )}
 
-                {/* 메시지 액션 버튼들 (호버 시 표시) */}
-                <Box
-                  className="message-actions"
-                  sx={{
-                    position: 'absolute',
-                    top: -8,
-                    right: 8,
-                    display: 'none',
-                    gap: 0.5,
-                    backgroundColor: colors.inputBackground,
-                    borderRadius: '8px',
-                    border: `1px solid ${colors.inputBorder}`,
-                    boxShadow: theme.palette.mode === 'dark'
-                      ? '0 2px 8px rgba(0,0,0,0.3)'
-                      : '0 2px 8px rgba(0,0,0,0.1)',
-                    '.message-container:hover &': {
-                      display: 'flex'
-                    }
-                  }}
-                >
-                  {/* 스레드 시작 버튼 */}
-                  <Tooltip title={t('chat.startThread')} placement="top">
+                    {/* 더보기 버튼 */}
                     <IconButton
                       size="small"
                       onClick={() => {
-                        if (onOpenThread) {
-                          onOpenThread(message);
-                        }
+                        // 더보기 메뉴 (추후 구현)
+                        console.log('More actions for message:', message.id);
                       }}
                       sx={{
                         p: 0.5,
@@ -1244,156 +1227,137 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                         }
                       }}
                     >
-                      <ReplyIcon sx={{ fontSize: 16 }} />
+                      <MoreIcon sx={{ fontSize: 16 }} />
                     </IconButton>
-                  </Tooltip>
 
-                  {/* 더보기 버튼 */}
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      // 더보기 메뉴 (추후 구현)
-                      console.log('More actions for message:', message.id);
-                    }}
-                    sx={{
-                      p: 0.5,
-                      color: colors.iconColor,
-                      '&:hover': {
-                        backgroundColor: colors.iconHover
-                      }
-                    }}
-                  >
-                    <MoreIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
-
-                  {/* 리액션 추가 버튼들 */}
-                  {['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji) => (
-                    <Box
-                      key={emoji}
-                      onClick={() => actions.addReaction(message.id, emoji)}
-                      sx={{
-                        p: 0.5,
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontSize: '16px',
-                        '&:hover': {
-                          backgroundColor: colors.iconHover
-                        }
-                      }}
-                    >
-                      {emoji}
-                    </Box>
-                  ))}
-                </Box>
-
-                {/* 답글 정보 표시 */}
-                {message.replyToId && (
-                  <Box sx={{
-                    mt: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    color: colors.placeholderText,
-                    fontSize: '12px'
-                  }}>
-                    <ReplyIcon sx={{ fontSize: 14 }} />
-                    <Typography variant="caption" sx={{ color: colors.placeholderText }}>
-                      {message.replyTo?.user?.username || '누군가'}님에게 답장
-                    </Typography>
+                    {/* 리액션 추가 버튼들 */}
+                    {['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji) => (
+                      <Box
+                        key={emoji}
+                        onClick={() => actions.addReaction(message.id, emoji)}
+                        sx={{
+                          p: 0.5,
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '16px',
+                          '&:hover': {
+                            backgroundColor: colors.iconHover
+                          }
+                        }}
+                      >
+                        {emoji}
+                      </Box>
+                    ))}
                   </Box>
-                )}
 
-                {/* 스레드 답글 수 표시 - Slack style */}
-                {(message.threadCount ?? 0) > 0 && (
-                  <Box
-                    onClick={() => {
-                      if (onOpenThread) {
-                        onOpenThread(message);
-                      }
-                    }}
-                    sx={{
-                      mt: 0.5, // 1 → 0.5로 줄임
+                  {/* 답글 정보 표시 */}
+                  {message.replyToId && (
+                    <Box sx={{
+                      mt: 1,
                       display: 'flex',
                       alignItems: 'center',
                       gap: 1,
-                      color: theme.palette.primary.main,
-                      fontSize: '12px',
-                      cursor: 'pointer',
-                      px: 1, // 좌우 패딩만 유지
-                      py: 0.5, // 상하 패딩 줄임 (1 → 0.5)
-                      borderRadius: '8px',
-                      border: '1px solid transparent', // 기본 상태에서는 투명한 테두리
-                      backgroundColor: 'transparent', // 기본 상태에서는 투명한 배경
-                      position: 'relative',
-                      '&:hover': {
-                        border: `1px solid ${theme.palette.primary.main}20`,
-                        backgroundColor: `${theme.palette.primary.main}08`,
-                        '& .thread-time-text': {
-                          opacity: 0,
-                          visibility: 'hidden'
-                        },
-                        '& .thread-view-text': {
-                          opacity: 1,
-                          visibility: 'visible'
-                        }
-                      }
-                    }}
-                  >
-                    <ReplyIcon sx={{ fontSize: 14 }} />
-
-                    {/* 댓글 개수와 스레드 보기 텍스트 */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      {/* 댓글 개수는 항상 표시 */}
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: theme.palette.primary.main,
-                          fontWeight: 500
-                        }}
-                      >
-                        {t('chat.threadCount', { count: message.threadCount })}
+                      color: colors.placeholderText,
+                      fontSize: '12px'
+                    }}>
+                      <ReplyIcon sx={{ fontSize: 14 }} />
+                      <Typography variant="caption" sx={{ color: colors.placeholderText }}>
+                        {message.replyTo?.user?.username || '누군가'}님에게 답장
                       </Typography>
+                    </Box>
+                  )}
 
-                      {/* 시간/스레드 보기 텍스트 컨테이너 - 같은 위치에서 전환 */}
-                      <Box sx={{ position: 'relative' }}>
-                        {/* 마지막 댓글 시간 (기본 상태) */}
-                        {message.lastThreadMessageAt && (
-                          <Typography
-                            variant="caption"
-                            className="thread-time-text"
-                            sx={{
-                              color: colors.placeholderText,
-                              transition: 'opacity 0.2s ease, visibility 0.2s ease'
-                            }}
-                          >
-                            · {t('chat.lastReply')}: {formatRelativeTime(message.lastThreadMessageAt)}
-                          </Typography>
-                        )}
+                  {/* 스레드 답글 수 표시 - Slack style */}
+                  {(message.threadCount ?? 0) > 0 && (
+                    <Box
+                      onClick={() => {
+                        if (onOpenThread) {
+                          onOpenThread(message);
+                        }
+                      }}
+                      sx={{
+                        mt: 0.5, // 1 → 0.5로 줄임
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        color: theme.palette.primary.main,
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        px: 1, // 좌우 패딩만 유지
+                        py: 0.5, // 상하 패딩 줄임 (1 → 0.5)
+                        borderRadius: '8px',
+                        border: '1px solid transparent', // 기본 상태에서는 투명한 테두리
+                        backgroundColor: 'transparent', // 기본 상태에서는 투명한 배경
+                        position: 'relative',
+                        '&:hover': {
+                          border: `1px solid ${theme.palette.primary.main}20`,
+                          backgroundColor: `${theme.palette.primary.main}08`,
+                          '& .thread-time-text': {
+                            opacity: 0,
+                            visibility: 'hidden'
+                          },
+                          '& .thread-view-text': {
+                            opacity: 1,
+                            visibility: 'visible'
+                          }
+                        }
+                      }}
+                    >
+                      <ReplyIcon sx={{ fontSize: 14 }} />
 
-                        {/* 스레드 보기 텍스트 (호버 상태) - 시간 텍스트와 같은 위치 */}
+                      {/* 댓글 개수와 스레드 보기 텍스트 */}
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        {/* 댓글 개수는 항상 표시 */}
                         <Typography
                           variant="caption"
-                          className="thread-view-text"
                           sx={{
                             color: theme.palette.primary.main,
-                            fontWeight: 500,
-                            opacity: 0,
-                            visibility: 'hidden',
-                            transition: 'opacity 0.2s ease, visibility 0.2s ease',
-                            whiteSpace: 'nowrap',
-                            position: 'absolute',
-                            top: 0,
-                            left: 0
+                            fontWeight: 500
                           }}
                         >
-                          · {t('chat.viewThread')}
+                          {t('chat.threadCount', { count: message.threadCount })}
                         </Typography>
+
+                        {/* 시간/스레드 보기 텍스트 컨테이너 - 같은 위치에서 전환 */}
+                        <Box sx={{ position: 'relative' }}>
+                          {/* 마지막 댓글 시간 (기본 상태) */}
+                          {message.lastThreadMessageAt && (
+                            <Typography
+                              variant="caption"
+                              className="thread-time-text"
+                              sx={{
+                                color: colors.placeholderText,
+                                transition: 'opacity 0.2s ease, visibility 0.2s ease'
+                              }}
+                            >
+                              · {t('chat.lastReply')}: {formatRelativeTime(message.lastThreadMessageAt)}
+                            </Typography>
+                          )}
+
+                          {/* 스레드 보기 텍스트 (호버 상태) - 시간 텍스트와 같은 위치 */}
+                          <Typography
+                            variant="caption"
+                            className="thread-view-text"
+                            sx={{
+                              color: theme.palette.primary.main,
+                              fontWeight: 500,
+                              opacity: 0,
+                              visibility: 'hidden',
+                              transition: 'opacity 0.2s ease, visibility 0.2s ease',
+                              whiteSpace: 'nowrap',
+                              position: 'absolute',
+                              top: 0,
+                              left: 0
+                            }}
+                          >
+                            · {t('chat.viewThread')}
+                          </Typography>
+                        </Box>
                       </Box>
                     </Box>
-                  </Box>
-                )}
+                  )}
+                </Box>
               </Box>
-            </Box>
             </React.Fragment>
           );
         })}

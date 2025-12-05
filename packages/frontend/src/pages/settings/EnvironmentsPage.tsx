@@ -359,7 +359,7 @@ const EnvironmentsPage: React.FC = () => {
                 <TableCell>{t('environments.description')}</TableCell>
                 <TableCell align="center">{t('environments.isDefault')}</TableCell>
                 <TableCell align="center">{t('environments.isSystemDefined')}</TableCell>
-                <TableCell align="center">{t('common.actions')}</TableCell>
+                {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -399,38 +399,40 @@ const EnvironmentsPage: React.FC = () => {
                   <TableCell align="center">
                     {env.isSystemDefined ? <Chip label="✓" color="default" size="small" /> : '-'}
                   </TableCell>
-                  <TableCell align="center">
-                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
-                      <Tooltip title={t('common.edit')}>
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => handleOpenEditDialog(env)}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      {Boolean(env.isSystemDefined) ? (
-                        <Tooltip title={t('environments.cannotDeleteSystem')}>
-                          <span>
-                            <IconButton size="small" color="error" disabled>
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title={t('common.delete')}>
+                  {canManage && (
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
+                        <Tooltip title={t('common.edit')}>
                           <IconButton
                             size="small"
-                            color="error"
-                            onClick={() => handleOpenDeleteDialog(env)}
+                            color="primary"
+                            onClick={() => handleOpenEditDialog(env)}
                           >
-                            <DeleteIcon fontSize="small" />
+                            <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                      )}
-                    </Box>
-                  </TableCell>
+                        {Boolean(env.isSystemDefined) ? (
+                          <Tooltip title={t('environments.cannotDeleteSystem')}>
+                            <span>
+                              <IconButton size="small" color="error" disabled>
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip title={t('common.delete')}>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleOpenDeleteDialog(env)}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
