@@ -837,7 +837,9 @@
     "system-settings_view": "시스템 설정 조회",
     "system-settings_view_desc": "네트워크, 통합, 서비스 디스커버리, 키-값 설정 등 시스템 설정을 조회할 수 있습니다.",
     "system-settings_manage": "시스템 설정 관리",
-    "system-settings_manage_desc": "시스템 설정을 변경하고 저장할 수 있습니다. 네트워크 URL, 웹훅, 서비스 디스커버리 설정 등을 관리합니다."
+    "system-settings_manage_desc": "시스템 설정을 변경하고 저장할 수 있습니다. 네트워크 URL, 웹훅, 서비스 디스커버리 설정 등을 관리합니다.",
+    "chat_access": "채팅 접근",
+    "chat_access_desc": "팀 채팅 기능에 접근할 수 있습니다."
   },
   "gameWorlds": {
     "worldId": "월드 ID",
@@ -2103,6 +2105,8 @@
     "goBack": "뒤로 가기",
     "goToDashboard": "대시보드로 이동",
     "goToLogin": "로그인으로 이동",
+    "roleChangeTitle": "권한 변경 알림",
+    "roleChangeMessage": "시스템 관리자에 의해 권한이 변경되었습니다. 변경된 권한을 적용하기 위해 대시보드로 이동합니다.",
     "history": "이력",
     "hour": "시",
     "id": "아이디",

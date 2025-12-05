@@ -878,7 +878,9 @@
     "system-settings_view": "查看系统设置",
     "system-settings_view_desc": "可以查看网络、集成、服务发现、键值配置等系统设置。",
     "system-settings_manage": "管理系统设置",
-    "system-settings_manage_desc": "可以修改和保存系统设置。管理网络URL、Webhook、服务发现设置等。"
+    "system-settings_manage_desc": "可以修改和保存系统设置。管理网络URL、Webhook、服务发现设置等。",
+    "chat_access": "聊天访问",
+    "chat_access_desc": "可以访问团队聊天功能。"
   },
   "gameWorlds": {
     "worldId": "世界ID",
@@ -2114,6 +2116,8 @@
     "goBack": "返回",
     "goToDashboard": "前往仪表板",
     "goToLogin": "前往登录",
+    "roleChangeTitle": "权限变更通知",
+    "roleChangeMessage": "系统管理员已更改您的权限。您将被重定向到仪表板以应用更改。",
     "history": "历史",
     "hour": "小时",
     "id": "ID",

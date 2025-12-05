@@ -9,6 +9,7 @@ import { clearAllCache } from '../middleware/responseCache';
 import logger from '../config/logger';
 import db from '../config/knex';
 import Joi from 'joi';
+import { pubSubService } from '../services/PubSubService';
 
 const setEnvironmentAccessSchema = Joi.object({
   allowAllEnvironments: Joi.boolean().required(),
@@ -282,6 +283,16 @@ export class AdminController {
       const userId = parseInt(req.params.id);
       await UserService.promoteToAdmin(userId);
 
+      // Send real-time notification to the affected user
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: {
+          userId,
+          changeType: 'role',
+        },
+        targetUsers: [userId],
+      });
+
       res.json({
         success: true,
         message: 'User promoted to admin successfully'
@@ -301,6 +312,16 @@ export class AdminController {
       }
 
       await UserService.demoteFromAdmin(userId);
+
+      // Send real-time notification to the affected user
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: {
+          userId,
+          changeType: 'role',
+        },
+        targetUsers: [userId],
+      });
 
       res.json({
         success: true,
@@ -1068,6 +1089,16 @@ export class AdminController {
         },
         ipAddress: req.ip || 'unknown',
         userAgent: req.headers['user-agent'] || 'unknown'
+      });
+
+      // Send real-time notification to the affected user
+      await pubSubService.publishNotification({
+        type: 'user_role_changed',
+        data: {
+          userId,
+          changeType: 'permissions',
+        },
+        targetUsers: [userId],
       });
 
       res.json({

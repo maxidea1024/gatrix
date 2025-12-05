@@ -19,6 +19,9 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  Fab,
+  Zoom,
+  keyframes,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import {
@@ -74,6 +77,7 @@ import {
   Dns as DnsIcon,
   ArrowBack as ArrowBackIcon,
   Api as ApiIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -90,9 +94,32 @@ import { computeMaintenanceStatus, getMaintenanceStatusDisplay, MaintenanceStatu
 import moment from 'moment';
 import { getMenuCategories, MenuItem as NavMenuItem, MenuCategory } from '@/config/navigation';
 import mailService from '@/services/mailService';
-import { Permission } from '@/types/permissions';
+import { Permission, PERMISSIONS } from '@/types/permissions';
 
 // Sidebar width is now dynamic
+
+// Wiggle animation for floating button
+const wiggleAnimation = keyframes`
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  15% { transform: rotate(-8deg) scale(1.05); }
+  30% { transform: rotate(8deg) scale(1.05); }
+  45% { transform: rotate(-6deg) scale(1.02); }
+  60% { transform: rotate(6deg) scale(1.02); }
+  75% { transform: rotate(-3deg) scale(1); }
+  90% { transform: rotate(3deg) scale(1); }
+`;
+
+// Ripple pulse animation for floating button
+const ripplePulseAnimation = keyframes`
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+`;
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -195,6 +222,33 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Mail notification state
   const [unreadMailCount, setUnreadMailCount] = useState(0);
+
+  // Role/Permission change dialog state
+  const [roleChangeDialogOpen, setRoleChangeDialogOpen] = useState(false);
+
+  // Handle role/permission change notification
+  useEffect(() => {
+    const handleRoleChange = (event: CustomEvent) => {
+      const { userId } = event.detail || {};
+      // Only show dialog if the notification is for the current user
+      if (userId && user?.id === userId) {
+        setRoleChangeDialogOpen(true);
+      }
+    };
+
+    window.addEventListener('user-role-changed', handleRoleChange as EventListener);
+    return () => {
+      window.removeEventListener('user-role-changed', handleRoleChange as EventListener);
+    };
+  }, [user?.id]);
+
+  // Handle role change dialog confirmation
+  const handleRoleChangeConfirm = useCallback(() => {
+    setRoleChangeDialogOpen(false);
+    // Navigate to dashboard and force a full page reload to refresh auth state
+    navigate('/dashboard');
+    window.location.reload();
+  }, [navigate]);
 
   // Maintenance banner state
   const [maintenanceStatus, setMaintenanceStatus] = useState<{ isMaintenance: boolean; status: MaintenanceStatusType; detail: MaintenanceDetail | null }>({ isMaintenance: false, status: 'inactive', detail: null });
@@ -1343,14 +1397,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             )}
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Tooltip title={t('sidebar.chat')}>
-              <IconButton
-                color="inherit"
-                onClick={() => navigate('/chat')}
-              >
-                <ChatIcon />
-              </IconButton>
-            </Tooltip>
+            {/* Chat button - only visible for admin users with chat permission */}
+            {isAdmin() && hasPermission(PERMISSIONS.CHAT_ACCESS) && (
+              <Tooltip title={t('sidebar.chat')}>
+                <IconButton
+                  color="inherit"
+                  onClick={() => navigate('/chat')}
+                >
+                  <ChatIcon />
+                </IconButton>
+              </Tooltip>
+            )}
 
             <Tooltip title={t('mailbox.title')}>
               <IconButton
@@ -1425,20 +1482,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
             <LanguageSelector variant="text" size="medium" />
 
-            {/* 구분선 */}
-            <Box
-              sx={{
-                width: '1px',
-                height: '24px',
-                bgcolor: theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.2)'
-                  : 'rgba(0, 0, 0, 0.2)',
-                mx: 1
-              }}
-            />
-
-            {/* Environment Selector - Only for admin users */}
-            {isAdmin() && <EnvironmentSelector size="small" />}
+            {/* Environment Selector with Divider - Only for admin users with environments */}
+            {hasEnvironmentAccess && (
+              <>
+                {/* 구분선 */}
+                <Box
+                  sx={{
+                    width: '1px',
+                    height: '24px',
+                    bgcolor: theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 0.2)',
+                    mx: 1
+                  }}
+                />
+                <EnvironmentSelector size="small" />
+              </>
+            )}
 
             <Menu
               anchorEl={userMenuAnchor}
@@ -1481,6 +1541,31 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {children}
         </Box>
       </Box>
+
+      {/* Role/Permission Change Floating Button */}
+      <Zoom in={roleChangeDialogOpen}>
+        <Tooltip title={t('common.roleChangeMessage')} placement="left" arrow>
+          <Fab
+            color="warning"
+            onClick={handleRoleChangeConfirm}
+            sx={{
+              position: 'fixed',
+              bottom: 24,
+              right: 24,
+              zIndex: 9999,
+              animation: `${wiggleAnimation} 1s ease-in-out infinite`,
+              boxShadow: '0 4px 20px rgba(237, 108, 2, 0.4)',
+              '&:hover': {
+                animation: 'none',
+                transform: 'scale(1.1)',
+              },
+            }}
+          >
+            <RefreshIcon />
+          </Fab>
+        </Tooltip>
+      </Zoom>
     </Box>
   );
 };
+

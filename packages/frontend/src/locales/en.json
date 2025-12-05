@@ -837,7 +837,9 @@
     "system-settings_view": "View System Settings",
     "system-settings_view_desc": "View system settings including network, integrations, service discovery, and key-value configurations.",
     "system-settings_manage": "Manage System Settings",
-    "system-settings_manage_desc": "Modify and save system settings. Manage network URLs, webhooks, service discovery settings, and more."
+    "system-settings_manage_desc": "Modify and save system settings. Manage network URLs, webhooks, service discovery settings, and more.",
+    "chat_access": "Chat Access",
+    "chat_access_desc": "Access team chat functionality."
   },
   "gameWorlds": {
     "worldId": "World ID",
@@ -2103,6 +2105,8 @@
     "goBack": "Go Back",
     "goToDashboard": "Go to Dashboard",
     "goToLogin": "Go to Login",
+    "roleChangeTitle": "Permission Changed",
+    "roleChangeMessage": "Your permissions have been changed by the system administrator. You will be redirected to the dashboard to apply the changes.",
     "history": "History",
     "hour": "Hour",
     "id": "ID",

@@ -91,6 +91,7 @@ import {
   DragIndicator as DragIndicatorIcon,
   Preview as PreviewIcon,
   ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -1145,7 +1146,10 @@ const UsersManagementPage: React.FC = () => {
         const newEnvs = editUserEnvIds.sort().join(',');
         if (origEnvs !== newEnvs) {
           const getEnvNames = (ids: string[]) =>
-            ids.map(id => environments.find(e => e.id === id)?.name || id).join(', ') || '-';
+            ids.map(id => {
+              const env = environments.find(e => e.id === id);
+              return env?.displayName || env?.environmentName || id;
+            }).join(', ') || '-';
           changes.push({
             field: t('users.environmentAccess'),
             from: getEnvNames(originalUserData.envIds),

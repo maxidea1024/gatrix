@@ -266,6 +266,11 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         }
         break;
 
+      case 'user_role_changed':
+        // Dispatch custom event for AuthContext or MainLayout to listen
+        window.dispatchEvent(new CustomEvent('user-role-changed', { detail: event.data }));
+        break;
+
       default:
         break;
     }

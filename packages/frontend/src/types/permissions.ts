@@ -110,6 +110,9 @@ export const PERMISSIONS = {
   // Settings - System Settings (Network, Integrations, Service Discovery, KV)
   SYSTEM_SETTINGS_VIEW: 'system-settings.view',
   SYSTEM_SETTINGS_MANAGE: 'system-settings.manage',
+
+  // Chat
+  CHAT_ACCESS: 'chat.access',
 } as const;
 
 export type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS];
