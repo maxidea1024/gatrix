@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { PERMISSIONS } from '../../types/permissions';
 import {
   Box,
   Typography,
@@ -50,6 +52,8 @@ import BannerFormDialog from '../../components/game/BannerFormDialog';
 const BannerManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.BANNERS_MANAGE]);
 
   // State
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -339,9 +343,11 @@ const BannerManagementPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
-            {t('banners.createBanner')}
-          </Button>
+          {canManage && (
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+              {t('banners.createBanner')}
+            </Button>
+          )}
         </Box>
       </Box>
 

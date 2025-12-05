@@ -1431,35 +1431,53 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 {isDark ? <LightModeIcon /> : <DarkModeIcon />}
               </IconButton>
 
-              <IconButton
-                onClick={handleUserMenuOpen}
-                color="inherit"
-              >
-                {user?.avatarUrl && !avatarImageError ? (
-                  <Avatar
-                    src={user.avatarUrl}
-                    alt={user.name || user.email}
-                    sx={{
-                      width: 32,
-                      height: 32,
-                    }}
-                    onError={() => {
-                      // 이미지 로드 실패 시 AccountCircle 아이콘으로 대체
-                      setAvatarImageError(true);
-                    }}
-                  >
-                    {user?.name?.charAt(0) || user?.email?.charAt(0)}
-                  </Avatar>
-                ) : (
-                  <AccountCircle
-                    sx={{
-                      width: 32,
-                      height: 32,
-                      color: 'inherit'
-                    }}
-                  />
-                )}
-              </IconButton>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <IconButton
+                  onClick={handleUserMenuOpen}
+                  color="inherit"
+                >
+                  {user?.avatarUrl && !avatarImageError ? (
+                    <Avatar
+                      src={user.avatarUrl}
+                      alt={user.name || user.email}
+                      sx={{
+                        width: 32,
+                        height: 32,
+                      }}
+                      onError={() => {
+                        // 이미지 로드 실패 시 AccountCircle 아이콘으로 대체
+                        setAvatarImageError(true);
+                      }}
+                    >
+                      {user?.name?.charAt(0) || user?.email?.charAt(0)}
+                    </Avatar>
+                  ) : (
+                    <AccountCircle
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        color: 'inherit'
+                      }}
+                    />
+                  )}
+                </IconButton>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    display: { xs: 'none', sm: 'block' },
+                    color: 'inherit',
+                    fontWeight: 500,
+                    maxWidth: 150,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                  }}
+                  onClick={handleUserMenuOpen}
+                >
+                  {user?.name || user?.email?.split('@')[0] || ''}
+                </Typography>
+              </Box>
 
               <LanguageSelector variant="text" size="medium" />
 

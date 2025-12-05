@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { PERMISSIONS } from '../../types/permissions';
 import {
   Box,
   Paper,
@@ -46,6 +48,8 @@ const EnvironmentsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { refresh: refreshEnvironments } = useEnvironment();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.ENVIRONMENTS_MANAGE]);
 
   const [environments, setEnvironments] = useState<Environment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -312,21 +316,25 @@ const EnvironmentsPage: React.FC = () => {
               <RefreshIcon />
             </IconButton>
           </Tooltip>
-          <Button
-            variant="outlined"
-            startIcon={<CopyIcon />}
-            onClick={() => setCopyDialogOpen(true)}
-            disabled={environments.length < 2}
-          >
-            {t('environments.copyEnvironment')}
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleOpenAddDialog}
-          >
-            {t('environments.add')}
-          </Button>
+          {canManage && (
+            <>
+              <Button
+                variant="outlined"
+                startIcon={<CopyIcon />}
+                onClick={() => setCopyDialogOpen(true)}
+                disabled={environments.length < 2}
+              >
+                {t('environments.copyEnvironment')}
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleOpenAddDialog}
+              >
+                {t('environments.add')}
+              </Button>
+            </>
+          )}
         </Box>
       </Box>
 

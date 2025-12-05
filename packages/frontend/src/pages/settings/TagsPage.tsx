@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import { Box, Typography, Card, CardContent, Button, TextField, IconButton, Stack, Chip, Tooltip, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableHead, TableRow, TableCell, TableBody, TableContainer, LinearProgress } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, Save as SaveIcon, Close as CloseIcon, Autorenew as RandomIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +15,8 @@ const randomHexColor = () => `#${Math.floor(Math.random() * 0xffffff).toString(1
 const TagsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.TAGS_MANAGE]);
 
   // Data/state
   const [tags, setTags] = useState<Tag[]>([]);

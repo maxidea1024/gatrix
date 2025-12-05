@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -146,6 +148,8 @@ const SchedulerPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const calendarRef = useRef<FullCalendar>(null);
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.SCHEDULER_MANAGE]);
 
   // State
   const [events, setEvents] = useState<ScheduleEvent[]>([]);
@@ -394,13 +398,15 @@ const SchedulerPage: React.FC = () => {
               </Typography>
             </Box>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAdd}
-          >
-            {t('scheduler.addEvent')}
-          </Button>
+          {canManage && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAdd}
+            >
+              {t('scheduler.addEvent')}
+            </Button>
+          )}
         </Box>
 
         {/* Calendar */}
