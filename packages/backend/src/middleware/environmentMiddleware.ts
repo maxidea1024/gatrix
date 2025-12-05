@@ -61,7 +61,7 @@ export const environmentContextMiddleware = async (
     }
 
     // Get environment name for logging
-    const environment = await db('g_remote_config_environments')
+    const environment = await db('g_environments')
       .where('id', req.environmentId)
       .select('environmentName')
       .first();
@@ -93,7 +93,7 @@ export const requireEnvironmentType = (allowedTypes: string[]) => {
     try {
       const environmentId = req.environmentId ?? getDefaultEnvironmentId();
 
-      const environment = await db('g_remote_config_environments')
+      const environment = await db('g_environments')
         .where('id', environmentId)
         .select('environmentType')
         .first();
@@ -129,7 +129,7 @@ export const preventProductionModification = async (
   try {
     const environmentId = req.environmentId ?? getDefaultEnvironmentId();
 
-    const environment = await db('g_remote_config_environments')
+    const environment = await db('g_environments')
       .where('id', environmentId)
       .select('environmentType', 'requiresApproval')
       .first();

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { RemoteConfigTemplate, TemplateStatus, TemplateType } from '../models/RemoteConfigTemplate';
-import { RemoteConfigEnvironment } from '../models/RemoteConfigEnvironment';
+import { Environment } from '../models/Environment';
 import { RemoteConfigChangeRequest } from '../models/RemoteConfigChangeRequest';
 import { RemoteConfigTemplateVersion } from '../models/RemoteConfigTemplateVersion';
 import { asyncHandler } from '../utils/asyncHandler';
@@ -86,7 +86,7 @@ export class RemoteConfigTemplateController {
 
     try {
       // Check if environment requires approval
-      const environment = await RemoteConfigEnvironment.query().findById(environmentId);
+      const environment = await Environment.query().findById(environmentId);
       if (!environment) {
         return res.status(404).json({
           success: false,

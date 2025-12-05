@@ -1,7 +1,7 @@
 import express from 'express';
 import { auth } from '../../middleware/auth';
 import { requireAdmin } from '../../middleware/requireAdmin';
-import RemoteConfigEnvironmentController from '../../controllers/RemoteConfigEnvironmentController';
+import EnvironmentController from '../../controllers/EnvironmentController';
 import RemoteConfigTemplateController from '../../controllers/RemoteConfigTemplateController';
 
 const router = express.Router();
@@ -10,19 +10,19 @@ const router = express.Router();
 router.use(auth as any);
 
 // Environment routes (admin only)
-router.get('/environments', requireAdmin, RemoteConfigEnvironmentController.getEnvironments);
-router.get('/environments/:id', requireAdmin, RemoteConfigEnvironmentController.getEnvironment);
-router.post('/environments', requireAdmin, RemoteConfigEnvironmentController.createEnvironment);
-router.put('/environments/:id', requireAdmin, RemoteConfigEnvironmentController.updateEnvironment);
-router.delete('/environments/:id', requireAdmin, RemoteConfigEnvironmentController.deleteEnvironment);
-router.get('/environments/:id/segments', requireAdmin, RemoteConfigEnvironmentController.getEnvironmentSegments);
-router.post('/environments/:id/segments/predefined', requireAdmin, RemoteConfigEnvironmentController.createPredefinedSegments);
-router.get('/environments/:id/stats', requireAdmin, RemoteConfigEnvironmentController.getEnvironmentStats);
-router.post('/environments/validate-name', requireAdmin, RemoteConfigEnvironmentController.validateEnvironmentName);
+router.get('/environments', requireAdmin, EnvironmentController.getEnvironments);
+router.get('/environments/:id', requireAdmin, EnvironmentController.getEnvironment);
+router.post('/environments', requireAdmin, EnvironmentController.createEnvironment);
+router.put('/environments/:id', requireAdmin, EnvironmentController.updateEnvironment);
+router.delete('/environments/:id', requireAdmin, EnvironmentController.deleteEnvironment);
+router.get('/environments/:id/segments', requireAdmin, EnvironmentController.getEnvironmentSegments);
+router.post('/environments/:id/segments/predefined', requireAdmin, EnvironmentController.createPredefinedSegments);
+router.get('/environments/:id/stats', requireAdmin, EnvironmentController.getEnvironmentStats);
+router.post('/environments/validate-name', requireAdmin, EnvironmentController.validateEnvironmentName);
 
 // Environment copy routes (admin only)
-router.get('/environments/:sourceEnvironmentId/copy/:targetEnvironmentId/preview', requireAdmin, RemoteConfigEnvironmentController.getCopyPreview);
-router.post('/environments/:sourceEnvironmentId/copy/:targetEnvironmentId', requireAdmin, RemoteConfigEnvironmentController.copyEnvironmentData);
+router.get('/environments/:sourceEnvironmentId/copy/:targetEnvironmentId/preview', requireAdmin, EnvironmentController.getCopyPreview);
+router.post('/environments/:sourceEnvironmentId/copy/:targetEnvironmentId', requireAdmin, EnvironmentController.copyEnvironmentData);
 
 // Template routes
 router.get('/environments/:environmentId/templates', RemoteConfigTemplateController.getTemplates);

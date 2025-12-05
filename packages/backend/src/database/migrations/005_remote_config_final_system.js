@@ -4,10 +4,10 @@ exports.up = async function(connection) {
 
   console.log('Creating Remote Config system tables...');
 
-  // 1. Environments table
+  // 1. Environments table (shared across all features)
   await connection.execute(`
-    CREATE TABLE IF NOT EXISTS g_remote_config_environments (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+    CREATE TABLE IF NOT EXISTS g_environments (
+      id VARCHAR(127) NOT NULL PRIMARY KEY COMMENT 'Format: {environmentName}.{ulid}',
       environmentName VARCHAR(100) NOT NULL UNIQUE,
       displayName VARCHAR(200) NOT NULL,
       description TEXT NULL,
@@ -18,11 +18,11 @@ exports.up = async function(connection) {
       updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      
+
       INDEX idx_environment_name (environmentName),
       INDEX idx_is_default (isDefault),
-      CONSTRAINT fk_rc_env_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id),
-      CONSTRAINT fk_rc_env_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
+      CONSTRAINT fk_env_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id),
+      CONSTRAINT fk_env_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -30,7 +30,7 @@ exports.up = async function(connection) {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_remote_config_templates (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      environmentId INT NOT NULL,
+      environmentId VARCHAR(127) NOT NULL,
       templateName VARCHAR(200) NOT NULL,
       displayName VARCHAR(300) NOT NULL,
       description TEXT NULL,
@@ -45,13 +45,13 @@ exports.up = async function(connection) {
       updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      
+
       UNIQUE KEY uk_template_env_name (environmentId, templateName),
       INDEX idx_template_type (templateType),
       INDEX idx_template_status (status),
       INDEX idx_template_etag (etag),
       INDEX idx_template_published (publishedAt),
-      CONSTRAINT fk_rc_template_environment FOREIGN KEY (environmentId) REFERENCES g_remote_config_environments(id) ON DELETE CASCADE,
+      CONSTRAINT fk_rc_template_environment FOREIGN KEY (environmentId) REFERENCES g_environments(id) ON DELETE CASCADE,
       CONSTRAINT fk_rc_template_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id),
       CONSTRAINT fk_rc_template_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -126,7 +126,7 @@ exports.up = async function(connection) {
       
       UNIQUE KEY uk_segment_env_name (environmentId, segmentName),
       INDEX idx_segment_active (isActive),
-      CONSTRAINT fk_rc_segment_environment FOREIGN KEY (environmentId) REFERENCES g_remote_config_environments(id) ON DELETE CASCADE,
+      CONSTRAINT fk_rc_segment_environment FOREIGN KEY (environmentId) REFERENCES g_environments(id) ON DELETE CASCADE,
       CONSTRAINT fk_rc_segment_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id),
       CONSTRAINT fk_rc_segment_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -155,7 +155,7 @@ exports.up = async function(connection) {
       INDEX idx_metrics_event (eventType),
       INDEX idx_metrics_timestamp (timestamp),
       INDEX idx_metrics_app (applicationName),
-      CONSTRAINT fk_rc_metrics_environment FOREIGN KEY (environmentId) REFERENCES g_remote_config_environments(id) ON DELETE CASCADE,
+      CONSTRAINT fk_rc_metrics_environment FOREIGN KEY (environmentId) REFERENCES g_environments(id) ON DELETE CASCADE,
       CONSTRAINT fk_rc_metrics_template FOREIGN KEY (templateId) REFERENCES g_remote_config_templates(id) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
@@ -186,7 +186,7 @@ exports.up = async function(connection) {
       INDEX idx_campaign_dates (startDate, endDate),
       INDEX idx_campaign_active (isActive),
       INDEX idx_campaign_priority (priority),
-      CONSTRAINT fk_rc_campaign_environment FOREIGN KEY (environmentId) REFERENCES g_remote_config_environments(id) ON DELETE CASCADE,
+      CONSTRAINT fk_rc_campaign_environment FOREIGN KEY (environmentId) REFERENCES g_environments(id) ON DELETE CASCADE,
       CONSTRAINT fk_rc_campaign_template FOREIGN KEY (templateId) REFERENCES g_remote_config_templates(id) ON DELETE CASCADE,
       CONSTRAINT fk_rc_campaign_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id),
       CONSTRAINT fk_rc_campaign_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id)
@@ -225,7 +225,7 @@ exports.down = async function(connection) {
     'g_remote_config_change_requests',
     'g_remote_config_template_versions',
     'g_remote_config_templates',
-    'g_remote_config_environments'
+    'g_environments'
   ];
 
   for (const table of tables) {

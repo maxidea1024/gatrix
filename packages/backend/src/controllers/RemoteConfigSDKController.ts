@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { RemoteConfigTemplate } from '../models/RemoteConfigTemplate';
-import { RemoteConfigEnvironment } from '../models/RemoteConfigEnvironment';
+import { Environment } from '../models/Environment';
 import { ApiAccessToken } from '../models/ApiAccessToken';
 import { asyncHandler } from '../utils/asyncHandler';
 import { CacheService } from '../services/CacheService';
@@ -8,7 +8,7 @@ import logger from '../config/logger';
 
 interface SDKRequest extends Request {
   apiToken?: ApiAccessToken;
-  environment?: RemoteConfigEnvironment;
+  environment?: Environment;
 }
 
 interface UserContext {

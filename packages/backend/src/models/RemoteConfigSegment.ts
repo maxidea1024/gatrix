@@ -1,6 +1,6 @@
 import { Model } from 'objection';
 import { User } from './User';
-import { RemoteConfigEnvironment } from './RemoteConfigEnvironment';
+import { Environment } from './Environment';
 
 export interface SegmentCondition {
   field: string;
@@ -43,7 +43,7 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
   updatedAt?: Date;
 
   // Relations
-  environment?: RemoteConfigEnvironment;
+  environment?: Environment;
   creator?: User;
   updater?: User;
 
@@ -76,10 +76,10 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
     return {
       environment: {
         relation: Model.BelongsToOneRelation,
-        modelClass: RemoteConfigEnvironment,
+        modelClass: Environment,
         join: {
           from: 'g_remote_config_segments.environmentId',
-          to: 'g_remote_config_environments.id'
+          to: 'g_environments.id'
         }
       },
       creator: {

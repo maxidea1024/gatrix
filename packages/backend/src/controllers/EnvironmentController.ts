@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { RemoteConfigEnvironment } from '../models/RemoteConfigEnvironment';
+import { Environment } from '../models/Environment';
 import { RemoteConfigSegment } from '../models/RemoteConfigSegment';
 import { RemoteConfigTemplate } from '../models/RemoteConfigTemplate';
 import { GameWorldModel } from '../models/GameWorld';
@@ -9,12 +9,12 @@ import logger from '../config/logger';
 import knex from '../config/knex';
 import { EnvironmentCopyService, CopyOptions } from '../services/EnvironmentCopyService';
 
-export class RemoteConfigEnvironmentController {
+export class EnvironmentController {
   /**
    * Get all environments
    */
   static getEnvironments = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environments = await RemoteConfigEnvironment.getAll();
+    const environments = await Environment.getAll();
     
     // Get stats for each environment
     const environmentsWithStats = await Promise.all(
@@ -39,7 +39,7 @@ export class RemoteConfigEnvironmentController {
   static getEnvironment = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     
-    const environment = await RemoteConfigEnvironment.query()
+    const environment = await Environment.query()
       .findById(id)
       .withGraphFetched('[creator(basicInfo), updater(basicInfo)]')
       .modifiers({
@@ -91,7 +91,7 @@ export class RemoteConfigEnvironmentController {
 
     // Validate base environment if provided
     if (baseEnvironmentId) {
-      const baseEnv = await RemoteConfigEnvironment.query().findById(baseEnvironmentId);
+      const baseEnv = await Environment.query().findById(baseEnvironmentId);
       if (!baseEnv) {
         return res.status(400).json({
           success: false,
@@ -101,7 +101,7 @@ export class RemoteConfigEnvironmentController {
     }
 
     try {
-      const environment = await RemoteConfigEnvironment.createEnvironment({
+      const environment = await Environment.createEnvironment({
         environmentName,
         displayName,
         description,
@@ -193,7 +193,7 @@ export class RemoteConfigEnvironmentController {
       });
     }
 
-    const environment = await RemoteConfigEnvironment.query().findById(id);
+    const environment = await Environment.query().findById(id);
     if (!environment) {
       return res.status(404).json({
         success: false,
@@ -232,7 +232,7 @@ export class RemoteConfigEnvironmentController {
   static getEnvironmentRelatedData = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const environment = await RemoteConfigEnvironment.query().findById(id);
+    const environment = await Environment.query().findById(id);
     if (!environment) {
       return res.status(404).json({
         success: false,
@@ -274,7 +274,7 @@ export class RemoteConfigEnvironmentController {
       });
     }
 
-    const environment = await RemoteConfigEnvironment.query().findById(id);
+    const environment = await Environment.query().findById(id);
     if (!environment) {
       return res.status(404).json({
         success: false,
@@ -336,7 +336,7 @@ export class RemoteConfigEnvironmentController {
   static getEnvironmentSegments = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     
-    const environment = await RemoteConfigEnvironment.query().findById(id);
+    const environment = await Environment.query().findById(id);
     if (!environment) {
       return res.status(404).json({
         success: false,
@@ -366,7 +366,7 @@ export class RemoteConfigEnvironmentController {
       });
     }
 
-    const environment = await RemoteConfigEnvironment.query().findById(id);
+    const environment = await Environment.query().findById(id);
     if (!environment) {
       return res.status(404).json({
         success: false,
@@ -399,7 +399,7 @@ export class RemoteConfigEnvironmentController {
   static getEnvironmentStats = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     
-    const environment = await RemoteConfigEnvironment.query().findById(id);
+    const environment = await Environment.query().findById(id);
     if (!environment) {
       return res.status(404).json({
         success: false,
@@ -428,7 +428,7 @@ export class RemoteConfigEnvironmentController {
       });
     }
 
-    const isValid = RemoteConfigEnvironment.isValidEnvironmentName(environmentName);
+    const isValid = Environment.isValidEnvironmentName(environmentName);
     if (!isValid) {
       return res.status(400).json({
         success: false,
@@ -436,7 +436,7 @@ export class RemoteConfigEnvironmentController {
       });
     }
 
-    const existing = await RemoteConfigEnvironment.getByName(environmentName);
+    const existing = await Environment.getByName(environmentName);
     if (existing) {
       return res.status(409).json({
         success: false,
@@ -466,7 +466,7 @@ export class RemoteConfigEnvironmentController {
     }
 
     // Validate source environment
-    const sourceEnv = await RemoteConfigEnvironment.query().findById(sourceEnvironmentId);
+    const sourceEnv = await Environment.query().findById(sourceEnvironmentId);
     if (!sourceEnv) {
       return res.status(404).json({
         success: false,
@@ -475,7 +475,7 @@ export class RemoteConfigEnvironmentController {
     }
 
     // Validate target environment
-    const targetEnv = await RemoteConfigEnvironment.query().findById(targetEnvironmentId);
+    const targetEnv = await Environment.query().findById(targetEnvironmentId);
     if (!targetEnv) {
       return res.status(404).json({
         success: false,
@@ -523,7 +523,7 @@ export class RemoteConfigEnvironmentController {
     const { sourceEnvironmentId, targetEnvironmentId } = req.params;
 
     // Validate source environment
-    const sourceEnv = await RemoteConfigEnvironment.query().findById(sourceEnvironmentId);
+    const sourceEnv = await Environment.query().findById(sourceEnvironmentId);
     if (!sourceEnv) {
       return res.status(404).json({
         success: false,
@@ -532,7 +532,7 @@ export class RemoteConfigEnvironmentController {
     }
 
     // Validate target environment
-    const targetEnv = await RemoteConfigEnvironment.query().findById(targetEnvironmentId);
+    const targetEnv = await Environment.query().findById(targetEnvironmentId);
     if (!targetEnv) {
       return res.status(404).json({
         success: false,
@@ -572,4 +572,4 @@ export class RemoteConfigEnvironmentController {
   });
 }
 
-export default RemoteConfigEnvironmentController;
+export default EnvironmentController;

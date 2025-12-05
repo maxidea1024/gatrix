@@ -32,7 +32,7 @@ module.exports = {
   async up(db) {
     // Get the default environment ID (development) - now a CHAR(26) ULID
     const [envRows] = await db.query(
-      `SELECT id FROM g_remote_config_environments WHERE environmentName = 'development' LIMIT 1`
+      `SELECT id FROM g_environments WHERE environmentName = 'development' LIMIT 1`
     );
 
     if (envRows.length === 0) {
@@ -81,7 +81,7 @@ module.exports = {
       // Add environmentId column with default value after the first column - using CHAR(26) for ULID
       await db.query(`
         ALTER TABLE ${tableName}
-        ADD COLUMN environmentId CHAR(26) NOT NULL DEFAULT '${defaultEnvId}'
+        ADD COLUMN environmentId VARCHAR(127) NOT NULL DEFAULT '${defaultEnvId}'
         AFTER ${firstColumn}
       `);
 
@@ -95,7 +95,7 @@ module.exports = {
       await db.query(`
         ALTER TABLE ${tableName}
         ADD CONSTRAINT fk_${tableName}_environment
-        FOREIGN KEY (environmentId) REFERENCES g_remote_config_environments(id)
+        FOREIGN KEY (environmentId) REFERENCES g_environments(id)
         ON DELETE RESTRICT ON UPDATE CASCADE
       `);
 

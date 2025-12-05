@@ -58,7 +58,7 @@ export class Project extends Model implements ProjectData {
   }
 
   static get relationMappings() {
-    const { RemoteConfigEnvironment } = require('./RemoteConfigEnvironment');
+    const { Environment } = require('./Environment');
     return {
       creator: {
         relation: Model.BelongsToOneRelation,
@@ -78,10 +78,10 @@ export class Project extends Model implements ProjectData {
       },
       environments: {
         relation: Model.HasManyRelation,
-        modelClass: RemoteConfigEnvironment,
+        modelClass: Environment,
         join: {
           from: 'g_projects.id',
-          to: 'g_remote_config_environments.projectId'
+          to: 'g_environments.projectId'
         }
       }
     };

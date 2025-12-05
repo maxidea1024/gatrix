@@ -1,7 +1,7 @@
 import { Model } from 'objection';
 import { User } from './User';
 import { RemoteConfigTemplate, TemplateData } from './RemoteConfigTemplate';
-import { RemoteConfigEnvironment } from './RemoteConfigEnvironment';
+import { Environment } from './Environment';
 import { pubSubService } from '../services/PubSubService';
 
 export type ChangeRequestType = 'create' | 'update' | 'delete' | 'import';
@@ -44,7 +44,7 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
 
   // Relations
   template?: RemoteConfigTemplate;
-  environment?: RemoteConfigEnvironment;
+  environment?: Environment;
   requester?: User;
   approver?: User;
 
@@ -83,10 +83,10 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
       },
       environment: {
         relation: Model.BelongsToOneRelation,
-        modelClass: RemoteConfigEnvironment,
+        modelClass: Environment,
         join: {
           from: 'g_remote_config_change_requests.environmentId',
-          to: 'g_remote_config_environments.id'
+          to: 'g_environments.id'
         }
       },
       requester: {
@@ -122,7 +122,7 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
    */
   static async createChangeRequest(data: Omit<RemoteConfigChangeRequestData, 'id' | 'status' | 'createdAt' | 'updatedAt'>): Promise<RemoteConfigChangeRequest> {
     // Check if environment requires approval
-    const environment = await RemoteConfigEnvironment.query().findById(data.environmentId);
+    const environment = await Environment.query().findById(data.environmentId);
     if (!environment) {
       throw new Error('Environment not found');
     }

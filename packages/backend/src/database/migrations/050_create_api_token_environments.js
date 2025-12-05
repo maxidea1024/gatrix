@@ -13,7 +13,7 @@ exports.up = async function(connection) {
     CREATE TABLE IF NOT EXISTS g_api_access_token_environments (
       id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       tokenId CHAR(26) NOT NULL COMMENT 'ULID reference to g_api_access_tokens',
-      environmentId CHAR(26) NOT NULL COMMENT 'ULID reference to g_remote_config_environments',
+      environmentId VARCHAR(127) NOT NULL COMMENT 'ULID reference to g_environments',
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
       UNIQUE KEY uk_token_environment (tokenId, environmentId),
@@ -21,7 +21,7 @@ exports.up = async function(connection) {
       CONSTRAINT fk_token_env_token FOREIGN KEY (tokenId)
         REFERENCES g_api_access_tokens(id) ON DELETE CASCADE,
       CONSTRAINT fk_token_env_environment FOREIGN KEY (environmentId)
-        REFERENCES g_remote_config_environments(id) ON DELETE CASCADE
+        REFERENCES g_environments(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 

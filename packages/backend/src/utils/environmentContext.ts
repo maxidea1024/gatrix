@@ -91,15 +91,32 @@ export function withEnvironmentFilter<T>(query: T, environmentId?: string): T {
 }
 
 /**
- * Validate ULID format (26 characters, Crockford Base32)
+ * Validate environment ID format: {environmentName}.{ulid}
+ * - environmentName: lowercase letters, numbers, underscore, hyphen (1-100 chars)
+ * - ulid: 26 characters Crockford Base32
  */
-export function isValidUlid(id: string): boolean {
+export function isValidEnvironmentId(id: string): boolean {
   if (!id || typeof id !== 'string') return false;
-  if (id.length !== 26) return false;
-  // Crockford Base32 characters (excluding I, L, O, U)
+
+  // Format: {environmentName}.{ulid}
+  const parts = id.split('.');
+  if (parts.length !== 2) return false;
+
+  const [envName, ulid] = parts;
+
+  // Validate environmentName: lowercase, numbers, underscore, hyphen
+  if (!envName || envName.length < 1 || envName.length > 100) return false;
+  const envNameRegex = /^[a-z0-9_-]+$/;
+  if (!envNameRegex.test(envName)) return false;
+
+  // Validate ULID: 26 characters Crockford Base32
+  if (!ulid || ulid.length !== 26) return false;
   const ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/i;
-  return ulidRegex.test(id);
+  return ulidRegex.test(ulid);
 }
+
+// Alias for backward compatibility
+export const isValidUlid = isValidEnvironmentId;
 
 /**
  * Get environment ID from request headers or query params
@@ -134,7 +151,7 @@ export async function validateEnvironmentId(db: any, environmentId: string): Pro
   if (!isValidUlid(environmentId)) {
     return false;
   }
-  const result = await db('g_remote_config_environments')
+  const result = await db('g_environments')
     .where('id', environmentId)
     .first();
   return !!result;
@@ -144,7 +161,7 @@ export async function validateEnvironmentId(db: any, environmentId: string): Pro
  * Get all available environment IDs
  */
 export async function getAllEnvironmentIds(db: any): Promise<string[]> {
-  const environments = await db('g_remote_config_environments')
+  const environments = await db('g_environments')
     .select('id')
     .orderBy('displayOrder', 'asc');
   return environments.map((e: any) => e.id);
@@ -155,7 +172,7 @@ export async function getAllEnvironmentIds(db: any): Promise<string[]> {
  * Should be called once during application startup
  */
 export async function initializeDefaultEnvironment(db: any): Promise<string> {
-  const defaultEnv = await db('g_remote_config_environments')
+  const defaultEnv = await db('g_environments')
     .where('isDefault', true)
     .first();
 

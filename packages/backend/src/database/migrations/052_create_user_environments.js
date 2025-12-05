@@ -15,14 +15,14 @@ async function up(connection) {
     CREATE TABLE IF NOT EXISTS g_user_environments (
       id INT AUTO_INCREMENT PRIMARY KEY,
       userId INT NOT NULL,
-      environmentId CHAR(26) NOT NULL,
+      environmentId VARCHAR(127) NOT NULL,
       createdBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       UNIQUE KEY uk_user_environment (userId, environmentId),
       INDEX idx_user_id (userId),
       INDEX idx_environment_id (environmentId),
       CONSTRAINT fk_user_environments_user FOREIGN KEY (userId) REFERENCES g_users(id) ON DELETE CASCADE,
-      CONSTRAINT fk_user_environments_env FOREIGN KEY (environmentId) REFERENCES g_remote_config_environments(id) ON DELETE CASCADE
+      CONSTRAINT fk_user_environments_env FOREIGN KEY (environmentId) REFERENCES g_environments(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 

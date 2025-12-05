@@ -7,7 +7,7 @@ exports.up = async function(connection) {
 
   // Insert default environments
   await connection.execute(`
-    INSERT IGNORE INTO g_remote_config_environments 
+    INSERT IGNORE INTO g_environments 
     (environmentName, displayName, description, isDefault, requiresApproval, requiredApprovers, createdBy) 
     VALUES 
     ('development', 'Development', 'Development environment for testing and feature development', TRUE, FALSE, 1, 1),
@@ -22,7 +22,7 @@ exports.down = async function(connection) {
   console.log('Removing seeded Remote Config environments...');
 
   await connection.execute(`
-    DELETE FROM g_remote_config_environments 
+    DELETE FROM g_environments 
     WHERE environmentName IN ('development', 'staging', 'production')
   `);
 

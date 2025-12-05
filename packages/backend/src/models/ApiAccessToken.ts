@@ -1,6 +1,6 @@
 import { Model } from 'objection';
 import { User } from './User';
-import { RemoteConfigEnvironment } from './RemoteConfigEnvironment';
+import { Environment } from './Environment';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { ulid } from 'ulid';
@@ -41,7 +41,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   updatedAt?: Date;
 
   // Relations
-  environments?: RemoteConfigEnvironment[];
+  environments?: Environment[];
   creator?: User;
 
   static get jsonSchema() {
@@ -68,14 +68,14 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     return {
       environments: {
         relation: Model.ManyToManyRelation,
-        modelClass: RemoteConfigEnvironment,
+        modelClass: Environment,
         join: {
           from: 'g_api_access_tokens.id',
           through: {
             from: 'g_api_access_token_environments.tokenId',
             to: 'g_api_access_token_environments.environmentId'
           },
-          to: 'g_remote_config_environments.id'
+          to: 'g_environments.id'
         }
       },
       creator: {
@@ -208,12 +208,12 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       return null;
     }
 
-    // 캐시 기반 사용량 추적 (비동기로 처리하여 API 응답 속도에 영향 없음)
+    // 캐시 기반 ?�용??추적 (비동기로 처리?�여 API ?�답 ?�도???�향 ?�음)
     if (tokenRecord.id) {
-      // 동적 import로 순환 참조 방지
+      // ?�적 import�??�환 참조 방�?
       const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
       apiTokenUsageService.recordTokenUsage(tokenRecord.id).catch(error => {
-        // 사용량 추적 실패가 API 요청을 방해하지 않도록 로그만 남김
+        // ?�용??추적 ?�패가 API ?�청??방해?��? ?�도�?로그�??��?
         const logger = require('../config/logger').default;
         logger.error('Failed to record token usage:', error);
       });
@@ -370,7 +370,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     if (this.allowAllEnvironments) {
       // Return all environment IDs
       const db = Model.knex();
-      const environments = await db('g_remote_config_environments').select('id');
+      const environments = await db('g_environments').select('id');
       return environments.map((e: any) => e.id);
     }
 

@@ -1,6 +1,6 @@
 import { Model } from 'objection';
 import { User } from './User';
-import { RemoteConfigEnvironment } from './RemoteConfigEnvironment';
+import { Environment } from './Environment';
 import crypto from 'crypto';
 
 export type TemplateStatus = 'draft' | 'staged' | 'published' | 'archived';
@@ -62,7 +62,7 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
   updatedAt?: Date;
 
   // Relations
-  environment?: RemoteConfigEnvironment;
+  environment?: Environment;
   creator?: User;
   updater?: User;
 
@@ -101,10 +101,10 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
     return {
       environment: {
         relation: Model.BelongsToOneRelation,
-        modelClass: RemoteConfigEnvironment,
+        modelClass: Environment,
         join: {
           from: 'g_remote_config_templates.environmentId',
-          to: 'g_remote_config_environments.id'
+          to: 'g_environments.id'
         }
       },
       creator: {

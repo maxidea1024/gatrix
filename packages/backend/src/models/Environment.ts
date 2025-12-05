@@ -9,7 +9,7 @@ export type EnvironmentType = 'development' | 'staging' | 'production';
 export const SYSTEM_DEFINED_ENVIRONMENTS = ['development', 'qa', 'production'] as const;
 export type SystemDefinedEnvironment = typeof SYSTEM_DEFINED_ENVIRONMENTS[number];
 
-export interface RemoteConfigEnvironmentData {
+export interface EnvironmentData {
   id?: string; // ULID (26 characters)
   environmentName: string;
   displayName: string;
@@ -28,8 +28,8 @@ export interface RemoteConfigEnvironmentData {
   updatedAt?: Date;
 }
 
-export class RemoteConfigEnvironment extends Model implements RemoteConfigEnvironmentData {
-  static tableName = 'g_remote_config_environments';
+export class Environment extends Model implements EnvironmentData {
+  static tableName = 'g_environments';
 
   id!: string; // ULID
   environmentName!: string;
@@ -58,7 +58,7 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
       type: 'object',
       required: ['environmentName', 'displayName', 'createdBy'],
       properties: {
-        id: { type: 'string', minLength: 26, maxLength: 26 }, // ULID
+        id: { type: 'string', minLength: 1, maxLength: 127 }, // Format: {environmentName}.{ulid}
         environmentName: {
           type: 'string',
           minLength: 1,
@@ -90,7 +90,7 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {
-          from: 'g_remote_config_environments.createdBy',
+          from: 'g_environments.createdBy',
           to: 'g_users.id'
         }
       },
@@ -98,7 +98,7 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {
-          from: 'g_remote_config_environments.updatedBy',
+          from: 'g_environments.updatedBy',
           to: 'g_users.id'
         }
       },
@@ -106,7 +106,7 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
         relation: Model.BelongsToOneRelation,
         modelClass: Project,
         join: {
-          from: 'g_remote_config_environments.projectId',
+          from: 'g_environments.projectId',
           to: 'g_projects.id'
         }
       }
@@ -115,7 +115,8 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
 
   $beforeInsert() {
     if (!this.id) {
-      this.id = ulid();
+      // Generate ID in format: {environmentName}.{ulid}
+      this.id = `${this.environmentName}.${ulid()}`;
     }
     this.createdAt = new Date();
     this.updatedAt = new Date();
@@ -128,28 +129,28 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
   /**
    * Get default environment
    */
-  static async getDefault(): Promise<RemoteConfigEnvironment | undefined> {
+  static async getDefault(): Promise<Environment | undefined> {
     return await this.query().where('isDefault', true).first();
   }
 
   /**
    * Get environment by name
    */
-  static async getByName(environmentName: string): Promise<RemoteConfigEnvironment | undefined> {
+  static async getByName(environmentName: string): Promise<Environment | undefined> {
     return await this.query().where('environmentName', environmentName).first();
   }
 
   /**
    * Get all active environments ordered by displayOrder
    */
-  static async getAll(): Promise<RemoteConfigEnvironment[]> {
+  static async getAll(): Promise<Environment[]> {
     return await this.query().orderBy('displayOrder', 'asc').orderBy('environmentName');
   }
 
   /**
    * Get all environments by project
    */
-  static async getByProject(projectId: string): Promise<RemoteConfigEnvironment[]> {
+  static async getByProject(projectId: string): Promise<Environment[]> {
     return await this.query()
       .where('projectId', projectId)
       .orderBy('displayOrder', 'asc');
@@ -186,7 +187,7 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
   /**
    * Create new environment
    */
-  static async createEnvironment(data: Omit<RemoteConfigEnvironmentData, 'id' | 'createdAt' | 'updatedAt'>): Promise<RemoteConfigEnvironment> {
+  static async createEnvironment(data: Omit<EnvironmentData, 'id' | 'createdAt' | 'updatedAt'>): Promise<Environment> {
     // Validate environment name
     if (!this.isValidEnvironmentName(data.environmentName)) {
       throw new Error('Invalid environment name. Use only lowercase letters, numbers, underscore, and hyphen.');
@@ -209,10 +210,10 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
   /**
    * Update environment
    */
-  async updateEnvironment(data: Partial<RemoteConfigEnvironmentData>, updatedBy: number): Promise<RemoteConfigEnvironment> {
+  async updateEnvironment(data: Partial<EnvironmentData>, updatedBy: number): Promise<Environment> {
     // If setting as default, unset other defaults
     if (data.isDefault) {
-      await RemoteConfigEnvironment.query().patch({ isDefault: false });
+      await Environment.query().patch({ isDefault: false });
     }
 
     return await this.$query().patchAndFetch({
@@ -447,7 +448,7 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
         await safeDelete(trx, 'g_client_versions');
 
         // Finally delete the environment itself
-        await trx('g_remote_config_environments').where('id', environmentId).del();
+        await trx('g_environments').where('id', environmentId).del();
       });
     } else {
       // No related data, just delete
@@ -482,4 +483,4 @@ export class RemoteConfigEnvironment extends Model implements RemoteConfigEnviro
   }
 }
 
-export default RemoteConfigEnvironment;
+export default Environment;

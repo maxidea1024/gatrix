@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiAccessToken } from '../models/ApiAccessToken';
-import { RemoteConfigEnvironment } from '../models/RemoteConfigEnvironment';
+import { Environment } from '../models/Environment';
 import { CacheService } from '../services/CacheService';
 import logger from '../config/logger';
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
@@ -17,8 +17,8 @@ const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
 
 interface SDKRequest extends Request {
   apiToken?: ApiAccessToken;
-  environments?: RemoteConfigEnvironment[];
-  environment?: RemoteConfigEnvironment;
+  environments?: Environment[];
+  environment?: Environment;
   isUnsecuredToken?: boolean; // Flag to indicate unsecured token usage
 }
 
@@ -81,7 +81,7 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       // Cache the token for 5 minutes
       await CacheService.set(cacheKey, apiToken, 300);
     } else {
-      // 캐시에서 토큰을 찾았어도 사용량 기록
+      // 캐시?�서 ?�큰??찾았?�도 ?�용??기록
       if (apiToken.id) {
         const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
         apiTokenUsageService.recordTokenUsage(apiToken.id).catch(error => {
@@ -126,7 +126,7 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     }
 
     // Get environments if token has specific environment access
-    let environments: RemoteConfigEnvironment[] = [];
+    let environments: Environment[] = [];
 
     if (!apiToken.allowAllEnvironments && apiToken.environments && apiToken.environments.length > 0) {
       environments = apiToken.environments;
@@ -138,7 +138,7 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
         .select('environmentId');
 
       if (envIds.length > 0) {
-        environments = await RemoteConfigEnvironment.query()
+        environments = await Environment.query()
           .whereIn('id', envIds.map(e => e.environmentId));
       }
     }
@@ -227,9 +227,9 @@ export const sdkRateLimit = (req: SDKRequest, res: Response, next: NextFunction)
 };
 
 /**
- * SDK 환경 설정 미들웨어
- * X-Environment-Id 헤더 또는 기본 환경을 사용하여 req.environment를 설정합니다.
- * 토큰의 환경 접근 권한도 검증합니다.
+ * SDK ?�경 ?�정 미들?�어
+ * X-Environment-Id ?�더 ?�는 기본 ?�경???�용?�여 req.environment�??�정?�니??
+ * ?�큰???�경 ?�근 권한??검증합?�다.
  */
 export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
@@ -283,10 +283,10 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
 
     // Fetch environment from database
     const cacheKey = `sdk_env:${environmentId}`;
-    let environment: RemoteConfigEnvironment | null = await CacheService.get<RemoteConfigEnvironment>(cacheKey);
+    let environment: Environment | null = await CacheService.get<Environment>(cacheKey);
 
     if (!environment) {
-      const foundEnv = await RemoteConfigEnvironment.query().findById(environmentId);
+      const foundEnv = await Environment.query().findById(environmentId);
 
       if (!foundEnv) {
         return res.status(404).json({
@@ -329,8 +329,8 @@ export const clientSDKAuth = [
 ];
 
 /**
- * Server API 토큰 인증 미들웨어
- * X-API-Token 헤더를 사용하여 서버 간 통신을 인증합니다.
+ * Server API ?�큰 ?�증 미들?�어
+ * X-API-Token ?�더�??�용?�여 ?�버 �??�신???�증?�니??
  */
 export const authenticateServerApiToken = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
@@ -383,7 +383,7 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
         });
       }
 
-      // 서버 토큰인지 확인
+      // ?�버 ?�큰?��? ?�인
       if (validatedToken.tokenType !== 'server') {
         return res.status(403).json({
           success: false,
@@ -395,7 +395,7 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
       await CacheService.set(cacheKey, validatedToken, 5 * 60 * 1000);
     }
 
-    // 요청 객체에 토큰 정보 추가
+    // ?�청 객체???�큰 ?�보 추�?
     req.apiToken = validatedToken;
 
     next();
