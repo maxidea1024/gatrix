@@ -62,6 +62,7 @@ import UnauthorizedPage from './pages/common/UnauthorizedPage';
 import ProfilePage from './pages/user/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import TagsPage from './pages/settings/TagsPage';
+import SystemSettingsPage from './pages/settings/SystemSettingsPage';
 
 // Pages - Admin
 import UsersManagementPage from './pages/admin/UsersManagementPage';
@@ -382,8 +383,13 @@ const AppContent: React.FC = () => {
                           </MainLayout>
                         </ProtectedRoute>
                       } />
-
-                      {/* Advanced Settings Route - Removed */}
+                      <Route path="/settings/system" element={
+                        <ProtectedRoute requiredRoles={['admin']}>
+                          <MainLayout>
+                            <SystemSettingsPage />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      } />
 
                       {/* Admin Routes */}
                       <Route path="/admin/*" element={
