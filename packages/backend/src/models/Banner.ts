@@ -1,5 +1,6 @@
 import db from '../config/knex';
 import logger from '../config/logger';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 // Frame action types
 export type FrameActionType = 'openUrl' | 'command' | 'deepLink' | 'none';
@@ -37,6 +38,30 @@ export interface FrameTransition {
   duration: number;
 }
 
+// Frame filter logic type
+export type FrameFilterLogic = 'and' | 'or';
+
+// Frame targeting/filtering options
+export interface FrameTargeting {
+  // Target platforms (e.g., 'pc', 'ios', 'android')
+  platforms?: string[];
+  platformsInverted?: boolean;
+  // Target channel/subchannels
+  channelSubchannels?: Array<{ channel: string; subchannels: string[] }>;
+  channelSubchannelsInverted?: boolean;
+  // Target worlds
+  worlds?: string[];
+  worldsInverted?: boolean;
+  // User level range
+  levelMin?: number;
+  levelMax?: number;
+  // Days since joining range
+  joinDaysMin?: number;
+  joinDaysMax?: number;
+  // Logic for combining conditions (AND = all conditions must match, OR = any condition matches)
+  filterLogic?: FrameFilterLogic;
+}
+
 export interface Frame {
   frameId: string;
   imageUrl: string;
@@ -47,6 +72,8 @@ export interface Frame {
   effects?: FrameEffects;
   transition?: FrameTransition;
   meta?: Record<string, any>;
+  // Frame targeting/filtering
+  targeting?: FrameTargeting;
 }
 
 export interface SequenceTransition {
@@ -71,6 +98,7 @@ export interface BannerAttributes {
   height: number;
   metadata?: Record<string, any>;
   playbackSpeed: number;
+  shuffle: boolean;
   sequences: Sequence[];
   version: number;
   status: BannerStatus;
@@ -81,6 +109,7 @@ export interface BannerAttributes {
 }
 
 export interface BannerFilters {
+  environmentId?: string;
   search?: string;
   status?: BannerStatus | BannerStatus[];
   limit?: number;
@@ -101,10 +130,12 @@ export class BannerModel {
       const offset = filters?.offset ?? 0;
       const sortBy = filters?.sortBy || 'createdAt';
       const sortOrder = filters?.sortOrder || 'DESC';
+      const envId = filters?.environmentId ?? getCurrentEnvironmentId();
 
       const baseQuery = () => db('g_banners as b')
         .leftJoin('g_users as creator', 'b.createdBy', 'creator.id')
-        .leftJoin('g_users as updater', 'b.updatedBy', 'updater.id');
+        .leftJoin('g_users as updater', 'b.updatedBy', 'updater.id')
+        .where('b.environmentId', envId);
 
       const applyFilters = (query: any) => {
         if (filters?.search) {
@@ -145,9 +176,10 @@ export class BannerModel {
 
       const total = countResult?.total || 0;
 
-      // Parse JSON fields
+      // Parse JSON fields and convert shuffle to boolean
       const parsedBanners = banners.map((b: any) => ({
         ...b,
+        shuffle: Boolean(b.shuffle),
         sequences: typeof b.sequences === 'string' ? JSON.parse(b.sequences) : b.sequences,
         metadata: b.metadata ? (typeof b.metadata === 'string' ? JSON.parse(b.metadata) : b.metadata) : null,
       }));
@@ -159,8 +191,9 @@ export class BannerModel {
     }
   }
 
-  static async findById(bannerId: string): Promise<BannerAttributes | null> {
+  static async findById(bannerId: string, environmentId?: string): Promise<BannerAttributes | null> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const banner = await db('g_banners as b')
         .leftJoin('g_users as creator', 'b.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'b.updatedBy', 'updater.id')
@@ -172,6 +205,7 @@ export class BannerModel {
           'updater.email as updatedByEmail'
         ])
         .where('b.bannerId', bannerId)
+        .where('b.environmentId', envId)
         .first();
 
       if (!banner) {
@@ -180,6 +214,7 @@ export class BannerModel {
 
       return {
         ...banner,
+        shuffle: Boolean(banner.shuffle),
         sequences: typeof banner.sequences === 'string' ? JSON.parse(banner.sequences) : banner.sequences,
         metadata: banner.metadata ? (typeof banner.metadata === 'string' ? JSON.parse(banner.metadata) : banner.metadata) : null,
       };
@@ -194,9 +229,10 @@ export class BannerModel {
    * @param name Banner name to search
    * @param excludeBannerId Optional bannerId to exclude (for update check)
    */
-  static async findByName(name: string, excludeBannerId?: string): Promise<BannerAttributes | null> {
+  static async findByName(name: string, excludeBannerId?: string, environmentId?: string): Promise<BannerAttributes | null> {
     try {
-      let query = db('g_banners').where('name', name);
+      const envId = environmentId ?? getCurrentEnvironmentId();
+      let query = db('g_banners').where('name', name).where('environmentId', envId);
       if (excludeBannerId) {
         query = query.whereNot('bannerId', excludeBannerId);
       }
@@ -206,6 +242,7 @@ export class BannerModel {
       }
       return {
         ...banner,
+        shuffle: Boolean(banner.shuffle),
         sequences: typeof banner.sequences === 'string' ? JSON.parse(banner.sequences) : banner.sequences,
         metadata: banner.metadata ? (typeof banner.metadata === 'string' ? JSON.parse(banner.metadata) : banner.metadata) : null,
       };
@@ -217,14 +254,17 @@ export class BannerModel {
 
   static async create(data: Omit<BannerAttributes, 'createdAt' | 'updatedAt'>): Promise<BannerAttributes> {
     try {
+      const envId = getCurrentEnvironmentId();
       await db('g_banners').insert({
         bannerId: data.bannerId,
+        environmentId: envId,
         name: data.name,
         description: data.description || null,
         width: data.width,
         height: data.height,
         metadata: data.metadata ? JSON.stringify(data.metadata) : null,
         playbackSpeed: data.playbackSpeed,
+        shuffle: data.shuffle ? 1 : 0,
         sequences: JSON.stringify(data.sequences),
         version: data.version || 1,
         status: data.status || 'draft',
@@ -234,7 +274,7 @@ export class BannerModel {
         updatedAt: new Date()
       });
 
-      const banner = await this.findById(data.bannerId);
+      const banner = await this.findById(data.bannerId, envId);
       if (!banner) {
         throw new Error('Failed to create banner');
       }
@@ -245,8 +285,9 @@ export class BannerModel {
     }
   }
 
-  static async update(bannerId: string, data: Partial<BannerAttributes>): Promise<BannerAttributes> {
+  static async update(bannerId: string, data: Partial<BannerAttributes>, environmentId?: string): Promise<BannerAttributes> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const updateData: any = {
         updatedAt: new Date()
       };
@@ -257,6 +298,7 @@ export class BannerModel {
       if (data.height !== undefined) updateData.height = data.height;
       if (data.metadata !== undefined) updateData.metadata = JSON.stringify(data.metadata);
       if (data.playbackSpeed !== undefined) updateData.playbackSpeed = data.playbackSpeed;
+      if (data.shuffle !== undefined) updateData.shuffle = data.shuffle ? 1 : 0;
       if (data.sequences !== undefined) updateData.sequences = JSON.stringify(data.sequences);
       if (data.status !== undefined) updateData.status = data.status;
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
@@ -264,12 +306,13 @@ export class BannerModel {
       // Increment version on update
       await db('g_banners')
         .where('bannerId', bannerId)
+        .where('environmentId', envId)
         .update({
           ...updateData,
           version: db.raw('version + 1')
         });
 
-      const banner = await this.findById(bannerId);
+      const banner = await this.findById(bannerId, envId);
       if (!banner) {
         throw new Error('Banner not found after update');
       }
@@ -280,19 +323,22 @@ export class BannerModel {
     }
   }
 
-  static async delete(bannerId: string): Promise<void> {
+  static async delete(bannerId: string, environmentId?: string): Promise<void> {
     try {
-      await db('g_banners').where('bannerId', bannerId).del();
+      const envId = environmentId ?? getCurrentEnvironmentId();
+      await db('g_banners').where('bannerId', bannerId).where('environmentId', envId).del();
     } catch (error) {
       logger.error('Error deleting banner:', error);
       throw error;
     }
   }
 
-  static async updateStatus(bannerId: string, status: BannerStatus, updatedBy?: number): Promise<BannerAttributes> {
+  static async updateStatus(bannerId: string, status: BannerStatus, updatedBy?: number, environmentId?: string): Promise<BannerAttributes> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       await db('g_banners')
         .where('bannerId', bannerId)
+        .where('environmentId', envId)
         .update({
           status,
           updatedBy: updatedBy || null,
@@ -300,7 +346,7 @@ export class BannerModel {
           version: db.raw('version + 1')
         });
 
-      const banner = await this.findById(bannerId);
+      const banner = await this.findById(bannerId, envId);
       if (!banner) {
         throw new Error('Banner not found after status update');
       }
@@ -311,9 +357,10 @@ export class BannerModel {
     }
   }
 
-  static async duplicate(bannerId: string, newBannerId: string, createdBy?: number): Promise<BannerAttributes> {
+  static async duplicate(bannerId: string, newBannerId: string, createdBy?: number, environmentId?: string): Promise<BannerAttributes> {
     try {
-      const original = await this.findById(bannerId);
+      const envId = environmentId ?? getCurrentEnvironmentId();
+      const original = await this.findById(bannerId, envId);
       if (!original) {
         throw new Error('Original banner not found');
       }
@@ -326,6 +373,7 @@ export class BannerModel {
         height: original.height,
         metadata: original.metadata,
         playbackSpeed: original.playbackSpeed,
+        shuffle: original.shuffle,
         sequences: original.sequences,
         version: 1,
         status: 'draft',
@@ -339,11 +387,13 @@ export class BannerModel {
   }
 
   // Get only published banners for client API
-  static async findPublished(): Promise<BannerAttributes[]> {
+  static async findPublished(environmentId?: string): Promise<BannerAttributes[]> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const banners = await db('g_banners')
         .select('*')
         .where('status', 'published')
+        .where('environmentId', envId)
         .orderBy('createdAt', 'DESC');
 
       return banners.map((b: any) => ({

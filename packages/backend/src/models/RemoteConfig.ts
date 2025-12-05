@@ -12,6 +12,7 @@ import {
   ConfigVariant,
   CreateConfigVersionData
 } from '../types/remoteConfig';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export class RemoteConfigModel {
   /**
@@ -24,7 +25,8 @@ export class RemoteConfigModel {
   ): Promise<RemoteConfigListResponse> {
     try {
       const offset = (page - 1) * limit;
-      
+      const envId = filters.environmentId ?? getCurrentEnvironmentId();
+
       let query = db('g_remote_configs as rc')
         .leftJoin('g_users as creator', 'rc.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'rc.updatedBy', 'updater.id')
@@ -34,7 +36,8 @@ export class RemoteConfigModel {
           'creator.email as createdByEmail',
           'updater.name as updatedByName',
           'updater.email as updatedByEmail'
-        ]);
+        ])
+        .where('rc.environmentId', envId);
 
       // Apply filters
       if (filters.search) {
@@ -124,8 +127,9 @@ export class RemoteConfigModel {
   /**
    * Get remote config by ID with relations
    */
-  static async findById(id: number, includeRelations: boolean = true): Promise<RemoteConfig | null> {
+  static async findById(id: number, includeRelations: boolean = true, environmentId?: string): Promise<RemoteConfig | null> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const config = await db('g_remote_configs as rc')
         .leftJoin('g_users as creator', 'rc.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'rc.updatedBy', 'updater.id')
@@ -137,6 +141,7 @@ export class RemoteConfigModel {
           'updater.email as updatedByEmail'
         ])
         .where('rc.id', id)
+        .where('rc.environmentId', envId)
         .first();
 
       if (!config) {
@@ -205,8 +210,9 @@ export class RemoteConfigModel {
   /**
    * Get remote config by key name
    */
-  static async findByKey(keyName: string): Promise<RemoteConfig | null> {
+  static async findByKey(keyName: string, environmentId?: string): Promise<RemoteConfig | null> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const config = await db('g_remote_configs as rc')
         .leftJoin('g_users as creator', 'rc.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'rc.updatedBy', 'updater.id')
@@ -218,6 +224,7 @@ export class RemoteConfigModel {
           'updater.email as updatedByEmail'
         ])
         .where('rc.keyName', keyName)
+        .where('rc.environmentId', envId)
         .first();
 
       return config ? this.transformConfig(config) : null;
@@ -232,7 +239,9 @@ export class RemoteConfigModel {
    */
   static async create(data: CreateRemoteConfigData): Promise<RemoteConfig> {
     try {
+      const envId = getCurrentEnvironmentId();
       const [insertId] = await db('g_remote_configs').insert({
+        environmentId: envId,
         keyName: data.keyName,
         defaultValue: data.defaultValue || null,
         valueType: data.valueType,
@@ -241,7 +250,7 @@ export class RemoteConfigModel {
         createdBy: data.createdBy || null
       });
 
-      const created = await this.findById(insertId, false);
+      const created = await this.findById(insertId, false, envId);
       if (!created) {
         throw new Error('Failed to retrieve created remote config');
       }
@@ -259,8 +268,9 @@ export class RemoteConfigModel {
   /**
    * Update remote config
    */
-  static async update(id: number, data: UpdateRemoteConfigData): Promise<RemoteConfig> {
+  static async update(id: number, data: UpdateRemoteConfigData, environmentId?: string): Promise<RemoteConfig> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const updateData: any = {};
 
       if (data.keyName !== undefined) updateData.keyName = data.keyName;
@@ -270,9 +280,9 @@ export class RemoteConfigModel {
       if (data.isActive !== undefined) updateData.isActive = data.isActive;
       if (data.updatedBy !== undefined) updateData.updatedBy = data.updatedBy;
 
-      await db('g_remote_configs').where('id', id).update(updateData);
+      await db('g_remote_configs').where('id', id).where('environmentId', envId).update(updateData);
 
-      const updated = await this.findById(id, false);
+      const updated = await this.findById(id, false, envId);
       if (!updated) {
         throw new Error('Failed to retrieve updated remote config');
       }
@@ -288,9 +298,10 @@ export class RemoteConfigModel {
   /**
    * Delete remote config
    */
-  static async delete(id: number): Promise<void> {
+  static async delete(id: number, environmentId?: string): Promise<void> {
     try {
-      await db('g_remote_configs').where('id', id).del();
+      const envId = environmentId ?? getCurrentEnvironmentId();
+      await db('g_remote_configs').where('id', id).where('environmentId', envId).del();
       logger.info(`Remote config deleted: ID ${id}`);
     } catch (error) {
       logger.error('Error deleting remote config:', error);

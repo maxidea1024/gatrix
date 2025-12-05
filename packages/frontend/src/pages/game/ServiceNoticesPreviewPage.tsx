@@ -106,7 +106,8 @@ const getReadNotices = (): Set<number> => {
     }
 
     if (stored) {
-      const readIds = new Set(JSON.parse(stored));
+      const parsed = JSON.parse(stored);
+      const readIds = new Set<number>(Array.isArray(parsed) ? parsed : []);
       console.log('[ReadStatus] Loaded read notices:', Array.from(readIds));
       return readIds;
     }
@@ -247,7 +248,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
   // Mark notice as read when selected
   const handleNoticeSelect = (notice: ServiceNotice) => {
     setSelectedNotice(notice);
-    
+
     // Mark as read
     if (!readNotices.has(notice.id)) {
       const newReadNotices = new Set(readNotices);
@@ -385,24 +386,6 @@ const ServiceNoticesPreviewPage: React.FC = () => {
             m: 0,
             WebkitFontSmoothing: 'antialiased',
             MozOsxFontSmoothing: 'grayscale',
-            // Custom scrollbar for game UI
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'rgba(0, 0, 0, 0.1)',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: 'rgba(255, 255, 255, 0.4)',
-              borderRadius: '4px',
-              '&:hover': {
-                background: 'rgba(255, 255, 255, 0.6)',
-              },
-            },
-            // Firefox scrollbar
-            scrollbarWidth: 'thin',
-            scrollbarColor: 'rgba(255, 255, 255, 0.4) rgba(0, 0, 0, 0.1)',
           }}
         >
           {notices.map((notice, index) => (
@@ -561,24 +544,6 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                 minHeight: 0,
                 WebkitFontSmoothing: 'antialiased',
                 MozOsxFontSmoothing: 'grayscale',
-                // Custom scrollbar
-                '&::-webkit-scrollbar': {
-                  width: '8px',
-                },
-                '&::-webkit-scrollbar-track': {
-                  background: 'rgba(0, 0, 0, 0.05)',
-                  borderRadius: '4px',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: 'rgba(107, 93, 82, 0.4)',
-                  borderRadius: '4px',
-                  '&:hover': {
-                    background: 'rgba(107, 93, 82, 0.6)',
-                  },
-                },
-                // Firefox scrollbar
-                scrollbarWidth: 'thin',
-                scrollbarColor: 'rgba(107, 93, 82, 0.4) rgba(0, 0, 0, 0.05)',
               }}
             >
               <Box

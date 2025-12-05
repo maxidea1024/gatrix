@@ -63,6 +63,8 @@ import SimplePagination from '../../components/common/SimplePagination';
 import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
 import WhitelistOverview from '../../components/admin/WhitelistOverview';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 
 
 
@@ -70,6 +72,10 @@ const WhitelistPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { hasPermission } = useAuth();
+
+  // Check if user can manage (create/edit/delete) whitelist entries
+  const canManage = hasPermission([PERMISSIONS.SECURITY_MANAGE]);
 
   // Refs for form focus
   const accountIdFieldRef = useRef<HTMLInputElement>(null);
@@ -469,22 +475,24 @@ const WhitelistPage: React.FC = () => {
           {/* Tab Content */}
           <Box sx={{ display: currentTab === 0 ? 'block' : 'none' }}>
             {/* Nickname Whitelist Header */}
-              <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'flex-end' }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<UploadIcon />}
-                  onClick={() => setBulkDialog(true)}
-                >
-                  {t('whitelist.bulkImport')}
-                </Button>
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={handleAdd}
-                >
-                  {t('whitelist.addEntry')}
-                </Button>
-              </Box>
+              {canManage && (
+                <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<UploadIcon />}
+                    onClick={() => setBulkDialog(true)}
+                  >
+                    {t('whitelist.bulkImport')}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={handleAdd}
+                  >
+                    {t('whitelist.addEntry')}
+                  </Button>
+                </Box>
+              )}
 
               {/* Search & Filters */}
               <Card variant="outlined" sx={{ mb: 3 }}>
@@ -668,27 +676,33 @@ const WhitelistPage: React.FC = () => {
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
               >
-                <MenuItem onClick={handleToggleStatus}>
-                  {selectedWhitelist?.isEnabled ? (
-                    <>
-                      <BlockIcon sx={{ mr: 1 }} />
-                      {t('whitelist.disable')}
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircleIcon sx={{ mr: 1 }} />
-                      {t('whitelist.enable')}
-                    </>
-                  )}
-                </MenuItem>
-                <MenuItem onClick={handleEdit}>
-                  <EditIcon sx={{ mr: 1 }} />
-                  {t('common.edit')}
-                </MenuItem>
-                <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
-                  <DeleteIcon sx={{ mr: 1 }} />
-                  {t('common.delete')}
-                </MenuItem>
+                {canManage && (
+                  <MenuItem onClick={handleToggleStatus}>
+                    {selectedWhitelist?.isEnabled ? (
+                      <>
+                        <BlockIcon sx={{ mr: 1 }} />
+                        {t('whitelist.disable')}
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircleIcon sx={{ mr: 1 }} />
+                        {t('whitelist.enable')}
+                      </>
+                    )}
+                  </MenuItem>
+                )}
+                {canManage && (
+                  <MenuItem onClick={handleEdit}>
+                    <EditIcon sx={{ mr: 1 }} />
+                    {t('common.edit')}
+                  </MenuItem>
+                )}
+                {canManage && (
+                  <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
+                    <DeleteIcon sx={{ mr: 1 }} />
+                    {t('common.delete')}
+                  </MenuItem>
+                )}
               </Menu>
 
               {/* Add/Edit Drawer */}
@@ -1035,7 +1049,7 @@ const WhitelistPage: React.FC = () => {
           </Box>
 
           <Box sx={{ display: currentTab === 1 ? 'block' : 'none' }}>
-            <IpWhitelistTab />
+            <IpWhitelistTab canManage={canManage} />
           </Box>
 
           <Box sx={{ display: currentTab === 2 ? 'block' : 'none' }}>

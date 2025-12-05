@@ -1,7 +1,9 @@
 import db from '../config/knex';
 import logger from '../config/logger';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface MessageTemplateFilters {
+  environmentId?: string;
   createdBy?: number | number[];
   createdBy_operator?: 'any_of' | 'include_all';
   isEnabled?: boolean | boolean[];
@@ -20,6 +22,7 @@ export interface MessageTemplateListResult {
 
 export interface MessageTemplate {
   id?: number;
+  environmentId?: string;
   name: string;
   type: string;
   isEnabled: boolean;
@@ -37,17 +40,19 @@ export class MessageTemplateModel {
       // 기본값 설정
       const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
+      const envId = filters?.environmentId ?? getCurrentEnvironmentId();
 
       console.log('🔍 MessageTemplate query filters:', filters);
 
       // 테스트: 테이블에 데이터가 있는지 확인
-      const testCount = await db('g_message_templates').count('* as count').first();
+      const testCount = await db('g_message_templates').where('environmentId', envId).count('* as count').first();
       console.log('🔍 Total records in g_message_templates:', testCount);
 
-      // 기본 쿼리 빌더
+      // 기본 쿼리 빌더 with environment filter
       const baseQuery = () => db('g_message_templates as mt')
         .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
-        .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id');
+        .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id')
+        .where('mt.environmentId', envId);
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
@@ -178,8 +183,9 @@ export class MessageTemplateModel {
     }
   }
 
-  static async findById(id: number): Promise<any | null> {
+  static async findById(id: number, environmentId?: string): Promise<any | null> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const template = await db('g_message_templates as mt')
         .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id')
@@ -189,6 +195,7 @@ export class MessageTemplateModel {
           'updater.name as updatedByName'
         ])
         .where('mt.id', id)
+        .where('mt.environmentId', envId)
         .first();
 
       if (!template) {
@@ -212,11 +219,13 @@ export class MessageTemplateModel {
     }
   }
 
-  static async create(data: any): Promise<any> {
+  static async create(data: any, environmentId?: string): Promise<any> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       return await db.transaction(async (trx) => {
         // 메시지 템플릿 생성
         const [insertId] = await trx('g_message_templates').insert({
+          environmentId: envId,
           name: data.name,
           type: data.type,
           defaultMessage: data.defaultMessage || data.default_message || data.content || '',
@@ -265,12 +274,14 @@ export class MessageTemplateModel {
     }
   }
 
-  static async update(id: number, data: any): Promise<any> {
+  static async update(id: number, data: any, environmentId?: string): Promise<any> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       return await db.transaction(async (trx) => {
         // 메시지 템플릿 업데이트
         await trx('g_message_templates')
           .where('id', id)
+          .where('environmentId', envId)
           .update({
             name: data.name,
             type: data.type,
@@ -299,7 +310,7 @@ export class MessageTemplateModel {
           await trx('g_message_template_locales').insert(localeInserts);
         }
 
-        return await this.findById(id);
+        return await this.findById(id, envId);
       });
     } catch (error) {
       logger.error('Error updating message template:', error);
@@ -307,10 +318,12 @@ export class MessageTemplateModel {
     }
   }
 
-  static async delete(id: number): Promise<void> {
+  static async delete(id: number, environmentId?: string): Promise<void> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       await db('g_message_templates')
         .where('id', id)
+        .where('environmentId', envId)
         .del();
     } catch (error) {
       logger.error('Error deleting message template:', error);

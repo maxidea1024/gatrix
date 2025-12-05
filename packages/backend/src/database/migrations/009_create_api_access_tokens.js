@@ -1,21 +1,21 @@
 /**
  * Migration: Create API Access Tokens table
- * 
+ *
  * This migration creates the g_api_access_tokens table for managing
  * API tokens used by client and server SDKs.
  */
 
 exports.up = async function(connection) {
   console.log('Creating g_api_access_tokens table...');
-  
+
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_api_access_tokens (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id CHAR(26) NOT NULL PRIMARY KEY COMMENT 'ULID',
       tokenName VARCHAR(255) NOT NULL,
       description TEXT NULL,
       tokenValue VARCHAR(255) NOT NULL UNIQUE,
       tokenType ENUM('client', 'server') NOT NULL,
-      environmentId INT NULL,
+      allowAllEnvironments BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'If true, token can access all environments',
       expiresAt TIMESTAMP NULL,
       lastUsedAt TIMESTAMP NULL,
       usageCount BIGINT DEFAULT 0,
@@ -34,7 +34,7 @@ exports.up = async function(connection) {
       INDEX idx_expires_at (expiresAt)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-  
+
   console.log('✅ g_api_access_tokens table created successfully');
 };
 

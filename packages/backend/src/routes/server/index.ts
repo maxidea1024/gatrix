@@ -12,6 +12,9 @@ import IngamePopupNoticeController from '../../controllers/IngamePopupNoticeCont
 import { SurveyController } from '../../controllers/SurveyController';
 import { MaintenanceController } from '../../controllers/MaintenanceController';
 import serviceDiscoveryRoutes, { getWhitelistsHandler } from './serviceDiscovery';
+import ServerClientVersionController from '../../controllers/ServerClientVersionController';
+import ServerServiceNoticeController from '../../controllers/ServerServiceNoticeController';
+import ServerBannerController from '../../controllers/ServerBannerController';
 
 const router = express.Router();
 
@@ -88,6 +91,18 @@ router.get('/whitelists', serverSDKAuth, getWhitelistsHandler);
 
 // Maintenance routes
 router.get('/maintenance', serverSDKAuth, MaintenanceController.getStatus as any);
+
+// Client version routes (Edge)
+router.get('/client-versions', serverSDKAuth, ServerClientVersionController.getClientVersions);
+router.get('/client-versions/:id', serverSDKAuth, ServerClientVersionController.getClientVersionById);
+
+// Service notice routes (Edge)
+router.get('/service-notices', serverSDKAuth, ServerServiceNoticeController.getServiceNotices);
+router.get('/service-notices/:id', serverSDKAuth, ServerServiceNoticeController.getServiceNoticeById);
+
+// Banner routes (Edge)
+router.get('/banners', serverSDKAuth, ServerBannerController.getBanners);
+router.get('/banners/:bannerId', serverSDKAuth, ServerBannerController.getBannerById);
 
 // Service discovery routes
 router.use('/services', serviceDiscoveryRoutes);

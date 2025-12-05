@@ -1,9 +1,11 @@
 import db from '../config/knex';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export type VarValueType = 'string' | 'number' | 'boolean' | 'color' | 'object' | 'array';
 
 export interface VarItem {
   id: number;
+  environmentId: string;
   varKey: string;
   varValue: string | null;
   valueType: VarValueType;
@@ -32,26 +34,30 @@ export interface UpdateVarData {
 }
 
 export default class VarsModel {
-  static async get(key: string): Promise<string | null> {
+  static async get(key: string, environmentId?: string): Promise<string | null> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     const result = await db('g_vars')
       .select('varValue')
       .where('varKey', key)
+      .where('environmentId', envId)
       .first();
 
     return result?.varValue ?? null;
   }
 
-  static async set(key: string, value: string | null, userId: number): Promise<void> {
+  static async set(key: string, value: string | null, userId: number, environmentId?: string): Promise<void> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     await db('g_vars')
-      .insert({ varKey: key, varValue: value, createdBy: userId })
-      .onConflict('varKey')
+      .insert({ varKey: key, varValue: value, createdBy: userId, environmentId: envId })
+      .onConflict(['varKey', 'environmentId'])
       .merge({ varValue: value, updatedBy: userId });
   }
 
   /**
    * Get all KV items (keys starting with 'kv:' or '$')
    */
-  static async getAllKV(): Promise<VarItem[]> {
+  static async getAllKV(environmentId?: string): Promise<VarItem[]> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     const results = await db('g_vars as v')
       .leftJoin('g_users as creator', 'v.createdBy', 'creator.id')
       .leftJoin('g_users as updater', 'v.updatedBy', 'updater.id')
@@ -60,6 +66,7 @@ export default class VarsModel {
         'creator.name as createdByName',
         'updater.name as updatedByName'
       )
+      .where('v.environmentId', envId)
       .where((builder) => {
         builder.where('v.varKey', 'like', 'kv:%').orWhere('v.varKey', 'like', '$%');
       })
@@ -76,7 +83,8 @@ export default class VarsModel {
   /**
    * Get a single KV item by key
    */
-  static async getKV(key: string): Promise<VarItem | null> {
+  static async getKV(key: string, environmentId?: string): Promise<VarItem | null> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     const result = await db('g_vars as v')
       .leftJoin('g_users as creator', 'v.createdBy', 'creator.id')
       .leftJoin('g_users as updater', 'v.updatedBy', 'updater.id')
@@ -86,6 +94,7 @@ export default class VarsModel {
         'updater.name as updatedByName'
       )
       .where('v.varKey', key)
+      .where('v.environmentId', envId)
       .first();
 
     if (!result) {
@@ -103,7 +112,8 @@ export default class VarsModel {
   /**
    * Create a new KV item
    */
-  static async createKV(data: CreateVarData, userId: number): Promise<VarItem> {
+  static async createKV(data: CreateVarData, userId: number, environmentId?: string): Promise<VarItem> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     // Ensure key starts with 'kv:'
     const key = data.varKey.startsWith('kv:') ? data.varKey : `kv:${data.varKey}`;
 
@@ -114,9 +124,10 @@ export default class VarsModel {
       description: data.description || null,
       isSystemDefined: false,
       createdBy: userId,
+      environmentId: envId,
     });
 
-    const created = await this.getKV(key);
+    const created = await this.getKV(key, envId);
     if (!created) {
       throw new Error('Failed to create KV item');
     }
@@ -126,9 +137,10 @@ export default class VarsModel {
   /**
    * Update an existing KV item
    */
-  static async updateKV(key: string, data: UpdateVarData, userId: number): Promise<VarItem> {
+  static async updateKV(key: string, data: UpdateVarData, userId: number, environmentId?: string): Promise<VarItem> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     // Check if item exists and is not system-defined for type changes
-    const existing = await this.getKV(key);
+    const existing = await this.getKV(key, envId);
     if (!existing) {
       throw new Error('KV item not found');
     }
@@ -153,9 +165,10 @@ export default class VarsModel {
 
     await db('g_vars')
       .where('varKey', key)
+      .where('environmentId', envId)
       .update(updateData);
 
-    const updated = await this.getKV(key);
+    const updated = await this.getKV(key, envId);
     if (!updated) {
       throw new Error('Failed to update KV item');
     }
@@ -165,8 +178,9 @@ export default class VarsModel {
   /**
    * Delete a KV item (only if not system-defined)
    */
-  static async deleteKV(key: string): Promise<void> {
-    const existing = await this.getKV(key);
+  static async deleteKV(key: string, environmentId?: string): Promise<void> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
+    const existing = await this.getKV(key, envId);
     if (!existing) {
       throw new Error('KV item not found');
     }
@@ -177,6 +191,7 @@ export default class VarsModel {
 
     await db('g_vars')
       .where('varKey', key)
+      .where('environmentId', envId)
       .delete();
   }
 
@@ -190,17 +205,20 @@ export default class VarsModel {
     value: string | null,
     valueType: VarValueType,
     description?: string,
-    isCopyable: boolean = true
+    isCopyable: boolean = true,
+    environmentId?: string
   ): Promise<void> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
 
     // Check if item already exists
-    const existing = await this.getKV(fullKey);
+    const existing = await this.getKV(fullKey, envId);
 
     if (existing) {
       // Item exists: only update description and ensure isSystemDefined is true
       await db('g_vars')
         .where('varKey', fullKey)
+        .where('environmentId', envId)
         .update({
           description: description || existing.description || null,
           isSystemDefined: true,
@@ -216,6 +234,7 @@ export default class VarsModel {
         isSystemDefined: true,
         isCopyable,
         createdBy: 1, // System user
+        environmentId: envId,
       });
     }
   }

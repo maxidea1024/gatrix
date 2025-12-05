@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
     Box,
     Button,
@@ -21,6 +23,8 @@ import { useTranslation } from 'react-i18next';
 
 const DataManagementPage: React.FC = () => {
     const { t } = useTranslation();
+    const { hasPermission } = useAuth();
+    const canManage = hasPermission([PERMISSIONS.DATA_MANAGEMENT_MANAGE]);
     const [exporting, setExporting] = useState(false);
     const [importing, setImporting] = useState(false);
     const [importFile, setImportFile] = useState<File | null>(null);
@@ -103,7 +107,7 @@ const DataManagementPage: React.FC = () => {
                             color="primary"
                             startIcon={exporting ? <CircularProgress size={20} color="inherit" /> : <CloudDownload />}
                             onClick={handleExport}
-                            disabled={exporting}
+                            disabled={exporting || !canManage}
                             fullWidth
                         >
                             {exporting ? t('Exporting...') : t('Export All Data')}
@@ -140,7 +144,7 @@ const DataManagementPage: React.FC = () => {
                             color="error"
                             startIcon={importing ? <CircularProgress size={20} color="inherit" /> : <CloudUpload />}
                             onClick={handleImportClick}
-                            disabled={!importFile || importing}
+                            disabled={!importFile || importing || !canManage}
                             fullWidth
                         >
                             {importing ? t('Importing...') : t('Import Data')}

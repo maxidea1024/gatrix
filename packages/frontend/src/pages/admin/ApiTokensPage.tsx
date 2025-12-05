@@ -84,18 +84,23 @@ import 'dayjs/locale/en';
 import 'dayjs/locale/zh-cn';
 import { ApiAccessToken, TokenType } from '@/types/apiToken';
 import { apiTokenService } from '@/services/apiTokenService';
+import { environmentService, Environment } from '@/services/environmentService';
 import SimplePagination from '@/components/common/SimplePagination';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import { useI18n } from '@/contexts/I18nContext';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 
 interface CreateTokenData {
   tokenName: string;
   description?: string;
   tokenType: TokenType;
   environmentId?: number;
+  allowAllEnvironments: boolean;
+  environmentIds: string[];
   expiresAt?: string;
 }
 
@@ -167,6 +172,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
 const defaultColumns: ColumnConfig[] = [
   { id: 'tokenName', labelKey: 'apiTokens.tokenName', visible: true },
   { id: 'tokenType', labelKey: 'apiTokens.tokenType', visible: true },
+  { id: 'environments', labelKey: 'apiTokens.environments', visible: true },
   { id: 'description', labelKey: 'apiTokens.description', visible: true },
   { id: 'lastUsedAt', labelKey: 'apiTokens.lastUsedAt', visible: true },
   { id: 'expiresAt', labelKey: 'apiTokens.expiresAt', visible: true },
@@ -185,6 +191,11 @@ const ApiTokensPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { language } = useI18n();
+  const { hasPermission } = useAuth();
+
+  // Check if user can manage (create/edit/delete) tokens
+  const canManage = hasPermission([PERMISSIONS.SECURITY_MANAGE]);
+
   const [tokens, setTokens] = useState<ApiAccessToken[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -243,12 +254,17 @@ const ApiTokensPage: React.FC = () => {
   const [regenerateDialogOpen, setRegenerateDialogOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState<ApiAccessToken | null>(null);
 
+  // Environment state
+  const [environments, setEnvironments] = useState<Environment[]>([]);
+
   // Form states
   const [formData, setFormData] = useState<CreateTokenData>({
     tokenName: '',
     description: '',
     tokenType: 'client',
     environmentId: 1,
+    allowAllEnvironments: true,
+    environmentIds: [],
   });
 
   // UI states
@@ -331,6 +347,19 @@ const ApiTokensPage: React.FC = () => {
     loadTokens();
   }, [page, rowsPerPage, sortBy, sortOrder, activeFilters]);
 
+  // Load environments on mount
+  useEffect(() => {
+    const loadEnvironments = async () => {
+      try {
+        const envs = await environmentService.getEnvironments();
+        setEnvironments(envs);
+      } catch (error) {
+        console.error('Failed to load environments:', error);
+      }
+    };
+    loadEnvironments();
+  }, []);
+
   const loadTokens = async () => {
     try {
       setLoading(true);
@@ -411,6 +440,38 @@ const ApiTokensPage: React.FC = () => {
               variant="filled"
             />
           </Tooltip>
+        );
+      case 'environments':
+        if (token.allowAllEnvironments) {
+          return (
+            <Chip
+              label={t('apiTokens.allEnvironments')}
+              size="small"
+              color="default"
+              variant="outlined"
+            />
+          );
+        }
+        // Map environment IDs to environment objects from loaded environments
+        const tokenEnvs = (token.environmentIds || [])
+          .map((envId: string) => environments.find(e => e.id === envId))
+          .filter(Boolean);
+        return (
+          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+            {tokenEnvs.length > 0 ? (
+              tokenEnvs.map((env) => (
+                <Chip
+                  key={env!.id}
+                  label={env!.displayName || env!.environmentName}
+                  size="small"
+                  variant="outlined"
+                  color="primary"
+                />
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">-</Typography>
+            )}
+          </Box>
         );
       case 'description':
         return (
@@ -496,10 +557,13 @@ const ApiTokensPage: React.FC = () => {
 
   const handleEdit = async () => {
     if (!selectedToken) return;
-    
+
     try {
       await apiTokenService.updateToken(selectedToken.id, {
         tokenName: formData.tokenName,
+        description: formData.description,
+        allowAllEnvironments: formData.allowAllEnvironments,
+        environmentIds: formData.allowAllEnvironments ? [] : formData.environmentIds,
         expiresAt: formData.expiresAt,
       });
       await loadTokens();
@@ -580,6 +644,8 @@ const ApiTokensPage: React.FC = () => {
       description: '',
       tokenType: 'client',
       environmentId: 1,
+      allowAllEnvironments: true,
+      environmentIds: [],
     });
   };
 
@@ -599,6 +665,8 @@ const ApiTokensPage: React.FC = () => {
       description: token.description || '',
       tokenType: token.tokenType,
       environmentId: token.environmentId,
+      allowAllEnvironments: token.allowAllEnvironments ?? true,
+      environmentIds: token.environmentIds || [],
       expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString().slice(0, 16) : undefined,
     });
     setEditDialogOpen(true);
@@ -791,16 +859,18 @@ const ApiTokensPage: React.FC = () => {
                 </Typography>
               </Box>
             </Box>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateDialog}>
-              {t('apiTokens.createToken')}
-            </Button>
+            {canManage && (
+              <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateDialog}>
+                {t('apiTokens.createToken')}
+              </Button>
+            )}
           </Box>
         </Box>
 
 
 
       {/* Bulk Actions */}
-      {selectedTokenIds.length > 0 && (
+      {canManage && selectedTokenIds.length > 0 && (
         <Box sx={{
           mb: 2,
           p: 2,
@@ -902,14 +972,16 @@ const ApiTokensPage: React.FC = () => {
           <Table stickyHeader sx={{ tableLayout: 'auto' }}>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox" sx={{ width: 50 }}>
-                  <Checkbox
-                    checked={selectAll}
-                    indeterminate={selectedTokenIds.length > 0 && selectedTokenIds.length < filteredTokens.length}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    disabled={filteredTokens.length === 0}
-                  />
-                </TableCell>
+                {canManage && (
+                  <TableCell padding="checkbox" sx={{ width: 50 }}>
+                    <Checkbox
+                      checked={selectAll}
+                      indeterminate={selectedTokenIds.length > 0 && selectedTokenIds.length < filteredTokens.length}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      disabled={filteredTokens.length === 0}
+                    />
+                  </TableCell>
+                )}
                 {columns.filter(col => col.visible).map((column) => (
                   <TableCell key={column.id}>
                     {t(column.labelKey)}
@@ -921,7 +993,7 @@ const ApiTokensPage: React.FC = () => {
             <TableBody>
               {!filteredTokens || filteredTokens.length === 0 ? (
                 <EmptyTableRow
-                  colSpan={columns.filter(col => col.visible).length + 2}
+                  colSpan={columns.filter(col => col.visible).length + (canManage ? 2 : 1)}
                   loading={loading}
                   message={searchTerm ? t('common.noSearchResults') : t('apiTokens.noTokens')}
                   loadingMessage={t('common.loadingData')}
@@ -929,12 +1001,14 @@ const ApiTokensPage: React.FC = () => {
               ) : (
                 filteredTokens.map((token) => (
                   <TableRow key={token.id} hover selected={selectedTokenIds.includes(token.id)}>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedTokenIds.includes(token.id)}
-                        onChange={(e) => handleSelectToken(token.id, e.target.checked)}
-                      />
-                    </TableCell>
+                    {canManage && (
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedTokenIds.includes(token.id)}
+                          onChange={(e) => handleSelectToken(token.id, e.target.checked)}
+                        />
+                      </TableCell>
+                    )}
                     {columns.filter(col => col.visible).map((column) => (
                       <TableCell key={column.id}>
                         {renderCellContent(token, column.id)}
@@ -947,21 +1021,25 @@ const ApiTokensPage: React.FC = () => {
                             <CopyIcon />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton size="small" onClick={() => openEditDialog(token)}>
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('apiTokens.regenerateToken')}>
-                          <IconButton size="small" onClick={() => openRegenerateDialog(token)}>
-                            <RefreshIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('common.delete')}>
-                          <IconButton size="small" onClick={() => openDeleteDialog(token)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
+                        {canManage && (
+                          <>
+                            <Tooltip title={t('common.edit')}>
+                              <IconButton size="small" onClick={() => openEditDialog(token)}>
+                                <EditIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('apiTokens.regenerateToken')}>
+                              <IconButton size="small" onClick={() => openRegenerateDialog(token)}>
+                                <RefreshIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('common.delete')}>
+                              <IconButton size="small" onClick={() => openDeleteDialog(token)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            </Tooltip>
+                          </>
+                        )}
                       </Box>
                     </TableCell>
                   </TableRow>
@@ -1110,6 +1188,70 @@ const ApiTokensPage: React.FC = () => {
               </RadioGroup>
             </FormControl>
 
+            {/* Environment Access */}
+            <FormControl component="fieldset" fullWidth>
+              <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
+                {t('apiTokens.environmentAccess')}
+              </FormLabel>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.allowAllEnvironments}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      allowAllEnvironments: e.target.checked,
+                      environmentIds: e.target.checked ? [] : prev.environmentIds,
+                    }))}
+                    size="small"
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {t('apiTokens.allowAllEnvironments')}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {t('apiTokens.allowAllEnvironmentsDescription')}
+                    </Typography>
+                  </Box>
+                }
+              />
+              {formData.allowAllEnvironments && (
+                <Alert severity="warning" sx={{ mt: 1, py: 0.5 }}>
+                  {t('apiTokens.allowAllEnvironmentsWarning')}
+                </Alert>
+              )}
+              {!formData.allowAllEnvironments && (
+                <Box sx={{ mt: 1, pl: 4 }}>
+                  {environments.map((env) => (
+                    <FormControlLabel
+                      key={env.id}
+                      control={
+                        <Checkbox
+                          checked={formData.environmentIds.includes(env.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData(prev => ({
+                                ...prev,
+                                environmentIds: [...prev.environmentIds, env.id],
+                              }));
+                            } else {
+                              setFormData(prev => ({
+                                ...prev,
+                                environmentIds: prev.environmentIds.filter(id => id !== env.id),
+                              }));
+                            }
+                          }}
+                          size="small"
+                        />
+                      }
+                      label={env.displayName || env.environmentName}
+                    />
+                  ))}
+                </Box>
+              )}
+            </FormControl>
+
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
               <DateTimePicker
                 label={t('apiTokens.expiresAt')}
@@ -1228,6 +1370,17 @@ const ApiTokensPage: React.FC = () => {
             />
 
             <TextField
+              label={t('apiTokens.description')}
+              value={formData.description || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              fullWidth
+              multiline
+              rows={2}
+              size="small"
+              placeholder={t('apiTokens.descriptionPlaceholder')}
+            />
+
+            <TextField
               label={t('apiTokens.tokenType')}
               value={t(`apiTokens.${formData.tokenType}TokenType`, formData.tokenType)}
               fullWidth
@@ -1235,6 +1388,70 @@ const ApiTokensPage: React.FC = () => {
               disabled
               helperText={t('apiTokens.tokenTypeNotEditable')}
             />
+
+            {/* Environment Access */}
+            <FormControl component="fieldset" fullWidth>
+              <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
+                {t('apiTokens.environmentAccess')}
+              </FormLabel>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.allowAllEnvironments}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      allowAllEnvironments: e.target.checked,
+                      environmentIds: e.target.checked ? [] : prev.environmentIds,
+                    }))}
+                    size="small"
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {t('apiTokens.allowAllEnvironments')}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {t('apiTokens.allowAllEnvironmentsDescription')}
+                    </Typography>
+                  </Box>
+                }
+              />
+              {formData.allowAllEnvironments && (
+                <Alert severity="warning" sx={{ mt: 1, py: 0.5 }}>
+                  {t('apiTokens.allowAllEnvironmentsWarning')}
+                </Alert>
+              )}
+              {!formData.allowAllEnvironments && (
+                <Box sx={{ mt: 1, pl: 4 }}>
+                  {environments.map((env) => (
+                    <FormControlLabel
+                      key={env.id}
+                      control={
+                        <Checkbox
+                          checked={formData.environmentIds.includes(env.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData(prev => ({
+                                ...prev,
+                                environmentIds: [...prev.environmentIds, env.id],
+                              }));
+                            } else {
+                              setFormData(prev => ({
+                                ...prev,
+                                environmentIds: prev.environmentIds.filter(id => id !== env.id),
+                              }));
+                            }
+                          }}
+                          size="small"
+                        />
+                      }
+                      label={env.displayName || env.environmentName}
+                    />
+                  ))}
+                </Box>
+              )}
+            </FormControl>
 
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
               <DateTimePicker
@@ -1245,7 +1462,7 @@ const ApiTokensPage: React.FC = () => {
                 slotProps={{
                   textField: {
                     fullWidth: true,
-                    size: 'small',
+                    size: "small",
                     helperText: t('apiTokens.expiresAtHelp'),
                     slotProps: { input: { readOnly: true } },
                   },

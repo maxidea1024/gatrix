@@ -1,7 +1,9 @@
 import db from '../config/knex';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface TagAttributes {
   id: number;
+  environmentId: string; // ULID
   name: string;
   color: string;
   description?: string | null;
@@ -16,6 +18,7 @@ export interface TagAttributes {
 }
 
 export interface CreateTagData {
+  environmentId?: string; // ULID
   name: string;
   color?: string;
   description?: string | null;
@@ -30,10 +33,12 @@ export interface UpdateTagData {
 }
 
 export default class TagModel {
-  static async list(): Promise<TagAttributes[]> {
+  static async list(environmentId?: string): Promise<TagAttributes[]> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     return await db('g_tags as t')
       .leftJoin('g_users as c', 'c.id', 't.createdBy')
       .leftJoin('g_users as u', 'u.id', 't.updatedBy')
+      .where('t.environmentId', envId)
       .select([
         't.*',
         'c.name as createdByName',
@@ -49,13 +54,18 @@ export default class TagModel {
     return row || null;
   }
 
-  static async findByName(name: string): Promise<TagAttributes | null> {
-    const row = await db('g_tags').where('name', name).first();
+  static async findByName(name: string, environmentId?: string): Promise<TagAttributes | null> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
+    const row = await db('g_tags')
+      .where('name', name)
+      .where('environmentId', envId)
+      .first();
     return row || null;
   }
 
   static async upsertByName(data: CreateTagData): Promise<TagAttributes> {
-    const existing = await this.findByName(data.name);
+    const envId = data.environmentId ?? getCurrentEnvironmentId();
+    const existing = await this.findByName(data.name, envId);
     if (existing) {
       await db('g_tags')
         .where('id', existing.id)
@@ -68,6 +78,7 @@ export default class TagModel {
       return (await this.findById(existing.id))!;
     }
     const [id] = await db('g_tags').insert({
+      environmentId: envId,
       name: data.name,
       color: data.color || '#607D8B',
       description: data.description || null,
@@ -77,7 +88,9 @@ export default class TagModel {
   }
 
   static async create(data: CreateTagData): Promise<TagAttributes> {
+    const envId = data.environmentId ?? getCurrentEnvironmentId();
     const insertData = {
+      environmentId: envId,
       name: data.name,
       color: data.color || '#607D8B',
       description: data.description || null,

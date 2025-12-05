@@ -33,11 +33,11 @@ interface EmojiPickerProps {
 const emojiCategories = {
   recent: ['😀', '😂', '❤️', '👍', '👎', '😊', '😢', '😮', '😡', '🎉'],
   smileys: [
-    '😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','😘','😗','😙','😚',
-    '😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤',
-    '😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','😳','😱','😨','😰','😥','😓','🥲',
-    '😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤗','🤔','🫣',
-    '🫠','🫢','🫡','🫥','🤫','🤭','🫨','🫤','🤐','🤑'
+    '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '😘', '😗', '😙', '😚',
+    '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤',
+    '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '😳', '😱', '😨', '😰', '😥', '😓', '🥲',
+    '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤗', '🤔', '🫣',
+    '🫠', '🫢', '🫡', '🫥', '🤫', '🤭', '🫨', '🫤', '🤐', '🤑'
   ],
   people: [
     '👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤏', '✌️', '🤞', '🤟',
@@ -102,8 +102,8 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
 
   const filteredEmojis = searchQuery
     ? Object.values(emojiCategories)
-        .flat()
-        .filter((emoji) => emoji.includes(searchQuery))
+      .flat()
+      .filter((emoji) => emoji.includes(searchQuery))
     : emojiCategories[selectedCategory as keyof typeof emojiCategories] || [];
   // 이 피커가 열려있는 동안에만 모달 backdrop의 blur를 비활성화
   useEffect(() => {
@@ -178,185 +178,167 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
           },
         }}
       >
-      <Box sx={{ height: '100%', display: 'flex', minHeight: 0 }}>
-        {/* 슬랙 스타일 세로 카테고리 사이드바 */}
-        {!searchQuery && (
-          <>
-            <Box sx={{
-              width: 60,
-              height: '100%',
-              backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f5f5f5',
-              display: 'flex',
-              flexDirection: 'column',
-              py: 1,
-              flexShrink: 0,
-              overflow: 'auto',
-              borderRight: (theme) => `1px solid ${theme.palette.divider}`,
-              '&::-webkit-scrollbar': { width: '6px' },
-              '&::-webkit-scrollbar-track': { background: 'transparent' },
-              '&::-webkit-scrollbar-thumb': {
-                background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
-                borderRadius: '3px',
-                '&:hover': {
-                  background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'
-                }
-              },
-            }}>
-              {Object.keys(categoryLabels).map((category) => {
-                const isSelected = selectedCategory === category;
-
-                const Icon = {
-                  recent: AccessTime,
-                  smileys: EmojiEmotions,
-                  people: BackHand,
-                  nature: Pets,
-                  food: Fastfood,
-                  activities: SportsSoccer,
-                  travel: DirectionsCar,
-                  objects: Devices,
-                  symbols: FavoriteBorder,
-                  flags: Flag,
-                }[category as keyof typeof categoryLabels] as React.ElementType;
-
-                return (
-                  <IconButton
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    sx={{
-                      width: 44,
-                      height: 44,
-                      mx: 'auto',
-                      mb: 0.5,
-                      color: isSelected
-                        ? 'primary.main'
-                        : (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
-                      backgroundColor: isSelected
-                        ? (theme) => theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.16)' : 'rgba(25, 118, 210, 0.08)'
-                        : 'transparent',
-                      borderRadius: '8px',
-                      '&:hover': {
-                        backgroundColor: isSelected
-                          ? (theme) => theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.24)' : 'rgba(25, 118, 210, 0.12)'
-                          : (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                      },
-                      '& .MuiTouchRipple-root': { display: 'none' },
-                    }}
-                    title={categoryLabels[category as keyof typeof categoryLabels]}
-                    disableRipple
-                  >
-                    <Icon fontSize="small" />
-                  </IconButton>
-                );
-              })}
-            </Box>
-          </>
-        )}
-
-        {/* 메인 컨텐츠 영역 */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: 2, overflow: 'hidden' }}>
-          {/* Search */}
-          <Box sx={{ mb: 2 }}>
-            <TextField
-              size="small"
-              placeholder={t('chat.searchEmojis')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" />
-                  </InputAdornment>
-                ),
-              }}
-              fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-                  '&:hover': {
-                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                  },
-                  '&.Mui-focused': {
-                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                  },
-                },
-              }}
-            />
-          </Box>
-
-          {/* 카테고리 제목 */}
+        <Box sx={{ height: '100%', display: 'flex', minHeight: 0 }}>
+          {/* 슬랙 스타일 세로 카테고리 사이드바 */}
           {!searchQuery && (
-            <Typography
-              variant="subtitle2"
-              sx={{
-                mb: 1.5,
-                px: 0.5,
-                color: 'text.secondary',
-                fontWeight: 600,
-                fontSize: '0.75rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-              }}
-            >
-              {categoryLabels[selectedCategory as keyof typeof categoryLabels]}
-            </Typography>
+            <>
+              <Box sx={{
+                width: 60,
+                height: '100%',
+                backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f5f5f5',
+                display: 'flex',
+                flexDirection: 'column',
+                py: 1,
+                flexShrink: 0,
+                overflow: 'auto',
+                borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+              }}>
+                {Object.keys(categoryLabels).map((category) => {
+                  const isSelected = selectedCategory === category;
+
+                  const Icon = {
+                    recent: AccessTime,
+                    smileys: EmojiEmotions,
+                    people: BackHand,
+                    nature: Pets,
+                    food: Fastfood,
+                    activities: SportsSoccer,
+                    travel: DirectionsCar,
+                    objects: Devices,
+                    symbols: FavoriteBorder,
+                    flags: Flag,
+                  }[category as keyof typeof categoryLabels] as React.ElementType;
+
+                  return (
+                    <IconButton
+                      key={category}
+                      onClick={() => setSelectedCategory(category)}
+                      sx={{
+                        width: 44,
+                        height: 44,
+                        mx: 'auto',
+                        mb: 0.5,
+                        color: isSelected
+                          ? 'primary.main'
+                          : (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+                        backgroundColor: isSelected
+                          ? (theme) => theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.16)' : 'rgba(25, 118, 210, 0.08)'
+                          : 'transparent',
+                        borderRadius: '8px',
+                        '&:hover': {
+                          backgroundColor: isSelected
+                            ? (theme) => theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.24)' : 'rgba(25, 118, 210, 0.12)'
+                            : (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                        },
+                        '& .MuiTouchRipple-root': { display: 'none' },
+                      }}
+                      title={categoryLabels[category as keyof typeof categoryLabels]}
+                      disableRipple
+                    >
+                      <Icon fontSize="small" />
+                    </IconButton>
+                  );
+                })}
+              </Box>
+            </>
           )}
 
-          {/* Emoji Grid */}
-          <Box sx={{
-            flex: 1,
-            overflow: 'auto',
-            '&::-webkit-scrollbar': { width: '8px' },
-            '&::-webkit-scrollbar-track': { background: 'transparent' },
-            '&::-webkit-scrollbar-thumb': {
-              background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
-              borderRadius: '4px',
-              '&:hover': {
-                background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'
-              }
-            },
-          }}>
-            {filteredEmojis.length === 0 ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px' }}>
-                <Typography variant="body2" color="text.secondary">
-                  {searchQuery ? t('chat.noEmojisFound') : t('chat.noEmojis')}
-                </Typography>
-              </Box>
-            ) : (
-              <Box sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(8, 1fr)',
-                gap: 0.5,
-                pb: 1,
-              }}>
-                {filteredEmojis.map((emoji, index) => (
-                  <IconButton
-                    key={`${emoji}-${index}`}
-                    size="small"
-                    onClick={() => handleEmojiClick(emoji)}
-                    disableRipple
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      fontSize: '1.5rem',
-                      color: 'inherit',
-                      backgroundColor: 'transparent',
-                      borderRadius: '8px',
-                      '&:hover': {
-                        backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                        transform: 'scale(1.2)'
-                      },
-                      transition: 'all 0.15s ease-in-out',
-                    }}
-                  >
-                    <span style={{ display: 'block', lineHeight: 1 }}>{emoji}</span>
-                  </IconButton>
-                ))}
-              </Box>
+          {/* 메인 컨텐츠 영역 */}
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: 2, overflow: 'hidden' }}>
+            {/* Search */}
+            <Box sx={{ mb: 2 }}>
+              <TextField
+                size="small"
+                placeholder={t('chat.searchEmojis')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                }}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+                    '&:hover': {
+                      backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                    },
+                  },
+                }}
+              />
+            </Box>
+
+            {/* 카테고리 제목 */}
+            {!searchQuery && (
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  mb: 1.5,
+                  px: 0.5,
+                  color: 'text.secondary',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                }}
+              >
+                {categoryLabels[selectedCategory as keyof typeof categoryLabels]}
+              </Typography>
             )}
+
+            {/* Emoji Grid */}
+            <Box sx={{
+              flex: 1,
+              overflow: 'auto',
+            }}>
+              {filteredEmojis.length === 0 ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {searchQuery ? t('chat.noEmojisFound') : t('chat.noEmojis')}
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(8, 1fr)',
+                  gap: 0.5,
+                  pb: 1,
+                }}>
+                  {filteredEmojis.map((emoji, index) => (
+                    <IconButton
+                      key={`${emoji}-${index}`}
+                      size="small"
+                      onClick={() => handleEmojiClick(emoji)}
+                      disableRipple
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        fontSize: '1.5rem',
+                        color: 'inherit',
+                        backgroundColor: 'transparent',
+                        borderRadius: '8px',
+                        '&:hover': {
+                          backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                          transform: 'scale(1.2)'
+                        },
+                        transition: 'all 0.15s ease-in-out',
+                      }}
+                    >
+                      <span style={{ display: 'block', lineHeight: 1 }}>{emoji}</span>
+                    </IconButton>
+                  ))}
+                </Box>
+              )}
+            </Box>
           </Box>
         </Box>
-      </Box>
-    </Popover>
+      </Popover>
     </>
 
   );

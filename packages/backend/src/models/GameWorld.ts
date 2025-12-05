@@ -1,6 +1,7 @@
 import db from '../config/knex';
 import logger from '../config/logger';
 import { convertDateFieldsForMySQL } from '../utils/dateUtils';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface GameWorldMaintenanceLocale {
   id?: number;
@@ -15,6 +16,7 @@ export interface GameWorldMaintenanceLocale {
 
 export interface GameWorld {
   id: number;
+  environmentId: string; // Environment this world belongs to (ULID)
   worldId: string;
   name: string;
   isVisible: boolean;
@@ -45,6 +47,7 @@ export interface GameWorld {
 }
 
 export interface CreateGameWorldData {
+  environmentId?: string; // Environment to create in (defaults to current context)
   worldId: string;
   name: string;
   isVisible?: boolean;
@@ -91,6 +94,7 @@ export interface UpdateGameWorldData {
 }
 
 export interface GameWorldListParams {
+  environmentId?: string; // Filter by environment (defaults to current context)
   search?: string;
   isVisible?: boolean;
   isMaintenance?: boolean;
@@ -135,10 +139,12 @@ export class GameWorldModel {
     } as any;
   }
 
-  static async findByWorldId(worldId: string): Promise<GameWorld | null> {
+  static async findByWorldId(worldId: string, environmentId?: string): Promise<GameWorld | null> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const gameWorld = await db('g_game_worlds')
         .where('worldId', worldId)
+        .where('environmentId', envId)
         .first();
 
       return gameWorld || null;
@@ -151,41 +157,15 @@ export class GameWorldModel {
   static async list(params: GameWorldListParams = {}): Promise<GameWorld[]> {
     try {
       const {
+        environmentId,
         search = '',
         isVisible,
         isMaintenance,
         tags,
       } = params;
 
-      // Build WHERE clause
-      const whereConditions: string[] = [];
-      const queryParams: any[] = [];
-
-      if (search) {
-        whereConditions.push('(name LIKE ? OR worldId LIKE ? OR description LIKE ? OR tags LIKE ?)');
-        const searchPattern = `%${search}%`;
-        queryParams.push(searchPattern, searchPattern, searchPattern, searchPattern);
-      }
-
-      if (isVisible !== undefined) {
-        whereConditions.push('isVisible = ?');
-        queryParams.push(isVisible);
-      }
-
-      if (params.isMaintenance !== undefined) {
-        whereConditions.push('isMaintenance = ?');
-        queryParams.push(params.isMaintenance);
-      }
-
-      if (params.tags) {
-        const tags = params.tags.split(',').map(t => t.trim()).filter(Boolean);
-        if (tags.length > 0) {
-          tags.forEach(tag => {
-            whereConditions.push('tags LIKE ?');
-            queryParams.push(`%${tag}%`);
-          });
-        }
-      }
+      // Get environment ID from params or current context
+      const envId = environmentId ?? getCurrentEnvironmentId();
 
       // Convert raw SQL to knex query builder
       let query = db('g_game_worlds as gw')
@@ -197,7 +177,8 @@ export class GameWorldModel {
           'c.email as createdByEmail',
           'u.name as updatedByName',
           'u.email as updatedByEmail'
-        ]);
+        ])
+        .where('gw.environmentId', envId); // Filter by environment
 
       // Apply search filter
       if (search) {
@@ -260,11 +241,15 @@ export class GameWorldModel {
 
   static async create(worldData: CreateGameWorldData): Promise<GameWorld> {
     try {
-      // Get the next display order if not provided
+      // Get environment ID from data or current context
+      const envId = worldData.environmentId ?? getCurrentEnvironmentId();
+
+      // Get the next display order if not provided (within the same environment)
       let displayOrder = worldData.displayOrder;
       if (displayOrder === undefined) {
         // Get the maximum display order to place new world at the top (when sorted DESC)
         const maxOrderResult = await db('g_game_worlds')
+          .where('environmentId', envId)
           .max('displayOrder as maxOrder')
           .first();
         displayOrder = (maxOrderResult?.maxOrder || 0) + 10;
@@ -277,9 +262,10 @@ export class GameWorldModel {
 
       return await db.transaction(async (trx) => {
         // maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
-        const { maintenanceLocales, ...gameWorldData } = worldData;
+        const { maintenanceLocales, environmentId: _envId, ...gameWorldData } = worldData;
 
         const insertData = {
+          environmentId: envId, // Set environment ID
           worldId: gameWorldData.worldId,
           name: gameWorldData.name,
           isVisible: gameWorldData.isVisible ?? true,
@@ -407,10 +393,12 @@ export class GameWorldModel {
     }
   }
 
-  static async exists(worldId: string, excludeId?: number): Promise<boolean> {
+  static async exists(worldId: string, excludeId?: number, environmentId?: string): Promise<boolean> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       let query = db('g_game_worlds')
         .where('worldId', worldId)
+        .where('environmentId', envId)
         .count('* as count');
 
       if (excludeId) {

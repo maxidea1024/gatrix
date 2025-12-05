@@ -15,7 +15,7 @@ export interface SegmentConditions {
 
 export interface RemoteConfigSegmentData {
   id?: number;
-  environmentId: number;
+  environmentId: string; // ULID
   segmentName: string;
   displayName: string;
   description?: string;
@@ -31,7 +31,7 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
   static tableName = 'g_remote_config_segments';
 
   id!: number;
-  environmentId!: number;
+  environmentId!: string; // ULID
   segmentName!: string;
   displayName!: string;
   description?: string;
@@ -113,7 +113,7 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
   /**
    * Get segment by environment and name
    */
-  static async getByEnvironmentAndName(environmentId: number, segmentName: string): Promise<RemoteConfigSegment | undefined> {
+  static async getByEnvironmentAndName(environmentId: string, segmentName: string): Promise<RemoteConfigSegment | undefined> {
     return await this.query()
       .where('environmentId', environmentId)
       .where('segmentName', segmentName)
@@ -133,7 +133,7 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
   /**
    * Get all segments for environment
    */
-  static async getAllByEnvironment(environmentId: number): Promise<RemoteConfigSegment[]> {
+  static async getAllByEnvironment(environmentId: string): Promise<RemoteConfigSegment[]> {
     return await this.query()
       .where('environmentId', environmentId)
       .withGraphFetched('[creator(basicInfo), updater(basicInfo)]')
@@ -342,7 +342,7 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
   /**
    * Create predefined segments for environment
    */
-  static async createPredefinedSegments(environmentId: number, createdBy: number): Promise<RemoteConfigSegment[]> {
+  static async createPredefinedSegments(environmentId: string, createdBy: number): Promise<RemoteConfigSegment[]> {
     const predefined = this.getPredefinedSegments();
     const segments: RemoteConfigSegment[] = [];
 

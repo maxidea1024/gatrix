@@ -14,6 +14,8 @@ import {
   AccordionDetails,
   Tooltip,
   FormControl,
+  FormControlLabel,
+  Checkbox,
   InputLabel,
   Select,
   MenuItem,
@@ -76,6 +78,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   const [height, setHeight] = useState(512);
   const [sizePreset, setSizePreset] = useState('1024x512');
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+  const [shuffle, setShuffle] = useState(false);
   const [sequences, setSequences] = useState<Sequence[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -83,6 +86,9 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
   const [basicInfoExpanded, setBasicInfoExpanded] = useState(true);
   const [sequenceExpanded, setSequenceExpanded] = useState(true);
   const [previewExpanded, setPreviewExpanded] = useState(true);
+
+  // Frame selection for preview sync
+  const [selectedPreviewFrame, setSelectedPreviewFrame] = useState<{ sequenceIndex: number; frameIndex: number } | null>(null);
 
   // Get size preset value from width/height
   const getSizePresetValue = useCallback((w: number, h: number) => {
@@ -117,6 +123,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       setHeight(banner.height);
       setSizePreset(getSizePresetValue(banner.width, banner.height));
       setPlaybackSpeed(banner.playbackSpeed);
+      setShuffle(banner.shuffle ?? false);
       const initialSequences = banner.sequences ? JSON.parse(JSON.stringify(banner.sequences)) : [];
       setSequences(initialSequences);
       setSequenceHistory([initialSequences]);
@@ -129,6 +136,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       setHeight(512);
       setSizePreset('1024x512');
       setPlaybackSpeed(1.0);
+      setShuffle(false);
       setSequences([]);
       setSequenceHistory([[]]);
       setHistoryIndex(0);
@@ -257,6 +265,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           width,
           height,
           playbackSpeed,
+          shuffle,
           sequences,
         });
         enqueueSnackbar(t('banners.updateSuccess'), { variant: 'success' });
@@ -267,6 +276,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
           width,
           height,
           playbackSpeed,
+          shuffle,
           sequences,
         });
         enqueueSnackbar(t('banners.createSuccess'), { variant: 'success' });
@@ -325,34 +335,12 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
       storageKey="bannerFormDrawerWidth"
       defaultWidth={900}
       minWidth={700}
-      maxWidth={1400}
     >
       <Box
         sx={{
           p: 3,
           overflow: 'auto',
           flex: 1,
-          // Chat message list scrollbar style
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-          },
-          scrollbarWidth: 'thin',
-          scrollbarColor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.2) transparent'
-              : 'rgba(0, 0, 0, 0.2) transparent',
         }}
       >
         {/* Basic Info Accordion */}
@@ -402,8 +390,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
               />
               <Divider />
               {/* Size row: Preset + (Custom fields if selected) */}
-              <Grid container spacing={2}>
-                <Grid item xs={sizePreset === 'custom' ? 4 : 6}>
+              <Stack direction="row" spacing={2}>
+                <Box sx={{ flex: sizePreset === 'custom' ? 4 : 6 }}>
                   <FormControl fullWidth size="small">
                     <InputLabel>{t('banners.sizePreset')}</InputLabel>
                     <Select
@@ -421,10 +409,10 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                       ))}
                     </Select>
                   </FormControl>
-                </Grid>
+                </Box>
                 {sizePreset === 'custom' && (
                   <>
-                    <Grid item xs={4}>
+                    <Box sx={{ flex: 4 }}>
                       <TextField
                         label={t('banners.width')}
                         value={width}
@@ -438,8 +426,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                           '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
                         }}
                       />
-                    </Grid>
-                    <Grid item xs={4}>
+                    </Box>
+                    <Box sx={{ flex: 4 }}>
                       <TextField
                         label={t('banners.height')}
                         value={height}
@@ -453,42 +441,56 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                           '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
                         }}
                       />
-                    </Grid>
+                    </Box>
                   </>
                 )}
                 {sizePreset !== 'custom' && (
-                  <Grid item xs={6}>
-                    <TextField
-                      label={t('banners.playbackSpeed')}
-                      value={playbackSpeed}
-                      onChange={(e) => setPlaybackSpeed(Number(e.target.value) || 1)}
-                      fullWidth
-                      size="small"
-                      inputProps={{ style: { MozAppearance: 'textfield' } }}
-                      sx={{
-                        '& input[type=number]': { MozAppearance: 'textfield' },
-                        '& input[type=number]::-webkit-outer-spin-button': { WebkitAppearance: 'none', margin: 0 },
-                        '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
-                      }}
-                    />
-                  </Grid>
+                  <>
+                    <Box sx={{ flex: 4 }}>
+                      <TextField
+                        label={t('banners.playbackSpeed')}
+                        value={playbackSpeed}
+                        onChange={(e) => setPlaybackSpeed(Number(e.target.value) || 1)}
+                        fullWidth
+                        size="small"
+                        inputProps={{ style: { MozAppearance: 'textfield' } }}
+                        sx={{
+                          '& input[type=number]': { MozAppearance: 'textfield' },
+                          '& input[type=number]::-webkit-outer-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                          '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                        }}
+                      />
+                    </Box>
+                    <Box sx={{ flex: 2, display: 'flex', alignItems: 'center' }}>
+                      <FormControlLabel
+                        control={<Checkbox checked={shuffle} onChange={(e) => setShuffle(e.target.checked)} size="small" />}
+                        label={t('banners.shuffleMode')}
+                      />
+                    </Box>
+                  </>
                 )}
-              </Grid>
-              {/* Playback speed on separate row when custom size */}
+              </Stack>
+              {/* Playback speed and shuffle on separate row when custom size */}
               {sizePreset === 'custom' && (
-                <TextField
-                  label={t('banners.playbackSpeed')}
-                  value={playbackSpeed}
-                  onChange={(e) => setPlaybackSpeed(Number(e.target.value) || 1)}
-                  fullWidth
-                  size="small"
-                  inputProps={{ style: { MozAppearance: 'textfield' } }}
-                  sx={{
-                    '& input[type=number]': { MozAppearance: 'textfield' },
-                    '& input[type=number]::-webkit-outer-spin-button': { WebkitAppearance: 'none', margin: 0 },
-                    '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
-                  }}
-                />
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                  <TextField
+                    label={t('banners.playbackSpeed')}
+                    value={playbackSpeed}
+                    onChange={(e) => setPlaybackSpeed(Number(e.target.value) || 1)}
+                    size="small"
+                    sx={{
+                      flex: 1,
+                      '& input[type=number]': { MozAppearance: 'textfield' },
+                      '& input[type=number]::-webkit-outer-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                      '& input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                    }}
+                    inputProps={{ style: { MozAppearance: 'textfield' } }}
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={shuffle} onChange={(e) => setShuffle(e.target.checked)} size="small" />}
+                    label={t('banners.shuffleMode')}
+                  />
+                </Box>
               )}
             </Stack>
           </AccordionDetails>
@@ -572,6 +574,7 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
                     onDelete={() => handleDeleteSequence(index)}
                     onMoveUp={() => index > 0 && handleMoveSequence(index, index - 1)}
                     onMoveDown={() => index < sequences.length - 1 && handleMoveSequence(index, index + 1)}
+                    onFrameSelect={(seqIdx, frameIdx) => setSelectedPreviewFrame({ sequenceIndex: seqIdx, frameIndex: frameIdx })}
                   />
                 ))}
               </Stack>
@@ -607,6 +610,8 @@ const BannerFormDialog: React.FC<BannerFormDialogProps> = ({
               height={height}
               sequences={sequences}
               playbackSpeed={playbackSpeed}
+              selectedSequenceIndex={selectedPreviewFrame?.sequenceIndex}
+              selectedFrameIndex={selectedPreviewFrame?.frameIndex}
             />
           </AccordionDetails>
         </Accordion>

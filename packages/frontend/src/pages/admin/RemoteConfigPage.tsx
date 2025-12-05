@@ -61,6 +61,8 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import CodeEditor from '@/components/common/CodeEditor';
 import TargetConditionBuilder from '../../components/TargetConditionBuilder';
 
@@ -98,6 +100,8 @@ interface RemoteConfigFilters {
 const RemoteConfigPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.REMOTE_CONFIG_MANAGE]);
   const [configs, setConfigs] = useState<RemoteConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -2570,13 +2574,15 @@ const RemoteConfigPage: React.FC = () => {
               >
                 <RefreshIcon />
               </IconButton>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={() => setCreateDialogOpen(true)}
-              >
-                {t('remoteConfig.createConfig')}
-              </Button>
+              {canManage && (
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => setCreateDialogOpen(true)}
+                >
+                  {t('remoteConfig.createConfig')}
+                </Button>
+              )}
             </Stack>
           </Stack>
           </CardContent>
@@ -2588,19 +2594,21 @@ const RemoteConfigPage: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  indeterminate={selectedConfigs.length > 0 && selectedConfigs.length < configs.length}
-                  checked={configs.length > 0 && selectedConfigs.length === configs.length}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedConfigs(configs.map(config => config.id));
-                    } else {
-                      setSelectedConfigs([]);
-                    }
-                  }}
-                />
-              </TableCell>
+              {canManage && (
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    indeterminate={selectedConfigs.length > 0 && selectedConfigs.length < configs.length}
+                    checked={configs.length > 0 && selectedConfigs.length === configs.length}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedConfigs(configs.map(config => config.id));
+                      } else {
+                        setSelectedConfigs([]);
+                      }
+                    }}
+                  />
+                </TableCell>
+              )}
               <TableCell>{t('remoteConfig.keyName')}</TableCell>
               <TableCell>{t('remoteConfig.valueType')}</TableCell>
               <TableCell>{t('remoteConfig.defaultValue')}</TableCell>
@@ -2609,24 +2617,26 @@ const RemoteConfigPage: React.FC = () => {
               <TableCell>{t('remoteConfig.description')}</TableCell>
               <TableCell>{t('remoteConfig.updated')}</TableCell>
               <TableCell>{t('remoteConfig.createdBy')}</TableCell>
-              <TableCell align="center">{t('remoteConfig.actions')}</TableCell>
+              {canManage && <TableCell align="center">{t('remoteConfig.actions')}</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
             {configs.map((config) => (
               <TableRow key={config.id}>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedConfigs.includes(config.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedConfigs([...selectedConfigs, config.id]);
-                      } else {
-                        setSelectedConfigs(selectedConfigs.filter(id => id !== config.id));
-                      }
-                    }}
-                  />
-                </TableCell>
+                {canManage && (
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedConfigs.includes(config.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedConfigs([...selectedConfigs, config.id]);
+                        } else {
+                          setSelectedConfigs(selectedConfigs.filter(id => id !== config.id));
+                        }
+                      }}
+                    />
+                  </TableCell>
+                )}
                 <TableCell>
                   <Typography variant="body2" fontWeight={500} color="text.primary">
                     {config.keyName}
@@ -2731,20 +2741,22 @@ const RemoteConfigPage: React.FC = () => {
                     </Typography>
                   )}
                 </TableCell>
-                <TableCell align="center">
-                  <Stack direction="row" spacing={1} justifyContent="center">
-                    <Tooltip title={t('common.edit')}>
-                      <IconButton size="small" onClick={() => openEditDialog(config)}>
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('common.delete')}>
-                      <IconButton size="small" onClick={() => handleDelete(config)} color="error">
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Stack>
-                </TableCell>
+                {canManage && (
+                  <TableCell align="center">
+                    <Stack direction="row" spacing={1} justifyContent="center">
+                      <Tooltip title={t('common.edit')}>
+                        <IconButton size="small" onClick={() => openEditDialog(config)}>
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={t('common.delete')}>
+                        <IconButton size="small" onClick={() => handleDelete(config)} color="error">
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Stack>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

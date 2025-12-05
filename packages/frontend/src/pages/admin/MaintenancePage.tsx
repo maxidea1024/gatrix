@@ -5,6 +5,7 @@ import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -30,7 +31,8 @@ import { computeMaintenanceStatus, getMaintenanceStatusDisplay, MaintenanceStatu
 const MaintenancePage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.MAINTENANCE_MANAGE]);
 
   // Set dayjs locale based on current language
   React.useEffect(() => {
@@ -820,112 +822,114 @@ const MaintenancePage: React.FC = () => {
         </Card>
 
         {/* 우측 액션 버튼 영역 */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 200 }}>
-          {!isMaintenance ? (
-            <Button
-              variant="contained"
-              color="error"
-              size="large"
-              startIcon={<PlayArrowIcon />}
-              onClick={() => {
-                // 시간 검증 먼저 실행
-                const validation = validateMaintenanceTime();
-                if (!validation.valid) {
-                  return;
-                }
-                setConfirmMode('start');
-                setConfirmInput('');
-                setConfirmOpen(true);
-              }}
-              disabled={!hasMessageForStart}
-              sx={{
-                width: 160,
-                height: 160,
-                borderRadius: '50%',
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                flexDirection: 'column',
-                gap: 1,
-                '& .MuiButton-startIcon': {
-                  margin: 0,
-                  fontSize: '2rem'
-                }
-              }}
-            >
-              <PlayArrowIcon sx={{ fontSize: '2.5rem' }} />
-              {t('maintenance.start')}
-            </Button>
-          ) : (
-            <>
-              {editMode ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  startIcon={<SaveIcon />}
-                  onClick={() => {
-                    // 시간 검증 먼저 실행
-                    const validation = validateMaintenanceTime();
-                    if (!validation.valid) {
-                      return;
-                    }
-                    setConfirmMode('update');
-                    setConfirmInput('');
-                    setConfirmOpen(true);
-                  }}
-                  disabled={!hasMessageForStart}
-                  sx={{
-                    width: 160,
-                    height: 160,
-                    borderRadius: '50%',
-                    fontSize: '1.1rem',
-                    fontWeight: 600,
-                    flexDirection: 'column',
-                    gap: 1,
-                    '& .MuiButton-startIcon': {
-                      margin: 0,
-                      fontSize: '2rem'
-                    }
-                  }}
-                >
-                  <SaveIcon sx={{ fontSize: '2.5rem' }} />
-                  {t('maintenance.update')}
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  color="success"
-                  size="large"
-                  startIcon={<StopIcon />}
-                  onClick={() => { setConfirmMode('stop'); setConfirmInput(''); setConfirmOpen(true); }}
-                  sx={{
-                    width: 160,
-                    height: 160,
-                    borderRadius: '50%',
-                    fontSize: '1.1rem',
-                    fontWeight: 600,
-                    flexDirection: 'column',
-                    gap: 1,
-                    '& .MuiButton-startIcon': {
-                      margin: 0,
-                      fontSize: '2rem'
-                    }
-                  }}
-                >
-                  <StopIcon sx={{ fontSize: '2.5rem' }} />
-                  {t('maintenance.stop')}
-                </Button>
-              )}
+        {canManage && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 200 }}>
+            {!isMaintenance ? (
               <Button
-                variant="outlined"
-                onClick={() => setEditMode(v => !v)}
-                sx={{ width: 140 }}
+                variant="contained"
+                color="error"
+                size="large"
+                startIcon={<PlayArrowIcon />}
+                onClick={() => {
+                  // 시간 검증 먼저 실행
+                  const validation = validateMaintenanceTime();
+                  if (!validation.valid) {
+                    return;
+                  }
+                  setConfirmMode('start');
+                  setConfirmInput('');
+                  setConfirmOpen(true);
+                }}
+                disabled={!hasMessageForStart}
+                sx={{
+                  width: 160,
+                  height: 160,
+                  borderRadius: '50%',
+                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  flexDirection: 'column',
+                  gap: 1,
+                  '& .MuiButton-startIcon': {
+                    margin: 0,
+                    fontSize: '2rem'
+                  }
+                }}
               >
-                {editMode ? t('common.cancel') : t('maintenance.edit')}
+                <PlayArrowIcon sx={{ fontSize: '2.5rem' }} />
+                {t('maintenance.start')}
               </Button>
-            </>
-          )}
-        </Box>
+            ) : (
+              <>
+                {editMode ? (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    startIcon={<SaveIcon />}
+                    onClick={() => {
+                      // 시간 검증 먼저 실행
+                      const validation = validateMaintenanceTime();
+                      if (!validation.valid) {
+                        return;
+                      }
+                      setConfirmMode('update');
+                      setConfirmInput('');
+                      setConfirmOpen(true);
+                    }}
+                    disabled={!hasMessageForStart}
+                    sx={{
+                      width: 160,
+                      height: 160,
+                      borderRadius: '50%',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      flexDirection: 'column',
+                      gap: 1,
+                      '& .MuiButton-startIcon': {
+                        margin: 0,
+                        fontSize: '2rem'
+                      }
+                    }}
+                  >
+                    <SaveIcon sx={{ fontSize: '2.5rem' }} />
+                    {t('maintenance.update')}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="success"
+                    size="large"
+                    startIcon={<StopIcon />}
+                    onClick={() => { setConfirmMode('stop'); setConfirmInput(''); setConfirmOpen(true); }}
+                    sx={{
+                      width: 160,
+                      height: 160,
+                      borderRadius: '50%',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      flexDirection: 'column',
+                      gap: 1,
+                      '& .MuiButton-startIcon': {
+                        margin: 0,
+                        fontSize: '2rem'
+                      }
+                    }}
+                  >
+                    <StopIcon sx={{ fontSize: '2.5rem' }} />
+                    {t('maintenance.stop')}
+                  </Button>
+                )}
+                <Button
+                  variant="outlined"
+                  onClick={() => setEditMode(v => !v)}
+                  sx={{ width: 140 }}
+                >
+                  {editMode ? t('common.cancel') : t('maintenance.edit')}
+                </Button>
+              </>
+            )}
+          </Box>
+        )}
 
         {/* Confirm dialog */}
         <Dialog

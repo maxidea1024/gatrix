@@ -12,9 +12,9 @@ services:
       MYSQL_USER: ${DB_USER:-gatrix_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
     ports:
-      - "0.0.0.0:${MYSQL_HOST_PORT:-53306}:3306"
+      - "0.0.0.0:${MYSQL_HOST_PORT:-43306}:3306"
     volumes:
-      - ${DATA_ROOT:-./data}/mysql:/var/lib/mysql
+      - gatrix_mysql_dev_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
     networks:
@@ -410,6 +410,58 @@ services:
       - ${DATA_ROOT:-./data}/chat-server/logs:/app/packages/chat-server/logs
     command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/chat-server dev"
 
+  # Edge Server for development (with hot reload)
+  edge-dev:
+    build:
+      context: .
+      dockerfile: packages/edge/Dockerfile.dev
+    container_name: gatrix-edge-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-edge
+      LOG_LEVEL: ${EDGE_LOG_LEVEL:-debug}
+      EDGE_PORT: 1337
+      EDGE_METRICS_PORT: 9337
+      # Backend API configuration
+      GATRIX_URL: http://backend-dev:5000
+      EDGE_API_TOKEN: ${EDGE_API_TOKEN:-gatrix-unsecured-server-api-token}
+      EDGE_APPLICATION_NAME: ${EDGE_APPLICATION_NAME:-edge-server}
+      # Target environments (comma-separated) - use all environments for dev
+      EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-01KBP3PMDF4MJPKYVX7ER1VMSH,01KBP3PMDFBWYEB9DGK7FS9KDT,01KBP3PMDFKP8MB9KPBY6EZZF2,01KBP3PPZSD79W1K2YXBYJ6E8G}
+      # Redis for PubSub
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      REDIS_DB: 0
+      # Cache configuration
+      CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-polling}
+      CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
+    ports:
+      - "0.0.0.0:${EDGE_PORT:-51337}:1337"
+      # Note: Metrics port (9337) is NOT exposed externally for security
+    depends_on:
+      backend-dev:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      gatrix-dev-network:
+        aliases:
+          - edge
+    volumes:
+      - .:/app:cached
+      - /app/node_modules
+      - ${DATA_ROOT:-./data}/edge/logs:/app/packages/edge/logs
+    command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/edge dev"
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:1337/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 30s
+
   # Loki - Log aggregation (development)
   loki:
     image: grafana/loki:latest
@@ -505,3 +557,6 @@ networks:
     ipam:
       config:
         - subnet: 172.23.0.0/16
+
+volumes:
+  gatrix_mysql_dev_data:

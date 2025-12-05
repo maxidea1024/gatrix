@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { devLogger, prodLogger } from '../../utils/logger';
 import { usePageState } from '../../hooks/usePageState';
 import { useClientVersions, useAvailableVersions, useTags, mutateClientVersions } from '../../hooks/useSWR';
+import { useAuth } from '../../hooks/useAuth';
+import { PERMISSIONS } from '../../types/permissions';
 import * as XLSX from 'xlsx';
 import {
   Box,
@@ -297,6 +299,8 @@ const ClientVersionsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
   const { platforms } = usePlatformConfig();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.CLIENT_VERSIONS_MANAGE]);
 
   // 페이지 상태 관리 (localStorage 연동)
   const {
@@ -1260,41 +1264,45 @@ const ClientVersionsPage: React.FC = () => {
               Excel (XLSX)
             </MenuItem>
           </Menu>
-          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={() => {
-              setEditingClientVersion(null);
-              setIsCopyMode(false);
-              setFormDialogOpen(true);
-            }}
-          >
-            {t('clientVersions.addIndividual')}
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={() => {
-              setBulkFormDialogOpen(true);
-            }}
-          >
-            {t('clientVersions.addBulk')}
-          </Button>
-          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-          <Tooltip title={t('platformDefaults.title')}>
-            <IconButton
-              aria-label={t('platformDefaults.title')}
-              onClick={() => {
-                setPlatformDefaultsDialogOpen(true);
-              }}
-              size="medium"
-            >
-              <SettingsIcon />
-            </IconButton>
-          </Tooltip>
+          {canManage && (
+            <>
+              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  setEditingClientVersion(null);
+                  setIsCopyMode(false);
+                  setFormDialogOpen(true);
+                }}
+              >
+                {t('clientVersions.addIndividual')}
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  setBulkFormDialogOpen(true);
+                }}
+              >
+                {t('clientVersions.addBulk')}
+              </Button>
+              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+              <Tooltip title={t('platformDefaults.title')}>
+                <IconButton
+                  aria-label={t('platformDefaults.title')}
+                  onClick={() => {
+                    setPlatformDefaultsDialogOpen(true);
+                  }}
+                  size="medium"
+                >
+                  <SettingsIcon />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
           <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
           <Button
             variant="outlined"
@@ -1397,24 +1405,28 @@ const ClientVersionsPage: React.FC = () => {
                 {t('clientVersions.selectedCount', { count: selectedIds.length })}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setBulkStatusDialogOpen(true)}
-                  startIcon={<EditIcon />}
-                >
-                  {t('clientVersions.changeStatus')}
-                </Button>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="error"
-                  onClick={() => setBulkDeleteDialogOpen(true)}
-                  startIcon={<DeleteIcon />}
-                >
-                  {t('common.delete')}
-                </Button>
+                {canManage && (
+                  <>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="primary"
+                      onClick={() => setBulkStatusDialogOpen(true)}
+                      startIcon={<EditIcon />}
+                    >
+                      {t('clientVersions.changeStatus')}
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="error"
+                      onClick={() => setBulkDeleteDialogOpen(true)}
+                      startIcon={<DeleteIcon />}
+                    >
+                      {t('common.delete')}
+                    </Button>
+                  </>
+                )}
                 <Button
                   size="small"
                   variant="outlined"
@@ -1478,13 +1490,15 @@ const ClientVersionsPage: React.FC = () => {
           <Table sx={{ tableLayout: 'auto' }}>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectAll}
-                    indeterminate={selectedIds.length > 0 && selectedIds.length < clientVersions.length}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                  />
-                </TableCell>
+                {canManage && (
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectAll}
+                      indeterminate={selectedIds.length > 0 && selectedIds.length < clientVersions.length}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                    />
+                  </TableCell>
+                )}
                 {columns.filter(col => col.visible).map((column) => (
                   <TableCell
                     key={column.id}
@@ -1496,7 +1510,7 @@ const ClientVersionsPage: React.FC = () => {
                   </TableCell>
                 ))}
                 <TableCell>{t('common.createdBy')}</TableCell>
-                <TableCell align="center">{t('common.actions')}</TableCell>
+                {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -1504,9 +1518,11 @@ const ClientVersionsPage: React.FC = () => {
                 // 스켈레톤 로딩 (초기 로딩 시에만)
                 Array.from({ length: 5 }).map((_, index) => (
                   <TableRow key={`skeleton-${index}`}>
-                    <TableCell padding="checkbox">
-                      <Skeleton variant="rectangular" width={24} height={24} />
-                    </TableCell>
+                    {canManage && (
+                      <TableCell padding="checkbox">
+                        <Skeleton variant="rectangular" width={24} height={24} />
+                      </TableCell>
+                    )}
                     <TableCell>
                       <Skeleton variant="rounded" width={80} height={24} />
                     </TableCell>
@@ -1537,15 +1553,17 @@ const ClientVersionsPage: React.FC = () => {
                         <Skeleton variant="rounded" width={60} height={24} />
                       </Box>
                     </TableCell>
-                    <TableCell align="center">
-                      <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
-                      <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
-                    </TableCell>
+                    {canManage && (
+                      <TableCell align="center">
+                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
+                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))
               ) : clientVersions.length === 0 ? (
                 <EmptyTableRow
-                  colSpan={12}
+                  colSpan={canManage ? 12 : 10}
                   loading={false}
                   message={t('clientVersions.noVersionsFound')}
                   loadingMessage={t('common.loadingClientVersions')}
@@ -1557,12 +1575,14 @@ const ClientVersionsPage: React.FC = () => {
                   selected={selectedIds.includes(clientVersion.id)}
                   hover
                 >
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedIds.includes(clientVersion.id)}
-                      onChange={(e) => handleSelectOne(clientVersion.id, e.target.checked)}
-                    />
-                  </TableCell>
+                  {canManage && (
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={selectedIds.includes(clientVersion.id)}
+                        onChange={(e) => handleSelectOne(clientVersion.id, e.target.checked)}
+                      />
+                    </TableCell>
+                  )}
                   {columns.filter(col => col.visible).map((column) => (
                     <TableCell
                       key={column.id}
@@ -1586,62 +1606,66 @@ const ClientVersionsPage: React.FC = () => {
                   </TableCell>
                   <TableCell align="center">
                     <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                      <Tooltip title={t('clientVersions.copyVersion')} arrow>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleCopyVersion(clientVersion)}
-                          color="primary"
-                          sx={{
-                            '&:hover': {
-                              backgroundColor: 'primary.light',
-                              color: 'white',
-                            },
-                          }}
-                        >
-                          <CopyIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t('common.edit')} arrow>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            console.log('Edit button clicked for client version:', {
-                              id: clientVersion.id,
-                              clientVersion: clientVersion
-                            });
-                            setEditingClientVersion(clientVersion);
-                            setIsCopyMode(false);
-                            setFormDialogOpen(true);
-                          }}
-                          color="info"
-                          sx={{
-                            '&:hover': {
-                              backgroundColor: 'info.light',
-                              color: 'white',
-                            },
-                          }}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t('common.delete')} arrow>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            setSelectedClientVersion(clientVersion);
-                            setDeleteDialogOpen(true);
-                          }}
-                          color="error"
-                          sx={{
-                            '&:hover': {
-                              backgroundColor: 'error.light',
-                              color: 'white',
-                            },
-                          }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                      {canManage && (
+                        <>
+                          <Tooltip title={t('clientVersions.copyVersion')} arrow>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleCopyVersion(clientVersion)}
+                              color="primary"
+                              sx={{
+                                '&:hover': {
+                                  backgroundColor: 'primary.light',
+                                  color: 'white',
+                                },
+                              }}
+                            >
+                              <CopyIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t('common.edit')} arrow>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                console.log('Edit button clicked for client version:', {
+                                  id: clientVersion.id,
+                                  clientVersion: clientVersion
+                                });
+                                setEditingClientVersion(clientVersion);
+                                setIsCopyMode(false);
+                                setFormDialogOpen(true);
+                              }}
+                              color="info"
+                              sx={{
+                                '&:hover': {
+                                  backgroundColor: 'info.light',
+                                  color: 'white',
+                                },
+                              }}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t('common.delete')} arrow>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setSelectedClientVersion(clientVersion);
+                                setDeleteDialogOpen(true);
+                              }}
+                              color="error"
+                              sx={{
+                                '&:hover': {
+                                  backgroundColor: 'error.light',
+                                  color: 'white',
+                                },
+                              }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </>
+                      )}
                     </Box>
                   </TableCell>
                 </TableRow>

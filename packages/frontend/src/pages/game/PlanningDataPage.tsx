@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -50,6 +52,8 @@ import PlanningDataUpload from '../../components/planning-data/PlanningDataUploa
 const PlanningDataPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.PLANNING_DATA_MANAGE]);
 
   // State
   const [stats, setStats] = useState<PlanningDataStats | null>(null);
@@ -657,14 +661,16 @@ const PlanningDataPage: React.FC = () => {
           >
             {t('common.refresh')}
           </Button>
-          <Button
-            variant="contained"
-            startIcon={<CloudUploadIcon />}
-            onClick={handleRebuild}
-            disabled={loading}
-          >
-            {t('planningData.uploadData')}
-          </Button>
+          {canManage && (
+            <Button
+              variant="contained"
+              startIcon={<CloudUploadIcon />}
+              onClick={handleRebuild}
+              disabled={loading}
+            >
+              {t('planningData.uploadData')}
+            </Button>
+          )}
         </Box>
       </Box>
 

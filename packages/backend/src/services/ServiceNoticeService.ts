@@ -1,9 +1,11 @@
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import database from '../config/database';
 import { convertDateFieldsFromMySQL, convertToMySQLDateTime } from '../utils/dateUtils';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface ServiceNotice {
   id: number;
+  environmentId: string;
   isActive: boolean;
   category: 'maintenance' | 'event' | 'notice' | 'promotion' | 'other';
   platforms: string[];
@@ -46,6 +48,7 @@ export interface ServiceNoticeFilters {
   subchannel?: string | string[];
   subchannelOperator?: 'any_of' | 'include_all';
   search?: string;
+  environmentId?: string;
 }
 
 class ServiceNoticeService {
@@ -61,6 +64,11 @@ class ServiceNoticeService {
     const offset = (page - 1) * limit;
     const whereClauses: string[] = [];
     const queryParams: any[] = [];
+
+    // Environment filter (always applied)
+    const envId = filters.environmentId ?? getCurrentEnvironmentId();
+    whereClauses.push('environmentId = ?');
+    queryParams.push(envId);
 
     // Apply filters
     if (filters.isActive !== undefined) {
@@ -167,6 +175,7 @@ class ServiceNoticeService {
     const notices = rows.map(row => {
       const notice = {
         id: row.id,
+        environmentId: row.environmentId,
         isActive: Boolean(row.isActive),
         category: row.category,
         platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
@@ -191,11 +200,12 @@ class ServiceNoticeService {
   /**
    * Get service notice by ID
    */
-  async getServiceNoticeById(id: number): Promise<ServiceNotice | null> {
+  async getServiceNoticeById(id: number, environmentId?: string): Promise<ServiceNotice | null> {
     const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
     const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM g_service_notices WHERE id = ?',
-      [id]
+      'SELECT * FROM g_service_notices WHERE id = ? AND environmentId = ?',
+      [id, envId]
     );
 
     if (rows.length === 0) {
@@ -205,6 +215,7 @@ class ServiceNoticeService {
     const row = rows[0];
     const notice = {
       id: row.id,
+      environmentId: row.environmentId,
       isActive: Boolean(row.isActive),
       category: row.category,
       platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
@@ -224,8 +235,9 @@ class ServiceNoticeService {
   /**
    * Create service notice
    */
-  async createServiceNotice(data: CreateServiceNoticeData): Promise<ServiceNotice> {
+  async createServiceNotice(data: CreateServiceNoticeData, environmentId?: string): Promise<ServiceNotice> {
     const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
 
     // Debug logging
     console.log('Creating service notice with data:', {
@@ -237,9 +249,10 @@ class ServiceNoticeService {
 
     const [result] = await pool.execute<ResultSetHeader>(
       `INSERT INTO g_service_notices
-      (isActive, category, platforms, channels, subchannels, startDate, endDate, tabTitle, title, content, description)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (environmentId, isActive, category, platforms, channels, subchannels, startDate, endDate, tabTitle, title, content, description)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        envId,
         data.isActive,
         data.category,
         JSON.stringify(data.platforms),
@@ -254,7 +267,7 @@ class ServiceNoticeService {
       ]
     );
 
-    const notice = await this.getServiceNoticeById(result.insertId);
+    const notice = await this.getServiceNoticeById(result.insertId, envId);
     if (!notice) {
       throw new Error('Failed to retrieve created service notice');
     }
@@ -265,8 +278,9 @@ class ServiceNoticeService {
   /**
    * Update service notice
    */
-  async updateServiceNotice(id: number, data: UpdateServiceNoticeData): Promise<ServiceNotice> {
+  async updateServiceNotice(id: number, data: UpdateServiceNoticeData, environmentId?: string): Promise<ServiceNotice> {
     const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
     const updates: string[] = [];
     const values: any[] = [];
 
@@ -326,14 +340,14 @@ class ServiceNoticeService {
     }
 
     updates.push('updatedAt = NOW()');
-    values.push(id);
+    values.push(id, envId);
 
     await pool.execute(
-      `UPDATE g_service_notices SET ${updates.join(', ')} WHERE id = ?`,
+      `UPDATE g_service_notices SET ${updates.join(', ')} WHERE id = ? AND environmentId = ?`,
       values
     );
 
-    const notice = await this.getServiceNoticeById(id);
+    const notice = await this.getServiceNoticeById(id, envId);
     if (!notice) {
       throw new Error('Service notice not found');
     }
@@ -344,36 +358,39 @@ class ServiceNoticeService {
   /**
    * Delete service notice
    */
-  async deleteServiceNotice(id: number): Promise<void> {
+  async deleteServiceNotice(id: number, environmentId?: string): Promise<void> {
     const pool = database.getPool();
-    await pool.execute('DELETE FROM g_service_notices WHERE id = ?', [id]);
+    const envId = environmentId ?? getCurrentEnvironmentId();
+    await pool.execute('DELETE FROM g_service_notices WHERE id = ? AND environmentId = ?', [id, envId]);
   }
 
   /**
    * Delete multiple service notices
    */
-  async deleteMultipleServiceNotices(ids: number[]): Promise<void> {
+  async deleteMultipleServiceNotices(ids: number[], environmentId?: string): Promise<void> {
     if (ids.length === 0) return;
 
     const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
     const placeholders = ids.map(() => '?').join(',');
     await pool.execute(
-      `DELETE FROM g_service_notices WHERE id IN (${placeholders})`,
-      ids
+      `DELETE FROM g_service_notices WHERE id IN (${placeholders}) AND environmentId = ?`,
+      [...ids, envId]
     );
   }
 
   /**
    * Toggle active status
    */
-  async toggleActive(id: number): Promise<ServiceNotice> {
+  async toggleActive(id: number, environmentId?: string): Promise<ServiceNotice> {
     const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
     await pool.execute(
-      'UPDATE g_service_notices SET isActive = NOT isActive, updatedAt = NOW() WHERE id = ?',
-      [id]
+      'UPDATE g_service_notices SET isActive = NOT isActive, updatedAt = NOW() WHERE id = ? AND environmentId = ?',
+      [id, envId]
     );
 
-    const notice = await this.getServiceNoticeById(id);
+    const notice = await this.getServiceNoticeById(id, envId);
     if (!notice) {
       throw new Error('Service notice not found');
     }

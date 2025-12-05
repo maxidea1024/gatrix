@@ -4,6 +4,7 @@ import { UserTagService } from '../services/UserTagService';
 import { ChatServerService } from '../services/ChatServerService';
 import { asyncHandler, GatrixError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { UserModel } from '../models/User';
 import Joi from 'joi';
 
 const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
@@ -51,6 +52,11 @@ const createUserSchema = Joi.object({
   status: Joi.string().valid('pending', 'active', 'suspended', 'deleted').optional().default('active'),
   emailVerified: Joi.boolean().optional().default(true),
   tagIds: Joi.array().items(Joi.number().integer().positive()).optional().default([]),
+});
+
+const setEnvironmentAccessSchema = Joi.object({
+  allowAllEnvironments: Joi.boolean().required(),
+  environmentIds: Joi.array().items(Joi.string().length(26)).default([]),
 });
 
 export class UserController {
@@ -525,6 +531,67 @@ export class UserController {
       message: 'Language preference updated successfully',
       data: {
         preferredLanguage
+      }
+    });
+  });
+
+  // Environment access endpoints
+
+  /**
+   * Get user's environment access settings
+   */
+  static getEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = parseInt(req.params.id);
+    if (isNaN(userId)) {
+      throw new GatrixError('Invalid user ID', 400);
+    }
+
+    const access = await UserModel.getEnvironmentAccess(userId);
+
+    res.json({
+      success: true,
+      data: access
+    });
+  });
+
+  /**
+   * Set user's environment access
+   */
+  static setEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = parseInt(req.params.id);
+    if (isNaN(userId)) {
+      throw new GatrixError('Invalid user ID', 400);
+    }
+
+    const { error, value } = setEnvironmentAccessSchema.validate(req.body);
+    if (error) {
+      throw new GatrixError(error.details[0].message, 400);
+    }
+
+    const { allowAllEnvironments, environmentIds } = value;
+    const updatedBy = req.user!.userId;
+
+    await UserModel.setEnvironmentAccess(userId, allowAllEnvironments, environmentIds, updatedBy);
+
+    res.json({
+      success: true,
+      message: 'Environment access updated successfully'
+    });
+  });
+
+  /**
+   * Get current user's accessible environments
+   */
+  static getMyEnvironmentAccess = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user!.userId;
+
+    const accessibleEnvs = await UserModel.getAccessibleEnvironmentIds(userId);
+
+    res.json({
+      success: true,
+      data: {
+        allowAllEnvironments: accessibleEnvs === 'all',
+        environmentIds: accessibleEnvs === 'all' ? [] : accessibleEnvs
       }
     });
   });

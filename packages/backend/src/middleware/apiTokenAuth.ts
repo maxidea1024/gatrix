@@ -4,6 +4,12 @@ import { RemoteConfigEnvironment } from '../models/RemoteConfigEnvironment';
 import { CacheService } from '../services/CacheService';
 import logger from '../config/logger';
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
+import {
+  getCurrentEnvironmentId,
+  getDefaultEnvironmentId,
+  runWithEnvironmentAsync,
+  isDefaultEnvironmentInitialized
+} from '../utils/environmentContext';
 
 // Unsecured tokens for testing purposes
 const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
@@ -11,6 +17,7 @@ const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
 
 interface SDKRequest extends Request {
   apiToken?: ApiAccessToken;
+  environments?: RemoteConfigEnvironment[];
   environment?: RemoteConfigEnvironment;
   isUnsecuredToken?: boolean; // Flag to indicate unsecured token usage
 }
@@ -92,31 +99,61 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       });
     }
 
-    // Get environment if token is environment-specific
-    let environment: RemoteConfigEnvironment | undefined;
+    // Check environment access for multi-environment support
+    const currentEnvId = getCurrentEnvironmentId();
+    if (currentEnvId && !apiToken.allowAllEnvironments) {
+      // Check if token has access to current environment
+      let hasAccess = false;
 
-    if (apiToken.environmentId) {
-      const envCacheKey = `environment:${apiToken.environmentId}`;
-      environment = await CacheService.get<RemoteConfigEnvironment>(envCacheKey) || undefined;
-
-      if (!environment) {
-        environment = await RemoteConfigEnvironment.query().findById(apiToken.environmentId);
-        if (environment) {
-          await CacheService.set(envCacheKey, environment, 600); // 10 minutes
-        }
+      if (typeof apiToken.hasEnvironmentAccess === 'function') {
+        hasAccess = await apiToken.hasEnvironmentAccess(currentEnvId);
+      } else {
+        // For cached plain objects, query the database
+        const { default: knex } = await import('../config/knex');
+        const envAccess = await knex('g_api_access_token_environments')
+          .where('tokenId', apiToken.id)
+          .where('environmentId', currentEnvId)
+          .first();
+        hasAccess = !!envAccess;
       }
 
-      if (!environment) {
-        return res.status(404).json({
+      if (!hasAccess) {
+        return res.status(403).json({
           success: false,
-          message: 'Environment not found'
+          message: 'API token does not have access to this environment'
         });
       }
     }
 
-    // Attach token and environment to request
+    // Get environments if token has specific environment access
+    let environments: RemoteConfigEnvironment[] = [];
+
+    if (!apiToken.allowAllEnvironments && apiToken.environments && apiToken.environments.length > 0) {
+      environments = apiToken.environments;
+    } else if (!apiToken.allowAllEnvironments) {
+      // Fetch environments from database if not loaded
+      const { default: knex } = await import('../config/knex');
+      const envIds = await knex('g_api_access_token_environments')
+        .where('tokenId', apiToken.id)
+        .select('environmentId');
+
+      if (envIds.length > 0) {
+        environments = await RemoteConfigEnvironment.query()
+          .whereIn('id', envIds.map(e => e.environmentId));
+      }
+    }
+
+    // If token has no environments and doesn't allow all, deny access
+    if (!apiToken.allowAllEnvironments && environments.length === 0) {
+      return res.status(403).json({
+        success: false,
+        message: 'API token has no environment access configured'
+      });
+    }
+
+    // Attach token and environments to request
     req.apiToken = apiToken;
-    req.environment = environment;
+    req.environments = environments;
 
     next();
   } catch (error) {
@@ -190,12 +227,104 @@ export const sdkRateLimit = (req: SDKRequest, res: Response, next: NextFunction)
 };
 
 /**
+ * SDK 환경 설정 미들웨어
+ * X-Environment-Id 헤더 또는 기본 환경을 사용하여 req.environment를 설정합니다.
+ * 토큰의 환경 접근 권한도 검증합니다.
+ */
+export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: NextFunction) => {
+  try {
+    const apiToken = req.apiToken;
+    const requestedEnvId = req.headers[HEADERS.X_ENVIRONMENT_ID] as string;
+
+    // Get environment ID from header or use default
+    let environmentId = requestedEnvId;
+
+    if (!environmentId) {
+      // Use default environment if not specified
+      if (!isDefaultEnvironmentInitialized()) {
+        return res.status(503).json({
+          success: false,
+          message: 'Environment not initialized. Please try again later.'
+        });
+      }
+      environmentId = getDefaultEnvironmentId();
+    }
+
+    if (!environmentId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Environment ID is required (via X-Environment-Id header)'
+      });
+    }
+
+    // Validate token has access to this environment (skip for unsecured tokens)
+    if (!req.isUnsecuredToken && apiToken && !apiToken.allowAllEnvironments) {
+      let hasAccess = false;
+
+      if (typeof apiToken.hasEnvironmentAccess === 'function') {
+        hasAccess = await apiToken.hasEnvironmentAccess(environmentId);
+      } else {
+        // For cached plain objects, query the database
+        const { default: knex } = await import('../config/knex');
+        const envAccess = await knex('g_api_access_token_environments')
+          .where('tokenId', apiToken.id)
+          .where('environmentId', environmentId)
+          .first();
+        hasAccess = !!envAccess;
+      }
+
+      if (!hasAccess) {
+        return res.status(403).json({
+          success: false,
+          message: 'API token does not have access to this environment'
+        });
+      }
+    }
+
+    // Fetch environment from database
+    const cacheKey = `sdk_env:${environmentId}`;
+    let environment: RemoteConfigEnvironment | null = await CacheService.get<RemoteConfigEnvironment>(cacheKey);
+
+    if (!environment) {
+      const foundEnv = await RemoteConfigEnvironment.query().findById(environmentId);
+
+      if (!foundEnv) {
+        return res.status(404).json({
+          success: false,
+          message: 'Environment not found'
+        });
+      }
+
+      environment = foundEnv;
+
+      // Cache environment for 5 minutes
+      await CacheService.set(cacheKey, environment, 300);
+    }
+
+    // Set environment on request
+    req.environment = environment;
+
+    // Run the rest of the request with environment context
+    await runWithEnvironmentAsync(environmentId, async () => {
+      next();
+    });
+  } catch (error) {
+    logger.error('Error setting SDK environment:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to set environment'
+    });
+  }
+};
+
+/**
  * Combined middleware for client SDK endpoints
  */
 export const clientSDKAuth = [
   authenticateApiToken,
   requireTokenType('client'),
   validateApplicationName,
+  setSDKEnvironment,
   sdkRateLimit
 ];
 
@@ -284,6 +413,7 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
  */
 export const serverSDKAuth = [
   authenticateServerApiToken,
+  setSDKEnvironment,
   sdkRateLimit
 ];
 
@@ -292,6 +422,7 @@ export default {
   authenticateServerApiToken,
   requireTokenType,
   validateApplicationName,
+  setSDKEnvironment,
   sdkRateLimit,
   clientSDKAuth,
   serverSDKAuth

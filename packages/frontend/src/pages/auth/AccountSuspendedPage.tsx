@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Card,
@@ -15,13 +15,20 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { AuthService } from '@/services/auth';
 
 const AccountSuspendedPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  // Clear all authentication data when this page loads
+  // to prevent showing dashboard briefly when navigating to login
+  useEffect(() => {
+    AuthService.clearAuthData();
+  }, []);
+
   const handleBackToLogin = () => {
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   return (

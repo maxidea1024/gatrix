@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Typography,
@@ -55,6 +57,8 @@ const IngamePopupNoticesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { platforms } = usePlatformConfig();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.INGAME_POPUP_NOTICES_MANAGE]);
 
   // State
   const [notices, setNotices] = useState<IngamePopupNotice[]>([]);
@@ -357,13 +361,15 @@ const IngamePopupNoticesPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreate}
-          >
-            {t('ingamePopupNotices.createNotice')}
-          </Button>
+          {canManage && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+            >
+              {t('ingamePopupNotices.createNotice')}
+            </Button>
+          )}
           <Divider orientation="vertical" flexItem sx={{ my: 1 }} />
           <Button
             variant="outlined"
@@ -484,17 +490,19 @@ const IngamePopupNoticesPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={notices.length > 0 && selectedIds.length === notices.length}
-                      indeterminate={selectedIds.length > 0 && selectedIds.length < notices.length}
-                      onChange={handleSelectAll}
-                    />
-                  </TableCell>
+                  {canManage && (
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={notices.length > 0 && selectedIds.length === notices.length}
+                        indeterminate={selectedIds.length > 0 && selectedIds.length < notices.length}
+                        onChange={handleSelectAll}
+                      />
+                    </TableCell>
+                  )}
                   {visibleColumns.map((column) => (
                     <TableCell key={column.id}>{t(column.labelKey)}</TableCell>
                   ))}
-                  <TableCell align="center">{t('common.actions')}</TableCell>
+                  {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -502,36 +510,42 @@ const IngamePopupNoticesPage: React.FC = () => {
                   // Skeleton loading (only on initial load)
                   Array.from({ length: 5 }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`}>
-                      <TableCell padding="checkbox">
-                        <Skeleton variant="rectangular" width={24} height={24} />
-                      </TableCell>
+                      {canManage && (
+                        <TableCell padding="checkbox">
+                          <Skeleton variant="rectangular" width={24} height={24} />
+                        </TableCell>
+                      )}
                       {visibleColumns.map((column) => (
                         <TableCell key={column.id}>
                           <Skeleton variant="text" width="80%" />
                         </TableCell>
                       ))}
-                      <TableCell align="center">
-                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
-                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
-                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
-                      </TableCell>
+                      {canManage && (
+                        <TableCell align="center">
+                          <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
+                          <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
+                          <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 ) : notices.length === 0 ? (
                   <EmptyTableRow
-                    colSpan={visibleColumns.length + 2}
+                    colSpan={visibleColumns.length + (canManage ? 2 : 0)}
                     loading={loading}
                     message={t('serviceNotices.noNoticesFound')}
                   />
                 ) : (
                   notices.map((notice) => (
                     <TableRow key={notice.id} hover>
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={selectedIds.includes(notice.id)}
-                          onChange={() => handleSelectOne(notice.id)}
-                        />
-                      </TableCell>
+                      {canManage && (
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedIds.includes(notice.id)}
+                            onChange={() => handleSelectOne(notice.id)}
+                          />
+                        </TableCell>
+                      )}
                       {visibleColumns.map((column) => {
                         if (column.id === 'status') {
                           return (
@@ -654,28 +668,30 @@ const IngamePopupNoticesPage: React.FC = () => {
                         }
                         return null;
                       })}
-                      <TableCell align="center">
-                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                          <Tooltip title={t('common.edit')}>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleEdit(notice)}
-                              color="primary"
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t('common.delete')}>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleDelete(notice)}
-                              color="error"
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      </TableCell>
+                      {canManage && (
+                        <TableCell align="center">
+                          <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                            <Tooltip title={t('common.edit')}>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleEdit(notice)}
+                                color="primary"
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('common.delete')}>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDelete(notice)}
+                                color="error"
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 )}

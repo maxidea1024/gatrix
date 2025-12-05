@@ -1,0 +1,41 @@
+# Development Dockerfile for Edge server
+FROM node:22-alpine
+
+# Install dependencies
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+# Use Tencent npm mirror for faster downloads in China
+RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
+
+# Copy package files
+COPY package.json yarn.lock* ./
+COPY packages/edge/package.json ./packages/edge/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+
+# Install dependencies
+RUN yarn install --frozen-lockfile --network-timeout 600000
+
+# Copy source code
+COPY packages/edge ./packages/edge
+COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+COPY tsconfig.json ./
+
+# Build server-sdk
+RUN cd packages/sdks/server-sdk && yarn build
+
+WORKDIR /app/packages/edge
+
+# Main API port
+EXPOSE 1337
+# Metrics port (internal only)
+EXPOSE 9337
+
+ENV NODE_ENV=development
+ENV EDGE_PORT=1337
+ENV EDGE_METRICS_PORT=9337
+
+# Run in development mode with hot reload
+CMD ["yarn", "dev"]
+

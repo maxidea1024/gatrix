@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import { useDebounce } from '../../hooks/useDebounce';
 import {
   Box,
@@ -160,6 +162,8 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
 const MessageTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.REMOTE_CONFIG_MANAGE]);
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -709,9 +713,11 @@ const MessageTemplatesPage: React.FC = () => {
               </Typography>
             </Box>
           </Box>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            {t('messageTemplates.addTemplate')}
-          </Button>
+          {canManage && (
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+              {t('messageTemplates.addTemplate')}
+            </Button>
+          )}
         </Box>
 
       </Box>
@@ -852,19 +858,21 @@ const MessageTemplatesPage: React.FC = () => {
             <Table sx={{ tableLayout: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectAll}
-                      indeterminate={selectedIds.length > 0 && selectedIds.length < items.filter(item => item.id).length}
-                      onChange={(e) => handleSelectAll(e.target.checked)}
-                    />
-                  </TableCell>
+                  {canManage && (
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={selectAll}
+                        indeterminate={selectedIds.length > 0 && selectedIds.length < items.filter(item => item.id).length}
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                      />
+                    </TableCell>
+                  )}
                   {columns.filter(col => col.visible).map((column) => (
                     <TableCell key={column.id} width={column.width}>
                       {t(column.labelKey)}
                     </TableCell>
                   ))}
-                  <TableCell align="right" sx={{ width: 100, minWidth: 100 }}>{t('common.actions')}</TableCell>
+                  {canManage && <TableCell align="right" sx={{ width: 100, minWidth: 100 }}>{t('common.actions')}</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -872,23 +880,27 @@ const MessageTemplatesPage: React.FC = () => {
                   // 스켈레톤 로딩 (초기 로딩 시에만)
                   Array.from({ length: 5 }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`}>
-                      <TableCell padding="checkbox">
-                        <Skeleton variant="rectangular" width={24} height={24} />
-                      </TableCell>
+                      {canManage && (
+                        <TableCell padding="checkbox">
+                          <Skeleton variant="rectangular" width={24} height={24} />
+                        </TableCell>
+                      )}
                       {columns.filter(col => col.visible).map((column) => (
                         <TableCell key={column.id}>
                           <Skeleton variant="text" width="80%" />
                         </TableCell>
                       ))}
-                      <TableCell align="right">
-                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
-                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
-                      </TableCell>
+                      {canManage && (
+                        <TableCell align="right">
+                          <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
+                          <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 ) : items.length === 0 ? (
                   <EmptyTableRow
-                    colSpan={columns.filter(col => col.visible).length + 2}
+                    colSpan={columns.filter(col => col.visible).length + (canManage ? 2 : 0)}
                     loading={loading}
                     message={t('messageTemplates.noTemplatesFound')}
                     loadingMessage={t('common.loadingData')}
@@ -896,22 +908,26 @@ const MessageTemplatesPage: React.FC = () => {
                 ) : (
                   items.map(row => (
                     <TableRow key={row.id} hover>
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={selectedIds.includes(row.id!)}
-                          onChange={(e) => handleSelectItem(row.id!, e.target.checked)}
-                          disabled={!row.id}
-                        />
-                      </TableCell>
+                      {canManage && (
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedIds.includes(row.id!)}
+                            onChange={(e) => handleSelectItem(row.id!, e.target.checked)}
+                            disabled={!row.id}
+                          />
+                        </TableCell>
+                      )}
                       {columns.filter(col => col.visible).map((column) => (
                         <TableCell key={column.id}>
                           {renderCellContent(row, column.id)}
                         </TableCell>
                       ))}
-                      <TableCell align="right">
-                        <IconButton size="small" onClick={() => handleEdit(row)}><EditIcon fontSize="small" /></IconButton>
-                        <IconButton size="small" color="error" onClick={() => openDeleteDialog(row)}><DeleteIcon fontSize="small" /></IconButton>
-                      </TableCell>
+                      {canManage && (
+                        <TableCell align="right">
+                          <IconButton size="small" onClick={() => handleEdit(row)}><EditIcon fontSize="small" /></IconButton>
+                          <IconButton size="small" color="error" onClick={() => openDeleteDialog(row)}><DeleteIcon fontSize="small" /></IconButton>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 )}

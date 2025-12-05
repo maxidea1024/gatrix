@@ -1,5 +1,6 @@
 import db from '../config/knex';
 import logger from '../config/logger';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface JobTypeAttributes {
   id: number;
@@ -56,8 +57,9 @@ export class JobTypeModel {
     return null;
   }
 
-  static async findAll(): Promise<JobTypeAttributes[]> {
+  static async findAll(environmentId?: string): Promise<JobTypeAttributes[]> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const results = await db('g_job_types as jt')
         .leftJoin('g_users as cu', 'jt.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
@@ -66,6 +68,7 @@ export class JobTypeModel {
           'cu.name as createdByName',
           'uu.name as updatedByName'
         ])
+        .where('jt.environmentId', envId)
         .orderBy('jt.name', 'asc');
 
       return results.map((row: any) => ({
@@ -88,8 +91,9 @@ export class JobTypeModel {
     }
   }
 
-  static async findById(id: number): Promise<JobTypeAttributes | null> {
+  static async findById(id: number, environmentId?: string): Promise<JobTypeAttributes | null> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const row = await db('g_job_types as jt')
         .leftJoin('g_users as cu', 'jt.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
@@ -99,6 +103,7 @@ export class JobTypeModel {
           'uu.name as updatedByName'
         ])
         .where('jt.id', id)
+        .where('jt.environmentId', envId)
         .first();
 
       if (!row) return null;
@@ -113,10 +118,10 @@ export class JobTypeModel {
     }
   }
 
-  static async findByName(name: string): Promise<JobTypeAttributes | null> {
+  static async findByName(name: string, environmentId?: string): Promise<JobTypeAttributes | null> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const row = await db('g_job_types as jt')
-        .leftJoin('g_users as cu', 'jt.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
         .select([
           'jt.*',
@@ -124,6 +129,7 @@ export class JobTypeModel {
           'uu.name as updatedByName'
         ])
         .where('jt.name', name)
+        .where('jt.environmentId', envId)
         .first();
 
       if (!row) return null;
@@ -141,9 +147,11 @@ export class JobTypeModel {
 
   static async create(data: CreateJobTypeData): Promise<JobTypeAttributes> {
     try {
+      const envId = getCurrentEnvironmentId();
       const schemaJson = data.jobSchema ? JSON.stringify(data.jobSchema) : null;
 
       const [insertId] = await db('g_job_types').insert({
+        environmentId: envId,
         name: data.name,
         displayName: data.displayName,
         description: data.description || null,
@@ -152,7 +160,7 @@ export class JobTypeModel {
         createdBy: data.createdBy || null
       });
 
-      const created = await this.findById(insertId);
+      const created = await this.findById(insertId, envId);
       if (!created) {
         throw new Error('Failed to retrieve created job type');
       }
@@ -164,9 +172,9 @@ export class JobTypeModel {
     }
   }
 
-  static async update(id: number, data: UpdateJobTypeData): Promise<JobTypeAttributes> {
+  static async update(id: number, data: UpdateJobTypeData, environmentId?: string): Promise<JobTypeAttributes> {
     try {
-
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const updateData: any = {};
 
       if (data.displayName !== undefined) {
@@ -189,13 +197,14 @@ export class JobTypeModel {
 
       await db('g_job_types')
         .where('id', id)
+        .where('environmentId', envId)
         .update(updateData);
-      
-      const updated = await this.findById(id);
+
+      const updated = await this.findById(id, envId);
       if (!updated) {
         throw new Error('Job type not found after update');
       }
-      
+
       return updated;
     } catch (error) {
       logger.error('Error updating job type:', error);
@@ -203,10 +212,12 @@ export class JobTypeModel {
     }
   }
 
-  static async delete(id: number): Promise<boolean> {
+  static async delete(id: number, environmentId?: string): Promise<boolean> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const result = await db('g_job_types')
         .where('id', id)
+        .where('environmentId', envId)
         .del();
 
       return result > 0;
@@ -216,16 +227,17 @@ export class JobTypeModel {
     }
   }
 
-  static async findEnabled(): Promise<JobTypeAttributes[]> {
+  static async findEnabled(environmentId?: string): Promise<JobTypeAttributes[]> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const results = await db('g_job_types as jt')
-        .leftJoin('g_users as cu', 'jt.createdBy', 'cu.id')
         .leftJoin('g_users as uu', 'jt.updatedBy', 'uu.id')
         .select([
           'jt.*',
           'cu.name as createdByName',
           'uu.name as updatedByName'
         ])
+        .where('jt.environmentId', envId)
         .where('jt.isEnabled', true)
         .orderBy('jt.name', 'asc');
 

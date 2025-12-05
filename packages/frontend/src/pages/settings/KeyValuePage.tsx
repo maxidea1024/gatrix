@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import {
   Box,
   Button,
@@ -35,6 +37,8 @@ import KeyValueFormDrawer from '@/components/settings/KeyValueFormDrawer';
 const KeyValuePage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.SYSTEM_SETTINGS_MANAGE]);
 
   const [items, setItems] = useState<VarItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -222,13 +226,15 @@ const KeyValuePage: React.FC = () => {
         <Typography variant="body2" color="text.secondary">
           {t('settings.kv.subtitle')}
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleCreate}
-        >
-          {t('settings.kv.create')}
-        </Button>
+        {canManage && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreate}
+          >
+            {t('settings.kv.create')}
+          </Button>
+        )}
       </Box>
 
       {/* Table */}
@@ -244,12 +250,12 @@ const KeyValuePage: React.FC = () => {
                   <TableCell>{t('settings.kv.value')}</TableCell>
                   <TableCell>{t('settings.kv.description')}</TableCell>
                   <TableCell>{t('common.updatedAt')}</TableCell>
-                  <TableCell align="center">{t('common.actions')}</TableCell>
+                  {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {items.length === 0 ? (
-                  <EmptyTableRow colSpan={6} message={t('settings.kv.noItems')} />
+                  <EmptyTableRow colSpan={canManage ? 6 : 5} message={t('settings.kv.noItems')} />
                 ) : (
                   items.map((item) => (
                     <TableRow key={item.varKey} hover>
@@ -304,35 +310,37 @@ const KeyValuePage: React.FC = () => {
                           {formatDateTimeDetailed(item.updatedAt)}
                         </Typography>
                       </TableCell>
-                      <TableCell align="center">
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton size="small" onClick={() => handleEdit(item)}>
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={!item.isCopyable ? t('settings.kv.cannotCopy') : t('common.duplicate')}>
-                          <span>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleDuplicate(item)}
-                              disabled={!item.isCopyable}
-                            >
-                              <DuplicateIcon fontSize="small" />
+                      {canManage && (
+                        <TableCell align="center">
+                          <Tooltip title={t('common.edit')}>
+                            <IconButton size="small" onClick={() => handleEdit(item)}>
+                              <EditIcon fontSize="small" />
                             </IconButton>
-                          </span>
-                        </Tooltip>
-                        <Tooltip title={item.isSystemDefined ? t('settings.kv.systemDefined') : t('common.delete')}>
-                          <span>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleDeleteClick(item)}
-                              disabled={item.isSystemDefined}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                      </TableCell>
+                          </Tooltip>
+                          <Tooltip title={!item.isCopyable ? t('settings.kv.cannotCopy') : t('common.duplicate')}>
+                            <span>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDuplicate(item)}
+                                disabled={!item.isCopyable}
+                              >
+                                <DuplicateIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                          <Tooltip title={item.isSystemDefined ? t('settings.kv.systemDefined') : t('common.delete')}>
+                            <span>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDeleteClick(item)}
+                                disabled={item.isSystemDefined}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 )}

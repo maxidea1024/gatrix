@@ -370,12 +370,12 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       };
 
       if (notice) {
-        await import('../../services/serviceNoticeService').then(m => 
+        await import('../../services/serviceNoticeService').then(m =>
           m.default.updateServiceNotice(notice.id, data)
         );
         enqueueSnackbar(t('serviceNotices.updateSuccess'), { variant: 'success' });
       } else {
-        await import('../../services/serviceNoticeService').then(m => 
+        await import('../../services/serviceNoticeService').then(m =>
           m.default.createServiceNotice(data as CreateServiceNoticeData)
         );
         enqueueSnackbar(t('serviceNotices.createSuccess'), { variant: 'success' });
@@ -441,186 +441,161 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
             overflow: 'auto',
             p: 3,
             transition: 'width 0.3s ease-in-out',
-            // Chat message list scrollbar style
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'transparent',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-            },
-            '&::-webkit-scrollbar-thumb:active': {
-              background: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-            },
-            scrollbarWidth: 'thin',
-            scrollbarColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.2) transparent'
-                : 'rgba(0, 0, 0, 0.2) transparent',
           }}
         >
           <Stack spacing={3}>
-          {/* Active Status */}
-          <Box>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={isActive}
-                  onChange={(e) => setIsActive(e.target.checked)}
-                />
-              }
-              label={t('serviceNotices.isActive')}
-            />
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 4, mt: 0.5 }}>
-              {t('serviceNotices.isActiveHelp')}
-            </Typography>
-          </Box>
-
-          {/* Target Settings (Platform + Channel/Subchannel) */}
-          <TargetSettingsGroup
-            targetPlatforms={platforms}
-            targetPlatformsInverted={platformsInverted}
-            platforms={platformConfig}
-            onPlatformsChange={(newPlatforms, inverted) => {
-              setPlatforms(newPlatforms);
-              setPlatformsInverted(inverted);
-            }}
-            targetChannelSubchannels={channelSubchannels}
-            targetChannelSubchannelsInverted={channelSubchannelsInverted}
-            channels={channelConfig}
-            onChannelsChange={(newChannels, inverted) => {
-              setChannelSubchannels(newChannels);
-              setChannelSubchannelsInverted(inverted);
-            }}
-            targetWorlds={[]}
-            targetWorldsInverted={false}
-            worlds={[]}
-            onWorldsChange={() => {}}
-            showUserIdFilter={false}
-            showWorldFilter={false}
-          />
-
-          {/* Date Range */}
-          <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <DateTimePicker
-                label={t('serviceNotices.startDate')}
-                value={startDate}
-                onChange={(date) => setStartDate(date)}
-                timeSteps={{ minutes: 1 }}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    required: false,
-                    slotProps: { input: { readOnly: true } },
-                  },
-                  actionBar: {
-                    actions: ['clear', 'cancel', 'accept'],
-                  },
-                }}
+            {/* Active Status */}
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isActive}
+                    onChange={(e) => setIsActive(e.target.checked)}
+                  />
+                }
+                label={t('serviceNotices.isActive')}
               />
-              <DateTimePicker
-                label={t('serviceNotices.endDate')}
-                value={endDate}
-                onChange={(date) => setEndDate(date)}
-                minDateTime={startDate || undefined}
-                timeSteps={{ minutes: 1 }}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    required: false,
-                    slotProps: { input: { readOnly: true } },
-                  },
-                  actionBar: {
-                    actions: ['clear', 'cancel', 'accept'],
-                  },
-                }}
-              />
-            </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
-              {t('serviceNotices.startDateHelp')} / {t('serviceNotices.endDateHelp')}
-            </Typography>
-          </Box>
-
-          {/* Category and Title in one row */}
-          <Box>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              {/* Category */}
-              <FormControl required sx={{ minWidth: 200 }}>
-                <InputLabel>{t('serviceNotices.category')}</InputLabel>
-                <Select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  label={t('serviceNotices.category')}
-                >
-                  {CATEGORIES.map((cat) => (
-                    <MenuItem key={cat} value={cat}>
-                      {t(`serviceNotices.categories.${cat}`)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {/* Title */}
-              <TextField
-                label={t('serviceNotices.noticeTitle')}
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                fullWidth
-                required
-              />
-            </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
-              {t('serviceNotices.categoryHelp')} / {t('serviceNotices.noticeTitleHelp')}
-            </Typography>
-          </Box>
-
-          {/* Tab Title (Optional) - Below Title */}
-          <TextField
-            label={t('serviceNotices.tabTitle')}
-            value={tabTitle}
-            onChange={(e) => setTabTitle(e.target.value)}
-            fullWidth
-            helperText={t('serviceNotices.tabTitleHelp')}
-          />
-
-          {/* Content (Rich Text) */}
-          <Box>
-            <Paper variant="outlined" sx={{ p: 2 }}>
-              <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5, fontWeight: 600 }}>
-                {t('serviceNotices.content')} <span style={{ color: 'error.main' }}>*</span>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 4, mt: 0.5 }}>
+                {t('serviceNotices.isActiveHelp')}
               </Typography>
-              <RichTextEditor
-                value={content}
-                onChange={setContent}
-                placeholder={t('serviceNotices.contentPlaceholder')}
-                minHeight={200}
-              />
-            </Paper>
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, ml: 1.75 }}>
-              {t('serviceNotices.contentHelp')}
-            </Typography>
-          </Box>
+            </Box>
 
-          {/* Description (Optional) */}
-          <TextField
-            label={t('serviceNotices.description')}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            fullWidth
-            multiline
-            rows={3}
-            helperText={t('serviceNotices.descriptionHelp')}
-          />
+            {/* Target Settings (Platform + Channel/Subchannel) */}
+            <TargetSettingsGroup
+              targetPlatforms={platforms}
+              targetPlatformsInverted={platformsInverted}
+              platforms={platformConfig}
+              onPlatformsChange={(newPlatforms, inverted) => {
+                setPlatforms(newPlatforms);
+                setPlatformsInverted(inverted);
+              }}
+              targetChannelSubchannels={channelSubchannels}
+              targetChannelSubchannelsInverted={channelSubchannelsInverted}
+              channels={channelConfig}
+              onChannelsChange={(newChannels, inverted) => {
+                setChannelSubchannels(newChannels);
+                setChannelSubchannelsInverted(inverted);
+              }}
+              targetWorlds={[]}
+              targetWorldsInverted={false}
+              worlds={[]}
+              onWorldsChange={() => { }}
+              showUserIdFilter={false}
+              showWorldFilter={false}
+            />
+
+            {/* Date Range */}
+            <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <DateTimePicker
+                  label={t('serviceNotices.startDate')}
+                  value={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  timeSteps={{ minutes: 1 }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      required: false,
+                      slotProps: { input: { readOnly: true } },
+                    },
+                    actionBar: {
+                      actions: ['clear', 'cancel', 'accept'],
+                    },
+                  }}
+                />
+                <DateTimePicker
+                  label={t('serviceNotices.endDate')}
+                  value={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  minDateTime={startDate || undefined}
+                  timeSteps={{ minutes: 1 }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      required: false,
+                      slotProps: { input: { readOnly: true } },
+                    },
+                    actionBar: {
+                      actions: ['clear', 'cancel', 'accept'],
+                    },
+                  }}
+                />
+              </Box>
+              <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
+                {t('serviceNotices.startDateHelp')} / {t('serviceNotices.endDateHelp')}
+              </Typography>
+            </Box>
+
+            {/* Category and Title in one row */}
+            <Box>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                {/* Category */}
+                <FormControl required sx={{ minWidth: 200 }}>
+                  <InputLabel>{t('serviceNotices.category')}</InputLabel>
+                  <Select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    label={t('serviceNotices.category')}
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <MenuItem key={cat} value={cat}>
+                        {t(`serviceNotices.categories.${cat}`)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {/* Title */}
+                <TextField
+                  label={t('serviceNotices.noticeTitle')}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  fullWidth
+                  required
+                />
+              </Box>
+              <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
+                {t('serviceNotices.categoryHelp')} / {t('serviceNotices.noticeTitleHelp')}
+              </Typography>
+            </Box>
+
+            {/* Tab Title (Optional) - Below Title */}
+            <TextField
+              label={t('serviceNotices.tabTitle')}
+              value={tabTitle}
+              onChange={(e) => setTabTitle(e.target.value)}
+              fullWidth
+              helperText={t('serviceNotices.tabTitleHelp')}
+            />
+
+            {/* Content (Rich Text) */}
+            <Box>
+              <Paper variant="outlined" sx={{ p: 2 }}>
+                <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5, fontWeight: 600 }}>
+                  {t('serviceNotices.content')} <span style={{ color: 'error.main' }}>*</span>
+                </Typography>
+                <RichTextEditor
+                  value={content}
+                  onChange={setContent}
+                  placeholder={t('serviceNotices.contentPlaceholder')}
+                  minHeight={200}
+                />
+              </Paper>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, ml: 1.75 }}>
+                {t('serviceNotices.contentHelp')}
+              </Typography>
+            </Box>
+
+            {/* Description (Optional) */}
+            <TextField
+              label={t('serviceNotices.description')}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              fullWidth
+              multiline
+              rows={3}
+              helperText={t('serviceNotices.descriptionHelp')}
+            />
           </Stack>
         </Box>
 
@@ -647,31 +622,6 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
               theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.02)',
             transition: 'width 0.3s ease-in-out, padding 0.3s ease-in-out',
             position: 'relative',
-            // Chat message list scrollbar style
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'transparent',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-            },
-            '&::-webkit-scrollbar-thumb:active': {
-              background: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-            },
-            scrollbarWidth: 'thin',
-            scrollbarColor: (theme) =>
-              theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.2) transparent'
-                : 'rgba(0, 0, 0, 0.2) transparent',
           }}
         >
           {!previewCollapsed && (

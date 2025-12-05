@@ -15,6 +15,7 @@ export interface CreateBannerInput {
   height: number;
   metadata?: Record<string, any>;
   playbackSpeed?: number;
+  shuffle?: boolean;
   sequences?: Sequence[];
   createdBy?: number;
 }
@@ -26,6 +27,7 @@ export interface UpdateBannerInput {
   height?: number;
   metadata?: Record<string, any>;
   playbackSpeed?: number;
+  shuffle?: boolean;
   sequences?: Sequence[];
   updatedBy?: number;
 }
@@ -134,6 +136,7 @@ class BannerService {
         height: input.height || 512,
         metadata: input.metadata,
         playbackSpeed: input.playbackSpeed || 1.0,
+        shuffle: input.shuffle ?? false,
         sequences: input.sequences || [],
         version: 1,
         status: 'draft',

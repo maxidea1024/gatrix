@@ -253,7 +253,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
           {invitation.channel?.name?.charAt(0).toUpperCase() || 'C'}
         </Avatar>
       </ListItemAvatar>
-      
+
       <ListItemText
         primary={
           <Box display="flex" alignItems="center" gap={1}>
@@ -279,7 +279,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
           </Box>
         }
       />
-      
+
       {invitation.status === 'pending' && (
         <ListItemSecondaryAction>
           <Box display="flex" gap={1}>
@@ -317,7 +317,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
           {invitation.invitee?.name?.charAt(0).toUpperCase() || 'U'}
         </Avatar>
       </ListItemAvatar>
-      
+
       <ListItemText
         primary={
           <Box display="flex" alignItems="center" gap={1}>
@@ -343,7 +343,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
           </Box>
         }
       />
-      
+
       {invitation.status === 'pending' && (
         <ListItemSecondaryAction>
           <Button
@@ -403,19 +403,6 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
         <Box sx={{
           flex: 1,
           overflow: 'auto',
-          '&::-webkit-scrollbar': {
-            width: '6px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: 'rgba(0,0,0,0.2)',
-            borderRadius: '3px',
-            '&:hover': {
-              background: 'rgba(0,0,0,0.3)',
-            },
-          },
         }}>
           {loading ? (
             <Box display="flex" justifyContent="center" py={4}>

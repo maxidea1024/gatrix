@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { gameWorldService } from '../services/gameWorldService';
 import { useAuth } from './AuthContext';
+import { PERMISSIONS } from '@/types/permissions';
 
 export interface GameWorldOption {
   label: string;
@@ -21,10 +22,13 @@ interface GameWorldProviderProps {
 }
 
 export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, hasPermission, permissionsLoading } = useAuth();
   const [worlds, setWorlds] = useState<GameWorldOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Check if user has permission to view game worlds
+  const canViewGameWorlds = hasPermission([PERMISSIONS.GAME_WORLDS_VIEW, PERMISSIONS.GAME_WORLDS_MANAGE]);
 
   const loadGameWorlds = async () => {
     try {
@@ -45,29 +49,34 @@ export const GameWorldProvider: React.FC<GameWorldProviderProps> = ({ children }
     }
   };
 
-  // Fetch only when authenticated
+  // Fetch only when authenticated and has permission
   useEffect(() => {
-    if (isAuthenticated) {
+    // Wait for permissions to be loaded
+    if (permissionsLoading) {
+      return;
+    }
+
+    if (isAuthenticated && canViewGameWorlds) {
       loadGameWorlds();
     } else {
-      // Reset and stop loading when unauthenticated
+      // Reset and stop loading when unauthenticated or no permission
       setWorlds([]);
       setError(null);
       setIsLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, canViewGameWorlds, permissionsLoading]);
 
-  // Listen for game world updates from backend (only when authenticated)
+  // Listen for game world updates from backend (only when authenticated and has permission)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'gameWorldsUpdated' && isAuthenticated) {
+      if (e.key === 'gameWorldsUpdated' && isAuthenticated && canViewGameWorlds) {
         loadGameWorlds();
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, canViewGameWorlds]);
 
   const value: GameWorldContextType = {
     worlds,

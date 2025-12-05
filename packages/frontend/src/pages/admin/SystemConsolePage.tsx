@@ -24,14 +24,14 @@ const parseAnsiToReact = (text: string): React.ReactNode => {
   const pushText = (t: string) => { if (t) parts.push(<span style={currentStyle} key={parts.length}>{t}</span>); };
 
   while (i < text.length) {
-    if (text.charCodeAt(i) === 27 /* ESC */ && text[i+1] === '[') {
+    if (text.charCodeAt(i) === 27 /* ESC */ && text[i + 1] === '[') {
       const mIndex = text.indexOf('m', i);
       if (mIndex === -1) { pushText(text.slice(i)); break; }
       const codeStr = text.slice(i + 2, mIndex);
       const code = parseInt(codeStr, 10);
       i = mIndex + 1;
       if (code === 0) { currentStyle = {}; continue; }
-      const colorMap: Record<number, string> = { 30:'#000000',31:'#ef4444',32:'#22c55e',33:'#eab308',34:'#3b82f6',35:'#a855f7',36:'#06b6d4',37:'#e5e7eb' } as any;
+      const colorMap: Record<number, string> = { 30: '#000000', 31: '#ef4444', 32: '#22c55e', 33: '#eab308', 34: '#3b82f6', 35: '#a855f7', 36: '#06b6d4', 37: '#e5e7eb' } as any;
       if (colorMap[code]) { currentStyle = { ...currentStyle, color: colorMap[code] }; }
     } else {
       const nextEsc = text.indexOf('\u001b[', i);
@@ -50,7 +50,7 @@ const splitCommand = (line: string): { command: string; args: string[] } => {
   for (let ch of line.trim()) {
     if ((ch === '"' || ch === "'") && !inQuote) { inQuote = ch; continue; }
     if (inQuote && ch === inQuote) { inQuote = null; continue; }
-    if (!inQuote && ch === ' ') { if (cur) { tokens.push(cur); cur=''; } continue; }
+    if (!inQuote && ch === ' ') { if (cur) { tokens.push(cur); cur = ''; } continue; }
     cur += ch;
   }
   if (cur) tokens.push(cur);
@@ -100,7 +100,7 @@ const SystemConsolePage: React.FC = () => {
           completionsRef.current = arr;
         }
       }
-    } catch {}
+    } catch { }
 
     // Don't fetch from server if auth is still loading
     if (!user) return;
@@ -127,9 +127,9 @@ const SystemConsolePage: React.FC = () => {
           localStorage.setItem('console:commands:v1', JSON.stringify(list));
           const newTag = res.headers.get('ETag');
           if (newTag) localStorage.setItem('console:commands:etag', newTag);
-        } catch {}
+        } catch { }
       }
-    }).catch(() => {});
+    }).catch(() => { });
   }, [user]);
 
   const historyIndexRef = useRef<number>(-1);
@@ -198,7 +198,7 @@ const SystemConsolePage: React.FC = () => {
     try {
       const sel = termRef.current?.getSelection();
       if (sel) await copyToClipboard(sel);
-    } catch {}
+    } catch { }
     setCtxMenu(null);
   };
   const handlePaste = async () => {
@@ -212,7 +212,7 @@ const SystemConsolePage: React.FC = () => {
         cursorRef.current += text.length;
         redrawLine(termRef.current);
       }
-    } catch {}
+    } catch { }
     setCtxMenu(null);
   };
 
@@ -238,7 +238,7 @@ const SystemConsolePage: React.FC = () => {
       const MAX = 1000;
       arr.push(text);
       localStorage.setItem('console:raw:v2', JSON.stringify(arr.slice(-MAX)));
-    } catch {}
+    } catch { }
   };
 
   const replaceBufferWith = (text: string) => {
@@ -287,7 +287,7 @@ const SystemConsolePage: React.FC = () => {
 
     if (containerRef.current) {
       term.open(containerRef.current);
-      try { fit.fit(); } catch {}
+      try { fit.fit(); } catch { }
       term.focus();
 
       // Add IME composition event listeners
@@ -365,7 +365,7 @@ const SystemConsolePage: React.FC = () => {
         // First check xterm selection (mouse selection)
         const sel = term.getSelection();
         if (sel) {
-          copyToClipboard(sel).catch(() => {});
+          copyToClipboard(sel).catch(() => { });
           return false; // prevent ^C input
         }
 
@@ -375,7 +375,7 @@ const SystemConsolePage: React.FC = () => {
           const end = Math.max(selectionStartRef.current, selectionEndRef.current);
           const selectedText = inputBufRef.current.slice(start, end);
           if (selectedText) {
-            copyToClipboard(selectedText).catch(() => {});
+            copyToClipboard(selectedText).catch(() => { });
             selectionStartRef.current = null;
             selectionEndRef.current = null;
             return false;
@@ -443,7 +443,7 @@ const SystemConsolePage: React.FC = () => {
       if (ctrlOrMeta && key === 'x') {
         const sel = term.getSelection();
         if (sel) {
-          navigator.clipboard?.writeText(sel).catch(() => {});
+          navigator.clipboard?.writeText(sel).catch(() => { });
           // Not removing selection from buffer/output to avoid corrupting history
           return false;
         }
@@ -482,11 +482,11 @@ const SystemConsolePage: React.FC = () => {
         const arr: string[] = JSON.parse(saved);
         for (const s of arr) term.write(s);
       }
-    } catch {}
+    } catch { }
 
     writePrompt(term);
 
-    const onResize = () => { try { fit.fit(); } catch {} };
+    const onResize = () => { try { fit.fit(); } catch { } };
     window.addEventListener('resize', onResize);
 
     term.onData((data) => {
@@ -552,7 +552,7 @@ const SystemConsolePage: React.FC = () => {
           writePrompt(term);
         } else if (line === 'clear') {
           term.clear();
-          try { localStorage.removeItem('console:raw:v2'); } catch {}
+          try { localStorage.removeItem('console:raw:v2'); } catch { }
           writePrompt(term);
         } else {
           // Check for |clip suffix for clipboard copy (with or without spaces)
@@ -568,7 +568,7 @@ const SystemConsolePage: React.FC = () => {
           const next = [...historyRef.current, line];
           setHistory(next);
           setHistoryIndex(-1);
-          try { localStorage.setItem('console:history:v1', JSON.stringify(next.slice(-200))); } catch {}
+          try { localStorage.setItem('console:history:v1', JSON.stringify(next.slice(-200))); } catch { }
 
           // persist prompt+command only
           pushRaw(`${getPromptAnsi()}${line}\r\n`, false);
@@ -924,7 +924,7 @@ const SystemConsolePage: React.FC = () => {
       }
       const savedHistory = localStorage.getItem('console:history:v1');
       if (savedHistory) setHistory(JSON.parse(savedHistory));
-    } catch {}
+    } catch { }
   }, [prompt]);
 
   const appendLog = useCallback((html: React.ReactNode) => {
@@ -935,7 +935,7 @@ const SystemConsolePage: React.FC = () => {
     try {
       const MAX = 500;
       localStorage.setItem('console:lines:v1', JSON.stringify(lines.slice(-MAX)));
-    } catch {}
+    } catch { }
   };
 
   const appendPromptLine = (text: string) => {
@@ -945,7 +945,7 @@ const SystemConsolePage: React.FC = () => {
       const arr: StoredLine[] = saved ? JSON.parse(saved) : [];
       arr.push({ kind: 'prompt', text });
       persistLines(arr);
-    } catch {}
+    } catch { }
   };
 
   const appendOutputAnsi = (text: string) => {
@@ -956,7 +956,7 @@ const SystemConsolePage: React.FC = () => {
       const arr: StoredLine[] = saved ? JSON.parse(saved) : [];
       arr.push({ kind: 'output', text });
       persistLines(arr);
-    } catch {}
+    } catch { }
   };
 
   const inputRef = useRef<HTMLDivElement | null>(null);
@@ -980,10 +980,10 @@ const SystemConsolePage: React.FC = () => {
   const handleExecute = useCallback(async () => {
     const line = input.trim();
     if (!line) return;
-  // Focus input on page enter
-  useEffect(() => {
-    setTimeout(() => inputRef.current?.focus(), 0);
-  }, []);
+    // Focus input on page enter
+    useEffect(() => {
+      setTimeout(() => inputRef.current?.focus(), 0);
+    }, []);
 
 
     // show the entered line with prompt and persist
@@ -993,7 +993,7 @@ const SystemConsolePage: React.FC = () => {
     setHistory((prev) => {
 
       const next = [...prev, line];
-      try { localStorage.setItem('console:history:v1', JSON.stringify(next.slice(-200))); } catch {}
+      try { localStorage.setItem('console:history:v1', JSON.stringify(next.slice(-200))); } catch { }
       return next;
     });
     setHistoryIndex(-1);
@@ -1125,24 +1125,6 @@ const SystemConsolePage: React.FC = () => {
         p: 1,
         minHeight: 0,
         fontFamily: 'D2Coding, "NanumGothicCoding", "Source Han Mono", "Noto Sans Mono CJK KR", Menlo, Monaco, "Courier New", monospace',
-        '& .xterm-viewport::-webkit-scrollbar': { width: '8px' },
-        '& .xterm-viewport::-webkit-scrollbar-track': {
-          background: alpha(th.palette.common.black, 0.35)
-        },
-        '& .xterm-viewport::-webkit-scrollbar-thumb': {
-          background: alpha(th.palette.text.primary, 0.2),
-          borderRadius: '4px'
-        },
-        '& .xterm-viewport::-webkit-scrollbar-thumb:hover': {
-          background: alpha(th.palette.text.primary, 0.3)
-        },
-        '& .xterm-viewport::-webkit-scrollbar-thumb:active': {
-          background: alpha(th.palette.text.primary, 0.4)
-        },
-        '& .xterm-viewport': {
-          scrollbarWidth: 'thin',
-          scrollbarColor: `${alpha(th.palette.text.primary, 0.3)} ${alpha(th.palette.common.black, 0.35)}`
-        },
       })}>
         <div
           ref={containerRef as any}
@@ -1224,7 +1206,7 @@ const SystemConsolePage: React.FC = () => {
           {t('console.hint')}: echo --green "Hello World" | help | date | time | timezone | uptime
         </Typography>
       </Box>
-    </Box>
+    </Box >
   );
 };
 

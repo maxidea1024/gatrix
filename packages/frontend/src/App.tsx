@@ -28,6 +28,7 @@ import { I18nProvider, useI18n } from './contexts/I18nContext';
 import { PlatformConfigProvider } from './contexts/PlatformConfigContext';
 import { GameWorldProvider } from './contexts/GameWorldContext';
 import { PlanningDataProvider } from './contexts/PlanningDataContext';
+import { EnvironmentProvider } from './contexts/EnvironmentContext';
 
 // Components
 import { LoadingIndicator } from './components/LoadingIndicator';
@@ -36,6 +37,8 @@ import { useAuth } from './contexts/AuthContext';
 
 // Layout Components
 import { MainLayout } from './components/layout/MainLayout';
+import { EnvironmentAwareLayout } from './components/layout/EnvironmentAwareLayout';
+import { EnvironmentChangeOverlay } from './components/EnvironmentChangeOverlay';
 
 // Pages - Auth
 import LoginPage from './pages/auth/LoginPage';
@@ -59,6 +62,7 @@ import UnauthorizedPage from './pages/common/UnauthorizedPage';
 import ProfilePage from './pages/user/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import TagsPage from './pages/settings/TagsPage';
+import SystemSettingsPage from './pages/settings/SystemSettingsPage';
 
 // Pages - Admin
 import UsersManagementPage from './pages/admin/UsersManagementPage';
@@ -67,7 +71,7 @@ import WhitelistPage from './pages/admin/WhitelistPage';
 import ClientVersionsPage from './pages/admin/ClientVersionsPage';
 import AuditLogsPage from './pages/admin/AuditLogsPage';
 import MaintenancePage from './pages/admin/MaintenancePage';
-import ServiceMaintenancesPage from './pages/admin/ServiceMaintenancesPage';
+
 import MessageTemplatesPage from './pages/admin/MessageTemplatesPage';
 import SchedulerPage from './pages/admin/SchedulerPage';
 
@@ -91,6 +95,7 @@ import OpenApiPage from './pages/admin/OpenApiPage';
 import GrafanaDashboardPage from './pages/admin/GrafanaDashboardPage';
 import EventLensProjectsPage from './pages/admin/EventLensProjectsPage';
 import DataManagementPage from './pages/admin/DataManagementPage';
+import EnvironmentsPage from './pages/settings/EnvironmentsPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Pages - Game
@@ -253,210 +258,228 @@ const AppContent: React.FC = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <PlatformConfigProvider>
-          <GameWorldProvider>
-            <AuthInitializer>
-              <LocalizedDatePickers>
-                <CssBaseline />
-                {/* Global scrollbar styles */}
-                <GlobalStyles
-                  styles={(theme) => ({
-                    // Firefox - thin scrollbar for all elements
-                    'html, body, *, div, main, section, article, aside, nav': {
-                      scrollbarWidth: 'thin',
-                    },
-                    // WebKit/Blink (Chrome, Edge, Safari)
-                    'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar': {
-                      width: '8px',
-                      height: '8px',
-                    },
-                    'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track': {
-                      background: 'transparent',
-                    },
-                    'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb': {
-                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-                      borderRadius: '4px',
-                    },
-                    'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover, div::-webkit-scrollbar-thumb:hover': {
-                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-                    },
-                    'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, *::-webkit-scrollbar-thumb:active, div::-webkit-scrollbar-thumb:active': {
-                      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-                    },
-                  })}
-                />
-                <SnackbarProvider
-                  maxSnack={3}
-                  autoHideDuration={3000}
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
-                  }}
-                  classes={{
-                    containerRoot: 'snackbar-container-root',
-                  }}
-                  style={{ zIndex: 9999 }}
-                >
-                  <Router basename={import.meta.env.VITE_ROUTER_BASENAME || '/'}>
-                    <Routes>
-                      {/* Public Routes */}
-                      <Route path="/login" element={<LoginPage />} />
-                      <Route path="/logout" element={<LogoutPage />} />
-                      <Route path="/register" element={<RegisterPage />} />
-                      <Route path="/signup" element={<RegisterPage />} />
-                      <Route path="/invalid-invite" element={<InvalidInvitePage />} />
-                      <Route path="/pending-approval" element={<PendingApprovalPage />} />
-                      <Route path="/session-expired" element={<SessionExpiredPage />} />
-                      <Route path="/auth/pending" element={<PendingApprovalPage />} />
-                      <Route path="/auth/callback" element={<OAuthCallbackPage />} />
-                      <Route path="/account-suspended" element={<AccountSuspendedPage />} />
-                      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                      <Route path="/reset-password" element={<ResetPasswordPage />} />
-                      <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        <EnvironmentProvider>
+          <EnvironmentChangeOverlay />
+          <PlatformConfigProvider>
+            <GameWorldProvider>
+              <AuthInitializer>
+                <LocalizedDatePickers>
+                  <CssBaseline />
+                  {/* Global scrollbar styles */}
+                  <GlobalStyles
+                    styles={(theme) => ({
+                      // Firefox - thin scrollbar for all elements
+                      'html, body, *, div, main, section, article, aside, nav': {
+                        scrollbarWidth: 'thin',
+                        scrollbarColor: theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.2) transparent'
+                          : 'rgba(0, 0, 0, 0.2) transparent',
+                      },
+                      // WebKit/Blink (Chrome, Edge, Safari)
+                      'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar': {
+                        width: '8px',
+                        height: '8px',
+                      },
+                      'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track': {
+                        background: 'transparent',
+                      },
+                      'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb': {
+                        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+                        borderRadius: '4px',
+                      },
+                      'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover, div::-webkit-scrollbar-thumb:hover': {
+                        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                      },
+                      'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, *::-webkit-scrollbar-thumb:active, div::-webkit-scrollbar-thumb:active': {
+                        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+                      },
+                    })}
+                  />
+                  <SnackbarProvider
+                    maxSnack={3}
+                    autoHideDuration={3000}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'center',
+                    }}
+                    classes={{
+                      containerRoot: 'snackbar-container-root',
+                    }}
+                    style={{ zIndex: 9999 }}
+                  >
+                    <Router basename={import.meta.env.VITE_ROUTER_BASENAME || '/'}>
+                      <Routes>
+                        {/* Public Routes */}
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/logout" element={<LogoutPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
+                        <Route path="/signup" element={<RegisterPage />} />
+                        <Route path="/invalid-invite" element={<InvalidInvitePage />} />
+                        <Route path="/pending-approval" element={<PendingApprovalPage />} />
+                        <Route path="/session-expired" element={<SessionExpiredPage />} />
+                        <Route path="/auth/pending" element={<PendingApprovalPage />} />
+                        <Route path="/auth/callback" element={<OAuthCallbackPage />} />
+                        <Route path="/account-suspended" element={<AccountSuspendedPage />} />
+                        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                        <Route path="/reset-password" element={<ResetPasswordPage />} />
+                        <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-                      {/* Service Notices Preview - Public Route */}
-                      <Route path="/service-notices-preview" element={<ServiceNoticesPreviewPage />} />
+                        {/* Service Notices Preview - Public Route */}
+                        <Route path="/service-notices-preview" element={<ServiceNoticesPreviewPage />} />
 
-                      {/* Landing Page - only for first-time visitors */}
-                      <Route path="/" element={<ConditionalLandingPage />} />
+                        {/* Landing Page - only for first-time visitors */}
+                        <Route path="/" element={<ConditionalLandingPage />} />
 
-                      {/* Protected Routes */}
+                        {/* Protected Routes */}
 
-                      <Route path="/dashboard" element={
-                        <ProtectedRoute>
-                          <MainLayout>
-                            <DashboardPage />
-                          </MainLayout>
-                        </ProtectedRoute>
-                      } />
-
-                      <Route path="/chat" element={
-                        <ProtectedRoute>
-                          <MainLayout>
-                            <ChatPage />
-                          </MainLayout>
-                        </ProtectedRoute>
-                      } />
-
-                      <Route path="/mailbox" element={
-                        <ProtectedRoute>
-                          <MainLayout>
-                            <MailboxPage />
-                          </MainLayout>
-                        </ProtectedRoute>
-                      } />
-
-                      <Route path="/profile" element={
-                        <ProtectedRoute>
-                          <MainLayout>
-                            <ProfilePage />
-                          </MainLayout>
-                        </ProtectedRoute>
-                      } />
-
-                      {/* Settings Routes */}
-                      <Route path="/settings" element={
-                        <ProtectedRoute>
-                          <MainLayout>
-                            <SettingsPage />
-                          </MainLayout>
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/settings/tags" element={
-                        <ProtectedRoute>
-                          <MainLayout>
-                            <TagsPage />
-                          </MainLayout>
-                        </ProtectedRoute>
-                      } />
-
-                      {/* Advanced Settings Route - Removed */}
-
-                      {/* Admin Routes */}
-                      <Route path="/admin/*" element={
-                        <ProtectedRoute requiredRoles={['admin']}>
-                          <MainLayout>
-                            <Routes>
-                              <Route index element={<Navigate to="/admin/users" replace />} />
-                              <Route path="users" element={<UsersManagementPage />} />
-                              <Route path="client-versions" element={<ClientVersionsPage />} />
-                              <Route path="game-worlds" element={<GameWorldsPage />} />
-                              <Route path="maintenance" element={<MaintenancePage />} />
-                              <Route path="maintenance-templates" element={<MessageTemplatesPage />} />
-                              <Route path="scheduler" element={<SchedulerPage />} />
-                              <Route path="whitelist" element={<WhitelistPage />} />
-
-                              <Route path="jobs" element={<JobsPage />} />
-                              <Route path="queue-monitor" element={<QueueMonitorPage />} />
-                              <Route path="audit-logs" element={<AuditLogsPage />} />
-                              <Route path="realtime-events" element={<RealtimeEventsPage />} />
-                              <Route path="crash-events" element={<CrashEventsPage />} />
-                              <Route path="remote-config" element={<RemoteConfigDashboard />} />
-                              <Route path="remote-config-old" element={<RemoteConfigPage />} />
-                              <Route path="remote-config/history" element={<RemoteConfigHistoryPage />} />
-                              <Route path="api-tokens" element={<ApiTokensPage />} />
-                              <Route path="console" element={<SystemConsolePage />} />
-                              <Route path="server-list" element={<ServerListPage />} />
-                              <Route path="grafana-dashboard" element={<GrafanaDashboardPage />} />
-                              <Route path="open-api" element={<OpenApiPage />} />
-                              <Route path="event-lens/projects" element={<EventLensProjectsPage />} />
-                              <Route path="data-management" element={<DataManagementPage />} />
-                            </Routes>
-                          </MainLayout>
-                        </ProtectedRoute>
-                      } />
-
-
-                      {/* Monitoring Routes */}
-                      <Route path="/monitoring/logs" element={
-                        <ProtectedRoute requiredRoles={['admin']}>
-                          <MainLayout>
-                            <LogsPage />
-                          </MainLayout>
-                        </ProtectedRoute>
-                      }
-                      />
-                      <Route path="/monitoring/alerts" element={
-                        <ProtectedRoute requiredRoles={['admin']}>
-                          <MainLayout>
-                            <AlertsPage />
-                          </MainLayout>
-                        </ProtectedRoute>
-                      }
-                      />
-
-                      {/* Game Routes */}
-                      <Route path="/game/*" element={
-                        <ProtectedRoute requiredRoles={['admin']}>
-                          <PlanningDataProvider>
+                        <Route path="/dashboard" element={
+                          <ProtectedRoute>
                             <MainLayout>
-                              <Routes>
-                                <Route path="service-notices" element={<ServiceNoticesPage />} />
-                                <Route path="ingame-popup-notices" element={<IngamePopupNoticesPage />} />
-                                <Route path="coupons" element={<CouponsPage />} />
-                                <Route path="surveys" element={<SurveysPage />} />
-                                <Route path="reward-templates" element={<RewardTemplatesPage />} />
-                                <Route path="banners" element={<BannerManagementPage />} />
-                                <Route path="hot-time-button-event" element={<HotTimeButtonEventPage />} />
-                                <Route path="coupon-settings" element={<CouponSettingsPage />} />
-                                <Route path="coupon-usage" element={<CouponUsagePage />} />
-                                <Route path="live-event" element={<LiveEventPage />} />
-                                <Route path="planning-data" element={<PlanningDataPage />} />
-                              </Routes>
+                              <DashboardPage />
                             </MainLayout>
-                          </PlanningDataProvider>
-                        </ProtectedRoute>
-                      } />
+                          </ProtectedRoute>
+                        } />
 
-                      {/* 404 Route */}
-                      <Route path="*" element={<NotFoundPage />} />
-                    </Routes>
-                  </Router>
-                </SnackbarProvider>
-              </LocalizedDatePickers>
-            </AuthInitializer>
-          </GameWorldProvider>
-        </PlatformConfigProvider>
+                        <Route path="/chat" element={
+                          <ProtectedRoute>
+                            <MainLayout>
+                              <ChatPage />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        } />
+
+                        <Route path="/mailbox" element={
+                          <ProtectedRoute>
+                            <MainLayout>
+                              <MailboxPage />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        } />
+
+                        <Route path="/profile" element={
+                          <ProtectedRoute>
+                            <MainLayout>
+                              <ProfilePage />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        } />
+
+                        {/* Settings Routes */}
+                        <Route path="/settings" element={
+                          <ProtectedRoute>
+                            <EnvironmentAwareLayout>
+                              <SettingsPage />
+                            </EnvironmentAwareLayout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/settings/tags" element={
+                          <ProtectedRoute>
+                            <EnvironmentAwareLayout>
+                              <TagsPage />
+                            </EnvironmentAwareLayout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/settings/environments" element={
+                          <ProtectedRoute requiredRoles={['admin']}>
+                            <MainLayout>
+                              <EnvironmentsPage />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/settings/system" element={
+                          <ProtectedRoute requiredRoles={['admin']}>
+                            <MainLayout>
+                              <SystemSettingsPage />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        } />
+
+                        {/* Admin Routes */}
+                        <Route path="/admin/*" element={
+                          <ProtectedRoute requiredRoles={['admin']}>
+                            <EnvironmentAwareLayout>
+                              <Routes>
+                                <Route index element={<Navigate to="/admin/users" replace />} />
+                                <Route path="users" element={<UsersManagementPage />} />
+                                <Route path="client-versions" element={<ClientVersionsPage />} />
+                                <Route path="game-worlds" element={<GameWorldsPage />} />
+                                <Route path="maintenance" element={<MaintenancePage />} />
+                                <Route path="maintenance-templates" element={<MessageTemplatesPage />} />
+                                <Route path="scheduler" element={<SchedulerPage />} />
+                                <Route path="whitelist" element={<WhitelistPage />} />
+
+                                <Route path="jobs" element={<JobsPage />} />
+                                <Route path="queue-monitor" element={<QueueMonitorPage />} />
+                                <Route path="audit-logs" element={<AuditLogsPage />} />
+                                <Route path="realtime-events" element={<RealtimeEventsPage />} />
+                                <Route path="crash-events" element={<CrashEventsPage />} />
+                                <Route path="remote-config" element={<RemoteConfigDashboard />} />
+                                <Route path="remote-config-old" element={<RemoteConfigPage />} />
+                                <Route path="remote-config/history" element={<RemoteConfigHistoryPage />} />
+                                <Route path="api-tokens" element={<ApiTokensPage />} />
+                                <Route path="console" element={<SystemConsolePage />} />
+                                <Route path="server-list" element={<ServerListPage />} />
+                                <Route path="grafana-dashboard" element={<GrafanaDashboardPage />} />
+                                <Route path="open-api" element={<OpenApiPage />} />
+                                <Route path="event-lens/projects" element={<EventLensProjectsPage />} />
+                                <Route path="data-management" element={<DataManagementPage />} />
+                              </Routes>
+                            </EnvironmentAwareLayout>
+                          </ProtectedRoute>
+                        } />
+
+
+                        {/* Monitoring Routes */}
+                        <Route path="/monitoring/logs" element={
+                          <ProtectedRoute requiredRoles={['admin']}>
+                            <MainLayout>
+                              <LogsPage />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        }
+                        />
+                        <Route path="/monitoring/alerts" element={
+                          <ProtectedRoute requiredRoles={['admin']}>
+                            <MainLayout>
+                              <AlertsPage />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        }
+                        />
+
+                        {/* Game Routes */}
+                        <Route path="/game/*" element={
+                          <ProtectedRoute requiredRoles={['admin']}>
+                            <PlanningDataProvider>
+                              <EnvironmentAwareLayout>
+                                <Routes>
+                                  <Route path="service-notices" element={<ServiceNoticesPage />} />
+                                  <Route path="ingame-popup-notices" element={<IngamePopupNoticesPage />} />
+                                  <Route path="coupons" element={<CouponsPage />} />
+                                  <Route path="surveys" element={<SurveysPage />} />
+                                  <Route path="reward-templates" element={<RewardTemplatesPage />} />
+                                  <Route path="banners" element={<BannerManagementPage />} />
+                                  <Route path="hot-time-button-event" element={<HotTimeButtonEventPage />} />
+                                  <Route path="coupon-settings" element={<CouponSettingsPage />} />
+                                  <Route path="coupon-usage" element={<CouponUsagePage />} />
+                                  <Route path="live-event" element={<LiveEventPage />} />
+                                  <Route path="planning-data" element={<PlanningDataPage />} />
+                                </Routes>
+                              </EnvironmentAwareLayout>
+                            </PlanningDataProvider>
+                          </ProtectedRoute>
+                        } />
+
+                        {/* 404 Route */}
+                        <Route path="*" element={<NotFoundPage />} />
+                      </Routes>
+                    </Router>
+                  </SnackbarProvider>
+                </LocalizedDatePickers>
+              </AuthInitializer>
+            </GameWorldProvider>
+          </PlatformConfigProvider>
+        </EnvironmentProvider>
       </AuthProvider>
     </ThemeProvider>
   );

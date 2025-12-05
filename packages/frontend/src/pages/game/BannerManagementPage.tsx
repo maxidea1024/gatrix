@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { PERMISSIONS } from '../../types/permissions';
 import {
   Box,
   Typography,
@@ -50,6 +52,8 @@ import BannerFormDialog from '../../components/game/BannerFormDialog';
 const BannerManagementPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.BANNERS_MANAGE]);
 
   // State
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -339,9 +343,11 @@ const BannerManagementPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
-            {t('banners.createBanner')}
-          </Button>
+          {canManage && (
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+              {t('banners.createBanner')}
+            </Button>
+          )}
         </Box>
       </Box>
 
@@ -400,9 +406,11 @@ const BannerManagementPage: React.FC = () => {
                 <TableRow>
                   {visibleColumns.map((column) => {
                     if (column.id === 'checkbox') {
+                      if (!canManage) return null;
                       return (<TableCell key={column.id} padding="checkbox"><Checkbox indeterminate={selectedIds.length > 0 && selectedIds.length < banners.length} checked={banners.length > 0 && selectedIds.length === banners.length} onChange={handleSelectAll} /></TableCell>);
                     }
                     if (column.id === 'actions') {
+                      if (!canManage) return null;
                       return (<TableCell key={column.id} align="center">{t(column.labelKey)}</TableCell>);
                     }
                     const isSortable = ['name', 'createdAt', 'status'].includes(column.id);
@@ -423,7 +431,10 @@ const BannerManagementPage: React.FC = () => {
                   banners.map((banner) => (
                     <TableRow key={banner.bannerId} hover selected={selectedIds.includes(banner.bannerId)}>
                       {visibleColumns.map((column) => {
-                        if (column.id === 'checkbox') return (<TableCell key={column.id} padding="checkbox"><Checkbox checked={selectedIds.includes(banner.bannerId)} onChange={() => handleSelectOne(banner.bannerId)} /></TableCell>);
+                        if (column.id === 'checkbox') {
+                          if (!canManage) return null;
+                          return (<TableCell key={column.id} padding="checkbox"><Checkbox checked={selectedIds.includes(banner.bannerId)} onChange={() => handleSelectOne(banner.bannerId)} /></TableCell>);
+                        }
                         if (column.id === 'name') return (<TableCell key={column.id}><Typography sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => handleEdit(banner)}>{banner.name}</Typography></TableCell>);
                         if (column.id === 'description') return (<TableCell key={column.id}><Typography sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => handleEdit(banner)}>{banner.description || '-'}</Typography></TableCell>);
                         if (column.id === 'size') return (<TableCell key={column.id}>{banner.width} x {banner.height}</TableCell>);
@@ -431,15 +442,18 @@ const BannerManagementPage: React.FC = () => {
                         if (column.id === 'status') return (<TableCell key={column.id}><Chip label={t(`banners.statusLabels.${banner.status}`)} size="small" color={getStatusColor(banner.status)} /></TableCell>);
                         if (column.id === 'version') return (<TableCell key={column.id}>v{banner.version}</TableCell>);
                         if (column.id === 'createdAt') return (<TableCell key={column.id}>{formatDateTimeDetailed(banner.createdAt)}</TableCell>);
-                        if (column.id === 'actions') return (
-                          <TableCell key={column.id} align="center">
-                            <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                              <Tooltip title={t('common.edit')}><IconButton size="small" onClick={() => handleEdit(banner)}><EditIcon fontSize="small" /></IconButton></Tooltip>
-                              <Tooltip title={t('common.delete')}><IconButton size="small" onClick={() => handleDelete(banner)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
-                              <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, banner)}><MoreVertIcon fontSize="small" /></IconButton>
-                            </Box>
-                          </TableCell>
-                        );
+                        if (column.id === 'actions') {
+                          if (!canManage) return null;
+                          return (
+                            <TableCell key={column.id} align="center">
+                              <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                                <Tooltip title={t('common.edit')}><IconButton size="small" onClick={() => handleEdit(banner)}><EditIcon fontSize="small" /></IconButton></Tooltip>
+                                <Tooltip title={t('common.delete')}><IconButton size="small" onClick={() => handleDelete(banner)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
+                                <IconButton size="small" onClick={(e) => handleActionMenuOpen(e, banner)}><MoreVertIcon fontSize="small" /></IconButton>
+                              </Box>
+                            </TableCell>
+                          );
+                        }
                         return null;
                       })}
                     </TableRow>

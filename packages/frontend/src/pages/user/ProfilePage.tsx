@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -11,7 +11,6 @@ import {
   TextField,
   IconButton,
   Divider,
-  Paper,
   Stack,
   useTheme,
   Dialog,
@@ -19,29 +18,47 @@ import {
   DialogContent,
   DialogActions,
   InputAdornment,
+  Skeleton,
+  alpha,
+  CircularProgress,
+  Tooltip,
 } from '@mui/material';
 import {
   Edit as EditIcon,
   Save as SaveIcon,
   Cancel as CancelIcon,
   PhotoCamera as PhotoCameraIcon,
-  Person as PersonIcon,
-  Email as EmailIcon,
   Security as SecurityIcon,
   Schedule as ScheduleIcon,
   Lock as LockIcon,
   Visibility,
   VisibilityOff,
+  VpnKey as PermissionIcon,
+  Public as EnvironmentIcon,
+  CheckCircle as CheckCircleIcon,
+  Info as InfoIcon,
 } from '@mui/icons-material';
-import { CircularProgress } from '@mui/material';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { AuthService } from '@/services/auth';
 import { useSnackbar } from 'notistack';
 import { api } from '@/services/api';
+import { Permission, getPermissionLabelKey, PERMISSION_CATEGORIES } from '@/types/permissions';
+
+interface Environment {
+  id: string;
+  environmentName: string;
+  displayName: string;
+  color?: string;
+}
+
+interface UserEnvironmentAccess {
+  allowAllEnvironments: boolean;
+  environmentIds: string[];
+}
 
 const ProfilePage: React.FC = () => {
-  const { user, refreshAuth } = useAuth();
+  const { user, refreshAuth, permissions } = useAuth();
   const { t } = useTranslation();
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
@@ -65,6 +82,34 @@ const ProfilePage: React.FC = () => {
   });
   const [passwordLoading, setPasswordLoading] = useState(false);
 
+  // Environment access state
+  const [environmentAccess, setEnvironmentAccess] = useState<UserEnvironmentAccess | null>(null);
+  const [environments, setEnvironments] = useState<Environment[]>([]);
+  const [envLoading, setEnvLoading] = useState(true);
+
+  // Fetch environment access
+  useEffect(() => {
+    const fetchEnvironmentAccess = async () => {
+      if (!user) return;
+
+      try {
+        setEnvLoading(true);
+        const [accessResponse, envsResponse] = await Promise.all([
+          api.get<UserEnvironmentAccess>('/admin/users/me/environments'),
+          api.get<Environment[]>('/admin/environments'),
+        ]);
+        setEnvironmentAccess(accessResponse.data || null);
+        setEnvironments(envsResponse.data || []);
+      } catch (error) {
+        console.error('Failed to fetch environment access:', error);
+      } finally {
+        setEnvLoading(false);
+      }
+    };
+
+    fetchEnvironmentAccess();
+  }, [user]);
+
   if (!user) {
     return (
       <Box sx={{ p: 3 }} display="flex" justifyContent="center" alignItems="center" minHeight="400px">
@@ -72,6 +117,11 @@ const ProfilePage: React.FC = () => {
       </Box>
     );
   }
+
+  // Get accessible environments
+  const accessibleEnvironments = environmentAccess?.allowAllEnvironments
+    ? environments
+    : environments.filter(env => environmentAccess?.environmentIds?.includes(env.id));
 
   const handleEditToggle = () => {
     if (isEditing) {
@@ -209,55 +259,54 @@ const ProfilePage: React.FC = () => {
     return role === 'admin' ? 'primary' : 'secondary';
   };
 
+  // Get auth type label
+  const getAuthTypeLabel = (authType: string) => {
+    switch (authType) {
+      case 'local': return 'Email / Password';
+      case 'google': return 'Google';
+      case 'github': return 'GitHub';
+      case 'qq': return 'QQ';
+      case 'wechat': return 'WeChat';
+      case 'baidu': return 'Baidu';
+      default: return authType;
+    }
+  };
+
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 4,
-          mb: 4,
-          background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}15 100%)`,
-          borderRadius: 2,
-          border: `1px solid ${theme.palette.divider}`
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <Box sx={{ position: 'relative' }}>
+    <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+      {/* Profile Header */}
+      <Card sx={{ mb: 3, overflow: 'visible' }}>
+        <Box
+          sx={{
+            height: 120,
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+            borderRadius: '12px 12px 0 0',
+          }}
+        />
+        <CardContent sx={{ pt: 0, pb: 3, position: 'relative' }}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'center', sm: 'flex-start' }, gap: 2 }}>
+            {/* Avatar */}
+            <Box sx={{ position: 'relative', mt: -6 }}>
               <Avatar
                 src={avatarPreview || user.avatarUrl}
                 sx={{
-                  width: 80,
-                  height: 80,
-                  fontSize: '2rem',
+                  width: 100,
+                  height: 100,
+                  fontSize: '2.5rem',
                   bgcolor: theme.palette.primary.main,
-                  border: `3px solid ${theme.palette.background.paper}`,
-                  boxShadow: theme.shadows[3]
+                  border: `4px solid ${theme.palette.background.paper}`,
+                  boxShadow: theme.shadows[4]
                 }}
               >
                 {!avatarPreview && !user.avatarUrl && (user.name || user.email)?.charAt(0).toUpperCase()}
               </Avatar>
               {isEditing && (
                 <>
-                  <input
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                    id="avatar-upload"
-                    type="file"
-                    onChange={handleAvatarChange}
-                  />
+                  <input accept="image/*" style={{ display: 'none' }} id="avatar-upload" type="file" onChange={handleAvatarChange} />
                   <label htmlFor="avatar-upload">
                     <IconButton
                       component="span"
-                      sx={{
-                        position: 'absolute',
-                        bottom: -5,
-                        right: -5,
-                        bgcolor: 'background.paper',
-                        border: `2px solid ${theme.palette.divider}`,
-                        '&:hover': { bgcolor: 'action.hover' }
-                      }}
+                      sx={{ position: 'absolute', bottom: 0, right: 0, bgcolor: 'background.paper', border: `2px solid ${theme.palette.divider}`, '&:hover': { bgcolor: 'action.hover' } }}
                       size="small"
                     >
                       <PhotoCameraIcon fontSize="small" />
@@ -266,151 +315,66 @@ const ProfilePage: React.FC = () => {
                 </>
               )}
             </Box>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-                {user.name || user.email}
-              </Typography>
-              <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                <Chip
-                  icon={<SecurityIcon />}
-                  label={user.role?.toUpperCase()}
-                  color={getRoleColor(user.role || '')}
-                  size="small"
-                  variant="filled"
-                />
-                <Chip
-                  label={user.status?.toUpperCase() || t('dashboard.unknown').toUpperCase()}
-                  color={getStatusColor(user.status || '')}
-                  size="small"
-                  variant="outlined"
-                />
+
+            {/* User Info */}
+            <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' }, mt: { xs: 1, sm: 2 } }}>
+              {isEditing ? (
+                <TextField value={editedName} onChange={(e) => setEditedName(e.target.value)} variant="outlined" size="small" sx={{ mb: 1, minWidth: 200 }} />
+              ) : (
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>{user.name || user.email}</Typography>
+              )}
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{user.email}</Typography>
+              <Stack direction="row" spacing={1} justifyContent={{ xs: 'center', sm: 'flex-start' }} flexWrap="wrap">
+                <Chip icon={<SecurityIcon />} label={t(`roles.${user.role}`)} color={getRoleColor(user.role || '')} size="small" />
+                <Chip icon={<CheckCircleIcon />} label={t(`users.statuses.${user.status}`)} color={getStatusColor(user.status || '')} size="small" variant="outlined" />
               </Stack>
-              <Typography variant="body2" color="text.secondary">
-                {t('profile.memberSince')}: {user.created_at ? new Date(user.created_at).toLocaleDateString() : t('dashboard.unknown')}
-              </Typography>
+            </Box>
+
+            {/* Action Buttons */}
+            <Box sx={{ display: 'flex', gap: 1, mt: { xs: 2, sm: 2 } }}>
+              {isEditing ? (
+                <>
+                  <Button variant="outlined" startIcon={<CancelIcon />} onClick={handleEditToggle}>{t('common.cancel')}</Button>
+                  <Button variant="contained" startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />} onClick={handleSave} disabled={isLoading}>
+                    {isLoading ? t('common.saving') : t('common.save')}
+                  </Button>
+                </>
+              ) : (
+                <Button variant="outlined" startIcon={<EditIcon />} onClick={handleEditToggle}>{t('profile.editProfile')}</Button>
+              )}
             </Box>
           </Box>
-          <Button
-            variant={isEditing ? "outlined" : "contained"}
-            startIcon={isEditing ? <CancelIcon /> : <EditIcon />}
-            onClick={handleEditToggle}
-            sx={{ minWidth: 120 }}
-          >
-            {isEditing ? t('common.cancel') : t('profile.editProfile')}
-          </Button>
-        </Box>
-      </Paper>
+        </CardContent>
+      </Card>
 
       <Grid container spacing={3}>
-        {/* Personal Information */}
-        <Grid size={{ xs: 12 , md: 8 }}>
-          <Card sx={{ height: 'fit-content' }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <PersonIcon sx={{ mr: 1, color: 'primary.main' }} />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {t('profile.personalInfo')}
-                </Typography>
-              </Box>
-
-              <Stack spacing={3}>
-                <Box>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    {t('profile.name')}
-                  </Typography>
-                  {isEditing ? (
-                    <TextField
-                      fullWidth
-                      value={editedName}
-                      onChange={(e) => setEditedName(e.target.value)}
-                      variant="outlined"
-                      size="small"
-                    />
-                  ) : (
-                    <Typography variant="body1" sx={{ py: 1 }}>
-                      {user.name || user.email}
-                    </Typography>
-                  )}
-                </Box>
-
-                <Divider />
-
-                <Box>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    <EmailIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
-                    {t('auth.email')}
-                  </Typography>
-                  <Typography variant="body1" sx={{ py: 1 }}>
-                    {user.email}
-                  </Typography>
-                </Box>
-
-                {isEditing && (
-                  <Box sx={{ pt: 2 }}>
-                    <Button
-                      variant="contained"
-                      startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
-                      onClick={handleSave}
-                      disabled={isLoading}
-                      sx={{ mr: 1 }}
-                    >
-                      {isLoading ? t('common.saving') : t('common.save')}
-                    </Button>
-                  </Box>
-                )}
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Account Information */}
-        <Grid size={{ xs: 12 , md: 4 }}>
-          <Card>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        {/* Left Column - Account Details */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          {/* Account Information */}
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <ScheduleIcon sx={{ mr: 1, color: 'primary.main' }} />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {t('profile.accountInfo')}
-                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>{t('profile.accountInfo')}</Typography>
               </Box>
+              <Divider sx={{ mb: 2 }} />
 
               <Stack spacing={2}>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('profile.memberSince')}
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">{t('profile.memberSince')}</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}
                   </Typography>
                 </Box>
-
-                {user.last_login_at && (
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('profile.lastLogin')}
-                    </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                      {new Date(user.last_login_at).toLocaleString()}
-                    </Typography>
+                {user.lastLoginAt && (
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">{t('profile.lastLogin')}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>{new Date(user.lastLoginAt).toLocaleString()}</Typography>
                   </Box>
                 )}
-
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('users.role')}
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 500, textTransform: 'capitalize' }}>
-                    {user.role}
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('users.status')}
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 500, textTransform: 'capitalize' }}>
-                    {user.status}
-                  </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">{t('profile.authType')}</Typography>
+                  <Chip label={getAuthTypeLabel(user.authType)} size="small" variant="outlined" />
                 </Box>
               </Stack>
             </CardContent>
@@ -418,33 +382,137 @@ const ProfilePage: React.FC = () => {
 
           {/* Security Settings - Only for local users */}
           {user.authType === 'local' && (
-            <Card sx={{ mt: 2 }}>
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                  <SecurityIcon sx={{ mr: 1, color: 'primary.main' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    {t('profile.security')}
-                  </Typography>
+            <Card>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <LockIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>{t('profile.security')}</Typography>
                 </Box>
-
-                <Stack spacing={2}>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                      {t('profile.password')}
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      startIcon={<LockIcon />}
-                      onClick={handlePasswordDialogOpen}
-                      size="small"
-                    >
-                      {t('profile.changePassword')}
-                    </Button>
-                  </Box>
-                </Stack>
+                <Divider sx={{ mb: 2 }} />
+                <Button variant="outlined" startIcon={<LockIcon />} onClick={handlePasswordDialogOpen} fullWidth>
+                  {t('profile.changePassword')}
+                </Button>
               </CardContent>
             </Card>
           )}
+        </Grid>
+
+        {/* Right Column - Permissions & Environments */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          {/* Permissions */}
+          {user.role === 'admin' && (
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <PermissionIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>{t('profile.permissions')}</Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{t('profile.permissionsDesc')}</Typography>
+                <Divider sx={{ mb: 2 }} />
+
+                {permissions.length > 0 ? (
+                  <Stack spacing={2}>
+                    {Object.entries(PERMISSION_CATEGORIES).map(([categoryKey, category]) => {
+                      const categoryPermissions = category.permissions.filter(p => permissions.includes(p));
+                      if (categoryPermissions.length === 0) return null;
+
+                      return (
+                        <Box key={categoryKey}>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                            {t(category.label)}
+                          </Typography>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                            {categoryPermissions.map((permission) => {
+                              const isManage = permission.includes('.manage');
+                              const permissionLabel = t(getPermissionLabelKey(permission as Permission));
+                              // Get localized description for tooltip (e.g., permissions.users_view_desc)
+                              const descKey = `permissions.${permission.replace('.', '_')}_desc`;
+                              const permissionDesc = t(descKey, { defaultValue: '' });
+                              return (
+                                <Tooltip key={permission} title={permissionDesc || permissionLabel} arrow placement="top">
+                                  <Box
+                                    sx={{
+                                      px: 1,
+                                      py: 0.5,
+                                      borderRadius: 0.5,
+                                      bgcolor: isManage ? alpha(theme.palette.warning.main, 0.15) : alpha(theme.palette.primary.main, 0.1),
+                                      color: isManage ? 'warning.dark' : 'primary.main',
+                                      fontWeight: 500,
+                                      fontSize: '0.75rem',
+                                      border: `1px solid ${isManage ? alpha(theme.palette.warning.main, 0.3) : alpha(theme.palette.primary.main, 0.2)}`,
+                                      cursor: 'default',
+                                      '&:hover': {
+                                        bgcolor: isManage ? alpha(theme.palette.warning.main, 0.25) : alpha(theme.palette.primary.main, 0.15),
+                                      },
+                                    }}
+                                  >
+                                    {permissionLabel}
+                                  </Box>
+                                </Tooltip>
+                              );
+                            })}
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </Stack>
+                ) : (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                    <InfoIcon fontSize="small" />
+                    <Typography variant="body2">{t('profile.noPermissions')}</Typography>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Accessible Environments */}
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <EnvironmentIcon sx={{ mr: 1, color: 'primary.main' }} />
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>{t('profile.accessibleEnvironments')}</Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{t('profile.accessibleEnvironmentsDesc')}</Typography>
+              <Divider sx={{ mb: 2 }} />
+
+              {envLoading ? (
+                <Stack spacing={1}>
+                  <Skeleton variant="rounded" height={32} width="60%" />
+                  <Skeleton variant="rounded" height={32} width="40%" />
+                </Stack>
+              ) : environmentAccess?.allowAllEnvironments ? (
+                <Chip
+                  icon={<CheckCircleIcon />}
+                  label={t('profile.allEnvironments')}
+                  color="success"
+                  variant="outlined"
+                />
+              ) : accessibleEnvironments.length > 0 ? (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {accessibleEnvironments.map((env) => (
+                    <Tooltip key={env.id} title={env.description || ''} arrow placement="top">
+                      <Chip
+                        label={env.displayName || env.environmentName}
+                        size="small"
+                        sx={{
+                          bgcolor: env.color ? alpha(env.color, 0.15) : alpha(theme.palette.info.main, 0.1),
+                          color: env.color || 'info.main',
+                          fontWeight: 500,
+                          borderLeft: `3px solid ${env.color || theme.palette.info.main}`,
+                        }}
+                      />
+                    </Tooltip>
+                  ))}
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                  <InfoIcon fontSize="small" />
+                  <Typography variant="body2">{t('profile.noEnvironments')}</Typography>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
 

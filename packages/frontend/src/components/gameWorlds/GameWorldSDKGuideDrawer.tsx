@@ -26,6 +26,7 @@ import Editor from '@monaco-editor/react';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
 import ResizableDrawer from '../common/ResizableDrawer';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 
 interface GameWorldSDKGuideDrawerProps {
   open: boolean;
@@ -37,6 +38,7 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const { enqueueSnackbar } = useSnackbar();
+  const { currentEnvironmentId } = useEnvironment();
 
   const [mainTabValue, setMainTabValue] = useState(0);
   const [errorTabValue, setErrorTabValue] = useState(0);
@@ -90,7 +92,8 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
 curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
   -H "Content-Type: application/json" \\
   -H "X-Application-Name: MyGameApp" \\
-  -H "X-API-Token: your-api-token-here"`;
+  -H "X-API-Token: your-api-token-here" \\
+  -H "X-Environment-Id: ${currentEnvironmentId || 'your-environment-id'}"`;
 
   // JSON response example
   const jsonResponse = `{
@@ -185,6 +188,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
             'Content-Type': 'application/json',
             'X-Application-Name': appName,
             'X-API-Token': apiToken,
+            ...(currentEnvironmentId && { 'X-Environment-Id': currentEnvironmentId }),
           },
         }
       );
@@ -201,6 +205,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
         'Content-Type': 'application/json',
         'X-Application-Name': appName,
         'X-API-Token': apiToken,
+        ...(currentEnvironmentId && { 'X-Environment-Id': currentEnvironmentId }),
       });
 
       setResponseHeaders({
@@ -356,6 +361,9 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds" \\
                 </Typography>
                 <Typography variant="body2">
                   • <strong>X-Application-Name</strong>: {t('gameWorlds.sdkGuide.headerAppName')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>X-Environment-Id</strong>: {t('common.sdkGuide.headerEnvironmentId')}
                 </Typography>
                 <Typography variant="body2">
                   • <strong>Content-Type</strong>: {t('gameWorlds.sdkGuide.headerContentType')}

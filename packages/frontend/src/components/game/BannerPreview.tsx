@@ -96,6 +96,9 @@ interface BannerPreviewProps {
   height: number;
   sequences: Sequence[];
   playbackSpeed: number;
+  // Optional: External frame selection (sequenceIndex, frameIndex within that sequence)
+  selectedSequenceIndex?: number;
+  selectedFrameIndex?: number;
 }
 
 interface ExtendedFrame extends Frame {
@@ -136,6 +139,8 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
   height,
   sequences,
   playbackSpeed,
+  selectedSequenceIndex: externalSequenceIndex,
+  selectedFrameIndex: externalFrameIndex,
 }) => {
   const { t } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -188,6 +193,23 @@ const BannerPreview: React.FC<BannerPreviewProps> = ({
       }))
     );
   }, [sequences, selectedSequenceIndex]);
+
+  // Handle external frame selection
+  useEffect(() => {
+    if (externalSequenceIndex !== undefined && externalFrameIndex !== undefined) {
+      // Find the frame index in allFrames that matches the external selection
+      const targetIndex = allFrames.findIndex(
+        (f) => f.sequenceIndex === externalSequenceIndex && f.frameIndex === externalFrameIndex
+      );
+      if (targetIndex >= 0 && targetIndex !== currentFrameIndex) {
+        setIsPlaying(false);
+        setIsTransitioning(false);
+        setPrevFrameIndex(null);
+        setCurrentFrameIndex(targetIndex);
+        setPlayDirection(1);
+      }
+    }
+  }, [externalSequenceIndex, externalFrameIndex, allFrames]);
 
   // Calculate total duration and cumulative times
   const { totalDuration, frameCumulativeTimes } = useMemo(() => {

@@ -1,6 +1,7 @@
 import db from '../config/knex';
 import { GatrixError } from '../middleware/errorHandler';
 import { ulid } from 'ulid';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface TriggerCondition {
   type: 'userLevel' | 'joinDays';
@@ -23,6 +24,7 @@ export interface ChannelSubchannelData {
  */
 export interface Survey {
   id: string;
+  environmentId?: string;
   platformSurveyId: string;
   surveyTitle: string;
   surveyContent?: string;
@@ -105,13 +107,15 @@ export class SurveyService {
     limit?: number;
     isActive?: boolean;
     search?: string;
+    environmentId?: string;
   }): Promise<{ surveys: Survey[]; total: number; page: number; limit: number }> {
     const page = params.page || 1;
     const limit = params.limit || 20;
     const offset = (page - 1) * limit;
+    const envId = params.environmentId ?? getCurrentEnvironmentId();
 
-    let query = db('g_surveys');
-    let countQuery = db('g_surveys');
+    let query = db('g_surveys').where('environmentId', envId);
+    let countQuery = db('g_surveys').where('environmentId', envId);
 
     if (params.isActive !== undefined) {
       query = query.where('isActive', params.isActive);
@@ -177,8 +181,9 @@ export class SurveyService {
   /**
    * Get survey by ID
    */
-  static async getSurveyById(id: string): Promise<Survey> {
-    const row = await db('g_surveys').where('id', id).first();
+  static async getSurveyById(id: string, environmentId?: string): Promise<Survey> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
+    const row = await db('g_surveys').where('id', id).where('environmentId', envId).first();
 
     if (!row) {
       throw new GatrixError('Survey not found', 404);
@@ -222,8 +227,9 @@ export class SurveyService {
   /**
    * Get survey by platform survey ID
    */
-  static async getSurveyByPlatformId(platformSurveyId: string): Promise<Survey> {
-    const row = await db('g_surveys').where('platformSurveyId', platformSurveyId).first();
+  static async getSurveyByPlatformId(platformSurveyId: string, environmentId?: string): Promise<Survey> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
+    const row = await db('g_surveys').where('platformSurveyId', platformSurveyId).where('environmentId', envId).first();
 
     if (!row) {
       throw new GatrixError('Survey not found', 404);
@@ -267,7 +273,9 @@ export class SurveyService {
   /**
    * Create a new survey
    */
-  static async createSurvey(input: CreateSurveyInput): Promise<Survey> {
+  static async createSurvey(input: CreateSurveyInput, environmentId?: string): Promise<Survey> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
+
     // Validate trigger conditions
     if (!input.triggerConditions || input.triggerConditions.length === 0) {
       throw new GatrixError('At least one trigger condition is required', 400);
@@ -278,8 +286,11 @@ export class SurveyService {
       throw new GatrixError('Cannot specify both participationRewards and rewardTemplateId', 400);
     }
 
-    // Check if platformSurveyId already exists
-    const existing = await db('g_surveys').where('platformSurveyId', input.platformSurveyId).first();
+    // Check if platformSurveyId already exists in this environment
+    const existing = await db('g_surveys')
+      .where('platformSurveyId', input.platformSurveyId)
+      .where('environmentId', envId)
+      .first();
 
     if (existing) {
       throw new GatrixError('Platform survey ID already exists', 400);
@@ -290,6 +301,7 @@ export class SurveyService {
 
     await db('g_surveys').insert({
       id,
+      environmentId: envId,
       platformSurveyId: input.platformSurveyId,
       surveyTitle: input.surveyTitle,
       surveyContent: input.surveyContent || null,
@@ -310,20 +322,22 @@ export class SurveyService {
       createdBy: input.createdBy || null,
     });
 
-    return await this.getSurveyById(id);
+    return await this.getSurveyById(id, envId);
   }
 
   /**
    * Update a survey
    */
-  static async updateSurvey(id: string, input: UpdateSurveyInput): Promise<Survey> {
+  static async updateSurvey(id: string, input: UpdateSurveyInput, environmentId?: string): Promise<Survey> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
     // Check if survey exists
-    await this.getSurveyById(id);
+    await this.getSurveyById(id, envId);
 
-    // If platformSurveyId is being updated, check for duplicates
+    // If platformSurveyId is being updated, check for duplicates in this environment
     if (input.platformSurveyId) {
       const existing = await db('g_surveys')
         .where('platformSurveyId', input.platformSurveyId)
+        .where('environmentId', envId)
         .whereNot('id', id)
         .first();
 
@@ -369,16 +383,17 @@ export class SurveyService {
       throw new GatrixError('No fields to update', 400);
     }
 
-    await db('g_surveys').where('id', id).update(updateData);
+    await db('g_surveys').where('id', id).where('environmentId', envId).update(updateData);
 
-    return await this.getSurveyById(id);
+    return await this.getSurveyById(id, envId);
   }
 
   /**
    * Delete a survey
    */
-  static async deleteSurvey(id: string): Promise<void> {
-    const result = await db('g_surveys').where('id', id).del();
+  static async deleteSurvey(id: string, environmentId?: string): Promise<void> {
+    const envId = environmentId ?? getCurrentEnvironmentId();
+    const result = await db('g_surveys').where('id', id).where('environmentId', envId).del();
 
     if (result === 0) {
       throw new GatrixError('Survey not found', 404);

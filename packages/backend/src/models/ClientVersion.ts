@@ -1,7 +1,9 @@
 import db from '../config/knex';
 import logger from '../config/logger';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface ClientVersionFilters {
+  environmentId?: string; // ULID
   clientVersion?: string | string[];
   platform?: string | string[];
   clientStatus?: string | string[];
@@ -31,6 +33,7 @@ export enum ClientStatus {
 
 export interface ClientVersionAttributes {
   id?: number;
+  environmentId?: string; // ULID
   clientVersion: string;
   platform: string;
   clientStatus: ClientStatus;
@@ -93,11 +96,13 @@ export class ClientVersionModel {
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
       const sortBy = filters?.sortBy || 'clientVersion';
       const sortOrder = filters?.sortOrder || 'DESC';
+      const envId = filters?.environmentId ?? getCurrentEnvironmentId();
 
-      // 기본 쿼리 빌더
+      // 기본 쿼리 빌더 with environment filter
       const baseQuery = () => db('g_client_versions as cv')
         .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
-        .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id');
+        .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
+        .where('cv.environmentId', envId);
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
@@ -260,12 +265,15 @@ export class ClientVersionModel {
 
   static async create(data: any): Promise<any> {
     try {
+      const envId = data.environmentId ?? getCurrentEnvironmentId();
+
       return await db.transaction(async (trx) => {
         // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
-        const { tags, maintenanceLocales, ...clientVersionData } = data;
+        const { tags, maintenanceLocales, environmentId: _envId, ...clientVersionData } = data;
 
         const [insertId] = await trx('g_client_versions').insert({
           ...clientVersionData,
+          environmentId: envId,
           createdAt: new Date(),
           updatedAt: new Date()
         });

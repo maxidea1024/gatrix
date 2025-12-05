@@ -1,9 +1,11 @@
 import db from '../config/knex';
 import { GatrixError } from '../middleware/errorHandler';
 import TagAssignmentModel from './TagAssignment';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 
 export interface Whitelist {
   id: number;
+  environmentId?: string;
   accountId: string;
   ipAddress?: string;
   startDate?: Date;
@@ -44,6 +46,7 @@ export interface UpdateWhitelistData {
 }
 
 export interface WhitelistFilters {
+  environmentId?: string;
   accountId?: string;
   ipAddress?: string;
   createdBy?: number;
@@ -68,13 +71,16 @@ export class WhitelistModel {
   ): Promise<WhitelistListResponse> {
     try {
       const offset = (page - 1) * limit;
+      const envId = filters.environmentId ?? getCurrentEnvironmentId();
 
-      // Build base query
+      // Build base query with environment filter
       let query = db('g_account_whitelist as w')
         .leftJoin('g_users as c', 'w.createdBy', 'c.id')
         .leftJoin('g_users as u', 'w.updatedBy', 'u.id')
+        .where('w.environmentId', envId)
         .select([
           'w.id',
+          'w.environmentId',
           'w.accountId',
           'w.ipAddress',
           'w.startDate',
@@ -153,13 +159,15 @@ export class WhitelistModel {
     }
   }
 
-  static async findById(id: number): Promise<Whitelist | null> {
+  static async findById(id: number, environmentId?: string): Promise<Whitelist | null> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const result = await db('g_account_whitelist as w')
         .leftJoin('g_users as c', 'w.createdBy', 'c.id')
         .leftJoin('g_users as u', 'w.updatedBy', 'u.id')
         .select([
           'w.id',
+          'w.environmentId',
           'w.accountId',
           'w.ipAddress',
           'w.startDate',
@@ -177,6 +185,7 @@ export class WhitelistModel {
           'u.email as updatedByEmail'
         ])
         .where('w.id', id)
+        .where('w.environmentId', envId)
         .first();
 
       return result ? this.mapRowToWhitelist(result) : null;
@@ -185,9 +194,11 @@ export class WhitelistModel {
     }
   }
 
-  static async create(data: CreateWhitelistData): Promise<Whitelist> {
+  static async create(data: CreateWhitelistData, environmentId?: string): Promise<Whitelist> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const [insertId] = await db('g_account_whitelist').insert({
+        environmentId: envId,
         accountId: data.accountId,
         ipAddress: data.ipAddress || null,
         startDate: data.startDate || null,
@@ -198,7 +209,7 @@ export class WhitelistModel {
         createdBy: data.createdBy
       });
 
-      const created = await this.findById(insertId);
+      const created = await this.findById(insertId, envId);
       if (!created) {
         throw new GatrixError('Failed to create whitelist entry', 500);
       }
@@ -209,8 +220,9 @@ export class WhitelistModel {
     }
   }
 
-  static async update(id: number, data: UpdateWhitelistData): Promise<Whitelist | null> {
+  static async update(id: number, data: UpdateWhitelistData, environmentId?: string): Promise<Whitelist | null> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const updateData: any = {};
 
       if (data.accountId !== undefined) {
@@ -253,18 +265,21 @@ export class WhitelistModel {
 
       await db('g_account_whitelist')
         .where('id', id)
+        .where('environmentId', envId)
         .update(updateData);
 
-      return await this.findById(id);
+      return await this.findById(id, envId);
     } catch (error) {
       throw new GatrixError('Failed to update whitelist entry', 500);
     }
   }
 
-  static async delete(id: number): Promise<boolean> {
+  static async delete(id: number, environmentId?: string): Promise<boolean> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const result = await db('g_account_whitelist')
         .where('id', id)
+        .where('environmentId', envId)
         .del();
       return result > 0;
     } catch (error) {
@@ -272,13 +287,15 @@ export class WhitelistModel {
     }
   }
 
-  static async bulkCreate(entries: CreateWhitelistData[]): Promise<number> {
+  static async bulkCreate(entries: CreateWhitelistData[], environmentId?: string): Promise<number> {
     try {
       if (entries.length === 0) {
         return 0;
       }
 
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const insertData = entries.map(entry => ({
+        environmentId: envId,
         accountId: entry.accountId,
         ipAddress: entry.ipAddress || null,
         startDate: entry.startDate || null,
@@ -332,8 +349,9 @@ export class WhitelistModel {
     };
   }
 
-  static async findByAccountId(accountId: string): Promise<Whitelist[]> {
+  static async findByAccountId(accountId: string, environmentId?: string): Promise<Whitelist[]> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
       const rows = await db('g_account_whitelist as w')
         .leftJoin('g_users as c', 'w.createdBy', 'c.id')
         .leftJoin('g_users as u', 'w.updatedBy', 'u.id')
@@ -345,6 +363,7 @@ export class WhitelistModel {
           'u.email as updatedByEmail'
         ])
         .where('w.accountId', accountId)
+        .where('w.environmentId', envId)
         .orderBy('w.createdAt', 'desc');
 
       return rows.map(this.mapRowToWhitelist);

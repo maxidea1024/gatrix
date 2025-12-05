@@ -286,6 +286,7 @@ export class UserModel {
           'g_users.createdAt',
           'g_users.updatedAt',
           'g_users.createdBy',
+          'g_users.allowAllEnvironments',
           'creator.name as createdByName',
           'creator.email as createdByEmail'
         ])
@@ -301,19 +302,37 @@ export class UserModel {
 
       const total = countResult?.total || 0;
 
-      // 각 사용자에 대해 태그 정보 로드
-      const usersWithTags = await Promise.all(
+      // Get all user IDs for batch loading
+      const userIds = users.map((u: any) => u.id);
+
+      // Batch load environment assignments
+      const envAssignments = userIds.length > 0
+        ? await db('g_user_environments')
+            .whereIn('userId', userIds)
+            .select('userId', 'environmentId')
+        : [];
+
+      // Group environment IDs by user
+      const envByUser = envAssignments.reduce((acc: any, env: any) => {
+        if (!acc[env.userId]) acc[env.userId] = [];
+        acc[env.userId].push(env.environmentId);
+        return acc;
+      }, {});
+
+      // 각 사용자에 대해 태그 및 환경 정보 로드
+      const usersWithExtras = await Promise.all(
         users.map(async (user: any) => {
           const tags = await this.getTags(user.id);
           return {
             ...user,
-            tags
+            tags,
+            environmentIds: envByUser[user.id] || []
           };
         })
       );
 
       return {
-        users: usersWithTags,
+        users: usersWithExtras,
         total,
         page: pageNum,
         limit: limitNum
@@ -515,6 +534,254 @@ export class UserModel {
       return users;
     } catch (error) {
       logger.error('Error getting users for sync:', error);
+      throw error;
+    }
+  }
+
+  // Environment access methods
+
+  /**
+   * Get user's environment access settings
+   */
+  static async getEnvironmentAccess(userId: number): Promise<{
+    allowAllEnvironments: boolean;
+    environmentIds: string[];
+  }> {
+    try {
+      // Get allowAllEnvironments flag
+      const user = await db('g_users')
+        .select('allowAllEnvironments')
+        .where('id', userId)
+        .first();
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      // Get specific environment assignments
+      const environments = await db('g_user_environments')
+        .select('environmentId')
+        .where('userId', userId);
+
+      return {
+        allowAllEnvironments: !!user.allowAllEnvironments,
+        environmentIds: environments.map((e: any) => e.environmentId)
+      };
+    } catch (error) {
+      logger.error('Error getting user environment access:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Set user's environment access
+   */
+  static async setEnvironmentAccess(
+    userId: number,
+    allowAllEnvironments: boolean,
+    environmentIds: string[],
+    updatedBy: number
+  ): Promise<void> {
+    try {
+      await db.transaction(async (trx) => {
+        // Update allowAllEnvironments flag
+        await trx('g_users')
+          .where('id', userId)
+          .update({
+            allowAllEnvironments,
+            updatedBy,
+            updatedAt: trx.fn.now()
+          });
+
+        // Clear existing environment assignments
+        await trx('g_user_environments')
+          .where('userId', userId)
+          .del();
+
+        // Add new environment assignments (only if not allowAllEnvironments)
+        if (!allowAllEnvironments && environmentIds.length > 0) {
+          const assignments = environmentIds.map(environmentId => ({
+            userId,
+            environmentId,
+            createdBy: updatedBy,
+            createdAt: new Date()
+          }));
+
+          await trx('g_user_environments').insert(assignments);
+        }
+      });
+    } catch (error) {
+      logger.error('Error setting user environment access:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if user has access to a specific environment
+   */
+  static async hasEnvironmentAccess(userId: number, environmentId: string): Promise<boolean> {
+    try {
+      const user = await db('g_users')
+        .select('allowAllEnvironments')
+        .where('id', userId)
+        .first();
+
+      if (!user) {
+        return false;
+      }
+
+      // Admin with all environments access
+      if (user.allowAllEnvironments) {
+        return true;
+      }
+
+      // Check specific environment assignment
+      const assignment = await db('g_user_environments')
+        .where('userId', userId)
+        .where('environmentId', environmentId)
+        .first();
+
+      return !!assignment;
+    } catch (error) {
+      logger.error('Error checking user environment access:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get accessible environment IDs for a user
+   */
+  static async getAccessibleEnvironmentIds(userId: number): Promise<string[] | 'all'> {
+    try {
+      const user = await db('g_users')
+        .select('allowAllEnvironments')
+        .where('id', userId)
+        .first();
+
+      if (!user) {
+        return [];
+      }
+
+      if (user.allowAllEnvironments) {
+        return 'all';
+      }
+
+      const environments = await db('g_user_environments')
+        .select('environmentId')
+        .where('userId', userId);
+
+      return environments.map((e: any) => e.environmentId);
+    } catch (error) {
+      logger.error('Error getting accessible environment IDs:', error);
+      return [];
+    }
+  }
+
+  // Permission methods for RBAC
+
+  /**
+   * Get all permissions for a user
+   */
+  static async getPermissions(userId: number): Promise<string[]> {
+    try {
+      const permissions = await db('g_user_permissions')
+        .select('permission')
+        .where('userId', userId);
+
+      return permissions.map((p: any) => p.permission);
+    } catch (error) {
+      logger.error('Error getting user permissions:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if user has a specific permission
+   */
+  static async hasPermission(userId: number, permission: string): Promise<boolean> {
+    try {
+      const result = await db('g_user_permissions')
+        .where('userId', userId)
+        .where('permission', permission)
+        .first();
+
+      return !!result;
+    } catch (error) {
+      logger.error('Error checking user permission:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Check if user has any of the specified permissions
+   */
+  static async hasAnyPermission(userId: number, permissions: string[]): Promise<boolean> {
+    try {
+      const result = await db('g_user_permissions')
+        .where('userId', userId)
+        .whereIn('permission', permissions)
+        .first();
+
+      return !!result;
+    } catch (error) {
+      logger.error('Error checking user permissions:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Set permissions for a user (replaces all existing permissions)
+   */
+  static async setPermissions(userId: number, permissions: string[]): Promise<void> {
+    try {
+      await db.transaction(async (trx) => {
+        // Delete all existing permissions
+        await trx('g_user_permissions')
+          .where('userId', userId)
+          .del();
+
+        // Insert new permissions
+        if (permissions.length > 0) {
+          const permissionsToInsert = permissions.map(permission => ({
+            userId,
+            permission,
+          }));
+
+          await trx('g_user_permissions').insert(permissionsToInsert);
+        }
+      });
+    } catch (error) {
+      logger.error('Error setting user permissions:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Add a permission to a user
+   */
+  static async addPermission(userId: number, permission: string): Promise<void> {
+    try {
+      await db('g_user_permissions')
+        .insert({ userId, permission })
+        .onConflict(['userId', 'permission'])
+        .ignore();
+    } catch (error) {
+      logger.error('Error adding user permission:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Remove a permission from a user
+   */
+  static async removePermission(userId: number, permission: string): Promise<void> {
+    try {
+      await db('g_user_permissions')
+        .where('userId', userId)
+        .where('permission', permission)
+        .del();
+    } catch (error) {
+      logger.error('Error removing user permission:', error);
       throw error;
     }
   }

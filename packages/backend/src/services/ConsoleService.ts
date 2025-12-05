@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import db from '../config/knex';
+import { ulid } from 'ulid';
 
 export interface ConsoleExecutionResult {
   output: string;
@@ -838,16 +839,18 @@ class ConsoleService {
       const userId = ctx?.user?.id || 1;
 
       // Generate token
+      const tokenId = ulid();
       const tokenValue = crypto.randomBytes(32).toString('hex');
       const expiresAt = expiresInDays ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000) : null;
 
       // Insert into database
-      const [id] = await db('g_api_access_tokens').insert({
+      await db('g_api_access_tokens').insert({
+        id: tokenId,
         tokenName,
         description,
-        tokenHash: tokenValue,
+        tokenValue: tokenValue,
         tokenType,
-        environmentId: null,
+        allowAllEnvironments: true,
         expiresAt,
         createdBy: userId,
         updatedBy: userId,
@@ -858,7 +861,7 @@ class ConsoleService {
       const lines = [
         '\u001b[32mAPI Token Created:\u001b[0m',
         '',
-        `ID: ${id}`,
+        `ID: ${tokenId}`,
         `Name: ${tokenName}`,
         `Type: ${tokenType}`,
         `Token: ${tokenValue}`,

@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { PERMISSIONS } from '@/types/permissions';
 import { Box, Typography, Card, CardContent, Button, TextField, IconButton, Stack, Chip, Tooltip, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableHead, TableRow, TableCell, TableBody, TableContainer, LinearProgress } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, Save as SaveIcon, Close as CloseIcon, Autorenew as RandomIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +15,8 @@ const randomHexColor = () => `#${Math.floor(Math.random() * 0xffffff).toString(1
 const TagsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission([PERMISSIONS.TAGS_MANAGE]);
 
   // Data/state
   const [tags, setTags] = useState<Tag[]>([]);
@@ -143,49 +147,51 @@ const TagsPage: React.FC = () => {
       </Box>
 
       {/* Create form (like GitHub new label row) */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }}>
-            <Tooltip title={newDescription || t('tags.noDescription')} arrow>
-              <Chip label={newName || 'label'} sx={{ bgcolor: newColor, color: '#fff', height: 28, cursor: 'help' }} />
-            </Tooltip>
-            <TextField
-              label={t('tags.name')}
-              value={newName}
-              onChange={(e)=>setNewName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && newName.trim()) {
-                  handleCreate();
-                }
-              }}
-              sx={{ width: 260 }}
-            />
-            <TextField
-              label={t('tags.description')}
-              value={newDescription}
-              onChange={(e)=>setNewDescription(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && newName.trim()) {
-                  handleCreate();
-                }
-              }}
-              sx={{ flex: 1, minWidth: 220 }}
-            />
-            <Stack direction="row" spacing={1} alignItems="center">
-              <ColorPicker
-                value={newColor}
-                onChange={setNewColor}
-                label={t('common.color')}
+      {canManage && (
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }}>
+              <Tooltip title={newDescription || t('tags.noDescription')} arrow>
+                <Chip label={newName || 'label'} sx={{ bgcolor: newColor, color: '#fff', height: 28, cursor: 'help' }} />
+              </Tooltip>
+              <TextField
+                label={t('tags.name')}
+                value={newName}
+                onChange={(e)=>setNewName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newName.trim()) {
+                    handleCreate();
+                  }
+                }}
+                sx={{ width: 260 }}
               />
-              <Typography variant="body2" sx={{ minWidth: 80 }}>{newColor}</Typography>
+              <TextField
+                label={t('tags.description')}
+                value={newDescription}
+                onChange={(e)=>setNewDescription(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newName.trim()) {
+                    handleCreate();
+                  }
+                }}
+                sx={{ flex: 1, minWidth: 220 }}
+              />
+              <Stack direction="row" spacing={1} alignItems="center">
+                <ColorPicker
+                  value={newColor}
+                  onChange={setNewColor}
+                  label={t('common.color')}
+                />
+                <Typography variant="body2" sx={{ minWidth: 80 }}>{newColor}</Typography>
+              </Stack>
+              <Stack direction="row" spacing={1}>
+                <Button variant="outlined" onClick={()=>{ setNewName(''); setNewDescription(''); }}>{t('common.cancel')}</Button>
+                <Button variant="contained" onClick={handleCreate} disabled={!newName.trim()}>태그 추가</Button>
+              </Stack>
             </Stack>
-            <Stack direction="row" spacing={1}>
-              <Button variant="outlined" onClick={()=>{ setNewName(''); setNewDescription(''); }}>{t('common.cancel')}</Button>
-              <Button variant="contained" onClick={handleCreate} disabled={!newName.trim()}>태그 추가</Button>
-            </Stack>
-          </Stack>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Table list */}
       <Card>
@@ -201,7 +207,7 @@ const TagsPage: React.FC = () => {
                   <TableCell>{t('common.createdAt')}</TableCell>
                   <TableCell>{t('common.updatedAt')}</TableCell>
                   <TableCell>{t('common.createdBy')}</TableCell>
-                  <TableCell align="right">{t('common.actions')}</TableCell>
+                  {canManage && <TableCell align="right">{t('common.actions')}</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -297,19 +303,21 @@ const TagsPage: React.FC = () => {
                         '-'
                       )}
                     </TableCell>
-                    <TableCell align="right" sx={{ width: 140 }}>
-                      {editingId === tag.id ? (
-                        <Stack direction="row" spacing={1} justifyContent="flex-end">
-                          <IconButton size="small" color="primary" onClick={()=>saveEdit(tag.id)} disabled={!editName.trim()}><SaveIcon fontSize="small" /></IconButton>
-                          <IconButton size="small" onClick={cancelEdit}><CloseIcon fontSize="small" /></IconButton>
-                        </Stack>
-                      ) : (
-                        <Stack direction="row" spacing={1} justifyContent="flex-end">
-                          <IconButton size="small" onClick={()=>startEdit(tag)}><EditIcon fontSize="small" /></IconButton>
-                          <IconButton size="small" color="error" onClick={()=>openDeleteDialog(tag)}><DeleteIcon fontSize="small" /></IconButton>
-                        </Stack>
-                      )}
-                    </TableCell>
+                    {canManage && (
+                      <TableCell align="right" sx={{ width: 140 }}>
+                        {editingId === tag.id ? (
+                          <Stack direction="row" spacing={1} justifyContent="flex-end">
+                            <IconButton size="small" color="primary" onClick={()=>saveEdit(tag.id)} disabled={!editName.trim()}><SaveIcon fontSize="small" /></IconButton>
+                            <IconButton size="small" onClick={cancelEdit}><CloseIcon fontSize="small" /></IconButton>
+                          </Stack>
+                        ) : (
+                          <Stack direction="row" spacing={1} justifyContent="flex-end">
+                            <IconButton size="small" onClick={()=>startEdit(tag)}><EditIcon fontSize="small" /></IconButton>
+                            <IconButton size="small" color="error" onClick={()=>openDeleteDialog(tag)}><DeleteIcon fontSize="small" /></IconButton>
+                          </Stack>
+                        )}
+                      </TableCell>
+                    )}
                   </TableRow>
                   ))
                 )}

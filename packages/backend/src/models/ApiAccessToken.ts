@@ -3,19 +3,20 @@ import { User } from './User';
 import { RemoteConfigEnvironment } from './RemoteConfigEnvironment';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
+import { ulid } from 'ulid';
 
 export type TokenType = 'client' | 'server';
 
 export interface ApiAccessTokenData {
-  id?: number;
+  id?: string; // ULID (26 characters)
   tokenName: string;
   description?: string;
   tokenValue: string;
   tokenType: TokenType;
-  environmentId?: number;
   expiresAt?: Date;
   lastUsedAt?: Date;
   usageCount?: number;
+  allowAllEnvironments: boolean;
   createdBy: number;
   updatedBy?: number;
   createdAt?: Date;
@@ -25,22 +26,22 @@ export interface ApiAccessTokenData {
 export class ApiAccessToken extends Model implements ApiAccessTokenData {
   static tableName = 'g_api_access_tokens';
 
-  id!: number;
+  id!: string; // ULID
   tokenName!: string;
   description?: string;
   tokenValue!: string;
   tokenType!: TokenType;
-  environmentId?: number;
   expiresAt?: Date;
   lastUsedAt?: Date;
   usageCount?: number;
+  allowAllEnvironments!: boolean;
   createdBy!: number;
   updatedBy?: number;
   createdAt?: Date;
   updatedAt?: Date;
 
   // Relations
-  environment?: RemoteConfigEnvironment;
+  environments?: RemoteConfigEnvironment[];
   creator?: User;
 
   static get jsonSchema() {
@@ -48,14 +49,14 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       type: 'object',
       required: ['tokenName', 'tokenValue', 'tokenType', 'createdBy'],
       properties: {
-        id: { type: 'integer' },
+        id: { type: 'string', minLength: 26, maxLength: 26 },
         tokenName: { type: 'string', minLength: 1, maxLength: 200 },
         tokenValue: { type: 'string', minLength: 1, maxLength: 255 },
         tokenType: { type: 'string', enum: ['client', 'server'] },
-        environmentId: { type: ['integer', 'null'] },
         expiresAt: { type: ['string', 'object', 'null'], format: 'date-time' },
         lastUsedAt: { type: ['string', 'object', 'null'], format: 'date-time' },
         usageCount: { type: ['integer', 'null'], minimum: 0 },
+        allowAllEnvironments: { type: 'boolean', default: true },
         createdBy: { type: 'integer' },
         createdAt: { type: ['string', 'object'], format: 'date-time' },
         updatedAt: { type: ['string', 'object'], format: 'date-time' }
@@ -65,11 +66,15 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
 
   static get relationMappings() {
     return {
-      environment: {
-        relation: Model.BelongsToOneRelation,
+      environments: {
+        relation: Model.ManyToManyRelation,
         modelClass: RemoteConfigEnvironment,
         join: {
-          from: 'g_api_access_tokens.environmentId',
+          from: 'g_api_access_tokens.id',
+          through: {
+            from: 'g_api_access_token_environments.tokenId',
+            to: 'g_api_access_token_environments.environmentId'
+          },
           to: 'g_remote_config_environments.id'
         }
       },
@@ -93,6 +98,9 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   }
 
   $beforeInsert() {
+    if (!this.id) {
+      this.id = ulid();
+    }
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
@@ -152,9 +160,9 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   static async createToken(data: {
     tokenName: string;
     tokenType: TokenType;
-    environmentId?: number;
     expiresAt?: Date;
     createdBy: number;
+    allowAllEnvironments?: boolean;
   }): Promise<{ token: ApiAccessToken; plainToken: string }> {
     // Generate token
     const plainToken = this.generateToken();
@@ -164,10 +172,10 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       tokenName: data.tokenName,
       tokenValue: plainToken, // Store plain token
       tokenType: data.tokenType,
-      environmentId: data.environmentId,
       expiresAt: data.expiresAt,
-      createdBy: data.createdBy
-    });
+      createdBy: data.createdBy,
+      allowAllEnvironments: data.allowAllEnvironments ?? true
+    } as any);
 
     return { token, plainToken };
   }
@@ -184,7 +192,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       .where(builder => {
         builder.whereNull('expiresAt').orWhere('expiresAt', '>', new Date());
       })
-      .withGraphFetched('environment')
+      .withGraphFetched('environments')
       .first();
 
     return tokenRecord;
@@ -217,10 +225,17 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   /**
    * Get tokens for environment
    */
-  static async getForEnvironment(environmentId: number): Promise<ApiAccessToken[]> {
-    return await this.query()
+  static async getForEnvironment(environmentId: string): Promise<ApiAccessToken[]> {
+    const { default: knex } = await import('../config/knex');
+
+    // Find tokens that have access to this environment
+    const tokenIds = await knex('g_api_access_token_environments')
       .where('environmentId', environmentId)
-      .withGraphFetched('creator(basicInfo)')
+      .select('tokenId');
+
+    return await this.query()
+      .whereIn('id', tokenIds.map(t => t.tokenId))
+      .withGraphFetched('[creator(basicInfo), environments]')
       .modifiers({
         basicInfo: (builder) => builder.select('id', 'username', 'email')
       })
@@ -315,12 +330,85 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       id: this.id,
       tokenName: this.tokenName,
       tokenType: this.tokenType,
-      environmentId: this.environmentId,
+      allowAllEnvironments: this.allowAllEnvironments,
+      environments: this.environments,
       expiresAt: this.expiresAt,
       lastUsedAt: this.lastUsedAt,
       createdAt: this.createdAt,
       // Never include tokenHash in summary
     };
+  }
+
+  /**
+   * Check if token has access to a specific environment
+   */
+  async hasEnvironmentAccess(environmentId: string): Promise<boolean> {
+    // If allowAllEnvironments is true, token can access any environment
+    if (this.allowAllEnvironments) {
+      return true;
+    }
+
+    // If environments relation is already loaded, check it
+    if (this.environments) {
+      return this.environments.some(env => env.id === environmentId);
+    }
+
+    // Otherwise, query the database
+    const db = Model.knex();
+    const result = await db('g_api_access_token_environments')
+      .where('tokenId', this.id)
+      .where('environmentId', environmentId)
+      .first();
+
+    return !!result;
+  }
+
+  /**
+   * Get all environment IDs that this token can access
+   */
+  async getAccessibleEnvironmentIds(): Promise<string[]> {
+    if (this.allowAllEnvironments) {
+      // Return all environment IDs
+      const db = Model.knex();
+      const environments = await db('g_remote_config_environments').select('id');
+      return environments.map((e: any) => e.id);
+    }
+
+    // Return only allowed environment IDs
+    const db = Model.knex();
+    const environments = await db('g_api_access_token_environments')
+      .where('tokenId', this.id)
+      .select('environmentId');
+    return environments.map((e: any) => e.environmentId);
+  }
+
+  /**
+   * Set allowed environments for this token
+   */
+  async setAllowedEnvironments(environmentIds: string[]): Promise<void> {
+    const db = Model.knex();
+
+    // Use transaction to ensure atomicity
+    await db.transaction(async (trx) => {
+      // Delete existing environment assignments
+      await trx('g_api_access_token_environments')
+        .where('tokenId', this.id)
+        .delete();
+
+      // Insert new environment assignments
+      if (environmentIds.length > 0) {
+        const insertData = environmentIds.map(envId => ({
+          tokenId: this.id,
+          environmentId: envId,
+        }));
+        await trx('g_api_access_token_environments').insert(insertData);
+      }
+
+      // Update allowAllEnvironments flag
+      await trx('g_api_access_tokens')
+        .where('id', this.id)
+        .update({ allowAllEnvironments: environmentIds.length === 0 });
+    });
   }
 }
 

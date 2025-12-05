@@ -693,7 +693,7 @@ const RealtimeEventsPage: React.FC = () => {
   };
 
   // Calculate time difference
-  const getTimeDiff = (current: Date, previous?: Date): string => {
+  const getTimeDiff = (current: string | Date, previous?: string | Date): string => {
     if (!previous) return '';
     const diff = dayjs(current).diff(dayjs(previous), 'second');
     if (diff < 60) return `${diff}s`;
@@ -940,28 +940,7 @@ const RealtimeEventsPage: React.FC = () => {
             sx={{
               flex: 1,
               overflowY: 'auto',
-            // Chat-style scrollbar
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'transparent',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-            },
-            '&::-webkit-scrollbar-thumb:active': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-            },
-            scrollbarWidth: 'thin',
-            scrollbarColor: theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.2) transparent'
-              : 'rgba(0, 0, 0, 0.2) transparent',
-          }}>
+            }}>
             {loading ? (
               <Box sx={{ textAlign: 'center', py: 4 }}>
                 <Typography variant="caption" color="text.secondary">{t('common.loading')}</Typography>
@@ -1004,163 +983,163 @@ const RealtimeEventsPage: React.FC = () => {
                   const isChanged = changedGroupKeys.has(group.timestamp);
 
                   return (
-                  <TimelineItem key={group.timestamp}>
-                    <TimelineSeparator>
-                      <TimelineDot
-                        sx={{
-                          bgcolor: 'transparent',
-                          boxShadow: 'none',
-                          p: 0,
-                          m: 0,
-                          position: 'relative',
-                        }}
-                      >
-                        {/* Outer glow ring */}
-                        <Box
+                    <TimelineItem key={group.timestamp}>
+                      <TimelineSeparator>
+                        <TimelineDot
                           sx={{
-                            position: 'absolute',
-                            width: 56,
-                            height: 56,
-                            borderRadius: '50%',
-                            bgcolor: alpha(theme.palette.primary.main, 0.1),
-                            animation: 'pulse 2s ease-in-out infinite',
-                            '@keyframes pulse': {
-                              '0%, 100%': {
-                                transform: 'scale(1)',
-                                opacity: 0.5,
-                              },
-                              '50%': {
-                                transform: 'scale(1.1)',
-                                opacity: 0.3,
-                              },
-                            },
-                          }}
-                        />
-                        {/* Main circle */}
-                        <Box
-                          sx={{
+                            bgcolor: 'transparent',
+                            boxShadow: 'none',
+                            p: 0,
+                            m: 0,
                             position: 'relative',
-                            width: 48,
-                            height: 48,
-                            borderRadius: '50%',
-                            bgcolor: 'primary.main',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '0.875rem',
-                            fontWeight: 700,
-                            color: 'primary.contrastText',
-                            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
-                            border: 4,
-                            borderColor: 'background.paper',
-                            transition: 'all 0.3s ease',
-                            animation: isChanged ? 'rumble 0.6s ease-out' : 'none',
-                            '@keyframes rumble': {
-                              '0%, 100%': {
-                                transform: 'translate(0, 0) scale(1)',
-                              },
-                              '10%': {
-                                transform: 'translate(-2px, -1px) scale(1.05)',
-                              },
-                              '20%': {
-                                transform: 'translate(2px, 1px) scale(1.05)',
-                              },
-                              '30%': {
-                                transform: 'translate(-2px, 1px) scale(1.05)',
-                              },
-                              '40%': {
-                                transform: 'translate(2px, -1px) scale(1.05)',
-                              },
-                              '50%': {
-                                transform: 'translate(-1px, -1px) scale(1.03)',
-                              },
-                              '60%': {
-                                transform: 'translate(1px, 1px) scale(1.03)',
-                              },
-                              '70%': {
-                                transform: 'translate(-1px, 1px) scale(1.02)',
-                              },
-                              '80%': {
-                                transform: 'translate(1px, -1px) scale(1.02)',
-                              },
-                              '90%': {
-                                transform: 'translate(-1px, 0) scale(1.01)',
-                              },
-                            },
-                            '&:hover': {
-                              transform: 'scale(1.1)',
-                              boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.5)}`,
-                            },
                           }}
                         >
-                          {group.count}
-                        </Box>
-                      </TimelineDot>
-                      {index < timelineGroups.length - 1 && (
-                        <TimelineConnector sx={{ minHeight: 50 }} />
-                      )}
-                    </TimelineSeparator>
-                    <TimelineContent sx={{ pt: 1.5 }}>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: 'block',
-                          mb: 1.5,
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          color: 'text.primary',
-                          letterSpacing: '0.5px',
-                        }}
-                      >
-                        {group.timeLabel}
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
-                        {Array.from(new Set(group.events.map(e => e.action))).slice(0, 3).map((action, idx) => (
-                          <Chip
-                            key={action}
-                            label={action}
-                            size="small"
+                          {/* Outer glow ring */}
+                          <Box
                             sx={{
-                              height: 26,
-                              fontSize: '0.7rem',
-                              fontWeight: 500,
-                              bgcolor: theme.palette.mode === 'dark'
-                                ? alpha(theme.palette.primary.main, 0.15)
-                                : alpha(theme.palette.primary.main, 0.08),
-                              color: theme.palette.mode === 'dark' ? 'primary.light' : 'primary.dark',
-                              border: 1,
-                              borderColor: theme.palette.mode === 'dark'
-                                ? alpha(theme.palette.primary.main, 0.3)
-                                : alpha(theme.palette.primary.main, 0.2),
-                              '& .MuiChip-label': { px: 1.5 },
-                              transition: 'all 0.2s ease',
-                              '&:hover': {
-                                bgcolor: theme.palette.mode === 'dark'
-                                  ? alpha(theme.palette.primary.main, 0.25)
-                                  : alpha(theme.palette.primary.main, 0.15),
-                                transform: 'translateY(-2px)',
-                                boxShadow: 1,
+                              position: 'absolute',
+                              width: 56,
+                              height: 56,
+                              borderRadius: '50%',
+                              bgcolor: alpha(theme.palette.primary.main, 0.1),
+                              animation: 'pulse 2s ease-in-out infinite',
+                              '@keyframes pulse': {
+                                '0%, 100%': {
+                                  transform: 'scale(1)',
+                                  opacity: 0.5,
+                                },
+                                '50%': {
+                                  transform: 'scale(1.1)',
+                                  opacity: 0.3,
+                                },
                               },
                             }}
                           />
-                        ))}
-                        {Array.from(new Set(group.events.map(e => e.action))).length > 3 && (
-                          <Chip
-                            label={`+${Array.from(new Set(group.events.map(e => e.action))).length - 3}`}
-                            size="small"
+                          {/* Main circle */}
+                          <Box
                             sx={{
-                              height: 26,
-                              fontSize: '0.7rem',
-                              fontWeight: 600,
-                              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
-                              color: 'text.secondary',
-                              '& .MuiChip-label': { px: 1 },
+                              position: 'relative',
+                              width: 48,
+                              height: 48,
+                              borderRadius: '50%',
+                              bgcolor: 'primary.main',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '0.875rem',
+                              fontWeight: 700,
+                              color: 'primary.contrastText',
+                              boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
+                              border: 4,
+                              borderColor: 'background.paper',
+                              transition: 'all 0.3s ease',
+                              animation: isChanged ? 'rumble 0.6s ease-out' : 'none',
+                              '@keyframes rumble': {
+                                '0%, 100%': {
+                                  transform: 'translate(0, 0) scale(1)',
+                                },
+                                '10%': {
+                                  transform: 'translate(-2px, -1px) scale(1.05)',
+                                },
+                                '20%': {
+                                  transform: 'translate(2px, 1px) scale(1.05)',
+                                },
+                                '30%': {
+                                  transform: 'translate(-2px, 1px) scale(1.05)',
+                                },
+                                '40%': {
+                                  transform: 'translate(2px, -1px) scale(1.05)',
+                                },
+                                '50%': {
+                                  transform: 'translate(-1px, -1px) scale(1.03)',
+                                },
+                                '60%': {
+                                  transform: 'translate(1px, 1px) scale(1.03)',
+                                },
+                                '70%': {
+                                  transform: 'translate(-1px, 1px) scale(1.02)',
+                                },
+                                '80%': {
+                                  transform: 'translate(1px, -1px) scale(1.02)',
+                                },
+                                '90%': {
+                                  transform: 'translate(-1px, 0) scale(1.01)',
+                                },
+                              },
+                              '&:hover': {
+                                transform: 'scale(1.1)',
+                                boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.5)}`,
+                              },
                             }}
-                          />
+                          >
+                            {group.count}
+                          </Box>
+                        </TimelineDot>
+                        {index < timelineGroups.length - 1 && (
+                          <TimelineConnector sx={{ minHeight: 50 }} />
                         )}
-                      </Box>
-                    </TimelineContent>
-                  </TimelineItem>
+                      </TimelineSeparator>
+                      <TimelineContent sx={{ pt: 1.5 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            display: 'block',
+                            mb: 1.5,
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            color: 'text.primary',
+                            letterSpacing: '0.5px',
+                          }}
+                        >
+                          {group.timeLabel}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+                          {Array.from(new Set(group.events.map(e => e.action))).slice(0, 3).map((action, idx) => (
+                            <Chip
+                              key={action}
+                              label={action}
+                              size="small"
+                              sx={{
+                                height: 26,
+                                fontSize: '0.7rem',
+                                fontWeight: 500,
+                                bgcolor: theme.palette.mode === 'dark'
+                                  ? alpha(theme.palette.primary.main, 0.15)
+                                  : alpha(theme.palette.primary.main, 0.08),
+                                color: theme.palette.mode === 'dark' ? 'primary.light' : 'primary.dark',
+                                border: 1,
+                                borderColor: theme.palette.mode === 'dark'
+                                  ? alpha(theme.palette.primary.main, 0.3)
+                                  : alpha(theme.palette.primary.main, 0.2),
+                                '& .MuiChip-label': { px: 1.5 },
+                                transition: 'all 0.2s ease',
+                                '&:hover': {
+                                  bgcolor: theme.palette.mode === 'dark'
+                                    ? alpha(theme.palette.primary.main, 0.25)
+                                    : alpha(theme.palette.primary.main, 0.15),
+                                  transform: 'translateY(-2px)',
+                                  boxShadow: 1,
+                                },
+                              }}
+                            />
+                          ))}
+                          {Array.from(new Set(group.events.map(e => e.action))).length > 3 && (
+                            <Chip
+                              label={`+${Array.from(new Set(group.events.map(e => e.action))).length - 3}`}
+                              size="small"
+                              sx={{
+                                height: 26,
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+                                color: 'text.secondary',
+                                '& .MuiChip-label': { px: 1 },
+                              }}
+                            />
+                          )}
+                        </Box>
+                      </TimelineContent>
+                    </TimelineItem>
                   );
                 })}
               </Timeline>
@@ -1256,27 +1235,6 @@ const RealtimeEventsPage: React.FC = () => {
               flex: 1,
               overflowY: 'auto',
               p: 2,
-              // Chat-style scrollbar
-              '&::-webkit-scrollbar': {
-                width: '8px',
-              },
-              '&::-webkit-scrollbar-track': {
-                background: 'transparent',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-                borderRadius: '4px',
-              },
-              '&::-webkit-scrollbar-thumb:hover': {
-                background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-              },
-              '&::-webkit-scrollbar-thumb:active': {
-                background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-              },
-              scrollbarWidth: 'thin',
-              scrollbarColor: theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.2) transparent'
-                : 'rgba(0, 0, 0, 0.2) transparent',
             }}
           >
             {loading ? (
@@ -1443,32 +1401,11 @@ const RealtimeEventsPage: React.FC = () => {
           <Box sx={{
             flex: 1,
             overflowY: 'auto',
-            // Chat-style scrollbar
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'transparent',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-            },
-            '&::-webkit-scrollbar-thumb:active': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-            },
-            scrollbarWidth: 'thin',
-            scrollbarColor: theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.2) transparent'
-              : 'rgba(0, 0, 0, 0.2) transparent',
           }}>
             {/* Stats Cards */}
             <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-              <Grid container spacing={1}>
-                <Grid item xs={4}>
+              <Stack direction="row" spacing={1}>
+                <Box sx={{ flex: 1 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -1486,8 +1423,8 @@ const RealtimeEventsPage: React.FC = () => {
                       {t('realtimeEvents.stats.events')}
                     </Typography>
                   </Paper>
-                </Grid>
-                <Grid item xs={4}>
+                </Box>
+                <Box sx={{ flex: 1 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -1505,8 +1442,8 @@ const RealtimeEventsPage: React.FC = () => {
                       {t('realtimeEvents.stats.users')}
                     </Typography>
                   </Paper>
-                </Grid>
-                <Grid item xs={4}>
+                </Box>
+                <Box sx={{ flex: 1 }}>
                   <Paper
                     elevation={0}
                     sx={{
@@ -1524,8 +1461,8 @@ const RealtimeEventsPage: React.FC = () => {
                       {t('realtimeEvents.stats.types')}
                     </Typography>
                   </Paper>
-                </Grid>
-              </Grid>
+                </Box>
+              </Stack>
             </Box>
 
             {/* Top Events List */}
@@ -1632,212 +1569,191 @@ const RealtimeEventsPage: React.FC = () => {
             flex: 1,
             overflowY: 'auto',
             p: 2,
-            // Chat-style scrollbar
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'transparent',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-            },
-            '&::-webkit-scrollbar-thumb:active': {
-              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-            },
-            scrollbarWidth: 'thin',
-            scrollbarColor: theme.palette.mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.2) transparent'
-              : 'rgba(0, 0, 0, 0.2) transparent',
           }}>
             {selectedEvent && (
               <Stack spacing={2}>
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t('realtimeEvents.eventType')}
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                  <Chip
-                    label={selectedEvent.action}
-                    sx={{
-                      bgcolor: alpha(getEventColor(selectedEvent.action), 0.1),
-                      color: getEventColor(selectedEvent.action),
-                      fontWeight: 600,
-                    }}
-                  />
-                  {selectedEvent.entityType && (
-                    <Chip label={selectedEvent.entityType} variant="outlined" />
-                  )}
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    {t('realtimeEvents.eventType')}
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                    <Chip
+                      label={selectedEvent.action}
+                      sx={{
+                        bgcolor: alpha(getEventColor(selectedEvent.action), 0.1),
+                        color: getEventColor(selectedEvent.action),
+                        fontWeight: 600,
+                      }}
+                    />
+                    {selectedEvent.entityType && (
+                      <Chip label={selectedEvent.entityType} variant="outlined" />
+                    )}
+                  </Box>
                 </Box>
-              </Box>
 
-              <Divider />
+                <Divider />
 
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t('realtimeEvents.timestamp')}
-                </Typography>
-                <Typography variant="body1" sx={{ mt: 0.5 }}>
-                  {formatDateTimeDetailed(selectedEvent.createdAt)}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  ({dayjs.utc(selectedEvent.createdAt).tz(getStoredTimezone()).fromNow()})
-                </Typography>
-              </Box>
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    {t('realtimeEvents.timestamp')}
+                  </Typography>
+                  <Typography variant="body1" sx={{ mt: 0.5 }}>
+                    {formatDateTimeDetailed(selectedEvent.createdAt)}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    ({dayjs.utc(selectedEvent.createdAt).tz(getStoredTimezone()).fromNow()})
+                  </Typography>
+                </Box>
 
-              <Divider />
+                <Divider />
 
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t('realtimeEvents.user')}
-                </Typography>
-                <Typography variant="body1" sx={{ mt: 0.5 }}>
-                  {selectedEvent.user?.name || 'N/A'}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {selectedEvent.user?.email || 'System'}
-                </Typography>
-              </Box>
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    {t('realtimeEvents.user')}
+                  </Typography>
+                  <Typography variant="body1" sx={{ mt: 0.5 }}>
+                    {selectedEvent.user?.name || 'N/A'}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {selectedEvent.user?.email || 'System'}
+                  </Typography>
+                </Box>
 
-              <Divider />
+                <Divider />
 
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t('realtimeEvents.ipAddress')}
-                </Typography>
-                <Typography variant="body1" sx={{ mt: 0.5 }}>
-                  {selectedEvent.ipAddress || 'N/A'}
-                </Typography>
-              </Box>
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    {t('realtimeEvents.ipAddress')}
+                  </Typography>
+                  <Typography variant="body1" sx={{ mt: 0.5 }}>
+                    {selectedEvent.ipAddress || 'N/A'}
+                  </Typography>
+                </Box>
 
-              {selectedEvent.entityId && (
-                <>
-                  <Divider />
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">
-                      {t('realtimeEvents.resource')}
-                    </Typography>
-                    <Typography variant="body1" sx={{ mt: 0.5 }}>
-                      {selectedEvent.entityType} #{selectedEvent.entityId}
-                    </Typography>
-                  </Box>
-                </>
-              )}
+                {selectedEvent.entityId && (
+                  <>
+                    <Divider />
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('realtimeEvents.resource')}
+                      </Typography>
+                      <Typography variant="body1" sx={{ mt: 0.5 }}>
+                        {selectedEvent.entityType} #{selectedEvent.entityId}
+                      </Typography>
+                    </Box>
+                  </>
+                )}
 
-              {/* Show diff if both old and new values exist */}
-              {selectedEvent.oldValues && selectedEvent.newValues && (
-                <>
-                  <Divider />
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-                      {t('realtimeEvents.changes')}
-                    </Typography>
-                    <Paper sx={{
-                      mt: 0.5,
-                      bgcolor: 'background.default',
-                      overflow: 'hidden',
-                      '& pre': {
-                        fontSize: '0.75rem !important',
-                        fontFamily: 'monospace',
-                      },
-                      '& .diff-gutter': {
-                        minWidth: '30px',
-                      },
-                      '& .diff-code': {
-                        fontSize: '0.75rem',
-                      },
-                    }}>
-                      <ReactDiffViewer
-                        oldValue={JSON.stringify(selectedEvent.oldValues, null, 2)}
-                        newValue={JSON.stringify(selectedEvent.newValues, null, 2)}
-                        splitView={false}
-                        compareMethod={DiffMethod.WORDS}
-                        useDarkTheme={theme.palette.mode === 'dark'}
-                        hideLineNumbers={false}
-                        showDiffOnly={true}
-                        styles={{
-                          variables: {
-                            dark: {
-                              diffViewerBackground: theme.palette.background.default,
-                              addedBackground: alpha(theme.palette.success.main, 0.2),
-                              addedColor: theme.palette.success.contrastText,
-                              removedBackground: alpha(theme.palette.error.main, 0.2),
-                              removedColor: theme.palette.error.contrastText,
-                              wordAddedBackground: alpha(theme.palette.success.main, 0.4),
-                              wordRemovedBackground: alpha(theme.palette.error.main, 0.4),
-                              gutterBackground: theme.palette.background.paper,
-                              gutterColor: theme.palette.text.secondary,
+                {/* Show diff if both old and new values exist */}
+                {selectedEvent.oldValues && selectedEvent.newValues && (
+                  <>
+                    <Divider />
+                    <Box>
+                      <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                        {t('realtimeEvents.changes')}
+                      </Typography>
+                      <Paper sx={{
+                        mt: 0.5,
+                        bgcolor: 'background.default',
+                        overflow: 'hidden',
+                        '& pre': {
+                          fontSize: '0.75rem !important',
+                          fontFamily: 'monospace',
+                        },
+                        '& .diff-gutter': {
+                          minWidth: '30px',
+                        },
+                        '& .diff-code': {
+                          fontSize: '0.75rem',
+                        },
+                      }}>
+                        <ReactDiffViewer
+                          oldValue={JSON.stringify(selectedEvent.oldValues, null, 2)}
+                          newValue={JSON.stringify(selectedEvent.newValues, null, 2)}
+                          splitView={false}
+                          compareMethod={DiffMethod.WORDS}
+                          useDarkTheme={theme.palette.mode === 'dark'}
+                          hideLineNumbers={false}
+                          showDiffOnly={true}
+                          styles={{
+                            variables: {
+                              dark: {
+                                diffViewerBackground: theme.palette.background.default,
+                                addedBackground: alpha(theme.palette.success.main, 0.2),
+                                addedColor: theme.palette.success.contrastText,
+                                removedBackground: alpha(theme.palette.error.main, 0.2),
+                                removedColor: theme.palette.error.contrastText,
+                                wordAddedBackground: alpha(theme.palette.success.main, 0.4),
+                                wordRemovedBackground: alpha(theme.palette.error.main, 0.4),
+                                gutterBackground: theme.palette.background.paper,
+                                gutterColor: theme.palette.text.secondary,
+                              },
+                              light: {
+                                diffViewerBackground: theme.palette.background.default,
+                                addedBackground: alpha(theme.palette.success.main, 0.1),
+                                addedColor: theme.palette.text.primary,
+                                removedBackground: alpha(theme.palette.error.main, 0.1),
+                                removedColor: theme.palette.text.primary,
+                                wordAddedBackground: alpha(theme.palette.success.main, 0.3),
+                                wordRemovedBackground: alpha(theme.palette.error.main, 0.3),
+                                gutterBackground: theme.palette.background.paper,
+                                gutterColor: theme.palette.text.secondary,
+                              },
                             },
-                            light: {
-                              diffViewerBackground: theme.palette.background.default,
-                              addedBackground: alpha(theme.palette.success.main, 0.1),
-                              addedColor: theme.palette.text.primary,
-                              removedBackground: alpha(theme.palette.error.main, 0.1),
-                              removedColor: theme.palette.text.primary,
-                              wordAddedBackground: alpha(theme.palette.success.main, 0.3),
-                              wordRemovedBackground: alpha(theme.palette.error.main, 0.3),
-                              gutterBackground: theme.palette.background.paper,
-                              gutterColor: theme.palette.text.secondary,
-                            },
-                          },
-                        }}
-                      />
-                    </Paper>
-                  </Box>
-                </>
-              )}
+                          }}
+                        />
+                      </Paper>
+                    </Box>
+                  </>
+                )}
 
-              {/* Show only old values if new values don't exist */}
-              {selectedEvent.oldValues && !selectedEvent.newValues && (
-                <>
-                  <Divider />
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">
-                      {t('realtimeEvents.oldValues')}
-                    </Typography>
-                    <Paper sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}>
-                      <pre style={{ margin: 0, fontSize: '0.75rem', overflow: 'auto' }}>
-                        {JSON.stringify(selectedEvent.oldValues, null, 2)}
-                      </pre>
-                    </Paper>
-                  </Box>
-                </>
-              )}
+                {/* Show only old values if new values don't exist */}
+                {selectedEvent.oldValues && !selectedEvent.newValues && (
+                  <>
+                    <Divider />
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('realtimeEvents.oldValues')}
+                      </Typography>
+                      <Paper sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}>
+                        <pre style={{ margin: 0, fontSize: '0.75rem', overflow: 'auto' }}>
+                          {JSON.stringify(selectedEvent.oldValues, null, 2)}
+                        </pre>
+                      </Paper>
+                    </Box>
+                  </>
+                )}
 
-              {/* Show only new values if old values don't exist */}
-              {!selectedEvent.oldValues && selectedEvent.newValues && (
-                <>
-                  <Divider />
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">
-                      {t('realtimeEvents.newValues')}
-                    </Typography>
-                    <Paper sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}>
-                      <pre style={{ margin: 0, fontSize: '0.75rem', overflow: 'auto' }}>
-                        {JSON.stringify(selectedEvent.newValues, null, 2)}
-                      </pre>
-                    </Paper>
-                  </Box>
-                </>
-              )}
+                {/* Show only new values if old values don't exist */}
+                {!selectedEvent.oldValues && selectedEvent.newValues && (
+                  <>
+                    <Divider />
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('realtimeEvents.newValues')}
+                      </Typography>
+                      <Paper sx={{ p: 1, mt: 0.5, bgcolor: 'background.default' }}>
+                        <pre style={{ margin: 0, fontSize: '0.75rem', overflow: 'auto' }}>
+                          {JSON.stringify(selectedEvent.newValues, null, 2)}
+                        </pre>
+                      </Paper>
+                    </Box>
+                  </>
+                )}
 
-              {selectedEvent.userAgent && (
-                <>
-                  <Divider />
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">
-                      {t('realtimeEvents.userAgent')}
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 0.5, wordBreak: 'break-all' }}>
-                      {selectedEvent.userAgent}
-                    </Typography>
-                  </Box>
-                </>
-              )}
+                {selectedEvent.userAgent && (
+                  <>
+                    <Divider />
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('realtimeEvents.userAgent')}
+                      </Typography>
+                      <Typography variant="body2" sx={{ mt: 0.5, wordBreak: 'break-all' }}>
+                        {selectedEvent.userAgent}
+                      </Typography>
+                    </Box>
+                  </>
+                )}
               </Stack>
             )}
           </Box>
