@@ -1,6 +1,7 @@
 import express from 'express';
-import { authenticate, requireAdmin } from '../../middleware/auth';
+import { authenticate, requireAdmin, requirePermission } from '../../middleware/auth';
 import { environmentContextMiddleware } from '../../middleware/environmentMiddleware';
+import { PERMISSIONS } from '../../types/permissions';
 
 // Import all admin-related route modules
 import adminRoutes from './admin';
@@ -57,39 +58,93 @@ router.use(requireAdmin as any);
 // Apply environment context middleware to set current environment from X-Environment-Id header
 router.use(environmentContextMiddleware as any);
 
-// Mount all other admin routes
+// Mount all other admin routes with permission checks
+// Dashboard and stats - no special permission required (admin role is enough)
 router.use('/', adminRoutes);
-router.use('/users', userRoutes);
-router.use('/whitelist', whitelistRoutes);
-router.use('/ip-whitelist', ipWhitelistRoutes);
-router.use('/client-versions', clientVersionRoutes);
-router.use('/audit-logs', auditLogRoutes);
-router.use('/tags', tagRoutes);
-router.use('/message-templates', messageTemplateRoutes);
-router.use('/translation', translationRoutes);
-router.use('/vars', varsRoutes);
-router.use('/game-worlds', gameWorldRoutes);
-router.use('/api-tokens', apiTokenRoutes);
-router.use('/campaigns', campaignRoutes);
-router.use('/context-fields', contextFieldRoutes);
-router.use('/platform-defaults', platformDefaultRoutes);
-router.use('/remote-config', remoteConfigRoutes);
-router.use('/remote-config-v2', remoteConfigV2Routes);
-router.use('/environments', environmentRoutes);
-router.use('/jobs', jobRoutes);
-router.use('/maintenance', maintenanceRoutes);
-router.use('/invitations', invitationRoutes);
-router.use('/crash-events', crashEventRoutes);
-router.use('/console', consoleRoutes);
-router.use('/surveys', surveyRoutes);
-router.use('/reward-templates', rewardTemplateRoutes);
-router.use('/service-notices', serviceNoticeRoutes);
-router.use('/ingame-popup-notices', ingamePopupNoticeRoutes);
-router.use('/monitoring/alerts', monitoringAlertRoutes);
 
-router.use('/planning-data', planningDataRoutes);
-router.use('/coupon-settings', couponSettingsRoutes);
-router.use('/data-management', dataManagementRoutes);
-router.use('/banners', bannerRoutes);
+// User management - requires users.view or users.manage permission
+router.use('/users', requirePermission([PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE]) as any, userRoutes);
+
+// Security routes - requires security.view or security.manage permission
+router.use('/whitelist', requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any, whitelistRoutes);
+router.use('/ip-whitelist', requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any, ipWhitelistRoutes);
+router.use('/api-tokens', requirePermission([PERMISSIONS.SECURITY_VIEW, PERMISSIONS.SECURITY_MANAGE]) as any, apiTokenRoutes);
+
+// Client versions - requires client-versions.view or client-versions.manage permission
+router.use('/client-versions', requirePermission([PERMISSIONS.CLIENT_VERSIONS_VIEW, PERMISSIONS.CLIENT_VERSIONS_MANAGE]) as any, clientVersionRoutes);
+
+// Audit logs - requires audit-logs.view permission
+router.use('/audit-logs', requirePermission(PERMISSIONS.AUDIT_LOGS_VIEW) as any, auditLogRoutes);
+
+// Tags - requires tags.view or tags.manage permission
+router.use('/tags', requirePermission([PERMISSIONS.TAGS_VIEW, PERMISSIONS.TAGS_MANAGE]) as any, tagRoutes);
+
+// Translation and vars (part of remote config)
+router.use('/message-templates', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, messageTemplateRoutes);
+router.use('/translation', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, translationRoutes);
+// vars (KV) - no permission required, used by many components for basic data like platform, channels
+router.use('/vars', varsRoutes);
+
+// Game worlds - requires game-worlds.view or game-worlds.manage permission
+router.use('/game-worlds', requirePermission([PERMISSIONS.GAME_WORLDS_VIEW, PERMISSIONS.GAME_WORLDS_MANAGE]) as any, gameWorldRoutes);
+
+// Campaigns (part of remote config)
+router.use('/campaigns', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, campaignRoutes);
+
+// Context fields (part of remote config)
+router.use('/context-fields', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, contextFieldRoutes);
+
+// Platform defaults (part of remote config)
+router.use('/platform-defaults', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, platformDefaultRoutes);
+
+// Remote config - requires remote-config.view or remote-config.manage permission
+router.use('/remote-config', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, remoteConfigRoutes);
+router.use('/remote-config-v2', requirePermission([PERMISSIONS.REMOTE_CONFIG_VIEW, PERMISSIONS.REMOTE_CONFIG_MANAGE]) as any, remoteConfigV2Routes);
+
+// Environments - no permission required for listing (returns only user's accessible environments)
+// Managing environments (create/update/delete) requires permission check inside routes
+router.use('/environments', environmentRoutes);
+
+// Jobs and scheduler - requires scheduler.view or scheduler.manage permission
+router.use('/jobs', requirePermission([PERMISSIONS.SCHEDULER_VIEW, PERMISSIONS.SCHEDULER_MANAGE]) as any, jobRoutes);
+
+// Maintenance - requires maintenance.view or maintenance.manage permission
+router.use('/maintenance', requirePermission([PERMISSIONS.MAINTENANCE_VIEW, PERMISSIONS.MAINTENANCE_MANAGE]) as any, maintenanceRoutes);
+
+// Invitations (part of user management)
+router.use('/invitations', requirePermission([PERMISSIONS.USERS_VIEW, PERMISSIONS.USERS_MANAGE]) as any, invitationRoutes);
+
+// Crash events - requires crash-events.view permission
+router.use('/crash-events', requirePermission(PERMISSIONS.CRASH_EVENTS_VIEW) as any, crashEventRoutes);
+
+// Console - requires console.access permission
+router.use('/console', requirePermission(PERMISSIONS.CONSOLE_ACCESS) as any, consoleRoutes);
+
+// Surveys - requires surveys.view or surveys.manage permission
+router.use('/surveys', requirePermission([PERMISSIONS.SURVEYS_VIEW, PERMISSIONS.SURVEYS_MANAGE]) as any, surveyRoutes);
+
+// Reward templates - requires reward-templates.view or reward-templates.manage permission
+router.use('/reward-templates', requirePermission([PERMISSIONS.REWARD_TEMPLATES_VIEW, PERMISSIONS.REWARD_TEMPLATES_MANAGE]) as any, rewardTemplateRoutes);
+
+// Service notices - requires service-notices.view or service-notices.manage permission
+router.use('/service-notices', requirePermission([PERMISSIONS.SERVICE_NOTICES_VIEW, PERMISSIONS.SERVICE_NOTICES_MANAGE]) as any, serviceNoticeRoutes);
+
+// Ingame popup notices - requires ingame-popup-notices.view or ingame-popup-notices.manage permission
+router.use('/ingame-popup-notices', requirePermission([PERMISSIONS.INGAME_POPUP_NOTICES_VIEW, PERMISSIONS.INGAME_POPUP_NOTICES_MANAGE]) as any, ingamePopupNoticeRoutes);
+
+// Monitoring alerts - requires monitoring.view permission
+router.use('/monitoring/alerts', requirePermission(PERMISSIONS.MONITORING_VIEW) as any, monitoringAlertRoutes);
+
+// Planning data - requires planning-data.view or planning-data.manage permission
+router.use('/planning-data', requirePermission([PERMISSIONS.PLANNING_DATA_VIEW, PERMISSIONS.PLANNING_DATA_MANAGE]) as any, planningDataRoutes);
+
+// Coupon settings - requires coupons.view or coupons.manage permission
+router.use('/coupon-settings', requirePermission([PERMISSIONS.COUPONS_VIEW, PERMISSIONS.COUPONS_MANAGE]) as any, couponSettingsRoutes);
+
+// Data management - requires data-management.view or data-management.manage permission
+router.use('/data-management', requirePermission([PERMISSIONS.DATA_MANAGEMENT_VIEW, PERMISSIONS.DATA_MANAGEMENT_MANAGE]) as any, dataManagementRoutes);
+
+// Banners - requires banners.view or banners.manage permission
+router.use('/banners', requirePermission([PERMISSIONS.BANNERS_VIEW, PERMISSIONS.BANNERS_MANAGE]) as any, bannerRoutes);
 
 export default router;

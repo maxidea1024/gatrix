@@ -194,6 +194,13 @@ class ApiService {
           }
         }
 
+        // Handle 403 Forbidden - just set error message, don't redirect automatically
+        // Redirecting on every 403 causes issues during initial load when some APIs may fail
+        // Individual pages should handle 403 errors appropriately
+        if (error.response?.status === 403) {
+          error.message = '접근 권한이 없습니다.';
+        }
+
         // Enhance error message for better user experience
         if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
           error.message = '서버 응답 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.';
@@ -203,8 +210,6 @@ class ApiService {
           error.message = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
         } else if (error.response?.status === 404) {
           error.message = '요청한 리소스를 찾을 수 없습니다.';
-        } else if (error.response?.status === 403) {
-          error.message = '접근 권한이 없습니다.';
         }
 
         return Promise.reject(error);

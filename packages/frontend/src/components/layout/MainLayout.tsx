@@ -84,11 +84,13 @@ import TimezoneSelector from '../common/TimezoneSelector';
 import EnvironmentSelector from '@/components/EnvironmentSelector';
 import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
+import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { computeMaintenanceStatus, getMaintenanceStatusDisplay, MaintenanceStatusType } from '@/utils/maintenanceStatusUtils';
 import moment from 'moment';
-import { getMenuCategories } from '@/config/navigation';
+import { getMenuCategories, MenuItem, MenuCategory } from '@/config/navigation';
 import mailService from '@/services/mailService';
+import { Permission } from '@/types/permissions';
 
 // Sidebar width is now dynamic
 
@@ -137,10 +139,59 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [avatarImageError, setAvatarImageError] = useState(false);
 
   const location = useLocation();
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, hasPermission } = useAuth();
   const { toggleTheme, mode, isDark } = useCustomTheme();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { environments, isLoading: environmentsLoading } = useEnvironment();
+
+  // Check if admin user has environment access
+  const hasEnvironmentAccess = isAdmin() && !environmentsLoading && environments.length > 0;
+
+  // Filter menu items based on permissions
+  const canAccessMenuItem = useCallback((item: MenuItem): boolean => {
+    // Check admin-only restriction
+    if (item.adminOnly && !hasEnvironmentAccess) {
+      return false;
+    }
+    // Check permission-based access
+    if (item.requiredPermission) {
+      const permissions = Array.isArray(item.requiredPermission)
+        ? item.requiredPermission
+        : [item.requiredPermission];
+      return hasPermission(permissions as Permission[]);
+    }
+    return true;
+  }, [hasEnvironmentAccess, hasPermission]);
+
+  const filterMenuItems = useCallback((items: MenuItem[]): MenuItem[] => {
+    return items.filter(item => {
+      if (!canAccessMenuItem(item)) {
+        return false;
+      }
+      // If item has children, filter them too
+      if (item.children) {
+        const filteredChildren = filterMenuItems(item.children);
+        // Only show parent if it has accessible children
+        return filteredChildren.length > 0;
+      }
+      return true;
+    }).map(item => {
+      if (item.children) {
+        return { ...item, children: filterMenuItems(item.children) };
+      }
+      return item;
+    });
+  }, [canAccessMenuItem]);
+
+  // Get filtered menu categories
+  const getFilteredMenuCategories = useCallback((): MenuCategory[] => {
+    const categories = getMenuCategories(isAdmin());
+    return categories.map(category => ({
+      ...category,
+      children: filterMenuItems(category.children)
+    })).filter(category => category.children.length > 0);
+  }, [isAdmin, filterMenuItems]);
 
   // Mail notification state
   const [unreadMailCount, setUnreadMailCount] = useState(0);
@@ -152,8 +203,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const maintenanceUpdatedBySSE = useRef(false);
   const maintenanceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initial load
+  // Initial load - only for admin users with environment access
   useEffect(() => {
+    // Skip maintenance status check for users without environment access
+    if (!hasEnvironmentAccess) {
+      return;
+    }
+
     let cancelled = false;
     maintenanceService.getStatus().then(({ isUnderMaintenance, detail }) => {
       if (cancelled) return;
@@ -166,7 +222,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       setMaintenanceStatus({ isMaintenance: false, status: 'inactive', detail: null });
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [hasEnvironmentAccess]);
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -774,7 +830,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           }}
         >
           {/* Show main categories */}
-          {getMenuCategories(isAdmin()).map((category) => {
+          {getFilteredMenuCategories().map((category) => {
             const categoryButton = (
               <ListItemButton
                 key={category.id}

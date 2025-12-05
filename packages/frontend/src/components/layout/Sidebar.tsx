@@ -138,6 +138,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
   const effectiveIsAdmin = isAdmin() && hasEnvironmentAccess;
   const menuCategories = getMenuCategories(effectiveIsAdmin);
 
+  // Debug logging - will be removed after fix is confirmed
+  React.useEffect(() => {
+    console.log('[Sidebar] Debug state:', {
+      isAdmin: isAdmin(),
+      environmentsLoading,
+      environmentsCount: environments.length,
+      hasEnvironmentAccess,
+      effectiveIsAdmin,
+      menuCategoriesCount: menuCategories.length,
+      menuCategoryIds: menuCategories.map(c => c.id),
+    });
+  }, [isAdmin, environmentsLoading, environments.length, hasEnvironmentAccess, effectiveIsAdmin, menuCategories]);
+
   const handleItemClick = (item: MenuItem) => {
     if (item.path) {
       // Open external links in a new tab
@@ -189,6 +202,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
   const canAccessItem = (item: MenuItem): boolean => {
     // Check admin-only restriction
     if (item.adminOnly && !effectiveIsAdmin) {
+      console.log(`[Sidebar] ${item.text} - adminOnly but not effectiveIsAdmin`);
       return false;
     }
 
@@ -197,9 +211,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
       const permissions = Array.isArray(item.requiredPermission)
         ? item.requiredPermission
         : [item.requiredPermission];
-      return hasPermission(permissions as Permission[]);
+      const result = hasPermission(permissions as Permission[]);
+      console.log(`[Sidebar] ${item.text} - requiredPermission: ${JSON.stringify(permissions)}, hasPermission: ${result}`);
+      return result;
     }
 
+    console.log(`[Sidebar] ${item.text} - no requiredPermission, returning true`);
     return true;
   };
 

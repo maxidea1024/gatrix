@@ -36,7 +36,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [permissions, setPermissions] = useState<Permission[]>([]);
-  const [permissionsLoading, setPermissionsLoading] = useState(false);
+  // Start with true so menus are hidden until permissions are loaded
+  const [permissionsLoading, setPermissionsLoading] = useState(true);
 
   const isAuthenticated = !!user;
 
@@ -174,22 +175,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Check if user has a specific permission or any of the permissions
   const hasPermission = useCallback((permission: Permission | Permission[]): boolean => {
+    console.log(`[hasPermission] Checking: ${JSON.stringify(permission)}`);
+    console.log(`[hasPermission] isAuthenticated: ${isAuthenticated}, user: ${user?.email}, role: ${user?.role}`);
+    console.log(`[hasPermission] permissionsLoading: ${permissionsLoading}, permissions: ${JSON.stringify(permissions)}`);
+
     if (!isAuthenticated || !user) {
+      console.log(`[hasPermission] Return false - not authenticated or no user`);
       return false;
     }
 
     // Admin users with role 'admin' need to have permissions assigned
     if (user.role !== 'admin') {
+      console.log(`[hasPermission] Return false - not admin role`);
       return false;
     }
 
     // While permissions are loading, return false to prevent showing menus prematurely
     if (permissionsLoading) {
+      console.log(`[hasPermission] Return false - permissions loading`);
       return false;
     }
 
     const requiredPermissions = Array.isArray(permission) ? permission : [permission];
-    return requiredPermissions.some(p => permissions.includes(p));
+    const result = requiredPermissions.some(p => permissions.includes(p));
+    console.log(`[hasPermission] Result: ${result}`);
+    return result;
   }, [isAuthenticated, user, permissions, permissionsLoading]);
 
   // Fetch permissions when user changes
@@ -198,6 +208,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       fetchPermissions(user.id);
     } else {
       setPermissions([]);
+      setPermissionsLoading(false); // Non-admin users don't need permission loading
     }
   }, [user?.id, user?.role, fetchPermissions]);
 

@@ -2310,6 +2310,7 @@
     "generic": "An error occurred",
     "loadError": "loadError",
     "networkError": "Network error",
+    "noPermissionAdminOnly": "You do not have permission to access this page. Required permissions have not been granted.",
     "notFound": "Not found",
     "saveError": "saveError",
     "serverError": "Server error",
