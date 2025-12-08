@@ -1,0 +1,43 @@
+{
+  ":FollowEventReward": {
+    ":type": {
+      "id": "key",
+      "group": "number",
+      "type": "number",
+      "stratDate": "string",
+      "endDate": "string",
+      "rewadrFixedId": "number"
+    },
+    ":required": {
+      "group": 1,
+      "type": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "FollowEventReward": {
+    "100210001": {
+      "id": 100210001,
+      "group": 4001,
+      "type": 1
+    },
+    "100210002": {
+      "id": 100210002,
+      "group": 4002,
+      "type": 1,
+      "stratDate": "2025/11/01/00:00:00",
+      "endDate": "2025/12/31/23:59:59",
+      "rewadrFixedId": 95998653
+    },
+    "100210003": {
+      "id": 100210003,
+      "group": 4002,
+      "type": 2,
+      "stratDate": "2025/11/01/00:00:00",
+      "endDate": "2025/12/31/23:59:59",
+      "rewadrFixedId": 95998654
+    }
+  }
+}

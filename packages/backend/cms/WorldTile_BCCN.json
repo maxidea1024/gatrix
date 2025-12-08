@@ -734,10 +734,10 @@
       "name": "해초 지형",
       "tileColor": "a28cff",
       "tileUseType": 6,
-      "moveLockVal": 30,
+      "moveLockVal": 25,
       "moveBuffVal": 0,
       "baseWorldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_BCCN",
-      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_BCCN_30",
+      "worldmapMoveLockTexture": "T_GEN_Worldmap_OceanSeaweedTile_BCCN_25",
       "moveLockText": "돌파 {0} 이상이 필요합니다.\n더 좋은 충각이나 닻을 장착하세요.",
       "moveBuffText": "돌파 {0} 이상 필요"
     },

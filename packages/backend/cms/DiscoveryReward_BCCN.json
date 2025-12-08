@@ -1,0 +1,44 @@
+{
+  ":DiscoveryReward": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "desc": "text",
+      "sortingOrder": "number",
+      "explorationNoteType": "number",
+      "explorationNoteTargetType": "number",
+      "explorationNoteTarget": [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number"
+      ],
+      "reward": "number"
+    },
+    ":required": {
+      "name": 1,
+      "reward": 1
+    },
+    ":min": {
+      "reward": 94000000
+    },
+    ":max": {
+      "reward": 95999999
+    },
+    ":enum": {},
+    ":links": {
+      "reward": [
+        "RewardFixed"
+      ]
+    }
+  },
+  "DiscoveryReward": {}
+}

@@ -1121,7 +1121,11 @@
         "Id": 100003,
         "Value": 8000
       },
-      "shipDockSlotCouponVal": 160
+      "shipDockSlotCouponVal": 160,
+      "presetSlotPoint": {
+        "Id": 100004,
+        "Value": 3000
+      }
     },
     "20": {
       "id": 20,
@@ -1155,7 +1159,11 @@
         "Id": 100003,
         "Value": 10000
       },
-      "shipDockSlotCouponVal": 200
+      "shipDockSlotCouponVal": 200,
+      "presetSlotPoint": {
+        "Id": 100004,
+        "Value": 3000
+      }
     },
     "21": {
       "id": 21,
@@ -1189,7 +1197,11 @@
         "Id": 100004,
         "Value": 1000
       },
-      "shipDockSlotCouponVal": 200
+      "shipDockSlotCouponVal": 200,
+      "presetSlotPoint": {
+        "Id": 100004,
+        "Value": 3000
+      }
     },
     "22": {
       "id": 22,
@@ -1223,7 +1235,11 @@
         "Id": 100004,
         "Value": 1500
       },
-      "shipDockSlotCouponVal": 200
+      "shipDockSlotCouponVal": 200,
+      "presetSlotPoint": {
+        "Id": 100004,
+        "Value": 3000
+      }
     },
     "23": {
       "id": 23,
@@ -1257,7 +1273,11 @@
         "Id": 100004,
         "Value": 2000
       },
-      "shipDockSlotCouponVal": 200
+      "shipDockSlotCouponVal": 200,
+      "presetSlotPoint": {
+        "Id": 100004,
+        "Value": 3000
+      }
     },
     "24": {
       "id": 24,
@@ -1291,7 +1311,11 @@
         "Id": 100004,
         "Value": 2500
       },
-      "shipDockSlotCouponVal": 200
+      "shipDockSlotCouponVal": 200,
+      "presetSlotPoint": {
+        "Id": 100004,
+        "Value": 3000
+      }
     },
     "25": {
       "id": 25,
@@ -1325,7 +1349,11 @@
         "Id": 100004,
         "Value": 3000
       },
-      "shipDockSlotCouponVal": 200
+      "shipDockSlotCouponVal": 200,
+      "presetSlotPoint": {
+        "Id": 100004,
+        "Value": 3000
+      }
     },
     "26": {
       "id": 26,
@@ -1359,7 +1387,11 @@
         "Id": 100004,
         "Value": 3500
       },
-      "shipDockSlotCouponVal": 200
+      "shipDockSlotCouponVal": 200,
+      "presetSlotPoint": {
+        "Id": 100004,
+        "Value": 3000
+      }
     },
     "27": {
       "id": 27,
@@ -1393,7 +1425,11 @@
         "Id": 100004,
         "Value": 4000
       },
-      "shipDockSlotCouponVal": 200
+      "shipDockSlotCouponVal": 200,
+      "presetSlotPoint": {
+        "Id": 100004,
+        "Value": 3000
+      }
     },
     "28": {
       "id": 28,
@@ -1427,7 +1463,11 @@
         "Id": 100004,
         "Value": 4500
       },
-      "shipDockSlotCouponVal": 200
+      "shipDockSlotCouponVal": 200,
+      "presetSlotPoint": {
+        "Id": 100004,
+        "Value": 3000
+      }
     },
     "29": {
       "id": 29,
@@ -2203,7 +2243,12 @@
         "Value": 120
       },
       "shipPartSlotCouponVal": 12,
-      "shipSlotCouponVal": 12
+      "shipSlotCouponVal": 12,
+      "shipDockSlotPoint": {
+        "Id": 100004,
+        "Value": 5500
+      },
+      "shipDockSlotCouponVal": 550
     },
     "52": {
       "id": 52,
@@ -2231,7 +2276,12 @@
         "Value": 120
       },
       "shipPartSlotCouponVal": 12,
-      "shipSlotCouponVal": 12
+      "shipSlotCouponVal": 12,
+      "shipDockSlotPoint": {
+        "Id": 100004,
+        "Value": 6000
+      },
+      "shipDockSlotCouponVal": 600
     },
     "53": {
       "id": 53,
@@ -2259,7 +2309,12 @@
         "Value": 120
       },
       "shipPartSlotCouponVal": 12,
-      "shipSlotCouponVal": 12
+      "shipSlotCouponVal": 12,
+      "shipDockSlotPoint": {
+        "Id": 100004,
+        "Value": 6500
+      },
+      "shipDockSlotCouponVal": 650
     },
     "54": {
       "id": 54,
@@ -2287,7 +2342,12 @@
         "Value": 120
       },
       "shipPartSlotCouponVal": 12,
-      "shipSlotCouponVal": 12
+      "shipSlotCouponVal": 12,
+      "shipDockSlotPoint": {
+        "Id": 100004,
+        "Value": 7000
+      },
+      "shipDockSlotCouponVal": 700
     },
     "55": {
       "id": 55,
@@ -2315,7 +2375,12 @@
         "Value": 120
       },
       "shipPartSlotCouponVal": 12,
-      "shipSlotCouponVal": 12
+      "shipSlotCouponVal": 12,
+      "shipDockSlotPoint": {
+        "Id": 100004,
+        "Value": 7500
+      },
+      "shipDockSlotCouponVal": 750
     },
     "56": {
       "id": 56,
@@ -2343,7 +2408,12 @@
         "Value": 120
       },
       "shipPartSlotCouponVal": 12,
-      "shipSlotCouponVal": 12
+      "shipSlotCouponVal": 12,
+      "shipDockSlotPoint": {
+        "Id": 100004,
+        "Value": 8000
+      },
+      "shipDockSlotCouponVal": 800
     },
     "57": {
       "id": 57,
@@ -2371,7 +2441,12 @@
         "Value": 120
       },
       "shipPartSlotCouponVal": 12,
-      "shipSlotCouponVal": 12
+      "shipSlotCouponVal": 12,
+      "shipDockSlotPoint": {
+        "Id": 100004,
+        "Value": 8500
+      },
+      "shipDockSlotCouponVal": 850
     },
     "58": {
       "id": 58,
@@ -2399,7 +2474,12 @@
         "Value": 120
       },
       "shipPartSlotCouponVal": 12,
-      "shipSlotCouponVal": 12
+      "shipSlotCouponVal": 12,
+      "shipDockSlotPoint": {
+        "Id": 100004,
+        "Value": 9000
+      },
+      "shipDockSlotCouponVal": 900
     },
     "59": {
       "id": 59,
@@ -2427,7 +2507,12 @@
         "Value": 120
       },
       "shipPartSlotCouponVal": 12,
-      "shipSlotCouponVal": 12
+      "shipSlotCouponVal": 12,
+      "shipDockSlotPoint": {
+        "Id": 100004,
+        "Value": 9500
+      },
+      "shipDockSlotCouponVal": 950
     },
     "60": {
       "id": 60,
@@ -2455,7 +2540,12 @@
         "Value": 120
       },
       "shipPartSlotCouponVal": 12,
-      "shipSlotCouponVal": 12
+      "shipSlotCouponVal": 12,
+      "shipDockSlotPoint": {
+        "Id": 100004,
+        "Value": 10000
+      },
+      "shipDockSlotCouponVal": 1000
     },
     "61": {
       "id": 61,
@@ -9196,7 +9286,12 @@
         "Id": 100003,
         "Value": 400
       },
-      "itemSlotCouponVal": 40
+      "itemSlotCouponVal": 40,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 200
+      },
+      "shipPartSlotCouponVal": 20
     },
     "302": {
       "id": 302,
@@ -9217,7 +9312,12 @@
         "Id": 100003,
         "Value": 400
       },
-      "itemSlotCouponVal": 40
+      "itemSlotCouponVal": 40,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 210
+      },
+      "shipPartSlotCouponVal": 21
     },
     "303": {
       "id": 303,
@@ -9238,7 +9338,12 @@
         "Id": 100003,
         "Value": 400
       },
-      "itemSlotCouponVal": 40
+      "itemSlotCouponVal": 40,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 220
+      },
+      "shipPartSlotCouponVal": 22
     },
     "304": {
       "id": 304,
@@ -9259,7 +9364,12 @@
         "Id": 100003,
         "Value": 400
       },
-      "itemSlotCouponVal": 40
+      "itemSlotCouponVal": 40,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 230
+      },
+      "shipPartSlotCouponVal": 23
     },
     "305": {
       "id": 305,
@@ -9280,7 +9390,12 @@
         "Id": 100003,
         "Value": 400
       },
-      "itemSlotCouponVal": 40
+      "itemSlotCouponVal": 40,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 240
+      },
+      "shipPartSlotCouponVal": 24
     },
     "306": {
       "id": 306,
@@ -9301,7 +9416,12 @@
         "Id": 100003,
         "Value": 400
       },
-      "itemSlotCouponVal": 40
+      "itemSlotCouponVal": 40,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 250
+      },
+      "shipPartSlotCouponVal": 25
     },
     "307": {
       "id": 307,
@@ -9322,7 +9442,12 @@
         "Id": 100003,
         "Value": 400
       },
-      "itemSlotCouponVal": 40
+      "itemSlotCouponVal": 40,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 260
+      },
+      "shipPartSlotCouponVal": 26
     },
     "308": {
       "id": 308,
@@ -9343,7 +9468,12 @@
         "Id": 100003,
         "Value": 400
       },
-      "itemSlotCouponVal": 40
+      "itemSlotCouponVal": 40,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 270
+      },
+      "shipPartSlotCouponVal": 27
     },
     "309": {
       "id": 309,
@@ -9364,7 +9494,12 @@
         "Id": 100003,
         "Value": 400
       },
-      "itemSlotCouponVal": 40
+      "itemSlotCouponVal": 40,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 280
+      },
+      "shipPartSlotCouponVal": 28
     },
     "310": {
       "id": 310,
@@ -9385,7 +9520,12 @@
         "Id": 100003,
         "Value": 400
       },
-      "itemSlotCouponVal": 40
+      "itemSlotCouponVal": 40,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 290
+      },
+      "shipPartSlotCouponVal": 29
     },
     "311": {
       "id": 311,
@@ -9406,7 +9546,12 @@
         "Id": 100003,
         "Value": 410
       },
-      "itemSlotCouponVal": 41
+      "itemSlotCouponVal": 41,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 300
+      },
+      "shipPartSlotCouponVal": 30
     },
     "312": {
       "id": 312,
@@ -9427,7 +9572,12 @@
         "Id": 100003,
         "Value": 410
       },
-      "itemSlotCouponVal": 41
+      "itemSlotCouponVal": 41,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 310
+      },
+      "shipPartSlotCouponVal": 31
     },
     "313": {
       "id": 313,
@@ -9448,7 +9598,12 @@
         "Id": 100003,
         "Value": 410
       },
-      "itemSlotCouponVal": 41
+      "itemSlotCouponVal": 41,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 320
+      },
+      "shipPartSlotCouponVal": 32
     },
     "314": {
       "id": 314,
@@ -9469,7 +9624,12 @@
         "Id": 100003,
         "Value": 410
       },
-      "itemSlotCouponVal": 41
+      "itemSlotCouponVal": 41,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 330
+      },
+      "shipPartSlotCouponVal": 33
     },
     "315": {
       "id": 315,
@@ -9490,7 +9650,12 @@
         "Id": 100003,
         "Value": 410
       },
-      "itemSlotCouponVal": 41
+      "itemSlotCouponVal": 41,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 340
+      },
+      "shipPartSlotCouponVal": 34
     },
     "316": {
       "id": 316,
@@ -9511,7 +9676,12 @@
         "Id": 100003,
         "Value": 410
       },
-      "itemSlotCouponVal": 41
+      "itemSlotCouponVal": 41,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 350
+      },
+      "shipPartSlotCouponVal": 35
     },
     "317": {
       "id": 317,
@@ -9532,7 +9702,12 @@
         "Id": 100003,
         "Value": 410
       },
-      "itemSlotCouponVal": 41
+      "itemSlotCouponVal": 41,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 360
+      },
+      "shipPartSlotCouponVal": 36
     },
     "318": {
       "id": 318,
@@ -9553,7 +9728,12 @@
         "Id": 100003,
         "Value": 410
       },
-      "itemSlotCouponVal": 41
+      "itemSlotCouponVal": 41,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 370
+      },
+      "shipPartSlotCouponVal": 37
     },
     "319": {
       "id": 319,
@@ -9574,7 +9754,12 @@
         "Id": 100003,
         "Value": 410
       },
-      "itemSlotCouponVal": 41
+      "itemSlotCouponVal": 41,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 380
+      },
+      "shipPartSlotCouponVal": 38
     },
     "320": {
       "id": 320,
@@ -9595,7 +9780,12 @@
         "Id": 100003,
         "Value": 410
       },
-      "itemSlotCouponVal": 41
+      "itemSlotCouponVal": 41,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 390
+      },
+      "shipPartSlotCouponVal": 39
     },
     "321": {
       "id": 321,
@@ -9616,7 +9806,12 @@
         "Id": 100003,
         "Value": 420
       },
-      "itemSlotCouponVal": 42
+      "itemSlotCouponVal": 42,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 400
+      },
+      "shipPartSlotCouponVal": 40
     },
     "322": {
       "id": 322,
@@ -9637,7 +9832,12 @@
         "Id": 100003,
         "Value": 420
       },
-      "itemSlotCouponVal": 42
+      "itemSlotCouponVal": 42,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 410
+      },
+      "shipPartSlotCouponVal": 41
     },
     "323": {
       "id": 323,
@@ -9658,7 +9858,12 @@
         "Id": 100003,
         "Value": 420
       },
-      "itemSlotCouponVal": 42
+      "itemSlotCouponVal": 42,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 420
+      },
+      "shipPartSlotCouponVal": 42
     },
     "324": {
       "id": 324,
@@ -9679,7 +9884,12 @@
         "Id": 100003,
         "Value": 420
       },
-      "itemSlotCouponVal": 42
+      "itemSlotCouponVal": 42,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 430
+      },
+      "shipPartSlotCouponVal": 43
     },
     "325": {
       "id": 325,
@@ -9700,7 +9910,12 @@
         "Id": 100003,
         "Value": 420
       },
-      "itemSlotCouponVal": 42
+      "itemSlotCouponVal": 42,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 440
+      },
+      "shipPartSlotCouponVal": 44
     },
     "326": {
       "id": 326,
@@ -9721,7 +9936,12 @@
         "Id": 100003,
         "Value": 420
       },
-      "itemSlotCouponVal": 42
+      "itemSlotCouponVal": 42,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 450
+      },
+      "shipPartSlotCouponVal": 45
     },
     "327": {
       "id": 327,
@@ -9742,7 +9962,12 @@
         "Id": 100003,
         "Value": 420
       },
-      "itemSlotCouponVal": 42
+      "itemSlotCouponVal": 42,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 460
+      },
+      "shipPartSlotCouponVal": 46
     },
     "328": {
       "id": 328,
@@ -9763,7 +9988,12 @@
         "Id": 100003,
         "Value": 420
       },
-      "itemSlotCouponVal": 42
+      "itemSlotCouponVal": 42,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 470
+      },
+      "shipPartSlotCouponVal": 47
     },
     "329": {
       "id": 329,
@@ -9784,7 +10014,12 @@
         "Id": 100003,
         "Value": 420
       },
-      "itemSlotCouponVal": 42
+      "itemSlotCouponVal": 42,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 480
+      },
+      "shipPartSlotCouponVal": 48
     },
     "330": {
       "id": 330,
@@ -9805,7 +10040,12 @@
         "Id": 100003,
         "Value": 420
       },
-      "itemSlotCouponVal": 42
+      "itemSlotCouponVal": 42,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 490
+      },
+      "shipPartSlotCouponVal": 49
     },
     "331": {
       "id": 331,
@@ -9826,7 +10066,12 @@
         "Id": 100003,
         "Value": 440
       },
-      "itemSlotCouponVal": 44
+      "itemSlotCouponVal": 44,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 500
+      },
+      "shipPartSlotCouponVal": 50
     },
     "332": {
       "id": 332,
@@ -9847,7 +10092,12 @@
         "Id": 100003,
         "Value": 440
       },
-      "itemSlotCouponVal": 44
+      "itemSlotCouponVal": 44,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 510
+      },
+      "shipPartSlotCouponVal": 51
     },
     "333": {
       "id": 333,
@@ -9868,7 +10118,12 @@
         "Id": 100003,
         "Value": 440
       },
-      "itemSlotCouponVal": 44
+      "itemSlotCouponVal": 44,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 520
+      },
+      "shipPartSlotCouponVal": 52
     },
     "334": {
       "id": 334,
@@ -9889,7 +10144,12 @@
         "Id": 100003,
         "Value": 440
       },
-      "itemSlotCouponVal": 44
+      "itemSlotCouponVal": 44,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 530
+      },
+      "shipPartSlotCouponVal": 53
     },
     "335": {
       "id": 335,
@@ -9910,7 +10170,12 @@
         "Id": 100003,
         "Value": 440
       },
-      "itemSlotCouponVal": 44
+      "itemSlotCouponVal": 44,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 540
+      },
+      "shipPartSlotCouponVal": 54
     },
     "336": {
       "id": 336,
@@ -9931,7 +10196,12 @@
         "Id": 100003,
         "Value": 440
       },
-      "itemSlotCouponVal": 44
+      "itemSlotCouponVal": 44,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 550
+      },
+      "shipPartSlotCouponVal": 55
     },
     "337": {
       "id": 337,
@@ -9952,7 +10222,12 @@
         "Id": 100003,
         "Value": 440
       },
-      "itemSlotCouponVal": 44
+      "itemSlotCouponVal": 44,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 560
+      },
+      "shipPartSlotCouponVal": 56
     },
     "338": {
       "id": 338,
@@ -9973,7 +10248,12 @@
         "Id": 100003,
         "Value": 440
       },
-      "itemSlotCouponVal": 44
+      "itemSlotCouponVal": 44,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 570
+      },
+      "shipPartSlotCouponVal": 57
     },
     "339": {
       "id": 339,
@@ -9994,7 +10274,12 @@
         "Id": 100003,
         "Value": 440
       },
-      "itemSlotCouponVal": 44
+      "itemSlotCouponVal": 44,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 580
+      },
+      "shipPartSlotCouponVal": 58
     },
     "340": {
       "id": 340,
@@ -10015,7 +10300,12 @@
         "Id": 100003,
         "Value": 440
       },
-      "itemSlotCouponVal": 44
+      "itemSlotCouponVal": 44,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 590
+      },
+      "shipPartSlotCouponVal": 59
     },
     "341": {
       "id": 341,
@@ -10036,7 +10326,12 @@
         "Id": 100003,
         "Value": 450
       },
-      "itemSlotCouponVal": 45
+      "itemSlotCouponVal": 45,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 600
+      },
+      "shipPartSlotCouponVal": 60
     },
     "342": {
       "id": 342,
@@ -10057,7 +10352,12 @@
         "Id": 100003,
         "Value": 450
       },
-      "itemSlotCouponVal": 45
+      "itemSlotCouponVal": 45,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 610
+      },
+      "shipPartSlotCouponVal": 61
     },
     "343": {
       "id": 343,
@@ -10078,7 +10378,12 @@
         "Id": 100003,
         "Value": 450
       },
-      "itemSlotCouponVal": 45
+      "itemSlotCouponVal": 45,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 620
+      },
+      "shipPartSlotCouponVal": 62
     },
     "344": {
       "id": 344,
@@ -10099,7 +10404,12 @@
         "Id": 100003,
         "Value": 450
       },
-      "itemSlotCouponVal": 45
+      "itemSlotCouponVal": 45,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 630
+      },
+      "shipPartSlotCouponVal": 63
     },
     "345": {
       "id": 345,
@@ -10120,7 +10430,12 @@
         "Id": 100003,
         "Value": 450
       },
-      "itemSlotCouponVal": 45
+      "itemSlotCouponVal": 45,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 640
+      },
+      "shipPartSlotCouponVal": 64
     },
     "346": {
       "id": 346,
@@ -10141,7 +10456,12 @@
         "Id": 100003,
         "Value": 450
       },
-      "itemSlotCouponVal": 45
+      "itemSlotCouponVal": 45,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 650
+      },
+      "shipPartSlotCouponVal": 65
     },
     "347": {
       "id": 347,
@@ -10162,7 +10482,12 @@
         "Id": 100003,
         "Value": 450
       },
-      "itemSlotCouponVal": 45
+      "itemSlotCouponVal": 45,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 660
+      },
+      "shipPartSlotCouponVal": 66
     },
     "348": {
       "id": 348,
@@ -10183,7 +10508,12 @@
         "Id": 100003,
         "Value": 450
       },
-      "itemSlotCouponVal": 45
+      "itemSlotCouponVal": 45,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 670
+      },
+      "shipPartSlotCouponVal": 67
     },
     "349": {
       "id": 349,
@@ -10204,7 +10534,12 @@
         "Id": 100003,
         "Value": 450
       },
-      "itemSlotCouponVal": 45
+      "itemSlotCouponVal": 45,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 680
+      },
+      "shipPartSlotCouponVal": 68
     },
     "350": {
       "id": 350,
@@ -10225,7 +10560,12 @@
         "Id": 100003,
         "Value": 450
       },
-      "itemSlotCouponVal": 45
+      "itemSlotCouponVal": 45,
+      "shipPartSlotPoint": {
+        "Id": 100004,
+        "Value": 690
+      },
+      "shipPartSlotCouponVal": 69
     },
     "351": {
       "id": 351,

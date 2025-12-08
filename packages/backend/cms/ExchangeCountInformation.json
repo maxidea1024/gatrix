@@ -1,0 +1,84 @@
+{
+  ":ExchangeCountInformation": {
+    ":type": {
+      "id": "key",
+      "group": "number",
+      "order": "number",
+      "exchangePageTooltip": "text",
+      "tooltipTextFormat": "text"
+    },
+    ":required": {
+      "group": 1,
+      "order": 1,
+      "exchangePageTooltip": 1,
+      "tooltipTextFormat": 1
+    },
+    ":min": {},
+    ":max": {}
+  },
+  "ExchangeCountInformation": {
+    "1": {
+      "id": 1,
+      "group": 100,
+      "order": 1,
+      "exchangePageTooltip": "{0} 우호도 {1} 달성",
+      "tooltipTextFormat": "경계"
+    },
+    "2": {
+      "id": 2,
+      "group": 100,
+      "order": 2,
+      "exchangePageTooltip": "{0} 우호도 {1} 달성",
+      "tooltipTextFormat": "보통"
+    },
+    "3": {
+      "id": 3,
+      "group": 100,
+      "order": 3,
+      "exchangePageTooltip": "{0} 우호도 {1} 달성",
+      "tooltipTextFormat": "신뢰"
+    },
+    "4": {
+      "id": 4,
+      "group": 100,
+      "order": 4,
+      "exchangePageTooltip": "{0} 우호도 {1} 달성",
+      "tooltipTextFormat": "우호"
+    },
+    "5": {
+      "id": 5,
+      "group": 200,
+      "order": 1,
+      "exchangePageTooltip": "교환 전략 전문 지식 LV {0} 달성",
+      "tooltipTextFormat": "8"
+    },
+    "6": {
+      "id": 6,
+      "group": 200,
+      "order": 2,
+      "exchangePageTooltip": "교환 전략 전문 지식 LV {0} 달성",
+      "tooltipTextFormat": "15"
+    },
+    "7": {
+      "id": 7,
+      "group": 200,
+      "order": 3,
+      "exchangePageTooltip": "교환 전략 전문 지식 LV {0} 달성",
+      "tooltipTextFormat": "26"
+    },
+    "8": {
+      "id": 8,
+      "group": 300,
+      "order": 1,
+      "exchangePageTooltip": "국가 교역 정책 LV {0}적용",
+      "tooltipTextFormat": "20"
+    },
+    "9": {
+      "id": 9,
+      "group": 400,
+      "order": 1,
+      "exchangePageTooltip": "{0} 구매",
+      "tooltipTextFormat": "교역의 가호 LV 3"
+    }
+  }
+}

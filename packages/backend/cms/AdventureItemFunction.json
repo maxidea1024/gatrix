@@ -608,7 +608,40 @@
         }
       ],
       "advSpcEff": [
-        77410006
+        77410013
+      ]
+    },
+    "77590009": {
+      "id": 77590009,
+      "type": 4,
+      "advStats": [
+        {
+          "Type": 2,
+          "MathSign": 1,
+          "Value": 5
+        },
+        {
+          "Type": 3,
+          "MathSign": 1,
+          "Value": 5
+        }
+      ],
+      "advSpcEff": [
+        77410014
+      ]
+    },
+    "77590010": {
+      "id": 77590010,
+      "type": 3,
+      "advStats": [
+        {
+          "Type": 2,
+          "MathSign": 1,
+          "Value": 5
+        }
+      ],
+      "advSpcEff": [
+        77410015
       ]
     }
   }

@@ -34,7 +34,7 @@
       "id": 0,
       "roomName": "조리실",
       "roomBG": "1",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "spine": [
         {
           "id": 1
@@ -52,7 +52,7 @@
       "id": 1,
       "roomName": "주조실",
       "roomBG": "1",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "spine": [
         {
           "id": 1

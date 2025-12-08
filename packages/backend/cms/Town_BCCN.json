@@ -395,17 +395,17 @@
         1000,
         30001,
         2001,
-        50001
+        40001
       ],
       "shopGroup": [
         1000,
-        2000,
         2900,
+        2000,
         3000,
         4000,
         4100,
         10001,
-        20001
+        15000
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -438,10 +438,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2108
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -503,17 +500,17 @@
         1000,
         30002,
         2002,
-        50001
+        40002
       ],
       "shopGroup": [
         1000,
-        2000,
         2900,
+        2000,
         3000,
         4000,
         4100,
         10001,
-        20002
+        15001
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -546,13 +543,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101,
-        2102,
-        2108,
-        2416
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -617,13 +608,13 @@
       ],
       "shopGroup": [
         1001,
-        2001,
         2500,
+        2001,
         3001,
         4000,
         4100,
         10002,
-        20003
+        15002
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -721,13 +712,13 @@
       ],
       "shopGroup": [
         1001,
-        2001,
         2500,
+        2001,
         3001,
         4000,
         4100,
         10002,
-        20004
+        15003
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -797,7 +788,7 @@
       "name": "고아",
       "mapName": "Town_Velhagoa_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001050,
@@ -828,13 +819,13 @@
       ],
       "shopGroup": [
         1051,
-        2051,
         2500,
+        2051,
         3051,
         4000,
         4100,
         10052,
-        20005
+        15004
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -901,7 +892,7 @@
       "name": "과테말라",
       "mapName": "Town_Guatemala_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001022,
@@ -931,8 +922,8 @@
       ],
       "shopGroup": [
         1092,
-        2092,
-        2500
+        2500,
+        2092
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -1000,7 +991,7 @@
       "name": "괌",
       "mapName": "Town_Hagatna_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001073,
@@ -1030,8 +1021,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -1124,12 +1115,13 @@
       "shipBuildGroup": 1008,
       "shipyardShopGroup": [
         1102,
-        30008
+        30008,
+        40008
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -1226,8 +1218,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -1293,7 +1285,7 @@
       "name": "나가사키",
       "mapName": "Town_Nagasaki_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001033,
@@ -1324,13 +1316,13 @@
       ],
       "shopGroup": [
         1071,
-        2071,
         2500,
+        2071,
         3071,
         4000,
         4100,
         10072,
-        20010
+        15010
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -1361,10 +1353,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2314
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -1398,7 +1387,7 @@
       "name": "나르비크",
       "mapName": "Town_Narvik_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001014,
@@ -1428,8 +1417,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -1523,12 +1512,13 @@
       "shipBuildGroup": 1012,
       "shipyardShopGroup": [
         1102,
-        30012
+        30012,
+        40012
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -1596,7 +1586,7 @@
       "name": "나탈",
       "mapName": "Town_Natal_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001025,
@@ -1626,8 +1616,8 @@
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -1721,18 +1711,17 @@
       "shipyardShopGroup": [
         1000,
         30014,
-        2014,
-        50010
+        2014
       ],
       "shopGroup": [
         1000,
-        2000,
         2500,
+        2000,
         3000,
         4000,
         4100,
         10001,
-        20014
+        15014
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -1766,10 +1755,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -1832,17 +1818,18 @@
       "shipyardShopGroup": [
         1001,
         30015,
-        2015
+        2015,
+        40015
       ],
       "shopGroup": [
         1001,
-        2001,
         2500,
+        2001,
         3001,
         4000,
         4100,
         10002,
-        20015
+        15015
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -1874,12 +1861,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102,
-        2107,
-        2312
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -1913,7 +1895,7 @@
       "name": "누탁",
       "mapName": "Town_Nutak_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001068,
@@ -1943,13 +1925,13 @@
       ],
       "shopGroup": [
         1102,
-        2102,
         2500,
+        2102,
         3102,
         4000,
         4100,
         10103,
-        20016
+        15016
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -2046,8 +2028,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -2081,10 +2063,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -2120,7 +2099,7 @@
       "name": "다바오",
       "mapName": "Town_Davao_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001018,
@@ -2150,8 +2129,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -2218,7 +2197,7 @@
       "name": "단수이",
       "mapName": "Town_OldTamsui_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001010,
@@ -2245,18 +2224,17 @@
       "shipyardShopGroup": [
         1060,
         30019,
-        2019,
-        50011
+        2019
       ],
       "shopGroup": [
         1060,
-        2060,
         2500,
+        2060,
         3060,
         4000,
         4100,
         10061,
-        20019
+        15019
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -2287,11 +2265,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2105,
-        2314
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -2353,12 +2327,13 @@
       "shipBuildGroup": 1020,
       "shipyardShopGroup": [
         1012,
-        30020
+        30020,
+        40020
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -2452,17 +2427,18 @@
       "shipyardShopGroup": [
         1011,
         30021,
-        2021
+        2021,
+        40021
       ],
       "shopGroup": [
         1011,
-        2011,
         2500,
+        2011,
         3011,
         4000,
         4100,
         10013,
-        20021
+        15021
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -2558,8 +2534,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -2591,10 +2567,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2312
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -2628,7 +2601,7 @@
       "name": "도파르",
       "mapName": "Town_Dhofar_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001087,
@@ -2658,8 +2631,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -2726,7 +2699,7 @@
       "name": "두알라",
       "mapName": "Town_Douala_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001026,
@@ -2749,15 +2722,15 @@
       "moneyTradeInvest": 10000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 9,
-      "shipBuildGroup": 1024,
+      "shipBuildGroup": 24,
       "shipyardShopGroup": [
         1032,
         30024
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -2825,7 +2798,7 @@
       "name": "디우",
       "mapName": "Town_Diu_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001007,
@@ -2855,8 +2828,8 @@
       ],
       "shopGroup": [
         1052,
-        2052,
-        2500
+        2500,
+        2052
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -2923,7 +2896,7 @@
       "name": "딕손",
       "mapName": "Town_Dikson_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001032,
@@ -2953,8 +2926,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -2985,10 +2958,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -3024,7 +2994,7 @@
       "name": "딜리",
       "mapName": "Town_Dili_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001067,
@@ -3054,8 +3024,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -3153,13 +3123,13 @@
       ],
       "shopGroup": [
         1001,
-        2001,
         2500,
+        2001,
         3001,
         4000,
         4100,
         10002,
-        20028
+        15028
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -3258,8 +3228,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -3355,17 +3325,17 @@
         1010,
         30030,
         2030,
-        50001
+        40030
       ],
       "shopGroup": [
         1010,
-        2010,
         2900,
+        2010,
         3010,
         4000,
         4100,
         10011,
-        20030
+        15030
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -3396,13 +3366,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102,
-        2106,
-        2107,
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -3436,7 +3400,7 @@
       "name": "롭부리",
       "mapName": "Town_Lopburi_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001054,
@@ -3466,13 +3430,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20031
+        15031
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -3540,7 +3504,7 @@
       "name": "루안다",
       "mapName": "Town_Luanda_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001079,
@@ -3563,7 +3527,7 @@
       "moneyTradeInvest": 20000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 9,
-      "shipBuildGroup": 1032,
+      "shipBuildGroup": 32,
       "shipyardShopGroup": [
         1031,
         30032,
@@ -3571,13 +3535,13 @@
       ],
       "shopGroup": [
         1031,
-        2031,
         2500,
+        2031,
         3031,
         4000,
         4100,
         10032,
-        20032
+        15032
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -3645,7 +3609,7 @@
       "name": "덕원",
       "mapName": "Town_DukWon_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001071,
@@ -3674,8 +3638,8 @@
       ],
       "shopGroup": [
         1082,
-        2082,
-        2500
+        2500,
+        2082
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -3771,13 +3735,13 @@
       ],
       "shopGroup": [
         1011,
-        2011,
         2500,
+        2011,
         3011,
         4000,
         4100,
         10013,
-        20034
+        15034
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -3875,8 +3839,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -3943,7 +3907,7 @@
       "name": "리마",
       "mapName": "Town_Lima_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001069,
@@ -3970,18 +3934,17 @@
       "shipyardShopGroup": [
         1090,
         30036,
-        2036,
-        50012
+        2036
       ],
       "shopGroup": [
         1090,
-        2090,
         2500,
+        2090,
         3090,
         4000,
         4100,
         10091,
-        20036
+        15036
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -4048,7 +4011,7 @@
       "name": "리우데자네이루",
       "mapName": "Town_RioDeJaneiro_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001055,
@@ -4078,8 +4041,8 @@
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -4110,10 +4073,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2108
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -4149,7 +4109,7 @@
       "name": "마닐라",
       "mapName": "Town_Manila_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001019,
@@ -4179,8 +4139,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -4211,11 +4171,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2109,
-        2315
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -4281,8 +4237,8 @@
       ],
       "shopGroup": [
         1002,
-        2002,
-        2500
+        2500,
+        2002
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -4377,8 +4333,8 @@
       ],
       "shopGroup": [
         1092,
-        2092,
-        2500
+        2500,
+        2092
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -4476,8 +4432,8 @@
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -4508,10 +4464,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -4574,18 +4527,17 @@
       "shipyardShopGroup": [
         1000,
         30042,
-        2042,
-        50013
+        2042
       ],
       "shopGroup": [
         1000,
-        2000,
         2500,
+        2000,
         3000,
         4000,
         4100,
         10001,
-        20042
+        15042
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -4618,11 +4570,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102,
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -4658,7 +4606,7 @@
       "name": "마사와",
       "mapName": "Town_Massawa_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001049,
@@ -4688,8 +4636,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -4756,7 +4704,7 @@
       "name": "마실리파트남",
       "mapName": "Town_Masulipatnam_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001004,
@@ -4786,8 +4734,8 @@
       ],
       "shopGroup": [
         1052,
-        2052,
-        2500
+        2500,
+        2052
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -4854,7 +4802,7 @@
       "name": "마카사르",
       "mapName": "Town_Makasar_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001003,
@@ -4884,8 +4832,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -4953,10 +4901,10 @@
       "name": "마카오",
       "mapName": "Town_Macao_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
-      "nationId": 10001031,
+      "nationId": 10001001,
       "disguiseType": 6,
       "disguiseBasePoint": 60,
       "disguiseBuffId": 38014000,
@@ -4984,13 +4932,13 @@
       ],
       "shopGroup": [
         1061,
-        2061,
         2500,
+        2061,
         3061,
         4000,
         4100,
         10062,
-        20046
+        15046
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -5021,13 +4969,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2109,
-        2312,
-        2420
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -5092,13 +5034,13 @@
       ],
       "shopGroup": [
         1001,
-        2001,
         2500,
+        2001,
         3001,
         4000,
         4100,
         10002,
-        20047
+        15047
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -5131,10 +5073,7 @@
       "tradeComboSetGroupSortOrder": 6,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -5168,7 +5107,7 @@
       "name": "말라카",
       "mapName": "Town_Malacca_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001027,
@@ -5195,18 +5134,17 @@
       "shipyardShopGroup": [
         1040,
         30048,
-        2048,
-        50014
+        2048
       ],
       "shopGroup": [
         1040,
-        2040,
         2500,
+        2040,
         3040,
         4000,
         4100,
         10041,
-        20048
+        15048
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -5238,10 +5176,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2312
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -5277,7 +5212,7 @@
       "name": "말린디",
       "mapName": "Town_Malindi_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001083,
@@ -5307,8 +5242,8 @@
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -5405,13 +5340,13 @@
       ],
       "shopGroup": [
         1092,
-        2092,
         2500,
+        2092,
         3092,
         4000,
         4100,
         10093,
-        20050
+        15050
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -5478,7 +5413,7 @@
       "name": "모가디슈",
       "mapName": "Town_Mogadishu_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001057,
@@ -5508,8 +5443,8 @@
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -5577,7 +5512,7 @@
       "name": "모잠비크",
       "mapName": "Town_Mocambique_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001020,
@@ -5608,13 +5543,13 @@
       ],
       "shopGroup": [
         1031,
-        2031,
         2500,
+        2031,
         3031,
         4000,
         4100,
         10032,
-        20052
+        15052
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -5682,7 +5617,7 @@
       "name": "몸바사",
       "mapName": "Town_Mombasa_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001015,
@@ -5712,13 +5647,13 @@
       ],
       "shopGroup": [
         1032,
-        2032,
         2500,
+        2032,
         3032,
         4000,
         4100,
         10033,
-        20053
+        15053
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -5815,13 +5750,13 @@
       ],
       "shopGroup": [
         1002,
-        2002,
         2500,
+        2002,
         3002,
         4000,
         4100,
         10003,
-        20054
+        15054
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -5854,11 +5789,7 @@
       "tradeComboSetGroupSortOrder": 7,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102,
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -5894,7 +5825,7 @@
       "name": "무스카트",
       "mapName": "Town_Muscat_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001063,
@@ -5925,13 +5856,13 @@
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20055
+        15055
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -6029,13 +5960,13 @@
       ],
       "shopGroup": [
         1001,
-        2001,
         2500,
+        2001,
         3001,
         4000,
         4100,
         10002,
-        20056
+        15056
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -6069,10 +6000,7 @@
       "tradeComboSetGroupSortOrder": 8,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -6132,17 +6060,18 @@
       "shipBuildGroup": 1057,
       "shipyardShopGroup": [
         1032,
-        30057
+        30057,
+        40057
       ],
       "shopGroup": [
         1032,
-        2032,
         2500,
+        2032,
         3032,
         4000,
         4100,
         10033,
-        20057
+        15057
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -6209,7 +6138,7 @@
       "name": "바스라",
       "mapName": "Town_Basra_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001042,
@@ -6240,13 +6169,13 @@
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20058
+        15058
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -6314,7 +6243,7 @@
       "name": "바이아",
       "mapName": "Town_Bahia_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001091,
@@ -6344,13 +6273,13 @@
       ],
       "shopGroup": [
         1102,
-        2102,
         2500,
+        2102,
         3102,
         4000,
         4100,
         10103,
-        20059
+        15059
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -6417,7 +6346,7 @@
       "name": "반다",
       "mapName": "Town_Banda_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001089,
@@ -6447,8 +6376,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -6515,7 +6444,7 @@
       "name": "반자르마신",
       "mapName": "Town_Banjarmasin_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001012,
@@ -6545,13 +6474,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20061
+        15061
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -6650,13 +6579,13 @@
       ],
       "shopGroup": [
         1001,
-        2001,
         2500,
+        2001,
         3001,
         4000,
         4100,
         10002,
-        20062
+        15062
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -6689,10 +6618,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -6726,7 +6652,7 @@
       "name": "발파라이소",
       "mapName": "Town_Valparaiso_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001069,
@@ -6756,8 +6682,8 @@
       ],
       "shopGroup": [
         1092,
-        2092,
-        2500
+        2500,
+        2092
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -6824,7 +6750,7 @@
       "name": "팡칼피낭",
       "mapName": "Town_PangkalPinang_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001012,
@@ -6854,8 +6780,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -6922,7 +6848,7 @@
       "name": "배로우",
       "mapName": "Town_Barrow_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001068,
@@ -6952,8 +6878,8 @@
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -7020,7 +6946,7 @@
       "name": "베냉",
       "mapName": "Town_Benin_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001035,
@@ -7043,15 +6969,15 @@
       "moneyTradeInvest": 10000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 9,
-      "shipBuildGroup": 1066,
+      "shipBuildGroup": 66,
       "shipyardShopGroup": [
         1032,
         30066
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -7146,18 +7072,17 @@
       "shipyardShopGroup": [
         1000,
         30067,
-        2067,
-        50015
+        2067
       ],
       "shopGroup": [
         1000,
-        2000,
         2500,
+        2000,
         3000,
         4000,
         4100,
         10001,
-        20067
+        15067
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -7190,10 +7115,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2418
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -7260,13 +7182,13 @@
       ],
       "shopGroup": [
         1091,
-        2091,
         2500,
+        2091,
         3091,
         4000,
         4100,
         10092,
-        20068
+        15068
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -7298,10 +7220,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -7360,15 +7279,16 @@
       "moneyTradeInvest": 10000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 0,
-      "shipBuildGroup": 69,
+      "shipBuildGroup": 1069,
       "shipyardShopGroup": [
         1012,
-        30069
+        30069,
+        40069
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -7467,13 +7387,13 @@
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20070
+        15070
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -7573,8 +7493,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -7644,7 +7564,7 @@
       "name": "벵겔라",
       "mapName": "Town_Benguela_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001079,
@@ -7667,15 +7587,15 @@
       "moneyTradeInvest": 10000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 9,
-      "shipBuildGroup": 1072,
+      "shipBuildGroup": 72,
       "shipyardShopGroup": [
         1032,
         30072
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -7774,13 +7694,13 @@
       ],
       "shopGroup": [
         1001,
-        2001,
         2500,
+        2001,
         3001,
         4000,
         4100,
         10002,
-        20073
+        15073
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -7811,13 +7731,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102,
-        2106,
-        2107,
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -7874,15 +7788,15 @@
       "moneyTradeInvest": 10000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 0,
-      "shipBuildGroup": 74,
+      "shipBuildGroup": 1074,
       "shipyardShopGroup": [
         1092,
         30074
       ],
       "shopGroup": [
         1092,
-        2092,
-        2500
+        2500,
+        2092
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -7913,10 +7827,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2106
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -7952,7 +7863,7 @@
       "name": "동래",
       "mapName": "Town_DongRae_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001071,
@@ -7982,13 +7893,13 @@
       ],
       "shopGroup": [
         1081,
-        2081,
         2500,
+        2081,
         3081,
         4000,
         4100,
         10082,
-        20075
+        15075
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -8019,10 +7930,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2109
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -8056,7 +7964,7 @@
       "name": "부에노스아이레스",
       "mapName": "Town_BuenosAires_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001072,
@@ -8086,8 +7994,8 @@
       ],
       "shopGroup": [
         1092,
-        2092,
-        2500
+        2500,
+        2092
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -8155,7 +8063,7 @@
       "name": "북경",
       "mapName": "Town_Beijing_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001031,
@@ -8182,18 +8090,17 @@
       "shipyardShopGroup": [
         1060,
         30077,
-        2077,
-        50001
+        2077
       ],
       "shopGroup": [
         1060,
-        2060,
         2900,
+        2060,
         3060,
         4000,
         4100,
         10061,
-        20077
+        15077
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -8224,12 +8131,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2109,
-        2312,
-        2420
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -8290,17 +8192,18 @@
       "shipyardShopGroup": [
         1011,
         30078,
-        2078
+        2078,
+        40078
       ],
       "shopGroup": [
         1011,
-        2011,
         2500,
+        2011,
         3011,
         4000,
         4100,
         10013,
-        20078
+        15078
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -8366,7 +8269,7 @@
       "name": "브루나이",
       "mapName": "Town_Brunei_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001040,
@@ -8396,8 +8299,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -8496,13 +8399,13 @@
       ],
       "shopGroup": [
         1011,
-        2011,
         2500,
+        2011,
         3011,
         4000,
         4100,
         10013,
-        20080
+        15080
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -8597,8 +8500,8 @@
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -8695,13 +8598,13 @@
       ],
       "shopGroup": [
         1012,
-        2012,
         2500,
+        2012,
         3012,
         4000,
         4100,
         10013,
-        20082
+        15082
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -8769,7 +8672,7 @@
       "name": "사마라이",
       "mapName": "Town_Samarai_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001093,
@@ -8799,8 +8702,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -8897,13 +8800,13 @@
       ],
       "shopGroup": [
         1002,
-        2002,
         2500,
+        2002,
         3002,
         4000,
         4100,
         10003,
-        20084
+        15084
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -8973,7 +8876,7 @@
       "name": "사카이",
       "mapName": "Town_Sacay_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001033,
@@ -9003,8 +8906,8 @@
       ],
       "shopGroup": [
         1072,
-        2072,
-        2500
+        2500,
+        2072
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -9100,13 +9003,13 @@
       ],
       "shopGroup": [
         1101,
-        2101,
         2500,
+        2101,
         3101,
         4000,
         4100,
         10102,
-        20086
+        15086
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -9203,13 +9106,13 @@
       ],
       "shopGroup": [
         1102,
-        2102,
         2500,
+        2102,
         3102,
         4000,
         4100,
         10103,
-        20087
+        15087
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -9303,12 +9206,13 @@
       "shipBuildGroup": 1088,
       "shipyardShopGroup": [
         1102,
-        30088
+        30088,
+        40088
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -9406,13 +9310,13 @@
       ],
       "shopGroup": [
         1002,
-        2002,
         2500,
+        2002,
         3002,
         4000,
         4100,
         10003,
-        20089
+        15089
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -9446,10 +9350,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -9483,7 +9384,7 @@
       "name": "상투메",
       "mapName": "Town_Saotome_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001079,
@@ -9506,15 +9407,15 @@
       "moneyTradeInvest": 10000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 9,
-      "shipBuildGroup": 1090,
+      "shipBuildGroup": 90,
       "shipyardShopGroup": [
         1032,
         30090
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -9610,17 +9511,17 @@
         1010,
         30091,
         2091,
-        50011
+        40091
       ],
       "shopGroup": [
         1010,
-        2010,
         2500,
+        2010,
         3010,
         4000,
         4100,
         10011,
-        20091
+        15091
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -9652,10 +9553,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2417
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -9691,7 +9589,7 @@
       "name": "오론",
       "mapName": "Town_Ohlone_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001044,
@@ -9721,8 +9619,8 @@
       ],
       "shopGroup": [
         1092,
-        2092,
-        2500
+        2500,
+        2092
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -9819,8 +9717,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -9915,17 +9813,18 @@
       "shipyardShopGroup": [
         1021,
         30094,
-        2094
+        2094,
+        40094
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20094
+        15094
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -10022,13 +9921,13 @@
       ],
       "shopGroup": [
         1031,
-        2031,
         2500,
+        2031,
         3031,
         4000,
         4100,
         10032,
-        20095
+        15095
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -10095,7 +9994,7 @@
       "name": "소코트라",
       "mapName": "Town_Hadiboh_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001087,
@@ -10125,13 +10024,13 @@
       ],
       "shopGroup": [
         1022,
-        2022,
         2500,
+        2022,
         3022,
         4000,
         4100,
         10023,
-        20096
+        15096
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -10198,7 +10097,7 @@
       "name": "소팔라",
       "mapName": "Town_Sofala_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001025,
@@ -10229,13 +10128,13 @@
       ],
       "shopGroup": [
         1031,
-        2031,
         2500,
+        2031,
         3031,
         4000,
         4100,
         10032,
-        20097
+        15097
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -10302,7 +10201,7 @@
       "name": "수라바야",
       "mapName": "Town_Surabaya_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001024,
@@ -10332,13 +10231,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20098
+        15098
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -10405,7 +10304,7 @@
       "name": "수에즈",
       "mapName": "Town_Suez_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001029,
@@ -10436,13 +10335,13 @@
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20099
+        15099
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -10540,13 +10439,13 @@
       ],
       "shopGroup": [
         1011,
-        2011,
         2500,
+        2011,
         3011,
         4000,
         4100,
         10013,
-        20100
+        15100
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -10644,13 +10543,13 @@
       ],
       "shopGroup": [
         1001,
-        2001,
         2500,
+        2001,
         3001,
         4000,
         4100,
         10002,
-        20101
+        15101
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -10719,7 +10618,7 @@
       "name": "시라즈",
       "mapName": "Town_Shiraz_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001042,
@@ -10749,8 +10648,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -10843,12 +10742,13 @@
       "shipBuildGroup": 1103,
       "shipyardShopGroup": [
         1032,
-        30103
+        30103,
+        40103
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -10915,7 +10815,7 @@
       "name": "실론",
       "mapName": "Town_Kotte_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001048,
@@ -10945,8 +10845,8 @@
       ],
       "shopGroup": [
         1052,
-        2052,
-        2500
+        2500,
+        2052
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -11013,7 +10913,7 @@
       "name": "아덴",
       "mapName": "Town_Aden_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001087,
@@ -11044,13 +10944,13 @@
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20105
+        15105
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -11081,10 +10981,7 @@
       "tradeComboSetGroupSortOrder": 6,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -11150,8 +11047,8 @@
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -11218,7 +11115,7 @@
       "name": "아르한겔스크",
       "mapName": "Town_Arkhangelsk_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001032,
@@ -11248,8 +11145,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -11343,17 +11240,18 @@
       "shipyardShopGroup": [
         1031,
         30108,
-        2108
+        2108,
+        40108
       ],
       "shopGroup": [
         1031,
-        2031,
         2500,
+        2031,
         3031,
         4000,
         4100,
         10032,
-        20108
+        15108
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -11450,13 +11348,13 @@
       ],
       "shopGroup": [
         1002,
-        2002,
         2500,
+        2002,
         3002,
         4000,
         4100,
         10003,
-        20109
+        15109
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -11521,7 +11419,7 @@
       "name": "아체",
       "mapName": "Town_Aceh_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001058,
@@ -11551,8 +11449,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -11619,7 +11517,7 @@
       "name": "아카풀코",
       "mapName": "Town_Acapulco_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001053,
@@ -11649,8 +11547,8 @@
       ],
       "shopGroup": [
         1092,
-        2092,
-        2500
+        2500,
+        2092
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -11681,10 +11579,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2416
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -11751,13 +11646,13 @@
       ],
       "shopGroup": [
         1000,
-        2000,
         2500,
+        2000,
         3000,
         4000,
         4100,
         10001,
-        20112
+        15112
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -11791,11 +11686,7 @@
       "tradeComboSetGroupSortOrder": 6,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103,
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -11855,12 +11746,13 @@
       "shipBuildGroup": 1113,
       "shipyardShopGroup": [
         1002,
-        30113
+        30113,
+        40113
       ],
       "shopGroup": [
         1002,
-        2002,
-        2500
+        2500,
+        2002
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -11929,7 +11821,7 @@
       "name": "타이난",
       "mapName": "Town_OldTainan_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001010,
@@ -11959,8 +11851,8 @@
       ],
       "shopGroup": [
         1062,
-        2062,
-        2500
+        2500,
+        2062
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -11991,11 +11883,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2105,
-        2315
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12062,13 +11950,13 @@
       ],
       "shopGroup": [
         1020,
-        2020,
         2500,
+        2020,
         3020,
         4000,
         4100,
         10021,
-        20115
+        15115
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -12102,10 +11990,7 @@
       "tradeComboSetGroupSortOrder": 7,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12144,7 +12029,7 @@
       "isReleased": true,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
-      "nationId": 10000005,
+      "nationId": 10001001,
       "disguiseType": 1,
       "disguiseBasePoint": 30,
       "disguiseBuffId": 38014000,
@@ -12168,17 +12053,18 @@
       "shipyardShopGroup": [
         1021,
         30116,
-        2116
+        2116,
+        40116
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20116
+        15116
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -12212,11 +12098,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103,
-        2107
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12250,7 +12132,7 @@
       "name": "암본",
       "mapName": "Town_Ambon_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001089,
@@ -12280,8 +12162,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -12376,17 +12258,17 @@
         1010,
         30118,
         2118,
-        50001
+        40118
       ],
       "shopGroup": [
         1010,
-        2010,
         2900,
+        2010,
         3010,
         4000,
         4100,
         10011,
-        20118
+        15118
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -12417,11 +12299,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2106,
-        2107
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12486,13 +12364,13 @@
       ],
       "shopGroup": [
         1011,
-        2011,
         2500,
+        2011,
         3011,
         4000,
         4100,
         10013,
-        20119
+        15119
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -12524,10 +12402,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12591,13 +12466,13 @@
       ],
       "shopGroup": [
         1022,
-        2022,
         2500,
+        2022,
         3022,
         4000,
         4100,
         10023,
-        20120
+        15120
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -12667,7 +12542,7 @@
       "name": "어널래스카",
       "mapName": "Town_Unalaska_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001060,
@@ -12697,8 +12572,8 @@
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -12765,7 +12640,7 @@
       "name": "에도",
       "mapName": "Town_Edo_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001033,
@@ -12792,18 +12667,17 @@
       "shipyardShopGroup": [
         1070,
         30122,
-        2122,
-        50001
+        2122
       ],
       "shopGroup": [
         1070,
-        2070,
         2900,
+        2070,
         3070,
         4000,
         4100,
         10071,
-        20122
+        15122
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -12834,13 +12708,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2109,
-        2314,
-        2315
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12905,13 +12773,13 @@
       ],
       "shopGroup": [
         1011,
-        2011,
         2500,
+        2011,
         3011,
         4000,
         4100,
         10013,
-        20123
+        15123
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -13002,12 +12870,13 @@
       "shipBuildGroup": 1124,
       "shipyardShopGroup": [
         1022,
-        30124
+        30124,
+        40124
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -13106,13 +12975,13 @@
       ],
       "shopGroup": [
         1011,
-        2011,
         2500,
+        2011,
         3011,
         4000,
         4100,
         10013,
-        20125
+        15125
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -13180,7 +13049,7 @@
       "name": "왕거누이",
       "mapName": "Town_Wanganui_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001023,
@@ -13210,13 +13079,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20126
+        15126
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -13283,7 +13152,7 @@
       "name": "우수아이아",
       "mapName": "Town_Ushuaia_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001062,
@@ -13313,8 +13182,8 @@
       ],
       "shopGroup": [
         1092,
-        2092,
-        2500
+        2500,
+        2092
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -13381,7 +13250,7 @@
       "name": "연운",
       "mapName": "Town_Lianyun_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001031,
@@ -13411,8 +13280,8 @@
       ],
       "shopGroup": [
         1062,
-        2062,
-        2500
+        2500,
+        2062
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -13443,12 +13312,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2105,
-        2315
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -13512,8 +13376,8 @@
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -13608,17 +13472,17 @@
         1020,
         30130,
         2130,
-        50001
+        40130
       ],
       "shopGroup": [
         1020,
-        2020,
         2900,
+        2020,
         3020,
         4000,
         4100,
         10021,
-        20130
+        15130
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -13651,12 +13515,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103,
-        2108,
-        2418
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -13720,8 +13579,8 @@
       ],
       "shopGroup": [
         1002,
-        2002,
-        2500
+        2500,
+        2002
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -13821,13 +13680,13 @@
       ],
       "shopGroup": [
         1101,
-        2101,
         2500,
+        2101,
         3101,
         4000,
         4100,
         10102,
-        20132
+        15132
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -13895,7 +13754,7 @@
       "name": "자카르타",
       "mapName": "Town_Jayakarta_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001092,
@@ -13926,13 +13785,13 @@
       ],
       "shopGroup": [
         1041,
-        2041,
         2500,
+        2041,
         3041,
         4000,
         4100,
         10042,
-        20133
+        15133
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -13963,10 +13822,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2110
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -14002,7 +13858,7 @@
       "name": "잔지바르",
       "mapName": "Town_Zanzibar_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001084,
@@ -14033,13 +13889,13 @@
       ],
       "shopGroup": [
         1031,
-        2031,
         2500,
+        2031,
         3031,
         4000,
         4100,
         10032,
-        20134
+        15134
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -14106,7 +13962,7 @@
       "name": "서안",
       "mapName": "Town_Xian_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001031,
@@ -14137,13 +13993,13 @@
       ],
       "shopGroup": [
         1060,
-        2060,
         2500,
+        2060,
         3060,
         4000,
         4100,
         10061,
-        20135
+        15135
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -14174,11 +14030,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2105
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -14240,17 +14092,17 @@
         1000,
         30136,
         2136,
-        50010
+        40136
       ],
       "shopGroup": [
         1000,
-        2000,
         2500,
+        2000,
         3000,
         4000,
         4100,
         10001,
-        20136
+        15136
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -14320,7 +14172,7 @@
       "name": "제다",
       "mapName": "Town_Jeddah_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001100,
@@ -14351,13 +14203,13 @@
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20137
+        15137
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -14424,7 +14276,7 @@
       "name": "중경",
       "mapName": "Town_Chongqing_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001031,
@@ -14455,13 +14307,13 @@
       ],
       "shopGroup": [
         1060,
-        2060,
         2500,
+        2060,
         3060,
         4000,
         4100,
         10061,
-        20138
+        15138
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -14492,11 +14344,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2105
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -14530,7 +14378,7 @@
       "name": "프레이노코르",
       "mapName": "Town_PreyNokor_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001082,
@@ -14560,13 +14408,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20139
+        15139
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -14634,10 +14482,10 @@
       "name": "천주",
       "mapName": "Town_Quanzhou_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
-      "nationId": 10001031,
+      "nationId": 10001001,
       "disguiseType": 6,
       "disguiseBasePoint": 60,
       "disguiseBuffId": 38014000,
@@ -14665,13 +14513,13 @@
       ],
       "shopGroup": [
         1061,
-        2061,
         2500,
+        2061,
         3061,
         4000,
         4100,
         10062,
-        20140
+        15140
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -14702,11 +14550,7 @@
       "tradeComboSetGroupSortOrder": 6,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2105
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -14770,13 +14614,13 @@
       ],
       "shopGroup": [
         1102,
-        2102,
         2500,
+        2102,
         3102,
         4000,
         4100,
         10103,
-        20141
+        15141
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -14807,11 +14651,7 @@
       "tradeComboSetGroupSortOrder": 7,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2419,
-        2420
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -14877,8 +14717,8 @@
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -14910,10 +14750,7 @@
       "tradeComboSetGroupSortOrder": 8,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -14949,7 +14786,7 @@
       "name": "카리비브",
       "mapName": "Town_Karibib_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001038,
@@ -14972,15 +14809,15 @@
       "moneyTradeInvest": 10000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 0,
-      "shipBuildGroup": 1143,
+      "shipBuildGroup": 143,
       "shipyardShopGroup": [
         1032,
         30143
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -15077,8 +14914,8 @@
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -15176,8 +15013,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -15243,7 +15080,7 @@
       "name": "카옌",
       "mapName": "Town_Cayenne_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001076,
@@ -15273,8 +15110,8 @@
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -15305,10 +15142,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2107
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -15371,17 +15205,18 @@
       "shipyardShopGroup": [
         1021,
         30147,
-        2147
+        2147,
+        40147
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20147
+        15147
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -15450,7 +15285,7 @@
       "name": "카카투와",
       "mapName": "Town_Kakadu_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001061,
@@ -15480,8 +15315,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -15548,7 +15383,7 @@
       "name": "도하",
       "mapName": "Town_Albidda_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001124,
@@ -15578,8 +15413,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -15677,8 +15512,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -15777,13 +15612,13 @@
       ],
       "shopGroup": [
         1001,
-        2001,
         2500,
+        2001,
         3001,
         4000,
         4100,
         10002,
-        20151
+        15151
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -15875,12 +15710,13 @@
       "shipBuildGroup": 1152,
       "shipyardShopGroup": [
         1002,
-        30152
+        30152,
+        40152
       ],
       "shopGroup": [
         1002,
-        2002,
-        2500
+        2500,
+        2002
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -15980,13 +15816,13 @@
       ],
       "shopGroup": [
         1002,
-        2002,
         2500,
+        2002,
         3002,
         4000,
         4100,
         10003,
-        20153
+        15153
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -16020,10 +15856,7 @@
       "tradeComboSetGroupSortOrder": 10,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -16059,7 +15892,7 @@
       "name": "캘리컷",
       "mapName": "Town_Kozhikode_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001041,
@@ -16086,18 +15919,17 @@
       "shipyardShopGroup": [
         1050,
         30154,
-        2154,
-        50012
+        2154
       ],
       "shopGroup": [
         1050,
-        2050,
         2500,
+        2050,
         3050,
         4000,
         4100,
         10051,
-        20154
+        15154
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -16164,7 +15996,7 @@
       "name": "캘커타",
       "mapName": "Town_Calcutta_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001037,
@@ -16194,13 +16026,13 @@
       ],
       "shopGroup": [
         1052,
-        2052,
         2500,
+        2052,
         3052,
         4000,
         4100,
         10053,
-        20155
+        15155
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -16268,7 +16100,7 @@
       "name": "케이프타운",
       "mapName": "Town_Kaapstad_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001078,
@@ -16291,7 +16123,7 @@
       "moneyTradeInvest": 20000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 0,
-      "shipBuildGroup": 1156,
+      "shipBuildGroup": 156,
       "shipyardShopGroup": [
         1031,
         30156,
@@ -16299,13 +16131,13 @@
       ],
       "shopGroup": [
         1031,
-        2031,
         2500,
+        2031,
         3031,
         4000,
         4100,
         10032,
-        20156
+        15156
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -16336,10 +16168,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2108
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -16375,7 +16204,7 @@
       "name": "켈리마느",
       "mapName": "Town_Quelimane_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001020,
@@ -16405,8 +16234,8 @@
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -16474,7 +16303,7 @@
       "name": "코친",
       "mapName": "Town_Cochin_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001041,
@@ -16504,8 +16333,8 @@
       ],
       "shopGroup": [
         1052,
-        2052,
-        2500
+        2500,
+        2052
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -16595,20 +16424,20 @@
       "moneyTradeInvest": 10000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 0,
-      "shipBuildGroup": 159,
+      "shipBuildGroup": 1159,
       "shipyardShopGroup": [
         1012,
         30159
       ],
       "shopGroup": [
         1012,
-        2012,
         2500,
+        2012,
         3012,
         4000,
         4100,
         10013,
-        20159
+        15159
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -16702,18 +16531,17 @@
       "shipyardShopGroup": [
         1010,
         30160,
-        2160,
-        50013
+        2160
       ],
       "shopGroup": [
         1010,
-        2010,
         2500,
+        2010,
         3010,
         4000,
         4100,
         10011,
-        20160
+        15160
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -16745,10 +16573,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2106
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -16784,7 +16609,7 @@
       "name": "코피아포",
       "mapName": "Town_Copiapo_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001069,
@@ -16814,13 +16639,13 @@
       ],
       "shopGroup": [
         1092,
-        2092,
         2500,
+        2092,
         3092,
         4000,
         4100,
         10093,
-        20161
+        15161
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -16887,7 +16712,7 @@
       "name": "가리",
       "mapName": "Town_Kgari_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001061,
@@ -16917,13 +16742,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20162
+        15162
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -16990,7 +16815,7 @@
       "name": "쿠칭",
       "mapName": "Town_Kucing_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001040,
@@ -17020,8 +16845,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -17088,7 +16913,7 @@
       "name": "킬와",
       "mapName": "Town_Kilwa_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001084,
@@ -17118,8 +16943,8 @@
       ],
       "shopGroup": [
         1032,
-        2032,
-        2500
+        2500,
+        2032
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -17216,8 +17041,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -17285,7 +17110,7 @@
       "name": "타마타브",
       "mapName": "Town_Tamatave_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001030,
@@ -17315,13 +17140,13 @@
       ],
       "shopGroup": [
         1032,
-        2032,
         2500,
+        2032,
         3032,
         4000,
         4100,
         10033,
-        20166
+        15166
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -17388,7 +17213,7 @@
       "name": "테르나테",
       "mapName": "Town_Ternate_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001089,
@@ -17418,8 +17243,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -17486,7 +17311,7 @@
       "name": "툼베스",
       "mapName": "Town_Tumbes_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001069,
@@ -17516,8 +17341,8 @@
       ],
       "shopGroup": [
         1092,
-        2092,
-        2500
+        2500,
+        2092
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -17615,13 +17440,13 @@
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20169
+        15169
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -17720,8 +17545,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -17754,10 +17579,7 @@
       "tradeComboSetGroupSortOrder": 11,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -17822,13 +17644,13 @@
       ],
       "shopGroup": [
         1091,
-        2091,
         2500,
+        2091,
         3091,
         4000,
         4100,
         10092,
-        20171
+        15171
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -17926,8 +17748,8 @@
       ],
       "shopGroup": [
         1002,
-        2002,
-        2500
+        2500,
+        2002
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -18026,8 +17848,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -18096,7 +17918,7 @@
       "name": "카탄가",
       "mapName": "Town_Khatanga_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001032,
@@ -18126,8 +17948,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -18194,7 +18016,7 @@
       "name": "팀북투",
       "mapName": "Town_Tombouctou_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001028,
@@ -18217,22 +18039,21 @@
       "moneyTradeInvest": 30000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 9,
-      "shipBuildGroup": 1175,
+      "shipBuildGroup": 175,
       "shipyardShopGroup": [
         1030,
         30175,
-        2175,
-        50014
+        2175
       ],
       "shopGroup": [
         1030,
-        2030,
         2500,
+        2030,
         3030,
         4000,
         4100,
         10031,
-        20175
+        15175
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -18299,7 +18120,7 @@
       "name": "파나마",
       "mapName": "Town_Panama_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001080,
@@ -18329,8 +18150,8 @@
       ],
       "shopGroup": [
         1092,
-        2092,
-        2500
+        2500,
+        2092
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -18427,13 +18248,13 @@
       ],
       "shopGroup": [
         1002,
-        2002,
         2500,
+        2002,
         3002,
         4000,
         4100,
         10003,
-        20177
+        15177
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -18529,8 +18350,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -18563,10 +18384,7 @@
       "tradeComboSetGroupSortOrder": 12,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -18602,7 +18420,7 @@
       "name": "파사이",
       "mapName": "Town_Pasay_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001058,
@@ -18632,13 +18450,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20179
+        15179
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -18705,7 +18523,7 @@
       "name": "팔렘방",
       "mapName": "Town_Palembang_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001012,
@@ -18735,13 +18553,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20180
+        15180
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -18811,7 +18629,7 @@
       "isReleased": true,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
-      "nationId": 10000001,
+      "nationId": 10001001,
       "disguiseType": 2,
       "disguiseBasePoint": 30,
       "disguiseBuffId": 38014000,
@@ -18838,8 +18656,8 @@
       ],
       "shopGroup": [
         1002,
-        2002,
-        2500
+        2500,
+        2002
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -18872,10 +18690,7 @@
       "tradeComboSetGroupSortOrder": 12,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -18909,7 +18724,7 @@
       "name": "페구",
       "mapName": "Town_Pegu_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001098,
@@ -18939,13 +18754,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20182
+        15182
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -19012,7 +18827,7 @@
       "name": "페르남부쿠",
       "mapName": "Town_Pernambuco_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001091,
@@ -19042,8 +18857,8 @@
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -19111,7 +18926,7 @@
       "name": "코르프",
       "mapName": "Town_Korf_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001060,
@@ -19141,8 +18956,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -19240,13 +19055,13 @@
       ],
       "shopGroup": [
         1101,
-        2101,
         2500,
+        2101,
         3101,
         4000,
         4100,
         10102,
-        20185
+        15185
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -19314,7 +19129,7 @@
       "name": "아비앗",
       "mapName": "Town_Arviat_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001068,
@@ -19344,8 +19159,8 @@
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -19412,7 +19227,7 @@
       "name": "영일",
       "mapName": "Town_Youngil_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001071,
@@ -19441,8 +19256,8 @@
       ],
       "shopGroup": [
         1082,
-        2082,
-        2500
+        2500,
+        2082
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -19473,11 +19288,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2315,
-        2419
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -19511,7 +19322,7 @@
       "name": "퐁디셰리",
       "mapName": "Town_Pondicherry_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001041,
@@ -19541,8 +19352,8 @@
       ],
       "shopGroup": [
         1052,
-        2052,
-        2500
+        2500,
+        2052
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -19640,13 +19451,13 @@
       ],
       "shopGroup": [
         1011,
-        2011,
         2500,
+        2011,
         3011,
         4000,
         4100,
         10013,
-        20189
+        15189
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -19677,12 +19488,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2106,
-        2108,
-        2417
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -19747,13 +19553,13 @@
       ],
       "shopGroup": [
         1001,
-        2001,
         2500,
+        2001,
         3001,
         4000,
         4100,
         10002,
-        20190
+        15190
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -19822,7 +19628,7 @@
       "name": "핀자라",
       "mapName": "Town_Pinjarra_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001061,
@@ -19852,8 +19658,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -19920,7 +19726,7 @@
       "name": "하노이",
       "mapName": "Town_Hanoi_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001011,
@@ -19950,8 +19756,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -19982,11 +19788,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2110
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20052,8 +19854,8 @@
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -20084,12 +19886,7 @@
       "tradeComboSetGroupSortOrder": 7,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2416,
-        2417,
-        2418
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20125,7 +19922,7 @@
       "name": "하와이",
       "mapName": "Town_Honolulu_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001096,
@@ -20155,8 +19952,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -20223,7 +20020,7 @@
       "name": "한양",
       "mapName": "Town_HanYang_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001071,
@@ -20249,18 +20046,17 @@
       "shipBuildGroup": 195,
       "shipyardShopGroup": [
         1080,
-        2195,
-        50001
+        2195
       ],
       "shopGroup": [
         1080,
-        2080,
         2900,
+        2080,
         3080,
         4000,
         4100,
         10081,
-        20195
+        15195
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -20291,13 +20087,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2109,
-        2110,
-        2419
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20358,18 +20148,17 @@
       "shipyardShopGroup": [
         1010,
         30196,
-        2196,
-        50015
+        2196
       ],
       "shopGroup": [
         1010,
-        2010,
         2500,
+        2010,
         3010,
         4000,
         4100,
         10011,
-        20196
+        15196
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -20400,10 +20189,7 @@
       "tradeComboSetGroupSortOrder": 6,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20437,7 +20223,7 @@
       "name": "항주",
       "mapName": "Town_Hangzhou_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001031,
@@ -20468,13 +20254,13 @@
       ],
       "shopGroup": [
         1060,
-        2060,
         2500,
+        2060,
         3060,
         4000,
         4100,
         10061,
-        20197
+        15197
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -20505,13 +20291,7 @@
       "tradeComboSetGroupSortOrder": 7,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2105,
-        2110,
-        2314
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20575,8 +20355,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -20641,7 +20421,7 @@
       "name": "호르무즈",
       "mapName": "Town_Hormuz_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001042,
@@ -20672,13 +20452,13 @@
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20199
+        15199
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -20745,7 +20525,7 @@
       "name": "호바트",
       "mapName": "Town_HobartTown_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001088,
@@ -20775,13 +20555,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20200
+        15200
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -20848,7 +20628,7 @@
       "name": "홀로",
       "mapName": "Town_Jolo_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001043,
@@ -20878,8 +20658,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -20946,7 +20726,7 @@
       "name": "아투오나",
       "mapName": "Town_Atuona_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001021,
@@ -20976,8 +20756,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -21074,8 +20854,8 @@
       ],
       "shopGroup": [
         1002,
-        2002,
-        2500
+        2500,
+        2002
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -21106,10 +20886,7 @@
       "tradeComboSetGroupSortOrder": 12,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -21143,7 +20920,7 @@
       "name": "제주",
       "mapName": "Town_Jeju_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001071,
@@ -21172,13 +20949,13 @@
       ],
       "shopGroup": [
         1082,
-        2082,
         2500,
+        2082,
         3082,
         4000,
         4100,
         10083,
-        20204
+        15204
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -21209,11 +20986,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2110,
-        2314
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -21247,7 +21020,7 @@
       "name": "마히나",
       "mapName": "Town_Mahina_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001101,
@@ -21277,13 +21050,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20205
+        15205
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -21350,7 +21123,7 @@
       "name": "수바",
       "mapName": "Town_Suva_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001102,
@@ -21380,13 +21153,13 @@
       ],
       "shopGroup": [
         1042,
-        2042,
         2500,
+        2042,
         3042,
         4000,
         4100,
         10043,
-        20206
+        15206
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -21453,7 +21226,7 @@
       "name": "나하",
       "mapName": "Town_Shuri_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001103,
@@ -21483,8 +21256,8 @@
       ],
       "shopGroup": [
         1072,
-        2072,
-        2500
+        2500,
+        2072
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -21515,12 +21288,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2105,
-        2110,
-        2314
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -21554,7 +21322,7 @@
       "name": "바그다드",
       "mapName": "Town_Baghdad_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
       "nationId": 10001042,
@@ -21585,13 +21353,13 @@
       ],
       "shopGroup": [
         1021,
-        2021,
         2500,
+        2021,
         3021,
         4000,
         4100,
         10022,
-        20208
+        15208
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -21658,7 +21426,7 @@
       "name": "레이캬비크",
       "mapName": "Town_Reykjavik_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001013,
@@ -21688,8 +21456,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -21757,10 +21525,10 @@
       "name": "율도",
       "mapName": "Town_Uldo_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
-      "nationId": 10001071,
+      "nationId": 10001001,
       "disguiseType": 10,
       "disguiseBasePoint": 60,
       "disguiseBuffId": 38014000,
@@ -21793,13 +21561,13 @@
       ],
       "shopGroup": [
         1082,
-        2082,
         2500,
+        2082,
         3082,
         4000,
         4100,
         10083,
-        20210
+        15210
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -21896,8 +21664,8 @@
       ],
       "shopGroup": [
         1022,
-        2022,
-        2500
+        2500,
+        2022
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -21929,10 +21697,7 @@
       "tradeComboSetGroupSortOrder": 13,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -21968,7 +21733,7 @@
       "name": "오호츠크",
       "mapName": "Town_Okhotsk_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001032,
@@ -21998,13 +21763,13 @@
       ],
       "shopGroup": [
         1012,
-        2012,
         2500,
+        2012,
         3012,
         4000,
         4100,
         10013,
-        20212
+        15212
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -22071,7 +21836,7 @@
       "name": "체르스키",
       "mapName": "Town_Chersky_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001032,
@@ -22101,8 +21866,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -22169,7 +21934,7 @@
       "name": "카나크",
       "mapName": "Town_Qaanaaq_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001068,
@@ -22199,13 +21964,13 @@
       ],
       "shopGroup": [
         1102,
-        2102,
         2500,
+        2102,
         3102,
         4000,
         4100,
         10103,
-        20214
+        15214
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -22272,7 +22037,7 @@
       "name": "캠브리지 베이",
       "mapName": "Town_Iqaluktuuttiaq_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001068,
@@ -22302,8 +22067,8 @@
       ],
       "shopGroup": [
         1102,
-        2102,
-        2500
+        2500,
+        2102
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -22370,7 +22135,7 @@
       "name": "바르도",
       "mapName": "Town_Vardo_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001014,
@@ -22400,8 +22165,8 @@
       ],
       "shopGroup": [
         1012,
-        2012,
-        2500
+        2500,
+        2012
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -22469,7 +22234,7 @@
       "name": "포트피리",
       "mapName": "Town_PortPirie_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001126,
@@ -22499,8 +22264,8 @@
       ],
       "shopGroup": [
         1042,
-        2042,
-        2500
+        2500,
+        2042
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -22567,7 +22332,7 @@
       "name": "에조",
       "mapName": "Town_Ezo_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001033,
@@ -22598,8 +22363,8 @@
       ],
       "shopGroup": [
         1070,
-        2070,
-        2500
+        2500,
+        2070
       ],
       "minBlackMarketCequipCount": 1,
       "maxBlackMarketCequipCount": 3,
@@ -22630,10 +22395,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2315
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -22690,15 +22452,14 @@
       "moneyTradeInvest": 10000000,
       "marketPriceStartTime": 10,
       "malariaHazard": 0,
-      "shipBuildGroup": 219,
+      "shipBuildGroup": 1219,
       "shipyardShopGroup": [
         2501,
         30039
       ],
       "shopGroup": [
         2002,
-        3666,
-        23666
+        3666
       ],
       "minBlackMarketCequipCount": 3,
       "maxBlackMarketCequipCount": 3,
@@ -22764,7 +22525,7 @@
       "name": "터코마",
       "mapName": "Town_Tacoma_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001044,
@@ -22794,8 +22555,8 @@
       ],
       "shopGroup": [
         1092,
-        2092,
-        2500
+        2500,
+        2092
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -22862,7 +22623,7 @@
       "name": "소다섬",
       "mapName": "Town_Soda_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000002,
       "townSize": 3,
       "nationId": 10001131,
@@ -22893,13 +22654,13 @@
       ],
       "shopGroup": [
         1030,
-        2030,
         2500,
+        2030,
         3030,
         4000,
         4100,
         10031,
-        20221
+        15221
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -22967,7 +22728,7 @@
       "name": "말레",
       "mapName": "Town_Maldives_M",
       "townNpcName": "TownNpcGlobal",
-      "isReleased": true,
+      "isReleased": false,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
       "nationId": 10001048,
@@ -22997,12 +22758,13 @@
       ],
       "shopGroup": [
         1022,
-        2022,
         2500,
+        2022,
         3022,
         4000,
         4100,
-        10053
+        10053,
+        15222
       ],
       "minBlackMarketCequipCount": 0,
       "maxBlackMarketCequipCount": 2,
@@ -23033,11 +22795,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2312,
-        2107
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,

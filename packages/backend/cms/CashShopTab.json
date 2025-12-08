@@ -93,7 +93,7 @@
     },
     "108": {
       "id": 108,
-      "sortOrder": 2,
+      "sortOrder": 1,
       "productCategory": 3,
       "productSize": 1,
       "name": "기간 한정",
@@ -102,10 +102,10 @@
     },
     "109": {
       "id": 109,
-      "sortOrder": 1,
+      "sortOrder": 2,
       "productCategory": 3,
       "productSize": 1,
-      "name": "추석",
+      "name": "할로윈",
       "productEntryType": 1,
       "useEventButton": false
     },
@@ -393,19 +393,19 @@
       "sortOrder": 1,
       "productCategory": 14,
       "productSize": 1,
-      "name": "레오니다스",
+      "name": "선희",
       "productEntryType": 4,
-      "bannereventImage": "WT_StepUp08_Sprite",
+      "bannereventImage": "WT_StepUp10_Sprite",
       "useEventButton": false
     },
     "702": {
       "id": 702,
-      "sortOrder": 4,
+      "sortOrder": 2,
       "productCategory": 14,
       "productSize": 1,
-      "name": "블랙 레이븐",
+      "name": "임화",
       "productEntryType": 4,
-      "bannereventImage": "WT_StepUp05_Sprite",
+      "bannereventImage": "WT_StepUp11_Sprite",
       "useEventButton": false
     },
     "703": {
@@ -420,12 +420,12 @@
     },
     "704": {
       "id": 704,
-      "sortOrder": 2,
+      "sortOrder": 3,
       "productCategory": 14,
       "productSize": 1,
       "name": "특수 합성",
       "productEntryType": 4,
-      "bannereventImage": "WT_StepUp07_Sprite",
+      "bannereventImage": "WT_StepUp12_Sprite",
       "useEventButton": false
     },
     "705": {

@@ -501,7 +501,7 @@
       },
       "notReverseSideDeco": false,
       "flavorText": "맑은 물이 바다로 흘러갑니다.\n제독님은 새로운 물결입니다!",
-      "hintText": "원양 항해 패키지 상품",
+      "hintText": "항해의 꿈 패키지 상품",
       "worldBuffId": [
         38096028
       ]
@@ -677,6 +677,51 @@
       "hintText": "대항해시대 오리진 한국 3주년 상품",
       "worldBuffId": [
         38096068
+      ]
+    },
+    "1402019": {
+      "id": 1402019,
+      "localBitFlag": 27,
+      "category": 2,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 318,
+      "name": "호박 수집가",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Halloween_Sprite",
+        "DecoColor": "393E4CFF",
+        "MiddleSideDeco": "WT_UserTitleSide_Halloween_Sprite"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "여기저기 호박이 쏟아집니다!",
+      "hintText": "25년 할로윈 이벤트 상품",
+      "worldBuffId": [
+        38090029
+      ]
+    },
+    "1402020": {
+      "id": 1402020,
+      "localBitFlag": 0,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 40,
+      "name": "대가",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_CNCashShop01_Sprite",
+        "DecoColor": "F7C400FF",
+        "MiddleSideDeco": "WT_UserTitleSide_CNCashShop01_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_14",
+        "PremiumDeco": "WT_UserTitle_Deco_CNCashShop01_Sprite",
+        "PremiumDecoColor": "DAAD00FF"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "대가의 기운이 느껴집니다.",
+      "hintText": "마일리지 교환소 상품",
+      "worldBuffId": [
+        38096084
       ]
     },
     "1403001": {
@@ -2954,7 +2999,7 @@
     },
     "1410055": {
       "id": 1410055,
-      "localBitFlag": 0,
+      "localBitFlag": 27,
       "category": 4,
       "period": {
         "Type": 0
@@ -2962,15 +3007,212 @@
       "sortingOrder": 111,
       "name": "백전노장",
       "userTitleDeco": {
-        "TopCenterDeco": "WT_UserTitleTop_Season4_Sprite",
-        "DecoColor": "FFFFFF",
-        "MiddleSideDeco": "WT_UserTitleSide_Season4_Sprite"
+        "TopCenterDeco": "WT_UserTitleTop_Season0Mayor_Sprite",
+        "DecoColor": "B4FCFFFF",
+        "MiddleSideDeco": "WT_UserTitleSide_lv100_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_12",
+        "PremiumDeco": "WT_UserTitle_Deco_04_Sprite",
+        "PremiumDecoColor": "00B6BCFF"
       },
       "notReverseSideDeco": false,
       "flavorText": "100 레벨을 달성한 제독님을 기념하기 위한 칭호입니다.",
       "hintText": "100 레벨 달성 상점 구매",
       "worldBuffId": [
         38096071
+      ]
+    },
+    "1410074": {
+      "id": 1410074,
+      "localBitFlag": 0,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "name": "비해의 선구자(秘海先驱)",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleSide_SmallStep_Sprite",
+        "DecoColor": "FFFFFF"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "唯有 先驅 得此名 오직 이 선구자만이 이 이름을 얻으리라.",
+      "hintText": "중국 서버 전용 보상",
+      "worldBuffId": [
+        38096080
+      ]
+    },
+    "1410075": {
+      "id": 1410075,
+      "localBitFlag": 0,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "name": "황금 키잡이(黄金舵手)",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season0Mayor_Sprite",
+        "DecoColor": "FFF68E",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1_Myth_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_13",
+        "PremiumDeco": "WT_UserTitle_Deco_04_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "黃金 之手 榮耀 萬里 황금의 손길이 가리키니, 영광이 만 리에 뻗치네.",
+      "hintText": "중국 서버 전용 보상",
+      "worldBuffId": [
+        38096081
+      ]
+    },
+    "1410076": {
+      "id": 1410076,
+      "localBitFlag": 0,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "name": "파도를 가르는 개척자(破浪的开拓者)",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleSide_Season0_Sprite",
+        "DecoColor": "00EEFF",
+        "MiddleSideDeco": "WT_UserTitle_NewWave_Sprite"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "初航無所懼 秘海待尋寶 첫 항해에는 두려울 것이 없으니, 비밀의 바다는 보물을 찾기를 기다리고 있다.",
+      "hintText": "중국 서버 전용 보상",
+      "worldBuffId": [
+        38096082
+      ]
+    },
+    "1410077": {
+      "id": 1410077,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "name": "연맹의 공로자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season5_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitleSide_Season5_Sprite"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "투자 시즌 5에서 위대한 모험에 참여한 제독을 위한 칭호입니다.",
+      "hintText": "투자 시즌 5 상점 구매",
+      "worldBuffId": [
+        38096083
+      ]
+    },
+    "1410078": {
+      "id": 1410078,
+      "localBitFlag": 192,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "name": "연맹의 공로자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitleSide_Season5_Sprite"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "투자 시즌 1에서 위대한 모험에 참여한 제독을 위한 칭호입니다.",
+      "hintText": "투자 시즌 1 상점 구매",
+      "worldBuffId": [
+        38096090
+      ]
+    },
+    "1410079": {
+      "id": 1410079,
+      "localBitFlag": 0,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "name": "성장의 패왕",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1_Sprite",
+        "DecoColor": "FBE500",
+        "MiddleSideDeco": "WT_UserTitleSide_DeusExMachina_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_06"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "성장 경쟁전에서 1위를 달성한 제독님께 드리는 칭호입니다.",
+      "hintText": "성장 경쟁전 종료 시 1위",
+      "worldBuffId": [
+        38096083
+      ]
+    },
+    "1410080": {
+      "id": 1410080,
+      "localBitFlag": 0,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "name": "성장의 개척자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season2_Sprite",
+        "DecoColor": "FBE500",
+        "MiddleSideDeco": "WT_UserTitleSide_DeusExMachina_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_06"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "성장 경쟁전에서 2위를 달성한 제독님께 드리는 칭호입니다.",
+      "hintText": "성장 경쟁전 종료 시 2위",
+      "worldBuffId": [
+        38096083
+      ]
+    },
+    "1410081": {
+      "id": 1410081,
+      "localBitFlag": 0,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "name": "성장의 선구자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season3_Sprite",
+        "DecoColor": "FBE500",
+        "MiddleSideDeco": "WT_UserTitleSide_DeusExMachina_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_06"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "성장 경쟁전에서 3위를 달성한 제독님께 드리는 칭호입니다.",
+      "hintText": "성장 경쟁전 종료 시 3위",
+      "worldBuffId": [
+        38096083
+      ]
+    },
+    "1410082": {
+      "id": 1410082,
+      "localBitFlag": 0,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "name": "성장의 여정자",
+      "userTitleDeco": {
+        "DecoColor": "FBE500",
+        "MiddleSideDeco": "WT_UserTitleSide_DeusExMachina_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_06"
+      },
+      "notReverseSideDeco": false,
+      "flavorText": "성장 경쟁전에서 4-10위를 달성한 제독님께 드리는 칭호입니다.",
+      "hintText": "성장 경쟁전 종료 시 4-10위",
+      "worldBuffId": [
+        38096083
       ]
     }
   }

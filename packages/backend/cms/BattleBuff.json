@@ -7163,38 +7163,41 @@
     },
     "65501181": {
       "id": 65501181,
-      "name": "엘리트보스 전용 버프_54",
+      "name": "유령선의 독안개",
       "jobType": 3,
-      "isBuff": true,
+      "isBuff": false,
       "duration": 99,
       "groupContentsType": 1,
       "Type": 0,
       "cancelType": 1,
       "stackCancelType": 1,
-      "stackMaxNum": 1,
+      "stackMaxNum": 4,
+      "category": 117,
       "groupNo": 40181,
       "groupOrder": 1,
       "hidden": false,
-      "statEffect": [
+      "passiveEffect": [
         {
-          "Id": 1023,
-          "Val": 500
+          "Id": 66100004,
+          "Val1": 100,
+          "Val2": 9999
         },
         {
-          "Id": 1038,
-          "Val": 500
-        },
-        {
-          "Id": 1053,
-          "Val": 500
+          "Id": 66100002,
+          "Val1": 100,
+          "Val2": 9999
         }
       ],
-      "markerIcon": "DummyIcon_Sprite",
-      "desc": "공격증가"
+      "markerIcon": "icon_effect_battle_403_Sprite",
+      "markerEffect": "BattleDebuffPoison",
+      "desc": "효과 중첩당 선원 및 선체 내구도가 {0} 감소합니다.\n4중첩이 될 시, 유령선의 맹독으로 변환됩니다.",
+      "descFormatTexts": [
+        "10%"
+      ]
     },
     "65501182": {
       "id": 65501182,
-      "name": "엘리트보스 전용 버프_55",
+      "name": "유령선의 맹독",
       "jobType": 3,
       "isBuff": true,
       "duration": 99,
@@ -7206,26 +7209,29 @@
       "groupNo": 40182,
       "groupOrder": 1,
       "hidden": false,
-      "statEffect": [
+      "passiveEffect": [
         {
-          "Id": 1023,
-          "Val": 500
+          "Id": 66100004,
+          "Val1": 500,
+          "Val2": 9999
         },
         {
-          "Id": 1038,
-          "Val": 500
-        },
-        {
-          "Id": 1053,
-          "Val": 500
+          "Id": 66100002,
+          "Val1": 500,
+          "Val2": 9999
         }
       ],
-      "markerIcon": "DummyIcon_Sprite",
-      "desc": "공격증가"
+      "markerIcon": "icon_effect_battle_404_Sprite",
+      "markerEffect": "BossRaidRayPoison",
+      "cancelBuffId": 65501181,
+      "desc": "선원 및 선체 내구도가 {0} 감소합니다.\n(면역 혹은 해제 불가)",
+      "descFormatTexts": [
+        "50%"
+      ]
     },
     "65501183": {
       "id": 65501183,
-      "name": "엘리트보스 전용 버프_56",
+      "name": "투묘",
       "jobType": 3,
       "isBuff": true,
       "duration": 99,
@@ -7234,31 +7240,41 @@
       "cancelType": 1,
       "stackCancelType": 1,
       "stackMaxNum": 1,
+      "category": 118,
       "groupNo": 40183,
       "groupOrder": 1,
       "hidden": false,
+      "passiveEffect": [
+        {
+          "Id": 66100030
+        }
+      ],
       "statEffect": [
         {
           "Id": 1023,
-          "Val": 500
+          "Val": 300
         },
         {
-          "Id": 1038,
-          "Val": 500
+          "Id": 1025,
+          "Val": 300
         },
         {
-          "Id": 1053,
-          "Val": 500
+          "Id": 1087,
+          "Val": 300
+        },
+        {
+          "Id": 1040,
+          "Val": -400
         }
       ],
-      "markerIcon": "DummyIcon_Sprite",
+      "markerIcon": "icon_skill_battle_shipClass_cannon_05_Sprite",
       "desc": "공격증가"
     },
     "65501184": {
       "id": 65501184,
-      "name": "엘리트보스 전용 버프_57",
+      "name": "화약고 유폭",
       "jobType": 3,
-      "isBuff": true,
+      "isBuff": false,
       "duration": 99,
       "groupContentsType": 1,
       "Type": 0,
@@ -7268,29 +7284,15 @@
       "groupNo": 40184,
       "groupOrder": 1,
       "hidden": false,
-      "statEffect": [
-        {
-          "Id": 1023,
-          "Val": 500
-        },
-        {
-          "Id": 1038,
-          "Val": 500
-        },
-        {
-          "Id": 1053,
-          "Val": 500
-        }
-      ],
       "markerIcon": "DummyIcon_Sprite",
       "desc": "공격증가"
     },
     "65501185": {
       "id": 65501185,
-      "name": "엘리트보스 전용 버프_58",
+      "name": "화약고 화재",
       "jobType": 3,
-      "isBuff": true,
-      "duration": 99,
+      "isBuff": false,
+      "duration": 5,
       "groupContentsType": 1,
       "Type": 0,
       "cancelType": 1,
@@ -7299,29 +7301,36 @@
       "groupNo": 40185,
       "groupOrder": 1,
       "hidden": false,
-      "statEffect": [
+      "passiveEffect": [
         {
-          "Id": 1023,
-          "Val": 500
+          "Id": 66100004,
+          "Val1": 150,
+          "Val2": 9999
         },
         {
-          "Id": 1038,
-          "Val": 500
+          "Id": 66100002,
+          "Val1": 150,
+          "Val2": 9999
         },
         {
-          "Id": 1053,
-          "Val": 500
+          "Id": 66100026,
+          "Val1": 67560045
         }
       ],
-      "markerIcon": "DummyIcon_Sprite",
-      "desc": "공격증가"
+      "markerIcon": "icon_skill_battle_debuff_10_Sprite",
+      "markerEffect": "BattleDebuffFire",
+      "desc": "선원 및 선체 내구도가 {0} 감소합니다.\n화약고 화재 상태에서 적 선박을 공격할 시, 적 선박에게 선체, 선원 체력의 {1}의 고정 피해를 줍니다.",
+      "descFormatTexts": [
+        "15%",
+        "10%"
+      ]
     },
     "65501186": {
       "id": 65501186,
-      "name": "엘리트보스 전용 버프_59",
+      "name": "이동 봉쇄",
       "jobType": 3,
-      "isBuff": true,
-      "duration": 99,
+      "isBuff": false,
+      "duration": 2,
       "groupContentsType": 1,
       "Type": 0,
       "cancelType": 1,
@@ -7330,53 +7339,60 @@
       "groupNo": 40186,
       "groupOrder": 1,
       "hidden": false,
-      "statEffect": [
+      "passiveEffect": [
         {
-          "Id": 1023,
-          "Val": 500
-        },
-        {
-          "Id": 1038,
-          "Val": 500
-        },
-        {
-          "Id": 1053,
-          "Val": 500
+          "Id": 66100011,
+          "Val1": 9
         }
       ],
-      "markerIcon": "DummyIcon_Sprite",
-      "desc": "공격증가"
+      "markerIcon": "icon_skill_battle_debuff_17_Sprite",
+      "desc": "선박의 이동을 봉인합니다."
     },
     "65501187": {
       "id": 65501187,
-      "name": "엘리트보스 전용 버프_60",
+      "name": "투지 감소",
       "jobType": 3,
-      "isBuff": true,
-      "duration": 99,
+      "isBuff": false,
+      "duration": 5,
       "groupContentsType": 1,
       "Type": 0,
       "cancelType": 1,
       "stackCancelType": 1,
-      "stackMaxNum": 1,
+      "stackMaxNum": 5,
       "groupNo": 40187,
       "groupOrder": 1,
       "hidden": false,
       "statEffect": [
         {
           "Id": 1023,
-          "Val": 500
+          "Val": -100
         },
         {
           "Id": 1038,
-          "Val": 500
+          "Val": -100
         },
         {
           "Id": 1053,
-          "Val": 500
+          "Val": -100
+        },
+        {
+          "Id": 1025,
+          "Val": -100
+        },
+        {
+          "Id": 1087,
+          "Val": -100
+        },
+        {
+          "Id": 1040,
+          "Val": -100
         }
       ],
-      "markerIcon": "DummyIcon_Sprite",
-      "desc": "공격증가"
+      "markerIcon": "icon_skill_battleOrder_26_Sprite",
+      "desc": "공격력과 방어력이 중첩 당 {0} 감소합니다.",
+      "descFormatTexts": [
+        "15%"
+      ]
     },
     "65501188": {
       "id": 65501188,
@@ -42521,7 +42537,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51220,
-      "groupOrder": 1,
+      "groupOrder": 2,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42551,7 +42567,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51220,
-      "groupOrder": 1,
+      "groupOrder": 3,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42581,7 +42597,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51220,
-      "groupOrder": 1,
+      "groupOrder": 4,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42611,7 +42627,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51220,
-      "groupOrder": 1,
+      "groupOrder": 5,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42671,7 +42687,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51221,
-      "groupOrder": 1,
+      "groupOrder": 2,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42701,7 +42717,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51221,
-      "groupOrder": 1,
+      "groupOrder": 3,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42731,7 +42747,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51221,
-      "groupOrder": 1,
+      "groupOrder": 4,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42761,7 +42777,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51221,
-      "groupOrder": 1,
+      "groupOrder": 5,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42821,7 +42837,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51222,
-      "groupOrder": 1,
+      "groupOrder": 2,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42851,7 +42867,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51222,
-      "groupOrder": 1,
+      "groupOrder": 3,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42881,7 +42897,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51222,
-      "groupOrder": 1,
+      "groupOrder": 4,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42911,7 +42927,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51222,
-      "groupOrder": 1,
+      "groupOrder": 5,
       "hidden": false,
       "passiveEffect": [
         {
@@ -42971,7 +42987,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51223,
-      "groupOrder": 1,
+      "groupOrder": 2,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43001,7 +43017,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51223,
-      "groupOrder": 1,
+      "groupOrder": 3,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43031,7 +43047,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51223,
-      "groupOrder": 1,
+      "groupOrder": 4,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43061,7 +43077,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51223,
-      "groupOrder": 1,
+      "groupOrder": 5,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43121,7 +43137,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51224,
-      "groupOrder": 1,
+      "groupOrder": 2,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43151,7 +43167,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51224,
-      "groupOrder": 1,
+      "groupOrder": 3,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43181,7 +43197,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51224,
-      "groupOrder": 1,
+      "groupOrder": 4,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43211,7 +43227,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51224,
-      "groupOrder": 1,
+      "groupOrder": 5,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43271,7 +43287,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51225,
-      "groupOrder": 1,
+      "groupOrder": 2,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43301,7 +43317,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51225,
-      "groupOrder": 1,
+      "groupOrder": 3,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43331,7 +43347,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51225,
-      "groupOrder": 1,
+      "groupOrder": 4,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43361,7 +43377,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51225,
-      "groupOrder": 1,
+      "groupOrder": 5,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43421,7 +43437,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51226,
-      "groupOrder": 1,
+      "groupOrder": 2,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43451,7 +43467,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51226,
-      "groupOrder": 1,
+      "groupOrder": 3,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43481,7 +43497,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51226,
-      "groupOrder": 1,
+      "groupOrder": 4,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43511,7 +43527,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51226,
-      "groupOrder": 1,
+      "groupOrder": 5,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43571,7 +43587,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51227,
-      "groupOrder": 1,
+      "groupOrder": 2,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43601,7 +43617,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51227,
-      "groupOrder": 1,
+      "groupOrder": 3,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43631,7 +43647,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51227,
-      "groupOrder": 1,
+      "groupOrder": 4,
       "hidden": false,
       "passiveEffect": [
         {
@@ -43661,7 +43677,7 @@
       "stackMaxNum": 1,
       "linkType": 1,
       "groupNo": 51227,
-      "groupOrder": 1,
+      "groupOrder": 5,
       "hidden": false,
       "passiveEffect": [
         {
@@ -52271,6 +52287,64 @@
       "markerIcon": "icon_skill_battle_debuff_19_Sprite",
       "desc": "선박의 백병을 봉인합니다."
     },
+    "65560072": {
+      "id": 65560072,
+      "name": "붕괴",
+      "jobType": 3,
+      "isBuff": false,
+      "duration": 3,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 1,
+      "stackCancelType": 1,
+      "stackMaxNum": 1,
+      "category": 1006,
+      "groupNo": 51301,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1004,
+          "Val": -4
+        }
+      ],
+      "markerIcon": "icon_skill_battle_debuff_20_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "이동력",
+        "4",
+        "감소"
+      ]
+    },
+    "65560073": {
+      "id": 65560073,
+      "name": "붕괴",
+      "jobType": 3,
+      "isBuff": false,
+      "duration": 3,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 1,
+      "stackCancelType": 1,
+      "stackMaxNum": 1,
+      "category": 1006,
+      "groupNo": 51301,
+      "groupOrder": 2,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1004,
+          "Val": -6
+        }
+      ],
+      "markerIcon": "icon_skill_battle_debuff_20_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "이동력",
+        "6",
+        "감소"
+      ]
+    },
     "65610000": {
       "id": 65610000,
       "name": "[정책] 정교한 포격",
@@ -55019,6 +55093,112 @@
       "markerEffect": "AsuraPacheonmu",
       "desc": "행동을 할 수 없습니다."
     },
+    "65700058": {
+      "id": 65700058,
+      "name": "역류 계산",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 3,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 1,
+      "stackCancelType": 1,
+      "stackMaxNum": 1,
+      "groupNo": 51302,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1036,
+          "Val": 1500
+        },
+        {
+          "Id": 1051,
+          "Val": 1500
+        },
+        {
+          "Id": 1055,
+          "Val": 1500
+        },
+        {
+          "Id": 1150,
+          "Val": -300
+        }
+      ],
+      "markerIcon": "icon_skill_battleOrder_132_Sprite",
+      "markerEffect": "AsuraPacheonmu",
+      "desc": "모든 반격 피해량이 {0} 증가하고, 직접적으로 받는 피해량이 {1} 감소합니다.",
+      "descFormatTexts": [
+        "150%",
+        "30%"
+      ]
+    },
+    "65700059": {
+      "id": 65700059,
+      "name": "필중",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 3,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 1,
+      "stackCancelType": 1,
+      "stackMaxNum": 1,
+      "groupNo": 51306,
+      "groupOrder": 1,
+      "hidden": false,
+      "passiveEffect": [
+        {
+          "Id": 66100033,
+          "Val1": 1,
+          "Val2": 1000
+        },
+        {
+          "Id": 66100081,
+          "Val1": 150
+        }
+      ],
+      "statEffect": [
+        {
+          "Id": 1106,
+          "Val": 277
+        }
+      ],
+      "markerIcon": "icon_skill_battleOrder_97_Sprite",
+      "markerEffect": "BattleOrderBlitzBuff",
+      "desc": "직접적으로 가하는 피해량이 {0} 증가하고, 적의 방어력을 {1} 추가로 무시하며 공격이 반드시 명중합니다.",
+      "descFormatTexts": [
+        "27.7%",
+        "15%"
+      ]
+    },
+    "65700060": {
+      "id": 65700060,
+      "name": "도독의 명",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 3,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 1,
+      "stackCancelType": 1,
+      "stackMaxNum": 1,
+      "groupNo": 51307,
+      "groupOrder": 1,
+      "hidden": false,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67590065
+        }
+      ],
+      "markerIcon": "icon_skill_battleOrder_134_Sprite",
+      "markerEffect": "BattleOrderBlitzBuff",
+      "desc": "포격 공격 시, 한 번 더 공격하여 {0}의 추가 피해를 줍니다.(두 번째 공격은 추가 효과를 발동시키지 않습니다.)",
+      "descFormatTexts": [
+        "50%"
+      ]
+    },
     "65800000": {
       "id": 65800000,
       "name": "고귀한 결속 전열",
@@ -56472,6 +56652,118 @@
       "descFormatTexts": [
         "받는 백병 피해량",
         "50%",
+        "감소"
+      ]
+    },
+    "65800049": {
+      "id": 65800049,
+      "name": "포격 피해량 60% 감소",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 0,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 58049,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1125,
+          "Val": -600
+        }
+      ],
+      "markerIcon": "icon_skill_battle_Formation_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "받는 포격 피해량",
+        "60%",
+        "감소"
+      ]
+    },
+    "65800050": {
+      "id": 65800050,
+      "name": "충파 피해량 85% 감소",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 0,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 58050,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1129,
+          "Val": -850
+        }
+      ],
+      "markerIcon": "icon_skill_battle_Formation_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "받는 충파 피해량",
+        "85%",
+        "감소"
+      ]
+    },
+    "65800051": {
+      "id": 65800051,
+      "name": "광역 공격 피해량 70% 감소",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 0,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 58051,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1157,
+          "Val": 700
+        }
+      ],
+      "markerIcon": "icon_skill_battle_Formation_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "받는 광역 피해량",
+        "70%",
+        "감소"
+      ]
+    },
+    "65800052": {
+      "id": 65800052,
+      "name": "광역 공격 피해량 80% 감소",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 0,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 58052,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1157,
+          "Val": 800
+        }
+      ],
+      "markerIcon": "icon_skill_battle_Formation_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "받는 광역 피해량",
+        "80%",
         "감소"
       ]
     },
@@ -62246,7 +62538,7 @@
       "statEffect": [
         {
           "Id": 1023,
-          "Val": 100
+          "Val": 50
         },
         {
           "Id": 1038,
@@ -62268,7 +62560,7 @@
       "markerIcon": "icon_effect_battle_354_Sprite",
       "desc": "추가 포격 공격력이 {0} {1}, 추가 백병 공격력이 {2} {3}하고, 추가 포격, 백병, 충파의 방어력이 {4} {5}합니다.",
       "descFormatTexts": [
-        "10%",
+        "5%",
         "증가",
         "20%",
         "증가",
@@ -62960,6 +63252,134 @@
       "descFormatTexts": [
         "모든 추가 공격력",
         "15%",
+        "증가"
+      ]
+    },
+    "65991010": {
+      "id": 65991010,
+      "name": "신디의 응원",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 99,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 90181,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1099,
+          "Val": 3
+        }
+      ],
+      "markerIcon": "icon_PetEffect_23_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 기동력",
+        "3",
+        "증가"
+      ]
+    },
+    "65991011": {
+      "id": 65991011,
+      "name": "마일로의 응원",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 99,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 90182,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1150,
+          "Val": -50
+        }
+      ],
+      "markerIcon": "icon_PetEffect_24_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "직접적으로 받는 모든 피해",
+        "5%",
+        "감소"
+      ]
+    },
+    "65991012": {
+      "id": 65991012,
+      "name": "후무스 효과",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 99,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 90183,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 50
+        },
+        {
+          "Id": 1038,
+          "Val": 50
+        },
+        {
+          "Id": 1053,
+          "Val": 50
+        }
+      ],
+      "markerIcon": "Icon_Item_23520052_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "모든 추가 공격력",
+        "5%",
+        "증가"
+      ]
+    },
+    "65991013": {
+      "id": 65991013,
+      "name": "풀 메다메스 효과",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 99,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 90184,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 100
+        },
+        {
+          "Id": 1038,
+          "Val": 100
+        },
+        {
+          "Id": 1053,
+          "Val": 100
+        }
+      ],
+      "markerIcon": "Icon_Item_23520054_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "모든 추가 공격력",
+        "10%",
         "증가"
       ]
     },
@@ -64693,6 +65113,134 @@
         "증가",
         "모든 추가 방어력",
         "1%",
+        "증가"
+      ]
+    },
+    "65999052": {
+      "id": 65999052,
+      "name": "[칭호 효과] 비해의 선구자",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 99,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 99049,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 10
+        },
+        {
+          "Id": 1037,
+          "Val": 10
+        },
+        {
+          "Id": 1052,
+          "Val": 10
+        }
+      ],
+      "markerIcon": "icon_effect_battle_447_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "모든 추가 공격력",
+        "10",
+        "증가"
+      ]
+    },
+    "65999053": {
+      "id": 65999053,
+      "name": "[칭호 효과] 황금 키잡이",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 99,
+      "groupContentsType": 1,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 99050,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 10
+        },
+        {
+          "Id": 1037,
+          "Val": 10
+        },
+        {
+          "Id": 1052,
+          "Val": 10
+        }
+      ],
+      "markerIcon": "icon_effect_battle_447_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "모든 추가 공격력",
+        "10",
+        "증가"
+      ]
+    },
+    "65999054": {
+      "id": 65999054,
+      "name": "[상회 효과] 쾌속의 수",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 1,
+      "groupContentsType": 3,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 99032,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1100,
+          "Val": 20
+        }
+      ],
+      "markerIcon": "icon_effect_battle_356_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 기동력",
+        "2%",
+        "증가"
+      ]
+    },
+    "65999055": {
+      "id": 65999055,
+      "name": "[상회 효과] 쾌속의 수",
+      "jobType": 3,
+      "isBuff": true,
+      "duration": 1,
+      "groupContentsType": 3,
+      "Type": 0,
+      "cancelType": 0,
+      "stackCancelType": 0,
+      "stackMaxNum": 1,
+      "groupNo": 99033,
+      "groupOrder": 1,
+      "hidden": false,
+      "statEffect": [
+        {
+          "Id": 1100,
+          "Val": 40
+        }
+      ],
+      "markerIcon": "icon_effect_battle_356_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 기동력",
+        "4%",
         "증가"
       ]
     }

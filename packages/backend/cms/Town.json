@@ -444,10 +444,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2108
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -557,13 +554,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101,
-        2102,
-        2108,
-        2416
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -1389,10 +1380,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2314
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -1800,10 +1788,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -1912,12 +1897,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102,
-        2107,
-        2312
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -2124,10 +2104,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -2335,11 +2312,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2105,
-        2314
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -2642,10 +2615,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2312
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -3037,10 +3007,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -3456,13 +3423,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102,
-        2106,
-        2107,
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -3632,7 +3593,8 @@
         1031,
         30032,
         2032,
-        40004
+        40004,
+        41032
       ],
       "shopGroup": [
         1031,
@@ -4188,10 +4150,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2108
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -4290,11 +4249,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2109,
-        2315
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -4588,10 +4543,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -4702,11 +4654,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102,
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -5041,7 +4989,7 @@
       "isReleased": true,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
-      "nationId": 10001031,
+      "nationId": 10001001,
       "disguiseType": 6,
       "disguiseBasePoint": 60,
       "disguiseBuffId": 38014000,
@@ -5111,14 +5059,7 @@
       "tradeComboSetGroupSortOrder": 1,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2109,
-        2312,
-        2420,
-        2522
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -5225,10 +5166,7 @@
       "tradeComboSetGroupSortOrder": 6,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -5337,10 +5275,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2312
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -5968,11 +5903,7 @@
       "tradeComboSetGroupSortOrder": 7,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102,
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -6189,10 +6120,7 @@
       "tradeComboSetGroupSortOrder": 8,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -6826,10 +6754,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -7333,10 +7258,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2418
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -7445,10 +7367,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -7967,13 +7886,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102,
-        2106,
-        2107,
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -8070,10 +7983,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2106
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -8180,10 +8090,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2109
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -8281,10 +8188,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2524
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -8393,12 +8297,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2109,
-        2312,
-        2420
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -9639,10 +9538,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -9850,11 +9746,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2417,
-        2523
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -11317,10 +11209,7 @@
       "tradeComboSetGroupSortOrder": 6,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -11925,10 +11814,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2416
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12038,11 +11924,7 @@
       "tradeComboSetGroupSortOrder": 6,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103,
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12239,12 +12121,7 @@
       "tradeComboSetGroupSortOrder": 2,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2105,
-        2315,
-        2525
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12354,10 +12231,7 @@
       "tradeComboSetGroupSortOrder": 7,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12396,7 +12270,7 @@
       "isReleased": true,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
-      "nationId": 10000005,
+      "nationId": 10001001,
       "disguiseType": 1,
       "disguiseBasePoint": 30,
       "disguiseBuffId": 38014000,
@@ -12467,11 +12341,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103,
-        2107
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12677,11 +12547,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2106,
-        2107
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -12787,10 +12653,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -13106,13 +12969,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2109,
-        2314,
-        2315
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -13728,12 +13585,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2105,
-        2315
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -13941,12 +13793,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103,
-        2108,
-        2418
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -14262,10 +14109,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2110
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -14480,11 +14324,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2105
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -14594,10 +14434,7 @@
       "tradeComboSetGroupSortOrder": 8,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2523
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -14813,11 +14650,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2105
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -14962,7 +14795,7 @@
       "isReleased": true,
       "npcAreaSpawnerId": 54000003,
       "townSize": 2,
-      "nationId": 10001031,
+      "nationId": 10001001,
       "disguiseType": 6,
       "disguiseBasePoint": 60,
       "disguiseBuffId": 38014000,
@@ -14986,7 +14819,8 @@
       "shipyardShopGroup": [
         1061,
         30140,
-        2140
+        2140,
+        41140
       ],
       "shopGroup": [
         1061,
@@ -15031,12 +14865,7 @@
       "tradeComboSetGroupSortOrder": 6,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2105,
-        2524
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -15141,11 +14970,7 @@
       "tradeComboSetGroupSortOrder": 7,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2419,
-        2420
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -15244,10 +15069,7 @@
       "tradeComboSetGroupSortOrder": 8,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -15641,10 +15463,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2107
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -16157,10 +15976,7 @@
       "tradeComboSetGroupSortOrder": 8,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2525
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -16368,10 +16184,7 @@
       "tradeComboSetGroupSortOrder": 10,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2102
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -16697,10 +16510,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2108
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -17114,10 +16924,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2106
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -18142,11 +17949,7 @@
       "tradeComboSetGroupSortOrder": 11,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103,
-        2522
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -18515,7 +18318,8 @@
       "shipBuildGroup": 174,
       "shipyardShopGroup": [
         1012,
-        30174
+        30174,
+        41174
       ],
       "shopGroup": [
         1012,
@@ -18967,10 +18771,7 @@
       "tradeComboSetGroupSortOrder": 12,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2103
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -19225,7 +19026,7 @@
       "isReleased": true,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
-      "nationId": 10000001,
+      "nationId": 10001001,
       "disguiseType": 2,
       "disguiseBasePoint": 30,
       "disguiseBuffId": 38014000,
@@ -19286,10 +19087,7 @@
       "tradeComboSetGroupSortOrder": 12,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -19705,10 +19503,7 @@
       "tradeComboSetGroupSortOrder": 6,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2421
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -19903,11 +19698,7 @@
       "tradeComboSetGroupSortOrder": 3,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2315,
-        2419
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20111,12 +19902,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2106,
-        2108,
-        2417
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20223,10 +20009,7 @@
       "tradeComboSetGroupSortOrder": 13,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2521
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20424,12 +20207,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2110,
-        2521
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20527,12 +20305,7 @@
       "tradeComboSetGroupSortOrder": 7,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2416,
-        2417,
-        2418
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20739,13 +20512,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2109,
-        2110,
-        2419
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20851,10 +20618,7 @@
       "tradeComboSetGroupSortOrder": 6,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2311
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -20960,13 +20724,7 @@
       "tradeComboSetGroupSortOrder": 7,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2104,
-        2105,
-        2110,
-        2314
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -21230,7 +20988,8 @@
       "shipBuildGroup": 200,
       "shipyardShopGroup": [
         1042,
-        30200
+        30200,
+        41200
       ],
       "shopGroup": [
         1042,
@@ -21570,10 +21329,7 @@
       "tradeComboSetGroupSortOrder": 12,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2101
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -21677,11 +21433,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2110,
-        2314
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -21993,12 +21745,7 @@
       "tradeComboSetGroupSortOrder": 4,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2105,
-        2110,
-        2314
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -22243,7 +21990,7 @@
       "isReleased": true,
       "npcAreaSpawnerId": 54000004,
       "townSize": 1,
-      "nationId": 10001071,
+      "nationId": 10001001,
       "disguiseType": 10,
       "disguiseBasePoint": 60,
       "disguiseBuffId": 38014000,
@@ -22419,10 +22166,7 @@
       "tradeComboSetGroupSortOrder": 13,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2313
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -23134,10 +22878,7 @@
       "tradeComboSetGroupSortOrder": 5,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2315
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -23549,11 +23290,7 @@
       "tradeComboSetGroupSortOrder": 9,
       "enchantCEquipAble": true,
       "enchantShipSlotAble": true,
-      "shipComposeAble": true,
-      "shipComposeGroupId": [
-        2312,
-        2107
-      ],
+      "shipComposeAble": false,
       "specialEntrySequence": false,
       "dominationRegionEffect": [
         38011008,
@@ -23564,6 +23301,216 @@
         38011007,
         38011004,
         38011006
+      ],
+      "worldWarResource": [
+        {
+          "PointId": 100016,
+          "ValuePerTick": 100
+        },
+        {
+          "PointId": 100017,
+          "ValuePerTick": 100
+        },
+        {
+          "PointId": 100018,
+          "ValuePerTick": 100
+        },
+        {
+          "PointId": 100019,
+          "ValuePerTick": 100
+        }
+      ]
+    },
+    "11000223": {
+      "id": 11000223,
+      "name": "쾰른",
+      "mapName": "Town_koeln_M",
+      "townNpcName": "TownNpcGlobal",
+      "isReleased": true,
+      "npcAreaSpawnerId": 54000002,
+      "townSize": 3,
+      "nationId": 10001016,
+      "disguiseType": 8,
+      "disguiseBasePoint": 30,
+      "disguiseBuffId": 38014000,
+      "CulturalAreaId": 12200002,
+      "RegionId": 12001200,
+      "WeatherTileId": 13300605,
+      "ChinaRegionId": 12011100,
+      "baseReligionType": 1,
+      "ownType": 0,
+      "bgm": 96000007,
+      "rtc": 0.5,
+      "sharePoint": 1725000,
+      "occupyPoint": 10,
+      "industryExp": 0,
+      "commerceExp": 0,
+      "armoryExp": 0,
+      "moneyTradeInvest": 20000000,
+      "marketPriceStartTime": 10,
+      "malariaHazard": 0,
+      "shipBuildGroup": 151,
+      "shipyardShopGroup": [
+        1001,
+        30151,
+        2151
+      ],
+      "shopGroup": [
+        1001,
+        2001,
+        2500,
+        3001,
+        4000,
+        4100,
+        10002,
+        20151,
+        12000,
+        12001,
+        15151
+      ],
+      "minBlackMarketCequipCount": 0,
+      "maxBlackMarketCequipCount": 2,
+      "minBlackMarketContractCount": 3,
+      "maxBlackMarketContractCount": 5,
+      "minBlackMarketDrawingCount": 2,
+      "maxBlackMarketDrawingCount": 4,
+      "minBlackMarkettoolCount": 2,
+      "maxBlackMarkettoolCount": 4,
+      "minBlackMarketitemCount": 3,
+      "maxBlackMarketitemCount": 5,
+      "minBlackMarketEventCount": 1,
+      "maxBlackMarketEventCount": 3,
+      "mateRecruitingGroup": 11000223,
+      "recruitNumberOfOnce": 10,
+      "requestGroups": [
+        999,
+        991,
+        11000223
+      ],
+      "admissionNpcId": 42000003,
+      "languageId": [
+        39000004
+      ],
+      "entranceSequenceTag": "TownEntranceLevelSequenceEast",
+      "discoveryId": 70412376,
+      "tradeComboSetGroup": 4,
+      "tradeComboSetGroupSortOrder": 8,
+      "enchantCEquipAble": true,
+      "enchantShipSlotAble": true,
+      "shipComposeAble": false,
+      "specialEntrySequence": false,
+      "dominationRegionEffect": [
+        38011008,
+        38011004
+      ],
+      "subordinationRegionEffect": [
+        38011007,
+        38011004
+      ],
+      "worldWarResource": [
+        {
+          "PointId": 100016,
+          "ValuePerTick": 100
+        },
+        {
+          "PointId": 100017,
+          "ValuePerTick": 100
+        },
+        {
+          "PointId": 100018,
+          "ValuePerTick": 100
+        },
+        {
+          "PointId": 100019,
+          "ValuePerTick": 100
+        }
+      ]
+    },
+    "11000224": {
+      "id": 11000224,
+      "name": "스트라스부르",
+      "mapName": "Town_Strasbourg_M",
+      "townNpcName": "TownNpcGlobal",
+      "isReleased": true,
+      "npcAreaSpawnerId": 54000003,
+      "townSize": 2,
+      "nationId": 10001016,
+      "disguiseType": 8,
+      "disguiseBasePoint": 30,
+      "disguiseBuffId": 38014000,
+      "CulturalAreaId": 12200002,
+      "RegionId": 12001200,
+      "WeatherTileId": 13300605,
+      "ChinaRegionId": 12011100,
+      "baseReligionType": 1,
+      "ownType": 0,
+      "bgm": 96000007,
+      "rtc": 0.5,
+      "sharePoint": 1725000,
+      "occupyPoint": 7,
+      "industryExp": 0,
+      "commerceExp": 0,
+      "armoryExp": 0,
+      "moneyTradeInvest": 20000000,
+      "marketPriceStartTime": 10,
+      "malariaHazard": 0,
+      "shipBuildGroup": 151,
+      "shipyardShopGroup": [
+        1001,
+        30151,
+        2151
+      ],
+      "shopGroup": [
+        1001,
+        2001,
+        2500,
+        3001,
+        4000,
+        4100,
+        10002,
+        20151,
+        12000,
+        12001,
+        15151
+      ],
+      "minBlackMarketCequipCount": 0,
+      "maxBlackMarketCequipCount": 2,
+      "minBlackMarketContractCount": 3,
+      "maxBlackMarketContractCount": 5,
+      "minBlackMarketDrawingCount": 2,
+      "maxBlackMarketDrawingCount": 4,
+      "minBlackMarkettoolCount": 2,
+      "maxBlackMarkettoolCount": 4,
+      "minBlackMarketitemCount": 3,
+      "maxBlackMarketitemCount": 5,
+      "minBlackMarketEventCount": 1,
+      "maxBlackMarketEventCount": 3,
+      "mateRecruitingGroup": 11000224,
+      "recruitNumberOfOnce": 10,
+      "requestGroups": [
+        999,
+        991,
+        11000224
+      ],
+      "admissionNpcId": 42000003,
+      "languageId": [
+        39000004
+      ],
+      "entranceSequenceTag": "TownEntranceLevelSequenceEast",
+      "discoveryId": 70412377,
+      "tradeComboSetGroup": 4,
+      "tradeComboSetGroupSortOrder": 8,
+      "enchantCEquipAble": true,
+      "enchantShipSlotAble": true,
+      "shipComposeAble": false,
+      "specialEntrySequence": false,
+      "dominationRegionEffect": [
+        38011008,
+        38011004
+      ],
+      "subordinationRegionEffect": [
+        38011007,
+        38011004
       ],
       "worldWarResource": [
         {

@@ -5924,6 +5924,76 @@
       "color2": 16777215,
       "backAnim": true,
       "attachMethod": 2
+    },
+    "33000546": {
+      "id": 33000546,
+      "skeleton": "AttachtoHairSkins",
+      "atlas": "AttachtoHairSkins0005",
+      "skin": "20",
+      "color1": 14795289,
+      "color2": 16777215,
+      "backAnim": true,
+      "attachMethod": 1
+    },
+    "33000547": {
+      "id": 33000547,
+      "skeleton": "AttachtoHairSkins",
+      "atlas": "AttachtoHairSkins0005",
+      "skin": "21",
+      "color1": 16777215,
+      "color2": 16777215,
+      "backAnim": true,
+      "attachMethod": 1
+    },
+    "33000548": {
+      "id": 33000548,
+      "skeleton": "ReplaceHeadSkins",
+      "atlas": "ReplaceHeadSkins0001",
+      "skin": "26",
+      "color1": 16777215,
+      "color2": 16777215,
+      "backAnim": true,
+      "attachMethod": 3
+    },
+    "33000549": {
+      "id": 33000549,
+      "skeleton": "ReplaceHairSkins",
+      "atlas": "ReplaceHairSkins0004",
+      "skin": "3",
+      "color1": 16777215,
+      "color2": 16777215,
+      "backAnim": true,
+      "attachMethod": 2
+    },
+    "33000550": {
+      "id": 33000550,
+      "skeleton": "AttachtoHairSkins",
+      "atlas": "AttachtoHairSkins0005",
+      "skin": "22",
+      "color1": 16777215,
+      "color2": 16777215,
+      "backAnim": true,
+      "attachMethod": 1
+    },
+    "33000551": {
+      "id": 33000551,
+      "skeleton": "AttachtoHairSkins",
+      "atlas": "AttachtoHairSkins0005",
+      "skin": "23",
+      "color1": 16777215,
+      "color2": 16777215,
+      "backAnim": true,
+      "attachMethod": 1
+    },
+    "33000552": {
+      "id": 33000552,
+      "skeleton": "AttachtoHairSkins",
+      "atlas": "AttachtoHairSkins0005",
+      "skin": "24",
+      "color1": 16777215,
+      "color2": 16777215,
+      "backAnim": true,
+      "attachMethod": 1
     }
   }
 }

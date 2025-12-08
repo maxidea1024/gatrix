@@ -1,0 +1,217 @@
+{
+  ":ExchangeVillageList": {
+    ":type": {
+      "id": "key",
+      "group": "number",
+      "sortOrder": "number",
+      "maxExchangeCount": "number",
+      "hideContentsTermsExchangeList": "bool",
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ],
+      "getTradeGoodsId": "number",
+      "getTradeGoodsDefault": "number",
+      "getTradeGoods": [
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        },
+        {
+          "Value": "number"
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Id": "number",
+          "Value": "number"
+        }
+      ]
+    },
+    ":required": {
+      "group": 1,
+      "sortOrder": 1,
+      "maxExchangeCount": 1,
+      "hideContentsTermsExchangeList": 1,
+      "getTradeGoodsId": 1,
+      "getTradeGoodsDefault": 1,
+      "getTradeGoods": [
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        },
+        {
+          "Value": 1
+        }
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": 1,
+          "Value": 1
+        }
+      ]
+    },
+    ":requiredInObject": {
+      "materialTradeGoods": [
+        {
+          "Id": 1,
+          "Value": 1
+        },
+        {
+          "Id": 1,
+          "Value": 1
+        },
+        {
+          "Id": 1,
+          "Value": 1
+        },
+        {
+          "Id": 1,
+          "Value": 1
+        },
+        {
+          "Id": 1,
+          "Value": 1
+        }
+      ]
+    },
+    ":min": {
+      "contentsTerms": [
+        {
+          "Id": 81000000
+        }
+      ],
+      "getTradeGoodsId": 24000000,
+      "materialTradeGoods": [
+        {
+          "Id": 24000000
+        },
+        {
+          "Id": 24000000
+        },
+        {
+          "Id": 24000000
+        },
+        {
+          "Id": 24000000
+        },
+        {
+          "Id": 24000000
+        }
+      ]
+    },
+    ":max": {
+      "contentsTerms": [
+        {
+          "Id": 81999999
+        }
+      ],
+      "getTradeGoodsId": 24499999,
+      "materialTradeGoods": [
+        {
+          "Id": 24499999
+        },
+        {
+          "Id": 24499999
+        },
+        {
+          "Id": 24499999
+        },
+        {
+          "Id": 24499999
+        },
+        {
+          "Id": 24499999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "contentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ],
+      "getTradeGoodsId": [
+        "TradeGoods"
+      ],
+      "materialTradeGoods": [
+        {
+          "Id": [
+            "TradeGoods"
+          ]
+        },
+        {
+          "Id": [
+            "TradeGoods"
+          ]
+        },
+        {
+          "Id": [
+            "TradeGoods"
+          ]
+        },
+        {
+          "Id": [
+            "TradeGoods"
+          ]
+        },
+        {
+          "Id": [
+            "TradeGoods"
+          ]
+        }
+      ]
+    }
+  },
+  "ExchangeVillageList": {}
+}

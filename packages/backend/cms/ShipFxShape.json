@@ -1047,6 +1047,94 @@
           "name": "BP_FX_Ornament_SRGoldIngotChestB_Back"
         }
       ]
+    },
+    "48000069": {
+      "id": 48000069,
+      "assetType": 4,
+      "scaleS": 0.5,
+      "scaleM": 0.7,
+      "scaleL": 0.8,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0,
+      "decorations": [
+        {
+          "name": "BP_FX_Ornament_PlagueDoctor_Top",
+          "socket": "cflag"
+        }
+      ]
+    },
+    "48000070": {
+      "id": 48000070,
+      "assetType": 4,
+      "scaleS": 0.6,
+      "scaleM": 0.75,
+      "scaleL": 0.85,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0,
+      "decorations": [
+        {
+          "name": "BP_FX_Ornament_JackOLantern_SideA_L",
+          "socket": "FXCostume_AbeamL1"
+        },
+        {
+          "name": "BP_FX_Ornament_JackOLantern_SideB_L",
+          "socket": "FXCostume_AbeamL2"
+        },
+        {
+          "name": "BP_FX_Ornament_JackOLantern_SideC_L",
+          "socket": "FXCostume_AbeamL3"
+        }
+      ]
+    },
+    "48000071": {
+      "id": 48000071,
+      "assetType": 4,
+      "scaleS": 0.6,
+      "scaleM": 0.75,
+      "scaleL": 0.85,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0,
+      "decorations": [
+        {
+          "name": "BP_FX_Ornament_JackOLantern_SideA_R",
+          "socket": "FXCostume_AbeamR1"
+        },
+        {
+          "name": "BP_FX_Ornament_JackOLantern_SideB_R",
+          "socket": "FXCostume_AbeamR2"
+        },
+        {
+          "name": "BP_FX_Ornament_JackOLantern_SideC_R",
+          "socket": "FXCostume_AbeamR3"
+        }
+      ]
+    },
+    "48000072": {
+      "id": 48000072,
+      "assetType": 4,
+      "scaleS": 0.6,
+      "scaleM": 0.75,
+      "scaleL": 0.85,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0,
+      "decorations": [
+        {
+          "name": "BP_FX_Ornament_JackOLantern_SideA_R",
+          "socket": "FXCostume_AbeamR1"
+        },
+        {
+          "name": "BP_FX_Ornament_JackOLantern_SideB_R",
+          "socket": "FXCostume_AbeamR2"
+        },
+        {
+          "name": "BP_FX_Ornament_JackOLantern_SideC_R",
+          "socket": "FXCostume_AbeamR3"
+        }
+      ]
     }
   }
 }

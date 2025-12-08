@@ -6679,7 +6679,7 @@
     "65399008": {
       "id": 65399008,
       "name": "헤파이스토스의 가호",
-      "battleSkillUseType": 5,
+      "battleSkillUseType": 0,
       "aiType": [
         1,
         10
@@ -6689,7 +6689,7 @@
       "skillType": 4,
       "controlActionType": 0,
       "isSkillLevelInformationUIHidden": true,
-      "preNameFX": false,
+      "preNameFX": true,
       "skillLevel": 10,
       "groupNo": 65399008,
       "aiScore": 0,
@@ -41737,7 +41737,7 @@
       "descFormatTexts": [
         "대상",
         "행동",
-        "3",
+        "2",
         "70%"
       ],
       "isShortDesc": [
@@ -88566,6 +88566,183 @@
         false
       ]
     },
+    "65450120": {
+      "id": 65450120,
+      "name": "역류 계산",
+      "battleSkillUseType": 0,
+      "aiType": [
+        1,
+        10
+      ],
+      "jobType": 3,
+      "skillActionType": 1,
+      "skillType": 6,
+      "controlActionType": 0,
+      "isSkillLevelInformationUIHidden": true,
+      "preNameFX": true,
+      "skillLevel": 1,
+      "groupNo": 65450120,
+      "aiScore": 0,
+      "costMorale": 50,
+      "costActionPower": 0,
+      "costWater": 0,
+      "costFood": 0,
+      "costResources": 0,
+      "costAmmo": 0,
+      "firstCooldown": 0,
+      "repeatCooldown": 0,
+      "targetType": 3,
+      "divideDamage": 0,
+      "useAoeDamageReduction": 0,
+      "damageDurabilityMultiplier": 0,
+      "damageSailorMultiplier": 0,
+      "healDurabilityMultiplier": 0,
+      "healSailorMultiplier": 0,
+      "actionOverrideType": 1,
+      "aoeOverrideType": 1,
+      "aoeRangeId": 60400000,
+      "aoeVector": false,
+      "rotateVector": false,
+      "isAoeTargetOnly": false,
+      "targetActiveEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65700058,
+          "Val2": 1000
+        }
+      ],
+      "accuType": 2,
+      "accuVal": 1000,
+      "toolTipIcon": "icon_skill_battleOrder_127_Sprite",
+      "animationName": "AdvancedGunnery",
+      "desc": "아군 전체의 반격 피해량을 {0}턴 동안 {1} 증가시키고, 직접적으로 받는 모든 피해량을 {2} 감소시킵니다.",
+      "descFormatTexts": [
+        "3",
+        "150%",
+        "30%"
+      ],
+      "isShortDesc": [
+        false,
+        false,
+        false
+      ]
+    },
+    "65450121": {
+      "id": 65450121,
+      "name": "필중",
+      "battleSkillUseType": 0,
+      "aiType": [
+        1,
+        10
+      ],
+      "jobType": 3,
+      "skillActionType": 1,
+      "skillType": 6,
+      "controlActionType": 0,
+      "isSkillLevelInformationUIHidden": true,
+      "preNameFX": true,
+      "skillLevel": 1,
+      "groupNo": 65450121,
+      "aiScore": 0,
+      "costMorale": 75,
+      "costActionPower": 0,
+      "costWater": 0,
+      "costFood": 0,
+      "costResources": 0,
+      "costAmmo": 0,
+      "firstCooldown": 0,
+      "repeatCooldown": 0,
+      "targetType": 3,
+      "divideDamage": 0,
+      "useAoeDamageReduction": 0,
+      "damageDurabilityMultiplier": 0,
+      "damageSailorMultiplier": 0,
+      "healDurabilityMultiplier": 0,
+      "healSailorMultiplier": 0,
+      "actionOverrideType": 1,
+      "aoeOverrideType": 1,
+      "aoeRangeId": 60400000,
+      "aoeVector": false,
+      "rotateVector": false,
+      "isAoeTargetOnly": false,
+      "targetActiveEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65700059,
+          "Val2": 1000
+        }
+      ],
+      "accuType": 2,
+      "accuVal": 1000,
+      "toolTipIcon": "icon_skill_battleOrder_97_Sprite",
+      "animationName": "BattleOrderPerfectHit",
+      "desc": "아군 전체에게 3턴 동안 직접적으로 가하는 피해량을 {0} 증가시키고, 공격한 대상의 방어력을 {1} 추가로 무시하며, 공격이 반드시 명중하는 능력을 부여합니다.\n(광역 공격 시 주 대상에게만 적용됩니다.\n기존 방어력 무시 효과와 곱연산으로 적용됩니다.)",
+      "descFormatTexts": [
+        "27.7%",
+        "15%"
+      ],
+      "isShortDesc": [
+        false,
+        false
+      ]
+    },
+    "65450122": {
+      "id": 65450122,
+      "name": "도독의 명",
+      "battleSkillUseType": 0,
+      "aiType": [
+        8,
+        10
+      ],
+      "jobType": 3,
+      "skillActionType": 1,
+      "skillType": 6,
+      "controlActionType": 0,
+      "isSkillLevelInformationUIHidden": true,
+      "preNameFX": true,
+      "skillLevel": 1,
+      "groupNo": 65450122,
+      "aiScore": 0,
+      "costMorale": 75,
+      "costActionPower": 0,
+      "costWater": 0,
+      "costFood": 0,
+      "costResources": 0,
+      "costAmmo": 0,
+      "firstCooldown": 0,
+      "repeatCooldown": 0,
+      "targetType": 3,
+      "divideDamage": 0,
+      "useAoeDamageReduction": 0,
+      "damageDurabilityMultiplier": 0,
+      "damageSailorMultiplier": 0,
+      "healDurabilityMultiplier": 0,
+      "healSailorMultiplier": 0,
+      "actionOverrideType": 1,
+      "aoeOverrideType": 1,
+      "aoeRangeId": 60400000,
+      "aoeVector": false,
+      "rotateVector": false,
+      "isAoeTargetOnly": false,
+      "targetActiveEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65700060,
+          "Val2": 1000
+        }
+      ],
+      "accuType": 2,
+      "accuVal": 1000,
+      "toolTipIcon": "icon_skill_battleOrder_134_Sprite",
+      "animationName": "BattleOrderPerfectHit",
+      "desc": "아군 전체에게 3턴 동안 포격 공격 시, 한번 더 공격하여 {0}의 추가 피해를 주는 능력을 부여합니다.\n(다른 추가 효과와 중첩되지 않으며, 추가 공격은 부가적인 효과를 발동시키지 않습니다)",
+      "descFormatTexts": [
+        "50%"
+      ],
+      "isShortDesc": [
+        false
+      ]
+    },
     "65459001": {
       "id": 65459001,
       "name": "강력한 포격",
@@ -89593,6 +89770,129 @@
       "accuType": 2,
       "accuVal": 1000,
       "toolTipIcon": "icon_skill_battle_combat_10_Sprite"
+    },
+    "65459018": {
+      "id": 65459018,
+      "name": "충파",
+      "battleSkillUseType": 5,
+      "aiType": [
+        2,
+        10
+      ],
+      "jobType": 3,
+      "skillActionType": 1,
+      "skillType": 3,
+      "controlActionType": 1,
+      "isSkillLevelInformationUIHidden": true,
+      "preNameFX": false,
+      "skillLevel": 1,
+      "groupNo": 65459018,
+      "aiScore": 0,
+      "costMorale": 0,
+      "costActionPower": 0,
+      "costWater": 0,
+      "costFood": 0,
+      "costResources": 0,
+      "costAmmo": 0,
+      "firstCooldown": 0,
+      "repeatCooldown": 0,
+      "targetType": 2,
+      "divideDamage": 0,
+      "useAoeDamageReduction": 0,
+      "damageDurabilityMultiplier": 2000,
+      "damageSailorMultiplier": 0,
+      "healDurabilityMultiplier": 0,
+      "healSailorMultiplier": 0,
+      "actionOverrideType": 1,
+      "actionRangeId": 60300400,
+      "aoeOverrideType": 0,
+      "aoeRangeId": 60401003,
+      "aoeVector": false,
+      "rotateVector": false,
+      "isAoeTargetOnly": false,
+      "selfActiveEffects": [
+        {
+          "Id": 66000045,
+          "Val1": 0,
+          "Val2": 1000
+        }
+      ],
+      "otherActiveEffects": [
+        {
+          "Id": 66000016,
+          "Val1": 60200054,
+          "Val2": 0
+        }
+      ],
+      "accuType": 2,
+      "accuVal": 1000,
+      "toolTipIcon": "icon_skill_battle_debuff_30_Sprite",
+      "desc": "충파 공격 시 독안개를 살포합니다.\n충파 공격 이후 자침합니다."
+    },
+    "65459019": {
+      "id": 65459019,
+      "name": "화약고 저격",
+      "battleSkillUseType": 5,
+      "aiType": [
+        1,
+        10
+      ],
+      "jobType": 3,
+      "skillActionType": 1,
+      "skillType": 1,
+      "controlActionType": 1,
+      "isSkillLevelInformationUIHidden": true,
+      "preNameFX": false,
+      "skillLevel": 1,
+      "groupNo": 65459019,
+      "aiScore": 0,
+      "costMorale": 0,
+      "costActionPower": 0,
+      "costWater": 0,
+      "costFood": 0,
+      "costResources": 0,
+      "costAmmo": 0,
+      "firstCooldown": 0,
+      "repeatCooldown": 0,
+      "targetType": 2,
+      "divideDamage": 0,
+      "useAoeDamageReduction": 0,
+      "damageDurabilityMultiplier": 1500,
+      "damageSailorMultiplier": 0,
+      "healDurabilityMultiplier": 0,
+      "healSailorMultiplier": 0,
+      "actionOverrideType": 1,
+      "actionRangeId": 60300000,
+      "aoeOverrideType": 1,
+      "aoeRangeId": 60400000,
+      "aoeVector": false,
+      "rotateVector": false,
+      "isAoeTargetOnly": false,
+      "targetActiveEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65501185,
+          "Val2": 1000
+        },
+        {
+          "Id": 66000011,
+          "Val1": 4,
+          "Val2": -15
+        }
+      ],
+      "accuType": 2,
+      "accuVal": 1000,
+      "accuOverrideSkillType": 1,
+      "toolTipIcon": "icon_skill_battle_shelling_22_Sprite",
+      "desc": "{0}에게 {1}를 부여합니다.",
+      "descFormatTexts": [
+        "대상",
+        "화약고 화재"
+      ],
+      "isShortDesc": [
+        false,
+        false
+      ]
     },
     "65459901": {
       "id": 65459901,
@@ -90870,7 +91170,7 @@
       "accuVal": 1000,
       "accuOverrideSkillType": 7,
       "toolTipIcon": "icon_skill_battle_debuff_26_Sprite",
-      "animationName": "BossRaidMobyDickGrowl",
+      "animationName": "TestBattleSkillDummy001",
       "desc": "{0} 상태이상을 지닌 배에게 {1}를 부여합니다.",
       "descFormatTexts": [
         "고래의 각인",
@@ -93425,7 +93725,7 @@
       "targetType": 2,
       "divideDamage": 0,
       "useAoeDamageReduction": 0,
-      "damageDurabilityMultiplier": 2500,
+      "damageDurabilityMultiplier": 2400,
       "damageSailorMultiplier": 0,
       "healDurabilityMultiplier": 0,
       "healSailorMultiplier": 0,

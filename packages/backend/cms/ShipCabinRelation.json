@@ -10645,6 +10645,2469 @@
           "Value": 5400
         }
       ]
+    },
+    "70320650": {
+      "id": 70320650,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320651": {
+      "id": 70320651,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320652": {
+      "id": 70320652,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 2,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320653": {
+      "id": 70320653,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320654": {
+      "id": 70320654,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 5,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320655": {
+      "id": 70320655,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 6,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320656": {
+      "id": 70320656,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 7,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320657": {
+      "id": 70320657,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 8,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320658": {
+      "id": 70320658,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 9,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320659": {
+      "id": 70320659,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 10,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320660": {
+      "id": 70320660,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320661": {
+      "id": 70320661,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320662": {
+      "id": 70320662,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320663": {
+      "id": 70320663,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320664": {
+      "id": 70320664,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 2,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320665": {
+      "id": 70320665,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320666": {
+      "id": 70320666,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 5,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320667": {
+      "id": 70320667,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 6,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320668": {
+      "id": 70320668,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 7,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320669": {
+      "id": 70320669,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 8,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320670": {
+      "id": 70320670,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 9,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320671": {
+      "id": 70320671,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 10,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320672": {
+      "id": 70320672,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320673": {
+      "id": 70320673,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320674": {
+      "id": 70320674,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 24
+        }
+      ]
+    },
+    "70320675": {
+      "id": 70320675,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 21
+        },
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320676": {
+      "id": 70320676,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 7,
+          "Modifier": 2,
+          "Value": 21
+        },
+        {
+          "NpcSkip": false,
+          "Type": 8,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320677": {
+      "id": 70320677,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320678": {
+      "id": 70320678,
+      "shipSlotJobType": 2,
+      "adventurePercent": 90,
+      "tradePercent": 100,
+      "battlePercent": 90,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 5,
+          "Modifier": 2,
+          "Value": 21
+        },
+        {
+          "NpcSkip": false,
+          "Type": 6,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320679": {
+      "id": 70320679,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 21
+        },
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320680": {
+      "id": 70320680,
+      "shipSlotJobType": 3,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320681": {
+      "id": 70320681,
+      "shipSlotJobType": 3,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 24
+        }
+      ]
+    },
+    "70320682": {
+      "id": 70320682,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 21
+        },
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320683": {
+      "id": 70320683,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 24
+        }
+      ]
+    },
+    "70320684": {
+      "id": 70320684,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 21
+        },
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320685": {
+      "id": 70320685,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320686": {
+      "id": 70320686,
+      "shipSlotJobType": 3,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 21
+        },
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320687": {
+      "id": 70320687,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 21
+        },
+        {
+          "NpcSkip": false,
+          "Type": 7,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320688": {
+      "id": 70320688,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 21
+        },
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320689": {
+      "id": 70320689,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 24
+        }
+      ]
+    },
+    "70320690": {
+      "id": 70320690,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 90,
+      "battlePercent": 90,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 9,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320691": {
+      "id": 70320691,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 90,
+      "battlePercent": 90,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 10,
+          "Modifier": 2,
+          "Value": 21
+        }
+      ]
+    },
+    "70320692": {
+      "id": 70320692,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320693": {
+      "id": 70320693,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320694": {
+      "id": 70320694,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 7,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 8,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320695": {
+      "id": 70320695,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 25
+        }
+      ]
+    },
+    "70320696": {
+      "id": 70320696,
+      "shipSlotJobType": 2,
+      "adventurePercent": 90,
+      "tradePercent": 100,
+      "battlePercent": 90,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 5,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 6,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320697": {
+      "id": 70320697,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320698": {
+      "id": 70320698,
+      "shipSlotJobType": 3,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 25
+        }
+      ]
+    },
+    "70320699": {
+      "id": 70320699,
+      "shipSlotJobType": 3,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320700": {
+      "id": 70320700,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320701": {
+      "id": 70320701,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 29
+        }
+      ]
+    },
+    "70320702": {
+      "id": 70320702,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320703": {
+      "id": 70320703,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 25
+        }
+      ]
+    },
+    "70320704": {
+      "id": 70320704,
+      "shipSlotJobType": 3,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 25
+        },
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320705": {
+      "id": 70320705,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 7,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320706": {
+      "id": 70320706,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 15
+        }
+      ]
+    },
+    "70320707": {
+      "id": 70320707,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320708": {
+      "id": 70320708,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 90,
+      "battlePercent": 90,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 9,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320709": {
+      "id": 70320709,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 90,
+      "battlePercent": 90,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 10,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320710": {
+      "id": 70320710,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 18
+        },
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 13
+        }
+      ]
+    },
+    "70320711": {
+      "id": 70320711,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 2,
+          "Modifier": 2,
+          "Value": 18
+        }
+      ]
+    },
+    "70320712": {
+      "id": 70320712,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 22
+        },
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 16
+        }
+      ]
+    },
+    "70320713": {
+      "id": 70320713,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 2,
+          "Modifier": 2,
+          "Value": 19
+        }
+      ]
+    },
+    "70320714": {
+      "id": 70320714,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320715": {
+      "id": 70320715,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320716": {
+      "id": 70320716,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320717": {
+      "id": 70320717,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320718": {
+      "id": 70320718,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320719": {
+      "id": 70320719,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320720": {
+      "id": 70320720,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320721": {
+      "id": 70320721,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320722": {
+      "id": 70320722,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320723": {
+      "id": 70320723,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320724": {
+      "id": 70320724,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320725": {
+      "id": 70320725,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320726": {
+      "id": 70320726,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320727": {
+      "id": 70320727,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320728": {
+      "id": 70320728,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320729": {
+      "id": 70320729,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320730": {
+      "id": 70320730,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320731": {
+      "id": 70320731,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320732": {
+      "id": 70320732,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320733": {
+      "id": 70320733,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320734": {
+      "id": 70320734,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320735": {
+      "id": 70320735,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320736": {
+      "id": 70320736,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320737": {
+      "id": 70320737,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320738": {
+      "id": 70320738,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320739": {
+      "id": 70320739,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320740": {
+      "id": 70320740,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320741": {
+      "id": 70320741,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320742": {
+      "id": 70320742,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320743": {
+      "id": 70320743,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320744": {
+      "id": 70320744,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320745": {
+      "id": 70320745,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320746": {
+      "id": 70320746,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320747": {
+      "id": 70320747,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320748": {
+      "id": 70320748,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320749": {
+      "id": 70320749,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320750": {
+      "id": 70320750,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320751": {
+      "id": 70320751,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320752": {
+      "id": 70320752,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320753": {
+      "id": 70320753,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320754": {
+      "id": 70320754,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320755": {
+      "id": 70320755,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320756": {
+      "id": 70320756,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320757": {
+      "id": 70320757,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320758": {
+      "id": 70320758,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320759": {
+      "id": 70320759,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320760": {
+      "id": 70320760,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320761": {
+      "id": 70320761,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320762": {
+      "id": 70320762,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320763": {
+      "id": 70320763,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320764": {
+      "id": 70320764,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320765": {
+      "id": 70320765,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320766": {
+      "id": 70320766,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320767": {
+      "id": 70320767,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320768": {
+      "id": 70320768,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320769": {
+      "id": 70320769,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320770": {
+      "id": 70320770,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320771": {
+      "id": 70320771,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320772": {
+      "id": 70320772,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320773": {
+      "id": 70320773,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320774": {
+      "id": 70320774,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320775": {
+      "id": 70320775,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320776": {
+      "id": 70320776,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320777": {
+      "id": 70320777,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320778": {
+      "id": 70320778,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320779": {
+      "id": 70320779,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320780": {
+      "id": 70320780,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320781": {
+      "id": 70320781,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320782": {
+      "id": 70320782,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 22
+        },
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 16
+        }
+      ]
+    },
+    "70320783": {
+      "id": 70320783,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 2,
+          "Modifier": 2,
+          "Value": 19
+        }
+      ]
+    },
+    "70320784": {
+      "id": 70320784,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320785": {
+      "id": 70320785,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320786": {
+      "id": 70320786,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320787": {
+      "id": 70320787,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 2,
+          "Modifier": 2,
+          "Value": 227
+        }
+      ]
+    },
+    "70320788": {
+      "id": 70320788,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320789": {
+      "id": 70320789,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320790": {
+      "id": 70320790,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320791": {
+      "id": 70320791,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320792": {
+      "id": 70320792,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 19
+        }
+      ]
+    },
+    "70320793": {
+      "id": 70320793,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 7,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 8,
+          "Modifier": 2,
+          "Value": 19
+        }
+      ]
+    },
+    "70320794": {
+      "id": 70320794,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 25
+        }
+      ]
+    },
+    "70320795": {
+      "id": 70320795,
+      "shipSlotJobType": 2,
+      "adventurePercent": 90,
+      "tradePercent": 100,
+      "battlePercent": 90,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 5,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 6,
+          "Modifier": 2,
+          "Value": 19
+        }
+      ]
+    },
+    "70320796": {
+      "id": 70320796,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 19
+        }
+      ]
+    },
+    "70320797": {
+      "id": 70320797,
+      "shipSlotJobType": 3,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 2,
+          "Value": 25
+        }
+      ]
+    },
+    "70320798": {
+      "id": 70320798,
+      "shipSlotJobType": 3,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320799": {
+      "id": 70320799,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 19
+        }
+      ]
+    },
+    "70320800": {
+      "id": 70320800,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 29
+        }
+      ]
+    },
+    "70320801": {
+      "id": 70320801,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 19
+        }
+      ]
+    },
+    "70320802": {
+      "id": 70320802,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 25
+        }
+      ]
+    },
+    "70320803": {
+      "id": 70320803,
+      "shipSlotJobType": 3,
+      "adventurePercent": 100,
+      "tradePercent": 80,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 4,
+          "Modifier": 2,
+          "Value": 25
+        },
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 19
+        }
+      ]
+    },
+    "70320804": {
+      "id": 70320804,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 7,
+          "Modifier": 2,
+          "Value": 19
+        }
+      ]
+    },
+    "70320805": {
+      "id": 70320805,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 27
+        },
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 19
+        }
+      ]
+    },
+    "70320806": {
+      "id": 70320806,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 29
+        }
+      ]
+    },
+    "70320807": {
+      "id": 70320807,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 90,
+      "battlePercent": 90,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 9,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320808": {
+      "id": 70320808,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 90,
+      "battlePercent": 90,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 10,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320809": {
+      "id": 70320809,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320810": {
+      "id": 70320810,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320811": {
+      "id": 70320811,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320812": {
+      "id": 70320812,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320813": {
+      "id": 70320813,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320814": {
+      "id": 70320814,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320815": {
+      "id": 70320815,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100
+    },
+    "70320816": {
+      "id": 70320816,
+      "shipSlotJobType": 3,
+      "adventurePercent": 50,
+      "tradePercent": 50,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 3,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320817": {
+      "id": 70320817,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320818": {
+      "id": 70320818,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320819": {
+      "id": 70320819,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320820": {
+      "id": 70320820,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320821": {
+      "id": 70320821,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50
+    },
+    "70320822": {
+      "id": 70320822,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 9,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320823": {
+      "id": 70320823,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 10,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320824": {
+      "id": 70320824,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320825": {
+      "id": 70320825,
+      "shipSlotJobType": 1,
+      "adventurePercent": 100,
+      "tradePercent": 50,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 11,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320826": {
+      "id": 70320826,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320827": {
+      "id": 70320827,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320828": {
+      "id": 70320828,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320829": {
+      "id": 70320829,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320830": {
+      "id": 70320830,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320831": {
+      "id": 70320831,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320832": {
+      "id": 70320832,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320833": {
+      "id": 70320833,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320834": {
+      "id": 70320834,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320835": {
+      "id": 70320835,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320836": {
+      "id": 70320836,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320837": {
+      "id": 70320837,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320838": {
+      "id": 70320838,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320839": {
+      "id": 70320839,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320840": {
+      "id": 70320840,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320841": {
+      "id": 70320841,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320842": {
+      "id": 70320842,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320843": {
+      "id": 70320843,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320844": {
+      "id": 70320844,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320845": {
+      "id": 70320845,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320846": {
+      "id": 70320846,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320847": {
+      "id": 70320847,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50
+    },
+    "70320848": {
+      "id": 70320848,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 5,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320849": {
+      "id": 70320849,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 6,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320850": {
+      "id": 70320850,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 7,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320851": {
+      "id": 70320851,
+      "shipSlotJobType": 2,
+      "adventurePercent": 50,
+      "tradePercent": 100,
+      "battlePercent": 50,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 8,
+          "Modifier": 2,
+          "Value": 27
+        }
+      ]
+    },
+    "70320852": {
+      "id": 70320852,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 13
+        },
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 6000
+        },
+        {
+          "Type": 12,
+          "Modifier": 1,
+          "Value": 6000
+        },
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 6000
+        }
+      ]
+    },
+    "70320853": {
+      "id": 70320853,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 13
+        },
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 6000
+        },
+        {
+          "Type": 12,
+          "Modifier": 1,
+          "Value": 6000
+        },
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 6000
+        }
+      ]
+    },
+    "70320854": {
+      "id": 70320854,
+      "shipSlotJobType": 0,
+      "adventurePercent": 100,
+      "tradePercent": 100,
+      "battlePercent": 100,
+      "specialStat": [
+        {
+          "NpcSkip": false,
+          "Type": 12,
+          "Modifier": 2,
+          "Value": 13
+        },
+        {
+          "NpcSkip": false,
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 6000
+        },
+        {
+          "Type": 12,
+          "Modifier": 1,
+          "Value": 6000
+        },
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 6000
+        }
+      ]
     }
   }
 }

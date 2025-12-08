@@ -4688,7 +4688,7 @@
       "guildLevelRequired": 4,
       "craftResultType": 2,
       "craftGuildPoint": 0,
-      "productLocalBitflag": 0,
+      "productLocalBitflag": 192,
       "craftPointId": 100001,
       "craftPointVal": 200000,
       "material": [
@@ -4707,7 +4707,7 @@
       "guildLevelRequired": 4,
       "craftResultType": 2,
       "craftGuildPoint": 0,
-      "productLocalBitflag": 0,
+      "productLocalBitflag": 192,
       "craftPointId": 100001,
       "craftPointVal": 700000,
       "material": [

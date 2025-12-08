@@ -3986,6 +3986,114 @@
       "color2": 16777215,
       "color3_hair": 4993321,
       "backAnim": true
+    },
+    "32000443": {
+      "id": 32000443,
+      "skeleton": "FMid11",
+      "atlas": "FMid11",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 2763819,
+      "backAnim": true
+    },
+    "32000444": {
+      "id": 32000444,
+      "skeleton": "FLong21",
+      "atlas": "FLong21",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 4993321,
+      "backAnim": true
+    },
+    "32000445": {
+      "id": 32000445,
+      "skeleton": "FLong41",
+      "atlas": "FLong41",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 9589046,
+      "backAnim": true
+    },
+    "32000446": {
+      "id": 32000446,
+      "skeleton": "FBunhair05",
+      "atlas": "FBunhair05",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 2763819,
+      "backAnim": true
+    },
+    "32000447": {
+      "id": 32000447,
+      "skeleton": "FMid12",
+      "atlas": "FMid12",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 4993321,
+      "backAnim": true
+    },
+    "32000448": {
+      "id": 32000448,
+      "skeleton": "FShorthair16",
+      "atlas": "FShorthair16",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 4993321,
+      "backAnim": true
+    },
+    "32000449": {
+      "id": 32000449,
+      "skeleton": "FLong42",
+      "atlas": "FLong42",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 4993321,
+      "backAnim": true
+    },
+    "32000450": {
+      "id": 32000450,
+      "skeleton": "MMid33",
+      "atlas": "MMid33",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 15921906,
+      "backAnim": true
+    },
+    "32000451": {
+      "id": 32000451,
+      "skeleton": "MShort48",
+      "atlas": "MShort48",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 2763819,
+      "backAnim": true
+    },
+    "32000452": {
+      "id": 32000452,
+      "skeleton": "FMid13",
+      "atlas": "FMid13",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 8081205,
+      "backAnim": true
+    },
+    "32000453": {
+      "id": 32000453,
+      "skeleton": "FShorthair17",
+      "atlas": "FShorthair17",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 16764245,
+      "backAnim": true
+    },
+    "32000454": {
+      "id": 32000454,
+      "skeleton": "MMid34",
+      "atlas": "MMid34",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 16764245,
+      "backAnim": true
     }
   }
 }

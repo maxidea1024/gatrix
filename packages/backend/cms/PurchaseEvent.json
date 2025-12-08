@@ -5,18 +5,24 @@
       "listText": "text",
       "group": "number",
       "order": "number",
+      "needGetRedgems": "number",
       "PurchaseTierPrice": "number",
       "usePrice": {
         "Type": "number",
         "Id": "number",
         "Value": "number"
       },
-      "rewardId": "number"
+      "rewardId": "number",
+      "rewardValueText1": "text",
+      "rewardValueText2": "text",
+      "rewardValueText3": "text",
+      "rewardValueText4": "text",
+      "rewardValueText5": "text",
+      "rewardValueText6": "text"
     },
     ":required": {
       "group": 1,
       "order": 1,
-      "PurchaseTierPrice": 1,
       "usePrice": {
         "Type": 1
       },
@@ -43,98 +49,243 @@
       "listText": "항해자보물나침반_항@항",
       "group": 1001,
       "order": 1,
-      "PurchaseTierPrice": 1,
+      "needGetRedgems": 1200,
       "usePrice": {
-        "Type": 0
+        "Type": 1,
+        "Id": 100004,
+        "Value": 256
       },
-      "rewardId": 90121675
+      "rewardId": 90121675,
+      "rewardValueText2": "1.2暴击",
+      "rewardValueText3": "1.5暴击",
+      "rewardValueText4": "1.9暴击",
+      "rewardValueText5": "2.5暴击",
+      "rewardValueText6": "3.0暴击"
     },
     "100110002": {
       "id": 100110002,
       "listText": "항해자보물나침반_해@해",
       "group": 1001,
       "order": 2,
-      "PurchaseTierPrice": 4,
+      "needGetRedgems": 2400,
       "usePrice": {
         "Type": 1,
-        "Id": 100001,
-        "Value": 10
+        "Id": 100004,
+        "Value": 336
       },
-      "rewardId": 90121676
+      "rewardId": 90121676,
+      "rewardValueText2": "1.2暴击",
+      "rewardValueText3": "1.3暴击",
+      "rewardValueText4": "1.7暴击",
+      "rewardValueText5": "2.0暴击",
+      "rewardValueText6": "3.2暴击"
     },
     "100110003": {
       "id": 100110003,
       "listText": "항해자보물나침반_자@자",
       "group": 1001,
       "order": 3,
-      "PurchaseTierPrice": 5,
+      "needGetRedgems": 4400,
       "usePrice": {
         "Type": 1,
-        "Id": 100003,
-        "Value": 1000
+        "Id": 100004,
+        "Value": 436
       },
-      "rewardId": 90121677
+      "rewardId": 90121677,
+      "rewardValueText2": "1.1暴击",
+      "rewardValueText3": "1.3暴击",
+      "rewardValueText4": "1.6暴击",
+      "rewardValueText5": "2.2暴击",
+      "rewardValueText6": "3.1暴击"
     },
     "100110004": {
       "id": 100110004,
       "listText": "항해자보물나침반_보@보",
       "group": 1001,
       "order": 4,
-      "PurchaseTierPrice": 6,
+      "needGetRedgems": 8320,
       "usePrice": {
         "Type": 1,
         "Id": 100004,
-        "Value": 10000
+        "Value": 716
       },
-      "rewardId": 90121678
+      "rewardId": 90121678,
+      "rewardValueText3": "1.3暴击",
+      "rewardValueText4": "1.6暴击",
+      "rewardValueText5": "2.0暴击",
+      "rewardValueText6": "2.9暴击"
     },
     "100110005": {
       "id": 100110005,
       "listText": "항해자보물나침반_물@물",
       "group": 1001,
       "order": 5,
-      "PurchaseTierPrice": 7,
+      "needGetRedgems": 16240,
       "usePrice": {
-        "Type": 0,
-        "Value": 1
+        "Type": 1,
+        "Id": 100004,
+        "Value": 1236
       },
-      "rewardId": 90121679
+      "rewardId": 90121679,
+      "rewardValueText2": "1.1暴击",
+      "rewardValueText3": "1.3暴击",
+      "rewardValueText4": "1.7暴击",
+      "rewardValueText5": "2.3暴击",
+      "rewardValueText6": "2.6暴击"
     },
     "100110006": {
       "id": 100110006,
       "listText": "항해자보물나침반_나@나",
       "group": 1001,
       "order": 6,
-      "PurchaseTierPrice": 10,
+      "needGetRedgems": 29360,
       "usePrice": {
-        "Type": 2,
-        "Id": 23340117,
-        "Value": 100
+        "Type": 1,
+        "Id": 100004,
+        "Value": 1976
       },
-      "rewardId": 90121680
+      "rewardId": 90121680,
+      "rewardValueText2": "1.2暴击",
+      "rewardValueText3": "1.4暴击",
+      "rewardValueText4": "1.7暴击",
+      "rewardValueText5": "1.9暴击",
+      "rewardValueText6": "2.6暴击"
     },
     "100110007": {
       "id": 100110007,
       "listText": "항해자보물나침반_침@침",
       "group": 1001,
       "order": 7,
-      "PurchaseTierPrice": 15,
+      "needGetRedgems": 55280,
       "usePrice": {
-        "Type": 2,
-        "Id": 23340119,
-        "Value": 200
+        "Type": 1,
+        "Id": 100004,
+        "Value": 4776
       },
-      "rewardId": 90121681
+      "rewardId": 90121681,
+      "rewardValueText3": "1.1暴击",
+      "rewardValueText4": "1.3暴击",
+      "rewardValueText5": "1.6暴击",
+      "rewardValueText6": "2.0暴击"
     },
     "100110008": {
       "id": 100110008,
       "listText": "항해자보물나침반_반@반",
       "group": 1001,
-      "order": 1,
-      "PurchaseTierPrice": 30,
+      "order": 8,
+      "needGetRedgems": 81200,
       "usePrice": {
-        "Type": 0,
-        "Value": 1
+        "Type": 1,
+        "Id": 100004,
+        "Value": 4776
+      },
+      "rewardId": 90121682,
+      "rewardValueText3": "1.1暴击",
+      "rewardValueText4": "1.3暴击",
+      "rewardValueText5": "1.6暴击",
+      "rewardValueText6": "2.0暴击"
+    },
+    "100110009": {
+      "id": 100110009,
+      "listText": "항해자보물나침반_항@항",
+      "group": 1002,
+      "order": 1,
+      "PurchaseTierPrice": 7,
+      "usePrice": {
+        "Type": 1,
+        "Id": 100004,
+        "Value": 256
+      },
+      "rewardId": 90121675
+    },
+    "100110010": {
+      "id": 100110010,
+      "listText": "항해자보물나침반_해@해",
+      "group": 1002,
+      "order": 2,
+      "PurchaseTierPrice": 9,
+      "usePrice": {
+        "Type": 1,
+        "Id": 100004,
+        "Value": 336
+      },
+      "rewardId": 90121676
+    },
+    "100110011": {
+      "id": 100110011,
+      "listText": "항해자보물나침반_자@자",
+      "group": 1002,
+      "order": 3,
+      "PurchaseTierPrice": 12,
+      "usePrice": {
+        "Type": 1,
+        "Id": 100004,
+        "Value": 436
+      },
+      "rewardId": 90121677
+    },
+    "100110012": {
+      "id": 100110012,
+      "listText": "항해자보물나침반_보@보",
+      "group": 1002,
+      "order": 4,
+      "PurchaseTierPrice": 14,
+      "usePrice": {
+        "Type": 1,
+        "Id": 100004,
+        "Value": 716
+      },
+      "rewardId": 90121678
+    },
+    "100110013": {
+      "id": 100110013,
+      "listText": "항해자보물나침반_물@물",
+      "group": 1002,
+      "order": 5,
+      "PurchaseTierPrice": 16,
+      "usePrice": {
+        "Type": 1,
+        "Id": 100004,
+        "Value": 1236
+      },
+      "rewardId": 90121679
+    },
+    "100110014": {
+      "id": 100110014,
+      "listText": "항해자보물나침반_나@나",
+      "group": 1002,
+      "order": 6,
+      "PurchaseTierPrice": 17,
+      "usePrice": {
+        "Type": 1,
+        "Id": 100004,
+        "Value": 1976
+      },
+      "rewardId": 90121680
+    },
+    "100110015": {
+      "id": 100110015,
+      "listText": "항해자보물나침반_침@침",
+      "group": 1002,
+      "order": 7,
+      "PurchaseTierPrice": 18,
+      "usePrice": {
+        "Type": 1,
+        "Id": 100004,
+        "Value": 4776
+      },
+      "rewardId": 90121681
+    },
+    "100110016": {
+      "id": 100110016,
+      "listText": "항해자보물나침반_반@반",
+      "group": 1002,
+      "order": 8,
+      "PurchaseTierPrice": 19,
+      "usePrice": {
+        "Type": 1,
+        "Id": 100004,
+        "Value": 4776
       },
       "rewardId": 90121682
     }

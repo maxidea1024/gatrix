@@ -244,7 +244,7 @@
       "localBitFlag": 0,
       "rankingGrade": 6,
       "rankingType": 2,
-      "rankingRange": 6,
+      "rankingRange": 5,
       "mailId": 92001150
     },
     "27100106": {
@@ -537,7 +537,7 @@
     },
     "27100300": {
       "id": 27100300,
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "rankingGrade": 1,
       "rankingType": 2,
       "rankingRange": 1,
@@ -550,7 +550,7 @@
     },
     "27100308": {
       "id": 27100308,
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "rankingGrade": 2,
       "rankingType": 2,
       "rankingRange": 2,
@@ -563,7 +563,7 @@
     },
     "27100309": {
       "id": 27100309,
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "rankingGrade": 3,
       "rankingType": 2,
       "rankingRange": 3,
@@ -576,7 +576,7 @@
     },
     "27100310": {
       "id": 27100310,
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "rankingGrade": 4,
       "rankingType": 2,
       "rankingRange": 5,
@@ -589,7 +589,7 @@
     },
     "27100311": {
       "id": 27100311,
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "rankingGrade": 5,
       "rankingType": 2,
       "rankingRange": 10,
@@ -602,7 +602,7 @@
     },
     "27100312": {
       "id": 27100312,
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "rankingGrade": 6,
       "rankingType": 2,
       "rankingRange": 15,
@@ -615,7 +615,7 @@
     },
     "27100313": {
       "id": 27100313,
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "rankingGrade": 7,
       "rankingType": 2,
       "rankingRange": 20,
@@ -628,7 +628,7 @@
     },
     "27100314": {
       "id": 27100314,
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "rankingGrade": 8,
       "rankingType": 2,
       "rankingRange": 30,
@@ -641,7 +641,7 @@
     },
     "27100315": {
       "id": 27100315,
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "rankingGrade": 9,
       "rankingType": 2,
       "rankingRange": 50,
@@ -654,13 +654,143 @@
     },
     "27100316": {
       "id": 27100316,
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "rankingGrade": 10,
       "rankingType": 1,
       "rankingRange": 100,
       "mailId": 92001247,
       "seasonRewardValue": [
         50,
+        1,
+        80
+      ]
+    },
+    "27100400": {
+      "id": 27100400,
+      "localBitFlag": 192,
+      "rankingGrade": 1,
+      "rankingType": 2,
+      "rankingRange": 1,
+      "mailId": 92001231,
+      "seasonRewardValue": [
+        2000,
+        50,
+        2000
+      ]
+    },
+    "27100401": {
+      "id": 27100401,
+      "localBitFlag": 192,
+      "rankingGrade": 2,
+      "rankingType": 2,
+      "rankingRange": 2,
+      "mailId": 92001239,
+      "seasonRewardValue": [
+        1000,
+        40,
+        1600
+      ]
+    },
+    "27100402": {
+      "id": 27100402,
+      "localBitFlag": 192,
+      "rankingGrade": 3,
+      "rankingType": 2,
+      "rankingRange": 3,
+      "mailId": 92001240,
+      "seasonRewardValue": [
+        700,
+        30,
+        1300
+      ]
+    },
+    "27100403": {
+      "id": 27100403,
+      "localBitFlag": 192,
+      "rankingGrade": 4,
+      "rankingType": 2,
+      "rankingRange": 5,
+      "mailId": 92001241,
+      "seasonRewardValue": [
+        500,
+        20,
+        1000
+      ]
+    },
+    "27100404": {
+      "id": 27100404,
+      "localBitFlag": 192,
+      "rankingGrade": 5,
+      "rankingType": 2,
+      "rankingRange": 10,
+      "mailId": 92001242,
+      "seasonRewardValue": [
+        300,
+        15,
+        800
+      ]
+    },
+    "27100405": {
+      "id": 27100405,
+      "localBitFlag": 192,
+      "rankingGrade": 6,
+      "rankingType": 2,
+      "rankingRange": 15,
+      "mailId": 92001243,
+      "seasonRewardValue": [
+        100,
+        10,
+        600
+      ]
+    },
+    "27100406": {
+      "id": 27100406,
+      "localBitFlag": 192,
+      "rankingGrade": 7,
+      "rankingType": 2,
+      "rankingRange": 20,
+      "mailId": 92001244,
+      "seasonRewardValue": [
+        75,
+        7,
+        400
+      ]
+    },
+    "27100407": {
+      "id": 27100407,
+      "localBitFlag": 192,
+      "rankingGrade": 8,
+      "rankingType": 2,
+      "rankingRange": 30,
+      "mailId": 92001245,
+      "seasonRewardValue": [
+        60,
+        5,
+        250
+      ]
+    },
+    "27100408": {
+      "id": 27100408,
+      "localBitFlag": 192,
+      "rankingGrade": 9,
+      "rankingType": 2,
+      "rankingRange": 50,
+      "mailId": 92001246,
+      "seasonRewardValue": [
+        50,
+        3,
+        150
+      ]
+    },
+    "27100409": {
+      "id": 27100409,
+      "localBitFlag": 192,
+      "rankingGrade": 10,
+      "rankingType": 1,
+      "rankingRange": 100,
+      "mailId": 92001247,
+      "seasonRewardValue": [
+        10,
         1,
         80
       ]

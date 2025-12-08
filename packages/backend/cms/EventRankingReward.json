@@ -12504,6 +12504,2517 @@
       "rateMax": 100,
       "valueMax": 0,
       "reward": 95961589
+    },
+    "78901455": {
+      "id": 78901455,
+      "group": 79,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961563
+    },
+    "78901456": {
+      "id": 78901456,
+      "group": 79,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961564
+    },
+    "78901457": {
+      "id": 78901457,
+      "group": 79,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961565
+    },
+    "78901458": {
+      "id": 78901458,
+      "group": 79,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961572
+    },
+    "78901459": {
+      "id": 78901459,
+      "group": 79,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 25,
+      "reward": 95961573
+    },
+    "78901460": {
+      "id": 78901460,
+      "group": 79,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961574
+    },
+    "78901461": {
+      "id": 78901461,
+      "group": 79,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961575
+    },
+    "78901462": {
+      "id": 78901462,
+      "group": 79,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 20,
+      "valueMax": 0,
+      "reward": 95961576
+    },
+    "78901463": {
+      "id": 78901463,
+      "group": 79,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961577
+    },
+    "78901464": {
+      "id": 78901464,
+      "group": 79,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 40,
+      "valueMax": 0,
+      "reward": 95961578
+    },
+    "78901465": {
+      "id": 78901465,
+      "group": 79,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961579
+    },
+    "78901466": {
+      "id": 78901466,
+      "group": 79,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961580
+    },
+    "78901467": {
+      "id": 78901467,
+      "group": 79,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961581
+    },
+    "78901468": {
+      "id": 78901468,
+      "group": 79,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961582
+    },
+    "78901469": {
+      "id": 78901469,
+      "group": 79,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961583
+    },
+    "78901470": {
+      "id": 78901470,
+      "group": 79,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961584
+    },
+    "78901471": {
+      "id": 78901471,
+      "group": 79,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961585
+    },
+    "78901472": {
+      "id": 78901472,
+      "group": 79,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961586
+    },
+    "78901473": {
+      "id": 78901473,
+      "group": 79,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961587
+    },
+    "78901474": {
+      "id": 78901474,
+      "group": 79,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961588
+    },
+    "78901475": {
+      "id": 78901475,
+      "group": 79,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961589
+    },
+    "78901476": {
+      "id": 78901476,
+      "group": 80,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961566
+    },
+    "78901477": {
+      "id": 78901477,
+      "group": 80,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961567
+    },
+    "78901478": {
+      "id": 78901478,
+      "group": 80,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961568
+    },
+    "78901479": {
+      "id": 78901479,
+      "group": 80,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961572
+    },
+    "78901480": {
+      "id": 78901480,
+      "group": 80,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 25,
+      "reward": 95961573
+    },
+    "78901481": {
+      "id": 78901481,
+      "group": 80,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961574
+    },
+    "78901482": {
+      "id": 78901482,
+      "group": 80,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961575
+    },
+    "78901483": {
+      "id": 78901483,
+      "group": 80,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 20,
+      "valueMax": 0,
+      "reward": 95961576
+    },
+    "78901484": {
+      "id": 78901484,
+      "group": 80,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961577
+    },
+    "78901485": {
+      "id": 78901485,
+      "group": 80,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 40,
+      "valueMax": 0,
+      "reward": 95961578
+    },
+    "78901486": {
+      "id": 78901486,
+      "group": 80,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961579
+    },
+    "78901487": {
+      "id": 78901487,
+      "group": 80,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961580
+    },
+    "78901488": {
+      "id": 78901488,
+      "group": 80,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961581
+    },
+    "78901489": {
+      "id": 78901489,
+      "group": 80,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961582
+    },
+    "78901490": {
+      "id": 78901490,
+      "group": 80,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961583
+    },
+    "78901491": {
+      "id": 78901491,
+      "group": 80,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961584
+    },
+    "78901492": {
+      "id": 78901492,
+      "group": 80,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961585
+    },
+    "78901493": {
+      "id": 78901493,
+      "group": 80,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961586
+    },
+    "78901494": {
+      "id": 78901494,
+      "group": 80,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961587
+    },
+    "78901495": {
+      "id": 78901495,
+      "group": 80,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961588
+    },
+    "78901496": {
+      "id": 78901496,
+      "group": 80,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961589
+    },
+    "78901497": {
+      "id": 78901497,
+      "group": 81,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961560
+    },
+    "78901498": {
+      "id": 78901498,
+      "group": 81,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961561
+    },
+    "78901499": {
+      "id": 78901499,
+      "group": 81,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961562
+    },
+    "78901500": {
+      "id": 78901500,
+      "group": 81,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961572
+    },
+    "78901501": {
+      "id": 78901501,
+      "group": 81,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 25,
+      "reward": 95961573
+    },
+    "78901502": {
+      "id": 78901502,
+      "group": 81,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961574
+    },
+    "78901503": {
+      "id": 78901503,
+      "group": 81,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961575
+    },
+    "78901504": {
+      "id": 78901504,
+      "group": 81,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 20,
+      "valueMax": 0,
+      "reward": 95961576
+    },
+    "78901505": {
+      "id": 78901505,
+      "group": 81,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961577
+    },
+    "78901506": {
+      "id": 78901506,
+      "group": 81,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 40,
+      "valueMax": 0,
+      "reward": 95961578
+    },
+    "78901507": {
+      "id": 78901507,
+      "group": 81,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961579
+    },
+    "78901508": {
+      "id": 78901508,
+      "group": 81,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961580
+    },
+    "78901509": {
+      "id": 78901509,
+      "group": 81,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961581
+    },
+    "78901510": {
+      "id": 78901510,
+      "group": 81,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961582
+    },
+    "78901511": {
+      "id": 78901511,
+      "group": 81,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961583
+    },
+    "78901512": {
+      "id": 78901512,
+      "group": 81,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961584
+    },
+    "78901513": {
+      "id": 78901513,
+      "group": 81,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961585
+    },
+    "78901514": {
+      "id": 78901514,
+      "group": 81,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961586
+    },
+    "78901515": {
+      "id": 78901515,
+      "group": 81,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961587
+    },
+    "78901516": {
+      "id": 78901516,
+      "group": 81,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961588
+    },
+    "78901517": {
+      "id": 78901517,
+      "group": 81,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961589
+    },
+    "78901518": {
+      "id": 78901518,
+      "group": 82,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961569
+    },
+    "78901519": {
+      "id": 78901519,
+      "group": 82,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961570
+    },
+    "78901520": {
+      "id": 78901520,
+      "group": 82,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961571
+    },
+    "78901521": {
+      "id": 78901521,
+      "group": 82,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961572
+    },
+    "78901522": {
+      "id": 78901522,
+      "group": 82,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 25,
+      "reward": 95961573
+    },
+    "78901523": {
+      "id": 78901523,
+      "group": 82,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961574
+    },
+    "78901524": {
+      "id": 78901524,
+      "group": 82,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961575
+    },
+    "78901525": {
+      "id": 78901525,
+      "group": 82,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 20,
+      "valueMax": 0,
+      "reward": 95961576
+    },
+    "78901526": {
+      "id": 78901526,
+      "group": 82,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961577
+    },
+    "78901527": {
+      "id": 78901527,
+      "group": 82,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 40,
+      "valueMax": 0,
+      "reward": 95961578
+    },
+    "78901528": {
+      "id": 78901528,
+      "group": 82,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961579
+    },
+    "78901529": {
+      "id": 78901529,
+      "group": 82,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961580
+    },
+    "78901530": {
+      "id": 78901530,
+      "group": 82,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961581
+    },
+    "78901531": {
+      "id": 78901531,
+      "group": 82,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961582
+    },
+    "78901532": {
+      "id": 78901532,
+      "group": 82,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961583
+    },
+    "78901533": {
+      "id": 78901533,
+      "group": 82,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961584
+    },
+    "78901534": {
+      "id": 78901534,
+      "group": 82,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961585
+    },
+    "78901535": {
+      "id": 78901535,
+      "group": 82,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961586
+    },
+    "78901536": {
+      "id": 78901536,
+      "group": 82,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961587
+    },
+    "78901537": {
+      "id": 78901537,
+      "group": 82,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961588
+    },
+    "78901538": {
+      "id": 78901538,
+      "group": 82,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961589
+    },
+    "78901539": {
+      "id": 78901539,
+      "group": 83,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961563
+    },
+    "78901540": {
+      "id": 78901540,
+      "group": 83,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961564
+    },
+    "78901541": {
+      "id": 78901541,
+      "group": 83,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961565
+    },
+    "78901542": {
+      "id": 78901542,
+      "group": 83,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961572
+    },
+    "78901543": {
+      "id": 78901543,
+      "group": 83,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 25,
+      "reward": 95961573
+    },
+    "78901544": {
+      "id": 78901544,
+      "group": 83,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961574
+    },
+    "78901545": {
+      "id": 78901545,
+      "group": 83,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961575
+    },
+    "78901546": {
+      "id": 78901546,
+      "group": 83,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 20,
+      "valueMax": 0,
+      "reward": 95961576
+    },
+    "78901547": {
+      "id": 78901547,
+      "group": 83,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961577
+    },
+    "78901548": {
+      "id": 78901548,
+      "group": 83,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 40,
+      "valueMax": 0,
+      "reward": 95961578
+    },
+    "78901549": {
+      "id": 78901549,
+      "group": 83,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961579
+    },
+    "78901550": {
+      "id": 78901550,
+      "group": 83,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961580
+    },
+    "78901551": {
+      "id": 78901551,
+      "group": 83,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961581
+    },
+    "78901552": {
+      "id": 78901552,
+      "group": 83,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961582
+    },
+    "78901553": {
+      "id": 78901553,
+      "group": 83,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961583
+    },
+    "78901554": {
+      "id": 78901554,
+      "group": 83,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961584
+    },
+    "78901555": {
+      "id": 78901555,
+      "group": 83,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961585
+    },
+    "78901556": {
+      "id": 78901556,
+      "group": 83,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961586
+    },
+    "78901557": {
+      "id": 78901557,
+      "group": 83,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961587
+    },
+    "78901558": {
+      "id": 78901558,
+      "group": 83,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961588
+    },
+    "78901559": {
+      "id": 78901559,
+      "group": 83,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961589
+    },
+    "78901560": {
+      "id": 78901560,
+      "group": 84,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961566
+    },
+    "78901561": {
+      "id": 78901561,
+      "group": 84,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961567
+    },
+    "78901562": {
+      "id": 78901562,
+      "group": 84,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961568
+    },
+    "78901563": {
+      "id": 78901563,
+      "group": 84,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961572
+    },
+    "78901564": {
+      "id": 78901564,
+      "group": 84,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 25,
+      "reward": 95961573
+    },
+    "78901565": {
+      "id": 78901565,
+      "group": 84,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961574
+    },
+    "78901566": {
+      "id": 78901566,
+      "group": 84,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961575
+    },
+    "78901567": {
+      "id": 78901567,
+      "group": 84,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 20,
+      "valueMax": 0,
+      "reward": 95961576
+    },
+    "78901568": {
+      "id": 78901568,
+      "group": 84,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961577
+    },
+    "78901569": {
+      "id": 78901569,
+      "group": 84,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 40,
+      "valueMax": 0,
+      "reward": 95961578
+    },
+    "78901570": {
+      "id": 78901570,
+      "group": 84,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961579
+    },
+    "78901571": {
+      "id": 78901571,
+      "group": 84,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961580
+    },
+    "78901572": {
+      "id": 78901572,
+      "group": 84,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961581
+    },
+    "78901573": {
+      "id": 78901573,
+      "group": 84,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961582
+    },
+    "78901574": {
+      "id": 78901574,
+      "group": 84,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961583
+    },
+    "78901575": {
+      "id": 78901575,
+      "group": 84,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961584
+    },
+    "78901576": {
+      "id": 78901576,
+      "group": 84,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961585
+    },
+    "78901577": {
+      "id": 78901577,
+      "group": 84,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961586
+    },
+    "78901578": {
+      "id": 78901578,
+      "group": 84,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961587
+    },
+    "78901579": {
+      "id": 78901579,
+      "group": 84,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961588
+    },
+    "78901580": {
+      "id": 78901580,
+      "group": 84,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961589
+    },
+    "78901581": {
+      "id": 78901581,
+      "group": 85,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961560
+    },
+    "78901582": {
+      "id": 78901582,
+      "group": 85,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961561
+    },
+    "78901583": {
+      "id": 78901583,
+      "group": 85,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961562
+    },
+    "78901584": {
+      "id": 78901584,
+      "group": 85,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961572
+    },
+    "78901585": {
+      "id": 78901585,
+      "group": 85,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 25,
+      "reward": 95961573
+    },
+    "78901586": {
+      "id": 78901586,
+      "group": 85,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961574
+    },
+    "78901587": {
+      "id": 78901587,
+      "group": 85,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961575
+    },
+    "78901588": {
+      "id": 78901588,
+      "group": 85,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 20,
+      "valueMax": 0,
+      "reward": 95961576
+    },
+    "78901589": {
+      "id": 78901589,
+      "group": 85,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961577
+    },
+    "78901590": {
+      "id": 78901590,
+      "group": 85,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 40,
+      "valueMax": 0,
+      "reward": 95961578
+    },
+    "78901591": {
+      "id": 78901591,
+      "group": 85,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961579
+    },
+    "78901592": {
+      "id": 78901592,
+      "group": 85,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961580
+    },
+    "78901593": {
+      "id": 78901593,
+      "group": 85,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961581
+    },
+    "78901594": {
+      "id": 78901594,
+      "group": 85,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961582
+    },
+    "78901595": {
+      "id": 78901595,
+      "group": 85,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961583
+    },
+    "78901596": {
+      "id": 78901596,
+      "group": 85,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961584
+    },
+    "78901597": {
+      "id": 78901597,
+      "group": 85,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961585
+    },
+    "78901598": {
+      "id": 78901598,
+      "group": 85,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961586
+    },
+    "78901599": {
+      "id": 78901599,
+      "group": 85,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961587
+    },
+    "78901600": {
+      "id": 78901600,
+      "group": 85,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961588
+    },
+    "78901601": {
+      "id": 78901601,
+      "group": 85,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961589
+    },
+    "78901707": {
+      "id": 78901707,
+      "group": 91,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961698
+    },
+    "78901708": {
+      "id": 78901708,
+      "group": 91,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961699
+    },
+    "78901709": {
+      "id": 78901709,
+      "group": 91,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961700
+    },
+    "78901710": {
+      "id": 78901710,
+      "group": 91,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961710
+    },
+    "78901711": {
+      "id": 78901711,
+      "group": 91,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 25,
+      "reward": 95961711
+    },
+    "78901712": {
+      "id": 78901712,
+      "group": 91,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961712
+    },
+    "78901713": {
+      "id": 78901713,
+      "group": 91,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961713
+    },
+    "78901714": {
+      "id": 78901714,
+      "group": 91,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 20,
+      "valueMax": 0,
+      "reward": 95961714
+    },
+    "78901715": {
+      "id": 78901715,
+      "group": 91,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961715
+    },
+    "78901716": {
+      "id": 78901716,
+      "group": 91,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 40,
+      "valueMax": 0,
+      "reward": 95961716
+    },
+    "78901717": {
+      "id": 78901717,
+      "group": 91,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961717
+    },
+    "78901718": {
+      "id": 78901718,
+      "group": 91,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961718
+    },
+    "78901719": {
+      "id": 78901719,
+      "group": 91,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961719
+    },
+    "78901720": {
+      "id": 78901720,
+      "group": 91,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961720
+    },
+    "78901721": {
+      "id": 78901721,
+      "group": 91,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961721
+    },
+    "78901722": {
+      "id": 78901722,
+      "group": 91,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961722
+    },
+    "78901723": {
+      "id": 78901723,
+      "group": 91,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961723
+    },
+    "78901724": {
+      "id": 78901724,
+      "group": 91,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961724
+    },
+    "78901725": {
+      "id": 78901725,
+      "group": 91,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961725
+    },
+    "78901726": {
+      "id": 78901726,
+      "group": 91,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961726
+    },
+    "78901727": {
+      "id": 78901727,
+      "group": 91,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961727
+    },
+    "78901728": {
+      "id": 78901728,
+      "group": 92,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961707
+    },
+    "78901729": {
+      "id": 78901729,
+      "group": 92,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961708
+    },
+    "78901730": {
+      "id": 78901730,
+      "group": 92,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961709
+    },
+    "78901731": {
+      "id": 78901731,
+      "group": 92,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961710
+    },
+    "78901732": {
+      "id": 78901732,
+      "group": 92,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 25,
+      "reward": 95961711
+    },
+    "78901733": {
+      "id": 78901733,
+      "group": 92,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961712
+    },
+    "78901734": {
+      "id": 78901734,
+      "group": 92,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961713
+    },
+    "78901735": {
+      "id": 78901735,
+      "group": 92,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 20,
+      "valueMax": 0,
+      "reward": 95961714
+    },
+    "78901736": {
+      "id": 78901736,
+      "group": 92,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961715
+    },
+    "78901737": {
+      "id": 78901737,
+      "group": 92,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 40,
+      "valueMax": 0,
+      "reward": 95961716
+    },
+    "78901738": {
+      "id": 78901738,
+      "group": 92,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961717
+    },
+    "78901739": {
+      "id": 78901739,
+      "group": 92,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961718
+    },
+    "78901740": {
+      "id": 78901740,
+      "group": 92,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961719
+    },
+    "78901741": {
+      "id": 78901741,
+      "group": 92,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961720
+    },
+    "78901742": {
+      "id": 78901742,
+      "group": 92,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961721
+    },
+    "78901743": {
+      "id": 78901743,
+      "group": 92,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961722
+    },
+    "78901744": {
+      "id": 78901744,
+      "group": 92,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961723
+    },
+    "78901745": {
+      "id": 78901745,
+      "group": 92,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961724
+    },
+    "78901746": {
+      "id": 78901746,
+      "group": 92,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961725
+    },
+    "78901747": {
+      "id": 78901747,
+      "group": 92,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961726
+    },
+    "78901748": {
+      "id": 78901748,
+      "group": 92,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961727
+    },
+    "78901749": {
+      "id": 78901749,
+      "group": 93,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961701
+    },
+    "78901750": {
+      "id": 78901750,
+      "group": 93,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961702
+    },
+    "78901751": {
+      "id": 78901751,
+      "group": 93,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961703
+    },
+    "78901752": {
+      "id": 78901752,
+      "group": 93,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961710
+    },
+    "78901753": {
+      "id": 78901753,
+      "group": 93,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 25,
+      "reward": 95961711
+    },
+    "78901754": {
+      "id": 78901754,
+      "group": 93,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961712
+    },
+    "78901755": {
+      "id": 78901755,
+      "group": 93,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961713
+    },
+    "78901756": {
+      "id": 78901756,
+      "group": 93,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 20,
+      "valueMax": 0,
+      "reward": 95961714
+    },
+    "78901757": {
+      "id": 78901757,
+      "group": 93,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961715
+    },
+    "78901758": {
+      "id": 78901758,
+      "group": 93,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 40,
+      "valueMax": 0,
+      "reward": 95961716
+    },
+    "78901759": {
+      "id": 78901759,
+      "group": 93,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961717
+    },
+    "78901760": {
+      "id": 78901760,
+      "group": 93,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961718
+    },
+    "78901761": {
+      "id": 78901761,
+      "group": 93,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961719
+    },
+    "78901762": {
+      "id": 78901762,
+      "group": 93,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961720
+    },
+    "78901763": {
+      "id": 78901763,
+      "group": 93,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961721
+    },
+    "78901764": {
+      "id": 78901764,
+      "group": 93,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961722
+    },
+    "78901765": {
+      "id": 78901765,
+      "group": 93,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961723
+    },
+    "78901766": {
+      "id": 78901766,
+      "group": 93,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961724
+    },
+    "78901767": {
+      "id": 78901767,
+      "group": 93,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961725
+    },
+    "78901768": {
+      "id": 78901768,
+      "group": 93,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961726
+    },
+    "78901769": {
+      "id": 78901769,
+      "group": 93,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961727
+    },
+    "78901770": {
+      "id": 78901770,
+      "group": 94,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961704
+    },
+    "78901771": {
+      "id": 78901771,
+      "group": 94,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961705
+    },
+    "78901772": {
+      "id": 78901772,
+      "group": 94,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961706
+    },
+    "78901773": {
+      "id": 78901773,
+      "group": 94,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961710
+    },
+    "78901774": {
+      "id": 78901774,
+      "group": 94,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 25,
+      "reward": 95961711
+    },
+    "78901775": {
+      "id": 78901775,
+      "group": 94,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961712
+    },
+    "78901776": {
+      "id": 78901776,
+      "group": 94,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961713
+    },
+    "78901777": {
+      "id": 78901777,
+      "group": 94,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 20,
+      "valueMax": 0,
+      "reward": 95961714
+    },
+    "78901778": {
+      "id": 78901778,
+      "group": 94,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961715
+    },
+    "78901779": {
+      "id": 78901779,
+      "group": 94,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 40,
+      "valueMax": 0,
+      "reward": 95961716
+    },
+    "78901780": {
+      "id": 78901780,
+      "group": 94,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961717
+    },
+    "78901781": {
+      "id": 78901781,
+      "group": 94,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961718
+    },
+    "78901782": {
+      "id": 78901782,
+      "group": 94,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961719
+    },
+    "78901783": {
+      "id": 78901783,
+      "group": 94,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961720
+    },
+    "78901784": {
+      "id": 78901784,
+      "group": 94,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961721
+    },
+    "78901785": {
+      "id": 78901785,
+      "group": 94,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961722
+    },
+    "78901786": {
+      "id": 78901786,
+      "group": 94,
+      "relateType": 2,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961723
+    },
+    "78901787": {
+      "id": 78901787,
+      "group": 94,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961724
+    },
+    "78901788": {
+      "id": 78901788,
+      "group": 94,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961725
+    },
+    "78901789": {
+      "id": 78901789,
+      "group": 94,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961726
+    },
+    "78901790": {
+      "id": 78901790,
+      "group": 94,
+      "relateType": 2,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961727
+    },
+    "78901791": {
+      "id": 78901791,
+      "group": 95,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961728
+    },
+    "78901792": {
+      "id": 78901792,
+      "group": 95,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961729
+    },
+    "78901793": {
+      "id": 78901793,
+      "group": 95,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961730
+    },
+    "78901794": {
+      "id": 78901794,
+      "group": 95,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961731
+    },
+    "78901795": {
+      "id": 78901795,
+      "group": 95,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961732
+    },
+    "78901796": {
+      "id": 78901796,
+      "group": 95,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 100,
+      "reward": 95961733
+    },
+    "78901797": {
+      "id": 78901797,
+      "group": 95,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 200,
+      "reward": 95961734
+    },
+    "78901798": {
+      "id": 78901798,
+      "group": 95,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961735
+    },
+    "78901799": {
+      "id": 78901799,
+      "group": 95,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961736
+    },
+    "78901800": {
+      "id": 78901800,
+      "group": 95,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961737
+    },
+    "78901801": {
+      "id": 78901801,
+      "group": 95,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961738
+    },
+    "78901802": {
+      "id": 78901802,
+      "group": 95,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961739
+    },
+    "78901803": {
+      "id": 78901803,
+      "group": 96,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961740
+    },
+    "78901804": {
+      "id": 78901804,
+      "group": 96,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961741
+    },
+    "78901805": {
+      "id": 78901805,
+      "group": 96,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961742
+    },
+    "78901806": {
+      "id": 78901806,
+      "group": 96,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961743
+    },
+    "78901807": {
+      "id": 78901807,
+      "group": 96,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961744
+    },
+    "78901808": {
+      "id": 78901808,
+      "group": 96,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 100,
+      "reward": 95961745
+    },
+    "78901809": {
+      "id": 78901809,
+      "group": 96,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 200,
+      "reward": 95961746
+    },
+    "78901810": {
+      "id": 78901810,
+      "group": 96,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961747
+    },
+    "78901811": {
+      "id": 78901811,
+      "group": 96,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961748
+    },
+    "78901812": {
+      "id": 78901812,
+      "group": 96,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961749
+    },
+    "78901813": {
+      "id": 78901813,
+      "group": 96,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961750
+    },
+    "78901814": {
+      "id": 78901814,
+      "group": 96,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961751
+    },
+    "78901815": {
+      "id": 78901815,
+      "group": 97,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961752
+    },
+    "78901816": {
+      "id": 78901816,
+      "group": 97,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961753
+    },
+    "78901817": {
+      "id": 78901817,
+      "group": 97,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961754
+    },
+    "78901818": {
+      "id": 78901818,
+      "group": 97,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961755
+    },
+    "78901819": {
+      "id": 78901819,
+      "group": 97,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961756
+    },
+    "78901820": {
+      "id": 78901820,
+      "group": 97,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 100,
+      "reward": 95961757
+    },
+    "78901821": {
+      "id": 78901821,
+      "group": 97,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 200,
+      "reward": 95961758
+    },
+    "78901822": {
+      "id": 78901822,
+      "group": 97,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961759
+    },
+    "78901823": {
+      "id": 78901823,
+      "group": 97,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961760
+    },
+    "78901824": {
+      "id": 78901824,
+      "group": 97,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961761
+    },
+    "78901825": {
+      "id": 78901825,
+      "group": 97,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961762
+    },
+    "78901826": {
+      "id": 78901826,
+      "group": 97,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961763
+    },
+    "78901827": {
+      "id": 78901827,
+      "group": 98,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 1,
+      "reward": 95961764
+    },
+    "78901828": {
+      "id": 78901828,
+      "group": 98,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 2,
+      "reward": 95961765
+    },
+    "78901829": {
+      "id": 78901829,
+      "group": 98,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 3,
+      "reward": 95961766
+    },
+    "78901830": {
+      "id": 78901830,
+      "group": 98,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 10,
+      "reward": 95961767
+    },
+    "78901831": {
+      "id": 78901831,
+      "group": 98,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 50,
+      "reward": 95961768
+    },
+    "78901832": {
+      "id": 78901832,
+      "group": 98,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 100,
+      "reward": 95961769
+    },
+    "78901833": {
+      "id": 78901833,
+      "group": 98,
+      "relateType": 1,
+      "type": 2,
+      "rateMax": 0,
+      "valueMax": 200,
+      "reward": 95961770
+    },
+    "78901834": {
+      "id": 78901834,
+      "group": 98,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 10,
+      "valueMax": 0,
+      "reward": 95961771
+    },
+    "78901835": {
+      "id": 78901835,
+      "group": 98,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 30,
+      "valueMax": 0,
+      "reward": 95961772
+    },
+    "78901836": {
+      "id": 78901836,
+      "group": 98,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 50,
+      "valueMax": 0,
+      "reward": 95961773
+    },
+    "78901837": {
+      "id": 78901837,
+      "group": 98,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 70,
+      "valueMax": 0,
+      "reward": 95961774
+    },
+    "78901838": {
+      "id": 78901838,
+      "group": 98,
+      "relateType": 1,
+      "type": 1,
+      "rateMax": 100,
+      "valueMax": 0,
+      "reward": 95961775
     }
   }
 }

@@ -1484,7 +1484,7 @@
 			"id": 70500071,
 			"location":
 			{
-				"longitude": -8.906711,
+				"longitude": -8.927446,
 				"latitude": 41.861053
 			},
 			"navPoint":
@@ -1496,6 +1496,26 @@
 			{
 				"longitude": -9.094486,
 				"latitude": 41.861053,
+				"radius": 3000
+			}
+		},
+		"70500072":
+		{
+			"id": 70500072,
+			"location":
+			{
+				"longitude": 8.919529,
+				"latitude": 47.508137
+			},
+			"navPoint":
+			{
+				"longitude": 8.778985,
+				"latitude": 47.505608
+			},
+			"spawnArea":
+			{
+				"longitude": 8.778985,
+				"latitude": 47.505608,
 				"radius": 3000
 			}
 		}

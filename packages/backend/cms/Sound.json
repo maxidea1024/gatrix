@@ -816,6 +816,11 @@
       "isUseLocal": false,
       "assetName0": "S_BGM_Autumn_Event"
     },
+    "98000117": {
+      "id": 98000117,
+      "isUseLocal": false,
+      "assetName0": "S_Bgm_Halloween"
+    },
     "98001001": {
       "id": 98001001,
       "isUseLocal": false,
@@ -4994,6 +4999,11 @@
       "id": 98001866,
       "isUseLocal": false,
       "assetName0": "S_Eff_Manufacture_Cooking2"
+    },
+    "98001867": {
+      "id": 98001867,
+      "isUseLocal": false,
+      "assetName0": "S_Eff_Season5_Start"
     }
   }
 }

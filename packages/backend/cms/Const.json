@@ -85,6 +85,10 @@
       "name": "ShipEnchantPer5",
       "value": 65
     },
+    "ShipEnchantPer6": {
+      "name": "ShipEnchantPer6",
+      "value": 100
+    },
     "ShipMaxEnchant1": {
       "name": "ShipMaxEnchant1",
       "value": 50
@@ -103,6 +107,10 @@
     },
     "ShipMaxEnchant5": {
       "name": "ShipMaxEnchant5",
+      "value": 50
+    },
+    "ShipMaxEnchant6": {
+      "name": "ShipMaxEnchant6",
       "value": 50
     },
     "ShipyardEnchantFixedRatio1": {
@@ -140,6 +148,10 @@
     "ShipRepairSizePer5": {
       "name": "ShipRepairSizePer5",
       "value": 5
+    },
+    "ShipRepairSizePer6": {
+      "name": "ShipRepairSizePer6",
+      "value": 7
     },
     "ShipTierVariable1": {
       "name": "ShipTierVariable1",
@@ -1419,6 +1431,10 @@
     },
     "BattleCriticalLossShipRate3": {
       "name": "BattleCriticalLossShipRate3",
+      "value": 100
+    },
+    "BattleCriticalLossShipRate4": {
+      "name": "BattleCriticalLossShipRate4",
       "value": 100
     },
     "RepairShipLifeValue": {
@@ -3361,6 +3377,10 @@
       "name": "SuezCamelShipDucat5",
       "value": 20000000
     },
+    "SuezCamelShipDucat6": {
+      "name": "SuezCamelShipDucat6",
+      "value": 30000000
+    },
     "PanamaCamelShipDucat1": {
       "name": "PanamaCamelShipDucat1",
       "value": 1000000
@@ -3380,6 +3400,10 @@
     "PanamaCamelShipDucat5": {
       "name": "PanamaCamelShipDucat5",
       "value": 10000000
+    },
+    "PanamaCamelShipDucat6": {
+      "name": "PanamaCamelShipDucat6",
+      "value": 15000000
     },
     "CamelUsingPoint": {
       "name": "CamelUsingPoint",
@@ -4387,7 +4411,7 @@
     },
     "MaxShipSize": {
       "name": "MaxShipSize",
-      "value": 5
+      "value": 6
     },
     "CostItemSearchSea": {
       "name": "CostItemSearchSea",
@@ -4791,7 +4815,7 @@
     },
     "MaxShipBuildLevel": {
       "name": "MaxShipBuildLevel",
-      "value": 25
+      "value": 26
     },
     "ShipBuildUnderTierExp": {
       "name": "ShipBuildUnderTierExp",
@@ -5219,7 +5243,7 @@
     },
     "PresetSlotMax": {
       "name": "PresetSlotMax",
-      "value": 20
+      "value": 30
     },
     "PresetNameMinimum": {
       "name": "PresetNameMinimum",
@@ -7352,6 +7376,110 @@
     "CashMarketPurchaseLimitItems": {
       "name": "CashMarketPurchaseLimitItems",
       "value": 500
+    },
+    "MarketPlacePurchaseLimitEquipable": {
+      "name": "MarketPlacePurchaseLimitEquipable",
+      "value": 50
+    },
+    "MarketPlacePurchaseLimitItems": {
+      "name": "MarketPlacePurchaseLimitItems",
+      "value": 500
+    },
+    "MarketPlaceRegistrationLimitVolume": {
+      "name": "MarketPlaceRegistrationLimitVolume",
+      "value": 10
+    },
+    "MarketPlaceRegistrationCooltimeSecMin": {
+      "name": "MarketPlaceRegistrationCooltimeSecMin",
+      "value": 300
+    },
+    "MarketPlaceRegistrationCooltimeSecMax": {
+      "name": "MarketPlaceRegistrationCooltimeSecMax",
+      "value": 1200
+    },
+    "MarketPlaceFeePointPer": {
+      "name": "MarketPlaceFeePointPer",
+      "value": 200
+    },
+    "MarketPlaceRegistrationFeeDucatPer": {
+      "name": "MarketPlaceRegistrationFeeDucatPer",
+      "value": 0.2
+    },
+    "MarketPlaceRegistrationTimeSec": {
+      "name": "MarketPlaceRegistrationTimeSec",
+      "value": 172800
+    },
+    "MarketPlaceCompleteListLimit": {
+      "name": "MarketPlaceCompleteListLimit",
+      "value": 100
+    },
+    "MarketPlaceHistoryLimitTimeDay": {
+      "name": "MarketPlaceHistoryLimitTimeDay",
+      "value": 28
+    },
+    "MarketPlaceRoundNumber": {
+      "name": "MarketPlaceRoundNumber",
+      "value": 4
+    },
+    "MarketPlaceLimitCompanyLv": {
+      "name": "MarketPlaceLimitCompanyLv",
+      "value": 20
+    },
+    "MarketPlaceRegistrationShipPriceLimit1": {
+      "name": "MarketPlaceRegistrationShipPriceLimit1",
+      "value": 2000
+    },
+    "MarketPlaceRegistrationShipPriceLimit2": {
+      "name": "MarketPlaceRegistrationShipPriceLimit2",
+      "value": 5000
+    },
+    "HighEndSlot1": {
+      "name": "HighEndSlot1",
+      "value": 200
+    },
+    "HighEndSlot2": {
+      "name": "HighEndSlot2",
+      "value": 650
+    },
+    "HighEndSlot3": {
+      "name": "HighEndSlot3",
+      "value": 150
+    },
+    "CouponCodeMinLength": {
+      "name": "CouponCodeMinLength",
+      "value": 6
+    },
+    "CouponCodeMaxLength": {
+      "name": "CouponCodeMaxLength",
+      "value": 12
+    },
+    "EquipSeparateStartLv": {
+      "name": "EquipSeparateStartLv",
+      "value": 8
+    },
+    "PartsSeparateStartLv": {
+      "name": "PartsSeparateStartLv",
+      "value": 6
+    },
+    "InvestSeasonParticipateMail": {
+      "name": "InvestSeasonParticipateMail",
+      "value": 92002005
+    },
+    "SeasonInvestCommonReward": {
+      "name": "SeasonInvestCommonReward",
+      "value": 1009
+    },
+    "TownAutoArrivalDistMargin": {
+      "name": "TownAutoArrivalDistMargin",
+      "value": 25000
+    },
+    "BaseCompanyJob": {
+      "name": "BaseCompanyJob",
+      "value": 21500002
+    },
+    "FloatBannerConfirmDisableActiveDays": {
+      "name": "FloatBannerConfirmDisableActiveDays",
+      "value": 180
     }
   }
 }

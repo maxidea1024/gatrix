@@ -49122,6 +49122,346 @@
       ],
       "buildingHoursId": 19000022,
       "shapeUpgradeTerms": 0
+    },
+    "19554270": {
+      "id": 19554270,
+      "townId": 11000223,
+      "buildingType": 3,
+      "buildingPriority": 10,
+      "localBitflag": 219,
+      "backgroundImage": "T_MiddleEu_Quest_Sprite",
+      "buildingNpcId": [
+        40000189
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554271": {
+      "id": 19554271,
+      "townId": 11000223,
+      "buildingType": 5,
+      "buildingPriority": 9,
+      "localBitflag": 219,
+      "backgroundImage": "T_MiddleEu_Trade_Sprite",
+      "buildingNpcId": [
+        40000146
+      ],
+      "buildingHoursId": 19000003,
+      "shapeUpgradeTerms": 0
+    },
+    "19554272": {
+      "id": 19554272,
+      "townId": 11000223,
+      "buildingType": 11,
+      "buildingPriority": 3,
+      "localBitflag": 219,
+      "backgroundImage": "T_MiddleEu_Shipyard_Sprite",
+      "buildingNpcId": [
+        40000058
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554273": {
+      "id": 19554273,
+      "townId": 11000223,
+      "buildingType": 12,
+      "buildingPriority": 1,
+      "localBitflag": 219,
+      "buildingNpcId": [
+        40000124
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554274": {
+      "id": 19554274,
+      "townId": 11000223,
+      "buildingType": 10,
+      "buildingPriority": 2,
+      "localBitflag": 219,
+      "backgroundImage": "T_MiddleEu_Trade_Sprite",
+      "buildingNpcId": [
+        40000102
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554275": {
+      "id": 19554275,
+      "townId": 11000223,
+      "buildingType": 2,
+      "buildingPriority": 11,
+      "localBitflag": 219,
+      "backgroundImage": "T_ChristmasEvent_Gover_Sprite",
+      "buildingNpcId": [
+        40000080
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554276": {
+      "id": 19554276,
+      "name": "성당",
+      "townId": 11000223,
+      "buildingType": 7,
+      "buildingPriority": 7,
+      "localBitflag": 219,
+      "religionType": 1,
+      "backgroundImage": "T_MiddleEu_Church_Sprite",
+      "buildingNpcId": [
+        40000230
+      ],
+      "buildingHoursId": 19000005,
+      "shapeUpgradeTerms": 0
+    },
+    "19554277": {
+      "id": 19554277,
+      "townId": 11000223,
+      "buildingType": 4,
+      "buildingPriority": 5,
+      "localBitflag": 219,
+      "levelName": "Town_PubMates",
+      "buildingNpcId": [
+        40000014
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554278": {
+      "id": 19554278,
+      "townId": 11000223,
+      "buildingType": 9,
+      "buildingPriority": 4,
+      "localBitflag": 219,
+      "backgroundImage": "T_MiddleEu_Bank_Sprite",
+      "buildingNpcId": [
+        40000036
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554279": {
+      "id": 19554279,
+      "townId": 11000223,
+      "buildingType": 13,
+      "buildingPriority": 13,
+      "localBitflag": 219,
+      "backgroundImage": "T_Native_Mantic_Sprite",
+      "buildingNpcId": [
+        40000199
+      ],
+      "buildingHoursId": 19000004,
+      "shapeUpgradeTerms": 0
+    },
+    "19554280": {
+      "id": 19554280,
+      "townId": 11000223,
+      "buildingType": 54,
+      "buildingPriority": 0,
+      "localBitflag": 219,
+      "shapeUpgradeTerms": 0,
+      "shapeUpgradeVal": [
+        1
+      ]
+    },
+    "19554281": {
+      "id": 19554281,
+      "townId": 11000223,
+      "buildingType": 54,
+      "buildingPriority": 0,
+      "localBitflag": 219,
+      "shapeUpgradeTerms": 0,
+      "shapeUpgradeVal": [
+        1
+      ]
+    },
+    "19554282": {
+      "id": 19554282,
+      "townId": 11000223,
+      "buildingType": 54,
+      "buildingPriority": 0,
+      "localBitflag": 219,
+      "shapeUpgradeTerms": 0,
+      "shapeUpgradeVal": [
+        1
+      ]
+    },
+    "19554283": {
+      "id": 19554283,
+      "townId": 11000224,
+      "buildingType": 3,
+      "buildingPriority": 10,
+      "localBitflag": 219,
+      "backgroundImage": "T_MiddleEu_Quest_Sprite",
+      "buildingNpcId": [
+        40000189
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 2,
+      "shapeUpgradeVal": [
+        1,
+        6
+      ]
+    },
+    "19554284": {
+      "id": 19554284,
+      "townId": 11000224,
+      "buildingType": 5,
+      "buildingPriority": 9,
+      "localBitflag": 219,
+      "backgroundImage": "T_MiddleEu_Trade_Sprite",
+      "buildingNpcId": [
+        40000146
+      ],
+      "buildingHoursId": 19000003,
+      "shapeUpgradeTerms": 1,
+      "shapeUpgradeVal": [
+        1,
+        6
+      ]
+    },
+    "19554285": {
+      "id": 19554285,
+      "townId": 11000224,
+      "buildingType": 11,
+      "buildingPriority": 3,
+      "localBitflag": 219,
+      "backgroundImage": "T_MiddleEu_Shipyard_Sprite",
+      "buildingNpcId": [
+        40000058
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554286": {
+      "id": 19554286,
+      "townId": 11000224,
+      "buildingType": 12,
+      "buildingPriority": 1,
+      "localBitflag": 219,
+      "buildingNpcId": [
+        40000124
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554287": {
+      "id": 19554287,
+      "townId": 11000224,
+      "buildingType": 10,
+      "buildingPriority": 2,
+      "localBitflag": 219,
+      "backgroundImage": "T_MiddleEu_Trade_Sprite",
+      "buildingNpcId": [
+        40000102
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554288": {
+      "id": 19554288,
+      "townId": 11000224,
+      "buildingType": 2,
+      "buildingPriority": 11,
+      "localBitflag": 219,
+      "backgroundImage": "T_ChristmasEvent_Gover_Sprite",
+      "buildingNpcId": [
+        40000080
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554289": {
+      "id": 19554289,
+      "name": "성당",
+      "townId": 11000224,
+      "buildingType": 7,
+      "buildingPriority": 7,
+      "localBitflag": 219,
+      "religionType": 1,
+      "backgroundImage": "T_MiddleEu_Church_Sprite",
+      "buildingNpcId": [
+        40000230
+      ],
+      "buildingHoursId": 19000005,
+      "shapeUpgradeTerms": 0
+    },
+    "19554290": {
+      "id": 19554290,
+      "townId": 11000224,
+      "buildingType": 4,
+      "buildingPriority": 5,
+      "localBitflag": 219,
+      "levelName": "Town_PubMates",
+      "buildingNpcId": [
+        40000014
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554291": {
+      "id": 19554291,
+      "townId": 11000224,
+      "buildingType": 9,
+      "buildingPriority": 4,
+      "localBitflag": 219,
+      "backgroundImage": "T_MiddleEu_Bank_Sprite",
+      "buildingNpcId": [
+        40000036
+      ],
+      "buildingHoursId": 19000000,
+      "shapeUpgradeTerms": 0
+    },
+    "19554292": {
+      "id": 19554292,
+      "townId": 11000224,
+      "buildingType": 13,
+      "buildingPriority": 13,
+      "localBitflag": 219,
+      "backgroundImage": "T_Native_Mantic_Sprite",
+      "buildingNpcId": [
+        40000199
+      ],
+      "buildingHoursId": 19000004,
+      "shapeUpgradeTerms": 3,
+      "shapeUpgradeVal": [
+        1,
+        6
+      ]
+    },
+    "19554293": {
+      "id": 19554293,
+      "townId": 11000224,
+      "buildingType": 54,
+      "buildingPriority": 0,
+      "localBitflag": 219,
+      "shapeUpgradeTerms": 0,
+      "shapeUpgradeVal": [
+        1
+      ]
+    },
+    "19554294": {
+      "id": 19554294,
+      "townId": 11000224,
+      "buildingType": 54,
+      "buildingPriority": 0,
+      "localBitflag": 219,
+      "shapeUpgradeTerms": 0,
+      "shapeUpgradeVal": [
+        1
+      ]
+    },
+    "19554295": {
+      "id": 19554295,
+      "townId": 11000224,
+      "buildingType": 54,
+      "buildingPriority": 0,
+      "localBitflag": 219,
+      "shapeUpgradeTerms": 0,
+      "shapeUpgradeVal": [
+        1
+      ]
     }
   }
 }

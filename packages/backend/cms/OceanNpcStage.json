@@ -5115,6 +5115,136 @@
         65500027
       ]
     },
+    "15620053": {
+      "id": 15620053,
+      "battleMapId": 64490105,
+      "climateId": 13100052,
+      "startTime": 9,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15070644,
+          "AnchorTemplateId": 64290244
+        }
+      ],
+      "questId": 82710112
+    },
+    "15620054": {
+      "id": 15620054,
+      "battleMapId": 64490105,
+      "climateId": 13100052,
+      "startTime": 9,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15070645,
+          "AnchorTemplateId": 64290244
+        }
+      ],
+      "questId": 82710112
+    },
+    "15620055": {
+      "id": 15620055,
+      "battleMapId": 64490105,
+      "climateId": 13100052,
+      "startTime": 9,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15070646,
+          "AnchorTemplateId": 64290244
+        }
+      ],
+      "questId": 82710112
+    },
+    "15620056": {
+      "id": 15620056,
+      "battleMapId": 64490105,
+      "climateId": 13100052,
+      "startTime": 9,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15070647,
+          "AnchorTemplateId": 64290244
+        }
+      ],
+      "questId": 82710112
+    },
+    "15620057": {
+      "id": 15620057,
+      "battleMapId": 64490105,
+      "climateId": 13100052,
+      "startTime": 9,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15070648,
+          "AnchorTemplateId": 64290244
+        }
+      ],
+      "questId": 82710115
+    },
+    "15620058": {
+      "id": 15620058,
+      "battleMapId": 64350007,
+      "climateId": 13100052,
+      "startTime": 9,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "questId": 82710119
+    },
+    "15620059": {
+      "id": 15620059,
+      "battleMapId": 64490070,
+      "climateId": 13100052,
+      "startTime": 9,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "questId": 82710120
+    },
+    "15620060": {
+      "id": 15620060,
+      "battleMapId": 64490106,
+      "climateId": 13100052,
+      "startTime": 9,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15010837,
+          "AnchorTemplateId": 64290218
+        }
+      ],
+      "questId": 82710121
+    },
     "15629001": {
       "id": 15629001,
       "battleMapId": 64499001,
@@ -8344,6 +8474,201 @@
         }
       ],
       "questId": 82710111
+    },
+    "15650172": {
+      "id": 15650172,
+      "battleMapId": 64499077,
+      "climateId": 13100346,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096370,
+          "AnchorTemplateId": 64290113
+        }
+      ],
+      "questId": 82710113
+    },
+    "15650173": {
+      "id": 15650173,
+      "battleMapId": 64499077,
+      "climateId": 13100346,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096371,
+          "AnchorTemplateId": 64290113
+        }
+      ],
+      "questId": 82710113
+    },
+    "15650174": {
+      "id": 15650174,
+      "battleMapId": 64499077,
+      "climateId": 13100346,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096372,
+          "AnchorTemplateId": 64290113
+        }
+      ],
+      "questId": 82710113
+    },
+    "15650175": {
+      "id": 15650175,
+      "battleMapId": 64499077,
+      "climateId": 13100346,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096373,
+          "AnchorTemplateId": 64290113
+        }
+      ],
+      "questId": 82710113
+    },
+    "15650176": {
+      "id": 15650176,
+      "battleMapId": 64499078,
+      "climateId": 13100346,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096374,
+          "AnchorTemplateId": 64290113
+        }
+      ],
+      "questId": 82710114
+    },
+    "15650177": {
+      "id": 15650177,
+      "battleMapId": 64499079,
+      "climateId": 13100347,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096380,
+          "AnchorTemplateId": 64290119
+        },
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096385,
+          "AnchorTemplateId": 64290194
+        }
+      ],
+      "questId": 82710116
+    },
+    "15650178": {
+      "id": 15650178,
+      "battleMapId": 64499079,
+      "climateId": 13100347,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096381,
+          "AnchorTemplateId": 64290119
+        },
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096386,
+          "AnchorTemplateId": 64290194
+        }
+      ],
+      "questId": 82710116
+    },
+    "15650179": {
+      "id": 15650179,
+      "battleMapId": 64499079,
+      "climateId": 13100347,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096382,
+          "AnchorTemplateId": 64290119
+        },
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096387,
+          "AnchorTemplateId": 64290194
+        }
+      ],
+      "questId": 82710116
+    },
+    "15650180": {
+      "id": 15650180,
+      "battleMapId": 64499079,
+      "climateId": 13100347,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096383,
+          "AnchorTemplateId": 64290119
+        },
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096388,
+          "AnchorTemplateId": 64290194
+        }
+      ],
+      "questId": 82710116
+    },
+    "15650181": {
+      "id": 15650181,
+      "battleMapId": 64499080,
+      "climateId": 13100347,
+      "windDir": 3,
+      "windSpeed": 1,
+      "allyAnchorTemplateId": 64250001,
+      "enemyAnchorTemplateId": 64250002,
+      "addStartFleet": [
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096384,
+          "AnchorTemplateId": 64290119
+        },
+        {
+          "FactionId": 67000005,
+          "OceanNpcId": 15096389,
+          "AnchorTemplateId": 64290194
+        }
+      ],
+      "questId": 82710117
     }
   }
 }

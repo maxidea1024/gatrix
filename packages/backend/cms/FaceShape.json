@@ -2290,6 +2290,133 @@
       "faceAccType": 1,
       "color1_eye": 8081205,
       "backAnim": true
+    },
+    "30000253": {
+      "id": 30000253,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0004",
+      "skin": "11",
+      "faceAccType": 1,
+      "color1_eye": 2763819,
+      "backAnim": true
+    },
+    "30000254": {
+      "id": 30000254,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0004",
+      "skin": "12",
+      "faceAccType": 1,
+      "color1_eye": 8081205,
+      "backAnim": true
+    },
+    "30000255": {
+      "id": 30000255,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0004",
+      "skin": "13",
+      "faceAccType": 1,
+      "color1_eye": 8081206,
+      "backAnim": true
+    },
+    "30000256": {
+      "id": 30000256,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0004",
+      "skin": "14",
+      "faceAccType": 1,
+      "color1_eye": 15246174,
+      "backAnim": true
+    },
+    "30000257": {
+      "id": 30000257,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0004",
+      "skin": "15",
+      "faceAccType": 1,
+      "color1_eye": 2763819,
+      "backAnim": true
+    },
+    "30000258": {
+      "id": 30000258,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0004",
+      "skin": "16",
+      "faceAccType": 1,
+      "color1_eye": 8081206,
+      "backAnim": true
+    },
+    "30000259": {
+      "id": 30000259,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0004",
+      "skin": "17",
+      "faceAccType": 1,
+      "color1_eye": 8081206,
+      "backAnim": true
+    },
+    "30000260": {
+      "id": 30000260,
+      "skeleton": "SkinsM",
+      "atlas": "SkinsM0006",
+      "skin": "9",
+      "faceAccType": 1,
+      "color1_eye": 12507961,
+      "backAnim": true
+    },
+    "30000261": {
+      "id": 30000261,
+      "skeleton": "date_masamune",
+      "atlas": "date_masamune",
+      "skin": "4",
+      "faceAccType": 1,
+      "color1_eye": 2763819,
+      "backAnim": true
+    },
+    "30000262": {
+      "id": 30000262,
+      "skeleton": "SkinsM",
+      "atlas": "SkinsM0006",
+      "skin": "8",
+      "faceAccType": 1,
+      "color1_eye": 2763819,
+      "backAnim": true
+    },
+    "30000263": {
+      "id": 30000263,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0004",
+      "skin": "18",
+      "skin_flip": "19",
+      "faceAccType": 1,
+      "color1_eye": 8081206,
+      "backAnim": true
+    },
+    "30000264": {
+      "id": 30000264,
+      "skeleton": "SkinsM",
+      "atlas": "SkinsM0006",
+      "skin": "10",
+      "faceAccType": 1,
+      "color1_eye": 8081206,
+      "backAnim": true
+    },
+    "30000265": {
+      "id": 30000265,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0004",
+      "skin": "20",
+      "faceAccType": 1,
+      "color1_eye": 4565908,
+      "backAnim": true
+    },
+    "30000266": {
+      "id": 30000266,
+      "skeleton": "SkinsM",
+      "atlas": "SkinsM0006",
+      "skin": "11",
+      "faceAccType": 1,
+      "color1_eye": 7634318,
+      "backAnim": true
     }
   }
 }

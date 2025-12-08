@@ -233,12 +233,14 @@
         },
         {
           "job": 3,
-          "id": 67300900,
+          "id": 67390110,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -255,10 +257,12 @@
           "job": 3,
           "id": 67301280,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -281,9 +285,11 @@
           "id": 67300840,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -298,12 +304,14 @@
         },
         {
           "job": 3,
-          "id": 67301020,
+          "id": 67390010,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -326,9 +334,11 @@
           "id": 67300960,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -343,12 +353,14 @@
         },
         {
           "job": 3,
-          "id": 67300780,
+          "id": 67390050,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -368,12 +380,14 @@
         },
         {
           "job": 3,
-          "id": 67300800,
+          "id": 67390070,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -390,10 +404,12 @@
           "job": 3,
           "id": 67300860,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -416,9 +432,11 @@
           "id": 67300860,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -433,12 +451,14 @@
         },
         {
           "job": 3,
-          "id": 67301040,
+          "id": 67390030,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -461,9 +481,11 @@
           "id": 67300980,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -478,12 +500,14 @@
         },
         {
           "job": 3,
-          "id": 67300800,
+          "id": 67390070,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -503,12 +527,14 @@
         },
         {
           "job": 3,
-          "id": 67300910,
+          "id": 67390120,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -525,10 +551,12 @@
           "job": 3,
           "id": 67301290,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -551,9 +579,11 @@
           "id": 67300850,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -568,12 +598,14 @@
         },
         {
           "job": 3,
-          "id": 67301030,
+          "id": 67390020,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -596,9 +628,11 @@
           "id": 67300970,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -613,12 +647,14 @@
         },
         {
           "job": 3,
-          "id": 67300790,
+          "id": 67390060,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -638,12 +674,14 @@
         },
         {
           "job": 3,
-          "id": 67301020,
+          "id": 67390010,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -660,10 +698,12 @@
           "job": 3,
           "id": 67300610,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -683,12 +723,14 @@
         },
         {
           "job": 3,
-          "id": 67301030,
+          "id": 67390020,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -705,10 +747,12 @@
           "job": 3,
           "id": 67301330,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -728,12 +772,14 @@
         },
         {
           "job": 3,
-          "id": 67301040,
+          "id": 67390090,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -750,10 +796,12 @@
           "job": 3,
           "id": 67300630,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -773,12 +821,14 @@
         },
         {
           "job": 3,
-          "id": 67300850,
+          "id": 67390100,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -793,12 +843,14 @@
         },
         {
           "job": 3,
-          "id": 67300180,
+          "id": 67300190,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -818,12 +870,14 @@
         },
         {
           "job": 3,
-          "id": 67300860,
+          "id": 67390080,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -840,10 +894,12 @@
           "job": 3,
           "id": 67301370,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -863,12 +919,14 @@
         },
         {
           "job": 3,
-          "id": 67300840,
+          "id": 67390080,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -885,10 +943,12 @@
           "job": 3,
           "id": 67300170,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -911,9 +971,11 @@
           "id": 75250840,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -930,10 +992,12 @@
           "job": 2,
           "id": 75205300,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -956,9 +1020,11 @@
           "id": 75250880,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -975,10 +1041,12 @@
           "job": 2,
           "id": 75205500,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1001,9 +1069,11 @@
           "id": 75250900,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1020,10 +1090,12 @@
           "job": 2,
           "id": 75205600,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1032,7 +1104,7 @@
       "passives": [
         {
           "job": 3,
-          "id": 67300990,
+          "id": 67301610,
           "needLv": 10,
           "needAwaken": 0,
           "learnPointId": 100001,
@@ -1046,9 +1118,11 @@
           "id": 75250920,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -1065,10 +1139,12 @@
           "job": 2,
           "id": 75205700,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1091,9 +1167,11 @@
           "id": 75250940,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1110,10 +1188,12 @@
           "job": 2,
           "id": 75205800,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1136,9 +1216,11 @@
           "id": 75250960,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1155,10 +1237,12 @@
           "job": 1,
           "id": 75205900,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1167,7 +1251,7 @@
       "passives": [
         {
           "job": 3,
-          "id": 67301010,
+          "id": 67301630,
           "needLv": 10,
           "needAwaken": 0,
           "learnPointId": 100001,
@@ -1181,9 +1265,11 @@
           "id": 75250980,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -1200,10 +1286,12 @@
           "job": 2,
           "id": 75206000,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1226,9 +1314,11 @@
           "id": 75251060,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -1245,10 +1335,12 @@
           "job": 2,
           "id": 75206400,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1271,9 +1363,11 @@
           "id": 75251140,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1290,10 +1384,12 @@
           "job": 2,
           "id": 75206800,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1316,9 +1412,11 @@
           "id": 75251200,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -1335,10 +1433,12 @@
           "job": 2,
           "id": 75207100,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1361,9 +1461,11 @@
           "id": 75251220,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -1380,10 +1482,12 @@
           "job": 2,
           "id": 75207200,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1406,9 +1510,11 @@
           "id": 75251120,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1425,10 +1531,12 @@
           "job": 1,
           "id": 75206700,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1451,9 +1559,11 @@
           "id": 75251000,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -1470,10 +1580,12 @@
           "job": 2,
           "id": 75206100,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1496,9 +1608,11 @@
           "id": 75251080,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1515,10 +1629,12 @@
           "job": 2,
           "id": 75206500,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1541,9 +1657,11 @@
           "id": 75251020,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1560,10 +1678,12 @@
           "job": 2,
           "id": 75206200,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1586,9 +1706,11 @@
           "id": 75230460,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1603,12 +1725,14 @@
         },
         {
           "job": 1,
-          "id": 75230120,
+          "id": 75220810,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1631,9 +1755,11 @@
           "id": 75230040,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1650,10 +1776,12 @@
           "job": 1,
           "id": 75230060,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1676,9 +1804,11 @@
           "id": 75230400,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1695,10 +1825,12 @@
           "job": 1,
           "id": 75230220,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1707,7 +1839,7 @@
       "passives": [
         {
           "job": 3,
-          "id": 67301000,
+          "id": 67301620,
           "needLv": 10,
           "needAwaken": 0,
           "learnPointId": 100001,
@@ -1721,9 +1853,11 @@
           "id": 75230580,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1740,10 +1874,12 @@
           "job": 1,
           "id": 75230600,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1766,9 +1902,11 @@
           "id": 75230440,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1785,10 +1923,12 @@
           "job": 1,
           "id": 75230200,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1811,9 +1951,11 @@
           "id": 75230140,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1828,12 +1970,14 @@
         },
         {
           "job": 1,
-          "id": 75230380,
+          "id": 75251230,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1856,9 +2000,11 @@
           "id": 75230160,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1875,10 +2021,12 @@
           "job": 1,
           "id": 75230080,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1901,9 +2049,11 @@
           "id": 75230670,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1920,10 +2070,12 @@
           "job": 1,
           "id": 75209340,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1946,9 +2098,11 @@
           "id": 75209900,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -1966,9 +2120,11 @@
           "id": 75209840,
           "needLv": 50,
           "needAwaken": 2,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -1991,9 +2147,11 @@
           "id": 75230750,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -2010,10 +2168,12 @@
           "job": 1,
           "id": 75209320,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2036,9 +2196,11 @@
           "id": 75209860,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -2055,10 +2217,12 @@
           "job": 1,
           "id": 75209440,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2081,9 +2245,11 @@
           "id": 75230850,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -2100,10 +2266,12 @@
           "job": 1,
           "id": 75230670,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2126,9 +2294,11 @@
           "id": 75230650,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -2145,10 +2315,12 @@
           "job": 2,
           "id": 75209400,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2171,9 +2343,11 @@
           "id": 75209620,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -2190,10 +2364,12 @@
           "job": 1,
           "id": 75230690,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2216,9 +2392,11 @@
           "id": 75209740,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -2235,10 +2413,12 @@
           "job": 1,
           "id": 75230360,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2261,13 +2441,15 @@
           "id": 67300010,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
-          "id": 67300790,
+          "id": 67390060,
           "needLv": 50,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -2280,10 +2462,12 @@
           "job": 3,
           "id": 67300030,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2306,13 +2490,15 @@
           "id": 67300840,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
-          "id": 67300780,
+          "id": 67390050,
           "needLv": 50,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -2325,10 +2511,12 @@
           "job": 3,
           "id": 67300020,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2337,7 +2525,7 @@
       "passives": [
         {
           "job": 3,
-          "id": 67300910,
+          "id": 67390120,
           "needLv": 10,
           "needAwaken": 0,
           "learnPointId": 100001,
@@ -2351,13 +2539,15 @@
           "id": 67301290,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
-          "id": 67301030,
+          "id": 67390020,
           "needLv": 50,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -2370,10 +2560,12 @@
           "job": 3,
           "id": 67300970,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2396,13 +2588,15 @@
           "id": 67301050,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
-          "id": 67301020,
+          "id": 67390010,
           "needLv": 50,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -2415,10 +2609,12 @@
           "job": 3,
           "id": 67300000,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2427,7 +2623,7 @@
       "passives": [
         {
           "job": 3,
-          "id": 67300790,
+          "id": 67390060,
           "needLv": 10,
           "needAwaken": 0,
           "learnPointId": 100001,
@@ -2441,9 +2637,11 @@
           "id": 67300850,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -2460,10 +2658,12 @@
           "job": 3,
           "id": 67300010,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2486,9 +2686,11 @@
           "id": 67300030,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -2505,10 +2707,12 @@
           "job": 3,
           "id": 67300020,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2517,7 +2721,7 @@
       "passives": [
         {
           "job": 3,
-          "id": 67301030,
+          "id": 67390020,
           "needLv": 10,
           "needAwaken": 0,
           "learnPointId": 100001,
@@ -2531,9 +2735,11 @@
           "id": 67300850,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -2550,10 +2756,12 @@
           "job": 3,
           "id": 67301530,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2576,13 +2784,15 @@
           "id": 67300860,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
-          "id": 67301040,
+          "id": 67390030,
           "needLv": 50,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -2593,12 +2803,14 @@
         },
         {
           "job": 3,
-          "id": 67300800,
+          "id": 67390070,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2621,9 +2833,11 @@
           "id": 67301340,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -2640,10 +2854,12 @@
           "job": 3,
           "id": 67300750,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2666,9 +2882,11 @@
           "id": 67300730,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -2685,10 +2903,12 @@
           "job": 3,
           "id": 67301360,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2711,9 +2931,11 @@
           "id": 75206500,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -2730,10 +2952,12 @@
           "job": 2,
           "id": 75206200,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2756,9 +2980,11 @@
           "id": 75206600,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -2775,10 +3001,12 @@
           "job": 2,
           "id": 75206100,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2801,9 +3029,11 @@
           "id": 75205600,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -2820,10 +3050,12 @@
           "job": 2,
           "id": 75205900,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2846,9 +3078,11 @@
           "id": 75206900,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -2865,10 +3099,12 @@
           "job": 2,
           "id": 75250760,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2891,9 +3127,11 @@
           "id": 75206400,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -2910,10 +3148,12 @@
           "job": 2,
           "id": 75206700,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2922,7 +3162,7 @@
       "passives": [
         {
           "job": 3,
-          "id": 67301020,
+          "id": 67390010,
           "needLv": 10,
           "needAwaken": 0,
           "learnPointId": 100001,
@@ -2936,9 +3176,11 @@
           "id": 67300840,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -2953,12 +3195,14 @@
         },
         {
           "job": 3,
-          "id": 67300780,
+          "id": 67390050,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -2978,16 +3222,18 @@
         },
         {
           "job": 1,
-          "id": 75230670,
+          "id": 75230220,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
-          "id": 75230770,
+          "id": 75209340,
           "needLv": 50,
           "needAwaken": 2,
           "learnPointId": 100001,
@@ -3000,10 +3246,12 @@
           "job": 1,
           "id": 75209320,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3026,9 +3274,11 @@
           "id": 75209940,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -3045,10 +3295,12 @@
           "job": 1,
           "id": 75209320,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3071,9 +3323,11 @@
           "id": 75209440,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -3090,10 +3344,12 @@
           "job": 1,
           "id": 75209340,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3116,9 +3372,11 @@
           "id": 75209440,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -3135,10 +3393,12 @@
           "job": 1,
           "id": 75209400,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3147,7 +3407,7 @@
       "passives": [
         {
           "job": 1,
-          "id": 75230460,
+          "id": 75230140,
           "needLv": 10,
           "needAwaken": 0,
           "learnPointId": 100001,
@@ -3161,13 +3421,15 @@
           "id": 75230120,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
-          "job": 3,
-          "id": 67301040,
+          "job": 2,
+          "id": 75250680,
           "needLv": 50,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -3180,10 +3442,12 @@
           "job": 1,
           "id": 75230200,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3206,9 +3470,11 @@
           "id": 75230380,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -3225,10 +3491,12 @@
           "job": 1,
           "id": 75230220,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3251,9 +3519,11 @@
           "id": 75230100,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -3270,10 +3540,12 @@
           "job": 1,
           "id": 75230600,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3296,13 +3568,15 @@
           "id": 75230600,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
-          "id": 67301030,
+          "id": 67390020,
           "needLv": 50,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -3315,10 +3589,12 @@
           "job": 1,
           "id": 75230080,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3341,13 +3617,15 @@
           "id": 75230080,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
-          "id": 67301040,
+          "id": 67390030,
           "needLv": 50,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -3360,10 +3638,12 @@
           "job": 1,
           "id": 75230060,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3386,13 +3666,15 @@
           "id": 75250740,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
-          "id": 67301020,
+          "id": 67390010,
           "needLv": 50,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -3405,10 +3687,12 @@
           "job": 1,
           "id": 75209400,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3431,9 +3715,11 @@
           "id": 75209980,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -3450,10 +3736,12 @@
           "job": 1,
           "id": 75210320,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3476,9 +3764,11 @@
           "id": 67300840,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -3493,12 +3783,14 @@
         },
         {
           "job": 3,
-          "id": 67300780,
+          "id": 67390050,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3521,9 +3813,11 @@
           "id": 67300850,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -3540,10 +3834,12 @@
           "job": 3,
           "id": 67300030,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3566,13 +3862,15 @@
           "id": 67300730,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
-          "id": 67301020,
+          "id": 67390010,
           "needLv": 50,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -3585,10 +3883,12 @@
           "job": 3,
           "id": 67300000,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3611,9 +3911,11 @@
           "id": 75257730,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -3630,10 +3932,12 @@
           "job": 2,
           "id": 75257710,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3642,7 +3946,7 @@
       "passives": [
         {
           "job": 3,
-          "id": 67301030,
+          "id": 67390020,
           "needLv": 10,
           "needAwaken": 0,
           "learnPointId": 100001,
@@ -3656,9 +3960,11 @@
           "id": 75299323,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -3675,10 +3981,12 @@
           "job": 1,
           "id": 75299303,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3701,9 +4009,11 @@
           "id": 75230200,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -3720,10 +4030,12 @@
           "job": 1,
           "id": 75230220,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3732,7 +4044,7 @@
       "passives": [
         {
           "job": 3,
-          "id": 67301030,
+          "id": 67390020,
           "needLv": 10,
           "needAwaken": 0,
           "learnPointId": 100001,
@@ -3746,9 +4058,11 @@
           "id": 67300850,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -3763,12 +4077,14 @@
         },
         {
           "job": 3,
-          "id": 67300910,
+          "id": 67390120,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3791,9 +4107,11 @@
           "id": 75257750,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -3810,10 +4128,12 @@
           "job": 2,
           "id": 75257710,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3836,9 +4156,11 @@
           "id": 75250760,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -3855,10 +4177,12 @@
           "job": 2,
           "id": 75250820,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3881,9 +4205,11 @@
           "id": 75257780,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -3900,10 +4226,12 @@
           "job": 2,
           "id": 75257710,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3926,9 +4254,11 @@
           "id": 67300010,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 3,
@@ -3945,10 +4275,12 @@
           "job": 3,
           "id": 67301530,
           "needLv": 50,
-          "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -3971,9 +4303,11 @@
           "id": 75251060,
           "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 2,
@@ -3990,10 +4324,159 @@
           "job": 2,
           "id": 75250640,
           "needLv": 50,
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
+        }
+      ]
+    },
+    "65200087": {
+      "id": 65200087,
+      "passives": [
+        {
+          "job": 2,
+          "id": 75250440,
+          "needLv": 10,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 32000,
+          "learnTime": 600,
+          "learnItemId1": 23421101,
+          "learnItemCount1": 20
+        },
+        {
+          "job": 2,
+          "id": 75257770,
+          "needLv": 10,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
+        },
+        {
+          "job": 1,
+          "id": 75220860,
+          "needLv": 50,
           "needAwaken": 3,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 86400,
+          "learnItemId1": 23421094,
+          "learnItemCount1": 20
+        },
+        {
+          "job": 2,
+          "id": 75250720,
+          "needLv": 50,
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
+        }
+      ]
+    },
+    "65200088": {
+      "id": 65200088,
+      "passives": [
+        {
+          "job": 2,
+          "id": 75257760,
+          "needLv": 10,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 32000,
+          "learnTime": 600,
+          "learnItemId1": 23421101,
+          "learnItemCount1": 20
+        },
+        {
+          "job": 2,
+          "id": 75206600,
+          "needLv": 10,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
+        },
+        {
+          "job": 1,
+          "id": 75251120,
+          "needLv": 50,
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 86400,
+          "learnItemId1": 23421094,
+          "learnItemCount1": 20
+        },
+        {
+          "job": 2,
+          "id": 75206700,
+          "needLv": 50,
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
+        }
+      ]
+    },
+    "65200089": {
+      "id": 65200089,
+      "passives": [
+        {
+          "job": 2,
+          "id": 75205400,
+          "needLv": 10,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 32000,
+          "learnTime": 600,
+          "learnItemId1": 23421101,
+          "learnItemCount1": 20
+        },
+        {
+          "job": 2,
+          "id": 75250460,
+          "needLv": 10,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
+        },
+        {
+          "job": 3,
+          "id": 67301640,
+          "needLv": 50,
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 86400,
+          "learnItemId1": 23421094,
+          "learnItemCount1": 20
+        },
+        {
+          "job": 2,
+          "id": 75250440,
+          "needLv": 50,
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     },
@@ -4014,11 +4497,13 @@
         {
           "job": 1,
           "id": 75230670,
-          "needLv": 1,
+          "needLv": 10,
           "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 10,
-          "learnTime": 600
+          "learnPointId": 100001,
+          "learnPointVal": 500000,
+          "learnTime": 600,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 1
         },
         {
           "job": 1,
@@ -4034,11 +4519,13 @@
         {
           "job": 1,
           "id": 75209340,
-          "needLv": 1,
-          "needAwaken": 0,
-          "learnPointId": 100004,
-          "learnPointVal": 200,
-          "learnTime": 86400
+          "needLv": 50,
+          "needAwaken": 2,
+          "learnPointId": 100001,
+          "learnPointVal": 10000000,
+          "learnTime": 86400,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 20
         }
       ]
     }

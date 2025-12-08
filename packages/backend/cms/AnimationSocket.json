@@ -3592,6 +3592,134 @@
         "socket_Flame",
         "socket_Flame"
       ]
+    },
+    "Ship_DeckOutskirtsNPC_04": {
+      "id": "Ship_DeckOutskirtsNPC_04",
+      "axe": "socket_Flame",
+      "blade": "socket_Flame",
+      "bow": "socket_Flame",
+      "crossbow": "socket_Flame",
+      "pistol": "socket_Flame",
+      "rifle": "socket_Flame",
+      "spear": "socket_Flame",
+      "sword": "socket_Flame",
+      "thSword": "socket_Flame",
+      "twinBlade": [
+        "socket_Flame",
+        "socket_Flame"
+      ]
+    },
+    "Ship_DeckOutskirtsNPC_05": {
+      "id": "Ship_DeckOutskirtsNPC_05",
+      "axe": "socket_Flame",
+      "blade": "socket_Flame",
+      "bow": "socket_Flame",
+      "crossbow": "socket_Flame",
+      "pistol": "socket_Flame",
+      "rifle": "socket_Flame",
+      "spear": "socket_Flame",
+      "sword": "socket_Flame",
+      "thSword": "socket_Flame",
+      "twinBlade": [
+        "socket_Flame",
+        "socket_Flame"
+      ]
+    },
+    "Town_Walk_04": {
+      "id": "Town_Walk_04",
+      "axe": "socket_Flame",
+      "blade": "socket_Flame",
+      "bow": "socket_Flame",
+      "crossbow": "socket_Flame",
+      "pistol": "socket_Flame",
+      "rifle": "socket_Flame",
+      "spear": "socket_Flame",
+      "sword": "socket_Flame",
+      "thSword": "socket_Flame",
+      "twinBlade": [
+        "socket_Flame",
+        "socket_Flame"
+      ]
+    },
+    "Town_Shoot_01": {
+      "id": "Town_Shoot_01",
+      "axe": "socket_Flame",
+      "blade": "socket_Flame",
+      "bow": "socket_Flame",
+      "crossbow": "socket_Flame",
+      "pistol": "socket_Flame",
+      "rifle": "socket_Flame",
+      "spear": "socket_Flame",
+      "sword": "socket_Flame",
+      "thSword": "socket_Flame",
+      "twinBlade": [
+        "socket_Flame",
+        "socket_Flame"
+      ]
+    },
+    "Town_Shoot_02": {
+      "id": "Town_Shoot_02",
+      "axe": "socket_Flame",
+      "blade": "socket_Flame",
+      "bow": "socket_Flame",
+      "crossbow": "socket_Flame",
+      "pistol": "socket_Flame",
+      "rifle": "socket_Flame",
+      "spear": "socket_Flame",
+      "sword": "socket_Flame",
+      "thSword": "socket_Flame",
+      "twinBlade": [
+        "socket_Flame",
+        "socket_Flame"
+      ]
+    },
+    "Manufacture_Crafting_01": {
+      "id": "Manufacture_Crafting_01",
+      "axe": "socket_Flame",
+      "blade": "socket_Flame",
+      "bow": "socket_Flame",
+      "crossbow": "socket_Flame",
+      "pistol": "socket_Flame",
+      "rifle": "socket_Flame",
+      "spear": "socket_Flame",
+      "sword": "socket_Flame",
+      "thSword": "socket_Flame",
+      "twinBlade": [
+        "socket_Flame",
+        "socket_Flame"
+      ]
+    },
+    "Manufacture_Crafting_02": {
+      "id": "Manufacture_Crafting_02",
+      "axe": "socket_Flame",
+      "blade": "socket_Flame",
+      "bow": "socket_Flame",
+      "crossbow": "socket_Flame",
+      "pistol": "socket_Flame",
+      "rifle": "socket_Flame",
+      "spear": "socket_Flame",
+      "sword": "socket_Flame",
+      "thSword": "socket_Flame",
+      "twinBlade": [
+        "socket_Flame",
+        "socket_Flame"
+      ]
+    },
+    "Manufacture_Crafting_03": {
+      "id": "Manufacture_Crafting_03",
+      "axe": "socket_Flame",
+      "blade": "socket_Flame",
+      "bow": "socket_Flame",
+      "crossbow": "socket_Flame",
+      "pistol": "socket_Flame",
+      "rifle": "socket_Flame",
+      "spear": "socket_Flame",
+      "sword": "socket_Flame",
+      "thSword": "socket_Flame",
+      "twinBlade": [
+        "socket_Flame",
+        "socket_Flame"
+      ]
     }
   }
 }

@@ -71,7 +71,7 @@
       "latitude": 17.595573,
       "longitude": -75.294281,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110080": {
       "id": 15110080,
@@ -107,7 +107,7 @@
       "latitude": 29.84033,
       "longitude": -14.90537,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110390": {
       "id": 15110390,
@@ -127,7 +127,7 @@
       "latitude": 25.494567,
       "longitude": -41.502934,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110410": {
       "id": 15110410,
@@ -167,7 +167,7 @@
       "latitude": 35.245422,
       "longitude": 18.044834,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110450": {
       "id": 15110450,
@@ -177,7 +177,7 @@
       "latitude": 21.482345,
       "longitude": -32.003567,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110460": {
       "id": 15110460,
@@ -197,7 +197,7 @@
       "latitude": 25.253656,
       "longitude": -68.354567,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110480": {
       "id": 15110480,
@@ -317,7 +317,7 @@
       "latitude": 39.78986,
       "longitude": 7.416,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110600": {
       "id": 15110600,
@@ -327,7 +327,7 @@
       "latitude": 58.786705,
       "longitude": 20.376015,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110610": {
       "id": 15110610,
@@ -337,7 +337,7 @@
       "latitude": 60.912277,
       "longitude": -8.424,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110620": {
       "id": 15110620,
@@ -347,7 +347,7 @@
       "latitude": 44.932203,
       "longitude": 12.968205,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110630": {
       "id": 15110630,
@@ -367,7 +367,7 @@
       "latitude": 41.138914,
       "longitude": 5.128102,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110650": {
       "id": 15110650,
@@ -447,7 +447,7 @@
       "latitude": 35.56618,
       "longitude": 16.930793,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110730": {
       "id": 15110730,
@@ -457,7 +457,7 @@
       "latitude": 34.894898,
       "longitude": 28.719033,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110740": {
       "id": 15110740,
@@ -467,7 +467,7 @@
       "latitude": 53.59216,
       "longitude": 1.816201,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110750": {
       "id": 15110750,
@@ -477,7 +477,7 @@
       "latitude": 17.843073,
       "longitude": -20.983735,
       "regenTime": 3600,
-      "localBitFlag": 219
+      "localBitFlag": 27
     },
     "15110760": {
       "id": 15110760,
@@ -722,6 +722,186 @@
       "longitude": 70.8,
       "regenTime": 3600,
       "localBitFlag": 27
+    },
+    "15110923": {
+      "id": 15110923,
+      "oceanNpcId": 15010831,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 33.99,
+      "longitude": 92.37,
+      "regenTime": 1800,
+      "localBitFlag": 192
+    },
+    "15110924": {
+      "id": 15110924,
+      "oceanNpcId": 15010832,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 31.92,
+      "longitude": 31.49,
+      "regenTime": 1800,
+      "localBitFlag": 192
+    },
+    "15110925": {
+      "id": 15110925,
+      "oceanNpcId": 15010833,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 53.42,
+      "longitude": 3.3,
+      "regenTime": 1800,
+      "localBitFlag": 192
+    },
+    "15110926": {
+      "id": 15110926,
+      "oceanNpcId": 15010834,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 33.99,
+      "longitude": 92.37,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110927": {
+      "id": 15110927,
+      "oceanNpcId": 15010835,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 31.92,
+      "longitude": 31.49,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110928": {
+      "id": 15110928,
+      "oceanNpcId": 15010836,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 53.42,
+      "longitude": 3.3,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110929": {
+      "id": 15110929,
+      "oceanNpcId": 15010834,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 33.99,
+      "longitude": 92.37,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110930": {
+      "id": 15110930,
+      "oceanNpcId": 15010835,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 31.92,
+      "longitude": 31.49,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110931": {
+      "id": 15110931,
+      "oceanNpcId": 15010836,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 53.42,
+      "longitude": 3.3,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110932": {
+      "id": 15110932,
+      "oceanNpcId": 15010834,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 33.99,
+      "longitude": 92.37,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110933": {
+      "id": 15110933,
+      "oceanNpcId": 15010835,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 31.92,
+      "longitude": 31.49,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110934": {
+      "id": 15110934,
+      "oceanNpcId": 15010836,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 53.42,
+      "longitude": 3.3,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110935": {
+      "id": 15110935,
+      "oceanNpcId": 15010834,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 33.99,
+      "longitude": 92.37,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110936": {
+      "id": 15110936,
+      "oceanNpcId": 15010835,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 31.92,
+      "longitude": 31.49,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110937": {
+      "id": 15110937,
+      "oceanNpcId": 15010836,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 53.42,
+      "longitude": 3.3,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110938": {
+      "id": 15110938,
+      "oceanNpcId": 15010834,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 33.99,
+      "longitude": 92.37,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110939": {
+      "id": 15110939,
+      "oceanNpcId": 15010835,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 31.92,
+      "longitude": 31.49,
+      "regenTime": 600,
+      "localBitFlag": 192
+    },
+    "15110940": {
+      "id": 15110940,
+      "oceanNpcId": 15010836,
+      "radiusType": 3,
+      "radius": 0,
+      "latitude": 53.42,
+      "longitude": 3.3,
+      "regenTime": 600,
+      "localBitFlag": 192
     },
     "15120001": {
       "id": 15120001,
@@ -67296,6 +67476,66 @@
         19,
         23
       ]
+    },
+    "15123345": {
+      "id": 15123345,
+      "oceanNpcId": 15070636,
+      "radiusType": 1,
+      "radius": 50000,
+      "latitude": -12.94,
+      "longitude": 54.64,
+      "regenTime": 3600,
+      "localBitFlag": 27,
+      "startDate": "2025/10/29/00:00:00",
+      "endDate": "2025/11/18/23:59:59"
+    },
+    "15123346": {
+      "id": 15123346,
+      "oceanNpcId": 15070637,
+      "radiusType": 1,
+      "radius": 50000,
+      "latitude": -20.59,
+      "longitude": 50.96,
+      "regenTime": 3600,
+      "localBitFlag": 27,
+      "startDate": "2025/10/29/00:00:00",
+      "endDate": "2025/11/18/23:59:59"
+    },
+    "15123347": {
+      "id": 15123347,
+      "oceanNpcId": 15070638,
+      "radiusType": 1,
+      "radius": 50000,
+      "latitude": -20.3,
+      "longitude": 60.26,
+      "regenTime": 3600,
+      "localBitFlag": 27,
+      "startDate": "2025/10/29/00:00:00",
+      "endDate": "2025/11/18/23:59:59"
+    },
+    "15123348": {
+      "id": 15123348,
+      "oceanNpcId": 15070639,
+      "radiusType": 1,
+      "radius": 50000,
+      "latitude": -12.41,
+      "longitude": 60.43,
+      "regenTime": 3600,
+      "localBitFlag": 27,
+      "startDate": "2025/10/29/00:00:00",
+      "endDate": "2025/11/18/23:59:59"
+    },
+    "15123349": {
+      "id": 15123349,
+      "oceanNpcId": 15070640,
+      "radiusType": 1,
+      "radius": 50000,
+      "latitude": -9,
+      "longitude": 49.99,
+      "regenTime": 3600,
+      "localBitFlag": 27,
+      "startDate": "2025/10/29/00:00:00",
+      "endDate": "2025/11/18/23:59:59"
     },
     "15190000": {
       "id": 15190000,

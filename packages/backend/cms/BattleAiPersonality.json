@@ -72,7 +72,7 @@
       ]
     },
     ":max": {
-      "personalityType": 209,
+      "personalityType": 210,
       "jobType": 3,
       "jobBattleType": 4,
       "weightRand": 1000,
@@ -8377,6 +8377,26 @@
         69371529
       ]
     },
+    "69170021": {
+      "id": 69170021,
+      "name": "25년 할로윈 이벤트 강적용 독안개 충파",
+      "personalityType": 210,
+      "jobType": 3,
+      "jobBattleType": 1,
+      "weightRand": 4,
+      "isPlayer": false,
+      "baseAiMove": 60500000,
+      "baseAiAction": 60600028,
+      "disabledMinRecoveryHpRate": 104,
+      "duelDisabledHp": 400,
+      "duelDownedRateHp": 800,
+      "duelDownedRate": 500,
+      "duelRequestRate": 300,
+      "duelAcceptRate": 600,
+      "weightListId": [
+        69371530
+      ]
+    },
     "69170050": {
       "id": 69170050,
       "name": "보물선_도망",
@@ -10024,7 +10044,10 @@
       "duelRequestRate": 0,
       "duelAcceptRate": 0,
       "weightListId": [
-        69379090
+        69379128,
+        69379129,
+        69379090,
+        69379130
       ]
     },
     "69199078": {
@@ -10646,6 +10669,87 @@
       "duelAcceptRate": 0,
       "weightListId": [
         69379122
+      ]
+    },
+    "69199109": {
+      "id": 69199109,
+      "name": "고정 포격",
+      "personalityType": 207,
+      "jobType": 3,
+      "jobBattleType": 3,
+      "weightRand": 0,
+      "isPlayer": true,
+      "baseAiMove": 60500056,
+      "baseAiAction": 60600037,
+      "disabledMinRecoveryHpRate": 0,
+      "duelDisabledHp": 400,
+      "duelDownedRateHp": 800,
+      "duelDownedRate": 500,
+      "duelRequestRate": 0,
+      "duelAcceptRate": 0,
+      "weightListId": [
+        69379123,
+        69379124
+      ]
+    },
+    "69199110": {
+      "id": 69199110,
+      "name": "후퇴하며 포격",
+      "personalityType": 207,
+      "jobType": 3,
+      "jobBattleType": 3,
+      "weightRand": 0,
+      "isPlayer": true,
+      "baseAiMove": 60500045,
+      "baseAiAction": 60600037,
+      "disabledMinRecoveryHpRate": 0,
+      "duelDisabledHp": 400,
+      "duelDownedRateHp": 800,
+      "duelDownedRate": 500,
+      "duelRequestRate": 0,
+      "duelAcceptRate": 0,
+      "weightListId": [
+        69379127
+      ]
+    },
+    "69199111": {
+      "id": 69199111,
+      "name": "화약고 저격",
+      "personalityType": 207,
+      "jobType": 3,
+      "jobBattleType": 3,
+      "weightRand": 0,
+      "isPlayer": true,
+      "baseAiMove": 60500044,
+      "baseAiAction": 60600037,
+      "disabledMinRecoveryHpRate": 0,
+      "duelDisabledHp": 400,
+      "duelDownedRateHp": 800,
+      "duelDownedRate": 500,
+      "duelRequestRate": 0,
+      "duelAcceptRate": 0,
+      "weightListId": [
+        69379125
+      ]
+    },
+    "69199112": {
+      "id": 69199112,
+      "name": "이동 불가",
+      "personalityType": 207,
+      "jobType": 3,
+      "jobBattleType": 3,
+      "weightRand": 0,
+      "isPlayer": true,
+      "baseAiMove": 60500044,
+      "baseAiAction": 60600037,
+      "disabledMinRecoveryHpRate": 0,
+      "duelDisabledHp": 400,
+      "duelDownedRateHp": 800,
+      "duelDownedRate": 500,
+      "duelRequestRate": 0,
+      "duelAcceptRate": 0,
+      "weightListId": [
+        69379126
       ]
     },
     "69130000": {

@@ -3087,6 +3087,126 @@
       "salePointVal": 90000,
       "productRewardFixedId": 95030996,
       "desc": "상급 장비 설계 안내서를 제공합니다"
+    },
+    "10600179": {
+      "id": 10600179,
+      "productName": "강화 흑단나무",
+      "productGroup": 1,
+      "productOrder": 143,
+      "saleType": 3,
+      "saleTypeVal": 1,
+      "productLocalBitflag": 27,
+      "salePointId": 100010,
+      "salePointVal": 25000,
+      "contentsTerms": [
+        {
+          "Id": 81000042,
+          "Target": 21700010,
+          "Count": 1
+        }
+      ],
+      "productRewardFixedId": 95030997,
+      "desc": "강화 흑단나무를 제공합니다."
+    },
+    "10600180": {
+      "id": 10600180,
+      "productName": "강화 흑단나무 돛대",
+      "productGroup": 1,
+      "productOrder": 144,
+      "saleType": 3,
+      "saleTypeVal": 1,
+      "productLocalBitflag": 27,
+      "salePointId": 100010,
+      "salePointVal": 25000,
+      "contentsTerms": [
+        {
+          "Id": 81000042,
+          "Target": 21700010,
+          "Count": 1
+        }
+      ],
+      "productRewardFixedId": 95030998,
+      "desc": "강화 흑단나무 돛대를 제공합니다"
+    },
+    "10600181": {
+      "id": 10600181,
+      "productName": "강화 흑단나무 포문",
+      "productGroup": 1,
+      "productOrder": 145,
+      "saleType": 3,
+      "saleTypeVal": 1,
+      "productLocalBitflag": 27,
+      "salePointId": 100010,
+      "salePointVal": 25000,
+      "contentsTerms": [
+        {
+          "Id": 81000042,
+          "Target": 21700010,
+          "Count": 1
+        }
+      ],
+      "productRewardFixedId": 95030999,
+      "desc": "강화 흑단나무 포문을 제공합니다"
+    },
+    "10600182": {
+      "id": 10600182,
+      "productName": "강화 흑단나무",
+      "productGroup": 2,
+      "productOrder": 143,
+      "saleType": 3,
+      "saleTypeVal": 1,
+      "productLocalBitflag": 27,
+      "salePointId": 100010,
+      "salePointVal": 25000,
+      "contentsTerms": [
+        {
+          "Id": 81000042,
+          "Target": 21700010,
+          "Count": 1
+        }
+      ],
+      "productRewardFixedId": 95030997,
+      "desc": "강화 흑단나무를 제공합니다."
+    },
+    "10600183": {
+      "id": 10600183,
+      "productName": "강화 흑단나무 돛대",
+      "productGroup": 2,
+      "productOrder": 144,
+      "saleType": 3,
+      "saleTypeVal": 1,
+      "productLocalBitflag": 27,
+      "salePointId": 100010,
+      "salePointVal": 25000,
+      "contentsTerms": [
+        {
+          "Id": 81000042,
+          "Target": 21700010,
+          "Count": 1
+        }
+      ],
+      "productRewardFixedId": 95030998,
+      "desc": "강화 흑단나무 돛대를 제공합니다"
+    },
+    "10600184": {
+      "id": 10600184,
+      "productName": "강화 흑단나무 포문",
+      "productGroup": 2,
+      "productOrder": 145,
+      "saleType": 3,
+      "saleTypeVal": 1,
+      "productLocalBitflag": 27,
+      "salePointId": 100010,
+      "salePointVal": 25000,
+      "contentsTerms": [
+        {
+          "Id": 81000042,
+          "Target": 21700010,
+          "Count": 1
+        }
+      ],
+      "productRewardFixedId": 95030999,
+      "desc": "강화 흑단나무 포문을 제공합니다"
     }
   }
 }

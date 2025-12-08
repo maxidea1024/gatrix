@@ -5851,7 +5851,7 @@
     },
     "70500071": {
       "id": 70500071,
-      "name": "두로 양조장",
+      "name": "루시타니아인의 마을",
       "isBackcountry": false,
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700001,
@@ -5896,6 +5896,79 @@
       "discoveryId": 70412375,
       "itemRatio": 300,
       "AdventureReward": 90071161,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1071,
+        1071
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "exchangeVillageListGroup": 15900,
+      "negoPricePoint": 5,
+      "negoGetGoodsPoint": 10
+    },
+    "70500072": {
+      "id": 70500072,
+      "name": "프랑크족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 10,
+      "gatheringVal": 10,
+      "observationVal": 10,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001200,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412378,
+      "itemRatio": 300,
+      "AdventureReward": 90121376,
       "waterDropRate": 200,
       "waterCountMin": 3,
       "waterCountMax": 7,

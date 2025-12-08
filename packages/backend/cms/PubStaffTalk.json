@@ -2968,7 +2968,7 @@
     "71400076": {
       "id": 71400076,
       "mateId": 21350076,
-      "personalityType": 6,
+      "personalityType": 10,
       "FirstDialog": 71451020,
       "GreetDialog": [
         71451021,
@@ -3005,7 +3005,7 @@
     "71400077": {
       "id": 71400077,
       "mateId": 21350077,
-      "personalityType": 9,
+      "personalityType": 7,
       "FirstDialog": 71451030,
       "GreetDialog": [
         71451031,

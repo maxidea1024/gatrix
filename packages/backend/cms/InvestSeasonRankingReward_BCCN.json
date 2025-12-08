@@ -9,9 +9,7 @@
       "rewardFixedId": "number"
     },
     ":required": {
-      "rankingGroup": 1,
-      "rankingGrade": 1,
-      "rankingRange": 1
+      "rankingGroup": 1
     },
     ":requiredInObject": {},
     ":min": {},
@@ -595,6 +593,11 @@
       "rankingGrade": 8,
       "rankingRange": 50,
       "rewardFixedId": 95600370
+    },
+    "100080073": {
+      "id": 100080073,
+      "rankingGroup": 1009,
+      "rewardFixedId": 95600392
     }
   }
 }

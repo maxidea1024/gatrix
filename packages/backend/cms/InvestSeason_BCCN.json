@@ -10,6 +10,9 @@
       "seasonName": "text",
       "numberImage": "string",
       "startFX": "string",
+      "startDate": "string",
+      "endDate": "string",
+      "startDateText": "string",
       "startSE": "number",
       "startFxJobType": "number",
       "investItems": [
@@ -53,6 +56,8 @@
     ":required": {
       "name": 1,
       "seasonNumber": 1,
+      "startDate": 1,
+      "endDate": 1,
       "investItems": [
         {
           "Id": 1,
@@ -127,35 +132,38 @@
         "1"
       ],
       "seasonNumber": 1,
-      "seasonName": "황금의 시대",
+      "seasonName": "북해의 연맹",
       "numberImage": "WT_SeasonStartNum_1_Sprite",
-      "startFX": "WBP_BaseSeasonStartIntro_S03",
-      "startSE": 96000918,
-      "startFxJobType": 3,
+      "startFX": "WBP_BaseSeasonStartIntro_S05",
+      "startDate": "2025/12/01/00:00:00",
+      "endDate": "2026/01/25/23:59:59",
+      "startDateText": "2025/12/16/00:00:00",
+      "startSE": 96000937,
+      "startFxJobType": 2,
       "investItems": [
         {
-          "Id": 23401003,
-          "Value": 1000000,
+          "Id": 23401027,
+          "Value": 100000,
           "Description": "육지 탐험, 전투 보상, 거래 점수 보상에서 주로 획득합니다."
         },
         {
-          "Id": 23401004,
-          "Value": 100000000,
+          "Id": 23401028,
+          "Value": 10000000,
           "Description": "순위 보상, 이벤트 보상, 투자 상자에서 낮은 확률로 획득할 수 있습니다."
         },
         {
-          "Id": 23401005,
-          "Value": 1000000000,
+          "Id": 23401029,
+          "Value": 100000000,
           "Description": "순위 보상, 이벤트 보상, 투자 상자에서 매우 낮은 확률로 획득할 수 있습니다."
         }
       ],
       "seasonRewardItemId": [
         100003,
-        23710168,
+        23340192,
         23401006
       ],
       "investRewardItemId": 23401006,
-      "viewRankingReward": true,
+      "viewRankingReward": false,
       "rankingRewardGroup": 1000,
       "nationRankingRewardGroup": [
         1001,
@@ -166,7 +174,9 @@
         1006,
         1007,
         1008
-      ]
+      ],
+      "titleImage": "WT_InfoHeadTitle_Season01_Sprite",
+      "BGImage": "WT_InfoHeadBG_Season5_Sprite"
     },
     "100070002": {
       "id": 100070002,
@@ -178,6 +188,8 @@
       "seasonName": "인도양의 패자",
       "numberImage": "WT_SeasonStartNum_2_Sprite",
       "startFX": "WBP_BaseSeasonStartIntro_S02",
+      "startDate": "2026/01/26/00:00:00",
+      "endDate": "2026/06/22/23:59:59",
       "startSE": 96000915,
       "startFxJobType": 3,
       "investItems": [
@@ -228,8 +240,10 @@
       "seasonName": "황금의 시대",
       "numberImage": "WT_SeasonStartNum_3_Sprite",
       "startFX": "WBP_BaseSeasonStartIntro_S03",
+      "startDate": "2026/06/23/00:00:00",
+      "endDate": "2026/09/21/23:59:59",
       "startSE": 96000918,
-      "startFxJobType": 3,
+      "startFxJobType": 2,
       "investItems": [
         {
           "Id": 23401011,

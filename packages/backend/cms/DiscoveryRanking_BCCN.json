@@ -1,0 +1,292 @@
+{
+  ":DiscoveryRanking": {
+    ":type": {
+      "id": "key",
+      "desc": "string",
+      "icon": "string",
+      "rankingGrade": "number",
+      "rankingTarget": "number",
+      "rankingType": "number",
+      "rankingRange": "number",
+      "mailId": "number"
+    },
+    ":required": {
+      "icon": 1,
+      "rankingGrade": 1,
+      "rankingTarget": 1,
+      "rankingType": 1
+    },
+    ":min": {
+      "mailId": 1
+    },
+    ":max": {
+      "mailId": 95999999
+    },
+    ":enum": {},
+    ":links": {
+      "mailId": [
+        "Mail"
+      ]
+    }
+  },
+  "DiscoveryRanking": {
+    "70800001": {
+      "id": 70800001,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 1,
+      "rankingType": 2,
+      "rankingRange": 1,
+      "mailId": 92000120
+    },
+    "70800002": {
+      "id": 70800002,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 1,
+      "rankingType": 2,
+      "rankingRange": 2,
+      "mailId": 92000121
+    },
+    "70800003": {
+      "id": 70800003,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 1,
+      "rankingType": 2,
+      "rankingRange": 3,
+      "mailId": 92000122
+    },
+    "70800004": {
+      "id": 70800004,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 1,
+      "rankingType": 2,
+      "rankingRange": 10,
+      "mailId": 92000123
+    },
+    "70800005": {
+      "id": 70800005,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 1,
+      "rankingType": 2,
+      "rankingRange": 20,
+      "mailId": 92000124
+    },
+    "70800006": {
+      "id": 70800006,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 1,
+      "rankingType": 2,
+      "rankingRange": 30,
+      "mailId": 92000125
+    },
+    "70800007": {
+      "id": 70800007,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 1,
+      "rankingType": 2,
+      "rankingRange": 40,
+      "mailId": 92000126
+    },
+    "70800008": {
+      "id": 70800008,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 1,
+      "rankingType": 2,
+      "rankingRange": 50,
+      "mailId": 92000127
+    },
+    "70800009": {
+      "id": 70800009,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 1,
+      "rankingType": 2,
+      "rankingRange": 100,
+      "mailId": 92000128
+    },
+    "70800101": {
+      "id": 70800101,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 2,
+      "rankingType": 2,
+      "rankingRange": 1,
+      "mailId": 92000129
+    },
+    "70800102": {
+      "id": 70800102,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 2,
+      "rankingType": 2,
+      "rankingRange": 2,
+      "mailId": 92000130
+    },
+    "70800103": {
+      "id": 70800103,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 2,
+      "rankingType": 2,
+      "rankingRange": 3,
+      "mailId": 92000131
+    },
+    "70800104": {
+      "id": 70800104,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 2,
+      "rankingType": 2,
+      "rankingRange": 5,
+      "mailId": 92000132
+    },
+    "70800105": {
+      "id": 70800105,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 2,
+      "rankingType": 2,
+      "rankingRange": 10,
+      "mailId": 92000133
+    },
+    "70800106": {
+      "id": 70800106,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 2,
+      "rankingType": 2,
+      "rankingRange": 15,
+      "mailId": 92000134
+    },
+    "70800107": {
+      "id": 70800107,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 2,
+      "rankingType": 2,
+      "rankingRange": 20,
+      "mailId": 92000135
+    },
+    "70800108": {
+      "id": 70800108,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 2,
+      "rankingType": 2,
+      "rankingRange": 30,
+      "mailId": 92000136
+    },
+    "70800109": {
+      "id": 70800109,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 2,
+      "rankingType": 2,
+      "rankingRange": 50,
+      "mailId": 92000137
+    },
+    "70800110": {
+      "id": 70800110,
+      "desc": "전설",
+      "icon": "WT_RankingEmblem_06Master_Sprite",
+      "rankingGrade": 7,
+      "rankingTarget": 2,
+      "rankingType": 2,
+      "rankingRange": 100,
+      "mailId": 92000138
+    },
+    "70800111": {
+      "id": 70800111,
+      "desc": "영웅",
+      "icon": "WT_RankingEmblem_05Diamond_Sprite",
+      "rankingGrade": 6,
+      "rankingTarget": 2,
+      "rankingType": 1,
+      "rankingRange": 10,
+      "mailId": 92000139
+    },
+    "70800112": {
+      "id": 70800112,
+      "desc": "특급",
+      "icon": "WT_RankingEmblem_04Platinum_Sprite",
+      "rankingGrade": 5,
+      "rankingTarget": 2,
+      "rankingType": 1,
+      "rankingRange": 20,
+      "mailId": 92000140
+    },
+    "70800113": {
+      "id": 70800113,
+      "desc": "고급",
+      "icon": "WT_RankingEmblem_03Gold_Sprite",
+      "rankingGrade": 4,
+      "rankingTarget": 2,
+      "rankingType": 1,
+      "rankingRange": 40,
+      "mailId": 92000141
+    },
+    "70800114": {
+      "id": 70800114,
+      "desc": "중급",
+      "icon": "WT_RankingEmblem_02Silver_Sprite",
+      "rankingGrade": 3,
+      "rankingTarget": 2,
+      "rankingType": 1,
+      "rankingRange": 60,
+      "mailId": 92000142
+    },
+    "70800115": {
+      "id": 70800115,
+      "desc": "초급 2단계",
+      "icon": "WT_RankingEmblem_01Bronze_Sprite",
+      "rankingGrade": 2,
+      "rankingTarget": 2,
+      "rankingType": 1,
+      "rankingRange": 80,
+      "mailId": 92000143
+    },
+    "70800116": {
+      "id": 70800116,
+      "desc": "초급",
+      "icon": "WT_RankingEmblem_01Bronze_Sprite",
+      "rankingGrade": 2,
+      "rankingTarget": 2,
+      "rankingType": 1,
+      "rankingRange": 100,
+      "mailId": 92000144
+    },
+    "70800117": {
+      "id": 70800117,
+      "desc": "등급 없음",
+      "icon": "Discovery_Ranking_Norank_Sprite",
+      "rankingGrade": 1,
+      "rankingTarget": 2,
+      "rankingType": 0
+    }
+  }
+}

@@ -7,7 +7,8 @@
       "productSize": "number",
       "name": "text",
       "productEntryType": "number",
-      "bannereventImage": "text"
+      "bannereventImage": "string",
+      "useEventButton": "bool"
     },
     ":required": {
       "sortOrder": 1,
@@ -31,97 +32,93 @@
       "id": 101,
       "sortOrder": 1,
       "productCategory": 3,
-      "productSize": 2,
+      "productSize": 1,
       "name": "특별",
-      "productEntryType": 2
+      "productEntryType": 2,
+      "useEventButton": false
     },
     "102": {
       "id": 102,
       "sortOrder": 2,
       "productCategory": 3,
-      "productSize": 2,
+      "productSize": 1,
       "name": "이벤트",
-      "productEntryType": 1
+      "productEntryType": 2,
+      "useEventButton": false
     },
     "103": {
       "id": 103,
       "sortOrder": 3,
       "productCategory": 3,
-      "productSize": 2,
-      "name": "희망",
-      "productEntryType": 1
+      "productSize": 1,
+      "name": "특전",
+      "productEntryType": 4,
+      "bannereventImage": "WT_CN_CashShopBannerEvent007",
+      "useEventButton": false
     },
     "104": {
       "id": 104,
       "sortOrder": 4,
       "productCategory": 3,
-      "productSize": 2,
-      "name": "눈꽃",
-      "productEntryType": 1
+      "productSize": 1,
+      "name": "특화",
+      "productEntryType": 4,
+      "bannereventImage": "WT_CN_CashShopBannerEvent009",
+      "useEventButton": false
     },
     "105": {
       "id": 105,
       "sortOrder": 5,
       "productCategory": 3,
-      "productSize": 2,
-      "name": "초보자",
-      "productEntryType": 2
+      "productSize": 1,
+      "name": "매일 패키지",
+      "productEntryType": 2,
+      "useEventButton": false
     },
     "106": {
       "id": 106,
       "sortOrder": 6,
       "productCategory": 3,
-      "productSize": 2,
-      "name": "선박 재료",
-      "productEntryType": 1
+      "productSize": 1,
+      "name": "주간 패키지",
+      "productEntryType": 2,
+      "useEventButton": false
     },
     "107": {
       "id": 107,
       "sortOrder": 7,
       "productCategory": 3,
       "productSize": 1,
-      "name": "신규 항해",
-      "productEntryType": 2
+      "name": "월간 패키지",
+      "productEntryType": 2,
+      "useEventButton": false
     },
     "108": {
       "id": 108,
       "sortOrder": 8,
       "productCategory": 3,
       "productSize": 1,
-      "name": "항해사",
-      "productEntryType": 2
+      "name": "성장",
+      "productEntryType": 1,
+      "useEventButton": false
     },
     "109": {
       "id": 109,
       "sortOrder": 9,
       "productCategory": 3,
       "productSize": 1,
-      "name": "부품/장비",
-      "productEntryType": 2
-    },
-    "110": {
-      "id": 110,
-      "sortOrder": 10,
-      "productCategory": 3,
-      "productSize": 2,
-      "name": "외형",
-      "productEntryType": 2
-    },
-    "111": {
-      "id": 111,
-      "sortOrder": 11,
-      "productCategory": 3,
-      "productSize": 1,
-      "name": "소모",
-      "productEntryType": 1
+      "name": "효과",
+      "productEntryType": 1,
+      "useEventButton": false
     },
     "301": {
       "id": 301,
       "sortOrder": 1,
       "productCategory": 10,
       "productSize": 2,
-      "name": "특별",
-      "productEntryType": 2
+      "name": "초보자 패스",
+      "productEntryType": 2,
+      "useEventButton": false
     },
     "302": {
       "id": 302,
@@ -129,15 +126,35 @@
       "productCategory": 10,
       "productSize": 2,
       "name": "시즌 패스",
-      "productEntryType": 2
+      "productEntryType": 2,
+      "useEventButton": false
     },
     "303": {
       "id": 303,
       "sortOrder": 3,
       "productCategory": 10,
       "productSize": 2,
-      "name": "월간 패스",
-      "productEntryType": 2
+      "name": "월간 고급 항해사",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "304": {
+      "id": 304,
+      "sortOrder": 4,
+      "productCategory": 10,
+      "productSize": 2,
+      "name": "월간 항해사",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "305": {
+      "id": 305,
+      "sortOrder": 5,
+      "productCategory": 10,
+      "productSize": 2,
+      "name": "레벨업 패스",
+      "productEntryType": 2,
+      "useEventButton": false
     },
     "501": {
       "id": 501,
@@ -145,7 +162,8 @@
       "productCategory": 7,
       "productSize": 2,
       "name": "모험",
-      "productEntryType": 2
+      "productEntryType": 2,
+      "useEventButton": false
     },
     "502": {
       "id": 502,
@@ -153,7 +171,8 @@
       "productCategory": 7,
       "productSize": 2,
       "name": "교역",
-      "productEntryType": 2
+      "productEntryType": 2,
+      "useEventButton": false
     },
     "503": {
       "id": 503,
@@ -161,47 +180,114 @@
       "productCategory": 7,
       "productSize": 2,
       "name": "전투",
-      "productEntryType": 2
+      "productEntryType": 2,
+      "useEventButton": false
     },
     "601": {
       "id": 601,
       "sortOrder": 1,
       "productCategory": 5,
-      "productSize": 2,
-      "name": "가호",
-      "productEntryType": 5
-    },
-    "602": {
-      "id": 602,
-      "sortOrder": 2,
-      "productCategory": 5,
-      "productSize": 2,
+      "productSize": 1,
       "name": "효과",
-      "productEntryType": 2
+      "productEntryType": 1,
+      "useEventButton": false
     },
     "701": {
       "id": 701,
       "sortOrder": 1,
       "productCategory": 8,
       "productSize": 1,
-      "name": "특별",
-      "productEntryType": 1
+      "name": "특별 패키지",
+      "productEntryType": 1,
+      "useEventButton": false
     },
     "702": {
       "id": 702,
       "sortOrder": 2,
       "productCategory": 8,
       "productSize": 1,
-      "name": "주간",
-      "productEntryType": 1
+      "name": "소모품",
+      "productEntryType": 1,
+      "useEventButton": false
     },
-    "703": {
-      "id": 703,
-      "sortOrder": 3,
-      "productCategory": 8,
+    "1301": {
+      "id": 1301,
+      "sortOrder": 1,
+      "productCategory": 13,
       "productSize": 1,
-      "name": "월간",
-      "productEntryType": 1
+      "name": "선박 외형",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "1401": {
+      "id": 1401,
+      "sortOrder": 1,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "블랙 레이븐",
+      "productEntryType": 4,
+      "bannereventImage": "WT_CN_CashShopBannerEvent001",
+      "useEventButton": false
+    },
+    "1402": {
+      "id": 1402,
+      "sortOrder": 2,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "줄리 도비니",
+      "productEntryType": 4,
+      "bannereventImage": "WT_CN_CashShopBannerEvent002",
+      "useEventButton": false
+    },
+    "1403": {
+      "id": 1403,
+      "sortOrder": 3,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "예바",
+      "productEntryType": 4,
+      "bannereventImage": "WT_CN_CashShopBannerEvent003",
+      "useEventButton": false
+    },
+    "1404": {
+      "id": 1404,
+      "sortOrder": 4,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "갈릴레오 갈릴레이",
+      "productEntryType": 4,
+      "bannereventImage": "WT_CN_CashShopBannerEvent004",
+      "useEventButton": false
+    },
+    "1405": {
+      "id": 1405,
+      "sortOrder": 5,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "비비엔 하트",
+      "productEntryType": 4,
+      "bannereventImage": "WT_CN_CashShopBannerEvent005",
+      "useEventButton": false
+    },
+    "1406": {
+      "id": 1406,
+      "sortOrder": 6,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "신규 항해",
+      "productEntryType": 4,
+      "bannereventImage": "WT_CN_CashShopBannerEvent006",
+      "useEventButton": false
+    },
+    "1407": {
+      "id": 1407,
+      "sortOrder": 7,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "런칭",
+      "productEntryType": 4,
+      "bannereventImage": "WT_CN_CashShopBannerEvent008",
+      "useEventButton": false
     }
   }
 }

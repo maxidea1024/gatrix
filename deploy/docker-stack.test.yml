@@ -1,0 +1,84 @@
+# Test stack for dashboard testing
+version: '3.8'
+
+services:
+  backend:
+    image: nginx:alpine
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    image: nginx:alpine
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+
+  chat-server:
+    image: nginx:alpine
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+
+  event-lens:
+    image: nginx:alpine
+    deploy:
+      replicas: 1
+
+  edge:
+    image: nginx:alpine
+    deploy:
+      replicas: 1
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    ports:
+      - target: 9000
+        published: 9000
+        mode: host
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  visualizer:
+    image: dockersamples/visualizer:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - target: 8080
+        published: 8080
+        mode: host
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  default:
+    driver: overlay
+
+volumes:
+  portainer_data:

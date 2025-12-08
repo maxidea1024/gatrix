@@ -3139,11 +3139,11 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 13,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 50000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910548,
       "shipBuildReward": [
@@ -3222,11 +3222,11 @@
       "minCompanyLv": 14,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 100000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910549,
       "shipBuildReward": [
@@ -3305,11 +3305,11 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 200000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910550,
       "shipBuildReward": [
@@ -3388,11 +3388,11 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 200000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910551,
       "shipBuildReward": [
@@ -3471,11 +3471,11 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 300000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910552,
       "shipBuildReward": [
@@ -3554,11 +3554,11 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 400000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910553,
       "shipBuildReward": [
@@ -3637,11 +3637,11 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 500000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910554,
       "shipBuildReward": [
@@ -3720,11 +3720,11 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 600000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910555,
       "shipBuildReward": [
@@ -3803,11 +3803,11 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 800000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910556,
       "shipBuildReward": [
@@ -3884,13 +3884,13 @@
       "category": 1,
       "jobType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 1000000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910557,
       "shipBuildReward": [
@@ -4750,7 +4750,7 @@
       "category": 1,
       "jobType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000072,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -5584,7 +5584,7 @@
       "category": 1,
       "jobType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000040,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -5672,9 +5672,6 @@
       "missionTargetType": 2,
       "isAutoSail": true,
       "achievementCount": 10,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910548,
       "shipBuildReward": [
         {
@@ -5719,9 +5716,6 @@
       "missionTargetType": 2,
       "isAutoSail": true,
       "achievementCount": 10,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910549,
       "shipBuildReward": [
         {
@@ -5766,9 +5760,6 @@
       "missionTargetType": 2,
       "isAutoSail": true,
       "achievementCount": 10,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910550,
       "shipBuildReward": [
         {
@@ -5813,9 +5804,6 @@
       "missionTargetType": 2,
       "isAutoSail": true,
       "achievementCount": 10,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910551,
       "shipBuildReward": [
         {
@@ -5860,9 +5848,6 @@
       "missionTargetType": 2,
       "isAutoSail": true,
       "achievementCount": 10,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910552,
       "shipBuildReward": [
         {
@@ -5907,9 +5892,6 @@
       "missionTargetType": 2,
       "isAutoSail": true,
       "achievementCount": 10,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910553,
       "shipBuildReward": [
         {
@@ -5954,9 +5936,6 @@
       "missionTargetType": 2,
       "isAutoSail": true,
       "achievementCount": 10,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910554,
       "shipBuildReward": [
         {
@@ -6001,9 +5980,6 @@
       "missionTargetType": 2,
       "isAutoSail": true,
       "achievementCount": 10,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910555,
       "shipBuildReward": [
         {
@@ -6048,9 +6024,6 @@
       "missionTargetType": 2,
       "isAutoSail": true,
       "achievementCount": 10,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910556,
       "shipBuildReward": [
         {
@@ -6095,9 +6068,6 @@
       "missionTargetType": 2,
       "isAutoSail": true,
       "achievementCount": 10,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910557,
       "shipBuildReward": [
         {
@@ -6920,7 +6890,7 @@
       "category": 1,
       "jobType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000072,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -7781,7 +7751,7 @@
       "category": 1,
       "jobType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000088,
       "missionTargetType": 2,
       "isAutoSail": true,
@@ -8614,7 +8584,7 @@
       "category": 1,
       "jobType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000059,
       "missionTargetType": 4,
       "isAutoSail": false,
@@ -9480,7 +9450,7 @@
       "category": 1,
       "jobType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000072,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -10341,7 +10311,7 @@
       "category": 1,
       "jobType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000112,
       "missionTargetType": 4,
       "isAutoSail": false,
@@ -10430,12 +10400,9 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 13,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910600,
       "shipBuildReward": [
         {
@@ -10470,12 +10437,9 @@
       "minCompanyLv": 14,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910601,
       "shipBuildReward": [
         {
@@ -10510,12 +10474,9 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910602,
       "shipBuildReward": [
         {
@@ -10550,12 +10511,9 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910603,
       "shipBuildReward": [
         {
@@ -10590,12 +10548,9 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910604,
       "shipBuildReward": [
         {
@@ -10630,12 +10585,9 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910605,
       "shipBuildReward": [
         {
@@ -10670,12 +10622,9 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910606,
       "shipBuildReward": [
         {
@@ -10710,12 +10659,9 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910607,
       "shipBuildReward": [
         {
@@ -10750,12 +10696,9 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910608,
       "shipBuildReward": [
         {
@@ -10788,14 +10731,11 @@
       "jobType": 0,
       "subType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910609,
       "shipBuildReward": [
         {
@@ -10830,12 +10770,9 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 13,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910600,
       "shipBuildReward": [
         {
@@ -10870,12 +10807,9 @@
       "minCompanyLv": 14,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910601,
       "shipBuildReward": [
         {
@@ -10910,12 +10844,9 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910602,
       "shipBuildReward": [
         {
@@ -10950,12 +10881,9 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910603,
       "shipBuildReward": [
         {
@@ -10990,12 +10918,9 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910604,
       "shipBuildReward": [
         {
@@ -11030,12 +10955,9 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910605,
       "shipBuildReward": [
         {
@@ -11070,12 +10992,9 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910606,
       "shipBuildReward": [
         {
@@ -11110,12 +11029,9 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910607,
       "shipBuildReward": [
         {
@@ -11150,12 +11066,9 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910608,
       "shipBuildReward": [
         {
@@ -11188,14 +11101,11 @@
       "jobType": 0,
       "subType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910609,
       "shipBuildReward": [
         {
@@ -11230,12 +11140,9 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 13,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910600,
       "shipBuildReward": [
         {
@@ -11270,12 +11177,9 @@
       "minCompanyLv": 14,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910601,
       "shipBuildReward": [
         {
@@ -11310,12 +11214,9 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910602,
       "shipBuildReward": [
         {
@@ -11350,12 +11251,9 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910603,
       "shipBuildReward": [
         {
@@ -11390,12 +11288,9 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910604,
       "shipBuildReward": [
         {
@@ -11430,12 +11325,9 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910605,
       "shipBuildReward": [
         {
@@ -11470,12 +11362,9 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910606,
       "shipBuildReward": [
         {
@@ -11510,12 +11399,9 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910607,
       "shipBuildReward": [
         {
@@ -11550,12 +11436,9 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910608,
       "shipBuildReward": [
         {
@@ -11588,14 +11471,11 @@
       "jobType": 0,
       "subType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910609,
       "shipBuildReward": [
         {
@@ -11630,12 +11510,9 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 13,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910600,
       "shipBuildReward": [
         {
@@ -11670,12 +11547,9 @@
       "minCompanyLv": 14,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910601,
       "shipBuildReward": [
         {
@@ -11710,12 +11584,9 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910602,
       "shipBuildReward": [
         {
@@ -11750,12 +11621,9 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910603,
       "shipBuildReward": [
         {
@@ -11790,12 +11658,9 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910604,
       "shipBuildReward": [
         {
@@ -11830,12 +11695,9 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910605,
       "shipBuildReward": [
         {
@@ -11870,12 +11732,9 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910606,
       "shipBuildReward": [
         {
@@ -11910,12 +11769,9 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910607,
       "shipBuildReward": [
         {
@@ -11950,12 +11806,9 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910608,
       "shipBuildReward": [
         {
@@ -11988,14 +11841,11 @@
       "jobType": 0,
       "subType": 4,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910609,
       "shipBuildReward": [
         {
@@ -12030,12 +11880,9 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 13,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910600,
       "shipBuildReward": [
         {
@@ -12070,12 +11917,9 @@
       "minCompanyLv": 14,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910601,
       "shipBuildReward": [
         {
@@ -12110,12 +11954,9 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910602,
       "shipBuildReward": [
         {
@@ -12150,12 +11991,9 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910603,
       "shipBuildReward": [
         {
@@ -12190,12 +12028,9 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910604,
       "shipBuildReward": [
         {
@@ -12230,12 +12065,9 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910605,
       "shipBuildReward": [
         {
@@ -12270,12 +12102,9 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910606,
       "shipBuildReward": [
         {
@@ -12310,12 +12139,9 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910607,
       "shipBuildReward": [
         {
@@ -12350,12 +12176,9 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910608,
       "shipBuildReward": [
         {
@@ -12388,14 +12211,11 @@
       "jobType": 0,
       "subType": 5,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910609,
       "shipBuildReward": [
         {
@@ -12430,12 +12250,9 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 13,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910600,
       "shipBuildReward": [
         {
@@ -12470,12 +12287,9 @@
       "minCompanyLv": 14,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910601,
       "shipBuildReward": [
         {
@@ -12510,12 +12324,9 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910602,
       "shipBuildReward": [
         {
@@ -12550,12 +12361,9 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910603,
       "shipBuildReward": [
         {
@@ -12590,12 +12398,9 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910604,
       "shipBuildReward": [
         {
@@ -12630,12 +12435,9 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910605,
       "shipBuildReward": [
         {
@@ -12670,12 +12472,9 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910606,
       "shipBuildReward": [
         {
@@ -12710,12 +12509,9 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910607,
       "shipBuildReward": [
         {
@@ -12750,12 +12546,9 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910608,
       "shipBuildReward": [
         {
@@ -12788,14 +12581,11 @@
       "jobType": 0,
       "subType": 6,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910609,
       "shipBuildReward": [
         {
@@ -12830,12 +12620,9 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 13,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910600,
       "shipBuildReward": [
         {
@@ -12870,12 +12657,9 @@
       "minCompanyLv": 14,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910601,
       "shipBuildReward": [
         {
@@ -12910,12 +12694,9 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910602,
       "shipBuildReward": [
         {
@@ -12950,12 +12731,9 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910603,
       "shipBuildReward": [
         {
@@ -12990,12 +12768,9 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910604,
       "shipBuildReward": [
         {
@@ -13030,12 +12805,9 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910605,
       "shipBuildReward": [
         {
@@ -13070,12 +12842,9 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910606,
       "shipBuildReward": [
         {
@@ -13110,12 +12879,9 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910607,
       "shipBuildReward": [
         {
@@ -13150,12 +12916,9 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910608,
       "shipBuildReward": [
         {
@@ -13188,14 +12951,11 @@
       "jobType": 0,
       "subType": 0,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 3,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910609,
       "shipBuildReward": [
         {
@@ -13229,7 +12989,7 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 13,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 3,
       "autoMovingVal": [
@@ -13312,7 +13072,7 @@
       "minCompanyLv": 14,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 3,
       "autoMovingVal": [
@@ -13395,7 +13155,7 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 3,
       "autoMovingVal": [
@@ -13478,7 +13238,7 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 3,
       "autoMovingVal": [
@@ -13561,7 +13321,7 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 3,
       "autoMovingVal": [
@@ -13644,7 +13404,7 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 3,
       "autoMovingVal": [
@@ -13727,7 +13487,7 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 3,
       "autoMovingVal": [
@@ -13810,7 +13570,7 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 3,
       "autoMovingVal": [
@@ -13893,7 +13653,7 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 3,
       "autoMovingVal": [
@@ -13974,9 +13734,9 @@
       "category": 1,
       "jobType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 3,
       "autoMovingVal": [
@@ -14625,7 +14385,7 @@
       "category": 2,
       "jobType": 0,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000107,
       "missionTargetType": 1,
       "isAutoSail": true,
@@ -15264,7 +15024,7 @@
       "category": 2,
       "jobType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000017,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -15927,7 +15687,7 @@
       "category": 2,
       "jobType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000088,
       "missionTargetType": 1,
       "isAutoSail": true,
@@ -16003,11 +15763,11 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 200000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910578,
       "shipBuildReward": [
@@ -16074,11 +15834,11 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 400000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910579,
       "shipBuildReward": [
@@ -16145,11 +15905,11 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 800000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910580,
       "shipBuildReward": [
@@ -16216,11 +15976,11 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 1000000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910581,
       "shipBuildReward": [
@@ -16287,11 +16047,11 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 1200000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910582,
       "shipBuildReward": [
@@ -16358,11 +16118,11 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 1600000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910583,
       "shipBuildReward": [
@@ -16429,11 +16189,11 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 2000000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910584,
       "shipBuildReward": [
@@ -16500,11 +16260,11 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 2400000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910585,
       "shipBuildReward": [
@@ -16569,13 +16329,13 @@
       "category": 2,
       "jobType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000042,
-      "missionTargetType": 17,
+      "missionTargetType": 35,
       "isAutoSail": true,
       "achievementCount": 3200000,
       "autoMovingVal": [
-        10
+        20
       ],
       "baseReward": 95910586,
       "shipBuildReward": [
@@ -17240,7 +17000,7 @@
       "category": 2,
       "jobType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000072,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -17883,7 +17643,7 @@
       "category": 2,
       "jobType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000040,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -17956,12 +17716,9 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 30,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910578,
       "shipBuildReward": [
         {
@@ -18027,12 +17784,9 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 30,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910579,
       "shipBuildReward": [
         {
@@ -18098,12 +17852,9 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 30,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910580,
       "shipBuildReward": [
         {
@@ -18169,12 +17920,9 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 30,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910581,
       "shipBuildReward": [
         {
@@ -18240,12 +17988,9 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 30,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910582,
       "shipBuildReward": [
         {
@@ -18311,12 +18056,9 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 30,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910583,
       "shipBuildReward": [
         {
@@ -18382,12 +18124,9 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 30,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910584,
       "shipBuildReward": [
         {
@@ -18453,12 +18192,9 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 30,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910585,
       "shipBuildReward": [
         {
@@ -18522,14 +18258,11 @@
       "category": 2,
       "jobType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 30,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910586,
       "shipBuildReward": [
         {
@@ -19161,7 +18894,7 @@
       "category": 2,
       "jobType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000049,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -19800,7 +19533,7 @@
       "category": 2,
       "jobType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000053,
       "missionTargetType": 2,
       "isAutoSail": true,
@@ -20471,7 +20204,7 @@
       "category": 2,
       "jobType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000072,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -20548,7 +20281,7 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 20,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 20,
       "autoMovingVal": [
@@ -20619,7 +20352,7 @@
       "minCompanyLv": 21,
       "maxCompanyLv": 30,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 20,
       "autoMovingVal": [
@@ -20690,7 +20423,7 @@
       "minCompanyLv": 31,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 20,
       "autoMovingVal": [
@@ -20761,7 +20494,7 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 20,
       "autoMovingVal": [
@@ -20832,7 +20565,7 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 20,
       "autoMovingVal": [
@@ -20903,7 +20636,7 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 20,
       "autoMovingVal": [
@@ -20974,7 +20707,7 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 20,
       "autoMovingVal": [
@@ -21045,7 +20778,7 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 20,
       "autoMovingVal": [
@@ -21114,9 +20847,9 @@
       "category": 2,
       "jobType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000078,
-      "missionTargetType": 2,
+      "missionTargetType": 30,
       "isAutoSail": true,
       "achievementCount": 20,
       "autoMovingVal": [
@@ -21753,7 +21486,7 @@
       "category": 2,
       "jobType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000059,
       "missionTargetType": 2,
       "isAutoSail": true,
@@ -22416,7 +22149,7 @@
       "category": 2,
       "jobType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000112,
       "missionTargetType": 2,
       "isAutoSail": true,
@@ -23082,7 +22815,7 @@
       "category": 2,
       "jobType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000088,
       "missionTargetType": 2,
       "isAutoSail": true,
@@ -23748,7 +23481,7 @@
       "category": 2,
       "jobType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000062,
       "missionTargetType": 2,
       "isAutoSail": true,
@@ -24422,7 +24155,7 @@
       "category": 2,
       "jobType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000072,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -24616,7 +24349,7 @@
       "category": 3,
       "jobType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000059,
       "missionTargetType": 2,
       "isAutoSail": true,
@@ -24773,7 +24506,7 @@
       "category": 3,
       "jobType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000088,
       "missionTargetType": 2,
       "isAutoSail": true,
@@ -24912,7 +24645,7 @@
       "category": 3,
       "jobType": 3,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000075,
       "missionTargetType": 2,
       "isAutoSail": true,
@@ -25027,7 +24760,7 @@
       "category": 3,
       "jobType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000065,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -25160,7 +24893,7 @@
       "category": 3,
       "jobType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000053,
       "missionTargetType": 2,
       "isAutoSail": true,
@@ -25179,12 +24912,9 @@
       "minCompanyLv": 1,
       "maxCompanyLv": 25,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 200,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910509,
       "reward": 95910509
     },
@@ -25196,12 +24926,9 @@
       "minCompanyLv": 26,
       "maxCompanyLv": 40,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 200,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910510,
       "reward": 95910510
     },
@@ -25213,12 +24940,9 @@
       "minCompanyLv": 41,
       "maxCompanyLv": 50,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 200,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910511,
       "reward": 95910511
     },
@@ -25230,12 +24954,9 @@
       "minCompanyLv": 51,
       "maxCompanyLv": 60,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 200,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910512,
       "reward": 95910512
     },
@@ -25247,12 +24968,9 @@
       "minCompanyLv": 61,
       "maxCompanyLv": 70,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 200,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910513,
       "reward": 95910513
     },
@@ -25264,12 +24982,9 @@
       "minCompanyLv": 71,
       "maxCompanyLv": 80,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 200,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910514,
       "reward": 95910514
     },
@@ -25281,12 +24996,9 @@
       "minCompanyLv": 81,
       "maxCompanyLv": 90,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 200,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910515,
       "reward": 95910515
     },
@@ -25296,14 +25008,11 @@
       "category": 3,
       "jobType": 1,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000104,
-      "missionTargetType": 2,
+      "missionTargetType": 29,
       "isAutoSail": true,
       "achievementCount": 200,
-      "autoMovingVal": [
-        12
-      ],
       "baseReward": 95910516,
       "reward": 95910516
     },
@@ -25592,7 +25301,7 @@
       "category": 3,
       "jobType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000100,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -25756,7 +25465,7 @@
       "category": 3,
       "jobType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000072,
       "missionTargetType": 17,
       "isAutoSail": true,
@@ -25896,7 +25605,7 @@
       "category": 3,
       "jobType": 2,
       "minCompanyLv": 91,
-      "maxCompanyLv": 101,
+      "maxCompanyLv": 255,
       "achievementTermsId": 87000125,
       "missionTargetType": 17,
       "isAutoSail": true,

@@ -329,6 +329,42 @@
       "descFormatTexts": [
         "7%"
       ]
+    },
+    "69300324": {
+      "id": 69300324,
+      "name": "첫걸음호",
+      "battlePassiveId": 67009040,
+      "desc": "직접적으로 받는 백병 피해가 {0} 감소합니다.",
+      "descFormatTexts": [
+        "2.5%"
+      ]
+    },
+    "69300325": {
+      "id": 69300325,
+      "name": "황금 삼판",
+      "battlePassiveId": 67009041,
+      "desc": "직접적으로 받는 백병 피해가 {0} 감소합니다.",
+      "descFormatTexts": [
+        "1%"
+      ]
+    },
+    "69300326": {
+      "id": 69300326,
+      "name": "특수 투함",
+      "battlePassiveId": 67009042,
+      "desc": "직접적으로 받는 백병 피해가 {0} 감소합니다.",
+      "descFormatTexts": [
+        "3%"
+      ]
+    },
+    "69300327": {
+      "id": 69300327,
+      "name": "특수 복선",
+      "battlePassiveId": 67009043,
+      "desc": "직접적으로 받는 백병 피해가 {0} 감소합니다.",
+      "descFormatTexts": [
+        "4%"
+      ]
     }
   }
 }

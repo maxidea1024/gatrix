@@ -2287,13 +2287,14 @@
     },
     "67560045": {
       "id": 67560045,
-      "name": "엘리트 전용_트리거_33",
+      "name": "화약고 유폭",
       "positiveType": 1,
-      "timing": 0,
+      "timing": 3,
       "priority": 0,
       "conditions": [
         {
-          "ConditionType": 0
+          "ConditionType": 1,
+          "ConditionVal1": 7
         },
         {
           "ConditionType": 0
@@ -2304,29 +2305,38 @@
       ],
       "targetType": 0,
       "rate": 1000,
-      "selfPhasePassiveEffects": [
+      "targetActiveEffects": [
         {
-          "Id": 66100056,
-          "Val1": 50,
-          "Val2": 65551094
+          "Id": 66000003,
+          "Val1": 100,
+          "Val2": 9999
         },
         {
-          "Id": 66100056,
-          "Val1": 50,
-          "Val2": 65551104
+          "Id": 66000005,
+          "Val1": 100,
+          "Val2": 9999
+        },
+        {
+          "Id": 66000011,
+          "Val1": 4,
+          "Val2": -10
         }
       ],
-      "selfDesc": "엘리트 전용_트리거_33"
+      "selfDesc": "공격 대상에 선체 내구도와 선원 체력을 {0} 감소시킵니다.",
+      "selfDescFormatTexts": [
+        "10%"
+      ]
     },
     "67560046": {
       "id": 67560046,
-      "name": "엘리트 전용_트리거_34",
+      "name": "가벼운 선체",
       "positiveType": 1,
-      "timing": 0,
+      "timing": 5,
       "priority": 0,
       "conditions": [
         {
-          "ConditionType": 0
+          "ConditionType": 1,
+          "ConditionVal1": 2
         },
         {
           "ConditionType": 0
@@ -2339,27 +2349,33 @@
       "rate": 1000,
       "selfPhasePassiveEffects": [
         {
-          "Id": 66100056,
-          "Val1": 8,
-          "Val2": 65551094
-        },
-        {
-          "Id": 66100056,
-          "Val1": 8,
-          "Val2": 65551104
+          "Id": 66100030,
+          "Val1": 69199076,
+          "Val2": 0
         }
       ],
-      "selfDesc": "엘리트 전용_트리거_34"
+      "targetPhasePassiveEffects": [
+        {
+          "Id": 66100061,
+          "Val1": 3,
+          "Val2": 500
+        }
+      ],
+      "selfDesc": "충파 공격을 받았을 때, {0}칸 뒤로 밀려납니다.",
+      "selfDescFormatTexts": [
+        "3"
+      ]
     },
     "67560047": {
       "id": 67560047,
-      "name": "엘리트 전용_트리거_35",
+      "name": "투지 감소",
       "positiveType": 1,
-      "timing": 0,
+      "timing": 7,
       "priority": 0,
       "conditions": [
         {
-          "ConditionType": 0
+          "ConditionType": 3,
+          "ConditionVal1": 60000013
         },
         {
           "ConditionType": 0
@@ -2368,21 +2384,19 @@
           "ConditionType": 0
         }
       ],
-      "targetType": 0,
+      "targetType": 1,
       "rate": 1000,
-      "selfPhasePassiveEffects": [
+      "targetActiveEffects": [
         {
-          "Id": 66100056,
-          "Val1": 8,
-          "Val2": 65551094
-        },
-        {
-          "Id": 66100056,
-          "Val1": 8,
-          "Val2": 65551104
+          "Id": 66000018,
+          "Val1": 65501187,
+          "Val2": 1000
         }
       ],
-      "selfDesc": "엘리트 전용_트리거_35"
+      "selfDesc": "공격력과 방어력이 중첩 당 {0} 감소합니다.",
+      "selfDescFormatTexts": [
+        "15%"
+      ]
     },
     "67560048": {
       "id": 67560048,
@@ -74420,6 +74434,177 @@
         "50%"
       ]
     },
+    "67580000": {
+      "id": 67580000,
+      "name": "선원 회유",
+      "positiveType": 1,
+      "timing": 3,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 1
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveMeleeSailorConciliate",
+      "selfPhasePassiveEffects": [
+        {
+          "Id": 66100029,
+          "Val1": 2,
+          "Val2": 15
+        }
+      ],
+      "selfDesc": "가한 피해량의 {0}만큼 선원을 회복합니다.",
+      "selfDescFormatTexts": [
+        "1.5%"
+      ]
+    },
+    "67580001": {
+      "id": 67580001,
+      "name": "선원 유도",
+      "positiveType": 1,
+      "timing": 3,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 1
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveMeleeSailorConciliate",
+      "selfPhasePassiveEffects": [
+        {
+          "Id": 66100029,
+          "Val1": 2,
+          "Val2": 15
+        }
+      ],
+      "selfDesc": "가한 피해량의 {0}만큼 선원을 회복합니다.",
+      "selfDescFormatTexts": [
+        "1.5%"
+      ]
+    },
+    "67580002": {
+      "id": 67580002,
+      "name": "사랑의 힘",
+      "positiveType": 1,
+      "timing": 1,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveRepair2",
+      "selfActiveEffects": [
+        {
+          "Id": 66000007,
+          "Val1": 30
+        },
+        {
+          "Id": 66000009,
+          "Val1": 30
+        }
+      ],
+      "selfDesc": "선박의 내구도와 선원 체력을 {0} 회복합니다.",
+      "selfDescFormatTexts": [
+        "3%"
+      ]
+    },
+    "67580003": {
+      "id": 67580003,
+      "name": "사랑의 진가",
+      "positiveType": 1,
+      "timing": 1,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveRepair2",
+      "selfActiveEffects": [
+        {
+          "Id": 66000007,
+          "Val1": 30
+        },
+        {
+          "Id": 66000009,
+          "Val1": 30
+        }
+      ],
+      "selfDesc": "선박의 내구도와 선원 체력을 {0} 회복합니다.",
+      "selfDescFormatTexts": [
+        "3%"
+      ]
+    },
+    "67580004": {
+      "id": 67580004,
+      "name": "사랑의 결실",
+      "positiveType": 1,
+      "timing": 1,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveRepair2",
+      "selfActiveEffects": [
+        {
+          "Id": 66000007,
+          "Val1": 30
+        },
+        {
+          "Id": 66000009,
+          "Val1": 30
+        }
+      ],
+      "selfDesc": "선박의 내구도와 선원 체력을 {0} 회복합니다.",
+      "selfDescFormatTexts": [
+        "3%"
+      ]
+    },
     "67590000": {
       "id": 67590000,
       "name": "연쇄 포격",
@@ -77966,6 +78151,108 @@
         "15%"
       ]
     },
+    "67680063": {
+      "id": 67680063,
+      "name": "비밀 항로",
+      "positiveType": 1,
+      "timing": 1,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 500,
+      "selfFxAnimationName": "BattlePassiveMoveUp1",
+      "selfActiveEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65551630,
+          "Val2": 1000
+        }
+      ],
+      "selfDesc": "턴 시작 시마다 {2} 확률로 {1}|hpp(이, 가) {0} 증가합니다.",
+      "selfDescFormatTexts": [
+        "1",
+        "이동력",
+        "50%"
+      ]
+    },
+    "67680064": {
+      "id": 67680064,
+      "name": "붕괴 Lv 1",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDdgHeavyIncrease",
+      "targetActiveEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65560072,
+          "Val2": 1000
+        }
+      ],
+      "selfDesc": "공격자의 이동력을 {0}턴 동안 {1} 감소시킵니다.",
+      "selfDescFormatTexts": [
+        "3",
+        "4"
+      ]
+    },
+    "67680065": {
+      "id": 67680065,
+      "name": "붕괴 Lv 2",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDdgHeavyIncrease",
+      "targetActiveEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65560073,
+          "Val2": 1000
+        }
+      ],
+      "selfDesc": "공격자의 이동력을 {0}턴 동안 {1} 감소시킵니다.",
+      "selfDescFormatTexts": [
+        "3",
+        "6"
+      ]
+    },
     "67550000": {
       "id": 67550000,
       "name": "테투안의 방어태세",
@@ -80386,6 +80673,39 @@
         "100%"
       ]
     },
+    "67590065": {
+      "id": 67590065,
+      "name": "도독의 명",
+      "positiveType": 1,
+      "timing": 3,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 0
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveDoubleCannon",
+      "selfActiveEffects": [
+        {
+          "Id": 66000039,
+          "Val1": 1,
+          "Val2": 500
+        }
+      ],
+      "selfDesc": "한 번 더 공격하여 {0}의 피해를 줍니다.",
+      "selfDescFormatTexts": [
+        "50%"
+      ]
+    },
     "67690040": {
       "id": 67690040,
       "name": "고래의 각인",
@@ -81428,6 +81748,836 @@
         }
       ],
       "selfDesc": "충파 공격력 증가 효과가 부여됩니다."
+    },
+    "67660000": {
+      "id": 67660000,
+      "name": "피격 시 방어력 증폭 Lv 1",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 100
+        },
+        {
+          "Id": 1040,
+          "Val": 100
+        },
+        {
+          "Id": 1087,
+          "Val": 100
+        }
+      ],
+      "selfDesc": "피격 당하기 전에 {1}가 {0} 증가합니다.",
+      "selfDescFormatTexts": [
+        "10%",
+        "모든 추가 방어력%"
+      ]
+    },
+    "67660001": {
+      "id": 67660001,
+      "name": "피격 시 방어력 증폭 Lv 2",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 166
+        },
+        {
+          "Id": 1040,
+          "Val": 166
+        },
+        {
+          "Id": 1087,
+          "Val": 166
+        }
+      ],
+      "selfDesc": "피격 당하기 전에 {1}가 {0} 증가합니다.",
+      "selfDescFormatTexts": [
+        "16.6%",
+        "모든 추가 방어력%"
+      ]
+    },
+    "67660002": {
+      "id": 67660002,
+      "name": "피격 시 방어력 증폭 Lv 3",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 188
+        },
+        {
+          "Id": 1040,
+          "Val": 188
+        },
+        {
+          "Id": 1087,
+          "Val": 188
+        }
+      ],
+      "selfDesc": "피격 당하기 전에 {1}가 {0} 증가합니다.",
+      "selfDescFormatTexts": [
+        "18.8%",
+        "모든 추가 방어력%"
+      ]
+    },
+    "67660003": {
+      "id": 67660003,
+      "name": "피격 시 방어력 증폭 Lv 4",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 211
+        },
+        {
+          "Id": 1040,
+          "Val": 211
+        },
+        {
+          "Id": 1087,
+          "Val": 211
+        }
+      ],
+      "selfDesc": "피격 당하기 전에 {1}가 {0} 증가합니다.",
+      "selfDescFormatTexts": [
+        "21.1%",
+        "모든 추가 방어력%"
+      ]
+    },
+    "67660004": {
+      "id": 67660004,
+      "name": "피격 시 방어력 증폭 Lv 5",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 300
+        },
+        {
+          "Id": 1040,
+          "Val": 300
+        },
+        {
+          "Id": 1087,
+          "Val": 300
+        }
+      ],
+      "selfDesc": "피격 당하기 전에 {1}가 {0} 증가합니다.",
+      "selfDescFormatTexts": [
+        "30%",
+        "모든 추가 방어력%"
+      ]
+    },
+    "67660005": {
+      "id": 67660005,
+      "name": "피격 시 방어력 증폭 Lv 6",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 322
+        },
+        {
+          "Id": 1040,
+          "Val": 322
+        },
+        {
+          "Id": 1087,
+          "Val": 322
+        }
+      ],
+      "selfDesc": "피격 당하기 전에 {1}가 {0} 증가합니다.",
+      "selfDescFormatTexts": [
+        "32.2%",
+        "모든 추가 방어력%"
+      ]
+    },
+    "67660006": {
+      "id": 67660006,
+      "name": "피격 시 방어력 증폭 Lv 7",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 344
+        },
+        {
+          "Id": 1040,
+          "Val": 344
+        },
+        {
+          "Id": 1087,
+          "Val": 344
+        }
+      ],
+      "selfDesc": "피격 당하기 전에 {1}가 {0} 증가합니다.",
+      "selfDescFormatTexts": [
+        "34.4%",
+        "모든 추가 방어력%"
+      ]
+    },
+    "67660007": {
+      "id": 67660007,
+      "name": "피격 시 방어력 증폭 Lv 8",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 366
+        },
+        {
+          "Id": 1040,
+          "Val": 366
+        },
+        {
+          "Id": 1087,
+          "Val": 366
+        }
+      ],
+      "selfDesc": "피격 당하기 전에 {1}가 {0} 증가합니다.",
+      "selfDescFormatTexts": [
+        "36.6%",
+        "모든 추가 방어력%"
+      ]
+    },
+    "67660008": {
+      "id": 67660008,
+      "name": "피격 시 방어력 증폭 Lv 9",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 388
+        },
+        {
+          "Id": 1040,
+          "Val": 388
+        },
+        {
+          "Id": 1087,
+          "Val": 388
+        }
+      ],
+      "selfDesc": "피격 당하기 전에 {1}가 {0} 증가합니다.",
+      "selfDescFormatTexts": [
+        "38.8%",
+        "모든 추가 방어력%"
+      ]
+    },
+    "67660009": {
+      "id": 67660009,
+      "name": "피격 시 방어력 증폭 Lv 10",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 500
+        },
+        {
+          "Id": 1040,
+          "Val": 500
+        },
+        {
+          "Id": 1087,
+          "Val": 500
+        }
+      ],
+      "selfDesc": "피격 당하기 전에 {1}가 {0} 증가합니다.",
+      "selfDescFormatTexts": [
+        "50%",
+        "모든 추가 방어력%"
+      ]
+    },
+    "67660010": {
+      "id": 67660010,
+      "name": "피격 전 방어력 증폭 Lv 1",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 352,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 250
+        },
+        {
+          "Id": 1040,
+          "Val": 250
+        },
+        {
+          "Id": 1087,
+          "Val": 250
+        }
+      ],
+      "selfDesc": "피격당하기 전에 {2} 확률로 {0}가 {1} 증가합니다.",
+      "selfDescFormatTexts": [
+        "모든 추가 방어력%",
+        "25%",
+        "35.2%"
+      ]
+    },
+    "67660011": {
+      "id": 67660011,
+      "name": "피격 전 방어력 증폭 Lv 2",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 433,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 291
+        },
+        {
+          "Id": 1040,
+          "Val": 291
+        },
+        {
+          "Id": 1087,
+          "Val": 291
+        }
+      ],
+      "selfDesc": "피격당하기 전에 {2} 확률로 {0}가 {1} 증가합니다.",
+      "selfDescFormatTexts": [
+        "모든 추가 방어력%",
+        "29.1%",
+        "43.3%"
+      ]
+    },
+    "67660012": {
+      "id": 67660012,
+      "name": "피격 전 방어력 증폭 Lv 3",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 433,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 305
+        },
+        {
+          "Id": 1040,
+          "Val": 305
+        },
+        {
+          "Id": 1087,
+          "Val": 305
+        }
+      ],
+      "selfDesc": "피격당하기 전에 {2} 확률로 {0}가 {1} 증가합니다.",
+      "selfDescFormatTexts": [
+        "모든 추가 방어력%",
+        "30.5%",
+        "43.3%"
+      ]
+    },
+    "67660013": {
+      "id": 67660013,
+      "name": "피격 전 방어력 증폭 Lv 4",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 433,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 319
+        },
+        {
+          "Id": 1040,
+          "Val": 319
+        },
+        {
+          "Id": 1087,
+          "Val": 319
+        }
+      ],
+      "selfDesc": "피격당하기 전에 {2} 확률로 {0}가 {1} 증가합니다.",
+      "selfDescFormatTexts": [
+        "모든 추가 방어력%",
+        "31.9%",
+        "43.3%"
+      ]
+    },
+    "67660014": {
+      "id": 67660014,
+      "name": "피격 전 방어력 증폭 Lv 5",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 676,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 375
+        },
+        {
+          "Id": 1040,
+          "Val": 375
+        },
+        {
+          "Id": 1087,
+          "Val": 375
+        }
+      ],
+      "selfDesc": "피격당하기 전에 {2} 확률로 {0}가 {1} 증가합니다.",
+      "selfDescFormatTexts": [
+        "모든 추가 방어력%",
+        "37.5%",
+        "67.6%"
+      ]
+    },
+    "67660015": {
+      "id": 67660015,
+      "name": "피격 전 방어력 증폭 Lv 6",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 676,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 388
+        },
+        {
+          "Id": 1040,
+          "Val": 388
+        },
+        {
+          "Id": 1087,
+          "Val": 388
+        }
+      ],
+      "selfDesc": "피격당하기 전에 {2} 확률로 {0}가 {1} 증가합니다.",
+      "selfDescFormatTexts": [
+        "모든 추가 방어력%",
+        "38.8%",
+        "67.6%"
+      ]
+    },
+    "67660016": {
+      "id": 67660016,
+      "name": "피격 전 방어력 증폭 Lv 7",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 676,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 402
+        },
+        {
+          "Id": 1040,
+          "Val": 402
+        },
+        {
+          "Id": 1087,
+          "Val": 402
+        }
+      ],
+      "selfDesc": "피격당하기 전에 {2} 확률로 {0}가 {1} 증가합니다.",
+      "selfDescFormatTexts": [
+        "모든 추가 방어력%",
+        "40.2%",
+        "67.6%"
+      ]
+    },
+    "67660017": {
+      "id": 67660017,
+      "name": "피격 전 방어력 증폭 Lv 8",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 676,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 416
+        },
+        {
+          "Id": 1040,
+          "Val": 416
+        },
+        {
+          "Id": 1087,
+          "Val": 416
+        }
+      ],
+      "selfDesc": "피격당하기 전에 {2} 확률로 {0}가 {1} 증가합니다.",
+      "selfDescFormatTexts": [
+        "모든 추가 방어력%",
+        "41.6%",
+        "67.6%"
+      ]
+    },
+    "67660018": {
+      "id": 67660018,
+      "name": "피격 전 방어력 증폭 Lv 9",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 676,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 430
+        },
+        {
+          "Id": 1040,
+          "Val": 430
+        },
+        {
+          "Id": 1087,
+          "Val": 430
+        }
+      ],
+      "selfDesc": "피격당하기 전에 {2} 확률로 {0}가 {1} 증가합니다.",
+      "selfDescFormatTexts": [
+        "모든 추가 방어력%",
+        "43%",
+        "67.6%"
+      ]
+    },
+    "67660019": {
+      "id": 67660019,
+      "name": "피격 전 방어력 증폭 Lv 10",
+      "positiveType": 1,
+      "timing": 5,
+      "priority": 0,
+      "conditions": [
+        {
+          "ConditionType": 1,
+          "ConditionVal1": 7
+        },
+        {
+          "ConditionType": 0
+        },
+        {
+          "ConditionType": 0
+        }
+      ],
+      "targetType": 0,
+      "rate": 1000,
+      "selfFxAnimationName": "BattlePassiveBeforeAttackedDefHeavyIncrease",
+      "selfPhaseStatEffects": [
+        {
+          "Id": 1025,
+          "Val": 500
+        },
+        {
+          "Id": 1040,
+          "Val": 500
+        },
+        {
+          "Id": 1087,
+          "Val": 500
+        }
+      ],
+      "selfDesc": "피격당하기 전에 {2} 확률로 {0}가 {1} 증가합니다.",
+      "selfDescFormatTexts": [
+        "모든 추가 방어력%",
+        "50%",
+        "100%"
+      ]
     },
     "67699000": {
       "id": 67699000,

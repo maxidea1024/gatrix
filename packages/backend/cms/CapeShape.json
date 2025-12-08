@@ -3049,6 +3049,38 @@
       "color3": 16777215,
       "backAnim": true,
       "alwaysBodyAnim": true
+    },
+    "35000176": {
+      "id": 35000176,
+      "skeleton": "MCape03Skins",
+      "atlas": "FCape03Skins0003",
+      "skin": "6",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000177": {
+      "id": 35000177,
+      "skeleton": "FCape03Skins",
+      "atlas": "FCape03Skins0003",
+      "skin": "7",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true,
+      "alwaysBodyAnim": true
+    },
+    "35000178": {
+      "id": 35000178,
+      "skeleton": "MBPack01Skins",
+      "atlas": "MBPack01Skins",
+      "skin": "4",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3": 16777215,
+      "backAnim": true
     }
   }
 }

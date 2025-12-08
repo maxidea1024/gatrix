@@ -172,6 +172,46 @@ Each service generates two tags:
 - `chat-server` - WebSocket chat server
 - `edge` - Edge server for clients
 
+## Docker Swarm Deployment
+
+For production environments with high availability requirements, use Docker Swarm orchestration.
+
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `yarn swarm:deploy` | Deploy stack to Swarm |
+| `yarn swarm:deploy:init` | Initial deployment (creates secrets) |
+| `yarn swarm:update` | Rolling update services |
+| `yarn swarm:rollback` | Rollback to previous version |
+| `yarn swarm:scale` | Scale services |
+| `yarn swarm:status` | View stack status |
+
+### Quick Start
+
+```bash
+# Initialize Swarm cluster
+docker swarm init
+
+# Configure environment
+cd deploy
+cp .env.example .env
+vim .env
+
+# Initial deployment
+./deploy.sh --init --version 1.0.0
+```
+
+### Key Features
+
+- **Rolling Updates**: Zero-downtime deployments
+- **Auto-Rollback**: Automatic rollback on failure
+- **Scaling Presets**: minimal, standard, high
+- **Secret Management**: Secure credential storage
+- **Health Monitoring**: Automatic health checks
+
+For detailed Swarm documentation, see [deploy/README.md](/deploy/README.md).
+
 ## Data Persistence
 
 All persistent data (MySQL, Redis, ClickHouse, logs, etc.) is stored under the `DATA_ROOT` path.

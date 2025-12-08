@@ -1,0 +1,164 @@
+{
+  ":FloatBanner": {
+    ":type": {
+      "id": "key",
+      "localBitFlag": "bit",
+      "iconSprite": "string",
+      "type": "number",
+      "typeTargetId": "number",
+      "startDate": "string",
+      "endDate": "string",
+      "color": "string",
+      "name": "text",
+      "order": "number",
+      "confirmDisable": "bool",
+      "questGoalId": "number"
+    },
+    ":required": {
+      "type": 1,
+      "name": 1,
+      "order": 1,
+      "confirmDisable": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "typeTargetId": [
+        "EventPage",
+        "LiveEvent"
+      ]
+    }
+  },
+  "FloatBanner": {
+    "100220001": {
+      "id": 100220001,
+      "localBitFlag": 219,
+      "type": 1,
+      "color": "FFC000",
+      "name": "대유행 발생!",
+      "order": 2,
+      "confirmDisable": false
+    },
+    "100220002": {
+      "id": 100220002,
+      "localBitFlag": 219,
+      "type": 2,
+      "color": "FFC000",
+      "name": "폭증 발생!",
+      "order": 1,
+      "confirmDisable": false
+    },
+    "100220003": {
+      "id": 100220003,
+      "localBitFlag": 192,
+      "type": 3,
+      "typeTargetId": 99320323,
+      "endDate": "2026/12/31/00:00:00",
+      "color": "7030A0",
+      "name": "공식 계정 팔로우",
+      "order": 101,
+      "confirmDisable": true
+    },
+    "100220004": {
+      "id": 100220004,
+      "localBitFlag": 192,
+      "type": 3,
+      "typeTargetId": 99320324,
+      "endDate": "2026/12/31/00:00:00",
+      "color": "406B96",
+      "name": "회원 보상 받기",
+      "order": 103,
+      "confirmDisable": true
+    },
+    "100220005": {
+      "id": 100220005,
+      "localBitFlag": 192,
+      "type": 3,
+      "typeTargetId": 99320349,
+      "startDate": "2025/12/26/00:00:00",
+      "endDate": "2026/01/01/23:59:59",
+      "color": "FF0000",
+      "name": "오픈 기념 성장 경쟁!",
+      "order": 102,
+      "confirmDisable": true
+    },
+    "100220006": {
+      "id": 100220006,
+      "localBitFlag": 0,
+      "type": 4,
+      "typeTargetId": 99809112,
+      "startDate": "2025/11/19/00:00:00",
+      "endDate": "2025/12/14/23:59:59",
+      "color": "FFFFFF",
+      "name": "산타섬으로 이동",
+      "order": 301,
+      "confirmDisable": true,
+      "questGoalId": 89995038
+    },
+    "100220007": {
+      "id": 100220007,
+      "localBitFlag": 0,
+      "type": 4,
+      "typeTargetId": 99809077,
+      "startDate": "2025/11/19/00:00:00",
+      "endDate": "2025/12/14/23:59:59",
+      "color": "FFFFFF",
+      "name": "돌소금을 찾아보자!",
+      "order": 303,
+      "confirmDisable": false,
+      "questGoalId": 89995039
+    },
+    "100220008": {
+      "id": 100220008,
+      "localBitFlag": 0,
+      "type": 4,
+      "typeTargetId": 99809077,
+      "startDate": "2025/11/19/00:00:00",
+      "endDate": "2025/12/14/23:59:59",
+      "color": "FFFFFF",
+      "name": "화약을 찾아보자!",
+      "order": 302,
+      "confirmDisable": true,
+      "questGoalId": 89995040
+    },
+    "100220009": {
+      "id": 100220009,
+      "localBitFlag": 0,
+      "type": 4,
+      "typeTargetId": 99809115,
+      "startDate": "2025/11/27/18:00:00",
+      "endDate": "2025/11/27/19:00:00",
+      "color": "FFFFFF",
+      "name": "상륙지로 이동",
+      "order": 305,
+      "confirmDisable": false,
+      "questGoalId": 89995041
+    },
+    "100220010": {
+      "id": 100220010,
+      "localBitFlag": 0,
+      "type": 4,
+      "typeTargetId": 99809075,
+      "startDate": "2025/09/24/00:00:00",
+      "endDate": "2025/10/21/23:59:59",
+      "color": "FFFFFF",
+      "name": "안나와야 정상",
+      "order": 306,
+      "confirmDisable": true,
+      "questGoalId": 89995042
+    },
+    "100220011": {
+      "id": 100220011,
+      "localBitFlag": 0,
+      "type": 3,
+      "typeTargetId": 99300233,
+      "startDate": "2025/11/01/00:00:00",
+      "endDate": "2025/11/30/23:59:59",
+      "color": "FFFFFF",
+      "name": "이벤트 시간과 동일하게 나옴",
+      "order": 104,
+      "confirmDisable": true
+    }
+  }
+}

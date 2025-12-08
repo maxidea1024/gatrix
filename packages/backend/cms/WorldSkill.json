@@ -1004,6 +1004,57 @@
       "skillIcon": "icon_skill_tradeOrder_25_Sprite",
       "skillFXShip": "SailingOrderTradeOrderRareSpoils"
     },
+    "75000297": {
+      "id": 75000297,
+      "name": "가공의 법칙",
+      "desc": "{0}시간 동안 식료품, 주류, 조미료 판매 수익이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "8.5%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030014,
+      "skillIcon": "icon_skill_tradeOrder_15_Sprite",
+      "skillFXShip": "TradeGodmotherJustice"
+    },
+    "75000298": {
+      "id": 75000298,
+      "name": "황씨 가문의 거래술",
+      "desc": "{0}시간 동안 귀금속, 보석, 공예품 판매 수익이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "8.5%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030027,
+      "skillIcon": "icon_skill_tradeOrder_28_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75000299": {
+      "id": 75000299,
+      "name": "황씨 가문의 회계술",
+      "desc": "{0}분 동안 귀금속, 보석, 공예품 구매 시 구매 수량이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "10",
+        "20"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030026,
+      "skillIcon": "icon_skill_tradeOrder_27_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
     "75080001": {
       "id": 75080001,
       "name": "끈기 있는 잠수부",

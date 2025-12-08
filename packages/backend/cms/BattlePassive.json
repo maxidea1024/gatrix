@@ -1060,6 +1060,82 @@
         "7%"
       ]
     },
+    "67009040": {
+      "id": 67009040,
+      "name": "첫걸음호",
+      "passiveUseType": 6,
+      "passiveType": 2,
+      "skillLevel": 1,
+      "groupNo": 67009040,
+      "statEffect": [
+        {
+          "Id": 1127,
+          "Val": -25
+        }
+      ],
+      "toolTipIcon": "icon_skill_battle_shipClass_Geobukseon_Sprite",
+      "desc": "직접적으로 받는 백병 피해가 {0} 감소합니다.",
+      "descFormatTexts": [
+        "2.5%"
+      ]
+    },
+    "67009041": {
+      "id": 67009041,
+      "name": "황금 삼판",
+      "passiveUseType": 6,
+      "passiveType": 2,
+      "skillLevel": 1,
+      "groupNo": 67009041,
+      "statEffect": [
+        {
+          "Id": 1127,
+          "Val": -10
+        }
+      ],
+      "toolTipIcon": "icon_skill_battle_shipClass_Geobukseon_Sprite",
+      "desc": "직접적으로 받는 백병 피해가 {0} 감소합니다.",
+      "descFormatTexts": [
+        "1%"
+      ]
+    },
+    "67009042": {
+      "id": 67009042,
+      "name": "특수 투함",
+      "passiveUseType": 6,
+      "passiveType": 2,
+      "skillLevel": 1,
+      "groupNo": 67009042,
+      "statEffect": [
+        {
+          "Id": 1127,
+          "Val": -30
+        }
+      ],
+      "toolTipIcon": "icon_skill_battle_shipClass_Geobukseon_Sprite",
+      "desc": "직접적으로 받는 백병 피해가 {0} 감소합니다.",
+      "descFormatTexts": [
+        "3%"
+      ]
+    },
+    "67009043": {
+      "id": 67009043,
+      "name": "특수 복선",
+      "passiveUseType": 6,
+      "passiveType": 2,
+      "skillLevel": 1,
+      "groupNo": 67009043,
+      "statEffect": [
+        {
+          "Id": 1127,
+          "Val": -40
+        }
+      ],
+      "toolTipIcon": "icon_skill_battle_shipClass_Geobukseon_Sprite",
+      "desc": "직접적으로 받는 백병 피해가 {0} 감소합니다.",
+      "descFormatTexts": [
+        "4%"
+      ]
+    },
     "67010001": {
       "id": 67010001,
       "name": "행동 봉쇄",
@@ -3192,6 +3268,25 @@
       ],
       "toolTipIcon": "icon_skill_battle_debuff_01_Sprite",
       "desc": "공격 대상을 {0}칸 밀어냅니다.",
+      "descFormatTexts": [
+        "3"
+      ]
+    },
+    "67010118": {
+      "id": 67010118,
+      "name": "가벼운 선체",
+      "passiveUseType": 7,
+      "passiveType": 16,
+      "skillLevel": 1,
+      "groupNo": 67010118,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67560046
+        }
+      ],
+      "toolTipIcon": "icon_skill_battle_debuff_01_Sprite",
+      "desc": "충파 공격을 받았을 때, {0}칸 뒤로 밀려납니다.",
       "descFormatTexts": [
         "3"
       ]
@@ -69832,6 +69927,69 @@
         "증가"
       ]
     },
+    "67020593": {
+      "id": 67020593,
+      "name": "검사 출신",
+      "passiveUseType": 3,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67020593,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 3
+        }
+      ],
+      "toolTipIcon": "icon_skill_battle_characterEffect_998_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "0.3%",
+        "증가"
+      ]
+    },
+    "67020594": {
+      "id": 67020594,
+      "name": "검인 출신",
+      "passiveUseType": 3,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67020594,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 4
+        }
+      ],
+      "toolTipIcon": "icon_skill_battle_characterEffect_998_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "0.4%",
+        "증가"
+      ]
+    },
+    "67020595": {
+      "id": 67020595,
+      "name": "검객 출신",
+      "passiveUseType": 3,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67020595,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 5
+        }
+      ],
+      "toolTipIcon": "icon_skill_battle_characterEffect_998_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "0.5%",
+        "증가"
+      ]
+    },
     "67030001": {
       "id": 67030001,
       "name": "흑토끼의 비상식량",
@@ -87590,6 +87748,182 @@
         "15%"
       ]
     },
+    "67029209": {
+      "id": 67029209,
+      "name": "맹수의 돌진",
+      "passiveUseType": 5,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67029209,
+      "statEffect": [
+        {
+          "Id": 1106,
+          "Val": 150
+        },
+        {
+          "Id": 1150,
+          "Val": 100
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_137_Sprite",
+      "desc": "적에게 직접적으로 가하는 피해가 {0} 증가하지만, 적에게 받는 피해가 {1} 증가합니다.",
+      "descFormatTexts": [
+        "15%",
+        "10%"
+      ]
+    },
+    "67029210": {
+      "id": 67029210,
+      "name": "맹수의 돌진",
+      "passiveUseType": 5,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67029209,
+      "passiveEffect": [
+        {
+          "Id": 66100050,
+          "Val1": 1005,
+          "Val2": 1000
+        },
+        {
+          "Id": 66100050,
+          "Val1": 1006,
+          "Val2": 1000
+        }
+      ],
+      "statEffect": [
+        {
+          "Id": 1106,
+          "Val": 150
+        },
+        {
+          "Id": 1150,
+          "Val": 100
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_137_Sprite",
+      "desc": "적에게 직접적으로 가하는 피해가 {0} 증가하지만, 적에게 받는 피해가 {1} 증가합니다.\n추가로, 이동력 감소 효과와 기동력 감소 효과에 면역이 됩니다.",
+      "descFormatTexts": [
+        "15%",
+        "10%"
+      ]
+    },
+    "67029211": {
+      "id": 67029211,
+      "name": "비밀 항로",
+      "passiveUseType": 5,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67029211,
+      "passiveEffect": [
+        {
+          "Id": 66100012
+        }
+      ],
+      "statEffect": [
+        {
+          "Id": 1004,
+          "Val": 1
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_126_Sprite",
+      "desc": "이동력이 {0} 증가하고, ZOC를 무시하여 이동할 수 있습니다.",
+      "descFormatTexts": [
+        "1"
+      ]
+    },
+    "67029212": {
+      "id": 67029212,
+      "name": "비밀 항로",
+      "passiveUseType": 5,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67029211,
+      "passiveEffect": [
+        {
+          "Id": 66100012
+        },
+        {
+          "Id": 66100026,
+          "Val1": 67680063
+        }
+      ],
+      "statEffect": [
+        {
+          "Id": 1004,
+          "Val": 1
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_126_Sprite",
+      "desc": "이동력이 {0} 증가하고, ZOC를 무시하여 이동할 수 있습니다.\n추가로, 매 턴 시작 시 {1} 확률로 이동력 {2} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "50%",
+        "1"
+      ]
+    },
+    "67029213": {
+      "id": 67029213,
+      "name": "붕괴",
+      "passiveUseType": 5,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67029213,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67680064
+        }
+      ],
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 550
+        },
+        {
+          "Id": 1047,
+          "Val": 550
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_039_Sprite",
+      "desc": "모든 추가 회피가 {0} 증가합니다.\n추가로, 피격 시 공격자의 이동력을 {1}턴 동안 {2} 감소시킵니다.",
+      "descFormatTexts": [
+        "55%",
+        "3",
+        "4"
+      ]
+    },
+    "67029214": {
+      "id": 67029214,
+      "name": "붕괴",
+      "passiveUseType": 5,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67029213,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67680065
+        }
+      ],
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 750
+        },
+        {
+          "Id": 1047,
+          "Val": 750
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_039_Sprite",
+      "desc": "모든 추가 회피가 {0} 증가합니다.\n추가로, 피격 시 공격자의 이동력을 {1}턴 동안 {2} 감소시킵니다.",
+      "descFormatTexts": [
+        "75%",
+        "3",
+        "6"
+      ]
+    },
     "67027000": {
       "id": 67027000,
       "name": "천상의 일격",
@@ -88558,6 +88892,16 @@
         {
           "Id": 66100026,
           "Val1": 67590029
+        }
+      ],
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 350
+        },
+        {
+          "Id": 1025,
+          "Val": 350
         }
       ],
       "toolTipIcon": "icon_goldenShipEffect_battle_001_Sprite",
@@ -92310,6 +92654,2881 @@
         "6%"
       ]
     },
+    "67200039": {
+      "id": 67200039,
+      "name": "선원 회유",
+      "passiveUseType": 8,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67200039,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67580000
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_450_Sprite",
+      "desc": "백병 공격 시 직접적으로 가한 백병 피해량의 {0}만큼 선원을 회복합니다.\n(광역 공격 시 주 대상에게 가한 피해량만 적용됩니다)",
+      "descFormatTexts": [
+        "1.5%"
+      ]
+    },
+    "67200040": {
+      "id": 67200040,
+      "name": "선원 유도",
+      "passiveUseType": 8,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67200040,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67580001
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_450_Sprite",
+      "desc": "백병 공격 시 직접적으로 가한 백병 피해량의 {0}만큼 선원을 회복합니다.\n(광역 공격 시 주 대상에게 가한 피해량만 적용됩니다)",
+      "descFormatTexts": [
+        "1.5%"
+      ]
+    },
+    "67200041": {
+      "id": 67200041,
+      "name": "사랑의 힘",
+      "passiveUseType": 8,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67200041,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67580002
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_085_Sprite",
+      "desc": "턴 시작 시, 내구도와 선원 체력이 {0} 회복됩니다.",
+      "descFormatTexts": [
+        "3%"
+      ]
+    },
+    "67200042": {
+      "id": 67200042,
+      "name": "사랑의 진가",
+      "passiveUseType": 8,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67200042,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67580003
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_450_Sprite",
+      "desc": "턴 시작 시, 내구도와 선원 체력이 {0} 회복됩니다.",
+      "descFormatTexts": [
+        "3%"
+      ]
+    },
+    "67200043": {
+      "id": 67200043,
+      "name": "사랑의 결실",
+      "passiveUseType": 8,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67200043,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67580004
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_450_Sprite",
+      "desc": "턴 시작 시, 내구도와 선원 체력이 {0} 회복됩니다.",
+      "descFormatTexts": [
+        "3%"
+      ]
+    },
+    "67200044": {
+      "id": 67200044,
+      "name": "명예로운 포격",
+      "passiveUseType": 8,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67200044,
+      "statEffect": [
+        {
+          "Id": 1109,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_450_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "포격",
+        "6%"
+      ]
+    },
+    "67200045": {
+      "id": 67200045,
+      "name": "믿음의 백병",
+      "passiveUseType": 8,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67200045,
+      "statEffect": [
+        {
+          "Id": 1110,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_450_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "백병",
+        "6%"
+      ]
+    },
+    "67200046": {
+      "id": 67200046,
+      "name": "해적의 충파",
+      "passiveUseType": 8,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67200046,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 30
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_097_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "3%"
+      ]
+    },
+    "67200047": {
+      "id": 67200047,
+      "name": "해적의 충각",
+      "passiveUseType": 8,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67200047,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 30
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_097_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "3%"
+      ]
+    },
+    "67360000": {
+      "id": 67360000,
+      "name": "명품 포격 정비 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360000,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "40"
+      ]
+    },
+    "67360001": {
+      "id": 67360001,
+      "name": "명품 포격 정비 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360001,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "120"
+      ]
+    },
+    "67360002": {
+      "id": 67360002,
+      "name": "명품 포격 정비 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360002,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 240
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "240"
+      ]
+    },
+    "67360003": {
+      "id": 67360003,
+      "name": "명품 포격 정비 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360003,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 400
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "400"
+      ]
+    },
+    "67360004": {
+      "id": 67360004,
+      "name": "명품 포격 정비 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360004,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 605
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "605"
+      ]
+    },
+    "67360005": {
+      "id": 67360005,
+      "name": "명품 포격 정비 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360005,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "40"
+      ]
+    },
+    "67360006": {
+      "id": 67360006,
+      "name": "명품 포격 정비 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360006,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "120"
+      ]
+    },
+    "67360007": {
+      "id": 67360007,
+      "name": "명품 포격 정비 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360007,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 240
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "240"
+      ]
+    },
+    "67360008": {
+      "id": 67360008,
+      "name": "명품 포격 정비 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360008,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 400
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "400"
+      ]
+    },
+    "67360009": {
+      "id": 67360009,
+      "name": "명품 포격 정비 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360009,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 605
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "605"
+      ]
+    },
+    "67360010": {
+      "id": 67360010,
+      "name": "명품 포격 정비 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360010,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "40"
+      ]
+    },
+    "67360011": {
+      "id": 67360011,
+      "name": "명품 포격 정비 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360011,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "120"
+      ]
+    },
+    "67360012": {
+      "id": 67360012,
+      "name": "명품 포격 정비 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360012,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 240
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "240"
+      ]
+    },
+    "67360013": {
+      "id": 67360013,
+      "name": "명품 포격 정비 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360013,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 400
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "400"
+      ]
+    },
+    "67360014": {
+      "id": 67360014,
+      "name": "명품 포격 정비 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360014,
+      "statEffect": [
+        {
+          "Id": 1022,
+          "Val": 605
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "605"
+      ]
+    },
+    "67360015": {
+      "id": 67360015,
+      "name": "명품 포격 강화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360015,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "2%"
+      ]
+    },
+    "67360016": {
+      "id": 67360016,
+      "name": "명품 포격 강화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360016,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "6%"
+      ]
+    },
+    "67360017": {
+      "id": 67360017,
+      "name": "명품 포격 강화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360017,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "12%"
+      ]
+    },
+    "67360018": {
+      "id": 67360018,
+      "name": "명품 포격 강화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360018,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "20%"
+      ]
+    },
+    "67360019": {
+      "id": 67360019,
+      "name": "명품 포격 강화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360019,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 300
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "30%"
+      ]
+    },
+    "67360020": {
+      "id": 67360020,
+      "name": "명품 포격 강화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360020,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "2%"
+      ]
+    },
+    "67360021": {
+      "id": 67360021,
+      "name": "명품 포격 강화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360021,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "6%"
+      ]
+    },
+    "67360022": {
+      "id": 67360022,
+      "name": "명품 포격 강화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360022,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "12%"
+      ]
+    },
+    "67360023": {
+      "id": 67360023,
+      "name": "명품 포격 강화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360023,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "20%"
+      ]
+    },
+    "67360024": {
+      "id": 67360024,
+      "name": "명품 포격 강화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360024,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 300
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "30%"
+      ]
+    },
+    "67360025": {
+      "id": 67360025,
+      "name": "명품 포격 강화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360025,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "2%"
+      ]
+    },
+    "67360026": {
+      "id": 67360026,
+      "name": "명품 포격 강화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360026,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "6%"
+      ]
+    },
+    "67360027": {
+      "id": 67360027,
+      "name": "명품 포격 강화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360027,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "12%"
+      ]
+    },
+    "67360028": {
+      "id": 67360028,
+      "name": "명품 포격 강화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360028,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "20%"
+      ]
+    },
+    "67360029": {
+      "id": 67360029,
+      "name": "명품 포격 강화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360029,
+      "statEffect": [
+        {
+          "Id": 1023,
+          "Val": 300
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 공격력",
+        "30%"
+      ]
+    },
+    "67360030": {
+      "id": 67360030,
+      "name": "명품 포격 심화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360030,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 10
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "1%"
+      ]
+    },
+    "67360031": {
+      "id": 67360031,
+      "name": "명품 포격 심화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360031,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "2%"
+      ]
+    },
+    "67360032": {
+      "id": 67360032,
+      "name": "명품 포격 심화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360032,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "4%"
+      ]
+    },
+    "67360033": {
+      "id": 67360033,
+      "name": "명품 포격 심화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360033,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "6%"
+      ]
+    },
+    "67360034": {
+      "id": 67360034,
+      "name": "명품 포격 심화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360034,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 100
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "10%"
+      ]
+    },
+    "67360035": {
+      "id": 67360035,
+      "name": "명품 포격 심화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360035,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 10
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "1%"
+      ]
+    },
+    "67360036": {
+      "id": 67360036,
+      "name": "명품 포격 심화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360036,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "2%"
+      ]
+    },
+    "67360037": {
+      "id": 67360037,
+      "name": "명품 포격 심화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360037,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "4%"
+      ]
+    },
+    "67360038": {
+      "id": 67360038,
+      "name": "명품 포격 심화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360038,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "6%"
+      ]
+    },
+    "67360039": {
+      "id": 67360039,
+      "name": "명품 포격 심화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360039,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 100
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "10%"
+      ]
+    },
+    "67360040": {
+      "id": 67360040,
+      "name": "명품 포격 심화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360040,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 10
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "1%"
+      ]
+    },
+    "67360041": {
+      "id": 67360041,
+      "name": "명품 포격 심화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360041,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "2%"
+      ]
+    },
+    "67360042": {
+      "id": 67360042,
+      "name": "명품 포격 심화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360042,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "4%"
+      ]
+    },
+    "67360043": {
+      "id": 67360043,
+      "name": "명품 포격 심화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360043,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "6%"
+      ]
+    },
+    "67360044": {
+      "id": 67360044,
+      "name": "명품 포격 심화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360044,
+      "statEffect": [
+        {
+          "Id": 1158,
+          "Val": 100
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 포격 피해",
+        "10%"
+      ]
+    },
+    "67360045": {
+      "id": 67360045,
+      "name": "명품 백병 정비 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360045,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 230
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "230"
+      ]
+    },
+    "67360046": {
+      "id": 67360046,
+      "name": "명품 백병 정비 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360046,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 690
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "690"
+      ]
+    },
+    "67360047": {
+      "id": 67360047,
+      "name": "명품 백병 정비 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360047,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 1380
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "1380"
+      ]
+    },
+    "67360048": {
+      "id": 67360048,
+      "name": "명품 백병 정비 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360048,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 2310
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "2310"
+      ]
+    },
+    "67360049": {
+      "id": 67360049,
+      "name": "명품 백병 정비 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360049,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 3470
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "3470"
+      ]
+    },
+    "67360050": {
+      "id": 67360050,
+      "name": "명품 백병 정비 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360050,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 230
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "230"
+      ]
+    },
+    "67360051": {
+      "id": 67360051,
+      "name": "명품 백병 정비 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360051,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 690
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "690"
+      ]
+    },
+    "67360052": {
+      "id": 67360052,
+      "name": "명품 백병 정비 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360052,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 1380
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "1380"
+      ]
+    },
+    "67360053": {
+      "id": 67360053,
+      "name": "명품 백병 정비 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360053,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 2310
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "2310"
+      ]
+    },
+    "67360054": {
+      "id": 67360054,
+      "name": "명품 백병 정비 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360054,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 3470
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "3470"
+      ]
+    },
+    "67360055": {
+      "id": 67360055,
+      "name": "명품 백병 정비 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360055,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 230
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "230"
+      ]
+    },
+    "67360056": {
+      "id": 67360056,
+      "name": "명품 백병 정비 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360056,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 690
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "690"
+      ]
+    },
+    "67360057": {
+      "id": 67360057,
+      "name": "명품 백병 정비 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360057,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 1380
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "1380"
+      ]
+    },
+    "67360058": {
+      "id": 67360058,
+      "name": "명품 백병 정비 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360058,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 2310
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "2310"
+      ]
+    },
+    "67360059": {
+      "id": 67360059,
+      "name": "명품 백병 정비 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360059,
+      "statEffect": [
+        {
+          "Id": 1037,
+          "Val": 3470
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "3470"
+      ]
+    },
+    "67360060": {
+      "id": 67360060,
+      "name": "명품 백병 강화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360060,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "2%"
+      ]
+    },
+    "67360061": {
+      "id": 67360061,
+      "name": "명품 백병 강화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360061,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "6%"
+      ]
+    },
+    "67360062": {
+      "id": 67360062,
+      "name": "명품 백병 강화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360062,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "12%"
+      ]
+    },
+    "67360063": {
+      "id": 67360063,
+      "name": "명품 백병 강화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360063,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "20%"
+      ]
+    },
+    "67360064": {
+      "id": 67360064,
+      "name": "명품 백병 강화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360064,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 300
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "30%"
+      ]
+    },
+    "67360065": {
+      "id": 67360065,
+      "name": "명품 백병 강화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360065,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "2%"
+      ]
+    },
+    "67360066": {
+      "id": 67360066,
+      "name": "명품 백병 강화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360066,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "6%"
+      ]
+    },
+    "67360067": {
+      "id": 67360067,
+      "name": "명품 백병 강화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360067,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "12%"
+      ]
+    },
+    "67360068": {
+      "id": 67360068,
+      "name": "명품 백병 강화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360068,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "20%"
+      ]
+    },
+    "67360069": {
+      "id": 67360069,
+      "name": "명품 백병 강화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360069,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 300
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "30%"
+      ]
+    },
+    "67360070": {
+      "id": 67360070,
+      "name": "명품 백병 강화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360070,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "2%"
+      ]
+    },
+    "67360071": {
+      "id": 67360071,
+      "name": "명품 백병 강화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360071,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "6%"
+      ]
+    },
+    "67360072": {
+      "id": 67360072,
+      "name": "명품 백병 강화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360072,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "12%"
+      ]
+    },
+    "67360073": {
+      "id": 67360073,
+      "name": "명품 백병 강화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360073,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "20%"
+      ]
+    },
+    "67360074": {
+      "id": 67360074,
+      "name": "명품 백병 강화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360074,
+      "statEffect": [
+        {
+          "Id": 1038,
+          "Val": 300
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 공격력",
+        "30%"
+      ]
+    },
+    "67360075": {
+      "id": 67360075,
+      "name": "명품 백병 심화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360075,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 10
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "1%"
+      ]
+    },
+    "67360076": {
+      "id": 67360076,
+      "name": "명품 백병 심화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360076,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "2%"
+      ]
+    },
+    "67360077": {
+      "id": 67360077,
+      "name": "명품 백병 심화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360077,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "4%"
+      ]
+    },
+    "67360078": {
+      "id": 67360078,
+      "name": "명품 백병 심화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360078,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "6%"
+      ]
+    },
+    "67360079": {
+      "id": 67360079,
+      "name": "명품 백병 심화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360079,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 100
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "10%"
+      ]
+    },
+    "67360080": {
+      "id": 67360080,
+      "name": "명품 백병 심화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360080,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 10
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "1%"
+      ]
+    },
+    "67360081": {
+      "id": 67360081,
+      "name": "명품 백병 심화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360081,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "2%"
+      ]
+    },
+    "67360082": {
+      "id": 67360082,
+      "name": "명품 백병 심화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360082,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "4%"
+      ]
+    },
+    "67360083": {
+      "id": 67360083,
+      "name": "명품 백병 심화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360083,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "6%"
+      ]
+    },
+    "67360084": {
+      "id": 67360084,
+      "name": "명품 백병 심화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360084,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 100
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "10%"
+      ]
+    },
+    "67360085": {
+      "id": 67360085,
+      "name": "명품 백병 심화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360085,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 10
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "1%"
+      ]
+    },
+    "67360086": {
+      "id": 67360086,
+      "name": "명품 백병 심화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360086,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "2%"
+      ]
+    },
+    "67360087": {
+      "id": 67360087,
+      "name": "명품 백병 심화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360087,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "4%"
+      ]
+    },
+    "67360088": {
+      "id": 67360088,
+      "name": "명품 백병 심화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360088,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "6%"
+      ]
+    },
+    "67360089": {
+      "id": 67360089,
+      "name": "명품 백병 심화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360089,
+      "statEffect": [
+        {
+          "Id": 1159,
+          "Val": 100
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 백병 피해",
+        "10%"
+      ]
+    },
+    "67360090": {
+      "id": 67360090,
+      "name": "명품 충파 정비 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360090,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "40"
+      ]
+    },
+    "67360091": {
+      "id": 67360091,
+      "name": "명품 충파 정비 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360091,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "120"
+      ]
+    },
+    "67360092": {
+      "id": 67360092,
+      "name": "명품 충파 정비 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360092,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 240
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "240"
+      ]
+    },
+    "67360093": {
+      "id": 67360093,
+      "name": "명품 충파 정비 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360093,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 400
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "400"
+      ]
+    },
+    "67360094": {
+      "id": 67360094,
+      "name": "명품 충파 정비 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360094,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 605
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "605"
+      ]
+    },
+    "67360095": {
+      "id": 67360095,
+      "name": "명품 충파 정비 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360095,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "40"
+      ]
+    },
+    "67360096": {
+      "id": 67360096,
+      "name": "명품 충파 정비 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360096,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "120"
+      ]
+    },
+    "67360097": {
+      "id": 67360097,
+      "name": "명품 충파 정비 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360097,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 240
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "240"
+      ]
+    },
+    "67360098": {
+      "id": 67360098,
+      "name": "명품 충파 정비 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360098,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 400
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "400"
+      ]
+    },
+    "67360099": {
+      "id": 67360099,
+      "name": "명품 충파 정비 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360099,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 605
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "605"
+      ]
+    },
+    "67360100": {
+      "id": 67360100,
+      "name": "명품 충파 정비 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360100,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "40"
+      ]
+    },
+    "67360101": {
+      "id": 67360101,
+      "name": "명품 충파 정비 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360101,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "120"
+      ]
+    },
+    "67360102": {
+      "id": 67360102,
+      "name": "명품 충파 정비 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360102,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 240
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "240"
+      ]
+    },
+    "67360103": {
+      "id": 67360103,
+      "name": "명품 충파 정비 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360103,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 400
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "400"
+      ]
+    },
+    "67360104": {
+      "id": 67360104,
+      "name": "명품 충파 정비 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360104,
+      "statEffect": [
+        {
+          "Id": 1052,
+          "Val": 605
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "605"
+      ]
+    },
+    "67360105": {
+      "id": 67360105,
+      "name": "명품 충파 강화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360105,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "2%"
+      ]
+    },
+    "67360106": {
+      "id": 67360106,
+      "name": "명품 충파 강화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360106,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "6%"
+      ]
+    },
+    "67360107": {
+      "id": 67360107,
+      "name": "명품 충파 강화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360107,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "12%"
+      ]
+    },
+    "67360108": {
+      "id": 67360108,
+      "name": "명품 충파 강화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360108,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "20%"
+      ]
+    },
+    "67360109": {
+      "id": 67360109,
+      "name": "명품 충파 강화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360109,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 300
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "30%"
+      ]
+    },
+    "67360110": {
+      "id": 67360110,
+      "name": "명품 충파 강화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360110,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "2%"
+      ]
+    },
+    "67360111": {
+      "id": 67360111,
+      "name": "명품 충파 강화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360111,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "6%"
+      ]
+    },
+    "67360112": {
+      "id": 67360112,
+      "name": "명품 충파 강화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360112,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "12%"
+      ]
+    },
+    "67360113": {
+      "id": 67360113,
+      "name": "명품 충파 강화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360113,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "20%"
+      ]
+    },
+    "67360114": {
+      "id": 67360114,
+      "name": "명품 충파 강화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360114,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 300
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "30%"
+      ]
+    },
+    "67360115": {
+      "id": 67360115,
+      "name": "명품 충파 강화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360115,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "2%"
+      ]
+    },
+    "67360116": {
+      "id": 67360116,
+      "name": "명품 충파 강화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360116,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "6%"
+      ]
+    },
+    "67360117": {
+      "id": 67360117,
+      "name": "명품 충파 강화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360117,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 120
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "12%"
+      ]
+    },
+    "67360118": {
+      "id": 67360118,
+      "name": "명품 충파 강화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360118,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "20%"
+      ]
+    },
+    "67360119": {
+      "id": 67360119,
+      "name": "명품 충파 강화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360119,
+      "statEffect": [
+        {
+          "Id": 1053,
+          "Val": 300
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 공격력",
+        "30%"
+      ]
+    },
+    "67360120": {
+      "id": 67360120,
+      "name": "명품 충파 심화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360120,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 10
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "1%"
+      ]
+    },
+    "67360121": {
+      "id": 67360121,
+      "name": "명품 충파 심화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360121,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "2%"
+      ]
+    },
+    "67360122": {
+      "id": 67360122,
+      "name": "명품 충파 심화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360122,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "4%"
+      ]
+    },
+    "67360123": {
+      "id": 67360123,
+      "name": "명품 충파 심화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360123,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "6%"
+      ]
+    },
+    "67360124": {
+      "id": 67360124,
+      "name": "명품 충파 심화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360124,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 100
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "10%"
+      ]
+    },
+    "67360125": {
+      "id": 67360125,
+      "name": "명품 충파 심화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360125,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 10
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "1%"
+      ]
+    },
+    "67360126": {
+      "id": 67360126,
+      "name": "명품 충파 심화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360126,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "2%"
+      ]
+    },
+    "67360127": {
+      "id": 67360127,
+      "name": "명품 충파 심화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360127,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "4%"
+      ]
+    },
+    "67360128": {
+      "id": 67360128,
+      "name": "명품 충파 심화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360128,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "6%"
+      ]
+    },
+    "67360129": {
+      "id": 67360129,
+      "name": "명품 충파 심화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360129,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 100
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "10%"
+      ]
+    },
+    "67360130": {
+      "id": 67360130,
+      "name": "명품 충파 심화 Ⅰ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360130,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 10
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "1%"
+      ]
+    },
+    "67360131": {
+      "id": 67360131,
+      "name": "명품 충파 심화 Ⅱ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360131,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 20
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "2%"
+      ]
+    },
+    "67360132": {
+      "id": 67360132,
+      "name": "명품 충파 심화 Ⅲ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360132,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 40
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "4%"
+      ]
+    },
+    "67360133": {
+      "id": 67360133,
+      "name": "명품 충파 심화 Ⅳ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360133,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 60
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "6%"
+      ]
+    },
+    "67360134": {
+      "id": 67360134,
+      "name": "명품 충파 심화 Ⅴ",
+      "passiveUseType": 10,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67360134,
+      "statEffect": [
+        {
+          "Id": 1160,
+          "Val": 100
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_095_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "직접적으로 가하는 충파 피해",
+        "10%"
+      ]
+    },
     "67490001": {
       "id": 67490001,
       "name": "테스트용_치명불가",
@@ -92948,7 +96167,7 @@
         }
       ],
       "toolTipIcon": "icon_effect_battle_349_Sprite",
-      "desc": "충파 공격을 {0}번까지 버틸 수 있습니다.",
+      "desc": "충파 공격을 {0}번까지 버틸 수 있습니다. 충파 공격을 받을 시, 이동할 수 없습니다.",
       "descFormatTexts": [
         "3"
       ]
@@ -93463,6 +96682,2656 @@
       ],
       "toolTipIcon": "icon_effect_battle_449_Sprite",
       "desc": "충파로만 공격합니다. 반격을 받지 않습니다.\n침몰 시 이 선박을 공격한 대상에게 포격 공격력 증가 효과를 부여합니다.\n받는 광역 피해량이 99% 감소합니다"
+    },
+    "67390000": {
+      "id": 67390000,
+      "name": "피격 시 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390000,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660000
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_040_Sprite",
+      "desc": "{0} 공격으로 피격 시, {0} {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "모든",
+        "추가 방어력",
+        "10%"
+      ]
+    },
+    "67390001": {
+      "id": 67390001,
+      "name": "피격 시 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390000,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660001
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_040_Sprite",
+      "desc": "{0} 공격으로 피격 시, {0} {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "모든",
+        "추가 방어력",
+        "16.6%"
+      ]
+    },
+    "67390002": {
+      "id": 67390002,
+      "name": "피격 시 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390000,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660002
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_040_Sprite",
+      "desc": "{0} 공격으로 피격 시, {0} {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "모든",
+        "추가 방어력",
+        "18.8%"
+      ]
+    },
+    "67390003": {
+      "id": 67390003,
+      "name": "피격 시 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390000,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660003
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_040_Sprite",
+      "desc": "{0} 공격으로 피격 시, {0} {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "모든",
+        "추가 방어력",
+        "21.1%"
+      ]
+    },
+    "67390004": {
+      "id": 67390004,
+      "name": "피격 시 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390000,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660004
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_040_Sprite",
+      "desc": "{0} 공격으로 피격 시, {0} {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "모든",
+        "추가 방어력",
+        "30%"
+      ]
+    },
+    "67390005": {
+      "id": 67390005,
+      "name": "피격 시 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390000,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660005
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_040_Sprite",
+      "desc": "{0} 공격으로 피격 시, {0} {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "모든",
+        "추가 방어력",
+        "32.2%"
+      ]
+    },
+    "67390006": {
+      "id": 67390006,
+      "name": "피격 시 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390000,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660006
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_040_Sprite",
+      "desc": "{0} 공격으로 피격 시, {0} {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "모든",
+        "추가 방어력",
+        "34.4%"
+      ]
+    },
+    "67390007": {
+      "id": 67390007,
+      "name": "피격 시 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390000,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660007
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_040_Sprite",
+      "desc": "{0} 공격으로 피격 시, {0} {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "모든",
+        "추가 방어력",
+        "36.6%"
+      ]
+    },
+    "67390008": {
+      "id": 67390008,
+      "name": "피격 시 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390000,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660008
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_040_Sprite",
+      "desc": "{0} 공격으로 피격 시, {0} {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "모든",
+        "추가 방어력",
+        "38.8%"
+      ]
+    },
+    "67390009": {
+      "id": 67390009,
+      "name": "피격 시 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390000,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660009
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_040_Sprite",
+      "desc": "{0} 공격으로 피격 시, {0} {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "모든",
+        "추가 방어력",
+        "50%"
+      ]
+    },
+    "67390010": {
+      "id": 67390010,
+      "name": "포격 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390010,
+      "statEffect": [
+        {
+          "Id": 1025,
+          "Val": 53
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_119_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 방어력",
+        "5.3%"
+      ]
+    },
+    "67390011": {
+      "id": 67390011,
+      "name": "포격 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390010,
+      "statEffect": [
+        {
+          "Id": 1025,
+          "Val": 135
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_119_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 방어력",
+        "13.5%"
+      ]
+    },
+    "67390012": {
+      "id": 67390012,
+      "name": "포격 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390010,
+      "statEffect": [
+        {
+          "Id": 1025,
+          "Val": 176
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_119_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 방어력",
+        "17.6%"
+      ]
+    },
+    "67390013": {
+      "id": 67390013,
+      "name": "포격 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390010,
+      "statEffect": [
+        {
+          "Id": 1025,
+          "Val": 217
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_119_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 방어력",
+        "21.7%"
+      ]
+    },
+    "67390014": {
+      "id": 67390014,
+      "name": "포격 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390010,
+      "statEffect": [
+        {
+          "Id": 1025,
+          "Val": 381
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_119_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 방어력",
+        "38.1%"
+      ]
+    },
+    "67390015": {
+      "id": 67390015,
+      "name": "포격 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390010,
+      "statEffect": [
+        {
+          "Id": 1025,
+          "Val": 422
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_119_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 방어력",
+        "42.2%"
+      ]
+    },
+    "67390016": {
+      "id": 67390016,
+      "name": "포격 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390010,
+      "statEffect": [
+        {
+          "Id": 1025,
+          "Val": 463
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_119_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 방어력",
+        "46.3%"
+      ]
+    },
+    "67390017": {
+      "id": 67390017,
+      "name": "포격 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390010,
+      "statEffect": [
+        {
+          "Id": 1025,
+          "Val": 504
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_119_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 방어력",
+        "50.4%"
+      ]
+    },
+    "67390018": {
+      "id": 67390018,
+      "name": "포격 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390010,
+      "statEffect": [
+        {
+          "Id": 1025,
+          "Val": 545
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_119_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 방어력",
+        "54.5%"
+      ]
+    },
+    "67390019": {
+      "id": 67390019,
+      "name": "포격 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390010,
+      "statEffect": [
+        {
+          "Id": 1025,
+          "Val": 750
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_119_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 방어력",
+        "75%"
+      ]
+    },
+    "67390020": {
+      "id": 67390020,
+      "name": "백병 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390020,
+      "statEffect": [
+        {
+          "Id": 1040,
+          "Val": 53
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_120_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 방어력",
+        "5.3%"
+      ]
+    },
+    "67390021": {
+      "id": 67390021,
+      "name": "백병 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390020,
+      "statEffect": [
+        {
+          "Id": 1040,
+          "Val": 135
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_120_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 방어력",
+        "13.5%"
+      ]
+    },
+    "67390022": {
+      "id": 67390022,
+      "name": "백병 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390020,
+      "statEffect": [
+        {
+          "Id": 1040,
+          "Val": 176
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_120_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 방어력",
+        "17.6%"
+      ]
+    },
+    "67390023": {
+      "id": 67390023,
+      "name": "백병 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390020,
+      "statEffect": [
+        {
+          "Id": 1040,
+          "Val": 217
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_120_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 방어력",
+        "21.7%"
+      ]
+    },
+    "67390024": {
+      "id": 67390024,
+      "name": "백병 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390020,
+      "statEffect": [
+        {
+          "Id": 1040,
+          "Val": 381
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_120_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 방어력",
+        "38.1%"
+      ]
+    },
+    "67390025": {
+      "id": 67390025,
+      "name": "백병 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390020,
+      "statEffect": [
+        {
+          "Id": 1040,
+          "Val": 422
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_120_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 방어력",
+        "42.2%"
+      ]
+    },
+    "67390026": {
+      "id": 67390026,
+      "name": "백병 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390020,
+      "statEffect": [
+        {
+          "Id": 1040,
+          "Val": 463
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_120_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 방어력",
+        "46.3%"
+      ]
+    },
+    "67390027": {
+      "id": 67390027,
+      "name": "백병 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390020,
+      "statEffect": [
+        {
+          "Id": 1040,
+          "Val": 504
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_120_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 방어력",
+        "50.4%"
+      ]
+    },
+    "67390028": {
+      "id": 67390028,
+      "name": "백병 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390020,
+      "statEffect": [
+        {
+          "Id": 1040,
+          "Val": 545
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_120_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 방어력",
+        "54.5%"
+      ]
+    },
+    "67390029": {
+      "id": 67390029,
+      "name": "백병 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390020,
+      "statEffect": [
+        {
+          "Id": 1040,
+          "Val": 750
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_120_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 방어력",
+        "75%"
+      ]
+    },
+    "67390030": {
+      "id": 67390030,
+      "name": "충파 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390030,
+      "statEffect": [
+        {
+          "Id": 1087,
+          "Val": 53
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_121_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 방어력",
+        "5.3%"
+      ]
+    },
+    "67390031": {
+      "id": 67390031,
+      "name": "충파 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390030,
+      "statEffect": [
+        {
+          "Id": 1087,
+          "Val": 135
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_121_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 방어력",
+        "13.5%"
+      ]
+    },
+    "67390032": {
+      "id": 67390032,
+      "name": "충파 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390030,
+      "statEffect": [
+        {
+          "Id": 1087,
+          "Val": 176
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_121_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 방어력",
+        "17.6%"
+      ]
+    },
+    "67390033": {
+      "id": 67390033,
+      "name": "충파 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390030,
+      "statEffect": [
+        {
+          "Id": 1087,
+          "Val": 217
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_121_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 방어력",
+        "21.7%"
+      ]
+    },
+    "67390034": {
+      "id": 67390034,
+      "name": "충파 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390030,
+      "statEffect": [
+        {
+          "Id": 1087,
+          "Val": 381
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_121_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 방어력",
+        "38.1%"
+      ]
+    },
+    "67390035": {
+      "id": 67390035,
+      "name": "충파 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390030,
+      "statEffect": [
+        {
+          "Id": 1087,
+          "Val": 422
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_121_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 방어력",
+        "42.2%"
+      ]
+    },
+    "67390036": {
+      "id": 67390036,
+      "name": "충파 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390030,
+      "statEffect": [
+        {
+          "Id": 1087,
+          "Val": 463
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_121_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 방어력",
+        "46.3%"
+      ]
+    },
+    "67390037": {
+      "id": 67390037,
+      "name": "충파 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390030,
+      "statEffect": [
+        {
+          "Id": 1087,
+          "Val": 504
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_121_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 방어력",
+        "50.4%"
+      ]
+    },
+    "67390038": {
+      "id": 67390038,
+      "name": "충파 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390030,
+      "statEffect": [
+        {
+          "Id": 1087,
+          "Val": 545
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_121_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 방어력",
+        "54.5%"
+      ]
+    },
+    "67390039": {
+      "id": 67390039,
+      "name": "충파 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390030,
+      "statEffect": [
+        {
+          "Id": 1087,
+          "Val": 750
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_121_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 충파 방어력",
+        "75%"
+      ]
+    },
+    "67390040": {
+      "id": 67390040,
+      "name": "피격 전 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390040,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660010
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_213_Sprite",
+      "desc": "피격 전, {0} 확률로 모든 {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "0%",
+        "추가 방어력",
+        "25%"
+      ]
+    },
+    "67390041": {
+      "id": 67390041,
+      "name": "피격 전 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390040,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660011
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_213_Sprite",
+      "desc": "피격 전, {0} 확률로 모든 {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "0%",
+        "추가 방어력",
+        "29.1%"
+      ]
+    },
+    "67390042": {
+      "id": 67390042,
+      "name": "피격 전 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390040,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660012
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_213_Sprite",
+      "desc": "피격 전, {0} 확률로 모든 {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "0%",
+        "추가 방어력",
+        "30.5%"
+      ]
+    },
+    "67390043": {
+      "id": 67390043,
+      "name": "피격 전 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390040,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660013
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_213_Sprite",
+      "desc": "피격 전, {0} 확률로 모든 {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "0%",
+        "추가 방어력",
+        "31.9%"
+      ]
+    },
+    "67390044": {
+      "id": 67390044,
+      "name": "피격 전 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390040,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660014
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_213_Sprite",
+      "desc": "피격 전, {0} 확률로 모든 {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "0%",
+        "추가 방어력",
+        "37.5%"
+      ]
+    },
+    "67390045": {
+      "id": 67390045,
+      "name": "피격 전 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390040,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660015
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_213_Sprite",
+      "desc": "피격 전, {0} 확률로 모든 {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "0%",
+        "추가 방어력",
+        "38.8%"
+      ]
+    },
+    "67390046": {
+      "id": 67390046,
+      "name": "피격 전 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390040,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660016
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_213_Sprite",
+      "desc": "피격 전, {0} 확률로 모든 {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "0%",
+        "추가 방어력",
+        "40.2%"
+      ]
+    },
+    "67390047": {
+      "id": 67390047,
+      "name": "피격 전 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390040,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660017
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_213_Sprite",
+      "desc": "피격 전, {0} 확률로 모든 {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "0%",
+        "추가 방어력",
+        "41.6%"
+      ]
+    },
+    "67390048": {
+      "id": 67390048,
+      "name": "피격 전 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390040,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660018
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_213_Sprite",
+      "desc": "피격 전, {0} 확률로 모든 {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "0%",
+        "추가 방어력",
+        "43%"
+      ]
+    },
+    "67390049": {
+      "id": 67390049,
+      "name": "피격 전 방어력 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390040,
+      "passiveEffect": [
+        {
+          "Id": 66100026,
+          "Val1": 67660019
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_213_Sprite",
+      "desc": "피격 전, {0} 확률로 모든 {1}|hpp(이, 가) {2} 증가합니다.",
+      "descFormatTexts": [
+        "0%",
+        "추가 방어력",
+        "50%"
+      ]
+    },
+    "67390050": {
+      "id": 67390050,
+      "name": "포격 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390050,
+      "statEffect": [
+        {
+          "Id": 1109,
+          "Val": 50
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "포격",
+        "5%"
+      ]
+    },
+    "67390051": {
+      "id": 67390051,
+      "name": "포격 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390050,
+      "statEffect": [
+        {
+          "Id": 1109,
+          "Val": 75
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "포격",
+        "7.5%"
+      ]
+    },
+    "67390052": {
+      "id": 67390052,
+      "name": "포격 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390050,
+      "statEffect": [
+        {
+          "Id": 1109,
+          "Val": 83
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "포격",
+        "8.3%"
+      ]
+    },
+    "67390053": {
+      "id": 67390053,
+      "name": "포격 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390050,
+      "statEffect": [
+        {
+          "Id": 1109,
+          "Val": 91
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "포격",
+        "9.1%"
+      ]
+    },
+    "67390054": {
+      "id": 67390054,
+      "name": "포격 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390050,
+      "statEffect": [
+        {
+          "Id": 1109,
+          "Val": 125
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "포격",
+        "12.5%"
+      ]
+    },
+    "67390055": {
+      "id": 67390055,
+      "name": "포격 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390050,
+      "statEffect": [
+        {
+          "Id": 1109,
+          "Val": 133
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "포격",
+        "13.3%"
+      ]
+    },
+    "67390056": {
+      "id": 67390056,
+      "name": "포격 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390050,
+      "statEffect": [
+        {
+          "Id": 1109,
+          "Val": 141
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "포격",
+        "14.1%"
+      ]
+    },
+    "67390057": {
+      "id": 67390057,
+      "name": "포격 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390050,
+      "statEffect": [
+        {
+          "Id": 1109,
+          "Val": 150
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "포격",
+        "15%"
+      ]
+    },
+    "67390058": {
+      "id": 67390058,
+      "name": "포격 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390050,
+      "statEffect": [
+        {
+          "Id": 1109,
+          "Val": 158
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "포격",
+        "15.8%"
+      ]
+    },
+    "67390059": {
+      "id": 67390059,
+      "name": "포격 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390050,
+      "statEffect": [
+        {
+          "Id": 1109,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "포격",
+        "20%"
+      ]
+    },
+    "67390060": {
+      "id": 67390060,
+      "name": "백병 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390060,
+      "statEffect": [
+        {
+          "Id": 1110,
+          "Val": 50
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "백병",
+        "5%"
+      ]
+    },
+    "67390061": {
+      "id": 67390061,
+      "name": "백병 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390060,
+      "statEffect": [
+        {
+          "Id": 1110,
+          "Val": 75
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "백병",
+        "7.5%"
+      ]
+    },
+    "67390062": {
+      "id": 67390062,
+      "name": "백병 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390060,
+      "statEffect": [
+        {
+          "Id": 1110,
+          "Val": 83
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "백병",
+        "8.3%"
+      ]
+    },
+    "67390063": {
+      "id": 67390063,
+      "name": "백병 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390060,
+      "statEffect": [
+        {
+          "Id": 1110,
+          "Val": 91
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "백병",
+        "9.1%"
+      ]
+    },
+    "67390064": {
+      "id": 67390064,
+      "name": "백병 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390060,
+      "statEffect": [
+        {
+          "Id": 1110,
+          "Val": 125
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "백병",
+        "12.5%"
+      ]
+    },
+    "67390065": {
+      "id": 67390065,
+      "name": "백병 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390060,
+      "statEffect": [
+        {
+          "Id": 1110,
+          "Val": 133
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "백병",
+        "13.3%"
+      ]
+    },
+    "67390066": {
+      "id": 67390066,
+      "name": "백병 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390060,
+      "statEffect": [
+        {
+          "Id": 1110,
+          "Val": 141
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "백병",
+        "14.1%"
+      ]
+    },
+    "67390067": {
+      "id": 67390067,
+      "name": "백병 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390060,
+      "statEffect": [
+        {
+          "Id": 1110,
+          "Val": 150
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "백병",
+        "15%"
+      ]
+    },
+    "67390068": {
+      "id": 67390068,
+      "name": "백병 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390060,
+      "statEffect": [
+        {
+          "Id": 1110,
+          "Val": 158
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "백병",
+        "15.8%"
+      ]
+    },
+    "67390069": {
+      "id": 67390069,
+      "name": "백병 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390060,
+      "statEffect": [
+        {
+          "Id": 1110,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "백병",
+        "20%"
+      ]
+    },
+    "67390070": {
+      "id": 67390070,
+      "name": "충파 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390070,
+      "statEffect": [
+        {
+          "Id": 1111,
+          "Val": 50
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "충파",
+        "5%"
+      ]
+    },
+    "67390071": {
+      "id": 67390071,
+      "name": "충파 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390070,
+      "statEffect": [
+        {
+          "Id": 1111,
+          "Val": 75
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "충파",
+        "7.5%"
+      ]
+    },
+    "67390072": {
+      "id": 67390072,
+      "name": "충파 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390070,
+      "statEffect": [
+        {
+          "Id": 1111,
+          "Val": 83
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "충파",
+        "8.3%"
+      ]
+    },
+    "67390073": {
+      "id": 67390073,
+      "name": "충파 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390070,
+      "statEffect": [
+        {
+          "Id": 1111,
+          "Val": 91
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "충파",
+        "9.1%"
+      ]
+    },
+    "67390074": {
+      "id": 67390074,
+      "name": "충파 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390070,
+      "statEffect": [
+        {
+          "Id": 1111,
+          "Val": 125
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "충파",
+        "12.5%"
+      ]
+    },
+    "67390075": {
+      "id": 67390075,
+      "name": "충파 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390070,
+      "statEffect": [
+        {
+          "Id": 1111,
+          "Val": 133
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "충파",
+        "13.3%"
+      ]
+    },
+    "67390076": {
+      "id": 67390076,
+      "name": "충파 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390070,
+      "statEffect": [
+        {
+          "Id": 1111,
+          "Val": 141
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "충파",
+        "14.1%"
+      ]
+    },
+    "67390077": {
+      "id": 67390077,
+      "name": "충파 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390070,
+      "statEffect": [
+        {
+          "Id": 1111,
+          "Val": 150
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "충파",
+        "15%"
+      ]
+    },
+    "67390078": {
+      "id": 67390078,
+      "name": "충파 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390070,
+      "statEffect": [
+        {
+          "Id": 1111,
+          "Val": 158
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "충파",
+        "15.8%"
+      ]
+    },
+    "67390079": {
+      "id": 67390079,
+      "name": "충파 치명타 추가 피해",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390070,
+      "statEffect": [
+        {
+          "Id": 1111,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0} 공격이 치명타로 발동하면, 피해량이 {1} 추가됩니다.",
+      "descFormatTexts": [
+        "충파",
+        "20%"
+      ]
+    },
+    "67390080": {
+      "id": 67390080,
+      "name": "포격 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390080,
+      "statEffect": [
+        {
+          "Id": 1133,
+          "Val": 50
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 포격 치명타 피해 저항",
+        "5%",
+        "증가"
+      ]
+    },
+    "67390081": {
+      "id": 67390081,
+      "name": "포격 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390080,
+      "statEffect": [
+        {
+          "Id": 1133,
+          "Val": 75
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 포격 치명타 피해 저항",
+        "7.5%",
+        "증가"
+      ]
+    },
+    "67390082": {
+      "id": 67390082,
+      "name": "포격 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390080,
+      "statEffect": [
+        {
+          "Id": 1133,
+          "Val": 83
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 포격 치명타 피해 저항",
+        "8.3%",
+        "증가"
+      ]
+    },
+    "67390083": {
+      "id": 67390083,
+      "name": "포격 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390080,
+      "statEffect": [
+        {
+          "Id": 1133,
+          "Val": 91
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 포격 치명타 피해 저항",
+        "9.1%",
+        "증가"
+      ]
+    },
+    "67390084": {
+      "id": 67390084,
+      "name": "포격 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390080,
+      "statEffect": [
+        {
+          "Id": 1133,
+          "Val": 125
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 포격 치명타 피해 저항",
+        "12.5%",
+        "증가"
+      ]
+    },
+    "67390085": {
+      "id": 67390085,
+      "name": "포격 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390080,
+      "statEffect": [
+        {
+          "Id": 1133,
+          "Val": 133
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 포격 치명타 피해 저항",
+        "13.3%",
+        "증가"
+      ]
+    },
+    "67390086": {
+      "id": 67390086,
+      "name": "포격 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390080,
+      "statEffect": [
+        {
+          "Id": 1133,
+          "Val": 141
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 포격 치명타 피해 저항",
+        "14.1%",
+        "증가"
+      ]
+    },
+    "67390087": {
+      "id": 67390087,
+      "name": "포격 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390080,
+      "statEffect": [
+        {
+          "Id": 1133,
+          "Val": 150
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 포격 치명타 피해 저항",
+        "15%",
+        "증가"
+      ]
+    },
+    "67390088": {
+      "id": 67390088,
+      "name": "포격 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390080,
+      "statEffect": [
+        {
+          "Id": 1133,
+          "Val": 158
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 포격 치명타 피해 저항",
+        "15.8%",
+        "증가"
+      ]
+    },
+    "67390089": {
+      "id": 67390089,
+      "name": "포격 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390080,
+      "statEffect": [
+        {
+          "Id": 1133,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_089_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 포격 치명타 피해 저항",
+        "20%",
+        "증가"
+      ]
+    },
+    "67390090": {
+      "id": 67390090,
+      "name": "백병 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390090,
+      "statEffect": [
+        {
+          "Id": 1138,
+          "Val": 50
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 치명타 피해 저항",
+        "5%",
+        "증가"
+      ]
+    },
+    "67390091": {
+      "id": 67390091,
+      "name": "백병 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390090,
+      "statEffect": [
+        {
+          "Id": 1138,
+          "Val": 75
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 치명타 피해 저항",
+        "7.5%",
+        "증가"
+      ]
+    },
+    "67390092": {
+      "id": 67390092,
+      "name": "백병 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390090,
+      "statEffect": [
+        {
+          "Id": 1138,
+          "Val": 83
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 치명타 피해 저항",
+        "8.3%",
+        "증가"
+      ]
+    },
+    "67390093": {
+      "id": 67390093,
+      "name": "백병 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390090,
+      "statEffect": [
+        {
+          "Id": 1138,
+          "Val": 91
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 치명타 피해 저항",
+        "9.1%",
+        "증가"
+      ]
+    },
+    "67390094": {
+      "id": 67390094,
+      "name": "백병 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390090,
+      "statEffect": [
+        {
+          "Id": 1138,
+          "Val": 125
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 치명타 피해 저항",
+        "12.5%",
+        "증가"
+      ]
+    },
+    "67390095": {
+      "id": 67390095,
+      "name": "백병 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390090,
+      "statEffect": [
+        {
+          "Id": 1138,
+          "Val": 133
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 치명타 피해 저항",
+        "13.3%",
+        "증가"
+      ]
+    },
+    "67390096": {
+      "id": 67390096,
+      "name": "백병 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390090,
+      "statEffect": [
+        {
+          "Id": 1138,
+          "Val": 141
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 치명타 피해 저항",
+        "14.1%",
+        "증가"
+      ]
+    },
+    "67390097": {
+      "id": 67390097,
+      "name": "백병 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390090,
+      "statEffect": [
+        {
+          "Id": 1138,
+          "Val": 150
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 치명타 피해 저항",
+        "15%",
+        "증가"
+      ]
+    },
+    "67390098": {
+      "id": 67390098,
+      "name": "백병 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390090,
+      "statEffect": [
+        {
+          "Id": 1138,
+          "Val": 158
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 치명타 피해 저항",
+        "15.8%",
+        "증가"
+      ]
+    },
+    "67390099": {
+      "id": 67390099,
+      "name": "백병 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390090,
+      "statEffect": [
+        {
+          "Id": 1138,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_090_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 백병 치명타 피해 저항",
+        "20%",
+        "증가"
+      ]
+    },
+    "67390100": {
+      "id": 67390100,
+      "name": "충파 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390100,
+      "statEffect": [
+        {
+          "Id": 1143,
+          "Val": 50
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 충파 치명타 피해 저항",
+        "5%",
+        "증가"
+      ]
+    },
+    "67390101": {
+      "id": 67390101,
+      "name": "충파 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390100,
+      "statEffect": [
+        {
+          "Id": 1143,
+          "Val": 75
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 충파 치명타 피해 저항",
+        "7.5%",
+        "증가"
+      ]
+    },
+    "67390102": {
+      "id": 67390102,
+      "name": "충파 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390100,
+      "statEffect": [
+        {
+          "Id": 1143,
+          "Val": 83
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 충파 치명타 피해 저항",
+        "8.3%",
+        "증가"
+      ]
+    },
+    "67390103": {
+      "id": 67390103,
+      "name": "충파 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390100,
+      "statEffect": [
+        {
+          "Id": 1143,
+          "Val": 91
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 충파 치명타 피해 저항",
+        "9.1%",
+        "증가"
+      ]
+    },
+    "67390104": {
+      "id": 67390104,
+      "name": "충파 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390100,
+      "statEffect": [
+        {
+          "Id": 1143,
+          "Val": 125
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 충파 치명타 피해 저항",
+        "12.5%",
+        "증가"
+      ]
+    },
+    "67390105": {
+      "id": 67390105,
+      "name": "충파 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390100,
+      "statEffect": [
+        {
+          "Id": 1143,
+          "Val": 133
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 충파 치명타 피해 저항",
+        "13.3%",
+        "증가"
+      ]
+    },
+    "67390106": {
+      "id": 67390106,
+      "name": "충파 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390100,
+      "statEffect": [
+        {
+          "Id": 1143,
+          "Val": 141
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 충파 치명타 피해 저항",
+        "14.1%",
+        "증가"
+      ]
+    },
+    "67390107": {
+      "id": 67390107,
+      "name": "충파 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390100,
+      "statEffect": [
+        {
+          "Id": 1143,
+          "Val": 150
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 충파 치명타 피해 저항",
+        "15%",
+        "증가"
+      ]
+    },
+    "67390108": {
+      "id": 67390108,
+      "name": "충파 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390100,
+      "statEffect": [
+        {
+          "Id": 1143,
+          "Val": 158
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 충파 치명타 피해 저항",
+        "15.8%",
+        "증가"
+      ]
+    },
+    "67390109": {
+      "id": 67390109,
+      "name": "충파 치명타 피해 저항",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390100,
+      "statEffect": [
+        {
+          "Id": 1143,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_091_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} {2}합니다.",
+      "descFormatTexts": [
+        "추가 충파 치명타 피해 저항",
+        "20%",
+        "증가"
+      ]
+    },
+    "67390110": {
+      "id": 67390110,
+      "name": "포격 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390110,
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 50
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_107_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 회피",
+        "5%"
+      ]
+    },
+    "67390111": {
+      "id": 67390111,
+      "name": "포격 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390110,
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 150
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_107_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 회피",
+        "15%"
+      ]
+    },
+    "67390112": {
+      "id": 67390112,
+      "name": "포격 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390110,
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_107_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 회피",
+        "20%"
+      ]
+    },
+    "67390113": {
+      "id": 67390113,
+      "name": "포격 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390110,
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 250
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_107_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 회피",
+        "25%"
+      ]
+    },
+    "67390114": {
+      "id": 67390114,
+      "name": "포격 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390110,
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 450
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_107_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 회피",
+        "45%"
+      ]
+    },
+    "67390115": {
+      "id": 67390115,
+      "name": "포격 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390110,
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 500
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_107_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 회피",
+        "50%"
+      ]
+    },
+    "67390116": {
+      "id": 67390116,
+      "name": "포격 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390110,
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 550
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_107_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 회피",
+        "55%"
+      ]
+    },
+    "67390117": {
+      "id": 67390117,
+      "name": "포격 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390110,
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 600
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_107_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 회피",
+        "60%"
+      ]
+    },
+    "67390118": {
+      "id": 67390118,
+      "name": "포격 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390110,
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 650
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_107_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 회피",
+        "65%"
+      ]
+    },
+    "67390119": {
+      "id": 67390119,
+      "name": "포격 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390110,
+      "statEffect": [
+        {
+          "Id": 1032,
+          "Val": 900
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_107_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 포격 회피",
+        "90%"
+      ]
+    },
+    "67390120": {
+      "id": 67390120,
+      "name": "백병 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 1,
+      "groupNo": 67390120,
+      "statEffect": [
+        {
+          "Id": 1047,
+          "Val": 50
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_108_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 회피",
+        "5%"
+      ]
+    },
+    "67390121": {
+      "id": 67390121,
+      "name": "백병 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 2,
+      "groupNo": 67390120,
+      "statEffect": [
+        {
+          "Id": 1047,
+          "Val": 150
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_108_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 회피",
+        "15%"
+      ]
+    },
+    "67390122": {
+      "id": 67390122,
+      "name": "백병 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 3,
+      "groupNo": 67390120,
+      "statEffect": [
+        {
+          "Id": 1047,
+          "Val": 200
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_108_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 회피",
+        "20%"
+      ]
+    },
+    "67390123": {
+      "id": 67390123,
+      "name": "백병 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 4,
+      "groupNo": 67390120,
+      "statEffect": [
+        {
+          "Id": 1047,
+          "Val": 250
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_108_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 회피",
+        "25%"
+      ]
+    },
+    "67390124": {
+      "id": 67390124,
+      "name": "백병 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 5,
+      "groupNo": 67390120,
+      "statEffect": [
+        {
+          "Id": 1047,
+          "Val": 450
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_108_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 회피",
+        "45%"
+      ]
+    },
+    "67390125": {
+      "id": 67390125,
+      "name": "백병 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 6,
+      "groupNo": 67390120,
+      "statEffect": [
+        {
+          "Id": 1047,
+          "Val": 500
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_108_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 회피",
+        "50%"
+      ]
+    },
+    "67390126": {
+      "id": 67390126,
+      "name": "백병 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 7,
+      "groupNo": 67390120,
+      "statEffect": [
+        {
+          "Id": 1047,
+          "Val": 550
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_108_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 회피",
+        "55%"
+      ]
+    },
+    "67390127": {
+      "id": 67390127,
+      "name": "백병 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 8,
+      "groupNo": 67390120,
+      "statEffect": [
+        {
+          "Id": 1047,
+          "Val": 600
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_108_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 회피",
+        "60%"
+      ]
+    },
+    "67390128": {
+      "id": 67390128,
+      "name": "백병 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 9,
+      "groupNo": 67390120,
+      "statEffect": [
+        {
+          "Id": 1047,
+          "Val": 650
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_108_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 회피",
+        "65%"
+      ]
+    },
+    "67390129": {
+      "id": 67390129,
+      "name": "백병 회피 증폭",
+      "passiveUseType": 1,
+      "passiveType": 15,
+      "skillLevel": 10,
+      "groupNo": 67390120,
+      "statEffect": [
+        {
+          "Id": 1047,
+          "Val": 900
+        }
+      ],
+      "toolTipIcon": "icon_effect_battle_108_Sprite",
+      "desc": "{0}|hpp(이, 가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "추가 백병 회피",
+        "90%"
+      ]
     },
     "67499995": {
       "id": 67499995,

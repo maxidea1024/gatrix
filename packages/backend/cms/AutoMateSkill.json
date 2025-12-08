@@ -11294,7 +11294,7 @@
         },
         {
           "job": 3,
-          "id": 65417047,
+          "id": 65417046,
           "needLv": 50,
           "needAwaken": 0
         }
@@ -12015,6 +12015,324 @@
         {
           "job": 3,
           "id": 65417477,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010652": {
+      "id": 65010652,
+      "name": "할로윈 유령선 선원1",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65459018,
+          "needLv": 1,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010653": {
+      "id": 65010653,
+      "name": "할로윈 유령선 제독",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65416865,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417415,
+          "needLv": 1,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010654": {
+      "id": 65010654,
+      "name": "선희",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417436,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417177,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010655": {
+      "id": 65010655,
+      "name": "임화",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417476,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417187,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010656": {
+      "id": 65010656,
+      "name": "루도",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417046,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417476,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010657": {
+      "id": 65010657,
+      "name": "제바히르",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417306,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417186,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010658": {
+      "id": 65010658,
+      "name": "아세네트",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417266,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417387,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010659": {
+      "id": 65010659,
+      "name": "아델리나",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417396,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417477,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010660": {
+      "id": 65010660,
+      "name": "라이너스 라쳇",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417356,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417187,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010661": {
+      "id": 65010661,
+      "name": "오렐리",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65416806,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417117,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010662": {
+      "id": 65010662,
+      "name": "슈발리에 럼",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417266,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417437,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010663": {
+      "id": 65010663,
+      "name": "황진화",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417376,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417186,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010664": {
+      "id": 65010664,
+      "name": "양충",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65416806,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417436,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010665": {
+      "id": 65010665,
+      "name": "헨리 블랙번",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65416696,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417376,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010666": {
+      "id": 65010666,
+      "name": "주용",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417226,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417286,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010667": {
+      "id": 65010667,
+      "name": "스틴",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417426,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417357,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010668": {
+      "id": 65010668,
+      "name": "파트리스",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417186,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417306,
+          "needLv": 50,
+          "needAwaken": 0
+        }
+      ]
+    },
+    "65010669": {
+      "id": 65010669,
+      "name": "클라라 반 슈네",
+      "skills": [
+        {
+          "job": 3,
+          "id": 65417186,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 3,
+          "id": 65417177,
           "needLv": 50,
           "needAwaken": 0
         }

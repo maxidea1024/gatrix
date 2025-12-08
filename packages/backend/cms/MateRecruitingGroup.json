@@ -11506,6 +11506,114 @@
       "isReRecruit": true,
       "isMustAppear": false
     },
+    "41550964": {
+      "id": 41550964,
+      "group": 11000197,
+      "orderPriority": 1,
+      "mateId": 21300609,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41550965": {
+      "id": 41550965,
+      "group": 11000140,
+      "orderPriority": 1,
+      "mateId": 21300609,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41550966": {
+      "id": 41550966,
+      "group": 11000019,
+      "orderPriority": 1,
+      "mateId": 21300609,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41550967": {
+      "id": 41550967,
+      "group": 11000163,
+      "orderPriority": 1,
+      "mateId": 21300609,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41550968": {
+      "id": 41550968,
+      "group": 11000061,
+      "orderPriority": 1,
+      "mateId": 21300609,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41550969": {
+      "id": 41550969,
+      "group": 11000079,
+      "orderPriority": 1,
+      "mateId": 21300609,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41550970": {
+      "id": 41550970,
+      "group": 11000077,
+      "orderPriority": 1,
+      "mateId": 21300610,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41550971": {
+      "id": 41550971,
+      "group": 11000128,
+      "orderPriority": 1,
+      "mateId": 21300610,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41550972": {
+      "id": 41550972,
+      "group": 11000046,
+      "orderPriority": 1,
+      "mateId": 21300610,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41550973": {
+      "id": 41550973,
+      "group": 11000114,
+      "orderPriority": 1,
+      "mateId": 21300610,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41550974": {
+      "id": 41550974,
+      "group": 11000139,
+      "orderPriority": 1,
+      "mateId": 21300610,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41550975": {
+      "id": 41550975,
+      "group": 11000031,
+      "orderPriority": 1,
+      "mateId": 21300610,
+      "Ratio": 1000,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
     "41600001": {
       "id": 41600001,
       "group": 11000048,
@@ -38974,6 +39082,88 @@
         {
           "Id": 81000075,
           "Target": 21800036,
+          "Count": 4
+        }
+      ],
+      "isReRecruit": false,
+      "isMustAppear": false
+    },
+    "41760017": {
+      "id": 41760017,
+      "group": 11000156,
+      "orderPriority": 2,
+      "mateId": 21350037,
+      "Ratio": 10,
+      "contentsTerms": [
+        {
+          "Id": 81000075,
+          "Target": 21800037,
+          "Count": 4
+        }
+      ],
+      "isReRecruit": false,
+      "isMustAppear": false
+    },
+    "41760018": {
+      "id": 41760018,
+      "group": 11000169,
+      "orderPriority": 2,
+      "mateId": 21350061,
+      "Ratio": 10,
+      "contentsTerms": [
+        {
+          "Id": 81000075,
+          "Target": 21800061,
+          "Count": 4
+        }
+      ],
+      "isReRecruit": false,
+      "isMustAppear": false
+    },
+    "41760019": {
+      "id": 41760019,
+      "group": 11000001,
+      "orderPriority": 2,
+      "mateId": 21350060,
+      "Ratio": 500,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41760020": {
+      "id": 41760020,
+      "group": 11000002,
+      "orderPriority": 2,
+      "mateId": 21350026,
+      "Ratio": 500,
+      "isReRecruit": true,
+      "isMustAppear": false
+    },
+    "41760021": {
+      "id": 41760021,
+      "group": 11000133,
+      "orderPriority": 2,
+      "mateId": 21350076,
+      "Ratio": 10,
+      "contentsTerms": [
+        {
+          "Id": 81000075,
+          "Target": 21800076,
+          "Count": 4
+        }
+      ],
+      "isReRecruit": false,
+      "isMustAppear": false
+    },
+    "41760022": {
+      "id": 41760022,
+      "group": 11000048,
+      "orderPriority": 2,
+      "mateId": 21350077,
+      "Ratio": 10,
+      "contentsTerms": [
+        {
+          "Id": 81000075,
+          "Target": 21800077,
           "Count": 4
         }
       ],

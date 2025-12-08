@@ -240,10 +240,10 @@
       ],
       "separateItemVal": [
         1,
-        1
+        0
       ],
       "enchantPointId": 100003,
-      "enchantPointVal": 1000,
+      "enchantPointVal": 100,
       "separateSuceessItem": 23900130,
       "separateSuceessItemVal": 1
     },
@@ -257,10 +257,10 @@
       ],
       "separateItemVal": [
         1,
-        1
+        0
       ],
       "enchantPointId": 100003,
-      "enchantPointVal": 1000,
+      "enchantPointVal": 100,
       "separateSuceessItem": 23900131,
       "separateSuceessItemVal": 2
     },
@@ -274,10 +274,10 @@
       ],
       "separateItemVal": [
         1,
-        1
+        0
       ],
       "enchantPointId": 100003,
-      "enchantPointVal": 1000,
+      "enchantPointVal": 100,
       "separateSuceessItem": 23900132,
       "separateSuceessItemVal": 3
     },
@@ -291,10 +291,10 @@
       ],
       "separateItemVal": [
         1,
-        1
+        0
       ],
       "enchantPointId": 100003,
-      "enchantPointVal": 1000,
+      "enchantPointVal": 100,
       "separateSuceessItem": 23900133,
       "separateSuceessItemVal": 4
     },
@@ -308,95 +308,95 @@
       ],
       "separateItemVal": [
         1,
-        1
+        0
       ],
       "enchantPointId": 100003,
-      "enchantPointVal": 1000,
+      "enchantPointVal": 100,
       "separateSuceessItem": 23900134,
       "separateSuceessItemVal": 5
     },
     "71600015": {
       "id": 71600015,
       "separatetLv": 6,
-      "separateRate": 500,
+      "separateRate": 1000,
       "separateItemId": [
         23900101,
         23900119
       ],
       "separateItemVal": [
-        1,
-        1
+        2,
+        0
       ],
       "enchantPointId": 100003,
-      "enchantPointVal": 1000,
+      "enchantPointVal": 100,
       "separateSuceessItem": 23900135,
       "separateSuceessItemVal": 6
     },
     "71600016": {
       "id": 71600016,
       "separatetLv": 7,
-      "separateRate": 400,
+      "separateRate": 1000,
       "separateItemId": [
         23900101,
         23900119
       ],
       "separateItemVal": [
-        1,
-        1
+        2,
+        0
       ],
       "enchantPointId": 100003,
-      "enchantPointVal": 1000,
+      "enchantPointVal": 100,
       "separateSuceessItem": 23900136,
       "separateSuceessItemVal": 7
     },
     "71600017": {
       "id": 71600017,
       "separatetLv": 8,
-      "separateRate": 300,
-      "separateItemId": [
-        23900101,
-        23900119
-      ],
-      "separateItemVal": [
-        2,
-        2
-      ],
-      "enchantPointId": 100003,
-      "enchantPointVal": 1000,
-      "separateSuceessItem": 23900137,
-      "separateSuceessItemVal": 8
-    },
-    "71600018": {
-      "id": 71600018,
-      "separatetLv": 9,
-      "separateRate": 250,
-      "separateItemId": [
-        23900101,
-        23900119
-      ],
-      "separateItemVal": [
-        2,
-        3
-      ],
-      "enchantPointId": 100003,
-      "enchantPointVal": 1000,
-      "separateSuceessItem": 23900138,
-      "separateSuceessItemVal": 9
-    },
-    "71600019": {
-      "id": 71600019,
-      "separatetLv": 10,
-      "separateRate": 150,
+      "separateRate": 800,
       "separateItemId": [
         23900101,
         23900119
       ],
       "separateItemVal": [
         3,
-        3
+        1
       ],
       "enchantPointId": 100003,
-      "enchantPointVal": 1000,
+      "enchantPointVal": 100,
+      "separateSuceessItem": 23900137,
+      "separateSuceessItemVal": 8
+    },
+    "71600018": {
+      "id": 71600018,
+      "separatetLv": 9,
+      "separateRate": 700,
+      "separateItemId": [
+        23900101,
+        23900119
+      ],
+      "separateItemVal": [
+        3,
+        1
+      ],
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "separateSuceessItem": 23900138,
+      "separateSuceessItemVal": 9
+    },
+    "71600019": {
+      "id": 71600019,
+      "separatetLv": 10,
+      "separateRate": 500,
+      "separateItemId": [
+        23900101,
+        23900119
+      ],
+      "separateItemVal": [
+        4,
+        1
+      ],
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
       "separateSuceessItem": 23900139,
       "separateSuceessItemVal": 10
     }

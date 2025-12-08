@@ -26290,6 +26290,75 @@
         0
       ]
     },
+    "77410013": {
+      "id": 77410013,
+      "name": "상급 마체테",
+      "lv": 2,
+      "timing": 1,
+      "duration": 0,
+      "isDisplayActivate": false,
+      "func": 0,
+      "cond": [
+        {
+          "Type": 0,
+          "ValueType": 0
+        },
+        {
+          "Type": 0,
+          "ValueType": 0
+        }
+      ],
+      "target": 2,
+      "targetSpotType": [
+        0
+      ]
+    },
+    "77410014": {
+      "id": 77410014,
+      "name": "상급 손도끼",
+      "lv": 2,
+      "timing": 1,
+      "duration": 0,
+      "isDisplayActivate": false,
+      "func": 0,
+      "cond": [
+        {
+          "Type": 0,
+          "ValueType": 0
+        },
+        {
+          "Type": 0,
+          "ValueType": 0
+        }
+      ],
+      "target": 2,
+      "targetSpotType": [
+        0
+      ]
+    },
+    "77410015": {
+      "id": 77410015,
+      "name": "밤낮의 눈",
+      "lv": 2,
+      "timing": 1,
+      "duration": 0,
+      "isDisplayActivate": false,
+      "func": 0,
+      "cond": [
+        {
+          "Type": 0,
+          "ValueType": 0
+        },
+        {
+          "Type": 0,
+          "ValueType": 0
+        }
+      ],
+      "target": 2,
+      "targetSpotType": [
+        0
+      ]
+    },
     "77420000": {
       "id": 77420000,
       "name": "동물의 왕",

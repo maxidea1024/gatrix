@@ -1503,36 +1503,10 @@
       "sword": "socket_hand_r"
     },
     "Town_Kneel_01": {
-      "id": "Town_Kneel_01",
-      "axe": "socket_back",
-      "blade": "socket_waist_l",
-      "bow": "socket_back",
-      "crossbow": "socket_waist_l",
-      "pistol": "socket_waist_l",
-      "rifle": "socket_back",
-      "spear": "socket_back",
-      "sword": "socket_waist_l",
-      "thSword": "socket_back",
-      "twinBlade": [
-        "socket_waist_r",
-        "socket_waist_l"
-      ]
+      "id": "Town_Kneel_01"
     },
     "Town_Kneeling_01": {
-      "id": "Town_Kneeling_01",
-      "axe": "socket_back",
-      "blade": "socket_waist_l",
-      "bow": "socket_back",
-      "crossbow": "socket_waist_l",
-      "pistol": "socket_waist_l",
-      "rifle": "socket_back",
-      "spear": "socket_back",
-      "sword": "socket_waist_l",
-      "thSword": "socket_back",
-      "twinBlade": [
-        "socket_waist_r",
-        "socket_waist_l"
-      ]
+      "id": "Town_Kneeling_01"
     },
     "Town_Cheers_Idle_03": {
       "id": "Town_Cheers_Idle_03",
@@ -1603,6 +1577,69 @@
       "tool": [
         "socket_hand_r",
         "socket_hand_l"
+      ]
+    },
+    "Ship_DeckOutskirtsNPC_04": {
+      "id": "Ship_DeckOutskirtsNPC_04",
+      "tool": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Ship_DeckOutskirtsNPC_05": {
+      "id": "Ship_DeckOutskirtsNPC_05",
+      "tool": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Town_Walk_04": {
+      "id": "Town_Walk_04",
+      "axe": "socket_back",
+      "blade": "socket_waist_l",
+      "bow": "socket_back",
+      "crossbow": "socket_waist_l",
+      "pistol": "socket_waist_l",
+      "rifle": "socket_back",
+      "spear": "socket_back",
+      "sword": "socket_waist_l",
+      "thSword": "socket_back",
+      "twinBlade": [
+        "socket_waist_r",
+        "socket_waist_l"
+      ]
+    },
+    "Town_Shoot_01": {
+      "id": "Town_Shoot_01",
+      "tool": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Town_Shoot_02": {
+      "id": "Town_Shoot_02",
+      "tool": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Manufacture_Crafting_01": {
+      "id": "Manufacture_Crafting_01",
+      "tool": [
+        "socket_hand_r",
+        "socket_hand_l"
+      ]
+    },
+    "Manufacture_Crafting_02": {
+      "id": "Manufacture_Crafting_02",
+      "tool": [
+        "socket_hand_r"
+      ]
+    },
+    "Manufacture_Crafting_03": {
+      "id": "Manufacture_Crafting_03",
+      "tool": [
+        "socket_hand_r"
       ]
     }
   }

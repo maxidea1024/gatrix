@@ -2224,7 +2224,7 @@
       ],
       "addEventSpot": [
         {
-          "Id": 77230010,
+          "Id": 77230011,
           "Prob": 1,
           "IsEssential": true
         },
@@ -2284,7 +2284,7 @@
       ],
       "addEventSpot": [
         {
-          "Id": 77230010,
+          "Id": 77230012,
           "Prob": 1,
           "IsEssential": true
         },
@@ -2986,6 +2986,486 @@
       ],
       "firstReward": 77353085,
       "trainingReward": 77353086
+    },
+    "77705001": {
+      "id": 77705001,
+      "name": "육지 수련",
+      "texture": "WT_ExplorationBG09_Sprite",
+      "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
+      "isDisplay": false,
+      "isDaily": true,
+      "advSpcEff": [
+        77440002,
+        77400771
+      ],
+      "representativeItem": [
+        23410000,
+        23421093
+      ],
+      "addEventSpot": [
+        {
+          "Id": 77230001,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        }
+      ],
+      "firstReward": 77375001,
+      "trainingReward": 77375002
+    },
+    "77705002": {
+      "id": 77705002,
+      "name": "육지 수련",
+      "texture": "WT_ExplorationBG09_Sprite",
+      "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
+      "isDisplay": false,
+      "isDaily": true,
+      "advSpcEff": [
+        77440002,
+        77400771
+      ],
+      "representativeItem": [
+        23410000,
+        23421093
+      ],
+      "addEventSpot": [
+        {
+          "Id": 77230001,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        }
+      ],
+      "firstReward": 77375003,
+      "trainingReward": 77375004
+    },
+    "77705003": {
+      "id": 77705003,
+      "name": "육지 수련",
+      "texture": "WT_ExplorationBG09_Sprite",
+      "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
+      "isDisplay": false,
+      "isDaily": true,
+      "advSpcEff": [
+        77440002,
+        77400771
+      ],
+      "representativeItem": [
+        23410000,
+        23421093
+      ],
+      "addEventSpot": [
+        {
+          "Id": 77230001,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        }
+      ],
+      "firstReward": 77375005,
+      "trainingReward": 77375006
+    },
+    "77705004": {
+      "id": 77705004,
+      "name": "육지 수련",
+      "texture": "WT_ExplorationBG09_Sprite",
+      "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
+      "isDisplay": false,
+      "isDaily": true,
+      "advSpcEff": [
+        77440002,
+        77400771
+      ],
+      "representativeItem": [
+        23410001,
+        23421094
+      ],
+      "addEventSpot": [
+        {
+          "Id": 77230001,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        }
+      ],
+      "firstReward": 77375007,
+      "trainingReward": 77375008
+    },
+    "77705005": {
+      "id": 77705005,
+      "name": "육지 수련",
+      "texture": "WT_ExplorationBG09_Sprite",
+      "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
+      "isDisplay": false,
+      "isDaily": true,
+      "advSpcEff": [
+        77440002,
+        77400771
+      ],
+      "representativeItem": [
+        23410001,
+        23421094
+      ],
+      "addEventSpot": [
+        {
+          "Id": 77230001,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        }
+      ],
+      "firstReward": 77375009,
+      "trainingReward": 77375010
+    },
+    "77705006": {
+      "id": 77705006,
+      "name": "육지 수련",
+      "texture": "WT_ExplorationBG09_Sprite",
+      "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
+      "isDisplay": false,
+      "isDaily": true,
+      "advSpcEff": [
+        77440002,
+        77400771
+      ],
+      "representativeItem": [
+        23410001,
+        23421094
+      ],
+      "addEventSpot": [
+        {
+          "Id": 77230001,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        }
+      ],
+      "firstReward": 77375011,
+      "trainingReward": 77375012
+    },
+    "77705007": {
+      "id": 77705007,
+      "name": "육지 수련",
+      "texture": "WT_ExplorationBG09_Sprite",
+      "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
+      "isDisplay": false,
+      "isDaily": true,
+      "advSpcEff": [
+        77440002,
+        77400771
+      ],
+      "representativeItem": [
+        23410002,
+        23421095
+      ],
+      "addEventSpot": [
+        {
+          "Id": 77230001,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        }
+      ],
+      "firstReward": 77375013,
+      "trainingReward": 77375014
+    },
+    "77705008": {
+      "id": 77705008,
+      "name": "육지 수련",
+      "texture": "WT_ExplorationBG09_Sprite",
+      "desc": "수련을 통해 승급, 강화 재료를 획득합니다.",
+      "isDisplay": false,
+      "isDaily": true,
+      "advSpcEff": [
+        77440002,
+        77400771
+      ],
+      "representativeItem": [
+        23410002,
+        23421095
+      ],
+      "addEventSpot": [
+        {
+          "Id": 77230001,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        },
+        {
+          "Id": 77230301,
+          "Prob": 1,
+          "IsEssential": true
+        }
+      ],
+      "firstReward": 77375013,
+      "trainingReward": 77375014
     },
     "77710003": {
       "id": 77710003,

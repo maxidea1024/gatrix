@@ -311,6 +311,7 @@
         "PointId": 1,
         "PointVal": 1
       },
+      "materialPublicBpId": 1,
       "forbiddenActionType": 1,
       "stat": [
         {
@@ -2035,7 +2036,7 @@
       "tier": 2,
       "masteryAble": true,
       "order": 1,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 2400,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -2286,7 +2287,7 @@
       "tier": 1,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 600,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -2524,7 +2525,7 @@
       "tier": 4,
       "masteryAble": true,
       "order": 1,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 8800,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -3528,7 +3529,7 @@
       "tier": 5,
       "masteryAble": true,
       "order": 1,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 15000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -4793,7 +4794,7 @@
       "tier": 7,
       "masteryAble": true,
       "order": 1,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 29400,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -5044,7 +5045,7 @@
       "tier": 7,
       "masteryAble": true,
       "order": 2,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 29400,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -6058,7 +6059,7 @@
       "tier": 6,
       "masteryAble": true,
       "order": 2,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 21000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -6309,7 +6310,7 @@
       "tier": 6,
       "masteryAble": true,
       "order": 3,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 21000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -7865,7 +7866,7 @@
       "tier": 3,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 4800,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -9431,7 +9432,7 @@
       "tier": 10,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 72000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -11268,7 +11269,7 @@
       "tier": 9,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 54000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -11529,7 +11530,7 @@
       "tier": 9,
       "masteryAble": true,
       "order": 5,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 54000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -11790,7 +11791,7 @@
       "tier": 10,
       "masteryAble": true,
       "order": 5,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 72000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -24247,7 +24248,7 @@
       "tier": 8,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 42000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -26429,7 +26430,7 @@
       "shipId": 70000096,
       "blueprintType": 3,
       "isAsia": false,
-      "tier": 21,
+      "tier": 26,
       "masteryAble": false,
       "order": 2,
       "localBitflag": 0,
@@ -26439,14 +26440,14 @@
       "improvedShipblueprintExchangeAbleRate": 0,
       "shipBuildSuccessionTime": 210600,
       "coercionOpenCostType": 100004,
-      "coercionOpenCost": 2100,
+      "coercionOpenCost": 2600,
       "verifyingPointId": 100001,
       "verifyingPointVal": 46000000,
       "relaunchPointId": 100003,
       "relaunchPointValue": 2900,
       "repairShipLife": {
         "PointId": 100003,
-        "PointVal": 42
+        "PointVal": 52
       },
       "materialPublicBpId": 23400011,
       "materialBpId": 23405096,
@@ -26474,22 +26475,22 @@
       "stat": [
         {
           "Type": 1,
-          "Val": 82,
+          "Val": 192,
           "MinRate": 700
         },
         {
           "Type": 2,
-          "Val": 396,
+          "Val": 340,
           "MinRate": 700
         },
         {
           "Type": 3,
-          "Val": 4400,
+          "Val": 5300,
           "MinRate": 700
         },
         {
           "Type": 4,
-          "Val": 450,
+          "Val": 555,
           "MinRate": 700
         },
         {
@@ -26499,57 +26500,57 @@
         },
         {
           "Type": 9,
-          "Val": 128,
+          "Val": 138,
           "MinRate": 700
         },
         {
           "Type": 7,
-          "Val": 757,
+          "Val": 1018,
           "MinRate": 700
         },
         {
           "Type": 8,
-          "Val": 747,
+          "Val": 434,
           "MinRate": 700
         },
         {
           "Type": 5,
-          "Val": 136,
+          "Val": 85,
           "MinRate": 700
         },
         {
           "Type": 1002,
-          "Val": 117,
+          "Val": 96,
           "MinRate": 700
         },
         {
           "Type": 1000,
-          "Val": 126,
+          "Val": 88,
           "MinRate": 700
         },
         {
           "Type": 1114,
-          "Val": 692,
+          "Val": 773,
           "MinRate": 700
         },
         {
           "Type": 1115,
-          "Val": 781,
+          "Val": 839,
           "MinRate": 700
         },
         {
           "Type": 1116,
-          "Val": 734,
+          "Val": 723,
           "MinRate": 700
         },
         {
           "Type": 1117,
-          "Val": 154,
+          "Val": 174,
           "MinRate": 700
         },
         {
           "Type": 1118,
-          "Val": 129,
+          "Val": 152,
           "MinRate": 700
         },
         {
@@ -26564,7 +26565,7 @@
         },
         {
           "Type": 1145,
-          "Val": 177,
+          "Val": 190,
           "MinRate": 700
         },
         {
@@ -26575,69 +26576,69 @@
       ],
       "shipSlot": [
         {
-          "Id": 70190892,
+          "Id": 70192501,
           "Index": 1,
           "Lv": 1
         },
         {
-          "Id": 70190906,
+          "Id": 70192796,
           "Index": 2,
           "Lv": 1
         },
         {
-          "Id": 70190719,
+          "Id": 70192795,
           "Index": 3,
           "Lv": 1
         },
         {
-          "Id": 70190763,
+          "Id": 70192844,
           "Index": 4,
           "Lv": 1
         },
         {
-          "Id": 70190764,
+          "Id": 70192845,
           "Index": 5,
           "Lv": 1
         },
         {
-          "Id": 70190765,
+          "Id": 70192846,
           "Index": 6,
           "Lv": 1
         },
         {
-          "Id": 70190767,
+          "Id": 70192848,
           "Index": 7,
           "Lv": 1
         },
         {
-          "Id": 70190768,
+          "Id": 70192849,
           "Index": 8,
-          "Lv": 1
+          "Lv": 5
         },
         {
-          "Id": 70190781,
+          "Id": 70192862,
           "Index": 9,
           "Lv": 1
         },
         {
-          "Id": 70190802,
+          "Id": 70192883,
           "Index": 10,
           "Lv": 1
         },
         {
-          "Id": 70190807,
+          "Id": 70192888,
           "Index": 11,
           "Lv": 1
         },
         {
-          "Id": 70190807,
+          "Id": 70192888,
           "Index": 12,
-          "Lv": 1
+          "Lv": 10
         },
         {
-          "Id": 70190802,
+          "Id": 70192883,
           "Index": 13,
-          "Lv": 1
+          "Lv": 20
         },
         {
           "Id": 70100846,
@@ -26680,23 +26681,18 @@
           "Lv": 1
         },
         {
-          "Id": 70190949,
+          "Id": 70192855,
           "Index": 22,
           "Lv": 1
         },
         {
-          "Id": 70190774,
+          "Id": 70101634,
           "Index": 23,
           "Lv": 1
         },
         {
-          "Id": 70190894,
+          "Id": 70192855,
           "Index": 24,
-          "Lv": 1
-        },
-        {
-          "Id": 70101634,
-          "Index": 25,
           "Lv": 1
         }
       ],
@@ -31432,87 +31428,87 @@
       "stat": [
         {
           "Type": 1,
-          "Val": 113,
+          "Val": 265,
           "MinRate": 700
         },
         {
           "Type": 2,
-          "Val": 181,
+          "Val": 430,
           "MinRate": 700
         },
         {
           "Type": 3,
-          "Val": 2250,
+          "Val": 5250,
           "MinRate": 700
         },
         {
           "Type": 4,
-          "Val": 274,
+          "Val": 420,
           "MinRate": 700
         },
         {
           "Type": 6,
-          "Val": 117,
+          "Val": 0,
           "MinRate": 700
         },
         {
           "Type": 9,
-          "Val": 79,
+          "Val": 132,
           "MinRate": 700
         },
         {
           "Type": 7,
-          "Val": 170,
+          "Val": 489,
           "MinRate": 700
         },
         {
           "Type": 8,
-          "Val": 468,
+          "Val": 880,
           "MinRate": 700
         },
         {
           "Type": 5,
-          "Val": 40,
+          "Val": 89,
           "MinRate": 700
         },
         {
           "Type": 1002,
-          "Val": 45,
+          "Val": 164,
           "MinRate": 700
         },
         {
           "Type": 1000,
-          "Val": 41,
+          "Val": 98,
           "MinRate": 700
         },
         {
           "Type": 1114,
-          "Val": 298,
+          "Val": 829,
           "MinRate": 700
         },
         {
           "Type": 1115,
-          "Val": 364,
+          "Val": 930,
           "MinRate": 700
         },
         {
           "Type": 1116,
-          "Val": 331,
+          "Val": 690,
           "MinRate": 700
         },
         {
           "Type": 1117,
-          "Val": 87,
+          "Val": 136,
           "MinRate": 700
         },
         {
           "Type": 1118,
-          "Val": 42,
+          "Val": 113,
           "MinRate": 700
         },
         {
           "Type": 11,
-          "Val": 100,
+          "Val": 70,
           "MinRate": 1000
         },
         {
@@ -31522,7 +31518,7 @@
         },
         {
           "Type": 1145,
-          "Val": 138,
+          "Val": 197,
           "MinRate": 700
         },
         {
@@ -31533,122 +31529,122 @@
       ],
       "shipSlot": [
         {
-          "Id": 70103001,
+          "Id": 70192502,
           "Index": 1,
           "Lv": 1
         },
         {
-          "Id": 70103003,
+          "Id": 70192794,
           "Index": 2,
           "Lv": 1
         },
         {
-          "Id": 70103002,
+          "Id": 70192793,
           "Index": 3,
           "Lv": 1
         },
         {
-          "Id": 70103004,
+          "Id": 70192844,
           "Index": 4,
           "Lv": 1
         },
         {
-          "Id": 70103005,
+          "Id": 70192845,
           "Index": 5,
           "Lv": 1
         },
         {
-          "Id": 70103006,
+          "Id": 70192846,
           "Index": 6,
           "Lv": 1
         },
         {
-          "Id": 70103008,
+          "Id": 70192848,
           "Index": 7,
           "Lv": 1
         },
         {
-          "Id": 70103009,
+          "Id": 70192849,
           "Index": 8,
-          "Lv": 1
+          "Lv": 5
         },
         {
-          "Id": 70103012,
+          "Id": 70192862,
           "Index": 9,
           "Lv": 1
         },
         {
-          "Id": 70103012,
+          "Id": 70192883,
           "Index": 10,
-          "Lv": 10
+          "Lv": 1
         },
         {
-          "Id": 70104361,
+          "Id": 70192888,
           "Index": 11,
           "Lv": 1
         },
         {
-          "Id": 70104382,
+          "Id": 70192888,
           "Index": 12,
-          "Lv": 1
+          "Lv": 10
         },
         {
-          "Id": 70104361,
+          "Id": 70192883,
           "Index": 13,
           "Lv": 20
         },
         {
-          "Id": 70104387,
+          "Id": 70100846,
           "Index": 14,
           "Lv": 1
         },
         {
-          "Id": 70104387,
+          "Id": 70100431,
           "Index": 15,
           "Lv": 1
         },
         {
-          "Id": 70100846,
+          "Id": 70100202,
           "Index": 16,
           "Lv": 1
         },
         {
-          "Id": 70100431,
+          "Id": 70100991,
           "Index": 17,
           "Lv": 1
         },
         {
-          "Id": 70100202,
+          "Id": 70100585,
           "Index": 18,
           "Lv": 1
         },
         {
-          "Id": 70100991,
+          "Id": 70100506,
           "Index": 19,
           "Lv": 1
         },
         {
-          "Id": 70100585,
+          "Id": 70101165,
           "Index": 20,
           "Lv": 1
         },
         {
-          "Id": 70100506,
+          "Id": 70169999,
           "Index": 21,
           "Lv": 1
         },
         {
-          "Id": 70101165,
+          "Id": 70192855,
           "Index": 22,
           "Lv": 1
         },
         {
-          "Id": 70169999,
+          "Id": 70101634,
           "Index": 23,
           "Lv": 1
         },
         {
-          "Id": 70101634,
+          "Id": 70192855,
           "Index": 24,
           "Lv": 1
         }
@@ -32792,7 +32788,7 @@
       "shipId": 70000120,
       "blueprintType": 1,
       "isAsia": false,
-      "tier": 31,
+      "tier": 26,
       "masteryAble": true,
       "order": 1,
       "localBitflag": 0,
@@ -32802,14 +32798,14 @@
       "improvedShipblueprintExchangeAbleRate": 0,
       "shipBuildSuccessionTime": 353200,
       "coercionOpenCostType": 100004,
-      "coercionOpenCost": 3100,
+      "coercionOpenCost": 2600,
       "verifyingPointId": 100001,
       "verifyingPointVal": 999999999,
       "relaunchPointId": 100003,
       "relaunchPointValue": 99999,
       "repairShipLife": {
         "PointId": 100003,
-        "PointVal": 62
+        "PointVal": 52
       },
       "materialPublicBpId": 23400011,
       "materialBpId": 23405120,
@@ -32825,22 +32821,22 @@
       "stat": [
         {
           "Type": 1,
-          "Val": 105,
+          "Val": 235,
           "MinRate": 700
         },
         {
           "Type": 2,
-          "Val": 169,
+          "Val": 412,
           "MinRate": 700
         },
         {
           "Type": 3,
-          "Val": 2150,
+          "Val": 5450,
           "MinRate": 700
         },
         {
           "Type": 4,
-          "Val": 286,
+          "Val": 420,
           "MinRate": 700
         },
         {
@@ -32850,62 +32846,62 @@
         },
         {
           "Type": 9,
-          "Val": 86,
+          "Val": 132,
           "MinRate": 700
         },
         {
           "Type": 7,
-          "Val": 250,
+          "Val": 662,
           "MinRate": 700
         },
         {
           "Type": 8,
-          "Val": 495,
+          "Val": 744,
           "MinRate": 700
         },
         {
           "Type": 5,
-          "Val": 49,
+          "Val": 180,
           "MinRate": 700
         },
         {
           "Type": 1002,
-          "Val": 41,
+          "Val": 80,
           "MinRate": 700
         },
         {
           "Type": 1000,
-          "Val": 37,
+          "Val": 105,
           "MinRate": 700
         },
         {
           "Type": 1114,
-          "Val": 364,
+          "Val": 866,
           "MinRate": 700
         },
         {
           "Type": 1115,
-          "Val": 331,
+          "Val": 707,
           "MinRate": 700
         },
         {
           "Type": 1116,
-          "Val": 298,
+          "Val": 785,
           "MinRate": 700
         },
         {
           "Type": 1117,
-          "Val": 87,
+          "Val": 126,
           "MinRate": 700
         },
         {
           "Type": 1118,
-          "Val": 42,
+          "Val": 98,
           "MinRate": 700
         },
         {
           "Type": 11,
-          "Val": 100,
+          "Val": 70,
           "MinRate": 1000
         },
         {
@@ -32915,7 +32911,7 @@
         },
         {
           "Type": 1145,
-          "Val": 145,
+          "Val": 177,
           "MinRate": 700
         },
         {
@@ -32926,122 +32922,122 @@
       ],
       "shipSlot": [
         {
-          "Id": 70103001,
+          "Id": 70192499,
           "Index": 1,
           "Lv": 1
         },
         {
-          "Id": 70103003,
+          "Id": 70192794,
           "Index": 2,
           "Lv": 1
         },
         {
-          "Id": 70103002,
+          "Id": 70192793,
           "Index": 3,
           "Lv": 1
         },
         {
-          "Id": 70103004,
+          "Id": 70192844,
           "Index": 4,
           "Lv": 1
         },
         {
-          "Id": 70103005,
+          "Id": 70192845,
           "Index": 5,
           "Lv": 1
         },
         {
-          "Id": 70103006,
+          "Id": 70192846,
           "Index": 6,
           "Lv": 1
         },
         {
-          "Id": 70103008,
+          "Id": 70192848,
           "Index": 7,
           "Lv": 1
         },
         {
-          "Id": 70103009,
+          "Id": 70192849,
           "Index": 8,
-          "Lv": 1
+          "Lv": 5
         },
         {
-          "Id": 70103012,
+          "Id": 70192862,
           "Index": 9,
           "Lv": 1
         },
         {
-          "Id": 70103012,
+          "Id": 70192883,
           "Index": 10,
-          "Lv": 10
+          "Lv": 1
         },
         {
-          "Id": 70104361,
+          "Id": 70192888,
           "Index": 11,
           "Lv": 1
         },
         {
-          "Id": 70104382,
+          "Id": 70192888,
           "Index": 12,
-          "Lv": 1
+          "Lv": 10
         },
         {
-          "Id": 70104361,
+          "Id": 70192883,
           "Index": 13,
           "Lv": 20
         },
         {
-          "Id": 70104387,
+          "Id": 70100846,
           "Index": 14,
           "Lv": 1
         },
         {
-          "Id": 70104387,
+          "Id": 70100431,
           "Index": 15,
           "Lv": 1
         },
         {
-          "Id": 70100846,
+          "Id": 70100202,
           "Index": 16,
           "Lv": 1
         },
         {
-          "Id": 70100431,
+          "Id": 70100991,
           "Index": 17,
           "Lv": 1
         },
         {
-          "Id": 70100202,
+          "Id": 70100585,
           "Index": 18,
           "Lv": 1
         },
         {
-          "Id": 70100991,
+          "Id": 70100506,
           "Index": 19,
           "Lv": 1
         },
         {
-          "Id": 70100585,
+          "Id": 70101165,
           "Index": 20,
           "Lv": 1
         },
         {
-          "Id": 70100506,
+          "Id": 70169999,
           "Index": 21,
           "Lv": 1
         },
         {
-          "Id": 70101165,
+          "Id": 70192855,
           "Index": 22,
           "Lv": 1
         },
         {
-          "Id": 70169999,
+          "Id": 70101634,
           "Index": 23,
           "Lv": 1
         },
         {
-          "Id": 70101634,
+          "Id": 70192855,
           "Index": 24,
           "Lv": 1
         }
@@ -33061,7 +33057,7 @@
       "shipId": 70000121,
       "blueprintType": 1,
       "isAsia": false,
-      "tier": 26,
+      "tier": 99,
       "masteryAble": true,
       "order": 1,
       "localBitflag": 0,
@@ -33071,14 +33067,14 @@
       "improvedShipblueprintExchangeAbleRate": 0,
       "shipBuildSuccessionTime": 283900,
       "coercionOpenCostType": 100004,
-      "coercionOpenCost": 2600,
+      "coercionOpenCost": 9900,
       "verifyingPointId": 100001,
       "verifyingPointVal": 999999999,
       "relaunchPointId": 100003,
       "relaunchPointValue": 99999,
       "repairShipLife": {
         "PointId": 100003,
-        "PointVal": 52
+        "PointVal": 198
       },
       "materialPublicBpId": 23400011,
       "materialBpId": 23405121,
@@ -33333,7 +33329,7 @@
       "tier": 8,
       "masteryAble": true,
       "order": 5,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 42000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -33589,7 +33585,7 @@
       "tier": 5,
       "masteryAble": true,
       "order": 6,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 15000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -34120,7 +34116,7 @@
       "tier": 12,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 120000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -34378,7 +34374,7 @@
       "shipId": 70000126,
       "blueprintType": 2,
       "isAsia": true,
-      "tier": 29,
+      "tier": 26,
       "masteryAble": true,
       "order": 1,
       "localBitflag": 0,
@@ -34388,14 +34384,14 @@
       "improvedShipblueprintExchangeAbleRate": 0,
       "shipBuildSuccessionTime": 241900,
       "coercionOpenCostType": 100004,
-      "coercionOpenCost": 2900,
+      "coercionOpenCost": 2600,
       "verifyingPointId": 100001,
       "verifyingPointVal": 999999999,
       "relaunchPointId": 100003,
       "relaunchPointValue": 99999,
       "repairShipLife": {
         "PointId": 100003,
-        "PointVal": 58
+        "PointVal": 52
       },
       "materialPublicBpId": 23400011,
       "materialBpId": 23405126,
@@ -34411,22 +34407,22 @@
       "stat": [
         {
           "Type": 1,
-          "Val": 112,
+          "Val": 210,
           "MinRate": 700
         },
         {
           "Type": 2,
-          "Val": 180,
+          "Val": 362,
           "MinRate": 700
         },
         {
           "Type": 3,
-          "Val": 2440,
+          "Val": 5350,
           "MinRate": 700
         },
         {
           "Type": 4,
-          "Val": 309,
+          "Val": 420,
           "MinRate": 700
         },
         {
@@ -34436,62 +34432,62 @@
         },
         {
           "Type": 9,
-          "Val": 92,
+          "Val": 132,
           "MinRate": 700
         },
         {
           "Type": 7,
-          "Val": 215,
+          "Val": 615,
           "MinRate": 700
         },
         {
           "Type": 8,
-          "Val": 595,
+          "Val": 925,
           "MinRate": 700
         },
         {
           "Type": 5,
-          "Val": 49,
+          "Val": 97,
           "MinRate": 700
         },
         {
           "Type": 1002,
-          "Val": 41,
+          "Val": 100,
           "MinRate": 700
         },
         {
           "Type": 1000,
-          "Val": 50,
+          "Val": 175,
           "MinRate": 700
         },
         {
           "Type": 1114,
-          "Val": 364,
+          "Val": 689,
           "MinRate": 700
         },
         {
           "Type": 1115,
-          "Val": 327,
+          "Val": 907,
           "MinRate": 700
         },
         {
           "Type": 1116,
-          "Val": 400,
+          "Val": 888,
           "MinRate": 700
         },
         {
           "Type": 1117,
-          "Val": 96,
+          "Val": 118,
           "MinRate": 700
         },
         {
           "Type": 1118,
-          "Val": 46,
+          "Val": 99,
           "MinRate": 700
         },
         {
           "Type": 11,
-          "Val": 100,
+          "Val": 70,
           "MinRate": 1000
         },
         {
@@ -34501,7 +34497,7 @@
         },
         {
           "Type": 1145,
-          "Val": 145,
+          "Val": 188,
           "MinRate": 700
         },
         {
@@ -34512,122 +34508,122 @@
       ],
       "shipSlot": [
         {
-          "Id": 70103001,
+          "Id": 70192503,
           "Index": 1,
           "Lv": 1
         },
         {
-          "Id": 70103003,
+          "Id": 70192794,
           "Index": 2,
           "Lv": 1
         },
         {
-          "Id": 70103002,
+          "Id": 70192793,
           "Index": 3,
           "Lv": 1
         },
         {
-          "Id": 70103004,
+          "Id": 70192844,
           "Index": 4,
           "Lv": 1
         },
         {
-          "Id": 70103005,
+          "Id": 70192845,
           "Index": 5,
           "Lv": 1
         },
         {
-          "Id": 70103006,
+          "Id": 70192846,
           "Index": 6,
           "Lv": 1
         },
         {
-          "Id": 70103008,
+          "Id": 70192848,
           "Index": 7,
           "Lv": 1
         },
         {
-          "Id": 70103009,
+          "Id": 70192849,
           "Index": 8,
-          "Lv": 1
+          "Lv": 5
         },
         {
-          "Id": 70103012,
+          "Id": 70192862,
           "Index": 9,
           "Lv": 1
         },
         {
-          "Id": 70103012,
+          "Id": 70192883,
           "Index": 10,
-          "Lv": 10
+          "Lv": 1
         },
         {
-          "Id": 70104361,
+          "Id": 70192888,
           "Index": 11,
           "Lv": 1
         },
         {
-          "Id": 70104382,
+          "Id": 70192888,
           "Index": 12,
-          "Lv": 1
+          "Lv": 10
         },
         {
-          "Id": 70104361,
+          "Id": 70192883,
           "Index": 13,
           "Lv": 20
         },
         {
-          "Id": 70104387,
+          "Id": 70100846,
           "Index": 14,
           "Lv": 1
         },
         {
-          "Id": 70104387,
+          "Id": 70100431,
           "Index": 15,
           "Lv": 1
         },
         {
-          "Id": 70100846,
+          "Id": 70100202,
           "Index": 16,
           "Lv": 1
         },
         {
-          "Id": 70100431,
+          "Id": 70100991,
           "Index": 17,
           "Lv": 1
         },
         {
-          "Id": 70100202,
+          "Id": 70100585,
           "Index": 18,
           "Lv": 1
         },
         {
-          "Id": 70100991,
+          "Id": 70100506,
           "Index": 19,
           "Lv": 1
         },
         {
-          "Id": 70100585,
+          "Id": 70101165,
           "Index": 20,
           "Lv": 1
         },
         {
-          "Id": 70100506,
+          "Id": 70169999,
           "Index": 21,
           "Lv": 1
         },
         {
-          "Id": 70101165,
+          "Id": 70192855,
           "Index": 22,
           "Lv": 1
         },
         {
-          "Id": 70169999,
+          "Id": 70101634,
           "Index": 23,
           "Lv": 1
         },
         {
-          "Id": 70101634,
+          "Id": 70192855,
           "Index": 24,
           "Lv": 1
         }
@@ -34927,7 +34923,7 @@
       "shipId": 70000150,
       "blueprintType": 2,
       "isAsia": true,
-      "tier": 26,
+      "tier": 99,
       "masteryAble": true,
       "order": 1,
       "localBitflag": 0,
@@ -34937,14 +34933,14 @@
       "improvedShipblueprintExchangeAbleRate": 0,
       "shipBuildSuccessionTime": 329300,
       "coercionOpenCostType": 100004,
-      "coercionOpenCost": 2600,
+      "coercionOpenCost": 9900,
       "verifyingPointId": 100001,
       "verifyingPointVal": 999999999,
       "relaunchPointId": 100003,
       "relaunchPointValue": 99999,
       "repairShipLife": {
         "PointId": 100003,
-        "PointVal": 52
+        "PointVal": 198
       },
       "materialPublicBpId": 23400011,
       "materialBpId": 23405128,
@@ -37946,7 +37942,7 @@
       "shipId": 70000181,
       "blueprintType": 2,
       "isAsia": true,
-      "tier": 27,
+      "tier": 26,
       "masteryAble": true,
       "order": 1,
       "localBitflag": 0,
@@ -37956,14 +37952,14 @@
       "improvedShipblueprintExchangeAbleRate": 0,
       "shipBuildSuccessionTime": 283900,
       "coercionOpenCostType": 100004,
-      "coercionOpenCost": 2700,
+      "coercionOpenCost": 2600,
       "verifyingPointId": 100001,
       "verifyingPointVal": 999999999,
       "relaunchPointId": 100003,
       "relaunchPointValue": 99999,
       "repairShipLife": {
         "PointId": 100003,
-        "PointVal": 54
+        "PointVal": 52
       },
       "materialPublicBpId": 23400011,
       "materialBpId": 23405211,
@@ -37979,22 +37975,22 @@
       "stat": [
         {
           "Type": 1,
-          "Val": 98,
+          "Val": 135,
           "MinRate": 700
         },
         {
           "Type": 2,
-          "Val": 165,
+          "Val": 540,
           "MinRate": 700
         },
         {
           "Type": 3,
-          "Val": 2010,
+          "Val": 5400,
           "MinRate": 700
         },
         {
           "Type": 4,
-          "Val": 291,
+          "Val": 510,
           "MinRate": 700
         },
         {
@@ -38004,62 +38000,62 @@
         },
         {
           "Type": 9,
-          "Val": 99,
+          "Val": 142,
           "MinRate": 700
         },
         {
           "Type": 7,
-          "Val": 748,
+          "Val": 987,
           "MinRate": 700
         },
         {
           "Type": 8,
-          "Val": 218,
+          "Val": 831,
           "MinRate": 700
         },
         {
           "Type": 5,
-          "Val": 41,
+          "Val": 87,
           "MinRate": 700
         },
         {
           "Type": 1002,
-          "Val": 39,
+          "Val": 91,
           "MinRate": 700
         },
         {
           "Type": 1000,
-          "Val": 39,
+          "Val": 93,
           "MinRate": 700
         },
         {
           "Type": 1114,
-          "Val": 316,
+          "Val": 736,
           "MinRate": 700
         },
         {
           "Type": 1115,
-          "Val": 316,
+          "Val": 805,
           "MinRate": 700
         },
         {
           "Type": 1116,
-          "Val": 316,
+          "Val": 701,
           "MinRate": 700
         },
         {
           "Type": 1117,
-          "Val": 83,
+          "Val": 175,
           "MinRate": 700
         },
         {
           "Type": 1118,
-          "Val": 43,
+          "Val": 160,
           "MinRate": 700
         },
         {
           "Type": 11,
-          "Val": 100,
+          "Val": 70,
           "MinRate": 1000
         },
         {
@@ -38069,7 +38065,7 @@
         },
         {
           "Type": 1145,
-          "Val": 157,
+          "Val": 186,
           "MinRate": 700
         },
         {
@@ -38080,122 +38076,122 @@
       ],
       "shipSlot": [
         {
-          "Id": 70103001,
+          "Id": 70192500,
           "Index": 1,
           "Lv": 1
         },
         {
-          "Id": 70103003,
+          "Id": 70192798,
           "Index": 2,
           "Lv": 1
         },
         {
-          "Id": 70103002,
+          "Id": 70192797,
           "Index": 3,
           "Lv": 1
         },
         {
-          "Id": 70103004,
+          "Id": 70192844,
           "Index": 4,
           "Lv": 1
         },
         {
-          "Id": 70103005,
+          "Id": 70192845,
           "Index": 5,
           "Lv": 1
         },
         {
-          "Id": 70103006,
+          "Id": 70192846,
           "Index": 6,
           "Lv": 1
         },
         {
-          "Id": 70103008,
+          "Id": 70192848,
           "Index": 7,
           "Lv": 1
         },
         {
-          "Id": 70103009,
+          "Id": 70192849,
           "Index": 8,
-          "Lv": 1
+          "Lv": 5
         },
         {
-          "Id": 70103012,
+          "Id": 70192862,
           "Index": 9,
           "Lv": 1
         },
         {
-          "Id": 70103012,
+          "Id": 70192883,
           "Index": 10,
-          "Lv": 10
+          "Lv": 1
         },
         {
-          "Id": 70104361,
+          "Id": 70192888,
           "Index": 11,
           "Lv": 1
         },
         {
-          "Id": 70104382,
+          "Id": 70192888,
           "Index": 12,
-          "Lv": 1
+          "Lv": 10
         },
         {
-          "Id": 70104361,
+          "Id": 70192883,
           "Index": 13,
           "Lv": 20
         },
         {
-          "Id": 70104387,
+          "Id": 70100846,
           "Index": 14,
           "Lv": 1
         },
         {
-          "Id": 70104387,
+          "Id": 70100431,
           "Index": 15,
           "Lv": 1
         },
         {
-          "Id": 70100846,
+          "Id": 70100202,
           "Index": 16,
           "Lv": 1
         },
         {
-          "Id": 70100431,
+          "Id": 70100991,
           "Index": 17,
           "Lv": 1
         },
         {
-          "Id": 70100202,
+          "Id": 70100585,
           "Index": 18,
           "Lv": 1
         },
         {
-          "Id": 70100991,
+          "Id": 70100506,
           "Index": 19,
           "Lv": 1
         },
         {
-          "Id": 70100585,
+          "Id": 70101165,
           "Index": 20,
           "Lv": 1
         },
         {
-          "Id": 70100506,
+          "Id": 70169999,
           "Index": 21,
           "Lv": 1
         },
         {
-          "Id": 70101165,
+          "Id": 70192855,
           "Index": 22,
           "Lv": 1
         },
         {
-          "Id": 70169999,
+          "Id": 70101634,
           "Index": 23,
           "Lv": 1
         },
         {
-          "Id": 70101634,
+          "Id": 70192855,
           "Index": 24,
           "Lv": 1
         }
@@ -39033,7 +39029,7 @@
       "tier": 11,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 84000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -39294,7 +39290,7 @@
       "tier": 11,
       "masteryAble": true,
       "order": 5,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 84000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -39555,7 +39551,7 @@
       "tier": 12,
       "masteryAble": true,
       "order": 5,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 120000,
       "exchangeAbleRate": 1000,
       "unconditionalExchangeAbleRate": 0,
@@ -46249,7 +46245,7 @@
       "tier": 1,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 600,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -46493,7 +46489,7 @@
       "tier": 2,
       "masteryAble": true,
       "order": 1,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 2400,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -49083,7 +49079,7 @@
       "tier": 3,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 4800,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -49342,7 +49338,7 @@
       "tier": 4,
       "masteryAble": true,
       "order": 1,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 8800,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -50378,7 +50374,7 @@
       "tier": 5,
       "masteryAble": true,
       "order": 1,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 15000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -51703,7 +51699,7 @@
       "tier": 5,
       "masteryAble": true,
       "order": 6,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 15000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -52231,7 +52227,7 @@
       "tier": 6,
       "masteryAble": true,
       "order": 2,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 21000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -52490,7 +52486,7 @@
       "tier": 6,
       "masteryAble": true,
       "order": 3,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 21000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -53287,7 +53283,7 @@
       "tier": 7,
       "masteryAble": true,
       "order": 1,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 29400,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -53546,7 +53542,7 @@
       "tier": 7,
       "masteryAble": true,
       "order": 2,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 29400,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -55419,7 +55415,7 @@
       "tier": 8,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 42000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -55688,7 +55684,7 @@
       "tier": 8,
       "masteryAble": true,
       "order": 5,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 42000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -56490,7 +56486,7 @@
       "tier": 9,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 54000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -56759,7 +56755,7 @@
       "tier": 9,
       "masteryAble": true,
       "order": 5,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 54000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -57297,7 +57293,7 @@
       "tier": 10,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 72000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -58393,7 +58389,7 @@
       "tier": 10,
       "masteryAble": true,
       "order": 5,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 72000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -63684,7 +63680,7 @@
       "tier": 11,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 84000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -63953,7 +63949,7 @@
       "tier": 11,
       "masteryAble": true,
       "order": 5,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 84000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -65029,7 +65025,7 @@
       "tier": 12,
       "masteryAble": true,
       "order": 4,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 120000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -65298,7 +65294,7 @@
       "tier": 12,
       "masteryAble": true,
       "order": 5,
-      "localBitflag": 27,
+      "localBitflag": 219,
       "shipBuildTime": 120000,
       "exchangeAbleRate": 100,
       "unconditionalExchangeAbleRate": 0,
@@ -71119,7 +71115,7 @@
       "shipId": 70000296,
       "blueprintType": 4,
       "isAsia": false,
-      "tier": 23,
+      "tier": 26,
       "masteryAble": true,
       "order": 1,
       "localBitflag": 0,
@@ -71129,14 +71125,14 @@
       "improvedShipblueprintExchangeAbleRate": 1000,
       "shipBuildSuccessionTime": 210600,
       "coercionOpenCostType": 100004,
-      "coercionOpenCost": 2300,
+      "coercionOpenCost": 2600,
       "verifyingPointId": 100001,
       "verifyingPointVal": 999999999,
       "relaunchPointId": 100003,
       "relaunchPointValue": 199998,
       "repairShipLife": {
         "PointId": 100003,
-        "PointVal": 92
+        "PointVal": 104
       },
       "materialPublicBpId": 23400011,
       "materialBpVal": 0,
@@ -71167,22 +71163,22 @@
       "stat": [
         {
           "Type": 1,
-          "Val": 105,
+          "Val": 192,
           "MinRate": 700
         },
         {
           "Type": 2,
-          "Val": 169,
+          "Val": 340,
           "MinRate": 700
         },
         {
           "Type": 3,
-          "Val": 2150,
+          "Val": 5300,
           "MinRate": 700
         },
         {
           "Type": 4,
-          "Val": 266,
+          "Val": 555,
           "MinRate": 700
         },
         {
@@ -71192,57 +71188,57 @@
         },
         {
           "Type": 9,
-          "Val": 75,
+          "Val": 138,
           "MinRate": 700
         },
         {
           "Type": 7,
-          "Val": 239,
+          "Val": 1018,
           "MinRate": 700
         },
         {
           "Type": 8,
-          "Val": 474,
+          "Val": 434,
           "MinRate": 700
         },
         {
           "Type": 5,
-          "Val": 49,
+          "Val": 85,
           "MinRate": 700
         },
         {
           "Type": 1002,
-          "Val": 41,
+          "Val": 96,
           "MinRate": 700
         },
         {
           "Type": 1000,
-          "Val": 37,
+          "Val": 88,
           "MinRate": 700
         },
         {
           "Type": 1114,
-          "Val": 364,
+          "Val": 773,
           "MinRate": 700
         },
         {
           "Type": 1115,
-          "Val": 331,
+          "Val": 839,
           "MinRate": 700
         },
         {
           "Type": 1116,
-          "Val": 298,
+          "Val": 723,
           "MinRate": 700
         },
         {
           "Type": 1117,
-          "Val": 87,
+          "Val": 174,
           "MinRate": 700
         },
         {
           "Type": 1118,
-          "Val": 42,
+          "Val": 152,
           "MinRate": 700
         },
         {
@@ -71257,7 +71253,7 @@
         },
         {
           "Type": 1145,
-          "Val": 122,
+          "Val": 190,
           "MinRate": 700
         },
         {
@@ -71268,67 +71264,67 @@
       ],
       "shipSlot": [
         {
-          "Id": 70103001,
+          "Id": 70192501,
           "Index": 1,
           "Lv": 1
         },
         {
-          "Id": 70103003,
+          "Id": 70192810,
           "Index": 2,
           "Lv": 1
         },
         {
-          "Id": 70103002,
+          "Id": 70192810,
           "Index": 3,
           "Lv": 1
         },
         {
-          "Id": 70103004,
+          "Id": 70192844,
           "Index": 4,
           "Lv": 1
         },
         {
-          "Id": 70103005,
+          "Id": 70192845,
           "Index": 5,
           "Lv": 1
         },
         {
-          "Id": 70103006,
+          "Id": 70192846,
           "Index": 6,
           "Lv": 1
         },
         {
-          "Id": 70103008,
+          "Id": 70192848,
           "Index": 7,
           "Lv": 1
         },
         {
-          "Id": 70103009,
+          "Id": 70192849,
           "Index": 8,
           "Lv": 1
         },
         {
-          "Id": 70103012,
+          "Id": 70192862,
           "Index": 9,
           "Lv": 1
         },
         {
-          "Id": 70104241,
+          "Id": 70192883,
           "Index": 10,
           "Lv": 1
         },
         {
-          "Id": 70104262,
+          "Id": 70192888,
           "Index": 11,
           "Lv": 1
         },
         {
-          "Id": 70104267,
+          "Id": 70192888,
           "Index": 12,
           "Lv": 1
         },
         {
-          "Id": 70104267,
+          "Id": 70192883,
           "Index": 13,
           "Lv": 1
         },
@@ -71373,8 +71369,23 @@
           "Lv": 1
         },
         {
-          "Id": 70101634,
+          "Id": 70192810,
           "Index": 22,
+          "Lv": 1
+        },
+        {
+          "Id": 70192855,
+          "Index": 23,
+          "Lv": 1
+        },
+        {
+          "Id": 70101634,
+          "Index": 24,
+          "Lv": 1
+        },
+        {
+          "Id": 70192855,
+          "Index": 25,
           "Lv": 1
         }
       ],
@@ -76463,87 +76474,87 @@
       "stat": [
         {
           "Type": 1,
-          "Val": 113,
+          "Val": 265,
           "MinRate": 700
         },
         {
           "Type": 2,
-          "Val": 181,
+          "Val": 430,
           "MinRate": 700
         },
         {
           "Type": 3,
-          "Val": 2250,
+          "Val": 5250,
           "MinRate": 700
         },
         {
           "Type": 4,
-          "Val": 274,
+          "Val": 420,
           "MinRate": 700
         },
         {
           "Type": 6,
-          "Val": 117,
+          "Val": 0,
           "MinRate": 700
         },
         {
           "Type": 9,
-          "Val": 79,
+          "Val": 132,
           "MinRate": 700
         },
         {
           "Type": 7,
-          "Val": 170,
+          "Val": 489,
           "MinRate": 700
         },
         {
           "Type": 8,
-          "Val": 468,
+          "Val": 880,
           "MinRate": 700
         },
         {
           "Type": 5,
-          "Val": 40,
+          "Val": 89,
           "MinRate": 700
         },
         {
           "Type": 1002,
-          "Val": 45,
+          "Val": 164,
           "MinRate": 700
         },
         {
           "Type": 1000,
-          "Val": 41,
+          "Val": 98,
           "MinRate": 700
         },
         {
           "Type": 1114,
-          "Val": 298,
+          "Val": 829,
           "MinRate": 700
         },
         {
           "Type": 1115,
-          "Val": 364,
+          "Val": 930,
           "MinRate": 700
         },
         {
           "Type": 1116,
-          "Val": 331,
+          "Val": 690,
           "MinRate": 700
         },
         {
           "Type": 1117,
-          "Val": 87,
+          "Val": 136,
           "MinRate": 700
         },
         {
           "Type": 1118,
-          "Val": 42,
+          "Val": 113,
           "MinRate": 700
         },
         {
           "Type": 11,
-          "Val": 100,
+          "Val": 70,
           "MinRate": 1000
         },
         {
@@ -76553,7 +76564,7 @@
         },
         {
           "Type": 1145,
-          "Val": 138,
+          "Val": 197,
           "MinRate": 700
         },
         {
@@ -76564,123 +76575,128 @@
       ],
       "shipSlot": [
         {
-          "Id": 70103001,
+          "Id": 70192502,
           "Index": 1,
           "Lv": 1
         },
         {
-          "Id": 70103003,
+          "Id": 70192801,
           "Index": 2,
           "Lv": 1
         },
         {
-          "Id": 70103002,
+          "Id": 70192801,
           "Index": 3,
           "Lv": 1
         },
         {
-          "Id": 70103004,
+          "Id": 70192844,
           "Index": 4,
           "Lv": 1
         },
         {
-          "Id": 70103005,
+          "Id": 70192845,
           "Index": 5,
           "Lv": 1
         },
         {
-          "Id": 70103006,
+          "Id": 70192846,
           "Index": 6,
           "Lv": 1
         },
         {
-          "Id": 70103008,
+          "Id": 70192848,
           "Index": 7,
           "Lv": 1
         },
         {
-          "Id": 70103009,
+          "Id": 70192849,
           "Index": 8,
           "Lv": 1
         },
         {
-          "Id": 70103012,
+          "Id": 70192862,
           "Index": 9,
           "Lv": 1
         },
         {
-          "Id": 70103012,
+          "Id": 70192883,
           "Index": 10,
           "Lv": 1
         },
         {
-          "Id": 70104361,
+          "Id": 70192888,
           "Index": 11,
           "Lv": 1
         },
         {
-          "Id": 70104382,
+          "Id": 70192888,
           "Index": 12,
           "Lv": 1
         },
         {
-          "Id": 70104361,
+          "Id": 70192883,
           "Index": 13,
           "Lv": 1
         },
         {
-          "Id": 70104387,
+          "Id": 70100846,
           "Index": 14,
           "Lv": 1
         },
         {
-          "Id": 70104387,
+          "Id": 70100431,
           "Index": 15,
           "Lv": 1
         },
         {
-          "Id": 70100846,
+          "Id": 70100202,
           "Index": 16,
           "Lv": 1
         },
         {
-          "Id": 70100431,
+          "Id": 70100991,
           "Index": 17,
           "Lv": 1
         },
         {
-          "Id": 70100202,
+          "Id": 70100585,
           "Index": 18,
           "Lv": 1
         },
         {
-          "Id": 70100991,
+          "Id": 70100506,
           "Index": 19,
           "Lv": 1
         },
         {
-          "Id": 70100585,
+          "Id": 70101165,
           "Index": 20,
           "Lv": 1
         },
         {
-          "Id": 70100506,
+          "Id": 70169999,
           "Index": 21,
           "Lv": 1
         },
         {
-          "Id": 70101165,
+          "Id": 70192801,
           "Index": 22,
           "Lv": 1
         },
         {
-          "Id": 70169999,
+          "Id": 70192855,
           "Index": 23,
           "Lv": 1
         },
         {
           "Id": 70101634,
           "Index": 24,
+          "Lv": 1
+        },
+        {
+          "Id": 70192855,
+          "Index": 25,
           "Lv": 1
         }
       ],
@@ -77820,275 +77836,6 @@
       "shipId": 70000320,
       "blueprintType": 4,
       "isAsia": false,
-      "tier": 31,
-      "masteryAble": true,
-      "order": 1,
-      "localBitflag": 0,
-      "shipBuildTime": 612400,
-      "exchangeAbleRate": 100,
-      "unconditionalExchangeAbleRate": 0,
-      "improvedShipblueprintExchangeAbleRate": 1000,
-      "shipBuildSuccessionTime": 306200,
-      "coercionOpenCostType": 100004,
-      "coercionOpenCost": 3100,
-      "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
-      "relaunchPointId": 100003,
-      "relaunchPointValue": 199998,
-      "repairShipLife": {
-        "PointId": 100003,
-        "PointVal": 124
-      },
-      "materialPublicBpId": 23400011,
-      "materialBpVal": 0,
-      "materialShipId": 70000120,
-      "materialItem": [
-        {
-          "Id": 23610003,
-          "Val": 0,
-          "SVal": 0
-        }
-      ],
-      "forbiddenActionType": 0,
-      "stat": [
-        {
-          "Type": 1,
-          "Val": 105,
-          "MinRate": 700
-        },
-        {
-          "Type": 2,
-          "Val": 169,
-          "MinRate": 700
-        },
-        {
-          "Type": 3,
-          "Val": 2150,
-          "MinRate": 700
-        },
-        {
-          "Type": 4,
-          "Val": 286,
-          "MinRate": 700
-        },
-        {
-          "Type": 6,
-          "Val": 0,
-          "MinRate": 700
-        },
-        {
-          "Type": 9,
-          "Val": 86,
-          "MinRate": 700
-        },
-        {
-          "Type": 7,
-          "Val": 250,
-          "MinRate": 700
-        },
-        {
-          "Type": 8,
-          "Val": 495,
-          "MinRate": 700
-        },
-        {
-          "Type": 5,
-          "Val": 49,
-          "MinRate": 700
-        },
-        {
-          "Type": 1002,
-          "Val": 41,
-          "MinRate": 700
-        },
-        {
-          "Type": 1000,
-          "Val": 37,
-          "MinRate": 700
-        },
-        {
-          "Type": 1114,
-          "Val": 364,
-          "MinRate": 700
-        },
-        {
-          "Type": 1115,
-          "Val": 331,
-          "MinRate": 700
-        },
-        {
-          "Type": 1116,
-          "Val": 298,
-          "MinRate": 700
-        },
-        {
-          "Type": 1117,
-          "Val": 87,
-          "MinRate": 700
-        },
-        {
-          "Type": 1118,
-          "Val": 42,
-          "MinRate": 700
-        },
-        {
-          "Type": 11,
-          "Val": 100,
-          "MinRate": 1000
-        },
-        {
-          "Type": 12,
-          "Val": 10,
-          "MinRate": 700
-        },
-        {
-          "Type": 1145,
-          "Val": 145,
-          "MinRate": 700
-        },
-        {
-          "Type": 108,
-          "Val": 0,
-          "MinRate": 700
-        }
-      ],
-      "shipSlot": [
-        {
-          "Id": 70103001,
-          "Index": 1,
-          "Lv": 1
-        },
-        {
-          "Id": 70103003,
-          "Index": 2,
-          "Lv": 1
-        },
-        {
-          "Id": 70103002,
-          "Index": 3,
-          "Lv": 1
-        },
-        {
-          "Id": 70103004,
-          "Index": 4,
-          "Lv": 1
-        },
-        {
-          "Id": 70103005,
-          "Index": 5,
-          "Lv": 1
-        },
-        {
-          "Id": 70103006,
-          "Index": 6,
-          "Lv": 1
-        },
-        {
-          "Id": 70103008,
-          "Index": 7,
-          "Lv": 1
-        },
-        {
-          "Id": 70103009,
-          "Index": 8,
-          "Lv": 1
-        },
-        {
-          "Id": 70103012,
-          "Index": 9,
-          "Lv": 1
-        },
-        {
-          "Id": 70103012,
-          "Index": 10,
-          "Lv": 1
-        },
-        {
-          "Id": 70104361,
-          "Index": 11,
-          "Lv": 1
-        },
-        {
-          "Id": 70104382,
-          "Index": 12,
-          "Lv": 1
-        },
-        {
-          "Id": 70104361,
-          "Index": 13,
-          "Lv": 1
-        },
-        {
-          "Id": 70104387,
-          "Index": 14,
-          "Lv": 1
-        },
-        {
-          "Id": 70104387,
-          "Index": 15,
-          "Lv": 1
-        },
-        {
-          "Id": 70100846,
-          "Index": 16,
-          "Lv": 1
-        },
-        {
-          "Id": 70100431,
-          "Index": 17,
-          "Lv": 1
-        },
-        {
-          "Id": 70100202,
-          "Index": 18,
-          "Lv": 1
-        },
-        {
-          "Id": 70100991,
-          "Index": 19,
-          "Lv": 1
-        },
-        {
-          "Id": 70100585,
-          "Index": 20,
-          "Lv": 1
-        },
-        {
-          "Id": 70100506,
-          "Index": 21,
-          "Lv": 1
-        },
-        {
-          "Id": 70101165,
-          "Index": 22,
-          "Lv": 1
-        },
-        {
-          "Id": 70169999,
-          "Index": 23,
-          "Lv": 1
-        },
-        {
-          "Id": 70101634,
-          "Index": 24,
-          "Lv": 1
-        }
-      ],
-      "maxLevelShipFlag": "Ship_Flag_MayorCondition",
-      "fixedStat": [
-        {
-          "Type": 1004,
-          "Val": 5
-        }
-      ],
-      "resetAble": false,
-      "isGold": false
-    },
-    "70270130": {
-      "id": 70270130,
-      "shipId": 70000321,
-      "blueprintType": 4,
-      "isAsia": false,
       "tier": 26,
       "masteryAble": true,
       "order": 1,
@@ -78107,6 +77854,280 @@
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 104
+      },
+      "materialPublicBpId": 23400011,
+      "materialBpVal": 0,
+      "materialShipId": 70000120,
+      "materialItem": [
+        {
+          "Id": 23610003,
+          "Val": 0,
+          "SVal": 0
+        }
+      ],
+      "forbiddenActionType": 0,
+      "stat": [
+        {
+          "Type": 1,
+          "Val": 235,
+          "MinRate": 700
+        },
+        {
+          "Type": 2,
+          "Val": 412,
+          "MinRate": 700
+        },
+        {
+          "Type": 3,
+          "Val": 5450,
+          "MinRate": 700
+        },
+        {
+          "Type": 4,
+          "Val": 420,
+          "MinRate": 700
+        },
+        {
+          "Type": 6,
+          "Val": 0,
+          "MinRate": 700
+        },
+        {
+          "Type": 9,
+          "Val": 132,
+          "MinRate": 700
+        },
+        {
+          "Type": 7,
+          "Val": 662,
+          "MinRate": 700
+        },
+        {
+          "Type": 8,
+          "Val": 744,
+          "MinRate": 700
+        },
+        {
+          "Type": 5,
+          "Val": 180,
+          "MinRate": 700
+        },
+        {
+          "Type": 1002,
+          "Val": 80,
+          "MinRate": 700
+        },
+        {
+          "Type": 1000,
+          "Val": 105,
+          "MinRate": 700
+        },
+        {
+          "Type": 1114,
+          "Val": 866,
+          "MinRate": 700
+        },
+        {
+          "Type": 1115,
+          "Val": 707,
+          "MinRate": 700
+        },
+        {
+          "Type": 1116,
+          "Val": 785,
+          "MinRate": 700
+        },
+        {
+          "Type": 1117,
+          "Val": 126,
+          "MinRate": 700
+        },
+        {
+          "Type": 1118,
+          "Val": 98,
+          "MinRate": 700
+        },
+        {
+          "Type": 11,
+          "Val": 70,
+          "MinRate": 1000
+        },
+        {
+          "Type": 12,
+          "Val": 10,
+          "MinRate": 700
+        },
+        {
+          "Type": 1145,
+          "Val": 177,
+          "MinRate": 700
+        },
+        {
+          "Type": 108,
+          "Val": 0,
+          "MinRate": 700
+        }
+      ],
+      "shipSlot": [
+        {
+          "Id": 70192499,
+          "Index": 1,
+          "Lv": 1
+        },
+        {
+          "Id": 70192800,
+          "Index": 2,
+          "Lv": 1
+        },
+        {
+          "Id": 70192800,
+          "Index": 3,
+          "Lv": 1
+        },
+        {
+          "Id": 70192844,
+          "Index": 4,
+          "Lv": 1
+        },
+        {
+          "Id": 70192845,
+          "Index": 5,
+          "Lv": 1
+        },
+        {
+          "Id": 70192846,
+          "Index": 6,
+          "Lv": 1
+        },
+        {
+          "Id": 70192848,
+          "Index": 7,
+          "Lv": 1
+        },
+        {
+          "Id": 70192849,
+          "Index": 8,
+          "Lv": 1
+        },
+        {
+          "Id": 70192862,
+          "Index": 9,
+          "Lv": 1
+        },
+        {
+          "Id": 70192883,
+          "Index": 10,
+          "Lv": 1
+        },
+        {
+          "Id": 70192888,
+          "Index": 11,
+          "Lv": 1
+        },
+        {
+          "Id": 70192888,
+          "Index": 12,
+          "Lv": 1
+        },
+        {
+          "Id": 70192883,
+          "Index": 13,
+          "Lv": 1
+        },
+        {
+          "Id": 70100846,
+          "Index": 14,
+          "Lv": 1
+        },
+        {
+          "Id": 70100431,
+          "Index": 15,
+          "Lv": 1
+        },
+        {
+          "Id": 70100202,
+          "Index": 16,
+          "Lv": 1
+        },
+        {
+          "Id": 70100991,
+          "Index": 17,
+          "Lv": 1
+        },
+        {
+          "Id": 70100585,
+          "Index": 18,
+          "Lv": 1
+        },
+        {
+          "Id": 70100506,
+          "Index": 19,
+          "Lv": 1
+        },
+        {
+          "Id": 70101165,
+          "Index": 20,
+          "Lv": 1
+        },
+        {
+          "Id": 70169999,
+          "Index": 21,
+          "Lv": 1
+        },
+        {
+          "Id": 70192800,
+          "Index": 22,
+          "Lv": 1
+        },
+        {
+          "Id": 70192855,
+          "Index": 23,
+          "Lv": 1
+        },
+        {
+          "Id": 70101634,
+          "Index": 24,
+          "Lv": 1
+        },
+        {
+          "Id": 70192855,
+          "Index": 25,
+          "Lv": 1
+        }
+      ],
+      "maxLevelShipFlag": "Ship_Flag_MayorCondition",
+      "fixedStat": [
+        {
+          "Type": 1004,
+          "Val": 5
+        }
+      ],
+      "resetAble": false,
+      "isGold": false
+    },
+    "70270130": {
+      "id": 70270130,
+      "shipId": 70000321,
+      "blueprintType": 4,
+      "isAsia": false,
+      "tier": 99,
+      "masteryAble": true,
+      "order": 1,
+      "localBitflag": 0,
+      "shipBuildTime": 612400,
+      "exchangeAbleRate": 100,
+      "unconditionalExchangeAbleRate": 0,
+      "improvedShipblueprintExchangeAbleRate": 1000,
+      "shipBuildSuccessionTime": 306200,
+      "coercionOpenCostType": 100004,
+      "coercionOpenCost": 9900,
+      "verifyingPointId": 100001,
+      "verifyingPointVal": 999999999,
+      "relaunchPointId": 100003,
+      "relaunchPointValue": 199998,
+      "repairShipLife": {
+        "PointId": 100003,
+        "PointVal": 396
       },
       "materialPublicBpId": 23400011,
       "materialBpVal": 0,
@@ -79479,7 +79500,7 @@
       "shipId": 70000326,
       "blueprintType": 5,
       "isAsia": true,
-      "tier": 29,
+      "tier": 26,
       "masteryAble": true,
       "order": 1,
       "localBitflag": 0,
@@ -79489,14 +79510,14 @@
       "improvedShipblueprintExchangeAbleRate": 1000,
       "shipBuildSuccessionTime": 353200,
       "coercionOpenCostType": 100004,
-      "coercionOpenCost": 2900,
+      "coercionOpenCost": 2600,
       "verifyingPointId": 100001,
       "verifyingPointVal": 999999999,
       "relaunchPointId": 100003,
       "relaunchPointValue": 199998,
       "repairShipLife": {
         "PointId": 100003,
-        "PointVal": 116
+        "PointVal": 104
       },
       "materialPublicBpId": 23400011,
       "materialBpVal": 0,
@@ -79512,22 +79533,22 @@
       "stat": [
         {
           "Type": 1,
-          "Val": 112,
+          "Val": 210,
           "MinRate": 700
         },
         {
           "Type": 2,
-          "Val": 180,
+          "Val": 362,
           "MinRate": 700
         },
         {
           "Type": 3,
-          "Val": 2440,
+          "Val": 5350,
           "MinRate": 700
         },
         {
           "Type": 4,
-          "Val": 309,
+          "Val": 420,
           "MinRate": 700
         },
         {
@@ -79537,62 +79558,62 @@
         },
         {
           "Type": 9,
-          "Val": 92,
+          "Val": 132,
           "MinRate": 700
         },
         {
           "Type": 7,
-          "Val": 215,
+          "Val": 615,
           "MinRate": 700
         },
         {
           "Type": 8,
-          "Val": 595,
+          "Val": 925,
           "MinRate": 700
         },
         {
           "Type": 5,
-          "Val": 49,
+          "Val": 97,
           "MinRate": 700
         },
         {
           "Type": 1002,
-          "Val": 41,
+          "Val": 100,
           "MinRate": 700
         },
         {
           "Type": 1000,
-          "Val": 50,
+          "Val": 175,
           "MinRate": 700
         },
         {
           "Type": 1114,
-          "Val": 364,
+          "Val": 689,
           "MinRate": 700
         },
         {
           "Type": 1115,
-          "Val": 327,
+          "Val": 907,
           "MinRate": 700
         },
         {
           "Type": 1116,
-          "Val": 400,
+          "Val": 888,
           "MinRate": 700
         },
         {
           "Type": 1117,
-          "Val": 96,
+          "Val": 118,
           "MinRate": 700
         },
         {
           "Type": 1118,
-          "Val": 46,
+          "Val": 99,
           "MinRate": 700
         },
         {
           "Type": 11,
-          "Val": 100,
+          "Val": 70,
           "MinRate": 1000
         },
         {
@@ -79602,7 +79623,7 @@
         },
         {
           "Type": 1145,
-          "Val": 145,
+          "Val": 188,
           "MinRate": 700
         },
         {
@@ -79613,123 +79634,128 @@
       ],
       "shipSlot": [
         {
-          "Id": 70103001,
+          "Id": 70192503,
           "Index": 1,
           "Lv": 1
         },
         {
-          "Id": 70103003,
+          "Id": 70192802,
           "Index": 2,
           "Lv": 1
         },
         {
-          "Id": 70103002,
+          "Id": 70192802,
           "Index": 3,
           "Lv": 1
         },
         {
-          "Id": 70103004,
+          "Id": 70192844,
           "Index": 4,
           "Lv": 1
         },
         {
-          "Id": 70103005,
+          "Id": 70192845,
           "Index": 5,
           "Lv": 1
         },
         {
-          "Id": 70103006,
+          "Id": 70192846,
           "Index": 6,
           "Lv": 1
         },
         {
-          "Id": 70103008,
+          "Id": 70192848,
           "Index": 7,
           "Lv": 1
         },
         {
-          "Id": 70103009,
+          "Id": 70192849,
           "Index": 8,
           "Lv": 1
         },
         {
-          "Id": 70103012,
+          "Id": 70192862,
           "Index": 9,
           "Lv": 1
         },
         {
-          "Id": 70103012,
+          "Id": 70192883,
           "Index": 10,
           "Lv": 1
         },
         {
-          "Id": 70104361,
+          "Id": 70192888,
           "Index": 11,
           "Lv": 1
         },
         {
-          "Id": 70104382,
+          "Id": 70192888,
           "Index": 12,
           "Lv": 1
         },
         {
-          "Id": 70104361,
+          "Id": 70192883,
           "Index": 13,
           "Lv": 1
         },
         {
-          "Id": 70104387,
+          "Id": 70100846,
           "Index": 14,
           "Lv": 1
         },
         {
-          "Id": 70104387,
+          "Id": 70100431,
           "Index": 15,
           "Lv": 1
         },
         {
-          "Id": 70100846,
+          "Id": 70100202,
           "Index": 16,
           "Lv": 1
         },
         {
-          "Id": 70100431,
+          "Id": 70100991,
           "Index": 17,
           "Lv": 1
         },
         {
-          "Id": 70100202,
+          "Id": 70100585,
           "Index": 18,
           "Lv": 1
         },
         {
-          "Id": 70100991,
+          "Id": 70100506,
           "Index": 19,
           "Lv": 1
         },
         {
-          "Id": 70100585,
+          "Id": 70101165,
           "Index": 20,
           "Lv": 1
         },
         {
-          "Id": 70100506,
+          "Id": 70169999,
           "Index": 21,
           "Lv": 1
         },
         {
-          "Id": 70101165,
+          "Id": 70192802,
           "Index": 22,
           "Lv": 1
         },
         {
-          "Id": 70169999,
+          "Id": 70192855,
           "Index": 23,
           "Lv": 1
         },
         {
           "Id": 70101634,
           "Index": 24,
+          "Lv": 1
+        },
+        {
+          "Id": 70192855,
+          "Index": 25,
           "Lv": 1
         }
       ],
@@ -80032,7 +80058,7 @@
       "shipId": 70000328,
       "blueprintType": 5,
       "isAsia": true,
-      "tier": 26,
+      "tier": 99,
       "masteryAble": true,
       "order": 1,
       "localBitflag": 0,
@@ -80042,14 +80068,14 @@
       "improvedShipblueprintExchangeAbleRate": 1000,
       "shipBuildSuccessionTime": 306200,
       "coercionOpenCostType": 100004,
-      "coercionOpenCost": 2600,
+      "coercionOpenCost": 9900,
       "verifyingPointId": 100001,
       "verifyingPointVal": 999999999,
       "relaunchPointId": 100003,
       "relaunchPointValue": 199998,
       "repairShipLife": {
         "PointId": 100003,
-        "PointVal": 104
+        "PointVal": 396
       },
       "materialPublicBpId": 23400011,
       "materialBpVal": 0,
@@ -83096,7 +83122,7 @@
       "shipId": 70000339,
       "blueprintType": 5,
       "isAsia": true,
-      "tier": 27,
+      "tier": 26,
       "masteryAble": true,
       "order": 1,
       "localBitflag": 0,
@@ -83106,14 +83132,14 @@
       "improvedShipblueprintExchangeAbleRate": 1000,
       "shipBuildSuccessionTime": 262500,
       "coercionOpenCostType": 100004,
-      "coercionOpenCost": 2700,
+      "coercionOpenCost": 2600,
       "verifyingPointId": 100001,
       "verifyingPointVal": 999999999,
       "relaunchPointId": 100003,
       "relaunchPointValue": 199998,
       "repairShipLife": {
         "PointId": 100003,
-        "PointVal": 108
+        "PointVal": 104
       },
       "materialPublicBpId": 23400011,
       "materialBpVal": 0,
@@ -83129,22 +83155,22 @@
       "stat": [
         {
           "Type": 1,
-          "Val": 98,
+          "Val": 135,
           "MinRate": 700
         },
         {
           "Type": 2,
-          "Val": 165,
+          "Val": 540,
           "MinRate": 700
         },
         {
           "Type": 3,
-          "Val": 2010,
+          "Val": 5400,
           "MinRate": 700
         },
         {
           "Type": 4,
-          "Val": 291,
+          "Val": 510,
           "MinRate": 700
         },
         {
@@ -83154,62 +83180,62 @@
         },
         {
           "Type": 9,
-          "Val": 99,
+          "Val": 142,
           "MinRate": 700
         },
         {
           "Type": 7,
-          "Val": 748,
+          "Val": 987,
           "MinRate": 700
         },
         {
           "Type": 8,
-          "Val": 218,
+          "Val": 831,
           "MinRate": 700
         },
         {
           "Type": 5,
-          "Val": 41,
+          "Val": 87,
           "MinRate": 700
         },
         {
           "Type": 1002,
-          "Val": 39,
+          "Val": 91,
           "MinRate": 700
         },
         {
           "Type": 1000,
-          "Val": 39,
+          "Val": 93,
           "MinRate": 700
         },
         {
           "Type": 1114,
-          "Val": 316,
+          "Val": 736,
           "MinRate": 700
         },
         {
           "Type": 1115,
-          "Val": 316,
+          "Val": 805,
           "MinRate": 700
         },
         {
           "Type": 1116,
-          "Val": 316,
+          "Val": 701,
           "MinRate": 700
         },
         {
           "Type": 1117,
-          "Val": 83,
+          "Val": 175,
           "MinRate": 700
         },
         {
           "Type": 1118,
-          "Val": 43,
+          "Val": 160,
           "MinRate": 700
         },
         {
           "Type": 11,
-          "Val": 100,
+          "Val": 70,
           "MinRate": 1000
         },
         {
@@ -83219,7 +83245,7 @@
         },
         {
           "Type": 1145,
-          "Val": 157,
+          "Val": 186,
           "MinRate": 700
         },
         {
@@ -83230,123 +83256,128 @@
       ],
       "shipSlot": [
         {
-          "Id": 70103001,
+          "Id": 70192500,
           "Index": 1,
           "Lv": 1
         },
         {
-          "Id": 70103003,
+          "Id": 70192842,
           "Index": 2,
           "Lv": 1
         },
         {
-          "Id": 70103002,
+          "Id": 70192842,
           "Index": 3,
           "Lv": 1
         },
         {
-          "Id": 70103004,
+          "Id": 70192844,
           "Index": 4,
           "Lv": 1
         },
         {
-          "Id": 70103005,
+          "Id": 70192845,
           "Index": 5,
           "Lv": 1
         },
         {
-          "Id": 70103006,
+          "Id": 70192846,
           "Index": 6,
           "Lv": 1
         },
         {
-          "Id": 70103008,
+          "Id": 70192848,
           "Index": 7,
           "Lv": 1
         },
         {
-          "Id": 70103009,
+          "Id": 70192849,
           "Index": 8,
           "Lv": 1
         },
         {
-          "Id": 70103012,
+          "Id": 70192862,
           "Index": 9,
           "Lv": 1
         },
         {
-          "Id": 70103012,
+          "Id": 70192883,
           "Index": 10,
           "Lv": 1
         },
         {
-          "Id": 70104361,
+          "Id": 70192888,
           "Index": 11,
           "Lv": 1
         },
         {
-          "Id": 70104382,
+          "Id": 70192888,
           "Index": 12,
           "Lv": 1
         },
         {
-          "Id": 70104361,
+          "Id": 70192883,
           "Index": 13,
           "Lv": 1
         },
         {
-          "Id": 70104387,
+          "Id": 70100846,
           "Index": 14,
           "Lv": 1
         },
         {
-          "Id": 70104387,
+          "Id": 70100431,
           "Index": 15,
           "Lv": 1
         },
         {
-          "Id": 70100846,
+          "Id": 70100202,
           "Index": 16,
           "Lv": 1
         },
         {
-          "Id": 70100431,
+          "Id": 70100991,
           "Index": 17,
           "Lv": 1
         },
         {
-          "Id": 70100202,
+          "Id": 70100585,
           "Index": 18,
           "Lv": 1
         },
         {
-          "Id": 70100991,
+          "Id": 70100506,
           "Index": 19,
           "Lv": 1
         },
         {
-          "Id": 70100585,
+          "Id": 70101165,
           "Index": 20,
           "Lv": 1
         },
         {
-          "Id": 70100506,
+          "Id": 70169999,
           "Index": 21,
           "Lv": 1
         },
         {
-          "Id": 70101165,
+          "Id": 70192842,
           "Index": 22,
           "Lv": 1
         },
         {
-          "Id": 70169999,
+          "Id": 70192855,
           "Index": 23,
           "Lv": 1
         },
         {
           "Id": 70101634,
           "Index": 24,
+          "Lv": 1
+        },
+        {
+          "Id": 70192855,
+          "Index": 25,
           "Lv": 1
         }
       ],
@@ -94496,6 +94527,266 @@
         {
           "Type": 1004,
           "Val": 5
+        }
+      ],
+      "resetAble": false,
+      "isGold": false
+    },
+    "70270192": {
+      "id": 70270192,
+      "shipId": 70080021,
+      "blueprintType": 1,
+      "isAsia": false,
+      "tier": 23,
+      "masteryAble": false,
+      "order": 4,
+      "localBitflag": 0,
+      "shipBuildTime": 421200,
+      "exchangeAbleRate": 1000,
+      "unconditionalExchangeAbleRate": 0,
+      "improvedShipblueprintExchangeAbleRate": 0,
+      "shipBuildSuccessionTime": 210600,
+      "coercionOpenCostType": 100004,
+      "coercionOpenCost": 2300,
+      "verifyingPointId": 100001,
+      "verifyingPointVal": 999999999,
+      "relaunchPointId": 100003,
+      "relaunchPointValue": 3990,
+      "repairShipLife": {
+        "PointId": 100003,
+        "PointVal": 46
+      },
+      "materialPublicBpId": 23400011,
+      "forbiddenActionType": 0,
+      "stat": [
+        {
+          "Type": 1,
+          "Val": 31,
+          "MinRate": 1000
+        },
+        {
+          "Type": 2,
+          "Val": 361,
+          "MinRate": 1000
+        },
+        {
+          "Type": 3,
+          "Val": 4700,
+          "MinRate": 1000
+        },
+        {
+          "Type": 4,
+          "Val": 400,
+          "MinRate": 1000
+        },
+        {
+          "Type": 6,
+          "Val": 0,
+          "MinRate": 1000
+        },
+        {
+          "Type": 9,
+          "Val": 122,
+          "MinRate": 1000
+        },
+        {
+          "Type": 7,
+          "Val": 602,
+          "MinRate": 1000
+        },
+        {
+          "Type": 8,
+          "Val": 684,
+          "MinRate": 1000
+        },
+        {
+          "Type": 5,
+          "Val": 153,
+          "MinRate": 1000
+        },
+        {
+          "Type": 1002,
+          "Val": 70,
+          "MinRate": 1000
+        },
+        {
+          "Type": 1000,
+          "Val": 95,
+          "MinRate": 1000
+        },
+        {
+          "Type": 1114,
+          "Val": 706,
+          "MinRate": 1000
+        },
+        {
+          "Type": 1115,
+          "Val": 587,
+          "MinRate": 1000
+        },
+        {
+          "Type": 1116,
+          "Val": 585,
+          "MinRate": 1000
+        },
+        {
+          "Type": 1117,
+          "Val": 111,
+          "MinRate": 1000
+        },
+        {
+          "Type": 1118,
+          "Val": 83,
+          "MinRate": 1000
+        },
+        {
+          "Type": 11,
+          "Val": 70,
+          "MinRate": 1000
+        },
+        {
+          "Type": 12,
+          "Val": 0,
+          "MinRate": 1000
+        },
+        {
+          "Type": 1145,
+          "Val": 168,
+          "MinRate": 1000
+        },
+        {
+          "Type": 108,
+          "Val": 0,
+          "MinRate": 1000
+        }
+      ],
+      "shipSlot": [
+        {
+          "Id": 70191675,
+          "Index": 1,
+          "Lv": 1
+        },
+        {
+          "Id": 70134539,
+          "Index": 2,
+          "Lv": 1
+        },
+        {
+          "Id": 70134539,
+          "Index": 3,
+          "Lv": 1
+        },
+        {
+          "Id": 70191481,
+          "Index": 4,
+          "Lv": 1
+        },
+        {
+          "Id": 70191482,
+          "Index": 5,
+          "Lv": 1
+        },
+        {
+          "Id": 70191905,
+          "Index": 6,
+          "Lv": 1
+        },
+        {
+          "Id": 70191907,
+          "Index": 7,
+          "Lv": 1
+        },
+        {
+          "Id": 70191908,
+          "Index": 8,
+          "Lv": 1
+        },
+        {
+          "Id": 70191499,
+          "Index": 9,
+          "Lv": 1
+        },
+        {
+          "Id": 70191520,
+          "Index": 10,
+          "Lv": 1
+        },
+        {
+          "Id": 70191525,
+          "Index": 11,
+          "Lv": 1
+        },
+        {
+          "Id": 70191525,
+          "Index": 12,
+          "Lv": 1
+        },
+        {
+          "Id": 70191520,
+          "Index": 13,
+          "Lv": 1
+        },
+        {
+          "Id": 70100846,
+          "Index": 14,
+          "Lv": 1
+        },
+        {
+          "Id": 70100431,
+          "Index": 15,
+          "Lv": 1
+        },
+        {
+          "Id": 70100202,
+          "Index": 16,
+          "Lv": 1
+        },
+        {
+          "Id": 70100991,
+          "Index": 17,
+          "Lv": 1
+        },
+        {
+          "Id": 70100585,
+          "Index": 18,
+          "Lv": 1
+        },
+        {
+          "Id": 70100506,
+          "Index": 19,
+          "Lv": 1
+        },
+        {
+          "Id": 70101165,
+          "Index": 20,
+          "Lv": 1
+        },
+        {
+          "Id": 70169999,
+          "Index": 21,
+          "Lv": 1
+        },
+        {
+          "Id": 70191535,
+          "Index": 22,
+          "Lv": 1
+        },
+        {
+          "Id": 70191638,
+          "Index": 23,
+          "Lv": 1
+        },
+        {
+          "Id": 70101634,
+          "Index": 24,
+          "Lv": 1
+        }
+      ],
+      "maxLevelShipFlag": "Ship_Flag_MayorCondition",
+      "fixedStat": [
+        {
+          "Type": 1004,
+          "Val": 6
         }
       ],
       "resetAble": false,
@@ -118285,6 +118576,1193 @@
       ],
       "resetAble": true,
       "isGold": true
+    },
+    "70280093": {
+      "id": 70280093,
+      "shipId": 70090113,
+      "blueprintType": 3,
+      "isAsia": false,
+      "tier": 8,
+      "masteryAble": true,
+      "order": 9,
+      "localBitflag": 192,
+      "shipBuildTime": 121000,
+      "exchangeAbleRate": 1000,
+      "unconditionalExchangeAbleRate": 0,
+      "improvedShipblueprintExchangeAbleRate": 0,
+      "shipBuildSuccessionTime": 60500,
+      "coercionOpenCostType": 100004,
+      "coercionOpenCost": 800,
+      "verifyingPointId": 100001,
+      "verifyingPointVal": 999999999,
+      "relaunchPointId": 100003,
+      "relaunchPointValue": 99999,
+      "repairShipLife": {
+        "PointId": 100003,
+        "PointVal": 16
+      },
+      "materialPublicBpId": 23400009,
+      "forbiddenActionType": 0,
+      "stat": [
+        {
+          "Type": 1,
+          "Val": 71,
+          "MinRate": 700
+        },
+        {
+          "Type": 2,
+          "Val": 118,
+          "MinRate": 700
+        },
+        {
+          "Type": 3,
+          "Val": 1765,
+          "MinRate": 700
+        },
+        {
+          "Type": 4,
+          "Val": 177,
+          "MinRate": 700
+        },
+        {
+          "Type": 6,
+          "Val": 0,
+          "MinRate": 700
+        },
+        {
+          "Type": 9,
+          "Val": 71,
+          "MinRate": 700
+        },
+        {
+          "Type": 7,
+          "Val": 224,
+          "MinRate": 700
+        },
+        {
+          "Type": 8,
+          "Val": 400,
+          "MinRate": 700
+        },
+        {
+          "Type": 5,
+          "Val": 42,
+          "MinRate": 700
+        },
+        {
+          "Type": 1002,
+          "Val": 24,
+          "MinRate": 700
+        },
+        {
+          "Type": 1000,
+          "Val": 20,
+          "MinRate": 700
+        },
+        {
+          "Type": 1114,
+          "Val": 353,
+          "MinRate": 700
+        },
+        {
+          "Type": 1115,
+          "Val": 295,
+          "MinRate": 700
+        },
+        {
+          "Type": 1116,
+          "Val": 236,
+          "MinRate": 700
+        },
+        {
+          "Type": 1117,
+          "Val": 59,
+          "MinRate": 700
+        },
+        {
+          "Type": 1118,
+          "Val": 30,
+          "MinRate": 700
+        },
+        {
+          "Type": 11,
+          "Val": 50,
+          "MinRate": 1000
+        },
+        {
+          "Type": 12,
+          "Val": 10,
+          "MinRate": 700
+        },
+        {
+          "Type": 1145,
+          "Val": 97,
+          "MinRate": 700
+        },
+        {
+          "Type": 108,
+          "Val": 0,
+          "MinRate": 700
+        }
+      ],
+      "shipSlot": [
+        {
+          "Id": 70103001,
+          "Index": 1,
+          "Lv": 1
+        },
+        {
+          "Id": 70103003,
+          "Index": 2,
+          "Lv": 1
+        },
+        {
+          "Id": 70103002,
+          "Index": 3,
+          "Lv": 1
+        },
+        {
+          "Id": 70134014,
+          "Index": 4,
+          "Lv": 1
+        },
+        {
+          "Id": 70134018,
+          "Index": 5,
+          "Lv": 1
+        },
+        {
+          "Id": 70134020,
+          "Index": 6,
+          "Lv": 1
+        },
+        {
+          "Id": 70134021,
+          "Index": 7,
+          "Lv": 1
+        },
+        {
+          "Id": 70134050,
+          "Index": 8,
+          "Lv": 1
+        },
+        {
+          "Id": 70134071,
+          "Index": 9,
+          "Lv": 1
+        },
+        {
+          "Id": 70134076,
+          "Index": 10,
+          "Lv": 1
+        },
+        {
+          "Id": 70100846,
+          "Index": 11,
+          "Lv": 1
+        },
+        {
+          "Id": 70100431,
+          "Index": 12,
+          "Lv": 1
+        },
+        {
+          "Id": 70100202,
+          "Index": 13,
+          "Lv": 1
+        },
+        {
+          "Id": 70100991,
+          "Index": 14,
+          "Lv": 1
+        },
+        {
+          "Id": 70100585,
+          "Index": 15,
+          "Lv": 1
+        },
+        {
+          "Id": 70100506,
+          "Index": 16,
+          "Lv": 1
+        },
+        {
+          "Id": 70101165,
+          "Index": 17,
+          "Lv": 1
+        },
+        {
+          "Id": 70169999,
+          "Index": 18,
+          "Lv": 1
+        },
+        {
+          "Id": 70101634,
+          "Index": 19,
+          "Lv": 1
+        }
+      ],
+      "maxLevelShipFlag": "Ship_Flag_MayorCondition",
+      "fixedStat": [
+        {
+          "Type": 1004,
+          "Val": 4
+        }
+      ],
+      "resetAble": false,
+      "isGold": false
+    },
+    "70280094": {
+      "id": 70280094,
+      "shipId": 70090114,
+      "blueprintType": 6,
+      "isAsia": false,
+      "tier": 8,
+      "masteryAble": true,
+      "order": 1,
+      "localBitflag": 0,
+      "shipBuildTime": 120000,
+      "exchangeAbleRate": 100,
+      "unconditionalExchangeAbleRate": 0,
+      "improvedShipblueprintExchangeAbleRate": 1000,
+      "shipBuildSuccessionTime": 60000,
+      "coercionOpenCostType": 100004,
+      "coercionOpenCost": 800,
+      "verifyingPointId": 100001,
+      "verifyingPointVal": 999999999,
+      "relaunchPointId": 100003,
+      "relaunchPointValue": 199998,
+      "repairShipLife": {
+        "PointId": 100003,
+        "PointVal": 32
+      },
+      "materialPublicBpId": 23400009,
+      "materialBpVal": 0,
+      "materialShipId": 70000193,
+      "forbiddenActionType": 0,
+      "stat": [
+        {
+          "Type": 1,
+          "Val": 71,
+          "MinRate": 700
+        },
+        {
+          "Type": 2,
+          "Val": 118,
+          "MinRate": 700
+        },
+        {
+          "Type": 3,
+          "Val": 1765,
+          "MinRate": 700
+        },
+        {
+          "Type": 4,
+          "Val": 177,
+          "MinRate": 700
+        },
+        {
+          "Type": 6,
+          "Val": 0,
+          "MinRate": 700
+        },
+        {
+          "Type": 9,
+          "Val": 71,
+          "MinRate": 700
+        },
+        {
+          "Type": 7,
+          "Val": 224,
+          "MinRate": 700
+        },
+        {
+          "Type": 8,
+          "Val": 400,
+          "MinRate": 700
+        },
+        {
+          "Type": 5,
+          "Val": 42,
+          "MinRate": 700
+        },
+        {
+          "Type": 1002,
+          "Val": 24,
+          "MinRate": 700
+        },
+        {
+          "Type": 1000,
+          "Val": 20,
+          "MinRate": 700
+        },
+        {
+          "Type": 1114,
+          "Val": 353,
+          "MinRate": 700
+        },
+        {
+          "Type": 1115,
+          "Val": 295,
+          "MinRate": 700
+        },
+        {
+          "Type": 1116,
+          "Val": 236,
+          "MinRate": 700
+        },
+        {
+          "Type": 1117,
+          "Val": 59,
+          "MinRate": 700
+        },
+        {
+          "Type": 1118,
+          "Val": 30,
+          "MinRate": 700
+        },
+        {
+          "Type": 11,
+          "Val": 50,
+          "MinRate": 1000
+        },
+        {
+          "Type": 12,
+          "Val": 10,
+          "MinRate": 700
+        },
+        {
+          "Type": 1145,
+          "Val": 97,
+          "MinRate": 700
+        },
+        {
+          "Type": 108,
+          "Val": 0,
+          "MinRate": 700
+        }
+      ],
+      "shipSlot": [
+        {
+          "Id": 70103001,
+          "Index": 1,
+          "Lv": 1
+        },
+        {
+          "Id": 70103003,
+          "Index": 2,
+          "Lv": 1
+        },
+        {
+          "Id": 70103002,
+          "Index": 3,
+          "Lv": 1
+        },
+        {
+          "Id": 70134014,
+          "Index": 4,
+          "Lv": 1
+        },
+        {
+          "Id": 70134018,
+          "Index": 5,
+          "Lv": 1
+        },
+        {
+          "Id": 70134020,
+          "Index": 6,
+          "Lv": 1
+        },
+        {
+          "Id": 70134021,
+          "Index": 7,
+          "Lv": 1
+        },
+        {
+          "Id": 70134050,
+          "Index": 8,
+          "Lv": 1
+        },
+        {
+          "Id": 70134071,
+          "Index": 9,
+          "Lv": 1
+        },
+        {
+          "Id": 70134076,
+          "Index": 10,
+          "Lv": 1
+        },
+        {
+          "Id": 70100846,
+          "Index": 11,
+          "Lv": 1
+        },
+        {
+          "Id": 70100431,
+          "Index": 12,
+          "Lv": 1
+        },
+        {
+          "Id": 70100202,
+          "Index": 13,
+          "Lv": 1
+        },
+        {
+          "Id": 70100991,
+          "Index": 14,
+          "Lv": 1
+        },
+        {
+          "Id": 70100585,
+          "Index": 15,
+          "Lv": 1
+        },
+        {
+          "Id": 70100506,
+          "Index": 16,
+          "Lv": 1
+        },
+        {
+          "Id": 70101165,
+          "Index": 17,
+          "Lv": 1
+        },
+        {
+          "Id": 70169999,
+          "Index": 18,
+          "Lv": 1
+        },
+        {
+          "Id": 70134018,
+          "Index": 19,
+          "Lv": 1
+        },
+        {
+          "Id": 70101634,
+          "Index": 20,
+          "Lv": 1
+        }
+      ],
+      "maxLevelShipFlag": "Ship_Flag_MayorCondition",
+      "fixedStat": [
+        {
+          "Type": 1004,
+          "Val": 4
+        }
+      ],
+      "resetAble": false,
+      "isGold": false
+    },
+    "70280103": {
+      "id": 70280103,
+      "shipId": 70090123,
+      "blueprintType": 3,
+      "isAsia": true,
+      "tier": 5,
+      "masteryAble": true,
+      "order": 6,
+      "localBitflag": 192,
+      "shipBuildTime": 15000,
+      "exchangeAbleRate": 1000,
+      "unconditionalExchangeAbleRate": 0,
+      "improvedShipblueprintExchangeAbleRate": 0,
+      "shipBuildSuccessionTime": 7500,
+      "coercionOpenCostType": 100004,
+      "coercionOpenCost": 500,
+      "verifyingPointId": 100001,
+      "verifyingPointVal": 999999999,
+      "relaunchPointId": 100003,
+      "relaunchPointValue": 99999,
+      "repairShipLife": {
+        "PointId": 100003,
+        "PointVal": 10
+      },
+      "materialPublicBpId": 23400008,
+      "forbiddenActionType": 0,
+      "stat": [
+        {
+          "Type": 1,
+          "Val": 32,
+          "MinRate": 700
+        },
+        {
+          "Type": 2,
+          "Val": 79,
+          "MinRate": 700
+        },
+        {
+          "Type": 3,
+          "Val": 940,
+          "MinRate": 700
+        },
+        {
+          "Type": 4,
+          "Val": 107,
+          "MinRate": 700
+        },
+        {
+          "Type": 6,
+          "Val": 36,
+          "MinRate": 700
+        },
+        {
+          "Type": 9,
+          "Val": 21,
+          "MinRate": 700
+        },
+        {
+          "Type": 7,
+          "Val": 257,
+          "MinRate": 700
+        },
+        {
+          "Type": 8,
+          "Val": 233,
+          "MinRate": 700
+        },
+        {
+          "Type": 5,
+          "Val": 18,
+          "MinRate": 700
+        },
+        {
+          "Type": 1002,
+          "Val": 15,
+          "MinRate": 700
+        },
+        {
+          "Type": 1000,
+          "Val": 20,
+          "MinRate": 700
+        },
+        {
+          "Type": 1114,
+          "Val": 116,
+          "MinRate": 700
+        },
+        {
+          "Type": 1115,
+          "Val": 160,
+          "MinRate": 700
+        },
+        {
+          "Type": 1116,
+          "Val": 158,
+          "MinRate": 700
+        },
+        {
+          "Type": 1117,
+          "Val": 30,
+          "MinRate": 700
+        },
+        {
+          "Type": 1118,
+          "Val": 23,
+          "MinRate": 700
+        },
+        {
+          "Type": 11,
+          "Val": 30,
+          "MinRate": 1000
+        },
+        {
+          "Type": 12,
+          "Val": 10,
+          "MinRate": 700
+        },
+        {
+          "Type": 1145,
+          "Val": 86,
+          "MinRate": 700
+        },
+        {
+          "Type": 108,
+          "Val": 0,
+          "MinRate": 700
+        }
+      ],
+      "shipSlot": [
+        {
+          "Id": 70134181,
+          "Index": 1,
+          "Lv": 1
+        },
+        {
+          "Id": 70134308,
+          "Index": 2,
+          "Lv": 1
+        },
+        {
+          "Id": 70134285,
+          "Index": 3,
+          "Lv": 1
+        },
+        {
+          "Id": 70131600,
+          "Index": 4,
+          "Lv": 1
+        },
+        {
+          "Id": 70131602,
+          "Index": 5,
+          "Lv": 1
+        },
+        {
+          "Id": 70131604,
+          "Index": 6,
+          "Lv": 1
+        },
+        {
+          "Id": 70111600,
+          "Index": 7,
+          "Lv": 1
+        },
+        {
+          "Id": 70111626,
+          "Index": 8,
+          "Lv": 5
+        },
+        {
+          "Id": 70100846,
+          "Index": 9,
+          "Lv": 1
+        },
+        {
+          "Id": 70100431,
+          "Index": 10,
+          "Lv": 1
+        },
+        {
+          "Id": 70100202,
+          "Index": 11,
+          "Lv": 1
+        },
+        {
+          "Id": 70100991,
+          "Index": 12,
+          "Lv": 1
+        },
+        {
+          "Id": 70100585,
+          "Index": 13,
+          "Lv": 1
+        },
+        {
+          "Id": 70100506,
+          "Index": 14,
+          "Lv": 1
+        },
+        {
+          "Id": 70101165,
+          "Index": 15,
+          "Lv": 1
+        },
+        {
+          "Id": 70111600,
+          "Index": 16,
+          "Lv": 20
+        },
+        {
+          "Id": 70169999,
+          "Index": 17,
+          "Lv": 1
+        },
+        {
+          "Id": 70101634,
+          "Index": 18,
+          "Lv": 1
+        }
+      ],
+      "maxLevelShipFlag": "Ship_Flag_MayorCondition",
+      "fixedStat": [
+        {
+          "Type": 1004,
+          "Val": 4
+        }
+      ],
+      "resetAble": false,
+      "isGold": true
+    },
+    "70280104": {
+      "id": 70280104,
+      "shipId": 70090125,
+      "blueprintType": 3,
+      "isAsia": true,
+      "tier": 9,
+      "masteryAble": true,
+      "order": 6,
+      "localBitflag": 192,
+      "shipBuildTime": 54000,
+      "exchangeAbleRate": 1000,
+      "unconditionalExchangeAbleRate": 0,
+      "improvedShipblueprintExchangeAbleRate": 0,
+      "shipBuildSuccessionTime": 27000,
+      "coercionOpenCostType": 100004,
+      "coercionOpenCost": 900,
+      "verifyingPointId": 100001,
+      "verifyingPointVal": 999999999,
+      "relaunchPointId": 100003,
+      "relaunchPointValue": 99999,
+      "repairShipLife": {
+        "PointId": 100003,
+        "PointVal": 18
+      },
+      "materialPublicBpId": 23400009,
+      "forbiddenActionType": 0,
+      "stat": [
+        {
+          "Type": 1,
+          "Val": 49,
+          "MinRate": 700
+        },
+        {
+          "Type": 2,
+          "Val": 102,
+          "MinRate": 700
+        },
+        {
+          "Type": 3,
+          "Val": 1330,
+          "MinRate": 700
+        },
+        {
+          "Type": 4,
+          "Val": 157,
+          "MinRate": 700
+        },
+        {
+          "Type": 6,
+          "Val": 0,
+          "MinRate": 700
+        },
+        {
+          "Type": 9,
+          "Val": 37,
+          "MinRate": 700
+        },
+        {
+          "Type": 7,
+          "Val": 230,
+          "MinRate": 700
+        },
+        {
+          "Type": 8,
+          "Val": 354,
+          "MinRate": 700
+        },
+        {
+          "Type": 5,
+          "Val": 26,
+          "MinRate": 700
+        },
+        {
+          "Type": 1002,
+          "Val": 22,
+          "MinRate": 700
+        },
+        {
+          "Type": 1000,
+          "Val": 28,
+          "MinRate": 700
+        },
+        {
+          "Type": 1114,
+          "Val": 167,
+          "MinRate": 700
+        },
+        {
+          "Type": 1115,
+          "Val": 230,
+          "MinRate": 700
+        },
+        {
+          "Type": 1116,
+          "Val": 224,
+          "MinRate": 700
+        },
+        {
+          "Type": 1117,
+          "Val": 43,
+          "MinRate": 700
+        },
+        {
+          "Type": 1118,
+          "Val": 34,
+          "MinRate": 700
+        },
+        {
+          "Type": 11,
+          "Val": 50,
+          "MinRate": 1000
+        },
+        {
+          "Type": 12,
+          "Val": 10,
+          "MinRate": 700
+        },
+        {
+          "Type": 1145,
+          "Val": 98,
+          "MinRate": 700
+        },
+        {
+          "Type": 108,
+          "Val": 0,
+          "MinRate": 700
+        }
+      ],
+      "shipSlot": [
+        {
+          "Id": 70134200,
+          "Index": 1,
+          "Lv": 1
+        },
+        {
+          "Id": 70134312,
+          "Index": 2,
+          "Lv": 1
+        },
+        {
+          "Id": 70134289,
+          "Index": 3,
+          "Lv": 1
+        },
+        {
+          "Id": 70133200,
+          "Index": 4,
+          "Lv": 1
+        },
+        {
+          "Id": 70133202,
+          "Index": 5,
+          "Lv": 1
+        },
+        {
+          "Id": 70133204,
+          "Index": 6,
+          "Lv": 1
+        },
+        {
+          "Id": 70133205,
+          "Index": 7,
+          "Lv": 1
+        },
+        {
+          "Id": 70113200,
+          "Index": 8,
+          "Lv": 1
+        },
+        {
+          "Id": 70113221,
+          "Index": 9,
+          "Lv": 5
+        },
+        {
+          "Id": 70113226,
+          "Index": 10,
+          "Lv": 1
+        },
+        {
+          "Id": 70100846,
+          "Index": 11,
+          "Lv": 1
+        },
+        {
+          "Id": 70100431,
+          "Index": 12,
+          "Lv": 1
+        },
+        {
+          "Id": 70100202,
+          "Index": 13,
+          "Lv": 1
+        },
+        {
+          "Id": 70100991,
+          "Index": 14,
+          "Lv": 1
+        },
+        {
+          "Id": 70100585,
+          "Index": 15,
+          "Lv": 1
+        },
+        {
+          "Id": 70100506,
+          "Index": 16,
+          "Lv": 1
+        },
+        {
+          "Id": 70101165,
+          "Index": 17,
+          "Lv": 1
+        },
+        {
+          "Id": 70113221,
+          "Index": 18,
+          "Lv": 20
+        },
+        {
+          "Id": 70169999,
+          "Index": 19,
+          "Lv": 1
+        },
+        {
+          "Id": 70101634,
+          "Index": 20,
+          "Lv": 1
+        }
+      ],
+      "maxLevelShipFlag": "Ship_Flag_MayorCondition",
+      "fixedStat": [
+        {
+          "Type": 1004,
+          "Val": 5
+        }
+      ],
+      "resetAble": false,
+      "isGold": false
+    },
+    "70280105": {
+      "id": 70280105,
+      "shipId": 70090124,
+      "blueprintType": 3,
+      "isAsia": true,
+      "tier": 11,
+      "masteryAble": true,
+      "order": 6,
+      "localBitflag": 192,
+      "shipBuildTime": 84000,
+      "exchangeAbleRate": 1000,
+      "unconditionalExchangeAbleRate": 0,
+      "improvedShipblueprintExchangeAbleRate": 0,
+      "shipBuildSuccessionTime": 42000,
+      "coercionOpenCostType": 100004,
+      "coercionOpenCost": 1100,
+      "verifyingPointId": 100001,
+      "verifyingPointVal": 999999999,
+      "relaunchPointId": 100003,
+      "relaunchPointValue": 99999,
+      "repairShipLife": {
+        "PointId": 100003,
+        "PointVal": 22
+      },
+      "materialPublicBpId": 23400009,
+      "forbiddenActionType": 0,
+      "stat": [
+        {
+          "Type": 1,
+          "Val": 56,
+          "MinRate": 700
+        },
+        {
+          "Type": 2,
+          "Val": 135,
+          "MinRate": 700
+        },
+        {
+          "Type": 3,
+          "Val": 1530,
+          "MinRate": 700
+        },
+        {
+          "Type": 4,
+          "Val": 171,
+          "MinRate": 700
+        },
+        {
+          "Type": 6,
+          "Val": 64,
+          "MinRate": 700
+        },
+        {
+          "Type": 9,
+          "Val": 45,
+          "MinRate": 700
+        },
+        {
+          "Type": 7,
+          "Val": 301,
+          "MinRate": 700
+        },
+        {
+          "Type": 8,
+          "Val": 334,
+          "MinRate": 700
+        },
+        {
+          "Type": 5,
+          "Val": 30,
+          "MinRate": 700
+        },
+        {
+          "Type": 1002,
+          "Val": 28,
+          "MinRate": 700
+        },
+        {
+          "Type": 1000,
+          "Val": 30,
+          "MinRate": 700
+        },
+        {
+          "Type": 1114,
+          "Val": 196,
+          "MinRate": 700
+        },
+        {
+          "Type": 1115,
+          "Val": 264,
+          "MinRate": 700
+        },
+        {
+          "Type": 1116,
+          "Val": 248,
+          "MinRate": 700
+        },
+        {
+          "Type": 1117,
+          "Val": 49,
+          "MinRate": 700
+        },
+        {
+          "Type": 1118,
+          "Val": 39,
+          "MinRate": 700
+        },
+        {
+          "Type": 11,
+          "Val": 50,
+          "MinRate": 1000
+        },
+        {
+          "Type": 12,
+          "Val": 10,
+          "MinRate": 700
+        },
+        {
+          "Type": 1145,
+          "Val": 104,
+          "MinRate": 700
+        },
+        {
+          "Type": 108,
+          "Val": 0,
+          "MinRate": 700
+        }
+      ],
+      "shipSlot": [
+        {
+          "Id": 70134212,
+          "Index": 1,
+          "Lv": 1
+        },
+        {
+          "Id": 70134268,
+          "Index": 2,
+          "Lv": 1
+        },
+        {
+          "Id": 70134245,
+          "Index": 3,
+          "Lv": 1
+        },
+        {
+          "Id": 70133918,
+          "Index": 4,
+          "Lv": 1
+        },
+        {
+          "Id": 70133922,
+          "Index": 5,
+          "Lv": 1
+        },
+        {
+          "Id": 70133924,
+          "Index": 6,
+          "Lv": 1
+        },
+        {
+          "Id": 70133925,
+          "Index": 7,
+          "Lv": 5
+        },
+        {
+          "Id": 70133954,
+          "Index": 8,
+          "Lv": 1
+        },
+        {
+          "Id": 70133975,
+          "Index": 9,
+          "Lv": 10
+        },
+        {
+          "Id": 70133980,
+          "Index": 10,
+          "Lv": 1
+        },
+        {
+          "Id": 70100846,
+          "Index": 11,
+          "Lv": 1
+        },
+        {
+          "Id": 70100431,
+          "Index": 12,
+          "Lv": 1
+        },
+        {
+          "Id": 70100202,
+          "Index": 13,
+          "Lv": 1
+        },
+        {
+          "Id": 70100991,
+          "Index": 14,
+          "Lv": 1
+        },
+        {
+          "Id": 70100585,
+          "Index": 15,
+          "Lv": 1
+        },
+        {
+          "Id": 70100506,
+          "Index": 16,
+          "Lv": 1
+        },
+        {
+          "Id": 70101165,
+          "Index": 17,
+          "Lv": 1
+        },
+        {
+          "Id": 70133975,
+          "Index": 18,
+          "Lv": 20
+        },
+        {
+          "Id": 70169999,
+          "Index": 19,
+          "Lv": 1
+        },
+        {
+          "Id": 70101634,
+          "Index": 20,
+          "Lv": 1
+        }
+      ],
+      "maxLevelShipFlag": "Ship_Flag_MayorCondition",
+      "fixedStat": [
+        {
+          "Type": 1004,
+          "Val": 5
+        }
+      ],
+      "resetAble": false,
+      "isGold": false
     }
   }
 }

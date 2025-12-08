@@ -1,0 +1,1457 @@
+{
+  ":GameGuidebook": {
+    ":type": {
+      "id": "key",
+      "group": "number",
+      "groupOrder": "number",
+      "localBitFlag": "bit",
+      "guideSubTitle": "text",
+      "guideWidget": "string"
+    },
+    ":required": {
+      "group": 1,
+      "groupOrder": 1,
+      "localBitFlag": 1,
+      "guideSubTitle": 1,
+      "guideWidget": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "GameGuidebook": {
+    "1": {
+      "id": 1,
+      "group": 1,
+      "groupOrder": 1,
+      "localBitFlag": 192,
+      "guideSubTitle": "시작 하기",
+      "guideWidget": "WBP_HelpGuidePage_Start_CN"
+    },
+    "2": {
+      "id": 2,
+      "group": 1,
+      "groupOrder": 2,
+      "localBitFlag": 0,
+      "guideSubTitle": "시작 하기",
+      "guideWidget": "WBP_HelpGuidePage_Start_GL"
+    },
+    "3": {
+      "id": 3,
+      "group": 1,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "두카트란?",
+      "guideWidget": "WBP_HelpGuidePage_Start_Ducat"
+    },
+    "4": {
+      "id": 4,
+      "group": 1,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "두카트의 획득",
+      "guideWidget": "WBP_HelpGuidePage_Start_DucatGain"
+    },
+    "5": {
+      "id": 5,
+      "group": 1,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "장비",
+      "guideWidget": "WBP_HelpGuidePage_Start_Gear"
+    },
+    "6": {
+      "id": 6,
+      "group": 1,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "부품",
+      "guideWidget": "WBP_HelpGuidePage_Start_Part"
+    },
+    "7": {
+      "id": 7,
+      "group": 1,
+      "groupOrder": 7,
+      "localBitFlag": 219,
+      "guideSubTitle": "연대기",
+      "guideWidget": "WBP_HelpGuidePage_Start_Chronicle"
+    },
+    "8": {
+      "id": 8,
+      "group": 1,
+      "groupOrder": 8,
+      "localBitFlag": 219,
+      "guideSubTitle": "회고록",
+      "guideWidget": "WBP_HelpGuidePage_Start_Reminisce"
+    },
+    "9": {
+      "id": 9,
+      "group": 2,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "선단이란?",
+      "guideWidget": "WBP_HelpGuidePage_Company"
+    },
+    "10": {
+      "id": 10,
+      "group": 2,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "선단 성향",
+      "guideWidget": "WBP_HelpGuidePage_Company_Focus"
+    },
+    "11": {
+      "id": 11,
+      "group": 2,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "선단 LV",
+      "guideWidget": "WBP_HelpGuidePage_Company_LV"
+    },
+    "12": {
+      "id": 12,
+      "group": 2,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "명성",
+      "guideWidget": "WBP_HelpGuidePage_Company_Fame"
+    },
+    "13": {
+      "id": 13,
+      "group": 2,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "선단 연구",
+      "guideWidget": "WBP_HelpGuidePage_Company_Study"
+    },
+    "14": {
+      "id": 14,
+      "group": 2,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "연구 포인트",
+      "guideWidget": "WBP_HelpGuidePage_Company_StudyPoint"
+    },
+    "15": {
+      "id": 15,
+      "group": 2,
+      "groupOrder": 7,
+      "localBitFlag": 219,
+      "guideSubTitle": "순위",
+      "guideWidget": "WBP_HelpGuidePage_Company_Ranking"
+    },
+    "16": {
+      "id": 16,
+      "group": 2,
+      "groupOrder": 8,
+      "localBitFlag": 219,
+      "guideSubTitle": "칭호",
+      "guideWidget": "WBP_HelpGuidePage_Company_Title"
+    },
+    "17": {
+      "id": 17,
+      "group": 2,
+      "groupOrder": 9,
+      "localBitFlag": 219,
+      "guideSubTitle": "대표 항해사",
+      "guideWidget": "WBP_HelpGuidePage_Company_Rep"
+    },
+    "18": {
+      "id": 18,
+      "group": 2,
+      "groupOrder": 10,
+      "localBitFlag": 219,
+      "guideSubTitle": "반려 동물",
+      "guideWidget": "WBP_HelpGuidePage_Company_Pet"
+    },
+    "19": {
+      "id": 19,
+      "group": 3,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "함대란?",
+      "guideWidget": "WBP_HelpGuidePage_Fleet"
+    },
+    "20": {
+      "id": 20,
+      "group": 3,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "함대 편성",
+      "guideWidget": "WBP_HelpGuidePage_Fleet_Designate"
+    },
+    "21": {
+      "id": 21,
+      "group": 3,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "함대 진형",
+      "guideWidget": "WBP_HelpGuidePage_Fleet_Formation"
+    },
+    "22": {
+      "id": 22,
+      "group": 3,
+      "groupOrder": 4,
+      "localBitFlag": 0,
+      "guideSubTitle": "함대 확장",
+      "guideWidget": "WBP_HelpGuidePage_Fleet_Add"
+    },
+    "23": {
+      "id": 23,
+      "group": 4,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "보급",
+      "guideWidget": "WBP_HelpGuidePage_Sail_Depart"
+    },
+    "24": {
+      "id": 24,
+      "group": 4,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "재해",
+      "guideWidget": "WBP_HelpGuidePage_Sail_Disaster"
+    },
+    "25": {
+      "id": 25,
+      "group": 4,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "재해 해소",
+      "guideWidget": "WBP_HelpGuidePage_Sail_Clear"
+    },
+    "26": {
+      "id": 26,
+      "group": 4,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "선창 관리 방법",
+      "guideWidget": "WBP_HelpGuidePage_Sail_Capacity"
+    },
+    "27": {
+      "id": 27,
+      "group": 4,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "선원 모집",
+      "guideWidget": "WBP_HelpGuidePage_Sail_Recruit"
+    },
+    "28": {
+      "id": 28,
+      "group": 4,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "날씨 효과",
+      "guideWidget": "WBP_HelpGuidePage_Sail_Weather"
+    },
+    "29": {
+      "id": 29,
+      "group": 4,
+      "groupOrder": 7,
+      "localBitFlag": 219,
+      "guideSubTitle": "해상 가호",
+      "guideWidget": "WBP_HelpGuidePage_Sail_Protection"
+    },
+    "30": {
+      "id": 30,
+      "group": 4,
+      "groupOrder": 8,
+      "localBitFlag": 219,
+      "guideSubTitle": "빠른 보급",
+      "guideWidget": "WBP_HelpGuidePage_Sail_QuickDepart"
+    },
+    "31": {
+      "id": 31,
+      "group": 5,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "국가",
+      "guideWidget": "WBP_HelpGuidePage_Nation"
+    },
+    "32": {
+      "id": 32,
+      "group": 5,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "이민",
+      "guideWidget": "WBP_HelpGuidePage_Nation_Immigrant"
+    },
+    "33": {
+      "id": 33,
+      "group": 5,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "작위",
+      "guideWidget": "WBP_HelpGuidePage_Nation_Accolade"
+    },
+    "34": {
+      "id": 34,
+      "group": 6,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "제독이란?",
+      "guideWidget": "WBP_HelpGuidePage_Admiral"
+    },
+    "35": {
+      "id": 35,
+      "group": 6,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "제독 임명",
+      "guideWidget": "WBP_HelpGuidePage_Admiral_Appoint"
+    },
+    "36": {
+      "id": 36,
+      "group": 6,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "제독 명령",
+      "guideWidget": "WBP_HelpGuidePage_Admiral_Order"
+    },
+    "37": {
+      "id": 37,
+      "group": 7,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "항해사란?",
+      "guideWidget": "WBP_HelpGuidePage_Mate"
+    },
+    "38": {
+      "id": 38,
+      "group": 7,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "항해사 획득 방법",
+      "guideWidget": "WBP_HelpGuidePage_Mate_Gain"
+    },
+    "39": {
+      "id": 39,
+      "group": 7,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "기술",
+      "guideWidget": "WBP_HelpGuidePage_Mate_Skill"
+    },
+    "40": {
+      "id": 40,
+      "group": 7,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "효과",
+      "guideWidget": "WBP_HelpGuidePage_Mate_Effect"
+    },
+    "41": {
+      "id": 41,
+      "group": 7,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "전문 지식",
+      "guideWidget": "WBP_HelpGuidePage_Mate_SPStat"
+    },
+    "42": {
+      "id": 42,
+      "group": 7,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "항해사 성장",
+      "guideWidget": "WBP_HelpGuidePage_Mate_Growth"
+    },
+    "43": {
+      "id": 43,
+      "group": 7,
+      "groupOrder": 7,
+      "localBitFlag": 219,
+      "guideSubTitle": "계약서",
+      "guideWidget": "WBP_HelpGuidePage_Mate_Contract"
+    },
+    "44": {
+      "id": 44,
+      "group": 7,
+      "groupOrder": 8,
+      "localBitFlag": 219,
+      "guideSubTitle": "항해사 성장-승급",
+      "guideWidget": "WBP_HelpGuidePage_Mate_Promote"
+    },
+    "45": {
+      "id": 45,
+      "group": 7,
+      "groupOrder": 9,
+      "localBitFlag": 0,
+      "guideSubTitle": "항해사 성장-훈련",
+      "guideWidget": "WBP_HelpGuidePage_Mate_Training"
+    },
+    "46": {
+      "id": 46,
+      "group": 7,
+      "groupOrder": 10,
+      "localBitFlag": 0,
+      "guideSubTitle": "항해사 성장-초월",
+      "guideWidget": "WBP_HelpGuidePage_Mate_Transcendence"
+    },
+    "47": {
+      "id": 47,
+      "group": 7,
+      "groupOrder": 11,
+      "localBitFlag": 219,
+      "guideSubTitle": "항해사 관리",
+      "guideWidget": "WBP_HelpGuidePage_Mate_Loyalty"
+    },
+    "48": {
+      "id": 48,
+      "group": 8,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박이란?",
+      "guideWidget": "WBP_HelpGuidePage_Ship"
+    },
+    "49": {
+      "id": 49,
+      "group": 8,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박의 종류",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Type"
+    },
+    "50": {
+      "id": 50,
+      "group": 8,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박의 기본 능력",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Skill"
+    },
+    "51": {
+      "id": 51,
+      "group": 8,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박 이해도",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Understand"
+    },
+    "52": {
+      "id": 52,
+      "group": 8,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "건조 LV",
+      "guideWidget": "WBP_HelpGuidePage_Ship_LV"
+    },
+    "53": {
+      "id": 53,
+      "group": 8,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "선실 배치",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Assign"
+    },
+    "54": {
+      "id": 54,
+      "group": 8,
+      "groupOrder": 7,
+      "localBitFlag": 219,
+      "guideSubTitle": "자동 배치",
+      "guideWidget": "WBP_HelpGuidePage_Ship_AutoAssign"
+    },
+    "55": {
+      "id": 55,
+      "group": 8,
+      "groupOrder": 8,
+      "localBitFlag": 219,
+      "guideSubTitle": "전투 기술",
+      "guideWidget": "WBP_HelpGuidePage_Ship_AtkSkill"
+    },
+    "56": {
+      "id": 56,
+      "group": 8,
+      "groupOrder": 9,
+      "localBitFlag": 219,
+      "guideSubTitle": "빠른 기술",
+      "guideWidget": "WBP_HelpGuidePage_Ship_QuickSkill"
+    },
+    "57": {
+      "id": 57,
+      "group": 8,
+      "groupOrder": 10,
+      "localBitFlag": 219,
+      "guideSubTitle": "설계도",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Blueprint"
+    },
+    "58": {
+      "id": 58,
+      "group": 8,
+      "groupOrder": 11,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박 건조 방법",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Build"
+    },
+    "59": {
+      "id": 59,
+      "group": 8,
+      "groupOrder": 12,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박 건조 재료",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Ingredient"
+    },
+    "60": {
+      "id": 60,
+      "group": 8,
+      "groupOrder": 13,
+      "localBitFlag": 219,
+      "guideSubTitle": "원격 건조와 탁송",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Receive"
+    },
+    "61": {
+      "id": 61,
+      "group": 8,
+      "groupOrder": 14,
+      "localBitFlag": 219,
+      "guideSubTitle": "승계 건조",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Succeed"
+    },
+    "62": {
+      "id": 62,
+      "group": 8,
+      "groupOrder": 15,
+      "localBitFlag": 192,
+      "guideSubTitle": "선박 운항 조건",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Condition"
+    },
+    "63": {
+      "id": 63,
+      "group": 8,
+      "groupOrder": 16,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박 나포 및 인양",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Salvage"
+    },
+    "64": {
+      "id": 64,
+      "group": 8,
+      "groupOrder": 17,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박의 수리",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Repair"
+    },
+    "65": {
+      "id": 65,
+      "group": 8,
+      "groupOrder": 18,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박 복원",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Restore"
+    },
+    "66": {
+      "id": 66,
+      "group": 8,
+      "groupOrder": 19,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박 해체",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Dismantle"
+    },
+    "67": {
+      "id": 67,
+      "group": 8,
+      "groupOrder": 20,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박 개조",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Modify"
+    },
+    "68": {
+      "id": 68,
+      "group": 8,
+      "groupOrder": 21,
+      "localBitFlag": 219,
+      "guideSubTitle": "선실 변경",
+      "guideWidget": "WBP_HelpGuidePage_Ship_ChangeCabin"
+    },
+    "69": {
+      "id": 69,
+      "group": 8,
+      "groupOrder": 22,
+      "localBitFlag": 0,
+      "guideSubTitle": "선박 조합",
+      "guideWidget": "WBP_HelpGuidePage_Ship_Assemble"
+    },
+    "70": {
+      "id": 70,
+      "group": 9,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "교역이란?",
+      "guideWidget": "WBP_HelpGuidePage_Trade"
+    },
+    "71": {
+      "id": 71,
+      "group": 9,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "교역 경험치",
+      "guideWidget": "WBP_HelpGuidePage_TradeExp"
+    },
+    "72": {
+      "id": 72,
+      "group": 9,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "교역품 시세",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Price"
+    },
+    "73": {
+      "id": 73,
+      "group": 9,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "교역소 구매",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Buy"
+    },
+    "74": {
+      "id": 74,
+      "group": 9,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "협상",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Nego"
+    },
+    "75": {
+      "id": 75,
+      "group": 9,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "명산품",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Special"
+    },
+    "76": {
+      "id": 76,
+      "group": 9,
+      "groupOrder": 7,
+      "localBitFlag": 219,
+      "guideSubTitle": "선창",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Cargo"
+    },
+    "77": {
+      "id": 77,
+      "group": 9,
+      "groupOrder": 8,
+      "localBitFlag": 219,
+      "guideSubTitle": "관세",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Tax"
+    },
+    "78": {
+      "id": 78,
+      "group": 9,
+      "groupOrder": 9,
+      "localBitFlag": 219,
+      "guideSubTitle": "면세",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Dutyfree"
+    },
+    "79": {
+      "id": 79,
+      "group": 9,
+      "groupOrder": 10,
+      "localBitFlag": 219,
+      "guideSubTitle": "일반 교역 이벤트",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Event"
+    },
+    "80": {
+      "id": 80,
+      "group": 9,
+      "groupOrder": 11,
+      "localBitFlag": 219,
+      "guideSubTitle": "폭증",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Increase"
+    },
+    "81": {
+      "id": 81,
+      "group": 9,
+      "groupOrder": 12,
+      "localBitFlag": 219,
+      "guideSubTitle": "대유행",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Trend"
+    },
+    "82": {
+      "id": 82,
+      "group": 9,
+      "groupOrder": 13,
+      "localBitFlag": 219,
+      "guideSubTitle": "행사",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Mayor"
+    },
+    "83": {
+      "id": 83,
+      "group": 9,
+      "groupOrder": 14,
+      "localBitFlag": 219,
+      "guideSubTitle": "거래 점수",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Point"
+    },
+    "84": {
+      "id": 84,
+      "group": 9,
+      "groupOrder": 15,
+      "localBitFlag": 219,
+      "guideSubTitle": "판매 조합",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Set"
+    },
+    "85": {
+      "id": 85,
+      "group": 9,
+      "groupOrder": 16,
+      "localBitFlag": 0,
+      "guideSubTitle": "물물 교환",
+      "guideWidget": "WBP_HelpGuidePage_Trade_Barter"
+    },
+    "86": {
+      "id": 86,
+      "group": 10,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "조우",
+      "guideWidget": "WBP_HelpGuidePage_Combat"
+    },
+    "87": {
+      "id": 87,
+      "group": 10,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "관찰모드",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Incounter"
+    },
+    "88": {
+      "id": 88,
+      "group": 10,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "전투 시작",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Start"
+    },
+    "89": {
+      "id": 89,
+      "group": 10,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "전투 환경",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Field"
+    },
+    "90": {
+      "id": 90,
+      "group": 10,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박 상성",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Counter"
+    },
+    "91": {
+      "id": 91,
+      "group": 10,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "타일의 종류",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Tile"
+    },
+    "92": {
+      "id": 92,
+      "group": 10,
+      "groupOrder": 7,
+      "localBitFlag": 219,
+      "guideSubTitle": "전투의 진행",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Process"
+    },
+    "93": {
+      "id": 93,
+      "group": 10,
+      "groupOrder": 8,
+      "localBitFlag": 219,
+      "guideSubTitle": "전투 방법",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Way"
+    },
+    "94": {
+      "id": 94,
+      "group": 10,
+      "groupOrder": 9,
+      "localBitFlag": 219,
+      "guideSubTitle": "제독 전투 명령",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Admiral"
+    },
+    "95": {
+      "id": 95,
+      "group": 10,
+      "groupOrder": 10,
+      "localBitFlag": 219,
+      "guideSubTitle": "전투 기술과 효과",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Skill"
+    },
+    "96": {
+      "id": 96,
+      "group": 10,
+      "groupOrder": 11,
+      "localBitFlag": 219,
+      "guideSubTitle": "빠른 기술",
+      "guideWidget": "WBP_HelpGuidePage_Combat_QuickSkill"
+    },
+    "97": {
+      "id": 97,
+      "group": 10,
+      "groupOrder": 12,
+      "localBitFlag": 219,
+      "guideSubTitle": "협공",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Pincer"
+    },
+    "98": {
+      "id": 98,
+      "group": 10,
+      "groupOrder": 13,
+      "localBitFlag": 219,
+      "guideSubTitle": "전투 도구",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Tool"
+    },
+    "99": {
+      "id": 99,
+      "group": 10,
+      "groupOrder": 14,
+      "localBitFlag": 219,
+      "guideSubTitle": "연속 전투",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Auto"
+    },
+    "100": {
+      "id": 100,
+      "group": 10,
+      "groupOrder": 15,
+      "localBitFlag": 219,
+      "guideSubTitle": "소탕과 자동 소탕",
+      "guideWidget": "WBP_HelpGuidePage_Combat_Repel"
+    },
+    "101": {
+      "id": 101,
+      "group": 11,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "모험이란?",
+      "guideWidget": "WBP_HelpGuidePage_Adventure"
+    },
+    "102": {
+      "id": 102,
+      "group": 11,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "모험 도구",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_Tool"
+    },
+    "103": {
+      "id": 103,
+      "group": 11,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "육지 탐색",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_ExploreLand"
+    },
+    "104": {
+      "id": 104,
+      "group": 11,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "탐험",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_Explore"
+    },
+    "105": {
+      "id": 105,
+      "group": 11,
+      "groupOrder": 5,
+      "localBitFlag": 0,
+      "guideSubTitle": "육지 수련",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_Training"
+    },
+    "106": {
+      "id": 106,
+      "group": 11,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "마을",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_Village"
+    },
+    "107": {
+      "id": 107,
+      "group": 11,
+      "groupOrder": 7,
+      "localBitFlag": 219,
+      "guideSubTitle": "발견 보고",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_Report"
+    },
+    "108": {
+      "id": 108,
+      "group": 11,
+      "groupOrder": 8,
+      "localBitFlag": 219,
+      "guideSubTitle": "해양 탐색",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_Sea"
+    },
+    "109": {
+      "id": 109,
+      "group": 11,
+      "groupOrder": 9,
+      "localBitFlag": 219,
+      "guideSubTitle": "낚시",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_Fish"
+    },
+    "110": {
+      "id": 110,
+      "group": 11,
+      "groupOrder": 10,
+      "localBitFlag": 219,
+      "guideSubTitle": "낚싯대와 떡밥",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_FishTool"
+    },
+    "111": {
+      "id": 111,
+      "group": 11,
+      "groupOrder": 11,
+      "localBitFlag": 219,
+      "guideSubTitle": "자동 낚시",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_AutoFish"
+    },
+    "112": {
+      "id": 112,
+      "group": 11,
+      "groupOrder": 12,
+      "localBitFlag": 0,
+      "guideSubTitle": "별자리",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_Stella"
+    },
+    "113": {
+      "id": 113,
+      "group": 11,
+      "groupOrder": 13,
+      "localBitFlag": 0,
+      "guideSubTitle": "모험 수첩",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_Note"
+    },
+    "114": {
+      "id": 114,
+      "group": 11,
+      "groupOrder": 14,
+      "localBitFlag": 0,
+      "guideSubTitle": "인양",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_Salvage"
+    },
+    "115": {
+      "id": 115,
+      "group": 11,
+      "groupOrder": 15,
+      "localBitFlag": 219,
+      "guideSubTitle": "마을 탐험",
+      "guideWidget": "WBP_HelpGuidePage_Adventure_VillageExplore"
+    },
+    "116": {
+      "id": 116,
+      "group": 12,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "세계 지도",
+      "guideWidget": "WBP_HelpGuidePage_Map"
+    },
+    "117": {
+      "id": 117,
+      "group": 12,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "권역",
+      "guideWidget": "WBP_HelpGuidePage_Map_Occupation"
+    },
+    "118": {
+      "id": 118,
+      "group": 12,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "해역 점유 효과",
+      "guideWidget": "WBP_HelpGuidePage_Map_OccupationEffect"
+    },
+    "119": {
+      "id": 119,
+      "group": 12,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "항구",
+      "guideWidget": "WBP_HelpGuidePage_Map_Port"
+    },
+    "120": {
+      "id": 120,
+      "group": 12,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "탐험",
+      "guideWidget": "WBP_HelpGuidePage_Map_Explore"
+    },
+    "121": {
+      "id": 121,
+      "group": 12,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "항로",
+      "guideWidget": "WBP_HelpGuidePage_Map_Route"
+    },
+    "122": {
+      "id": 122,
+      "group": 13,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박 부품이란?",
+      "guideWidget": "WBP_HelpGuidePage_Part"
+    },
+    "123": {
+      "id": 123,
+      "group": 13,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박 외형 부품",
+      "guideWidget": "WBP_HelpGuidePage_Part_Appearance"
+    },
+    "124": {
+      "id": 124,
+      "group": 13,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "선박 부품 획득 방법",
+      "guideWidget": "WBP_HelpGuidePage_Part_Gain"
+    },
+    "125": {
+      "id": 125,
+      "group": 13,
+      "groupOrder": 4,
+      "localBitFlag": 0,
+      "guideSubTitle": "선박 부품 강화",
+      "guideWidget": "WBP_HelpGuidePage_Part_Enhance"
+    },
+    "126": {
+      "id": 126,
+      "group": 14,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "장비",
+      "guideWidget": "WBP_HelpGuidePage_Equip"
+    },
+    "127": {
+      "id": 127,
+      "group": 14,
+      "groupOrder": 2,
+      "localBitFlag": 0,
+      "guideSubTitle": "항해사 장비 획득 방법",
+      "guideWidget": "WBP_HelpGuidePage_Equip_Gain_GL"
+    },
+    "128": {
+      "id": 128,
+      "group": 14,
+      "groupOrder": 3,
+      "localBitFlag": 192,
+      "guideSubTitle": "항해사 장비 획득 방법",
+      "guideWidget": "WBP_HelpGuidePage_Equip_Gain_CN"
+    },
+    "129": {
+      "id": 129,
+      "group": 14,
+      "groupOrder": 4,
+      "localBitFlag": 0,
+      "guideSubTitle": "항해사 장비 강화",
+      "guideWidget": "WBP_HelpGuidePage_Equip_Enhance"
+    },
+    "130": {
+      "id": 130,
+      "group": 14,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "전용 장비",
+      "guideWidget": "WBP_HelpGuidePage_Equip_Exclusive"
+    },
+    "131": {
+      "id": 131,
+      "group": 14,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "항해사 외형",
+      "guideWidget": "WBP_HelpGuidePage_Equip_Appearance"
+    },
+    "132": {
+      "id": 132,
+      "group": 15,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "언어",
+      "guideWidget": "WBP_HelpGuidePage_City_Language"
+    },
+    "133": {
+      "id": 133,
+      "group": 15,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "출항소",
+      "guideWidget": "WBP_HelpGuidePage_City_Habor"
+    },
+    "134": {
+      "id": 134,
+      "group": 15,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "조선소",
+      "guideWidget": "WBP_HelpGuidePage_City_Shipyard"
+    },
+    "135": {
+      "id": 135,
+      "group": 15,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "교역소",
+      "guideWidget": "WBP_HelpGuidePage_City_Market"
+    },
+    "136": {
+      "id": 136,
+      "group": 15,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "여관",
+      "guideWidget": "WBP_HelpGuidePage_City_Inn"
+    },
+    "137": {
+      "id": 137,
+      "group": 15,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "조합",
+      "guideWidget": "WBP_HelpGuidePage_City_Union"
+    },
+    "138": {
+      "id": 138,
+      "group": 15,
+      "groupOrder": 7,
+      "localBitFlag": 219,
+      "guideSubTitle": "공관",
+      "guideWidget": "WBP_HelpGuidePage_City_Bureau"
+    },
+    "139": {
+      "id": 139,
+      "group": 15,
+      "groupOrder": 8,
+      "localBitFlag": 219,
+      "guideSubTitle": "도구점",
+      "guideWidget": "WBP_HelpGuidePage_City_Shop_CN"
+    },
+    "140": {
+      "id": 140,
+      "group": 15,
+      "groupOrder": 9,
+      "localBitFlag": 219,
+      "guideSubTitle": "은행",
+      "guideWidget": "WBP_HelpGuidePage_City_Bank"
+    },
+    "141": {
+      "id": 141,
+      "group": 15,
+      "groupOrder": 10,
+      "localBitFlag": 219,
+      "guideSubTitle": "성당",
+      "guideWidget": "WBP_HelpGuidePage_City_Cathedral"
+    },
+    "142": {
+      "id": 142,
+      "group": 15,
+      "groupOrder": 11,
+      "localBitFlag": 219,
+      "guideSubTitle": "저택",
+      "guideWidget": "WBP_HelpGuidePage_City_Estate"
+    },
+    "143": {
+      "id": 143,
+      "group": 15,
+      "groupOrder": 12,
+      "localBitFlag": 219,
+      "guideSubTitle": "왕궁",
+      "guideWidget": "WBP_HelpGuidePage_City_Castle"
+    },
+    "144": {
+      "id": 144,
+      "group": 16,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "투자란?",
+      "guideWidget": "WBP_HelpGuidePage_Invest"
+    },
+    "145": {
+      "id": 145,
+      "group": 16,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "투자 시 도시 변화",
+      "guideWidget": "WBP_HelpGuidePage_Invest_LV"
+    },
+    "146": {
+      "id": 146,
+      "group": 16,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "투자 정산",
+      "guideWidget": "WBP_HelpGuidePage_Invest_Progress"
+    },
+    "147": {
+      "id": 147,
+      "group": 16,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "투자 보상",
+      "guideWidget": "WBP_HelpGuidePage_Invest_Reward"
+    },
+    "148": {
+      "id": 148,
+      "group": 16,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "시장 선출",
+      "guideWidget": "WBP_HelpGuidePage_Invest_Mayor"
+    },
+    "149": {
+      "id": 149,
+      "group": 16,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "원격 투자",
+      "guideWidget": "WBP_HelpGuidePage_Invest_Remote"
+    },
+    "150": {
+      "id": 150,
+      "group": 17,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "상회란",
+      "guideWidget": "WBP_HelpGuidePage_Guild"
+    },
+    "151": {
+      "id": 151,
+      "group": 17,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "상회 기여도",
+      "guideWidget": "WBP_HelpGuidePage_Guild_Contribution"
+    },
+    "152": {
+      "id": 152,
+      "group": 17,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "기여도 상점",
+      "guideWidget": "WBP_HelpGuidePage_Guild_Shop"
+    },
+    "153": {
+      "id": 153,
+      "group": 17,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "상회 기부",
+      "guideWidget": "WBP_HelpGuidePage_Guild_Donate"
+    },
+    "154": {
+      "id": 154,
+      "group": 17,
+      "groupOrder": 5,
+      "localBitFlag": 0,
+      "guideSubTitle": "상회 합성",
+      "guideWidget": "WBP_HelpGuidePage_Guild_Combine"
+    },
+    "155": {
+      "id": 155,
+      "group": 17,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "상회 효과",
+      "guideWidget": "WBP_HelpGuidePage_Guild_Effect"
+    },
+    "156": {
+      "id": 156,
+      "group": 17,
+      "groupOrder": 7,
+      "localBitFlag": 219,
+      "guideSubTitle": "상회 효과 강화",
+      "guideWidget": "WBP_HelpGuidePage_Guild_Enhance"
+    },
+    "157": {
+      "id": 157,
+      "group": 17,
+      "groupOrder": 8,
+      "localBitFlag": 219,
+      "guideSubTitle": "상회 제작",
+      "guideWidget": "WBP_HelpGuidePage_Guild_Craft"
+    },
+    "158": {
+      "id": 158,
+      "group": 17,
+      "groupOrder": 9,
+      "localBitFlag": 219,
+      "guideSubTitle": "제작 재료",
+      "guideWidget": "WBP_HelpGuidePage_Guild_Ingredient"
+    },
+    "159": {
+      "id": 159,
+      "group": 17,
+      "groupOrder": 10,
+      "localBitFlag": 219,
+      "guideSubTitle": "제작 현황",
+      "guideWidget": "WBP_HelpGuidePage_Guild_CraftOverview"
+    },
+    "160": {
+      "id": 160,
+      "group": 18,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "생산이란?",
+      "guideWidget": "WBP_HelpGuidePage_Production"
+    },
+    "161": {
+      "id": 161,
+      "group": 18,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "생산 계열",
+      "guideWidget": "WBP_HelpGuidePage_Production_Category"
+    },
+    "162": {
+      "id": 162,
+      "group": 18,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "레시피북과 레시피",
+      "guideWidget": "WBP_HelpGuidePage_Production_Recipe"
+    },
+    "163": {
+      "id": 163,
+      "group": 18,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "생산력",
+      "guideWidget": "WBP_HelpGuidePage_Production_Power"
+    },
+    "164": {
+      "id": 164,
+      "group": 19,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "PVP",
+      "guideWidget": "WBP_HelpGuidePage_PVP"
+    },
+    "165": {
+      "id": 165,
+      "group": 19,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "모의전",
+      "guideWidget": "WBP_HelpGuidePage_PVP_Skirmish"
+    },
+    "166": {
+      "id": 166,
+      "group": 19,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "모의전-진행",
+      "guideWidget": "WBP_HelpGuidePage_PVP_SkirmishProcess"
+    },
+    "167": {
+      "id": 167,
+      "group": 19,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "모의전-계급 보상",
+      "guideWidget": "WBP_HelpGuidePage_PVP_Rank"
+    },
+    "168": {
+      "id": 168,
+      "group": 20,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "수집이란?",
+      "guideWidget": "WBP_HelpGuidePage_Collection"
+    },
+    "169": {
+      "id": 169,
+      "group": 20,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "수집-동료",
+      "guideWidget": "WBP_HelpGuidePage_CollectMate"
+    },
+    "170": {
+      "id": 170,
+      "group": 20,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "수집-장비",
+      "guideWidget": "WBP_HelpGuidePage_CollectGear"
+    },
+    "171": {
+      "id": 171,
+      "group": 20,
+      "groupOrder": 4,
+      "localBitFlag": 219,
+      "guideSubTitle": "수집-부품",
+      "guideWidget": "WBP_HelpGuidePage_CollectPart"
+    },
+    "172": {
+      "id": 172,
+      "group": 20,
+      "groupOrder": 5,
+      "localBitFlag": 219,
+      "guideSubTitle": "수집-선박",
+      "guideWidget": "WBP_HelpGuidePage_CollectShip"
+    },
+    "173": {
+      "id": 173,
+      "group": 20,
+      "groupOrder": 6,
+      "localBitFlag": 219,
+      "guideSubTitle": "수집-설계도",
+      "guideWidget": "WBP_HelpGuidePage_CollectBlue"
+    },
+    "174": {
+      "id": 174,
+      "group": 21,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "도구란?",
+      "guideWidget": "WBP_HelpGuidePage_Tool"
+    },
+    "175": {
+      "id": 175,
+      "group": 21,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "도구 일람",
+      "guideWidget": "WBP_HelpGuidePage_Tool_Explain"
+    },
+    "176": {
+      "id": 176,
+      "group": 22,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "거래소란?",
+      "guideWidget": "WBP_HelpGuidePage_Auction"
+    },
+    "177": {
+      "id": 177,
+      "group": 22,
+      "groupOrder": 2,
+      "localBitFlag": 219,
+      "guideSubTitle": "구매",
+      "guideWidget": "WBP_HelpGuidePage_Auction_Buy"
+    },
+    "178": {
+      "id": 178,
+      "group": 22,
+      "groupOrder": 3,
+      "localBitFlag": 219,
+      "guideSubTitle": "판매",
+      "guideWidget": "WBP_HelpGuidePage_Auction_Sell"
+    },
+    "179": {
+      "id": 179,
+      "group": 23,
+      "groupOrder": 1,
+      "localBitFlag": 219,
+      "guideSubTitle": "친구",
+      "guideWidget": "WBP_HelpGuidePage_Friend"
+    }
+  }
+}

@@ -9070,6 +9070,1806 @@
       "isAttack": true,
       "rewardFixedId": 95998465,
       "energy": 10
+    },
+    "1100841": {
+      "id": 1100841,
+      "name": "1 해역",
+      "stageGroup": 14,
+      "stage": 1,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096000,
+      "isAttack": true,
+      "rewardFixedId": 95998416,
+      "energy": 10
+    },
+    "1100842": {
+      "id": 1100842,
+      "name": "2 해역",
+      "stageGroup": 14,
+      "stage": 2,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096001,
+      "isAttack": true,
+      "rewardFixedId": 95998417,
+      "energy": 10
+    },
+    "1100843": {
+      "id": 1100843,
+      "name": "3 해역",
+      "stageGroup": 14,
+      "stage": 3,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096002,
+      "isAttack": true,
+      "rewardFixedId": 95998418,
+      "energy": 10
+    },
+    "1100844": {
+      "id": 1100844,
+      "name": "4 해역",
+      "stageGroup": 14,
+      "stage": 4,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096003,
+      "isAttack": true,
+      "rewardFixedId": 95998419,
+      "energy": 10
+    },
+    "1100845": {
+      "id": 1100845,
+      "name": "5 해역",
+      "stageGroup": 14,
+      "stage": 5,
+      "illust": "LightHouse_Image_002_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096004,
+      "isAttack": true,
+      "rewardFixedId": 95998420,
+      "energy": 10
+    },
+    "1100846": {
+      "id": 1100846,
+      "name": "6 해역",
+      "stageGroup": 14,
+      "stage": 6,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096005,
+      "isAttack": true,
+      "rewardFixedId": 95998421,
+      "energy": 10
+    },
+    "1100847": {
+      "id": 1100847,
+      "name": "7 해역",
+      "stageGroup": 14,
+      "stage": 7,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096006,
+      "isAttack": true,
+      "rewardFixedId": 95998422,
+      "energy": 10
+    },
+    "1100848": {
+      "id": 1100848,
+      "name": "8 해역",
+      "stageGroup": 14,
+      "stage": 8,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096007,
+      "isAttack": true,
+      "rewardFixedId": 95998423,
+      "energy": 10
+    },
+    "1100849": {
+      "id": 1100849,
+      "name": "9 해역",
+      "stageGroup": 14,
+      "stage": 9,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096008,
+      "isAttack": true,
+      "rewardFixedId": 95998424,
+      "energy": 10
+    },
+    "1100850": {
+      "id": 1100850,
+      "name": "10 해역",
+      "stageGroup": 14,
+      "stage": 10,
+      "illust": "LightHouse_Image_003_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096009,
+      "isAttack": true,
+      "rewardFixedId": 95998425,
+      "energy": 10
+    },
+    "1100851": {
+      "id": 1100851,
+      "name": "11 해역",
+      "stageGroup": 14,
+      "stage": 11,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096010,
+      "isAttack": true,
+      "rewardFixedId": 95998426,
+      "energy": 10
+    },
+    "1100852": {
+      "id": 1100852,
+      "name": "12 해역",
+      "stageGroup": 14,
+      "stage": 12,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096011,
+      "isAttack": true,
+      "rewardFixedId": 95998427,
+      "energy": 10
+    },
+    "1100853": {
+      "id": 1100853,
+      "name": "13 해역",
+      "stageGroup": 14,
+      "stage": 13,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096012,
+      "isAttack": true,
+      "rewardFixedId": 95998428,
+      "energy": 10
+    },
+    "1100854": {
+      "id": 1100854,
+      "name": "14 해역",
+      "stageGroup": 14,
+      "stage": 14,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096013,
+      "isAttack": true,
+      "rewardFixedId": 95998429,
+      "energy": 10
+    },
+    "1100855": {
+      "id": 1100855,
+      "name": "15 해역",
+      "stageGroup": 14,
+      "stage": 15,
+      "illust": "LightHouse_Image_002_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096014,
+      "isAttack": true,
+      "rewardFixedId": 95998430,
+      "energy": 10
+    },
+    "1100856": {
+      "id": 1100856,
+      "name": "16 해역",
+      "stageGroup": 14,
+      "stage": 16,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096100,
+      "isAttack": true,
+      "rewardFixedId": 95998431,
+      "energy": 10
+    },
+    "1100857": {
+      "id": 1100857,
+      "name": "17 해역",
+      "stageGroup": 14,
+      "stage": 17,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096101,
+      "isAttack": true,
+      "rewardFixedId": 95998432,
+      "energy": 10
+    },
+    "1100858": {
+      "id": 1100858,
+      "name": "18 해역",
+      "stageGroup": 14,
+      "stage": 18,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096102,
+      "isAttack": true,
+      "rewardFixedId": 95998433,
+      "energy": 10
+    },
+    "1100859": {
+      "id": 1100859,
+      "name": "19 해역",
+      "stageGroup": 14,
+      "stage": 19,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096103,
+      "isAttack": true,
+      "rewardFixedId": 95998434,
+      "energy": 10
+    },
+    "1100860": {
+      "id": 1100860,
+      "name": "20 해역",
+      "stageGroup": 14,
+      "stage": 20,
+      "illust": "LightHouse_Image_003_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096104,
+      "isAttack": true,
+      "rewardFixedId": 95998435,
+      "energy": 10
+    },
+    "1100861": {
+      "id": 1100861,
+      "name": "21 해역",
+      "stageGroup": 14,
+      "stage": 21,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096164,
+      "isAttack": true,
+      "rewardFixedId": 95998436,
+      "energy": 10
+    },
+    "1100862": {
+      "id": 1100862,
+      "name": "22 해역",
+      "stageGroup": 14,
+      "stage": 22,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096165,
+      "isAttack": true,
+      "rewardFixedId": 95998437,
+      "energy": 10
+    },
+    "1100863": {
+      "id": 1100863,
+      "name": "23 해역",
+      "stageGroup": 14,
+      "stage": 23,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096166,
+      "isAttack": true,
+      "rewardFixedId": 95998438,
+      "energy": 10
+    },
+    "1100864": {
+      "id": 1100864,
+      "name": "24 해역",
+      "stageGroup": 14,
+      "stage": 24,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096167,
+      "isAttack": true,
+      "rewardFixedId": 95998439,
+      "energy": 10
+    },
+    "1100865": {
+      "id": 1100865,
+      "name": "25 해역",
+      "stageGroup": 14,
+      "stage": 25,
+      "illust": "LightHouse_Image_002_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096168,
+      "isAttack": true,
+      "rewardFixedId": 95998440,
+      "energy": 10
+    },
+    "1100866": {
+      "id": 1100866,
+      "name": "26 해역",
+      "stageGroup": 14,
+      "stage": 26,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096169,
+      "isAttack": true,
+      "rewardFixedId": 95998441,
+      "energy": 10
+    },
+    "1100867": {
+      "id": 1100867,
+      "name": "27 해역",
+      "stageGroup": 14,
+      "stage": 27,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096170,
+      "isAttack": true,
+      "rewardFixedId": 95998442,
+      "energy": 10
+    },
+    "1100868": {
+      "id": 1100868,
+      "name": "28 해역",
+      "stageGroup": 14,
+      "stage": 28,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096171,
+      "isAttack": true,
+      "rewardFixedId": 95998443,
+      "energy": 10
+    },
+    "1100869": {
+      "id": 1100869,
+      "name": "29 해역",
+      "stageGroup": 14,
+      "stage": 29,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096172,
+      "isAttack": true,
+      "rewardFixedId": 95998444,
+      "energy": 10
+    },
+    "1100870": {
+      "id": 1100870,
+      "name": "30 해역",
+      "stageGroup": 14,
+      "stage": 30,
+      "illust": "LightHouse_Image_003_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096173,
+      "isAttack": true,
+      "rewardFixedId": 95998445,
+      "energy": 10
+    },
+    "1100871": {
+      "id": 1100871,
+      "name": "31 해역",
+      "stageGroup": 14,
+      "stage": 31,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096230,
+      "isAttack": true,
+      "rewardFixedId": 95998446,
+      "energy": 10
+    },
+    "1100872": {
+      "id": 1100872,
+      "name": "32 해역",
+      "stageGroup": 14,
+      "stage": 32,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096231,
+      "isAttack": true,
+      "rewardFixedId": 95998447,
+      "energy": 10
+    },
+    "1100873": {
+      "id": 1100873,
+      "name": "33 해역",
+      "stageGroup": 14,
+      "stage": 33,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096232,
+      "isAttack": true,
+      "rewardFixedId": 95998448,
+      "energy": 10
+    },
+    "1100874": {
+      "id": 1100874,
+      "name": "34 해역",
+      "stageGroup": 14,
+      "stage": 34,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096233,
+      "isAttack": true,
+      "rewardFixedId": 95998449,
+      "energy": 10
+    },
+    "1100875": {
+      "id": 1100875,
+      "name": "35 해역",
+      "stageGroup": 14,
+      "stage": 35,
+      "illust": "LightHouse_Image_002_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096234,
+      "isAttack": true,
+      "rewardFixedId": 95998450,
+      "energy": 10
+    },
+    "1100876": {
+      "id": 1100876,
+      "name": "36 해역",
+      "stageGroup": 14,
+      "stage": 36,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096302,
+      "isAttack": true,
+      "rewardFixedId": 95998451,
+      "energy": 10
+    },
+    "1100877": {
+      "id": 1100877,
+      "name": "37 해역",
+      "stageGroup": 14,
+      "stage": 37,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096303,
+      "isAttack": true,
+      "rewardFixedId": 95998452,
+      "energy": 10
+    },
+    "1100878": {
+      "id": 1100878,
+      "name": "38 해역",
+      "stageGroup": 14,
+      "stage": 38,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096304,
+      "isAttack": true,
+      "rewardFixedId": 95998453,
+      "energy": 10
+    },
+    "1100879": {
+      "id": 1100879,
+      "name": "39 해역",
+      "stageGroup": 14,
+      "stage": 39,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096305,
+      "isAttack": true,
+      "rewardFixedId": 95998454,
+      "energy": 10
+    },
+    "1100880": {
+      "id": 1100880,
+      "name": "40 해역",
+      "stageGroup": 14,
+      "stage": 40,
+      "illust": "LightHouse_Image_003_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096306,
+      "isAttack": true,
+      "rewardFixedId": 95998455,
+      "energy": 10
+    },
+    "1100881": {
+      "id": 1100881,
+      "name": "41 해역",
+      "stageGroup": 14,
+      "stage": 41,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096318,
+      "isAttack": true,
+      "rewardFixedId": 95998456,
+      "energy": 10
+    },
+    "1100882": {
+      "id": 1100882,
+      "name": "42 해역",
+      "stageGroup": 14,
+      "stage": 42,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096319,
+      "isAttack": true,
+      "rewardFixedId": 95998457,
+      "energy": 10
+    },
+    "1100883": {
+      "id": 1100883,
+      "name": "43 해역",
+      "stageGroup": 14,
+      "stage": 43,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096320,
+      "isAttack": true,
+      "rewardFixedId": 95998458,
+      "energy": 10
+    },
+    "1100884": {
+      "id": 1100884,
+      "name": "44 해역",
+      "stageGroup": 14,
+      "stage": 44,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096321,
+      "isAttack": true,
+      "rewardFixedId": 95998459,
+      "energy": 10
+    },
+    "1100885": {
+      "id": 1100885,
+      "name": "45 해역",
+      "stageGroup": 14,
+      "stage": 45,
+      "illust": "LightHouse_Image_002_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096322,
+      "isAttack": true,
+      "rewardFixedId": 95998460,
+      "energy": 10
+    },
+    "1100886": {
+      "id": 1100886,
+      "name": "46 해역",
+      "stageGroup": 14,
+      "stage": 46,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096365,
+      "isAttack": true,
+      "rewardFixedId": 95998461,
+      "energy": 10
+    },
+    "1100887": {
+      "id": 1100887,
+      "name": "47 해역",
+      "stageGroup": 14,
+      "stage": 47,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096366,
+      "isAttack": true,
+      "rewardFixedId": 95998462,
+      "energy": 10
+    },
+    "1100888": {
+      "id": 1100888,
+      "name": "48 해역",
+      "stageGroup": 14,
+      "stage": 48,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096367,
+      "isAttack": true,
+      "rewardFixedId": 95998463,
+      "energy": 10
+    },
+    "1100889": {
+      "id": 1100889,
+      "name": "49 해역",
+      "stageGroup": 14,
+      "stage": 49,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096368,
+      "isAttack": true,
+      "rewardFixedId": 95998464,
+      "energy": 10
+    },
+    "1100890": {
+      "id": 1100890,
+      "name": "50 해역",
+      "stageGroup": 14,
+      "stage": 50,
+      "illust": "LightHouse_Image_003_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096369,
+      "isAttack": true,
+      "rewardFixedId": 95998465,
+      "energy": 10
+    },
+    "1100891": {
+      "id": 1100891,
+      "name": "1 해역",
+      "stageGroup": 15,
+      "stage": 1,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096000,
+      "isAttack": true,
+      "rewardFixedId": 95998416,
+      "energy": 10
+    },
+    "1100892": {
+      "id": 1100892,
+      "name": "2 해역",
+      "stageGroup": 15,
+      "stage": 2,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096001,
+      "isAttack": true,
+      "rewardFixedId": 95998417,
+      "energy": 10
+    },
+    "1100893": {
+      "id": 1100893,
+      "name": "3 해역",
+      "stageGroup": 15,
+      "stage": 3,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096002,
+      "isAttack": true,
+      "rewardFixedId": 95998418,
+      "energy": 10
+    },
+    "1100894": {
+      "id": 1100894,
+      "name": "4 해역",
+      "stageGroup": 15,
+      "stage": 4,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096003,
+      "isAttack": true,
+      "rewardFixedId": 95998419,
+      "energy": 10
+    },
+    "1100895": {
+      "id": 1100895,
+      "name": "5 해역",
+      "stageGroup": 15,
+      "stage": 5,
+      "illust": "LightHouse_Image_002_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096004,
+      "isAttack": true,
+      "rewardFixedId": 95998420,
+      "energy": 10
+    },
+    "1100896": {
+      "id": 1100896,
+      "name": "6 해역",
+      "stageGroup": 15,
+      "stage": 6,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096005,
+      "isAttack": true,
+      "rewardFixedId": 95998421,
+      "energy": 10
+    },
+    "1100897": {
+      "id": 1100897,
+      "name": "7 해역",
+      "stageGroup": 15,
+      "stage": 7,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096006,
+      "isAttack": true,
+      "rewardFixedId": 95998422,
+      "energy": 10
+    },
+    "1100898": {
+      "id": 1100898,
+      "name": "8 해역",
+      "stageGroup": 15,
+      "stage": 8,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096007,
+      "isAttack": true,
+      "rewardFixedId": 95998423,
+      "energy": 10
+    },
+    "1100899": {
+      "id": 1100899,
+      "name": "9 해역",
+      "stageGroup": 15,
+      "stage": 9,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096008,
+      "isAttack": true,
+      "rewardFixedId": 95998424,
+      "energy": 10
+    },
+    "1100900": {
+      "id": 1100900,
+      "name": "10 해역",
+      "stageGroup": 15,
+      "stage": 10,
+      "illust": "LightHouse_Image_003_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096009,
+      "isAttack": true,
+      "rewardFixedId": 95998425,
+      "energy": 10
+    },
+    "1100901": {
+      "id": 1100901,
+      "name": "11 해역",
+      "stageGroup": 15,
+      "stage": 11,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096010,
+      "isAttack": true,
+      "rewardFixedId": 95998426,
+      "energy": 10
+    },
+    "1100902": {
+      "id": 1100902,
+      "name": "12 해역",
+      "stageGroup": 15,
+      "stage": 12,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096011,
+      "isAttack": true,
+      "rewardFixedId": 95998427,
+      "energy": 10
+    },
+    "1100903": {
+      "id": 1100903,
+      "name": "13 해역",
+      "stageGroup": 15,
+      "stage": 13,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096012,
+      "isAttack": true,
+      "rewardFixedId": 95998428,
+      "energy": 10
+    },
+    "1100904": {
+      "id": 1100904,
+      "name": "14 해역",
+      "stageGroup": 15,
+      "stage": 14,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096013,
+      "isAttack": true,
+      "rewardFixedId": 95998429,
+      "energy": 10
+    },
+    "1100905": {
+      "id": 1100905,
+      "name": "15 해역",
+      "stageGroup": 15,
+      "stage": 15,
+      "illust": "LightHouse_Image_002_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096014,
+      "isAttack": true,
+      "rewardFixedId": 95998430,
+      "energy": 10
+    },
+    "1100906": {
+      "id": 1100906,
+      "name": "16 해역",
+      "stageGroup": 15,
+      "stage": 16,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096100,
+      "isAttack": true,
+      "rewardFixedId": 95998431,
+      "energy": 10
+    },
+    "1100907": {
+      "id": 1100907,
+      "name": "17 해역",
+      "stageGroup": 15,
+      "stage": 17,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096101,
+      "isAttack": true,
+      "rewardFixedId": 95998432,
+      "energy": 10
+    },
+    "1100908": {
+      "id": 1100908,
+      "name": "18 해역",
+      "stageGroup": 15,
+      "stage": 18,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096102,
+      "isAttack": true,
+      "rewardFixedId": 95998433,
+      "energy": 10
+    },
+    "1100909": {
+      "id": 1100909,
+      "name": "19 해역",
+      "stageGroup": 15,
+      "stage": 19,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096103,
+      "isAttack": true,
+      "rewardFixedId": 95998434,
+      "energy": 10
+    },
+    "1100910": {
+      "id": 1100910,
+      "name": "20 해역",
+      "stageGroup": 15,
+      "stage": 20,
+      "illust": "LightHouse_Image_003_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096104,
+      "isAttack": true,
+      "rewardFixedId": 95998435,
+      "energy": 10
+    },
+    "1100911": {
+      "id": 1100911,
+      "name": "21 해역",
+      "stageGroup": 15,
+      "stage": 21,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096164,
+      "isAttack": true,
+      "rewardFixedId": 95998436,
+      "energy": 10
+    },
+    "1100912": {
+      "id": 1100912,
+      "name": "22 해역",
+      "stageGroup": 15,
+      "stage": 22,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096165,
+      "isAttack": true,
+      "rewardFixedId": 95998437,
+      "energy": 10
+    },
+    "1100913": {
+      "id": 1100913,
+      "name": "23 해역",
+      "stageGroup": 15,
+      "stage": 23,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096166,
+      "isAttack": true,
+      "rewardFixedId": 95998438,
+      "energy": 10
+    },
+    "1100914": {
+      "id": 1100914,
+      "name": "24 해역",
+      "stageGroup": 15,
+      "stage": 24,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096167,
+      "isAttack": true,
+      "rewardFixedId": 95998439,
+      "energy": 10
+    },
+    "1100915": {
+      "id": 1100915,
+      "name": "25 해역",
+      "stageGroup": 15,
+      "stage": 25,
+      "illust": "LightHouse_Image_002_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096168,
+      "isAttack": true,
+      "rewardFixedId": 95998440,
+      "energy": 10
+    },
+    "1100916": {
+      "id": 1100916,
+      "name": "26 해역",
+      "stageGroup": 15,
+      "stage": 26,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096169,
+      "isAttack": true,
+      "rewardFixedId": 95998441,
+      "energy": 10
+    },
+    "1100917": {
+      "id": 1100917,
+      "name": "27 해역",
+      "stageGroup": 15,
+      "stage": 27,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096170,
+      "isAttack": true,
+      "rewardFixedId": 95998442,
+      "energy": 10
+    },
+    "1100918": {
+      "id": 1100918,
+      "name": "28 해역",
+      "stageGroup": 15,
+      "stage": 28,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096171,
+      "isAttack": true,
+      "rewardFixedId": 95998443,
+      "energy": 10
+    },
+    "1100919": {
+      "id": 1100919,
+      "name": "29 해역",
+      "stageGroup": 15,
+      "stage": 29,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096172,
+      "isAttack": true,
+      "rewardFixedId": 95998444,
+      "energy": 10
+    },
+    "1100920": {
+      "id": 1100920,
+      "name": "30 해역",
+      "stageGroup": 15,
+      "stage": 30,
+      "illust": "LightHouse_Image_003_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096173,
+      "isAttack": true,
+      "rewardFixedId": 95998445,
+      "energy": 10
+    },
+    "1100921": {
+      "id": 1100921,
+      "name": "31 해역",
+      "stageGroup": 15,
+      "stage": 31,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096230,
+      "isAttack": true,
+      "rewardFixedId": 95998446,
+      "energy": 10
+    },
+    "1100922": {
+      "id": 1100922,
+      "name": "32 해역",
+      "stageGroup": 15,
+      "stage": 32,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096231,
+      "isAttack": true,
+      "rewardFixedId": 95998447,
+      "energy": 10
+    },
+    "1100923": {
+      "id": 1100923,
+      "name": "33 해역",
+      "stageGroup": 15,
+      "stage": 33,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096232,
+      "isAttack": true,
+      "rewardFixedId": 95998448,
+      "energy": 10
+    },
+    "1100924": {
+      "id": 1100924,
+      "name": "34 해역",
+      "stageGroup": 15,
+      "stage": 34,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096233,
+      "isAttack": true,
+      "rewardFixedId": 95998449,
+      "energy": 10
+    },
+    "1100925": {
+      "id": 1100925,
+      "name": "35 해역",
+      "stageGroup": 15,
+      "stage": 35,
+      "illust": "LightHouse_Image_002_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096234,
+      "isAttack": true,
+      "rewardFixedId": 95998450,
+      "energy": 10
+    },
+    "1100926": {
+      "id": 1100926,
+      "name": "36 해역",
+      "stageGroup": 15,
+      "stage": 36,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096302,
+      "isAttack": true,
+      "rewardFixedId": 95998451,
+      "energy": 10
+    },
+    "1100927": {
+      "id": 1100927,
+      "name": "37 해역",
+      "stageGroup": 15,
+      "stage": 37,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096303,
+      "isAttack": true,
+      "rewardFixedId": 95998452,
+      "energy": 10
+    },
+    "1100928": {
+      "id": 1100928,
+      "name": "38 해역",
+      "stageGroup": 15,
+      "stage": 38,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096304,
+      "isAttack": true,
+      "rewardFixedId": 95998453,
+      "energy": 10
+    },
+    "1100929": {
+      "id": 1100929,
+      "name": "39 해역",
+      "stageGroup": 15,
+      "stage": 39,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096305,
+      "isAttack": true,
+      "rewardFixedId": 95998454,
+      "energy": 10
+    },
+    "1100930": {
+      "id": 1100930,
+      "name": "40 해역",
+      "stageGroup": 15,
+      "stage": 40,
+      "illust": "LightHouse_Image_003_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096306,
+      "isAttack": true,
+      "rewardFixedId": 95998455,
+      "energy": 10
+    },
+    "1100931": {
+      "id": 1100931,
+      "name": "41 해역",
+      "stageGroup": 15,
+      "stage": 41,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096318,
+      "isAttack": true,
+      "rewardFixedId": 95998456,
+      "energy": 10
+    },
+    "1100932": {
+      "id": 1100932,
+      "name": "42 해역",
+      "stageGroup": 15,
+      "stage": 42,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096319,
+      "isAttack": true,
+      "rewardFixedId": 95998457,
+      "energy": 10
+    },
+    "1100933": {
+      "id": 1100933,
+      "name": "43 해역",
+      "stageGroup": 15,
+      "stage": 43,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096320,
+      "isAttack": true,
+      "rewardFixedId": 95998458,
+      "energy": 10
+    },
+    "1100934": {
+      "id": 1100934,
+      "name": "44 해역",
+      "stageGroup": 15,
+      "stage": 44,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096321,
+      "isAttack": true,
+      "rewardFixedId": 95998459,
+      "energy": 10
+    },
+    "1100935": {
+      "id": 1100935,
+      "name": "45 해역",
+      "stageGroup": 15,
+      "stage": 45,
+      "illust": "LightHouse_Image_002_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096322,
+      "isAttack": true,
+      "rewardFixedId": 95998460,
+      "energy": 10
+    },
+    "1100936": {
+      "id": 1100936,
+      "name": "46 해역",
+      "stageGroup": 15,
+      "stage": 46,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096375,
+      "isAttack": true,
+      "rewardFixedId": 95998461,
+      "energy": 10
+    },
+    "1100937": {
+      "id": 1100937,
+      "name": "47 해역",
+      "stageGroup": 15,
+      "stage": 47,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096376,
+      "isAttack": true,
+      "rewardFixedId": 95998462,
+      "energy": 10
+    },
+    "1100938": {
+      "id": 1100938,
+      "name": "48 해역",
+      "stageGroup": 15,
+      "stage": 48,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096377,
+      "isAttack": true,
+      "rewardFixedId": 95998463,
+      "energy": 10
+    },
+    "1100939": {
+      "id": 1100939,
+      "name": "49 해역",
+      "stageGroup": 15,
+      "stage": 49,
+      "illust": "LightHouse_Image_001_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096378,
+      "isAttack": true,
+      "rewardFixedId": 95998464,
+      "energy": 10
+    },
+    "1100940": {
+      "id": 1100940,
+      "name": "50 해역",
+      "stageGroup": 15,
+      "stage": 50,
+      "illust": "LightHouse_Image_003_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
+      "oceanNpcId": 15096379,
+      "isAttack": true,
+      "rewardFixedId": 95998465,
+      "energy": 10
     }
   }
 }

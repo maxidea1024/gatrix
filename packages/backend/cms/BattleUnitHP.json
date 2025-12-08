@@ -405,6 +405,23 @@
           "Order": 1
         }
       ]
+    },
+    "12": {
+      "id": 12,
+      "minSailorHPPct3f": 1000,
+      "hp": [
+        {
+          "Name": "선체 내구도",
+          "StatOperator": 7000,
+          "Val": 3500,
+          "minSailorHpPct3f": 0,
+          "HPType": 3,
+          "IsLife": true,
+          "IsCheck": true,
+          "InterruptHeal": false,
+          "Order": 1
+        }
+      ]
     }
   }
 }

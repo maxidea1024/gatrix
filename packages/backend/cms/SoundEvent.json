@@ -734,6 +734,11 @@
           "Tag": "Raid2",
           "SoundGroupId": 97000101,
           "DuckingAsset": "SM_Battle"
+        },
+        {
+          "Tag": "HalloweenBattle",
+          "SoundGroupId": 97000132,
+          "DuckingAsset": "SM_Battle"
         }
       ]
     },
@@ -991,6 +996,11 @@
         {
           "Tag": "창세기전",
           "SoundGroupId": 97010186,
+          "DuckingAsset": "SM-Title"
+        },
+        {
+          "Tag": "할로윈 BGM",
+          "SoundGroupId": 97000131,
           "DuckingAsset": "SM-Title"
         }
       ]
@@ -8499,6 +8509,17 @@
         {
           "Tag": "Default",
           "SoundGroupId": 97010339,
+          "DuckingAsset": "nop"
+        }
+      ]
+    },
+    "96000937": {
+      "id": 96000937,
+      "name": "SE_시즌 5 시작 효과음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010340,
           "DuckingAsset": "nop"
         }
       ]

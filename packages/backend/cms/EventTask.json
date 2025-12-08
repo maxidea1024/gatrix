@@ -54389,6 +54389,3190 @@
         }
       ]
     },
+    "99790264": {
+      "id": 99790264,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130132
+      ],
+      "eventTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99790265": {
+      "id": 99790265,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130133
+      ],
+      "eventTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99790266": {
+      "id": 99790266,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130132
+      ],
+      "eventTaskCount": 10,
+      "missionTargetType": 1
+    },
+    "99790267": {
+      "id": 99790267,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130133
+      ],
+      "eventTaskCount": 10,
+      "missionTargetType": 1
+    },
+    "99790268": {
+      "id": 99790268,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130132
+      ],
+      "eventTaskCount": 15,
+      "missionTargetType": 1
+    },
+    "99790269": {
+      "id": 99790269,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130133
+      ],
+      "eventTaskCount": 15,
+      "missionTargetType": 1
+    },
+    "99790270": {
+      "id": 99790270,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130132
+      ],
+      "eventTaskCount": 20,
+      "missionTargetType": 1
+    },
+    "99790271": {
+      "id": 99790271,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130133
+      ],
+      "eventTaskCount": 20,
+      "missionTargetType": 1
+    },
+    "99790272": {
+      "id": 99790272,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130132
+      ],
+      "eventTaskCount": 25,
+      "missionTargetType": 1
+    },
+    "99790273": {
+      "id": 99790273,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130133
+      ],
+      "eventTaskCount": 25,
+      "missionTargetType": 1
+    },
+    "99790274": {
+      "id": 99790274,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130132
+      ],
+      "eventTaskCount": 30,
+      "missionTargetType": 1
+    },
+    "99790275": {
+      "id": 99790275,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130133
+      ],
+      "eventTaskCount": 30,
+      "missionTargetType": 1
+    },
+    "99790276": {
+      "id": 99790276,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000121,
+      "eventTaskTargets": [
+        11000000,
+        24000057
+      ],
+      "eventTaskCount": 50,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000000,
+        10
+      ]
+    },
+    "99790277": {
+      "id": 99790277,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000122,
+      "eventTaskTargets": [
+        11000094,
+        24000057
+      ],
+      "eventTaskCount": 50,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000094,
+        10
+      ]
+    },
+    "99790278": {
+      "id": 99790278,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000040,
+      "eventTaskCount": 30,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99790279": {
+      "id": 99790279,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000042,
+      "eventTaskCount": 100000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99790280": {
+      "id": 99790280,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000054,
+      "eventTaskTargets": [
+        23700017
+      ],
+      "eventTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        5
+      ]
+    },
+    "99790281": {
+      "id": 99790281,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000104,
+      "eventTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790282": {
+      "id": 99790282,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000085,
+      "eventTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        8
+      ]
+    },
+    "99790283": {
+      "id": 99790283,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000078,
+      "eventTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790284": {
+      "id": 99790284,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000059,
+      "eventTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790285": {
+      "id": 99790285,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000061,
+      "eventTaskTargets": [
+        2
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790286": {
+      "id": 99790286,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000072,
+      "eventTaskTargets": [
+        3,
+        3
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99790287": {
+      "id": 99790287,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000075,
+      "eventTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790288": {
+      "id": 99790288,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000016,
+      "eventTaskTargets": [
+        11000153
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000153,
+        2
+      ]
+    },
+    "99790289": {
+      "id": 99790289,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000016,
+      "eventTaskTargets": [
+        11000169
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000169,
+        2
+      ]
+    },
+    "99790290": {
+      "id": 99790290,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000016,
+      "eventTaskTargets": [
+        11000101
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000101,
+        2
+      ]
+    },
+    "99790291": {
+      "id": 99790291,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000017,
+      "eventTaskCount": 300000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99790292": {
+      "id": 99790292,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000072,
+      "eventTaskTargets": [
+        3,
+        2
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99790293": {
+      "id": 99790293,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000125,
+      "eventTaskCount": 3000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99790294": {
+      "id": 99790294,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000100,
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99790295": {
+      "id": 99790295,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000149,
+      "eventTaskTargets": [
+        0
+      ],
+      "eventTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99790296": {
+      "id": 99790296,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000054,
+      "eventTaskTargets": [
+        23700000
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        5
+      ]
+    },
+    "99790297": {
+      "id": 99790297,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000072,
+      "eventTaskTargets": [
+        3,
+        1
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99790298": {
+      "id": 99790298,
+      "overrideDesc": "지브롤터 암벽 발견",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000052,
+      "eventTaskTargets": [
+        70413507
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        36.27,
+        -5.12
+      ]
+    },
+    "99790299": {
+      "id": 99790299,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000048,
+      "eventTaskCount": 1,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000000,
+        8
+      ]
+    },
+    "99790300": {
+      "id": 99790300,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000081,
+      "eventTaskTargets": [
+        23523014
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000000,
+        5
+      ]
+    },
+    "99790301": {
+      "id": 99790301,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000119,
+      "eventTaskTargets": [
+        24000183
+      ],
+      "eventTaskCount": 50,
+      "missionTargetType": 16,
+      "autoMovingVal": [
+        24000183
+      ]
+    },
+    "99790302": {
+      "id": 99790302,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000054,
+      "eventTaskTargets": [
+        23700016
+      ],
+      "eventTaskCount": 10,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        5
+      ]
+    },
+    "99790303": {
+      "id": 99790303,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000168,
+      "eventTaskTargets": [
+        100130052
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 1
+    },
+    "99790304": {
+      "id": 99790304,
+      "overrideDesc": "주조 레벨 2 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000080,
+      "eventTaskTargets": [
+        2
+      ],
+      "eventTaskCount": 2,
+      "missionTargetType": 1
+    },
+    "99790305": {
+      "id": 99790305,
+      "overrideDesc": "조리 레벨 2 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000080,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 2,
+      "missionTargetType": 1
+    },
+    "99790306": {
+      "id": 99790306,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790307": {
+      "id": 99790307,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790308": {
+      "id": 99790308,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790309": {
+      "id": 99790309,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790310": {
+      "id": 99790310,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790311": {
+      "id": 99790311,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 6,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790312": {
+      "id": 99790312,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790313": {
+      "id": 99790313,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 8,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790314": {
+      "id": 99790314,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 9,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790315": {
+      "id": 99790315,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790316": {
+      "id": 99790316,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 11,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790317": {
+      "id": 99790317,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 12,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790318": {
+      "id": 99790318,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 13,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790319": {
+      "id": 99790319,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 14,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790320": {
+      "id": 99790320,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 15,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790321": {
+      "id": 99790321,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 16,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790322": {
+      "id": 99790322,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 17,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790323": {
+      "id": 99790323,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 18,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790324": {
+      "id": 99790324,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 19,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790325": {
+      "id": 99790325,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 20,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790326": {
+      "id": 99790326,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 21,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790327": {
+      "id": 99790327,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 22,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790328": {
+      "id": 99790328,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 23,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790329": {
+      "id": 99790329,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 24,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790330": {
+      "id": 99790330,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 25,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790331": {
+      "id": 99790331,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 26,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790332": {
+      "id": 99790332,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 27,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790333": {
+      "id": 99790333,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 28,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790334": {
+      "id": 99790334,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 29,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790335": {
+      "id": 99790335,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 30,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790336": {
+      "id": 99790336,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 31,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790337": {
+      "id": 99790337,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 32,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790338": {
+      "id": 99790338,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 33,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790339": {
+      "id": 99790339,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 34,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790340": {
+      "id": 99790340,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 35,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790341": {
+      "id": 99790341,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 36,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790342": {
+      "id": 99790342,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 37,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790343": {
+      "id": 99790343,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 38,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790344": {
+      "id": 99790344,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 39,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790345": {
+      "id": 99790345,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 40,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790346": {
+      "id": 99790346,
+      "overrideDesc": "서양 건조 LV 1 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000050,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99790347": {
+      "id": 99790347,
+      "overrideDesc": "서양 건조 LV 2 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000050,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99790348": {
+      "id": 99790348,
+      "overrideDesc": "서양 건조 LV 3 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000050,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99790349": {
+      "id": 99790349,
+      "overrideDesc": "서양 건조 LV 4 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000050,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 4,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99790350": {
+      "id": 99790350,
+      "overrideDesc": "서양 건조 LV 5 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000050,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99790351": {
+      "id": 99790351,
+      "overrideDesc": "서양 건조 LV 6 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000050,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 6,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99790352": {
+      "id": 99790352,
+      "overrideDesc": "서양 건조 LV 7 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000050,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 7,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99790353": {
+      "id": 99790353,
+      "overrideDesc": "서양 건조 LV 8 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000050,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 8,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99790354": {
+      "id": 99790354,
+      "overrideDesc": "서양 건조 LV 9 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000050,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 9,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99790355": {
+      "id": 99790355,
+      "overrideDesc": "서양 건조 LV 10 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000050,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 10,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99790356": {
+      "id": 99790356,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000051,
+      "eventTaskTargets": [
+        82651014
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ],
+      "missionImage": "WT_CH_NPC_RU_Yeva0_S_Sprite"
+    },
+    "99790357": {
+      "id": 99790357,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000051,
+      "eventTaskTargets": [
+        82651015
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ],
+      "missionImage": "WT_CH_Officer_RU_Natasha0_S_Sprite"
+    },
+    "99790358": {
+      "id": 99790358,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000051,
+      "eventTaskTargets": [
+        82651016
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ],
+      "missionImage": "WT_CH_NPC_FR_Aurelie0_S_Sprite"
+    },
+    "99790359": {
+      "id": 99790359,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000051,
+      "eventTaskTargets": [
+        82651017
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ],
+      "missionImage": "WT_CH_NPC_RU_Rudy0_S_Sprite"
+    },
+    "99790360": {
+      "id": 99790360,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000051,
+      "eventTaskTargets": [
+        82651018
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ],
+      "missionImage": "WT_CH_Officer_DE_ClaraS0_S_Sprite"
+    },
+    "99790361": {
+      "id": 99790361,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000051,
+      "eventTaskTargets": [
+        82651019
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ],
+      "missionImage": "WT_CH_Admiral_IE_AnneB2_S_Sprite"
+    },
+    "99790362": {
+      "id": 99790362,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000051,
+      "eventTaskTargets": [
+        82651020
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ],
+      "missionImage": "icon_Effect_Christmas_1_Sprite"
+    },
+    "99790363": {
+      "id": 99790363,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000051,
+      "eventTaskTargets": [
+        82651021
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ],
+      "missionImage": "WT_Ship_PresentOfChristmas_S_Sprite"
+    },
+    "99790364": {
+      "id": 99790364,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000051,
+      "eventTaskTargets": [
+        82651022
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ],
+      "missionImage": "Discovery_Card_Christmas0_Sprite"
+    },
+    "99790365": {
+      "id": 99790365,
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000051,
+      "eventTaskTargets": [
+        82651023
+      ],
+      "eventTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ],
+      "missionImage": "WT_CH_Admiral_RU_LinusRC0_S_Sprite"
+    },
+    "99790366": {
+      "id": 99790366,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 11,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790367": {
+      "id": 99790367,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 12,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790368": {
+      "id": 99790368,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 13,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790369": {
+      "id": 99790369,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 14,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790370": {
+      "id": 99790370,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 15,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790371": {
+      "id": 99790371,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 16,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790372": {
+      "id": 99790372,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 17,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790373": {
+      "id": 99790373,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 18,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790374": {
+      "id": 99790374,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 19,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790375": {
+      "id": 99790375,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 20,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790376": {
+      "id": 99790376,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 21,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790377": {
+      "id": 99790377,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 22,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790378": {
+      "id": 99790378,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 23,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790379": {
+      "id": 99790379,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 24,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790380": {
+      "id": 99790380,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 25,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790381": {
+      "id": 99790381,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 26,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790382": {
+      "id": 99790382,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 27,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790383": {
+      "id": 99790383,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 28,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790384": {
+      "id": 99790384,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 29,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790385": {
+      "id": 99790385,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 30,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790386": {
+      "id": 99790386,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 31,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790387": {
+      "id": 99790387,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 32,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790388": {
+      "id": 99790388,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 33,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790389": {
+      "id": 99790389,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 34,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790390": {
+      "id": 99790390,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 35,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790391": {
+      "id": 99790391,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 36,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790392": {
+      "id": 99790392,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 37,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790393": {
+      "id": 99790393,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 38,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790394": {
+      "id": 99790394,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 39,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790395": {
+      "id": 99790395,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 40,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790396": {
+      "id": 99790396,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 41,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790397": {
+      "id": 99790397,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 42,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790398": {
+      "id": 99790398,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 43,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790399": {
+      "id": 99790399,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 44,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790400": {
+      "id": 99790400,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 45,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790401": {
+      "id": 99790401,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 46,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790402": {
+      "id": 99790402,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 47,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790403": {
+      "id": 99790403,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 48,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790404": {
+      "id": 99790404,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 49,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790405": {
+      "id": 99790405,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 50,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790406": {
+      "id": 99790406,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 51,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790407": {
+      "id": 99790407,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 52,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790408": {
+      "id": 99790408,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 53,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790409": {
+      "id": 99790409,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 54,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790410": {
+      "id": 99790410,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 55,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790411": {
+      "id": 99790411,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 56,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790412": {
+      "id": 99790412,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 57,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790413": {
+      "id": 99790413,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 58,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790414": {
+      "id": 99790414,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 59,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790415": {
+      "id": 99790415,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 60,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790416": {
+      "id": 99790416,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 61,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790417": {
+      "id": 99790417,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 62,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790418": {
+      "id": 99790418,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 63,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790419": {
+      "id": 99790419,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 64,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790420": {
+      "id": 99790420,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 65,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790421": {
+      "id": 99790421,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 66,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790422": {
+      "id": 99790422,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 67,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790423": {
+      "id": 99790423,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 68,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790424": {
+      "id": 99790424,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 69,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790425": {
+      "id": 99790425,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 70,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790426": {
+      "id": 99790426,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 71,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790427": {
+      "id": 99790427,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 72,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790428": {
+      "id": 99790428,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 73,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790429": {
+      "id": 99790429,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 74,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790430": {
+      "id": 99790430,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 75,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790431": {
+      "id": 99790431,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 76,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790432": {
+      "id": 99790432,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 77,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790433": {
+      "id": 99790433,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 78,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790434": {
+      "id": 99790434,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 79,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790435": {
+      "id": 99790435,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 80,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790436": {
+      "id": 99790436,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 81,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790437": {
+      "id": 99790437,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 82,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790438": {
+      "id": 99790438,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 83,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790439": {
+      "id": 99790439,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 84,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790440": {
+      "id": 99790440,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 85,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790441": {
+      "id": 99790441,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 86,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790442": {
+      "id": 99790442,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 87,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790443": {
+      "id": 99790443,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 88,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790444": {
+      "id": 99790444,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 89,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790445": {
+      "id": 99790445,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 90,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790446": {
+      "id": 99790446,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 91,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790447": {
+      "id": 99790447,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 92,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790448": {
+      "id": 99790448,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 93,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790449": {
+      "id": 99790449,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 94,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790450": {
+      "id": 99790450,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 95,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790451": {
+      "id": 99790451,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 96,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790452": {
+      "id": 99790452,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 97,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790453": {
+      "id": 99790453,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 98,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790454": {
+      "id": 99790454,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 99,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790455": {
+      "id": 99790455,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 100,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790456": {
+      "id": 99790456,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 101,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790457": {
+      "id": 99790457,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 102,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790458": {
+      "id": 99790458,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 103,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790459": {
+      "id": 99790459,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 104,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790460": {
+      "id": 99790460,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 105,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790461": {
+      "id": 99790461,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 106,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790462": {
+      "id": 99790462,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 107,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790463": {
+      "id": 99790463,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 108,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790464": {
+      "id": 99790464,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 109,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790465": {
+      "id": 99790465,
+      "overrideDesc": "선단 LV {0} 달성",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 110,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99790466": {
+      "id": 99790466,
+      "overrideDesc": "매일 접속 1회",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790467": {
+      "id": 99790467,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000053,
+      "eventTaskCount": 15,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790468": {
+      "id": 99790468,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000088,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 500,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790469": {
+      "id": 99790469,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000088,
+      "eventTaskTargets": [
+        2
+      ],
+      "eventTaskCount": 500,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99790470": {
+      "id": 99790470,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000088,
+      "eventTaskTargets": [
+        3
+      ],
+      "eventTaskCount": 500,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790471": {
+      "id": 99790471,
+      "overrideDesc": "매일 접속 1회",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790472": {
+      "id": 99790472,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000053,
+      "eventTaskCount": 15,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790473": {
+      "id": 99790473,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000088,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 1000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790474": {
+      "id": 99790474,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000088,
+      "eventTaskTargets": [
+        2
+      ],
+      "eventTaskCount": 1000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99790475": {
+      "id": 99790475,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000088,
+      "eventTaskTargets": [
+        3
+      ],
+      "eventTaskCount": 1000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790476": {
+      "id": 99790476,
+      "overrideDesc": "매일 접속 1회",
+      "eventTaskTermsType": 2,
+      "eventTaskTermsId": 81000001,
+      "eventTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790477": {
+      "id": 99790477,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000053,
+      "eventTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790478": {
+      "id": 99790478,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000088,
+      "eventTaskTargets": [
+        1
+      ],
+      "eventTaskCount": 500,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99790479": {
+      "id": 99790479,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000088,
+      "eventTaskTargets": [
+        2
+      ],
+      "eventTaskCount": 500,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99790480": {
+      "id": 99790480,
+      "eventTaskTermsType": 1,
+      "eventTaskTermsId": 87000088,
+      "eventTaskTargets": [
+        3
+      ],
+      "eventTaskCount": 500,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
     "99799991": {
       "id": 99799991,
       "overrideDesc": "매일 접속 1회",

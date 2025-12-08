@@ -1,0 +1,419 @@
+{
+  ":ShipEnchant": {
+    ":type": {
+      "id": "key",
+      "shipTier": "number",
+      "enchantPointId": "number",
+      "enchantPointVal": "number",
+      "enchantResetId": "number",
+      "enchantResetVal": "number",
+      "enchantHold1PointId": "number",
+      "enchantHold1PointVal": "number",
+      "enchantHold2PointId": "number",
+      "enchantHold2PointVal": "number"
+    },
+    ":required": {
+      "shipTier": 1,
+      "enchantPointId": 1,
+      "enchantPointVal": 1,
+      "enchantResetId": 1,
+      "enchantResetVal": 1,
+      "enchantHold1PointId": 1,
+      "enchantHold1PointVal": 1,
+      "enchantHold2PointId": 1,
+      "enchantHold2PointVal": 1
+    },
+    ":requiredInObject": {},
+    ":min": {
+      "shipTier": 1,
+      "enchantPointId": 100000,
+      "enchantResetId": 100000,
+      "enchantHold1PointId": 100000,
+      "enchantHold2PointId": 100000
+    },
+    ":max": {
+      "shipTier": 30,
+      "enchantPointId": 199999,
+      "enchantResetId": 199999,
+      "enchantHold1PointId": 199999,
+      "enchantHold2PointId": 199999
+    },
+    ":enum": {},
+    ":links": {
+      "enchantPointId": [
+        "Point"
+      ],
+      "enchantResetId": [
+        "Point"
+      ],
+      "enchantHold1PointId": [
+        "Point"
+      ],
+      "enchantHold2PointId": [
+        "Point"
+      ]
+    }
+  },
+  "ShipEnchant": {
+    "76000001": {
+      "id": 76000001,
+      "shipTier": 1,
+      "enchantPointId": 100003,
+      "enchantPointVal": 10,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000002": {
+      "id": 76000002,
+      "shipTier": 2,
+      "enchantPointId": 100003,
+      "enchantPointVal": 50,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000003": {
+      "id": 76000003,
+      "shipTier": 3,
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000004": {
+      "id": 76000004,
+      "shipTier": 4,
+      "enchantPointId": 100003,
+      "enchantPointVal": 150,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000005": {
+      "id": 76000005,
+      "shipTier": 5,
+      "enchantPointId": 100003,
+      "enchantPointVal": 200,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000006": {
+      "id": 76000006,
+      "shipTier": 6,
+      "enchantPointId": 100003,
+      "enchantPointVal": 250,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000007": {
+      "id": 76000007,
+      "shipTier": 7,
+      "enchantPointId": 100003,
+      "enchantPointVal": 300,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000008": {
+      "id": 76000008,
+      "shipTier": 8,
+      "enchantPointId": 100003,
+      "enchantPointVal": 350,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000009": {
+      "id": 76000009,
+      "shipTier": 9,
+      "enchantPointId": 100003,
+      "enchantPointVal": 400,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000010": {
+      "id": 76000010,
+      "shipTier": 10,
+      "enchantPointId": 100003,
+      "enchantPointVal": 450,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000011": {
+      "id": 76000011,
+      "shipTier": 11,
+      "enchantPointId": 100003,
+      "enchantPointVal": 500,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000012": {
+      "id": 76000012,
+      "shipTier": 12,
+      "enchantPointId": 100003,
+      "enchantPointVal": 650,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000013": {
+      "id": 76000013,
+      "shipTier": 13,
+      "enchantPointId": 100003,
+      "enchantPointVal": 800,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000014": {
+      "id": 76000014,
+      "shipTier": 14,
+      "enchantPointId": 100003,
+      "enchantPointVal": 950,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000015": {
+      "id": 76000015,
+      "shipTier": 15,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1100,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000016": {
+      "id": 76000016,
+      "shipTier": 16,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1250,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000017": {
+      "id": 76000017,
+      "shipTier": 17,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1400,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000018": {
+      "id": 76000018,
+      "shipTier": 18,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1550,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000019": {
+      "id": 76000019,
+      "shipTier": 19,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1700,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000020": {
+      "id": 76000020,
+      "shipTier": 20,
+      "enchantPointId": 100003,
+      "enchantPointVal": 2050,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000021": {
+      "id": 76000021,
+      "shipTier": 21,
+      "enchantPointId": 100003,
+      "enchantPointVal": 2400,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000022": {
+      "id": 76000022,
+      "shipTier": 22,
+      "enchantPointId": 100003,
+      "enchantPointVal": 2750,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000023": {
+      "id": 76000023,
+      "shipTier": 23,
+      "enchantPointId": 100003,
+      "enchantPointVal": 3100,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000024": {
+      "id": 76000024,
+      "shipTier": 24,
+      "enchantPointId": 100003,
+      "enchantPointVal": 3450,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000025": {
+      "id": 76000025,
+      "shipTier": 25,
+      "enchantPointId": 100003,
+      "enchantPointVal": 3800,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000026": {
+      "id": 76000026,
+      "shipTier": 26,
+      "enchantPointId": 100003,
+      "enchantPointVal": 4200,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000027": {
+      "id": 76000027,
+      "shipTier": 27,
+      "enchantPointId": 100003,
+      "enchantPointVal": 4500,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000028": {
+      "id": 76000028,
+      "shipTier": 28,
+      "enchantPointId": 100003,
+      "enchantPointVal": 4800,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000029": {
+      "id": 76000029,
+      "shipTier": 29,
+      "enchantPointId": 100003,
+      "enchantPointVal": 5100,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    },
+    "76000030": {
+      "id": 76000030,
+      "shipTier": 30,
+      "enchantPointId": 100003,
+      "enchantPointVal": 5400,
+      "enchantResetId": 100004,
+      "enchantResetVal": 1000,
+      "enchantHold1PointId": 100004,
+      "enchantHold1PointVal": 500,
+      "enchantHold2PointId": 100004,
+      "enchantHold2PointVal": 1000
+    }
+  }
+}

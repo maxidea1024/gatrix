@@ -2296,6 +2296,120 @@
       ],
       "purchaseNeedRank": 1,
       "purchaseGem": 1000
+    },
+    "64249538": {
+      "id": 64249538,
+      "name": "받는 피해량 감소 60%, 광역 피해량 감소 40%",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800033,
+        65800044
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800033,
+        65800044
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800033,
+        65800044
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249539": {
+      "id": 64249539,
+      "name": "받는 피해량 50% 감소, 광역 피해량 70% 감소",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800035,
+        65800051
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800035,
+        65800051
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800035,
+        65800051
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249542": {
+      "id": 64249542,
+      "name": "기함만 받는 피해량 99% 감소",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800038
+      ],
+      "frontSlot": [
+        1
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        2,
+        3,
+        4
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        5,
+        6,
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
     }
   }
 }

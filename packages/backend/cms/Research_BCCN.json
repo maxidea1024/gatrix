@@ -1,0 +1,9211 @@
+{
+  ":Research": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "researchType": "number",
+      "researchLayer": "number",
+      "researchOrder": "number",
+      "researchGroup": "number",
+      "researchLv": "number",
+      "needResearch": [
+        {
+          "GroupId": "number",
+          "Lv": "number"
+        },
+        {
+          "GroupId": "number",
+          "Lv": "number"
+        },
+        {
+          "GroupId": "number",
+          "Lv": "number"
+        },
+        {
+          "GroupId": "number",
+          "Lv": "number"
+        }
+      ],
+      "researchTaskId": [
+        "number",
+        "number",
+        "number"
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Value": "number"
+        }
+      ],
+      "desc": "text",
+      "skillIcon": "string"
+    },
+    ":required": {
+      "name": 1,
+      "researchType": 1,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 1,
+      "researchLv": 1,
+      "researchTaskId": [
+        1
+      ],
+      "desc": 1
+    },
+    ":requiredInObject": {
+      "needResearch": [
+        {
+          "GroupId": 1,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1,
+          "Lv": 1
+        }
+      ]
+    },
+    ":min": {
+      "researchTaskId": [
+        99800000,
+        99800000,
+        99800000
+      ],
+      "fleetStatEffect": [
+        {
+          "Id": 75300000
+        },
+        {
+          "Id": 75300000
+        },
+        {
+          "Id": 75300000
+        },
+        {
+          "Id": 75300000
+        },
+        {
+          "Id": 75300000
+        },
+        {
+          "Id": 75300000
+        },
+        {
+          "Id": 75300000
+        },
+        {
+          "Id": 75300000
+        },
+        {
+          "Id": 75300000
+        },
+        {
+          "Id": 75300000
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Id": 0
+        },
+        {
+          "Id": 0
+        },
+        {
+          "Id": 0
+        }
+      ]
+    },
+    ":max": {
+      "researchTaskId": [
+        99899999,
+        99899999,
+        99899999
+      ],
+      "fleetStatEffect": [
+        {
+          "Id": 75399999
+        },
+        {
+          "Id": 75399999
+        },
+        {
+          "Id": 75399999
+        },
+        {
+          "Id": 75399999
+        },
+        {
+          "Id": 75399999
+        },
+        {
+          "Id": 75399999
+        },
+        {
+          "Id": 75399999
+        },
+        {
+          "Id": 75399999
+        },
+        {
+          "Id": 75399999
+        },
+        {
+          "Id": 75399999
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Id": 9999
+        },
+        {
+          "Id": 9999
+        },
+        {
+          "Id": 9999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "researchTaskId": [
+        [
+          "ResearchTask"
+        ],
+        [
+          "ResearchTask"
+        ],
+        [
+          "ResearchTask"
+        ]
+      ],
+      "fleetStatEffect": [
+        {
+          "Id": [
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassiveEffect"
+          ]
+        }
+      ],
+      "shipStatEffect": [
+        {
+          "Id": [
+            "StatOperator"
+          ]
+        },
+        {
+          "Id": [
+            "StatOperator"
+          ]
+        },
+        {
+          "Id": [
+            "StatOperator"
+          ]
+        }
+      ]
+    }
+  },
+  "Research": {
+    "72500000": {
+      "id": 72500000,
+      "name": "재해 대응반 구성 Ⅰ",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 1,
+      "researchLv": 1,
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311120,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311115,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311126,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311108,
+          "Value": 20
+        }
+      ],
+      "desc": "세이렌, 불면증, 돌풍, 침수 발생 시 해소 확률이 2% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_001_Sprite"
+    },
+    "72500001": {
+      "id": 72500001,
+      "name": "재해 대응반 구성 Ⅰ",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 1,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311120,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311115,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311126,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311108,
+          "Value": 40
+        }
+      ],
+      "desc": "세이렌, 불면증, 돌풍, 침수 발생 시 해소 확률이 4% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_001_Sprite"
+    },
+    "72500002": {
+      "id": 72500002,
+      "name": "재해 대응반 구성 Ⅰ",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 1,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311120,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311115,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311126,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311108,
+          "Value": 60
+        }
+      ],
+      "desc": "세이렌, 불면증, 돌풍, 침수 발생 시 해소 확률이 6% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_001_Sprite"
+    },
+    "72500003": {
+      "id": 72500003,
+      "name": "재해 대응반 구성 Ⅰ",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 1,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311120,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311115,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311126,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311108,
+          "Value": 80
+        }
+      ],
+      "desc": "세이렌, 불면증, 돌풍, 침수 발생 시 해소 확률이 8% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_001_Sprite"
+    },
+    "72500004": {
+      "id": 72500004,
+      "name": "재해 대응반 구성 Ⅰ",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 1,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311120,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311115,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311126,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311108,
+          "Value": 100
+        }
+      ],
+      "desc": "세이렌, 불면증, 돌풍, 침수 발생 시 해소 확률이 10% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_002_Sprite"
+    },
+    "72500005": {
+      "id": 72500005,
+      "name": "재해 대응반 구성 Ⅱ",
+      "researchType": 0,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 2,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311106,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311100,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311101,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311102,
+          "Value": 20
+        }
+      ],
+      "desc": "화재, 쥐, 오염, 괴혈병 발생 시 해소 확률이 2% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_002_Sprite"
+    },
+    "72500006": {
+      "id": 72500006,
+      "name": "재해 대응반 구성 Ⅱ",
+      "researchType": 0,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 2,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311106,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311100,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311101,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311102,
+          "Value": 40
+        }
+      ],
+      "desc": "화재, 쥐, 오염, 괴혈병 발생 시 해소 확률이 4% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_002_Sprite"
+    },
+    "72500007": {
+      "id": 72500007,
+      "name": "재해 대응반 구성 Ⅱ",
+      "researchType": 0,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 2,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311106,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311100,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311101,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311102,
+          "Value": 60
+        }
+      ],
+      "desc": "화재, 쥐, 오염, 괴혈병 발생 시 해소 확률이 6% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_002_Sprite"
+    },
+    "72500008": {
+      "id": 72500008,
+      "name": "재해 대응반 구성 Ⅱ",
+      "researchType": 0,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 2,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311106,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311100,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311101,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311102,
+          "Value": 80
+        }
+      ],
+      "desc": "화재, 쥐, 오염, 괴혈병 발생 시 해소 확률이 8% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_002_Sprite"
+    },
+    "72500009": {
+      "id": 72500009,
+      "name": "재해 대응반 구성 Ⅱ",
+      "researchType": 0,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 2,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311106,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311100,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311101,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311102,
+          "Value": 100
+        }
+      ],
+      "desc": "화재, 쥐, 오염, 괴혈병 발생 시 해소 확률이 10% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_003_Sprite"
+    },
+    "72500010": {
+      "id": 72500010,
+      "name": "재해 대응반 구성 Ⅲ",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 3,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311103,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311104,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311107,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311111,
+          "Value": 20
+        }
+      ],
+      "desc": "전염병, 부패, 해초, 싸움 발생 시 해소 확률이 2% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_003_Sprite"
+    },
+    "72500011": {
+      "id": 72500011,
+      "name": "재해 대응반 구성 Ⅲ",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 3,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2,
+          "Lv": 1
+        },
+        {
+          "GroupId": 3,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311103,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311104,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311107,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311111,
+          "Value": 40
+        }
+      ],
+      "desc": "전염병, 부패, 해초, 싸움 발생 시 해소 확률이 4% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_003_Sprite"
+    },
+    "72500012": {
+      "id": 72500012,
+      "name": "재해 대응반 구성 Ⅲ",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 3,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2,
+          "Lv": 1
+        },
+        {
+          "GroupId": 3,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311103,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311104,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311107,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311111,
+          "Value": 60
+        }
+      ],
+      "desc": "전염병, 부패, 해초, 싸움 발생 시 해소 확률이 6% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_003_Sprite"
+    },
+    "72500013": {
+      "id": 72500013,
+      "name": "재해 대응반 구성 Ⅲ",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 3,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2,
+          "Lv": 1
+        },
+        {
+          "GroupId": 3,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311103,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311104,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311107,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311111,
+          "Value": 80
+        }
+      ],
+      "desc": "전염병, 부패, 해초, 싸움 발생 시 해소 확률이 8% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_003_Sprite"
+    },
+    "72500014": {
+      "id": 72500014,
+      "name": "재해 대응반 구성 Ⅲ",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 3,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2,
+          "Lv": 1
+        },
+        {
+          "GroupId": 3,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311103,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311104,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311107,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311111,
+          "Value": 100
+        }
+      ],
+      "desc": "전염병, 부패, 해초, 싸움 발생 시 해소 확률이 10% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_004_Sprite"
+    },
+    "72500015": {
+      "id": 72500015,
+      "name": "재해 대응반 구성 Ⅳ",
+      "researchType": 0,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 4,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 3,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311112,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311113,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311114,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311124,
+          "Value": 20
+        }
+      ],
+      "desc": "욕구불만, 정서불안, 향수병, 암초 발생 시 해소 확률이 2% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_004_Sprite"
+    },
+    "72500016": {
+      "id": 72500016,
+      "name": "재해 대응반 구성 Ⅳ",
+      "researchType": 0,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 4,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 3,
+          "Lv": 1
+        },
+        {
+          "GroupId": 4,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311112,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311113,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311114,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311124,
+          "Value": 40
+        }
+      ],
+      "desc": "욕구불만, 정서불안, 향수병, 암초 발생 시 해소 확률이 4% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_004_Sprite"
+    },
+    "72500017": {
+      "id": 72500017,
+      "name": "재해 대응반 구성 Ⅳ",
+      "researchType": 0,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 4,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 3,
+          "Lv": 1
+        },
+        {
+          "GroupId": 4,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311112,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311113,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311114,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311124,
+          "Value": 60
+        }
+      ],
+      "desc": "욕구불만, 정서불안, 향수병, 암초 발생 시 해소 확률이 6% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_004_Sprite"
+    },
+    "72500018": {
+      "id": 72500018,
+      "name": "재해 대응반 구성 Ⅳ",
+      "researchType": 0,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 4,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 3,
+          "Lv": 1
+        },
+        {
+          "GroupId": 4,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311112,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311113,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311114,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311124,
+          "Value": 80
+        }
+      ],
+      "desc": "욕구불만, 정서불안, 향수병, 암초 발생 시 해소 확률이 8% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_004_Sprite"
+    },
+    "72500019": {
+      "id": 72500019,
+      "name": "재해 대응반 구성 Ⅳ",
+      "researchType": 0,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 4,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 3,
+          "Lv": 1
+        },
+        {
+          "GroupId": 4,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311112,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311113,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311114,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311124,
+          "Value": 100
+        }
+      ],
+      "desc": "욕구불만, 정서불안, 향수병, 암초 발생 시 해소 확률이 10% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_004_Sprite"
+    },
+    "72500020": {
+      "id": 72500020,
+      "name": "재해 대응반 구성 Ⅴ",
+      "researchType": 0,
+      "researchLayer": 5,
+      "researchOrder": 1,
+      "researchGroup": 5,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 4,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311125,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311118,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311121,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75311122,
+          "Value": 20
+        }
+      ],
+      "desc": "화물 도난, 무풍, 식인상어, 저체온증 발생 시 해소 확률이 2% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_008_Sprite"
+    },
+    "72500021": {
+      "id": 72500021,
+      "name": "재해 대응반 구성 Ⅴ",
+      "researchType": 0,
+      "researchLayer": 5,
+      "researchOrder": 1,
+      "researchGroup": 5,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 4,
+          "Lv": 1
+        },
+        {
+          "GroupId": 5,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311125,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311118,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311121,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75311122,
+          "Value": 40
+        }
+      ],
+      "desc": "화물 도난, 무풍, 식인상어, 저체온증 발생 시 해소 확률이 4% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_008_Sprite"
+    },
+    "72500022": {
+      "id": 72500022,
+      "name": "재해 대응반 구성 Ⅴ",
+      "researchType": 0,
+      "researchLayer": 5,
+      "researchOrder": 1,
+      "researchGroup": 5,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 4,
+          "Lv": 1
+        },
+        {
+          "GroupId": 5,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311125,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311118,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311121,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75311122,
+          "Value": 60
+        }
+      ],
+      "desc": "화물 도난, 무풍, 식인상어, 저체온증 발생 시 해소 확률이 6% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_008_Sprite"
+    },
+    "72500023": {
+      "id": 72500023,
+      "name": "재해 대응반 구성 Ⅴ",
+      "researchType": 0,
+      "researchLayer": 5,
+      "researchOrder": 1,
+      "researchGroup": 5,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 4,
+          "Lv": 1
+        },
+        {
+          "GroupId": 5,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311125,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311118,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311121,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75311122,
+          "Value": 80
+        }
+      ],
+      "desc": "화물 도난, 무풍, 식인상어, 저체온증 발생 시 해소 확률이 8% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_008_Sprite"
+    },
+    "72500024": {
+      "id": 72500024,
+      "name": "재해 대응반 구성 Ⅴ",
+      "researchType": 0,
+      "researchLayer": 5,
+      "researchOrder": 1,
+      "researchGroup": 5,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 4,
+          "Lv": 1
+        },
+        {
+          "GroupId": 5,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75311125,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311118,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311121,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75311122,
+          "Value": 100
+        }
+      ],
+      "desc": "화물 도난, 무풍, 식인상어, 저체온증 발생 시 해소 확률이 10% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_008_Sprite"
+    },
+    "72500025": {
+      "id": 72500025,
+      "name": "빗물 저장 시설 확보",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 2,
+      "researchGroup": 6,
+      "researchLv": 1,
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312209,
+          "Value": 20
+        }
+      ],
+      "desc": "우천 시 물 조달량이 2% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_009_Sprite"
+    },
+    "72500026": {
+      "id": 72500026,
+      "name": "빗물 저장 시설 확보",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 2,
+      "researchGroup": 6,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 6,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312209,
+          "Value": 40
+        }
+      ],
+      "desc": "우천 시 물 조달량이 4% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_009_Sprite"
+    },
+    "72500027": {
+      "id": 72500027,
+      "name": "빗물 저장 시설 확보",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 2,
+      "researchGroup": 6,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 6,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312209,
+          "Value": 60
+        }
+      ],
+      "desc": "우천 시 물 조달량이 6% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_009_Sprite"
+    },
+    "72500028": {
+      "id": 72500028,
+      "name": "빗물 저장 시설 확보",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 2,
+      "researchGroup": 6,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 6,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312209,
+          "Value": 80
+        }
+      ],
+      "desc": "우천 시 물 조달량이 8% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_009_Sprite"
+    },
+    "72500029": {
+      "id": 72500029,
+      "name": "빗물 저장 시설 확보",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 2,
+      "researchGroup": 6,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 6,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312209,
+          "Value": 10
+        }
+      ],
+      "desc": "우천 시 물 조달량이 10% 증가합니다.",
+      "skillIcon": "icon_shipResearch_adventure_009_Sprite"
+    },
+    "72500030": {
+      "id": 72500030,
+      "name": "낚시 기술 전수",
+      "researchType": 0,
+      "researchLayer": 2,
+      "researchOrder": 2,
+      "researchGroup": 7,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 6,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312050,
+          "Value": 2
+        }
+      ],
+      "desc": "낚시 기술이 2 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_005_Sprite"
+    },
+    "72500031": {
+      "id": 72500031,
+      "name": "낚시 기술 전수",
+      "researchType": 0,
+      "researchLayer": 2,
+      "researchOrder": 2,
+      "researchGroup": 7,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 6,
+          "Lv": 1
+        },
+        {
+          "GroupId": 7,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312050,
+          "Value": 4
+        }
+      ],
+      "desc": "낚시 기술이 4 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_005_Sprite"
+    },
+    "72500032": {
+      "id": 72500032,
+      "name": "낚시 기술 전수",
+      "researchType": 0,
+      "researchLayer": 2,
+      "researchOrder": 2,
+      "researchGroup": 7,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 6,
+          "Lv": 1
+        },
+        {
+          "GroupId": 7,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312050,
+          "Value": 6
+        }
+      ],
+      "desc": "낚시 기술이 6 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_005_Sprite"
+    },
+    "72500033": {
+      "id": 72500033,
+      "name": "낚시 기술 전수",
+      "researchType": 0,
+      "researchLayer": 2,
+      "researchOrder": 2,
+      "researchGroup": 7,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 6,
+          "Lv": 1
+        },
+        {
+          "GroupId": 7,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312050,
+          "Value": 8
+        }
+      ],
+      "desc": "낚시 기술이 8 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_005_Sprite"
+    },
+    "72500034": {
+      "id": 72500034,
+      "name": "낚시 기술 전수",
+      "researchType": 0,
+      "researchLayer": 2,
+      "researchOrder": 2,
+      "researchGroup": 7,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 6,
+          "Lv": 1
+        },
+        {
+          "GroupId": 7,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312050,
+          "Value": 10
+        }
+      ],
+      "desc": "낚시 기술이 10 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_005_Sprite"
+    },
+    "72500035": {
+      "id": 72500035,
+      "name": "낚시대 보강",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 2,
+      "researchGroup": 8,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 7,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312205,
+          "Value": 15
+        }
+      ],
+      "desc": "자동 낚시 성공 확률이 1.5% 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_010_Sprite"
+    },
+    "72500036": {
+      "id": 72500036,
+      "name": "낚시대 보강",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 2,
+      "researchGroup": 8,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 7,
+          "Lv": 1
+        },
+        {
+          "GroupId": 8,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312205,
+          "Value": 30
+        }
+      ],
+      "desc": "자동 낚시 성공 확률이 3% 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_010_Sprite"
+    },
+    "72500037": {
+      "id": 72500037,
+      "name": "낚시대 보강",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 2,
+      "researchGroup": 8,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 7,
+          "Lv": 1
+        },
+        {
+          "GroupId": 8,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312205,
+          "Value": 45
+        }
+      ],
+      "desc": "자동 낚시 성공 확률이 4.5% 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_010_Sprite"
+    },
+    "72500038": {
+      "id": 72500038,
+      "name": "낚시대 보강",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 2,
+      "researchGroup": 8,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 7,
+          "Lv": 1
+        },
+        {
+          "GroupId": 8,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312205,
+          "Value": 60
+        }
+      ],
+      "desc": "자동 낚시 성공 확률이 6% 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_010_Sprite"
+    },
+    "72500039": {
+      "id": 72500039,
+      "name": "낚시대 보강",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 2,
+      "researchGroup": 8,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 7,
+          "Lv": 1
+        },
+        {
+          "GroupId": 8,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312205,
+          "Value": 75
+        }
+      ],
+      "desc": "자동 낚시 성공 확률이 7.5% 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_010_Sprite"
+    },
+    "72500040": {
+      "id": 72500040,
+      "name": "돛 보강",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 9,
+      "researchLv": 1,
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 8,
+          "Value": 5
+        },
+        {
+          "Type": 0,
+          "Id": 7,
+          "Value": 5
+        }
+      ],
+      "desc": "가로돛과 세로돛이 5 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_19_Sprite"
+    },
+    "72500041": {
+      "id": 72500041,
+      "name": "돛 보강",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 9,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 9,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 8,
+          "Value": 10
+        },
+        {
+          "Type": 0,
+          "Id": 7,
+          "Value": 10
+        }
+      ],
+      "desc": "가로돛과 세로돛이 20 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_19_Sprite"
+    },
+    "72500042": {
+      "id": 72500042,
+      "name": "돛 보강",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 9,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 9,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 8,
+          "Value": 15
+        },
+        {
+          "Type": 0,
+          "Id": 7,
+          "Value": 15
+        }
+      ],
+      "desc": "가로돛과 세로돛이 30 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_19_Sprite"
+    },
+    "72500043": {
+      "id": 72500043,
+      "name": "돛 보강",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 9,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 9,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 8,
+          "Value": 20
+        },
+        {
+          "Type": 0,
+          "Id": 7,
+          "Value": 20
+        }
+      ],
+      "desc": "가로돛과 세로돛이 40 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_19_Sprite"
+    },
+    "72500044": {
+      "id": 72500044,
+      "name": "돛 보강",
+      "researchType": 0,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 9,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 9,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 8,
+          "Value": 25
+        },
+        {
+          "Type": 0,
+          "Id": 7,
+          "Value": 25
+        }
+      ],
+      "desc": "가로돛과 세로돛이 25 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_19_Sprite"
+    },
+    "72500045": {
+      "id": 72500045,
+      "name": "운선 숙련",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 10,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 9,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310014,
+          "Value": 1
+        }
+      ],
+      "desc": "함대 속도가 0.1 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_011_Sprite"
+    },
+    "72500046": {
+      "id": 72500046,
+      "name": "운선 숙련",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 10,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 9,
+          "Lv": 1
+        },
+        {
+          "GroupId": 10,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310014,
+          "Value": 2
+        }
+      ],
+      "desc": "함대 속도가 0.2 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_011_Sprite"
+    },
+    "72500047": {
+      "id": 72500047,
+      "name": "운선 숙련",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 10,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 9,
+          "Lv": 1
+        },
+        {
+          "GroupId": 10,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310014,
+          "Value": 3
+        }
+      ],
+      "desc": "함대 속도가 0.3 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_011_Sprite"
+    },
+    "72500048": {
+      "id": 72500048,
+      "name": "운선 숙련",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 10,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 9,
+          "Lv": 1
+        },
+        {
+          "GroupId": 10,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310014,
+          "Value": 4
+        }
+      ],
+      "desc": "함대 속도가 0.4 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_011_Sprite"
+    },
+    "72500049": {
+      "id": 72500049,
+      "name": "운선 숙련",
+      "researchType": 0,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 10,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 9,
+          "Lv": 1
+        },
+        {
+          "GroupId": 10,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310014,
+          "Value": 5
+        }
+      ],
+      "desc": "함대 속도가 0.5 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_011_Sprite"
+    },
+    "72500050": {
+      "id": 72500050,
+      "name": "배식 개선 Ⅰ",
+      "researchType": 0,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 11,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 5,
+          "Lv": 2
+        },
+        {
+          "GroupId": 8,
+          "Lv": 2
+        },
+        {
+          "GroupId": 10,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310004,
+          "Value": 5
+        }
+      ],
+      "desc": "하루에 소모하는 식량이 0.5% 감소합니다",
+      "skillIcon": "icon_shipResearch_adventure_012_Sprite"
+    },
+    "72500051": {
+      "id": 72500051,
+      "name": "배식 개선 Ⅰ",
+      "researchType": 0,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 11,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 5,
+          "Lv": 2
+        },
+        {
+          "GroupId": 8,
+          "Lv": 2
+        },
+        {
+          "GroupId": 10,
+          "Lv": 2
+        },
+        {
+          "GroupId": 11,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310004,
+          "Value": 10
+        }
+      ],
+      "desc": "하루에 소모하는 식량이 1% 감소합니다",
+      "skillIcon": "icon_shipResearch_adventure_012_Sprite"
+    },
+    "72500052": {
+      "id": 72500052,
+      "name": "배식 개선 Ⅰ",
+      "researchType": 0,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 11,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 5,
+          "Lv": 2
+        },
+        {
+          "GroupId": 8,
+          "Lv": 2
+        },
+        {
+          "GroupId": 10,
+          "Lv": 2
+        },
+        {
+          "GroupId": 11,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310004,
+          "Value": 15
+        }
+      ],
+      "desc": "하루에 소모하는 식량이 1.5% 감소합니다",
+      "skillIcon": "icon_shipResearch_adventure_012_Sprite"
+    },
+    "72500053": {
+      "id": 72500053,
+      "name": "배식 개선 Ⅰ",
+      "researchType": 0,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 11,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 5,
+          "Lv": 2
+        },
+        {
+          "GroupId": 8,
+          "Lv": 2
+        },
+        {
+          "GroupId": 10,
+          "Lv": 2
+        },
+        {
+          "GroupId": 11,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310004,
+          "Value": 20
+        }
+      ],
+      "desc": "하루에 소모하는 식량이 2% 감소합니다",
+      "skillIcon": "icon_shipResearch_adventure_012_Sprite"
+    },
+    "72500054": {
+      "id": 72500054,
+      "name": "배식 개선 Ⅰ",
+      "researchType": 0,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 11,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 5,
+          "Lv": 2
+        },
+        {
+          "GroupId": 8,
+          "Lv": 2
+        },
+        {
+          "GroupId": 10,
+          "Lv": 2
+        },
+        {
+          "GroupId": 11,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310004,
+          "Value": 25
+        }
+      ],
+      "desc": "하루에 소모하는 식량이 2.5% 감소합니다",
+      "skillIcon": "icon_shipResearch_adventure_012_Sprite"
+    },
+    "72500055": {
+      "id": 72500055,
+      "name": "배식 개선 Ⅱ",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 12,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310003,
+          "Value": 5
+        }
+      ],
+      "desc": "하루에 소모하는 물이 0.5% 감소합니다",
+      "skillIcon": "icon_shipResearch_adventure_013_Sprite"
+    },
+    "72500056": {
+      "id": 72500056,
+      "name": "배식 개선 Ⅱ",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 12,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 12,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310003,
+          "Value": 10
+        }
+      ],
+      "desc": "하루에 소모하는 물이 1% 감소합니다",
+      "skillIcon": "icon_shipResearch_adventure_013_Sprite"
+    },
+    "72500057": {
+      "id": 72500057,
+      "name": "배식 개선 Ⅱ",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 12,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 12,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310003,
+          "Value": 15
+        }
+      ],
+      "desc": "하루에 소모하는 물이 1.5% 감소합니다",
+      "skillIcon": "icon_shipResearch_adventure_013_Sprite"
+    },
+    "72500058": {
+      "id": 72500058,
+      "name": "배식 개선 Ⅱ",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 12,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 12,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310003,
+          "Value": 20
+        }
+      ],
+      "desc": "하루에 소모하는 물이 2% 감소합니다",
+      "skillIcon": "icon_shipResearch_adventure_013_Sprite"
+    },
+    "72500059": {
+      "id": 72500059,
+      "name": "배식 개선 Ⅱ",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 12,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 12,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75310003,
+          "Value": 25
+        }
+      ],
+      "desc": "하루에 소모하는 물이 2.5% 감소합니다",
+      "skillIcon": "icon_shipResearch_adventure_013_Sprite"
+    },
+    "72500060": {
+      "id": 72500060,
+      "name": "채집 요원 선발",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 1,
+      "researchGroup": 13,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312223,
+          "Value": 2
+        }
+      ],
+      "desc": "탐험 중 채집력이 2 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_91_Sprite"
+    },
+    "72500061": {
+      "id": 72500061,
+      "name": "채집 요원 선발",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 1,
+      "researchGroup": 13,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 13,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312223,
+          "Value": 4
+        }
+      ],
+      "desc": "탐험 중 채집력이 4 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_91_Sprite"
+    },
+    "72500062": {
+      "id": 72500062,
+      "name": "채집 요원 선발",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 1,
+      "researchGroup": 13,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 13,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312223,
+          "Value": 6
+        }
+      ],
+      "desc": "탐험 중 채집력이 6 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_91_Sprite"
+    },
+    "72500063": {
+      "id": 72500063,
+      "name": "채집 요원 선발",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 1,
+      "researchGroup": 13,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 13,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312223,
+          "Value": 8
+        }
+      ],
+      "desc": "탐험 중 채집력이 8 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_91_Sprite"
+    },
+    "72500064": {
+      "id": 72500064,
+      "name": "채집 요원 선발",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 1,
+      "researchGroup": 13,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 13,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312223,
+          "Value": 10
+        }
+      ],
+      "desc": "탐험 중 채집력이 10 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_91_Sprite"
+    },
+    "72500065": {
+      "id": 72500065,
+      "name": "관찰 요원 선발",
+      "researchType": 0,
+      "researchLayer": 8,
+      "researchOrder": 1,
+      "researchGroup": 14,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 13,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312224,
+          "Value": 2
+        }
+      ],
+      "desc": "탐험 중 관찰력이 2 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_90_Sprite"
+    },
+    "72500066": {
+      "id": 72500066,
+      "name": "관찰 요원 선발",
+      "researchType": 0,
+      "researchLayer": 8,
+      "researchOrder": 1,
+      "researchGroup": 14,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 13,
+          "Lv": 4
+        },
+        {
+          "GroupId": 14,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312224,
+          "Value": 4
+        }
+      ],
+      "desc": "탐험 중 관찰력이 4 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_90_Sprite"
+    },
+    "72500067": {
+      "id": 72500067,
+      "name": "관찰 요원 선발",
+      "researchType": 0,
+      "researchLayer": 8,
+      "researchOrder": 1,
+      "researchGroup": 14,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 13,
+          "Lv": 4
+        },
+        {
+          "GroupId": 14,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312224,
+          "Value": 6
+        }
+      ],
+      "desc": "탐험 중 관찰력이 6 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_90_Sprite"
+    },
+    "72500068": {
+      "id": 72500068,
+      "name": "관찰 요원 선발",
+      "researchType": 0,
+      "researchLayer": 8,
+      "researchOrder": 1,
+      "researchGroup": 14,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 13,
+          "Lv": 4
+        },
+        {
+          "GroupId": 14,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312224,
+          "Value": 8
+        }
+      ],
+      "desc": "탐험 중 관찰력이 8 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_90_Sprite"
+    },
+    "72500069": {
+      "id": 72500069,
+      "name": "관찰 요원 선발",
+      "researchType": 0,
+      "researchLayer": 8,
+      "researchOrder": 1,
+      "researchGroup": 14,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 13,
+          "Lv": 4
+        },
+        {
+          "GroupId": 14,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312224,
+          "Value": 10
+        }
+      ],
+      "desc": "탐험 중 관찰력이 10 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_90_Sprite"
+    },
+    "72500070": {
+      "id": 72500070,
+      "name": "전투 요원 선발",
+      "researchType": 0,
+      "researchLayer": 9,
+      "researchOrder": 1,
+      "researchGroup": 15,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 14,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312225,
+          "Value": 2
+        }
+      ],
+      "desc": "탐험 중 전투력이 2 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_92_Sprite"
+    },
+    "72500071": {
+      "id": 72500071,
+      "name": "전투 요원 선발",
+      "researchType": 0,
+      "researchLayer": 9,
+      "researchOrder": 1,
+      "researchGroup": 15,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 14,
+          "Lv": 4
+        },
+        {
+          "GroupId": 15,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312225,
+          "Value": 4
+        }
+      ],
+      "desc": "탐험 중 전투력이 4 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_92_Sprite"
+    },
+    "72500072": {
+      "id": 72500072,
+      "name": "전투 요원 선발",
+      "researchType": 0,
+      "researchLayer": 9,
+      "researchOrder": 1,
+      "researchGroup": 15,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 14,
+          "Lv": 4
+        },
+        {
+          "GroupId": 15,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312225,
+          "Value": 6
+        }
+      ],
+      "desc": "탐험 중 전투력이 6 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_92_Sprite"
+    },
+    "72500073": {
+      "id": 72500073,
+      "name": "전투 요원 선발",
+      "researchType": 0,
+      "researchLayer": 9,
+      "researchOrder": 1,
+      "researchGroup": 15,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 14,
+          "Lv": 4
+        },
+        {
+          "GroupId": 15,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312225,
+          "Value": 8
+        }
+      ],
+      "desc": "탐험 중 전투력이 8 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_92_Sprite"
+    },
+    "72500074": {
+      "id": 72500074,
+      "name": "전투 요원 선발",
+      "researchType": 0,
+      "researchLayer": 9,
+      "researchOrder": 1,
+      "researchGroup": 15,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 14,
+          "Lv": 4
+        },
+        {
+          "GroupId": 15,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75312225,
+          "Value": 10
+        }
+      ],
+      "desc": "탐험 중 전투력이 10 증가합니다",
+      "skillIcon": "icon_characterEffect_adventure_92_Sprite"
+    },
+    "72500075": {
+      "id": 72500075,
+      "name": "조류 대응교육",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 3,
+      "researchGroup": 16,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 109,
+          "Value": 2
+        }
+      ],
+      "desc": "함대 돌파가 2 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_014_Sprite"
+    },
+    "72500076": {
+      "id": 72500076,
+      "name": "조류 대응교육",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 3,
+      "researchGroup": 16,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 16,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 109,
+          "Value": 4
+        }
+      ],
+      "desc": "함대 돌파가 4 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_014_Sprite"
+    },
+    "72500077": {
+      "id": 72500077,
+      "name": "조류 대응교육",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 3,
+      "researchGroup": 16,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 16,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 109,
+          "Value": 6
+        }
+      ],
+      "desc": "함대 돌파가 6 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_014_Sprite"
+    },
+    "72500078": {
+      "id": 72500078,
+      "name": "조류 대응교육",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 3,
+      "researchGroup": 16,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 16,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 109,
+          "Value": 8
+        }
+      ],
+      "desc": "함대 돌파가 8 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_014_Sprite"
+    },
+    "72500079": {
+      "id": 72500079,
+      "name": "조류 대응교육",
+      "researchType": 0,
+      "researchLayer": 7,
+      "researchOrder": 3,
+      "researchGroup": 16,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 11,
+          "Lv": 4
+        },
+        {
+          "GroupId": 16,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 109,
+          "Value": 10
+        }
+      ],
+      "desc": "함대 돌파가 10 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_014_Sprite"
+    },
+    "72500080": {
+      "id": 72500080,
+      "name": "빙해 대응교육",
+      "researchType": 0,
+      "researchLayer": 8,
+      "researchOrder": 3,
+      "researchGroup": 17,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 16,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 108,
+          "Value": 2
+        }
+      ],
+      "desc": "함대 쇄빙이 2 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_015_Sprite"
+    },
+    "72500081": {
+      "id": 72500081,
+      "name": "빙해 대응교육",
+      "researchType": 0,
+      "researchLayer": 8,
+      "researchOrder": 3,
+      "researchGroup": 17,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 16,
+          "Lv": 4
+        },
+        {
+          "GroupId": 17,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 108,
+          "Value": 4
+        }
+      ],
+      "desc": "함대 쇄빙이 4 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_015_Sprite"
+    },
+    "72500082": {
+      "id": 72500082,
+      "name": "빙해 대응교육",
+      "researchType": 0,
+      "researchLayer": 8,
+      "researchOrder": 3,
+      "researchGroup": 17,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 16,
+          "Lv": 4
+        },
+        {
+          "GroupId": 17,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 108,
+          "Value": 6
+        }
+      ],
+      "desc": "함대 쇄빙이 6 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_015_Sprite"
+    },
+    "72500083": {
+      "id": 72500083,
+      "name": "빙해 대응교육",
+      "researchType": 0,
+      "researchLayer": 8,
+      "researchOrder": 3,
+      "researchGroup": 17,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 16,
+          "Lv": 4
+        },
+        {
+          "GroupId": 17,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 108,
+          "Value": 8
+        }
+      ],
+      "desc": "함대 쇄빙이 8 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_015_Sprite"
+    },
+    "72500084": {
+      "id": 72500084,
+      "name": "빙해 대응교육",
+      "researchType": 0,
+      "researchLayer": 8,
+      "researchOrder": 3,
+      "researchGroup": 17,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 16,
+          "Lv": 4
+        },
+        {
+          "GroupId": 17,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 108,
+          "Value": 10
+        }
+      ],
+      "desc": "함대 쇄빙이 10 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_015_Sprite"
+    },
+    "72500085": {
+      "id": 72500085,
+      "name": "파고 대응교육",
+      "researchType": 0,
+      "researchLayer": 9,
+      "researchOrder": 3,
+      "researchGroup": 18,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 17,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 9,
+          "Value": 1
+        }
+      ],
+      "desc": "함대 내파가 1 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_016_Sprite"
+    },
+    "72500086": {
+      "id": 72500086,
+      "name": "파고 대응교육",
+      "researchType": 0,
+      "researchLayer": 9,
+      "researchOrder": 3,
+      "researchGroup": 18,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 17,
+          "Lv": 4
+        },
+        {
+          "GroupId": 18,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 9,
+          "Value": 2
+        }
+      ],
+      "desc": "함대 내파가 2 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_016_Sprite"
+    },
+    "72500087": {
+      "id": 72500087,
+      "name": "파고 대응교육",
+      "researchType": 0,
+      "researchLayer": 9,
+      "researchOrder": 3,
+      "researchGroup": 18,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 17,
+          "Lv": 4
+        },
+        {
+          "GroupId": 18,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 9,
+          "Value": 3
+        }
+      ],
+      "desc": "함대 내파가 3 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_016_Sprite"
+    },
+    "72500088": {
+      "id": 72500088,
+      "name": "파고 대응교육",
+      "researchType": 0,
+      "researchLayer": 9,
+      "researchOrder": 3,
+      "researchGroup": 18,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 17,
+          "Lv": 4
+        },
+        {
+          "GroupId": 18,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 9,
+          "Value": 4
+        }
+      ],
+      "desc": "함대 내파가 4 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_016_Sprite"
+    },
+    "72500089": {
+      "id": 72500089,
+      "name": "파고 대응교육",
+      "researchType": 0,
+      "researchLayer": 9,
+      "researchOrder": 3,
+      "researchGroup": 18,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 17,
+          "Lv": 4
+        },
+        {
+          "GroupId": 18,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 9,
+          "Value": 5
+        }
+      ],
+      "desc": "함대 내파가 5 증가합니다",
+      "skillIcon": "icon_shipResearch_adventure_016_Sprite"
+    },
+    "72600000": {
+      "id": 72600000,
+      "name": "덤 받는 비결 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 1000,
+      "researchLv": 1,
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300141,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300151,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300161,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300171,
+          "Value": 30
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 구매 수량 3% 증가",
+      "skillIcon": "icon_shipResearch_trade_001_Sprite"
+    },
+    "72600001": {
+      "id": 72600001,
+      "name": "덤 받는 비결 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 1000,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1000,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300141,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300151,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300161,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300171,
+          "Value": 60
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 구매 수량 6% 증가",
+      "skillIcon": "icon_shipResearch_trade_001_Sprite"
+    },
+    "72600002": {
+      "id": 72600002,
+      "name": "덤 받는 비결 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 1000,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1000,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300141,
+          "Value": 90
+        },
+        {
+          "Type": 1,
+          "Id": 75300151,
+          "Value": 90
+        },
+        {
+          "Type": 1,
+          "Id": 75300161,
+          "Value": 90
+        },
+        {
+          "Type": 1,
+          "Id": 75300171,
+          "Value": 90
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 구매 수량 9% 증가",
+      "skillIcon": "icon_shipResearch_trade_001_Sprite"
+    },
+    "72600003": {
+      "id": 72600003,
+      "name": "덤 받는 비결 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 1000,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1000,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300141,
+          "Value": 120
+        },
+        {
+          "Type": 1,
+          "Id": 75300151,
+          "Value": 120
+        },
+        {
+          "Type": 1,
+          "Id": 75300161,
+          "Value": 120
+        },
+        {
+          "Type": 1,
+          "Id": 75300171,
+          "Value": 120
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 구매 수량 12% 증가",
+      "skillIcon": "icon_shipResearch_trade_001_Sprite"
+    },
+    "72600004": {
+      "id": 72600004,
+      "name": "덤 받는 비결 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 1000,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1000,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300141,
+          "Value": 150
+        },
+        {
+          "Type": 1,
+          "Id": 75300151,
+          "Value": 150
+        },
+        {
+          "Type": 1,
+          "Id": 75300161,
+          "Value": 150
+        },
+        {
+          "Type": 1,
+          "Id": 75300171,
+          "Value": 150
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 구매 수량 15% 증가",
+      "skillIcon": "icon_shipResearch_trade_001_Sprite"
+    },
+    "72600005": {
+      "id": 72600005,
+      "name": "덤 받는 비결 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 1001,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1000,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300181,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300201,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300211,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300221,
+          "Value": 20
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 구매 수량 3% 증가",
+      "skillIcon": "icon_shipResearch_trade_002_Sprite"
+    },
+    "72600006": {
+      "id": 72600006,
+      "name": "덤 받는 비결 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 1001,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1000,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1001,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300181,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300201,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300211,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300221,
+          "Value": 40
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 구매 수량 6% 증가",
+      "skillIcon": "icon_shipResearch_trade_002_Sprite"
+    },
+    "72600007": {
+      "id": 72600007,
+      "name": "덤 받는 비결 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 1001,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1000,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1001,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300181,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300201,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300211,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300221,
+          "Value": 60
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 구매 수량 9% 증가",
+      "skillIcon": "icon_shipResearch_trade_002_Sprite"
+    },
+    "72600008": {
+      "id": 72600008,
+      "name": "덤 받는 비결 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 1001,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1000,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1001,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300181,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300201,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300211,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300221,
+          "Value": 80
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 구매 수량 12% 증가",
+      "skillIcon": "icon_shipResearch_trade_002_Sprite"
+    },
+    "72600009": {
+      "id": 72600009,
+      "name": "덤 받는 비결 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 1001,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1000,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1001,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300181,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300201,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300211,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300221,
+          "Value": 100
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 구매 수량 15% 증가",
+      "skillIcon": "icon_shipResearch_trade_002_Sprite"
+    },
+    "72600010": {
+      "id": 72600010,
+      "name": "덤 받는 비결 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 1002,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1001,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300231,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300241,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300191,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300251,
+          "Value": 20
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 구매 수량 3% 증가",
+      "skillIcon": "icon_shipResearch_trade_013_Sprite"
+    },
+    "72600011": {
+      "id": 72600011,
+      "name": "덤 받는 비결 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 1002,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1001,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1002,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300231,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300241,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300191,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300251,
+          "Value": 40
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 구매 수량 6% 증가",
+      "skillIcon": "icon_shipResearch_trade_013_Sprite"
+    },
+    "72600012": {
+      "id": 72600012,
+      "name": "덤 받는 비결 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 1002,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1001,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1002,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300231,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300241,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300191,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300251,
+          "Value": 60
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 구매 수량 9% 증가",
+      "skillIcon": "icon_shipResearch_trade_013_Sprite"
+    },
+    "72600013": {
+      "id": 72600013,
+      "name": "덤 받는 비결 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 1002,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1001,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1002,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300231,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300241,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300191,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300251,
+          "Value": 80
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 구매 수량 12% 증가",
+      "skillIcon": "icon_shipResearch_trade_013_Sprite"
+    },
+    "72600014": {
+      "id": 72600014,
+      "name": "덤 받는 비결 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 1002,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1001,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1002,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300231,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300241,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300191,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300251,
+          "Value": 100
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 구매 수량 15% 증가",
+      "skillIcon": "icon_shipResearch_trade_013_Sprite"
+    },
+    "72600015": {
+      "id": 72600015,
+      "name": "덤 받는 비결 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 1003,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1002,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300261,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300281,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300301,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300271,
+          "Value": 20
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 구매 수량 3% 증가",
+      "skillIcon": "icon_shipResearch_trade_014_Sprite"
+    },
+    "72600016": {
+      "id": 72600016,
+      "name": "덤 받는 비결 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 1003,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1003,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300261,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300281,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300301,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300271,
+          "Value": 40
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 구매 수량 6% 증가",
+      "skillIcon": "icon_shipResearch_trade_014_Sprite"
+    },
+    "72600017": {
+      "id": 72600017,
+      "name": "덤 받는 비결 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 1003,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1003,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300261,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300281,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300301,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300271,
+          "Value": 60
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 구매 수량 9% 증가",
+      "skillIcon": "icon_shipResearch_trade_014_Sprite"
+    },
+    "72600018": {
+      "id": 72600018,
+      "name": "덤 받는 비결 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 1003,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1003,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300261,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300281,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300301,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300271,
+          "Value": 80
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 구매 수량 12% 증가",
+      "skillIcon": "icon_shipResearch_trade_014_Sprite"
+    },
+    "72600019": {
+      "id": 72600019,
+      "name": "덤 받는 비결 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 1003,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1003,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300261,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300281,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300301,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300271,
+          "Value": 100
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 구매 수량 15% 증가",
+      "skillIcon": "icon_shipResearch_trade_014_Sprite"
+    },
+    "72600020": {
+      "id": 72600020,
+      "name": "덤 받는 비결 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 5,
+      "researchOrder": 1,
+      "researchGroup": 1004,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1003,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300291,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300311,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300321,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300331,
+          "Value": 20
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 구매 수량 3% 증가",
+      "skillIcon": "icon_shipResearch_trade_015_Sprite"
+    },
+    "72600021": {
+      "id": 72600021,
+      "name": "덤 받는 비결 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 5,
+      "researchOrder": 1,
+      "researchGroup": 1004,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1003,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1004,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300291,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300311,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300321,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300331,
+          "Value": 40
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 구매 수량 6% 증가",
+      "skillIcon": "icon_shipResearch_trade_015_Sprite"
+    },
+    "72600022": {
+      "id": 72600022,
+      "name": "덤 받는 비결 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 5,
+      "researchOrder": 1,
+      "researchGroup": 1004,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1003,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1004,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300291,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300311,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300321,
+          "Value": 60
+        },
+        {
+          "Type": 1,
+          "Id": 75300331,
+          "Value": 60
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 구매 수량 9% 증가",
+      "skillIcon": "icon_shipResearch_trade_015_Sprite"
+    },
+    "72600023": {
+      "id": 72600023,
+      "name": "덤 받는 비결 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 5,
+      "researchOrder": 1,
+      "researchGroup": 1004,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1003,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1004,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300291,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300311,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300321,
+          "Value": 80
+        },
+        {
+          "Type": 1,
+          "Id": 75300331,
+          "Value": 80
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 구매 수량 12% 증가",
+      "skillIcon": "icon_shipResearch_trade_015_Sprite"
+    },
+    "72600024": {
+      "id": 72600024,
+      "name": "덤 받는 비결 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 5,
+      "researchOrder": 1,
+      "researchGroup": 1004,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1003,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1004,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300291,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300311,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300321,
+          "Value": 100
+        },
+        {
+          "Type": 1,
+          "Id": 75300331,
+          "Value": 100
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 구매 수량 15% 증가",
+      "skillIcon": "icon_shipResearch_trade_015_Sprite"
+    },
+    "72600025": {
+      "id": 72600025,
+      "name": "에누리의 정석 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 1005,
+      "researchLv": 1,
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300340,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300350,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300360,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300370,
+          "Value": 10
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 3% 할인",
+      "skillIcon": "icon_shipResearch_trade_016_Sprite"
+    },
+    "72600026": {
+      "id": 72600026,
+      "name": "에누리의 정석 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 1005,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1005,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300340,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300350,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300360,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300370,
+          "Value": 20
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 6% 할인",
+      "skillIcon": "icon_shipResearch_trade_016_Sprite"
+    },
+    "72600027": {
+      "id": 72600027,
+      "name": "에누리의 정석 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 1005,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1005,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300340,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300350,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300360,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300370,
+          "Value": 30
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 9% 할인",
+      "skillIcon": "icon_shipResearch_trade_016_Sprite"
+    },
+    "72600028": {
+      "id": 72600028,
+      "name": "에누리의 정석 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 1005,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1005,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300340,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300350,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300360,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300370,
+          "Value": 40
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 12% 할인",
+      "skillIcon": "icon_shipResearch_trade_016_Sprite"
+    },
+    "72600029": {
+      "id": 72600029,
+      "name": "에누리의 정석 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 1005,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1005,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300340,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300350,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300360,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300370,
+          "Value": 50
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 15% 할인",
+      "skillIcon": "icon_shipResearch_trade_016_Sprite"
+    },
+    "72600030": {
+      "id": 72600030,
+      "name": "에누리의 정석 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 2,
+      "researchOrder": 3,
+      "researchGroup": 1006,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1005,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300380,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300400,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300410,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300420,
+          "Value": 10
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 구매 가격 1% 할인",
+      "skillIcon": "icon_shipResearch_trade_016_Sprite"
+    },
+    "72600031": {
+      "id": 72600031,
+      "name": "에누리의 정석 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 2,
+      "researchOrder": 3,
+      "researchGroup": 1006,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1005,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1006,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300380,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300400,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300410,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300420,
+          "Value": 20
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 구매 가격 2% 할인",
+      "skillIcon": "icon_shipResearch_trade_017_Sprite"
+    },
+    "72600032": {
+      "id": 72600032,
+      "name": "에누리의 정석 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 2,
+      "researchOrder": 3,
+      "researchGroup": 1006,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1005,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1006,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300380,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300400,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300410,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300420,
+          "Value": 30
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 구매 가격 3% 할인",
+      "skillIcon": "icon_shipResearch_trade_017_Sprite"
+    },
+    "72600033": {
+      "id": 72600033,
+      "name": "에누리의 정석 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 2,
+      "researchOrder": 3,
+      "researchGroup": 1006,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1005,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1006,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300380,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300400,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300410,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300420,
+          "Value": 40
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 구매 가격 4% 할인",
+      "skillIcon": "icon_shipResearch_trade_017_Sprite"
+    },
+    "72600034": {
+      "id": 72600034,
+      "name": "에누리의 정석 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 2,
+      "researchOrder": 3,
+      "researchGroup": 1006,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1005,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1006,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300380,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300400,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300410,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300420,
+          "Value": 50
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 구매 가격 5% 할인",
+      "skillIcon": "icon_shipResearch_trade_017_Sprite"
+    },
+    "72600035": {
+      "id": 72600035,
+      "name": "에누리의 정석 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 1007,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1006,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300430,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300440,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300390,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300450,
+          "Value": 10
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 구매 가격 1% 할인",
+      "skillIcon": "icon_shipResearch_trade_018_Sprite"
+    },
+    "72600036": {
+      "id": 72600036,
+      "name": "에누리의 정석 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 1007,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1006,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1007,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300430,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300440,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300390,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300450,
+          "Value": 20
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 구매 가격 2% 할인",
+      "skillIcon": "icon_shipResearch_trade_018_Sprite"
+    },
+    "72600037": {
+      "id": 72600037,
+      "name": "에누리의 정석 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 1007,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1006,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1007,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300430,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300440,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300390,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300450,
+          "Value": 30
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 구매 가격 3% 할인",
+      "skillIcon": "icon_shipResearch_trade_018_Sprite"
+    },
+    "72600038": {
+      "id": 72600038,
+      "name": "에누리의 정석 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 1007,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1006,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1007,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300430,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300440,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300390,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300450,
+          "Value": 40
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 구매 가격 4% 할인",
+      "skillIcon": "icon_shipResearch_trade_018_Sprite"
+    },
+    "72600039": {
+      "id": 72600039,
+      "name": "에누리의 정석 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 1007,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1006,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1007,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300430,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300440,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300390,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300450,
+          "Value": 50
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 구매 가격 5% 할인",
+      "skillIcon": "icon_shipResearch_trade_018_Sprite"
+    },
+    "72600040": {
+      "id": 72600040,
+      "name": "에누리의 정석 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 4,
+      "researchOrder": 3,
+      "researchGroup": 1008,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1007,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300460,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300480,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300500,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300470,
+          "Value": 10
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 구매 가격 1% 할인",
+      "skillIcon": "icon_shipResearch_trade_019_Sprite"
+    },
+    "72600041": {
+      "id": 72600041,
+      "name": "에누리의 정석 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 4,
+      "researchOrder": 3,
+      "researchGroup": 1008,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1007,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1008,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300460,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300480,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300500,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300470,
+          "Value": 20
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 구매 가격 2% 할인",
+      "skillIcon": "icon_shipResearch_trade_019_Sprite"
+    },
+    "72600042": {
+      "id": 72600042,
+      "name": "에누리의 정석 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 4,
+      "researchOrder": 3,
+      "researchGroup": 1008,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1007,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1008,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300460,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300480,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300500,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300470,
+          "Value": 30
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 구매 가격 3% 할인",
+      "skillIcon": "icon_shipResearch_trade_019_Sprite"
+    },
+    "72600043": {
+      "id": 72600043,
+      "name": "에누리의 정석 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 4,
+      "researchOrder": 3,
+      "researchGroup": 1008,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1007,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1008,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300460,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300480,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300500,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300470,
+          "Value": 40
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 구매 가격 4% 할인",
+      "skillIcon": "icon_shipResearch_trade_019_Sprite"
+    },
+    "72600044": {
+      "id": 72600044,
+      "name": "에누리의 정석 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 4,
+      "researchOrder": 3,
+      "researchGroup": 1008,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1007,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1008,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300460,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300480,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300500,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300470,
+          "Value": 50
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 구매 가격 5% 할인",
+      "skillIcon": "icon_shipResearch_trade_019_Sprite"
+    },
+    "72600045": {
+      "id": 72600045,
+      "name": "에누리의 정석 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 5,
+      "researchOrder": 3,
+      "researchGroup": 1009,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1008,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300490,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300510,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300520,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300530,
+          "Value": 10
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 구매 가격 1% 할인",
+      "skillIcon": "icon_shipResearch_trade_020_Sprite"
+    },
+    "72600046": {
+      "id": 72600046,
+      "name": "에누리의 정석 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 5,
+      "researchOrder": 3,
+      "researchGroup": 1009,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1008,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1009,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300490,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300510,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300520,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300530,
+          "Value": 20
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 구매 가격 2% 할인",
+      "skillIcon": "icon_shipResearch_trade_020_Sprite"
+    },
+    "72600047": {
+      "id": 72600047,
+      "name": "에누리의 정석 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 5,
+      "researchOrder": 3,
+      "researchGroup": 1009,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1008,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1009,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300490,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300510,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300520,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300530,
+          "Value": 30
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 구매 가격 3% 할인",
+      "skillIcon": "icon_shipResearch_trade_020_Sprite"
+    },
+    "72600048": {
+      "id": 72600048,
+      "name": "에누리의 정석 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 5,
+      "researchOrder": 3,
+      "researchGroup": 1009,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1008,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1009,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300490,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300510,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300520,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300530,
+          "Value": 40
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 구매 가격 4% 할인",
+      "skillIcon": "icon_shipResearch_trade_020_Sprite"
+    },
+    "72600049": {
+      "id": 72600049,
+      "name": "에누리의 정석 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 5,
+      "researchOrder": 3,
+      "researchGroup": 1009,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1008,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1009,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300490,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300510,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300520,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300530,
+          "Value": 50
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 구매 가격 5% 할인",
+      "skillIcon": "icon_shipResearch_trade_020_Sprite"
+    },
+    "72600050": {
+      "id": 72600050,
+      "name": "웃돈 받는 비결 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 1010,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1004,
+          "Lv": 2
+        },
+        {
+          "GroupId": 1009,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300540,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300550,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300570,
+          "Value": 10
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 판매 가격 1% 할증",
+      "skillIcon": "icon_shipResearch_trade_009_Sprite"
+    },
+    "72600051": {
+      "id": 72600051,
+      "name": "웃돈 받는 비결 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 1010,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1004,
+          "Lv": 2
+        },
+        {
+          "GroupId": 1009,
+          "Lv": 2
+        },
+        {
+          "GroupId": 1010,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300540,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300550,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300570,
+          "Value": 20
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 판매 가격 2% 할증",
+      "skillIcon": "icon_shipResearch_trade_009_Sprite"
+    },
+    "72600052": {
+      "id": 72600052,
+      "name": "웃돈 받는 비결 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 1010,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1004,
+          "Lv": 2
+        },
+        {
+          "GroupId": 1009,
+          "Lv": 2
+        },
+        {
+          "GroupId": 1010,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300540,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300550,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300570,
+          "Value": 30
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 판매 가격 3% 할증",
+      "skillIcon": "icon_shipResearch_trade_009_Sprite"
+    },
+    "72600053": {
+      "id": 72600053,
+      "name": "웃돈 받는 비결 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 1010,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1004,
+          "Lv": 2
+        },
+        {
+          "GroupId": 1009,
+          "Lv": 2
+        },
+        {
+          "GroupId": 1010,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300540,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300550,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300570,
+          "Value": 40
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 판매 가격 4% 할증",
+      "skillIcon": "icon_shipResearch_trade_009_Sprite"
+    },
+    "72600054": {
+      "id": 72600054,
+      "name": "웃돈 받는 비결 Ⅰ",
+      "researchType": 1,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 1010,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1004,
+          "Lv": 2
+        },
+        {
+          "GroupId": 1009,
+          "Lv": 2
+        },
+        {
+          "GroupId": 1010,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300540,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300550,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300570,
+          "Value": 50
+        }
+      ],
+      "desc": "식료품, 조미료, 가축, 의약품 판매 가격 5% 할증",
+      "skillIcon": "icon_shipResearch_trade_009_Sprite"
+    },
+    "72600055": {
+      "id": 72600055,
+      "name": "웃돈 받는 비결 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 1011,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1010,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300580,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300600,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300610,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300620,
+          "Value": 10
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 판매 가격 1% 할증",
+      "skillIcon": "icon_shipResearch_trade_010_Sprite"
+    },
+    "72600056": {
+      "id": 72600056,
+      "name": "웃돈 받는 비결 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 1011,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1010,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1011,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300580,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300600,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300610,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300620,
+          "Value": 20
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 판매 가격 2% 할증",
+      "skillIcon": "icon_shipResearch_trade_010_Sprite"
+    },
+    "72600057": {
+      "id": 72600057,
+      "name": "웃돈 받는 비결 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 1011,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1010,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1011,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300580,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300600,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300610,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300620,
+          "Value": 30
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 판매 가격 3% 할증",
+      "skillIcon": "icon_shipResearch_trade_010_Sprite"
+    },
+    "72600058": {
+      "id": 72600058,
+      "name": "웃돈 받는 비결 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 1011,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1010,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1011,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300580,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300600,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300610,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300620,
+          "Value": 40
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 판매 가격 4% 할증",
+      "skillIcon": "icon_shipResearch_trade_010_Sprite"
+    },
+    "72600059": {
+      "id": 72600059,
+      "name": "웃돈 받는 비결 Ⅱ",
+      "researchType": 1,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 1011,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1010,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1011,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300580,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300600,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300610,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300620,
+          "Value": 50
+        }
+      ],
+      "desc": "잡화, 염료, 광석, 공업품 판매 가격 5% 할증",
+      "skillIcon": "icon_shipResearch_trade_010_Sprite"
+    },
+    "72600060": {
+      "id": 72600060,
+      "name": "웃돈 받는 비결 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 8,
+      "researchOrder": 2,
+      "researchGroup": 1012,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1011,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300630,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300640,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300590,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300650,
+          "Value": 10
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 판매 가격 1% 할증",
+      "skillIcon": "icon_shipResearch_trade_021_Sprite"
+    },
+    "72600061": {
+      "id": 72600061,
+      "name": "웃돈 받는 비결 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 8,
+      "researchOrder": 2,
+      "researchGroup": 1012,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1011,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1012,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300630,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300640,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300590,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300650,
+          "Value": 20
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 판매 가격 2% 할증",
+      "skillIcon": "icon_shipResearch_trade_021_Sprite"
+    },
+    "72600062": {
+      "id": 72600062,
+      "name": "웃돈 받는 비결 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 8,
+      "researchOrder": 2,
+      "researchGroup": 1012,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1011,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1012,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300630,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300640,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300590,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300650,
+          "Value": 30
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 판매 가격 3% 할증",
+      "skillIcon": "icon_shipResearch_trade_021_Sprite"
+    },
+    "72600063": {
+      "id": 72600063,
+      "name": "웃돈 받는 비결 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 8,
+      "researchOrder": 2,
+      "researchGroup": 1012,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1011,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1012,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300630,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300640,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300590,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300650,
+          "Value": 40
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 판매 가격 4% 할증",
+      "skillIcon": "icon_shipResearch_trade_021_Sprite"
+    },
+    "72600064": {
+      "id": 72600064,
+      "name": "웃돈 받는 비결 Ⅲ",
+      "researchType": 1,
+      "researchLayer": 8,
+      "researchOrder": 2,
+      "researchGroup": 1012,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1011,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1012,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300630,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300640,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300590,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300650,
+          "Value": 50
+        }
+      ],
+      "desc": "기호품, 섬유, 주류, 직물 판매 가격 5% 할증",
+      "skillIcon": "icon_shipResearch_trade_021_Sprite"
+    },
+    "72600065": {
+      "id": 72600065,
+      "name": "웃돈 받는 비결 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 9,
+      "researchOrder": 2,
+      "researchGroup": 1013,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1012,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300660,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300680,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300700,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300670,
+          "Value": 10
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 판매 가격 1% 할증",
+      "skillIcon": "icon_shipResearch_trade_022_Sprite"
+    },
+    "72600066": {
+      "id": 72600066,
+      "name": "웃돈 받는 비결 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 9,
+      "researchOrder": 2,
+      "researchGroup": 1013,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1012,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1013,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300660,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300680,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300700,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300670,
+          "Value": 20
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 판매 가격 2% 할증",
+      "skillIcon": "icon_shipResearch_trade_022_Sprite"
+    },
+    "72600067": {
+      "id": 72600067,
+      "name": "웃돈 받는 비결 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 9,
+      "researchOrder": 2,
+      "researchGroup": 1013,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1012,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1013,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300660,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300680,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300700,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300670,
+          "Value": 30
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 판매 가격 3% 할증",
+      "skillIcon": "icon_shipResearch_trade_022_Sprite"
+    },
+    "72600068": {
+      "id": 72600068,
+      "name": "웃돈 받는 비결 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 9,
+      "researchOrder": 2,
+      "researchGroup": 1013,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1012,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1013,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300660,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300680,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300700,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300670,
+          "Value": 40
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 판매 가격 4% 할증",
+      "skillIcon": "icon_shipResearch_trade_022_Sprite"
+    },
+    "72600069": {
+      "id": 72600069,
+      "name": "웃돈 받는 비결 Ⅳ",
+      "researchType": 1,
+      "researchLayer": 9,
+      "researchOrder": 2,
+      "researchGroup": 1013,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1012,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1013,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300660,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300680,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300700,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300670,
+          "Value": 50
+        }
+      ],
+      "desc": "무기류, 공예품, 향신료, 총포류 판매 가격 5% 할증",
+      "skillIcon": "icon_shipResearch_trade_022_Sprite"
+    },
+    "72600070": {
+      "id": 72600070,
+      "name": "웃돈 받는 비결 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 10,
+      "researchOrder": 2,
+      "researchGroup": 1014,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 1013,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300690,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300710,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300720,
+          "Value": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300730,
+          "Value": 10
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 판매 가격 1% 할증",
+      "skillIcon": "icon_shipResearch_trade_023_Sprite"
+    },
+    "72600071": {
+      "id": 72600071,
+      "name": "웃돈 받는 비결 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 10,
+      "researchOrder": 2,
+      "researchGroup": 1014,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 1013,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1014,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300690,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300710,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300720,
+          "Value": 20
+        },
+        {
+          "Type": 1,
+          "Id": 75300730,
+          "Value": 20
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 판매 가격 2% 할증",
+      "skillIcon": "icon_shipResearch_trade_023_Sprite"
+    },
+    "72600072": {
+      "id": 72600072,
+      "name": "웃돈 받는 비결 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 10,
+      "researchOrder": 2,
+      "researchGroup": 1014,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 1013,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1014,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300690,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300710,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300720,
+          "Value": 30
+        },
+        {
+          "Type": 1,
+          "Id": 75300730,
+          "Value": 30
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 판매 가격 3% 할증",
+      "skillIcon": "icon_shipResearch_trade_023_Sprite"
+    },
+    "72600073": {
+      "id": 72600073,
+      "name": "웃돈 받는 비결 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 10,
+      "researchOrder": 2,
+      "researchGroup": 1014,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 1013,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1014,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300690,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300710,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300720,
+          "Value": 40
+        },
+        {
+          "Type": 1,
+          "Id": 75300730,
+          "Value": 40
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 판매 가격 4% 할증",
+      "skillIcon": "icon_shipResearch_trade_023_Sprite"
+    },
+    "72600074": {
+      "id": 72600074,
+      "name": "웃돈 받는 비결 Ⅴ",
+      "researchType": 1,
+      "researchLayer": 10,
+      "researchOrder": 2,
+      "researchGroup": 1014,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 1013,
+          "Lv": 1
+        },
+        {
+          "GroupId": 1014,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "fleetStatEffect": [
+        {
+          "Type": 1,
+          "Id": 75300690,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300710,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300720,
+          "Value": 50
+        },
+        {
+          "Type": 1,
+          "Id": 75300730,
+          "Value": 50
+        }
+      ],
+      "desc": "미술품, 귀금속, 향료, 보석 판매 가격 5% 할증",
+      "skillIcon": "icon_shipResearch_trade_023_Sprite"
+    },
+    "72700000": {
+      "id": 72700000,
+      "name": "철의 물결",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 2000,
+      "researchLv": 1,
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 5,
+          "Value": 2
+        },
+        {
+          "Type": 0,
+          "Id": 1114,
+          "Value": 12
+        }
+      ],
+      "desc": "포격 위력이 2, 포격 수비력이 12 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_001_Sprite"
+    },
+    "72700001": {
+      "id": 72700001,
+      "name": "철의 물결",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 2000,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2000,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 5,
+          "Value": 4
+        },
+        {
+          "Type": 0,
+          "Id": 1114,
+          "Value": 24
+        }
+      ],
+      "desc": "포격 위력이 4, 포격 수비력이 24 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_001_Sprite"
+    },
+    "72700002": {
+      "id": 72700002,
+      "name": "철의 물결",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 2000,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2000,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 5,
+          "Value": 6
+        },
+        {
+          "Type": 0,
+          "Id": 1114,
+          "Value": 36
+        }
+      ],
+      "desc": "포격 위력이 6, 포격 수비력이 36 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_001_Sprite"
+    },
+    "72700003": {
+      "id": 72700003,
+      "name": "철의 물결",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 2000,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2000,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 5,
+          "Value": 8
+        },
+        {
+          "Type": 0,
+          "Id": 1114,
+          "Value": 48
+        }
+      ],
+      "desc": "포격 위력이 8, 포격 수비력이 48 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_001_Sprite"
+    },
+    "72700004": {
+      "id": 72700004,
+      "name": "철의 물결",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 1,
+      "researchGroup": 2000,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2000,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 5,
+          "Value": 10
+        },
+        {
+          "Type": 0,
+          "Id": 1114,
+          "Value": 60
+        }
+      ],
+      "desc": "포격 위력이 10, 포격 수비력이 60 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_001_Sprite"
+    },
+    "72700005": {
+      "id": 72700005,
+      "name": "선박 복구 강화",
+      "researchType": 2,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 2001,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2000,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1057,
+          "Value": 30
+        }
+      ],
+      "desc": "추가 수리 회복량이 3% 증가합니다.",
+      "skillIcon": "icon_effect_battle_318_Sprite"
+    },
+    "72700006": {
+      "id": 72700006,
+      "name": "선박 복구 강화",
+      "researchType": 2,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 2001,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2000,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2001,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1057,
+          "Value": 60
+        }
+      ],
+      "desc": "추가 수리 회복량이 6% 증가합니다.",
+      "skillIcon": "icon_effect_battle_318_Sprite"
+    },
+    "72700007": {
+      "id": 72700007,
+      "name": "선박 복구 강화",
+      "researchType": 2,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 2001,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2000,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2001,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1057,
+          "Value": 90
+        }
+      ],
+      "desc": "추가 수리 회복량이 9% 증가합니다.",
+      "skillIcon": "icon_effect_battle_318_Sprite"
+    },
+    "72700008": {
+      "id": 72700008,
+      "name": "선박 복구 강화",
+      "researchType": 2,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 2001,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2000,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2001,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1057,
+          "Value": 120
+        }
+      ],
+      "desc": "추가 수리 회복량이 12% 증가합니다.",
+      "skillIcon": "icon_effect_battle_318_Sprite"
+    },
+    "72700009": {
+      "id": 72700009,
+      "name": "선박 복구 강화",
+      "researchType": 2,
+      "researchLayer": 2,
+      "researchOrder": 1,
+      "researchGroup": 2001,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2000,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2001,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1057,
+          "Value": 150
+        }
+      ],
+      "desc": "추가 수리 회복량이 15% 증가합니다.",
+      "skillIcon": "icon_effect_battle_318_Sprite"
+    },
+    "72700010": {
+      "id": 72700010,
+      "name": "선박 내구 강화",
+      "researchType": 2,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 2002,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2001,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 3,
+          "Value": 5
+        }
+      ],
+      "desc": "최대 내구도가 5 증가합니다.",
+      "skillIcon": "icon_effect_battle_081_Sprite"
+    },
+    "72700011": {
+      "id": 72700011,
+      "name": "선박 내구 강화",
+      "researchType": 2,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 2002,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2001,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2002,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 3,
+          "Value": 10
+        }
+      ],
+      "desc": "최대 내구도가 10 증가합니다.",
+      "skillIcon": "icon_effect_battle_081_Sprite"
+    },
+    "72700012": {
+      "id": 72700012,
+      "name": "선박 내구 강화",
+      "researchType": 2,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 2002,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2001,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2002,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 3,
+          "Value": 15
+        }
+      ],
+      "desc": "최대 내구도가 15 증가합니다.",
+      "skillIcon": "icon_effect_battle_081_Sprite"
+    },
+    "72700013": {
+      "id": 72700013,
+      "name": "선박 내구 강화",
+      "researchType": 2,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 2002,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2001,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2002,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 3,
+          "Value": 20
+        }
+      ],
+      "desc": "최대 내구도가 20 증가합니다.",
+      "skillIcon": "icon_effect_battle_081_Sprite"
+    },
+    "72700014": {
+      "id": 72700014,
+      "name": "선박 내구 강화",
+      "researchType": 2,
+      "researchLayer": 3,
+      "researchOrder": 1,
+      "researchGroup": 2002,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2001,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2002,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 3,
+          "Value": 25
+        }
+      ],
+      "desc": "최대 내구도가 25 증가합니다.",
+      "skillIcon": "icon_effect_battle_081_Sprite"
+    },
+    "72700015": {
+      "id": 72700015,
+      "name": "폭풍같은 포격",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 2003,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2002,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1109,
+          "Value": 5
+        }
+      ],
+      "desc": "포격 치명타 피해량이 0.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_089_Sprite"
+    },
+    "72700016": {
+      "id": 72700016,
+      "name": "폭풍같은 포격",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 2003,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2003,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1109,
+          "Value": 10
+        }
+      ],
+      "desc": "포격 치명타 피해량이 1% 증가합니다.",
+      "skillIcon": "icon_effect_battle_089_Sprite"
+    },
+    "72700017": {
+      "id": 72700017,
+      "name": "폭풍같은 포격",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 2003,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2003,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1109,
+          "Value": 15
+        }
+      ],
+      "desc": "포격 치명타 피해량이 1.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_089_Sprite"
+    },
+    "72700018": {
+      "id": 72700018,
+      "name": "폭풍같은 포격",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 2003,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2003,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1109,
+          "Value": 20
+        }
+      ],
+      "desc": "포격 치명타 피해량이 2% 증가합니다.",
+      "skillIcon": "icon_effect_battle_089_Sprite"
+    },
+    "72700019": {
+      "id": 72700019,
+      "name": "폭풍같은 포격",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 1,
+      "researchGroup": 2003,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2003,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1109,
+          "Value": 25
+        }
+      ],
+      "desc": "포격 치명타 피해량이 2.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_089_Sprite"
+    },
+    "72700020": {
+      "id": 72700020,
+      "name": "철의 날개",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 2,
+      "researchGroup": 2004,
+      "researchLv": 1,
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1000,
+          "Value": 2
+        },
+        {
+          "Type": 0,
+          "Id": 1116,
+          "Value": 12
+        }
+      ],
+      "desc": "충파 위력이 2, 충파 수비력이 12 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_004_Sprite"
+    },
+    "72700021": {
+      "id": 72700021,
+      "name": "철의 날개",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 2,
+      "researchGroup": 2004,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2004,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1000,
+          "Value": 4
+        },
+        {
+          "Type": 0,
+          "Id": 1116,
+          "Value": 24
+        }
+      ],
+      "desc": "충파 위력이 4, 충파 수비력이 24 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_004_Sprite"
+    },
+    "72700022": {
+      "id": 72700022,
+      "name": "철의 날개",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 2,
+      "researchGroup": 2004,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2004,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1000,
+          "Value": 6
+        },
+        {
+          "Type": 0,
+          "Id": 1116,
+          "Value": 36
+        }
+      ],
+      "desc": "충파 위력이 6, 충파 수비력이 36 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_004_Sprite"
+    },
+    "72700023": {
+      "id": 72700023,
+      "name": "철의 날개",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 2,
+      "researchGroup": 2004,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2004,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1000,
+          "Value": 8
+        },
+        {
+          "Type": 0,
+          "Id": 1116,
+          "Value": 48
+        }
+      ],
+      "desc": "충파 위력이 8, 충파 수비력이 48 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_004_Sprite"
+    },
+    "72700024": {
+      "id": 72700024,
+      "name": "철의 날개",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 2,
+      "researchGroup": 2004,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2004,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1000,
+          "Value": 10
+        },
+        {
+          "Type": 0,
+          "Id": 1116,
+          "Value": 60
+        }
+      ],
+      "desc": "충파 위력이 10, 충파 수비력이 60 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_004_Sprite"
+    },
+    "72700025": {
+      "id": 72700025,
+      "name": "종심 돌파 특화",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 2,
+      "researchGroup": 2005,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2002,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1111,
+          "Value": 5
+        }
+      ],
+      "desc": "충파 치명타 피해량이 0.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_091_Sprite"
+    },
+    "72700026": {
+      "id": 72700026,
+      "name": "종심 돌파 특화",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 2,
+      "researchGroup": 2005,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2005,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1111,
+          "Value": 10
+        }
+      ],
+      "desc": "충파 치명타 피해량이 1% 증가합니다.",
+      "skillIcon": "icon_effect_battle_091_Sprite"
+    },
+    "72700027": {
+      "id": 72700027,
+      "name": "종심 돌파 특화",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 2,
+      "researchGroup": 2005,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2005,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1111,
+          "Value": 15
+        }
+      ],
+      "desc": "충파 치명타 피해량이 1.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_091_Sprite"
+    },
+    "72700028": {
+      "id": 72700028,
+      "name": "종심 돌파 특화",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 2,
+      "researchGroup": 2005,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2005,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1111,
+          "Value": 20
+        }
+      ],
+      "desc": "충파 치명타 피해량이 2% 증가합니다.",
+      "skillIcon": "icon_effect_battle_091_Sprite"
+    },
+    "72700029": {
+      "id": 72700029,
+      "name": "종심 돌파 특화",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 2,
+      "researchGroup": 2005,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2002,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2005,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1111,
+          "Value": 25
+        }
+      ],
+      "desc": "충파 치명타 피해량이 2.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_091_Sprite"
+    },
+    "72700030": {
+      "id": 72700030,
+      "name": "고급 장비 지급",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 2006,
+      "researchLv": 1,
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1002,
+          "Value": 2
+        },
+        {
+          "Type": 0,
+          "Id": 1115,
+          "Value": 12
+        }
+      ],
+      "desc": "백병 위력이 2, 백병 수비력이 12 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_007_Sprite"
+    },
+    "72700031": {
+      "id": 72700031,
+      "name": "고급 장비 지급",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 2006,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2006,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1002,
+          "Value": 4
+        },
+        {
+          "Type": 0,
+          "Id": 1115,
+          "Value": 24
+        }
+      ],
+      "desc": "백병 위력이 4, 백병 수비력이 24 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_007_Sprite"
+    },
+    "72700032": {
+      "id": 72700032,
+      "name": "고급 장비 지급",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 2006,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2006,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1002,
+          "Value": 6
+        },
+        {
+          "Type": 0,
+          "Id": 1115,
+          "Value": 36
+        }
+      ],
+      "desc": "백병 위력이 6, 백병 수비력이 36 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_007_Sprite"
+    },
+    "72700033": {
+      "id": 72700033,
+      "name": "고급 장비 지급",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 2006,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2006,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1002,
+          "Value": 8
+        },
+        {
+          "Type": 0,
+          "Id": 1115,
+          "Value": 48
+        }
+      ],
+      "desc": "백병 위력이 8, 백병 수비력이 48 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_007_Sprite"
+    },
+    "72700034": {
+      "id": 72700034,
+      "name": "고급 장비 지급",
+      "researchType": 2,
+      "researchLayer": 1,
+      "researchOrder": 3,
+      "researchGroup": 2006,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2006,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1002,
+          "Value": 10
+        },
+        {
+          "Type": 0,
+          "Id": 1115,
+          "Value": 60
+        }
+      ],
+      "desc": "백병 위력이 10, 백병 수비력이 60 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_007_Sprite"
+    },
+    "72700035": {
+      "id": 72700035,
+      "name": "선원 치료 강화",
+      "researchType": 2,
+      "researchLayer": 2,
+      "researchOrder": 3,
+      "researchGroup": 2007,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2006,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1060,
+          "Value": 30
+        }
+      ],
+      "desc": "추가 의술 회복량이 3% 증가합니다.",
+      "skillIcon": "icon_effect_battle_315_Sprite"
+    },
+    "72700036": {
+      "id": 72700036,
+      "name": "선원 치료 강화",
+      "researchType": 2,
+      "researchLayer": 2,
+      "researchOrder": 3,
+      "researchGroup": 2007,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2006,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2007,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1060,
+          "Value": 60
+        }
+      ],
+      "desc": "추가 의술 회복량이 6% 증가합니다.",
+      "skillIcon": "icon_effect_battle_315_Sprite"
+    },
+    "72700037": {
+      "id": 72700037,
+      "name": "선원 치료 강화",
+      "researchType": 2,
+      "researchLayer": 2,
+      "researchOrder": 3,
+      "researchGroup": 2007,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2006,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2007,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1060,
+          "Value": 90
+        }
+      ],
+      "desc": "추가 의술 회복량이 9% 증가합니다.",
+      "skillIcon": "icon_effect_battle_315_Sprite"
+    },
+    "72700038": {
+      "id": 72700038,
+      "name": "선원 치료 강화",
+      "researchType": 2,
+      "researchLayer": 2,
+      "researchOrder": 3,
+      "researchGroup": 2007,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2006,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2007,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1060,
+          "Value": 120
+        }
+      ],
+      "desc": "추가 의술 회복량이 12% 증가합니다.",
+      "skillIcon": "icon_effect_battle_315_Sprite"
+    },
+    "72700039": {
+      "id": 72700039,
+      "name": "선원 치료 강화",
+      "researchType": 2,
+      "researchLayer": 2,
+      "researchOrder": 3,
+      "researchGroup": 2007,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2006,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2007,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1060,
+          "Value": 150
+        }
+      ],
+      "desc": "추가 의술 회복량이 15% 증가합니다.",
+      "skillIcon": "icon_effect_battle_315_Sprite"
+    },
+    "72700040": {
+      "id": 72700040,
+      "name": "선원 탑승 개선",
+      "researchType": 2,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 2008,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2007,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 2,
+          "Value": 4
+        }
+      ],
+      "desc": "최대 선원수가 4 증가합니다.",
+      "skillIcon": "icon_effect_battle_082_Sprite"
+    },
+    "72700041": {
+      "id": 72700041,
+      "name": "선원 탑승 개선",
+      "researchType": 2,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 2008,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2007,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2008,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 2,
+          "Value": 8
+        }
+      ],
+      "desc": "최대 선원수가 8 증가합니다.",
+      "skillIcon": "icon_effect_battle_082_Sprite"
+    },
+    "72700042": {
+      "id": 72700042,
+      "name": "선원 탑승 개선",
+      "researchType": 2,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 2008,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2007,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2008,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 2,
+          "Value": 12
+        }
+      ],
+      "desc": "최대 선원수가 12 증가합니다.",
+      "skillIcon": "icon_effect_battle_082_Sprite"
+    },
+    "72700043": {
+      "id": 72700043,
+      "name": "선원 탑승 개선",
+      "researchType": 2,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 2008,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2007,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2008,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 2,
+          "Value": 16
+        }
+      ],
+      "desc": "최대 선원수가 16 증가합니다.",
+      "skillIcon": "icon_effect_battle_082_Sprite"
+    },
+    "72700044": {
+      "id": 72700044,
+      "name": "선원 탑승 개선",
+      "researchType": 2,
+      "researchLayer": 3,
+      "researchOrder": 3,
+      "researchGroup": 2008,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2007,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2008,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 2,
+          "Value": 20
+        }
+      ],
+      "desc": "최대 선원수가 20 증가합니다.",
+      "skillIcon": "icon_effect_battle_082_Sprite"
+    },
+    "72700045": {
+      "id": 72700045,
+      "name": "특임대 배치",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 3,
+      "researchGroup": 2009,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2008,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1110,
+          "Value": 5
+        }
+      ],
+      "desc": "백병 치명타 피해량이 0.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_090_Sprite"
+    },
+    "72700046": {
+      "id": 72700046,
+      "name": "특임대 배치",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 3,
+      "researchGroup": 2009,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2008,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2009,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1110,
+          "Value": 10
+        }
+      ],
+      "desc": "백병 치명타 피해량이 1% 증가합니다.",
+      "skillIcon": "icon_effect_battle_090_Sprite"
+    },
+    "72700047": {
+      "id": 72700047,
+      "name": "특임대 배치",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 3,
+      "researchGroup": 2009,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2008,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2009,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1110,
+          "Value": 15
+        }
+      ],
+      "desc": "백병 치명타 피해량이 1.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_090_Sprite"
+    },
+    "72700048": {
+      "id": 72700048,
+      "name": "특임대 배치",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 3,
+      "researchGroup": 2009,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2008,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2009,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1110,
+          "Value": 20
+        }
+      ],
+      "desc": "백병 치명타 피해량이 2% 증가합니다.",
+      "skillIcon": "icon_effect_battle_090_Sprite"
+    },
+    "72700049": {
+      "id": 72700049,
+      "name": "특임대 배치",
+      "researchType": 2,
+      "researchLayer": 4,
+      "researchOrder": 3,
+      "researchGroup": 2009,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2008,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2009,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1110,
+          "Value": 25
+        }
+      ],
+      "desc": "백병 치명타 피해량이 2.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_090_Sprite"
+    },
+    "72700050": {
+      "id": 72700050,
+      "name": "효율적인 운선",
+      "researchType": 2,
+      "researchLayer": 5,
+      "researchOrder": 2,
+      "researchGroup": 2010,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2003,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2005,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2009,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1100,
+          "Value": 2
+        }
+      ],
+      "desc": "추가 기동력이 0.2% 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_006_Sprite"
+    },
+    "72700051": {
+      "id": 72700051,
+      "name": "효율적인 운선",
+      "researchType": 2,
+      "researchLayer": 5,
+      "researchOrder": 2,
+      "researchGroup": 2010,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2003,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2005,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2009,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2010,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1100,
+          "Value": 4
+        }
+      ],
+      "desc": "추가 기동력이 0.4% 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_006_Sprite"
+    },
+    "72700052": {
+      "id": 72700052,
+      "name": "효율적인 운선",
+      "researchType": 2,
+      "researchLayer": 5,
+      "researchOrder": 2,
+      "researchGroup": 2010,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2003,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2005,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2009,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2010,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1100,
+          "Value": 6
+        }
+      ],
+      "desc": "추가 기동력이 0.6% 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_006_Sprite"
+    },
+    "72700053": {
+      "id": 72700053,
+      "name": "효율적인 운선",
+      "researchType": 2,
+      "researchLayer": 5,
+      "researchOrder": 2,
+      "researchGroup": 2010,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2003,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2005,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2009,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2010,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1100,
+          "Value": 8
+        }
+      ],
+      "desc": "추가 기동력이 0.8% 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_006_Sprite"
+    },
+    "72700054": {
+      "id": 72700054,
+      "name": "효율적인 운선",
+      "researchType": 2,
+      "researchLayer": 5,
+      "researchOrder": 2,
+      "researchGroup": 2010,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2003,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2005,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2009,
+          "Lv": 2
+        },
+        {
+          "GroupId": 2010,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1100,
+          "Value": 10
+        }
+      ],
+      "desc": "추가 기동력이 1% 증가합니다.",
+      "skillIcon": "icon_shipResearch_battle_006_Sprite"
+    },
+    "72700055": {
+      "id": 72700055,
+      "name": "압도적인 포격",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 1,
+      "researchGroup": 2011,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1023,
+          "Value": 10
+        },
+        {
+          "Type": 0,
+          "Id": 1029,
+          "Value": 5
+        }
+      ],
+      "desc": "추가 포격 공격력이 1% 증가하고, 추가 포격 치명타 발생이 0.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_009_Sprite"
+    },
+    "72700056": {
+      "id": 72700056,
+      "name": "압도적인 포격",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 1,
+      "researchGroup": 2011,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2011,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1023,
+          "Value": 20
+        },
+        {
+          "Type": 0,
+          "Id": 1029,
+          "Value": 10
+        }
+      ],
+      "desc": "추가 포격 공격력이 2% 증가하고, 추가 포격 치명타 발생이 1% 증가합니다.",
+      "skillIcon": "icon_effect_battle_009_Sprite"
+    },
+    "72700057": {
+      "id": 72700057,
+      "name": "압도적인 포격",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 1,
+      "researchGroup": 2011,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2011,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1023,
+          "Value": 30
+        },
+        {
+          "Type": 0,
+          "Id": 1029,
+          "Value": 15
+        }
+      ],
+      "desc": "추가 포격 공격력이 3% 증가하고, 추가 포격 치명타 발생이 1.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_009_Sprite"
+    },
+    "72700058": {
+      "id": 72700058,
+      "name": "압도적인 포격",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 1,
+      "researchGroup": 2011,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2011,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1023,
+          "Value": 40
+        },
+        {
+          "Type": 0,
+          "Id": 1029,
+          "Value": 20
+        }
+      ],
+      "desc": "추가 포격 공격력이 4% 증가하고, 추가 포격 치명타 발생이 2% 증가합니다.",
+      "skillIcon": "icon_effect_battle_009_Sprite"
+    },
+    "72700059": {
+      "id": 72700059,
+      "name": "압도적인 포격",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 1,
+      "researchGroup": 2011,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2011,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1023,
+          "Value": 50
+        },
+        {
+          "Type": 0,
+          "Id": 1029,
+          "Value": 25
+        }
+      ],
+      "desc": "추가 포격 공격력이 5% 증가하고, 추가 포격 치명타 발생이 2.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_009_Sprite"
+    },
+    "72700060": {
+      "id": 72700060,
+      "name": "압도적인 충각",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 2012,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1053,
+          "Value": 10
+        },
+        {
+          "Type": 0,
+          "Id": 1091,
+          "Value": 5
+        }
+      ],
+      "desc": "추가 충파 공격력이 1% 증가하고, 추가 충파 치명타 발생이 0.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_011_Sprite"
+    },
+    "72700061": {
+      "id": 72700061,
+      "name": "압도적인 충각",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 2012,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2012,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1053,
+          "Value": 20
+        },
+        {
+          "Type": 0,
+          "Id": 1091,
+          "Value": 10
+        }
+      ],
+      "desc": "추가 충파 공격력이 2% 증가하고, 추가 충파 치명타 발생이 1% 증가합니다.",
+      "skillIcon": "icon_effect_battle_011_Sprite"
+    },
+    "72700062": {
+      "id": 72700062,
+      "name": "압도적인 충각",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 2012,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2012,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1053,
+          "Value": 30
+        },
+        {
+          "Type": 0,
+          "Id": 1091,
+          "Value": 15
+        }
+      ],
+      "desc": "추가 충파 공격력이 3% 증가하고, 추가 충파 치명타 발생이 1.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_011_Sprite"
+    },
+    "72700063": {
+      "id": 72700063,
+      "name": "압도적인 충각",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 2012,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2012,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1053,
+          "Value": 40
+        },
+        {
+          "Type": 0,
+          "Id": 1091,
+          "Value": 20
+        }
+      ],
+      "desc": "추가 충파 공격력이 4% 증가하고, 추가 충파 치명타 발생이 2% 증가합니다.",
+      "skillIcon": "icon_effect_battle_011_Sprite"
+    },
+    "72700064": {
+      "id": 72700064,
+      "name": "압도적인 충각",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 2,
+      "researchGroup": 2012,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2012,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1053,
+          "Value": 50
+        },
+        {
+          "Type": 0,
+          "Id": 1091,
+          "Value": 25
+        }
+      ],
+      "desc": "추가 충파 공격력이 5% 증가하고, 추가 충파 치명타 발생이 2.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_011_Sprite"
+    },
+    "72700065": {
+      "id": 72700065,
+      "name": "압도적인 무력",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 3,
+      "researchGroup": 2013,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1038,
+          "Value": 10
+        },
+        {
+          "Type": 0,
+          "Id": 1044,
+          "Value": 5
+        }
+      ],
+      "desc": "추가 백병 공격력이 1% 증가하고, 추가 백병 치명타 발생이 0.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_010_Sprite"
+    },
+    "72700066": {
+      "id": 72700066,
+      "name": "압도적인 무력",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 3,
+      "researchGroup": 2013,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2013,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1038,
+          "Value": 20
+        },
+        {
+          "Type": 0,
+          "Id": 1044,
+          "Value": 10
+        }
+      ],
+      "desc": "추가 백병 공격력이 2% 증가하고, 추가 백병 치명타 발생이 1% 증가합니다.",
+      "skillIcon": "icon_effect_battle_010_Sprite"
+    },
+    "72700067": {
+      "id": 72700067,
+      "name": "압도적인 무력",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 3,
+      "researchGroup": 2013,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2013,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1038,
+          "Value": 30
+        },
+        {
+          "Type": 0,
+          "Id": 1044,
+          "Value": 15
+        }
+      ],
+      "desc": "추가 백병 공격력이 3% 증가하고, 추가 백병 치명타 발생이 1.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_010_Sprite"
+    },
+    "72700068": {
+      "id": 72700068,
+      "name": "압도적인 무력",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 3,
+      "researchGroup": 2013,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2013,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1038,
+          "Value": 40
+        },
+        {
+          "Type": 0,
+          "Id": 1044,
+          "Value": 20
+        }
+      ],
+      "desc": "추가 백병 공격력이 4% 증가하고, 추가 백병 치명타 발생이 2% 증가합니다.",
+      "skillIcon": "icon_effect_battle_010_Sprite"
+    },
+    "72700069": {
+      "id": 72700069,
+      "name": "압도적인 무력",
+      "researchType": 2,
+      "researchLayer": 6,
+      "researchOrder": 3,
+      "researchGroup": 2013,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2010,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2013,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1038,
+          "Value": 50
+        },
+        {
+          "Type": 0,
+          "Id": 1044,
+          "Value": 25
+        }
+      ],
+      "desc": "추가 백병 공격력이 5% 증가하고, 추가 백병 치명타 발생이 2.5% 증가합니다.",
+      "skillIcon": "icon_effect_battle_010_Sprite"
+    },
+    "72700070": {
+      "id": 72700070,
+      "name": "광역 피해 내성",
+      "researchType": 2,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 2014,
+      "researchLv": 1,
+      "needResearch": [
+        {
+          "GroupId": 2011,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2012,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2013,
+          "Lv": 5
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1157,
+          "Value": 15
+        }
+      ],
+      "desc": "광역 공격으로 받는 피해량이 1.5% 감소합니다.",
+      "skillIcon": "icon_effect_battle_036_Sprite"
+    },
+    "72700071": {
+      "id": 72700071,
+      "name": "광역 피해 내성",
+      "researchType": 2,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 2014,
+      "researchLv": 2,
+      "needResearch": [
+        {
+          "GroupId": 2011,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2012,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2013,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2014,
+          "Lv": 1
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1157,
+          "Value": 30
+        }
+      ],
+      "desc": "광역 포격으로 받는 피해량이 3% 감소합니다.",
+      "skillIcon": "icon_effect_battle_036_Sprite"
+    },
+    "72700072": {
+      "id": 72700072,
+      "name": "광역 피해 내성",
+      "researchType": 2,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 2014,
+      "researchLv": 3,
+      "needResearch": [
+        {
+          "GroupId": 2011,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2012,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2013,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2014,
+          "Lv": 2
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1157,
+          "Value": 45
+        }
+      ],
+      "desc": "광역 포격으로 받는 피해량이 4.5% 감소합니다.",
+      "skillIcon": "icon_effect_battle_036_Sprite"
+    },
+    "72700073": {
+      "id": 72700073,
+      "name": "광역 피해 내성",
+      "researchType": 2,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 2014,
+      "researchLv": 4,
+      "needResearch": [
+        {
+          "GroupId": 2011,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2012,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2013,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2014,
+          "Lv": 3
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1157,
+          "Value": 60
+        }
+      ],
+      "desc": "광역 포격으로 받는 피해량이 6% 감소합니다.",
+      "skillIcon": "icon_effect_battle_036_Sprite"
+    },
+    "72700074": {
+      "id": 72700074,
+      "name": "광역 피해 내성",
+      "researchType": 2,
+      "researchLayer": 7,
+      "researchOrder": 2,
+      "researchGroup": 2014,
+      "researchLv": 5,
+      "needResearch": [
+        {
+          "GroupId": 2011,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2012,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2013,
+          "Lv": 5
+        },
+        {
+          "GroupId": 2014,
+          "Lv": 4
+        }
+      ],
+      "researchTaskId": [
+        99803271
+      ],
+      "shipStatEffect": [
+        {
+          "Type": 0,
+          "Id": 1157,
+          "Value": 75
+        }
+      ],
+      "desc": "광역 포격으로 받는 피해량이 7.5% 감소합니다.",
+      "skillIcon": "icon_effect_battle_036_Sprite"
+    }
+  }
+}

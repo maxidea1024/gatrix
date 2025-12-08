@@ -68637,6 +68637,7 @@
         255
       ],
       "ignoreSkillType": 255,
+      "skillBlackList": 69690039,
       "ignoreActionType": 31,
       "targetType": 1,
       "assignTarget": 0,
@@ -68666,6 +68667,27 @@
       "canPincerAttack": true,
       "pattern": 0,
       "moveWeightId": 60500059,
+      "actionWeightId": 60600045
+    },
+    "69371530": {
+      "id": 69371530,
+      "conditionType": [
+        15
+      ],
+      "conditionVal": [
+        255
+      ],
+      "ignoreSkillType": 131,
+      "battleSkillId": 65459018,
+      "ignoreActionType": 16,
+      "targetType": 1,
+      "assignTarget": 0,
+      "ignoreTarget": 0,
+      "multiplyGoalTarget": 1000,
+      "multiplyNonGoalTarget": 1000,
+      "canPincerAttack": true,
+      "pattern": 0,
+      "moveWeightId": 60500012,
       "actionWeightId": 60600045
     },
     "69375000": {
@@ -70597,10 +70619,10 @@
         15
       ],
       "conditionVal": [
-        256
+        255
       ],
       "ignoreSkillType": 128,
-      "ignoreActionType": 16,
+      "ignoreActionType": 24,
       "targetType": 1,
       "assignTarget": 0,
       "ignoreTarget": 0,
@@ -71265,7 +71287,7 @@
       "multiplyNonGoalTarget": 1000,
       "canPincerAttack": true,
       "pattern": 0,
-      "moveWeightId": 60500012,
+      "moveWeightId": 60500010,
       "actionWeightId": 60600034
     },
     "69379122": {
@@ -71287,6 +71309,167 @@
       "pattern": 0,
       "moveWeightId": 60500012,
       "actionWeightId": 60600041
+    },
+    "69379123": {
+      "id": 69379123,
+      "conditionType": [
+        17
+      ],
+      "conditionVal": [
+        7
+      ],
+      "ignoreSkillType": 222,
+      "ignoreActionType": 24,
+      "targetType": 1,
+      "assignTarget": 0,
+      "ignoreTarget": 0,
+      "multiplyGoalTarget": 1000,
+      "multiplyNonGoalTarget": 1000,
+      "canPincerAttack": true,
+      "pattern": 0,
+      "moveWeightId": 60500056,
+      "actionWeightId": 60600034
+    },
+    "69379124": {
+      "id": 69379124,
+      "conditionType": [
+        17
+      ],
+      "conditionVal": [
+        2
+      ],
+      "ignoreSkillType": 198,
+      "ignoreActionType": 16,
+      "targetType": 1,
+      "assignTarget": 0,
+      "ignoreTarget": 0,
+      "multiplyGoalTarget": 1000,
+      "multiplyNonGoalTarget": 1000,
+      "canPincerAttack": true,
+      "pattern": 0,
+      "moveWeightId": 60500045,
+      "actionWeightId": 60600034
+    },
+    "69379125": {
+      "id": 69379125,
+      "conditionType": [
+        15
+      ],
+      "conditionVal": [
+        255
+      ],
+      "ignoreSkillType": 254,
+      "battleSkillId": 65459019,
+      "ignoreActionType": 16,
+      "targetType": 1,
+      "assignTarget": 0,
+      "ignoreTarget": 0,
+      "multiplyGoalTarget": 1000,
+      "multiplyNonGoalTarget": 1000,
+      "canPincerAttack": true,
+      "pattern": 0,
+      "moveWeightId": 60500012,
+      "actionWeightId": 60600034
+    },
+    "69379126": {
+      "id": 69379126,
+      "conditionType": [
+        15
+      ],
+      "conditionVal": [
+        255
+      ],
+      "ignoreSkillType": 140,
+      "ignoreActionType": 24,
+      "targetType": 1,
+      "assignTarget": 0,
+      "ignoreTarget": 0,
+      "multiplyGoalTarget": 1000,
+      "multiplyNonGoalTarget": 1000,
+      "canPincerAttack": true,
+      "pattern": 0,
+      "moveWeightId": 60500012,
+      "actionWeightId": 60600034
+    },
+    "69379127": {
+      "id": 69379127,
+      "conditionType": [
+        15
+      ],
+      "conditionVal": [
+        255
+      ],
+      "ignoreSkillType": 198,
+      "ignoreActionType": 16,
+      "targetType": 1,
+      "assignTarget": 0,
+      "ignoreTarget": 0,
+      "multiplyGoalTarget": 1000,
+      "multiplyNonGoalTarget": 1000,
+      "canPincerAttack": true,
+      "pattern": 0,
+      "moveWeightId": 60500045,
+      "actionWeightId": 60600034
+    },
+    "69379128": {
+      "id": 69379128,
+      "conditionType": [
+        19
+      ],
+      "conditionVal": [
+        999
+      ],
+      "ignoreSkillType": 128,
+      "ignoreActionType": 16,
+      "targetType": 1,
+      "assignTarget": 0,
+      "ignoreTarget": 0,
+      "multiplyGoalTarget": 1000,
+      "multiplyNonGoalTarget": 1000,
+      "canPincerAttack": true,
+      "pattern": 0,
+      "moveWeightId": 60500044,
+      "actionWeightId": 60600034
+    },
+    "69379129": {
+      "id": 69379129,
+      "conditionType": [
+        20
+      ],
+      "conditionVal": [
+        999
+      ],
+      "ignoreSkillType": 128,
+      "ignoreActionType": 16,
+      "targetType": 1,
+      "assignTarget": 0,
+      "ignoreTarget": 0,
+      "multiplyGoalTarget": 1000,
+      "multiplyNonGoalTarget": 1000,
+      "canPincerAttack": true,
+      "pattern": 0,
+      "moveWeightId": 60500044,
+      "actionWeightId": 60600034
+    },
+    "69379130": {
+      "id": 69379130,
+      "conditionType": [
+        17
+      ],
+      "conditionVal": [
+        7
+      ],
+      "ignoreSkillType": 128,
+      "ignoreActionType": 16,
+      "targetType": 1,
+      "assignTarget": 0,
+      "ignoreTarget": 0,
+      "multiplyGoalTarget": 1000,
+      "multiplyNonGoalTarget": 1000,
+      "canPincerAttack": true,
+      "pattern": 0,
+      "moveWeightId": 60500044,
+      "actionWeightId": 60690012
     },
     "69330000": {
       "id": 69330000,

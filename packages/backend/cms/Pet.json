@@ -190,6 +190,22 @@
       "hintText": "'펫 : 버디' 상품",
       "desc": "성격이 사나운 버디입니다.",
       "worldBuffId": 38099092
+    },
+    "1500020": {
+      "id": 1500020,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160019,
+      "hintText": "'펫 : 신디' 상품",
+      "desc": "변장의 달인 신디는 오늘도 밤 하늘을 날아다닙니다.",
+      "worldBuffId": 38099094
+    },
+    "1500021": {
+      "id": 1500021,
+      "icon": "WT_CH_NPC_TW_M_Soldier0_S_Sprite",
+      "characterId": 21160020,
+      "hintText": "'펫 : 마일로' 상품",
+      "desc": "호박 기사가 되고 싶은 귀여운 마일로.",
+      "worldBuffId": 38099095
     }
   }
 }

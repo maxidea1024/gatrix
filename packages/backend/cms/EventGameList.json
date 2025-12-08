@@ -13,7 +13,10 @@
       "referPage": [
         "number",
         "number"
-      ]
+      ],
+      "ticketPurchaseId": "number",
+      "ticketPurchaseVal": "number",
+      "isLoop": "bool"
     },
     ":required": {
       "name": 1,
@@ -53,7 +56,8 @@
       "referPage": [
         99320024,
         99320026
-      ]
+      ],
+      "isLoop": false
     },
     "10002": {
       "id": 10002,
@@ -64,7 +68,8 @@
       "costCount": 1,
       "referPage": [
         99320080
-      ]
+      ],
+      "isLoop": false
     },
     "10003": {
       "id": 10003,
@@ -75,7 +80,8 @@
       "costCount": 1,
       "referPage": [
         99320081
-      ]
+      ],
+      "isLoop": false
     },
     "10004": {
       "id": 10004,
@@ -87,7 +93,36 @@
       "referPage": [
         99320176,
         99320178
-      ]
+      ],
+      "isLoop": false
+    },
+    "10006": {
+      "id": 10006,
+      "name": "#추첨 게임 loop O 테스트",
+      "type": 1,
+      "groupId": 10006,
+      "costItem": 23340011,
+      "costCount": 1,
+      "referPage": [
+        99390005
+      ],
+      "ticketPurchaseId": 100003,
+      "ticketPurchaseVal": 300,
+      "isLoop": true
+    },
+    "10007": {
+      "id": 10007,
+      "name": "#추첨 게임 loop X 테스트",
+      "type": 1,
+      "groupId": 10007,
+      "costItem": 23340003,
+      "costCount": 1,
+      "referPage": [
+        99390006
+      ],
+      "ticketPurchaseId": 10500339,
+      "ticketPurchaseVal": 3,
+      "isLoop": false
     }
   }
 }

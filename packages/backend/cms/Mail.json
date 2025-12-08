@@ -11,6 +11,9 @@
         "text",
         "text"
       ],
+      "titleTextForamt": [
+        "text"
+      ],
       "languageMailDesc": [
         "text",
         "text",
@@ -29,6 +32,9 @@
           "Type": "number",
           "TypeName": "string"
         }
+      ],
+      "descTextFormat": [
+        "text"
       ],
       "languagesenderName": [
         "text",
@@ -1095,60 +1101,6 @@
       ],
       "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600135
-    },
-    "92000145": {
-      "id": 92000145,
-      "mailType": 0,
-      "mailNotiType": 0,
-      "mailKeepTime": 604800,
-      "rsn": "discovery_rank_reward27",
-      "languageMailTitle": [
-        "주간 발견순위 보상"
-      ],
-      "languageMailDesc": [
-        "이번 주 발견순위 보상이 도착했습니다."
-      ],
-      "languagesenderName": [
-        "대항해시대 오리진"
-      ],
-      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
-      "rewardFixed": 95600136
-    },
-    "92000146": {
-      "id": 92000146,
-      "mailType": 0,
-      "mailNotiType": 0,
-      "mailKeepTime": 604800,
-      "rsn": "discovery_rank_reward28",
-      "languageMailTitle": [
-        "주간 발견순위 보상"
-      ],
-      "languageMailDesc": [
-        "이번 주 발견순위 보상이 도착했습니다."
-      ],
-      "languagesenderName": [
-        "대항해시대 오리진"
-      ],
-      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
-      "rewardFixed": 95600137
-    },
-    "92000147": {
-      "id": 92000147,
-      "mailType": 0,
-      "mailNotiType": 0,
-      "mailKeepTime": 604800,
-      "rsn": "discovery_rank_reward29",
-      "languageMailTitle": [
-        "주간 발견순위 보상"
-      ],
-      "languageMailDesc": [
-        "이번 주 발견순위 보상이 도착했습니다."
-      ],
-      "languagesenderName": [
-        "대항해시대 오리진"
-      ],
-      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
-      "rewardFixed": 95600138
     },
     "92000201": {
       "id": 92000201,
@@ -12685,7 +12637,799 @@
         "대항해시대 오리진"
       ],
       "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
-      "rewardFixed": 95998601
+      "rewardFixed": 95998645
+    },
+    "92001645": {
+      "id": 92001645,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward1",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998602
+    },
+    "92001646": {
+      "id": 92001646,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward2",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998603
+    },
+    "92001647": {
+      "id": 92001647,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward3",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998604
+    },
+    "92001648": {
+      "id": 92001648,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward4",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998605
+    },
+    "92001649": {
+      "id": 92001649,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward5",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998606
+    },
+    "92001650": {
+      "id": 92001650,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward6",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998607
+    },
+    "92001651": {
+      "id": 92001651,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward7",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998608
+    },
+    "92001652": {
+      "id": 92001652,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward8",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998609
+    },
+    "92001653": {
+      "id": 92001653,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward9",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998610
+    },
+    "92001654": {
+      "id": 92001654,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward10",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998611
+    },
+    "92001655": {
+      "id": 92001655,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward11",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998612
+    },
+    "92001656": {
+      "id": 92001656,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward12",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998613
+    },
+    "92001657": {
+      "id": 92001657,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward13",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998614
+    },
+    "92001658": {
+      "id": 92001658,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward14",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998615
+    },
+    "92001659": {
+      "id": 92001659,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward15",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998616
+    },
+    "92001660": {
+      "id": 92001660,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward16",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998617
+    },
+    "92001661": {
+      "id": 92001661,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward17",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998618
+    },
+    "92001662": {
+      "id": 92001662,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward18",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998619
+    },
+    "92001663": {
+      "id": 92001663,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward19",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998620
+    },
+    "92001664": {
+      "id": 92001664,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward20",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998621
+    },
+    "92001665": {
+      "id": 92001665,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward21",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998622
+    },
+    "92001666": {
+      "id": 92001666,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_weekly_reward22",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998623
+    },
+    "92001667": {
+      "id": 92001667,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward1",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998624
+    },
+    "92001668": {
+      "id": 92001668,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward2",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998625
+    },
+    "92001669": {
+      "id": 92001669,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward3",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998626
+    },
+    "92001670": {
+      "id": 92001670,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward4",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998627
+    },
+    "92001671": {
+      "id": 92001671,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward5",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998628
+    },
+    "92001672": {
+      "id": 92001672,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward6",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998629
+    },
+    "92001673": {
+      "id": 92001673,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward7",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998630
+    },
+    "92001674": {
+      "id": 92001674,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward8",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998631
+    },
+    "92001675": {
+      "id": 92001675,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward9",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998632
+    },
+    "92001676": {
+      "id": 92001676,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward10",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998633
+    },
+    "92001677": {
+      "id": 92001677,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward11",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998634
+    },
+    "92001678": {
+      "id": 92001678,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward12",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998635
+    },
+    "92001679": {
+      "id": 92001679,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward13",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998636
+    },
+    "92001680": {
+      "id": 92001680,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward14",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998637
+    },
+    "92001681": {
+      "id": 92001681,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward15",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998638
+    },
+    "92001682": {
+      "id": 92001682,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward16",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998639
+    },
+    "92001683": {
+      "id": 92001683,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward17",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998640
+    },
+    "92001684": {
+      "id": 92001684,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward18",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998641
+    },
+    "92001685": {
+      "id": 92001685,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward19",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998642
+    },
+    "92001686": {
+      "id": 92001686,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward20",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998643
+    },
+    "92001687": {
+      "id": 92001687,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward21",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998644
+    },
+    "92001688": {
+      "id": 92001688,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "clash_season_reward22",
+      "languageMailTitle": [
+        "대격돌 주간 보상"
+      ],
+      "languageMailDesc": [
+        "4주차 대격돌의 등급에 따른 보상이 도착했습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95998645
     },
     "92002001": {
       "id": 92002001,
@@ -12768,6 +13512,28 @@
       ],
       "languageMailDesc": [
         "시즌 국가 순위 {0}위 보상이 도착했습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
+    },
+    "92002005": {
+      "id": 92002005,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investseason_participate_reward",
+      "languageMailTitle": [
+        "시즌 참여 보상"
+      ],
+      "languageMailDesc": [
+        "시즌 참여 보상이 도착했습니다."
       ],
       "descFormat": [
         {
@@ -15930,6 +16696,42 @@
       "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050095
     },
+    "92100309": {
+      "id": 92100309,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "coupon_reward89",
+      "languageMailTitle": [
+        "대항해시대 오리진 쿠폰"
+      ],
+      "languageMailDesc": [
+        "대항해시대 오리진 업데이트 쿠폰입니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
+      "rewardFixed": 94050096
+    },
+    "92100310": {
+      "id": 92100310,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "coupon_reward90",
+      "languageMailTitle": [
+        "대항해시대 오리진 쿠폰"
+      ],
+      "languageMailDesc": [
+        "대항해시대 오리진 업데이트 쿠폰입니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
+      "rewardFixed": 94050097
+    },
     "92110000": {
       "id": 92110000,
       "mailType": 0,
@@ -16525,6 +17327,1009 @@
       ],
       "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
+    "92110035": {
+      "id": 92110035,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 82800,
+      "rsn": "season4_eventranking2",
+      "languageMailTitle": [
+        "동방의 모험 경쟁전"
+      ],
+      "languageMailDesc": [
+        "동방의 모험 주화가 숨겨져 있는 지도를 발견했습니다.\n타마타브 경쟁전 지역 : -18.14 , 49.97\n아체 경쟁전 지역 : 5.74 , 95.28\n카카투와 경쟁전 지역 : -11.3 , 132.9\n하와이 경쟁전 지역 : 19.74 , -155.39\n인도양 외딴섬 경쟁전 지역 : -49.9 , 69.5"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110036": {
+      "id": 92110036,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure36",
+      "languageMailTitle": [
+        "화산 폭발"
+      ],
+      "languageMailDesc": [
+        "잠들어 있던 화산이 폭발하였습니다.\n폭발 후 어떤 광물이 나타났을지 아무도 모릅니다.\n빠르게 화산 주변을 관찰해보세요.\n-17.25 , 178.54"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110037": {
+      "id": 92110037,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure37",
+      "languageMailTitle": [
+        "광맥 발견"
+      ],
+      "languageMailDesc": [
+        "새로운 광맥이 발견되었습니다.\n남들보다 빠르게 광맥을 채집해 보세요.\n-3.39 , 122.73"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110038": {
+      "id": 92110038,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure38",
+      "languageMailTitle": [
+        "폐허가 된 도시 발견"
+      ],
+      "languageMailDesc": [
+        "폐허가 된 도시가 발견되었습니다.\n폐허가 된 도시에 무엇이 존재하는지 아무도 모릅니다.\n빠르게 탐사대를 보내 도시를 탐험해 보세요.\n21.65 , 89.68"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110039": {
+      "id": 92110039,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure39",
+      "languageMailTitle": [
+        "지진 발생"
+      ],
+      "languageMailDesc": [
+        "대규모의 지진이 발생했습니다.\n갈라진 땅 안에 진귀한 광물들이 숨어있는 것 같습니다.\n빠르게 광물을 채집해 보세요.\n-39.28 , 177.28"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110040": {
+      "id": 92110040,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure40",
+      "languageMailTitle": [
+        "화산 폭발"
+      ],
+      "languageMailDesc": [
+        "잠들어 있던 화산이 폭발하였습니다.\n폭발 후 어떤 광물이 나타났을지 아무도 모릅니다.\n빠르게 화산 주변을 관찰해보세요.\n23.24 , 122.38"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110041": {
+      "id": 92110041,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure41",
+      "languageMailTitle": [
+        "폐허가 된 도시 발견"
+      ],
+      "languageMailDesc": [
+        "폐허가 된 도시가 발견되었습니다.\n폐허가 된 도시에 무엇이 존재하는지 아무도 모릅니다.\n빠르게 탐사대를 보내 도시를 탐험해 보세요.\n32.73 , 127.08"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110042": {
+      "id": 92110042,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure42",
+      "languageMailTitle": [
+        "숨겨진 동굴 발견"
+      ],
+      "languageMailDesc": [
+        "지도에는 존재하지 않는 숨겨진 동굴이 발견되었습니다.\n끝없이 이어진 동굴 안에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 동굴을 탐험해 보세요.\n-14.47 , 129.01"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110043": {
+      "id": 92110043,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure43",
+      "languageMailTitle": [
+        "광맥 발견"
+      ],
+      "languageMailDesc": [
+        "새로운 광맥이 발견되었습니다.\n남들보다 빠르게 광맥을 채집해 보세요.\n-43.95 , 172.92"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110044": {
+      "id": 92110044,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure44",
+      "languageMailTitle": [
+        "고대 유적 발견"
+      ],
+      "languageMailDesc": [
+        "고대 유적이 모습을 드러냈습니다.\n주변에는 잊혀진 문자의 흔적이 남아있으며, 유적 내부에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 유적을 탐험 해보세요.\n14 , 123.59"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110045": {
+      "id": 92110045,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure45",
+      "languageMailTitle": [
+        "고대 유적 발견"
+      ],
+      "languageMailDesc": [
+        "고대 유적이 모습을 드러냈습니다.\n주변에는 잊혀진 문자의 흔적이 남아있으며, 유적 내부에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 유적을 탐험 해보세요.\n48.35 , 153.04"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110046": {
+      "id": 92110046,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure46",
+      "languageMailTitle": [
+        "지진 발생"
+      ],
+      "languageMailDesc": [
+        "대규모의 지진이 발생했습니다.\n갈라진 땅 안에 진귀한 광물들이 숨어있는 것 같습니다.\n빠르게 광물을 채집해 보세요.\n-42.65 , 148.15"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110047": {
+      "id": 92110047,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure47",
+      "languageMailTitle": [
+        "숨겨진 동굴 발견"
+      ],
+      "languageMailDesc": [
+        "지도에는 존재하지 않는 숨겨진 동굴이 발견되었습니다.\n끝없이 이어진 동굴 안에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 동굴을 탐험해 보세요.\n-7.47 , 115.74"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110048": {
+      "id": 92110048,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure48",
+      "languageMailTitle": [
+        "폐허가 된 도시 발견"
+      ],
+      "languageMailDesc": [
+        "폐허가 된 도시가 발견되었습니다.\n폐허가 된 도시에 무엇이 존재하는지 아무도 모릅니다.\n빠르게 탐사대를 보내 도시를 탐험해 보세요.\n35.5 , 126.47"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110049": {
+      "id": 92110049,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure49",
+      "languageMailTitle": [
+        "화산 폭발"
+      ],
+      "languageMailDesc": [
+        "잠들어 있던 화산이 폭발하였습니다.\n폭발 후 어떤 광물이 나타났을지 아무도 모릅니다.\n빠르게 화산 주변을 관찰해보세요.\n-19.93 , 118.73"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110050": {
+      "id": 92110050,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure50",
+      "languageMailTitle": [
+        "숨겨진 동굴 발견"
+      ],
+      "languageMailDesc": [
+        "지도에는 존재하지 않는 숨겨진 동굴이 발견되었습니다.\n끝없이 이어진 동굴 안에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 동굴을 탐험해 보세요.\n-8.12 , 143.13"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110051": {
+      "id": 92110051,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure51",
+      "languageMailTitle": [
+        "화산 폭발"
+      ],
+      "languageMailDesc": [
+        "잠들어 있던 화산이 폭발하였습니다.\n폭발 후 어떤 광물이 나타났을지 아무도 모릅니다.\n빠르게 화산 주변을 관찰해보세요.\n34.31 , 138.5"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110052": {
+      "id": 92110052,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure52",
+      "languageMailTitle": [
+        "폐허가 된 도시 발견"
+      ],
+      "languageMailDesc": [
+        "폐허가 된 도시가 발견되었습니다.\n폐허가 된 도시에 무엇이 존재하는지 아무도 모릅니다.\n빠르게 탐사대를 보내 도시를 탐험해 보세요.\n-18.9 , 121.27"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110053": {
+      "id": 92110053,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure53",
+      "languageMailTitle": [
+        "광맥 발견"
+      ],
+      "languageMailDesc": [
+        "새로운 광맥이 발견되었습니다.\n남들보다 빠르게 광맥을 채집해 보세요.\n23.44 , 68.2"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110054": {
+      "id": 92110054,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure54",
+      "languageMailTitle": [
+        "지진 발생"
+      ],
+      "languageMailDesc": [
+        "대규모의 지진이 발생했습니다.\n갈라진 땅 안에 진귀한 광물들이 숨어있는 것 같습니다.\n빠르게 광물을 채집해 보세요.\n12.62 , 98.34"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110055": {
+      "id": 92110055,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure55",
+      "languageMailTitle": [
+        "숨겨진 동굴 발견"
+      ],
+      "languageMailDesc": [
+        "지도에는 존재하지 않는 숨겨진 동굴이 발견되었습니다.\n끝없이 이어진 동굴 안에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 동굴을 탐험해 보세요.\n-32.25 , 127.18"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110056": {
+      "id": 92110056,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure56",
+      "languageMailTitle": [
+        "고대 유적 발견"
+      ],
+      "languageMailDesc": [
+        "고대 유적이 모습을 드러냈습니다.\n주변에는 잊혀진 문자의 흔적이 남아있으며, 유적 내부에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 유적을 탐험 해보세요.\n3.02 , 99.75"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110057": {
+      "id": 92110057,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure57",
+      "languageMailTitle": [
+        "고대 유적 발견"
+      ],
+      "languageMailDesc": [
+        "고대 유적이 모습을 드러냈습니다.\n주변에는 잊혀진 문자의 흔적이 남아있으며, 유적 내부에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 유적을 탐험 해보세요.\n8.19 , 50.67"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110058": {
+      "id": 92110058,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure58",
+      "languageMailTitle": [
+        "화산 폭발"
+      ],
+      "languageMailDesc": [
+        "잠들어 있던 화산이 폭발하였습니다.\n폭발 후 어떤 광물이 나타났을지 아무도 모릅니다.\n빠르게 화산 주변을 관찰해보세요.\n-8.26 , 121.36"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110059": {
+      "id": 92110059,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure59",
+      "languageMailTitle": [
+        "지진 발생"
+      ],
+      "languageMailDesc": [
+        "대규모의 지진이 발생했습니다.\n갈라진 땅 안에 진귀한 광물들이 숨어있는 것 같습니다.\n빠르게 광물을 채집해 보세요.\n5.73 , 103.22"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110060": {
+      "id": 92110060,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure60",
+      "languageMailTitle": [
+        "광맥 발견"
+      ],
+      "languageMailDesc": [
+        "새로운 광맥이 발견되었습니다.\n남들보다 빠르게 광맥을 채집해 보세요.\n-36.48 , 139.67"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110061": {
+      "id": 92110061,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure61",
+      "languageMailTitle": [
+        "숨겨진 동굴 발견"
+      ],
+      "languageMailDesc": [
+        "지도에는 존재하지 않는 숨겨진 동굴이 발견되었습니다.\n끝없이 이어진 동굴 안에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 동굴을 탐험해 보세요.\n43.25 , 145.89"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110062": {
+      "id": 92110062,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure62",
+      "languageMailTitle": [
+        "화산 폭발"
+      ],
+      "languageMailDesc": [
+        "잠들어 있던 화산이 폭발하였습니다.\n폭발 후 어떤 광물이 나타났을지 아무도 모릅니다.\n빠르게 화산 주변을 관찰해보세요.\n-4.27 , 127.66"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110063": {
+      "id": 92110063,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure63",
+      "languageMailTitle": [
+        "고대 유적 발견"
+      ],
+      "languageMailDesc": [
+        "고대 유적이 모습을 드러냈습니다.\n주변에는 잊혀진 문자의 흔적이 남아있으며, 유적 내부에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 유적을 탐험 해보세요.\n44.22 , 147.17"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110064": {
+      "id": 92110064,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "itemgateway01",
+      "languageMailTitle": [
+        "VIP累充礼包"
+      ],
+      "languageMailDesc": [
+        "尊敬的提督大人， 感谢您对游戏的支持和喜爱！\n我们为您准备了一份本月的专属福利，感谢您的一路陪伴！\n祝您游戏愉快"
+      ],
+      "languagesenderName": [
+        "《大航海时代：起源》"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110065": {
+      "id": 92110065,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure64",
+      "languageMailTitle": [
+        "폐허가 된 도시 발견"
+      ],
+      "languageMailDesc": [
+        "폐허가 된 도시가 발견되었습니다.\n폐허가 된 도시에 무엇이 존재하는지 아무도 모릅니다.\n빠르게 탐사대를 보내 도시를 탐험해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110066": {
+      "id": 92110066,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure65",
+      "languageMailTitle": [
+        "숨겨진 동굴 발견"
+      ],
+      "languageMailDesc": [
+        "지도에는 존재하지 않는 숨겨진 동굴이 발견되었습니다.\n끝없이 이어진 동굴 안에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 동굴을 탐험해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110067": {
+      "id": 92110067,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure66",
+      "languageMailTitle": [
+        "고대 유적 발견"
+      ],
+      "languageMailDesc": [
+        "고대 유적이 모습을 드러냈습니다.\n주변에는 잊혀진 문자의 흔적이 남아있으며, 유적 내부에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 유적을 탐험 해보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110068": {
+      "id": 92110068,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure67",
+      "languageMailTitle": [
+        "폐허가 된 도시 발견"
+      ],
+      "languageMailDesc": [
+        "폐허가 된 도시가 발견되었습니다.\n폐허가 된 도시에 무엇이 존재하는지 아무도 모릅니다.\n빠르게 탐사대를 보내 도시를 탐험해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110069": {
+      "id": 92110069,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure68",
+      "languageMailTitle": [
+        "광맥 발견"
+      ],
+      "languageMailDesc": [
+        "새로운 광맥이 발견되었습니다.\n남들보다 빠르게 광맥을 채집해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110070": {
+      "id": 92110070,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure69",
+      "languageMailTitle": [
+        "숨겨진 동굴 발견"
+      ],
+      "languageMailDesc": [
+        "지도에는 존재하지 않는 숨겨진 동굴이 발견되었습니다.\n끝없이 이어진 동굴 안에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 동굴을 탐험해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110071": {
+      "id": 92110071,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure70",
+      "languageMailTitle": [
+        "화산 폭발"
+      ],
+      "languageMailDesc": [
+        "잠들어 있던 화산이 폭발하였습니다.\n폭발 후 어떤 광물이 나타났을지 아무도 모릅니다.\n빠르게 화산 주변을 관찰해보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110072": {
+      "id": 92110072,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure71",
+      "languageMailTitle": [
+        "폐허가 된 도시 발견"
+      ],
+      "languageMailDesc": [
+        "폐허가 된 도시가 발견되었습니다.\n폐허가 된 도시에 무엇이 존재하는지 아무도 모릅니다.\n빠르게 탐사대를 보내 도시를 탐험해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110073": {
+      "id": 92110073,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure72",
+      "languageMailTitle": [
+        "고대 유적 발견"
+      ],
+      "languageMailDesc": [
+        "고대 유적이 모습을 드러냈습니다.\n주변에는 잊혀진 문자의 흔적이 남아있으며, 유적 내부에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 유적을 탐험 해보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110074": {
+      "id": 92110074,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure73",
+      "languageMailTitle": [
+        "화산 폭발"
+      ],
+      "languageMailDesc": [
+        "잠들어 있던 화산이 폭발하였습니다.\n폭발 후 어떤 광물이 나타났을지 아무도 모릅니다.\n빠르게 화산 주변을 관찰해보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110075": {
+      "id": 92110075,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure74",
+      "languageMailTitle": [
+        "숨겨진 동굴 발견"
+      ],
+      "languageMailDesc": [
+        "지도에는 존재하지 않는 숨겨진 동굴이 발견되었습니다.\n끝없이 이어진 동굴 안에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 동굴을 탐험해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110076": {
+      "id": 92110076,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure75",
+      "languageMailTitle": [
+        "지진 발생"
+      ],
+      "languageMailDesc": [
+        "대규모의 지진이 발생했습니다.\n갈라진 땅 안에 진귀한 광물들이 숨어있는 것 같습니다.\n빠르게 광물을 채집해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110077": {
+      "id": 92110077,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure76",
+      "languageMailTitle": [
+        "고대 유적 발견"
+      ],
+      "languageMailDesc": [
+        "고대 유적이 모습을 드러냈습니다.\n주변에는 잊혀진 문자의 흔적이 남아있으며, 유적 내부에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 유적을 탐험 해보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110078": {
+      "id": 92110078,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure77",
+      "languageMailTitle": [
+        "광맥 발견"
+      ],
+      "languageMailDesc": [
+        "새로운 광맥이 발견되었습니다.\n남들보다 빠르게 광맥을 채집해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110079": {
+      "id": 92110079,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure78",
+      "languageMailTitle": [
+        "폐허가 된 도시 발견"
+      ],
+      "languageMailDesc": [
+        "폐허가 된 도시가 발견되었습니다.\n폐허가 된 도시에 무엇이 존재하는지 아무도 모릅니다.\n빠르게 탐사대를 보내 도시를 탐험해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110080": {
+      "id": 92110080,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure79",
+      "languageMailTitle": [
+        "고대 유적 발견"
+      ],
+      "languageMailDesc": [
+        "고대 유적이 모습을 드러냈습니다.\n주변에는 잊혀진 문자의 흔적이 남아있으며, 유적 내부에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 유적을 탐험 해보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110081": {
+      "id": 92110081,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure80",
+      "languageMailTitle": [
+        "광맥 발견"
+      ],
+      "languageMailDesc": [
+        "새로운 광맥이 발견되었습니다.\n남들보다 빠르게 광맥을 채집해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110082": {
+      "id": 92110082,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure81",
+      "languageMailTitle": [
+        "숨겨진 동굴 발견"
+      ],
+      "languageMailDesc": [
+        "지도에는 존재하지 않는 숨겨진 동굴이 발견되었습니다.\n끝없이 이어진 동굴 안에는 어떤 것이 있을지 아무도 모릅니다.\n빠르게 탐사대를 보내 동굴을 탐험해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110083": {
+      "id": 92110083,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure82",
+      "languageMailTitle": [
+        "지진 발생"
+      ],
+      "languageMailDesc": [
+        "대규모의 지진이 발생했습니다.\n갈라진 땅 안에 진귀한 광물들이 숨어있는 것 같습니다.\n빠르게 광물을 채집해 보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110084": {
+      "id": 92110084,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure83",
+      "languageMailTitle": [
+        "화산 폭발"
+      ],
+      "languageMailDesc": [
+        "잠들어 있던 화산이 폭발하였습니다.\n폭발 후 어떤 광물이 나타났을지 아무도 모릅니다.\n빠르게 화산 주변을 관찰해보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110085": {
+      "id": 92110085,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "season4_adventure84",
+      "languageMailTitle": [
+        "화산 폭발"
+      ],
+      "languageMailDesc": [
+        "잠들어 있던 화산이 폭발하였습니다.\n폭발 후 어떤 광물이 나타났을지 아무도 모릅니다.\n빠르게 화산 주변을 관찰해보세요."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110086": {
+      "id": 92110086,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 82800,
+      "rsn": "season4_eventranking3",
+      "languageMailTitle": [
+        "동방의 모험 경쟁전"
+      ],
+      "languageMailDesc": [
+        "동방의 모험 주화가 숨겨져 있는 지도를 발견했습니다.\n장강 경쟁전 지역 : 36.75 , 108.31\n핀자라 경쟁전 지역 : -32.73 , 115.5\n황허 경쟁전 지역 : 30.22 , 110.62\n수바 경쟁전 지역 : -18.26 , 178.91\n모가디슈 경쟁전 지역 : 1.94 , 45.67"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110087": {
+      "id": 92110087,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "cn_fgt_redgemreward1",
+      "languageMailTitle": [
+        "尊敬的提督"
+      ],
+      "languageMailDesc": [
+        "本日航行补给已发放，请及时领取！测试期间不定期掉落随机航行补给，为您航行助力！"
+      ],
+      "languagesenderName": [
+        "《大航海时代：起源》社区管理员"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110088": {
+      "id": 92110088,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "cn_fgt_redgemreward2",
+      "languageMailTitle": [
+        "尊敬的提督"
+      ],
+      "languageMailDesc": [
+        "本日航行补给已发放，请及时领取！测试期间不定期掉落随机航行补给，为您航行助力！"
+      ],
+      "languagesenderName": [
+        "《大航海时代：起源》社区管理员"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110089": {
+      "id": 92110089,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "cn_fgt_redgemreward3",
+      "languageMailTitle": [
+        "尊敬的提督"
+      ],
+      "languageMailDesc": [
+        "本日航行补给已发放，请及时领取！测试期间不定期掉落随机航行补给，为您航行助力！"
+      ],
+      "languagesenderName": [
+        "《大航海时代：起源》社区管理员"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110090": {
+      "id": 92110090,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "cn_fgt_redgemreward4",
+      "languageMailTitle": [
+        "尊敬的提督"
+      ],
+      "languageMailDesc": [
+        "本日航行补给已发放，请及时领取！测试期间不定期掉落随机航行补给，为您航行助力！"
+      ],
+      "languagesenderName": [
+        "《大航海时代：起源》社区管理员"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110091": {
+      "id": 92110091,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "cn_fgt_redgemreward5",
+      "languageMailTitle": [
+        "尊敬的提督"
+      ],
+      "languageMailDesc": [
+        "本日航行补给已发放，请及时领取！测试期间不定期掉落随机航行补给，为您航行助力！"
+      ],
+      "languagesenderName": [
+        "《大航海时代：起源》社区管理员"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110092": {
+      "id": 92110092,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "cn_fgt_redgemreward6",
+      "languageMailTitle": [
+        "尊敬的提督"
+      ],
+      "languageMailDesc": [
+        "本日航行补给已发放，请及时领取！测试期间不定期掉落随机航行补给，为您航行助力！"
+      ],
+      "languagesenderName": [
+        "《大航海时代：起源》社区管理员"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110093": {
+      "id": 92110093,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 7200,
+      "rsn": "cn_fgt_redgemreward7",
+      "languageMailTitle": [
+        "尊敬的提督"
+      ],
+      "languageMailDesc": [
+        "本日航行补给已发放，请及时领取！测试期间不定期掉落随机航行补给，为您航行助力！"
+      ],
+      "languagesenderName": [
+        "《大航海时代：起源》社区管理员"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
     "92120000": {
       "id": 92120000,
       "mailType": 0,
@@ -16848,6 +18653,375 @@
       "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050001
     },
+    "92990015": {
+      "id": 92990015,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case01",
+      "languageMailTitle": [
+        "{0} 입장"
+      ],
+      "languageMailDesc": [
+        "도시에 입장하였습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990016": {
+      "id": 92990016,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case02",
+      "languageMailTitle": [
+        "도시 {1}"
+      ],
+      "titleTextForamt": [
+        "입장"
+      ],
+      "languageMailDesc": [
+        "도시에 입장하였습니다."
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990017": {
+      "id": 92990017,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case03",
+      "languageMailTitle": [
+        "도시 입장"
+      ],
+      "languageMailDesc": [
+        "{0}에 입장하였습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990018": {
+      "id": 92990018,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case04",
+      "languageMailTitle": [
+        "도시 입장"
+      ],
+      "languageMailDesc": [
+        "도시에 {1}하였습니다."
+      ],
+      "descTextFormat": [
+        "입장"
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990019": {
+      "id": 92990019,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case05",
+      "languageMailTitle": [
+        "{0} {1}"
+      ],
+      "titleTextForamt": [
+        "입장"
+      ],
+      "languageMailDesc": [
+        "도시에 입장하였습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990020": {
+      "id": 92990020,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case06",
+      "languageMailTitle": [
+        "{0} 입장"
+      ],
+      "languageMailDesc": [
+        "{0}에 입장하였습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990021": {
+      "id": 92990021,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case07",
+      "languageMailTitle": [
+        "{0} 입장"
+      ],
+      "languageMailDesc": [
+        "도시에 {1}하였습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "descTextFormat": [
+        "입장"
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990022": {
+      "id": 92990022,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case08",
+      "languageMailTitle": [
+        "도시 {1}"
+      ],
+      "titleTextForamt": [
+        "입장"
+      ],
+      "languageMailDesc": [
+        "{0}에 입장하였습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990023": {
+      "id": 92990023,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case09",
+      "languageMailTitle": [
+        "도시 {1}"
+      ],
+      "titleTextForamt": [
+        "입장"
+      ],
+      "languageMailDesc": [
+        "도시에 {1}하였습니다."
+      ],
+      "descTextFormat": [
+        "입장"
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990024": {
+      "id": 92990024,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case10",
+      "languageMailTitle": [
+        "도시 입장"
+      ],
+      "languageMailDesc": [
+        "{0}에 {1}하였습니다."
+      ],
+      "descTextFormat": [
+        "입장"
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990025": {
+      "id": 92990025,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case11",
+      "languageMailTitle": [
+        "{0} {1}"
+      ],
+      "titleTextForamt": [
+        "입장"
+      ],
+      "languageMailDesc": [
+        "{0}에 입장하였습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990026": {
+      "id": 92990026,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case12",
+      "languageMailTitle": [
+        "{0} {1}"
+      ],
+      "titleTextForamt": [
+        "입장"
+      ],
+      "languageMailDesc": [
+        "도시에 {1}하였습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "descTextFormat": [
+        "입장"
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990027": {
+      "id": 92990027,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case13",
+      "languageMailTitle": [
+        "{0} 입장"
+      ],
+      "languageMailDesc": [
+        "{0}에 {1}하였습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "descTextFormat": [
+        "입장"
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990028": {
+      "id": 92990028,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case14",
+      "languageMailTitle": [
+        "도시 {1}"
+      ],
+      "titleTextForamt": [
+        "입장"
+      ],
+      "languageMailDesc": [
+        "{0}에 {1}하였습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "descTextFormat": [
+        "입장"
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92990029": {
+      "id": 92990029,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 2592000,
+      "rsn": "QA_textformat_case15",
+      "languageMailTitle": [
+        "{0} {1}"
+      ],
+      "titleTextForamt": [
+        "입장"
+      ],
+      "languageMailDesc": [
+        "{0}에 {1}하였습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "descTextFormat": [
+        "입장"
+      ],
+      "languagesenderName": [
+        "Motif_QA"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
     "92999000": {
       "id": 92999000,
       "mailType": 2,
@@ -16864,6 +19038,57 @@
         "UWO GM"
       ],
       "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92999001": {
+      "id": 92999001,
+      "mailType": 2,
+      "mailNotiType": 1,
+      "mailKeepTime": 2592000,
+      "rsn": "shengqu_gm",
+      "languageMailTitle": [
+        "우편"
+      ],
+      "languageMailDesc": [
+        "설명"
+      ],
+      "languagesenderName": [
+        "《大航海时代：起源》运营团队"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92999002": {
+      "id": 92999002,
+      "mailType": 2,
+      "mailNotiType": 1,
+      "mailKeepTime": 2592000,
+      "rsn": "shengqu_community",
+      "languageMailTitle": [
+        "우편"
+      ],
+      "languageMailDesc": [
+        "설명"
+      ],
+      "languagesenderName": [
+        "《大航海时代：起源》社区管理员"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92999003": {
+      "id": 92999003,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investment_rank_reward",
+      "languageMailTitle": [
+        "투자 정산 안내"
+      ],
+      "languageMailDesc": [
+        "투자 정산이 완료되어 보상이 도착했습니다.\n상세한 내용은 금주 투자 정산 상세에서 확인하실 수 있습니다."
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     }
   }
 }

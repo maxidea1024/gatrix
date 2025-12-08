@@ -48055,7 +48055,7 @@
         {
           "potential": false,
           "job": 3,
-          "id": 67300731,
+          "id": 67300730,
           "needLv": 70,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -48134,7 +48134,7 @@
         {
           "potential": false,
           "job": 2,
-          "id": 75250441,
+          "id": 75250440,
           "needLv": 70,
           "needAwaken": 3,
           "learnPointId": 100001,
@@ -51151,6 +51151,1166 @@
           "potential": true,
           "job": 2,
           "id": 75220680,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930676": {
+      "id": 64930676,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75205400,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300710,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75220810,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75250481,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220420,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220020,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930677": {
+      "id": 64930677,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75257770,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75251230,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67301600,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75250661,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220510,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220100,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930678": {
+      "id": 64930678,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75206600,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75230200,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75299343,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75220810,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 1,
+          "id": 75220660,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 1,
+          "id": 75220890,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930679": {
+      "id": 64930679,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75206900,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75299333,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67301650,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75299303,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 1,
+          "id": 75220660,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 1,
+          "id": 75220870,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930680": {
+      "id": 64930680,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75206300,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300030,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67301600,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300011,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 3,
+          "id": 67350360,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 3,
+          "id": 67350160,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930681": {
+      "id": 64930681,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75257730,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75220860,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300370,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75250661,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220510,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220100,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930682": {
+      "id": 64930682,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75257750,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300370,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75257710,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75250461,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220710,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220680,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930683": {
+      "id": 64930683,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75258311,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75251230,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300710,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75220811,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 1,
+          "id": 75220610,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 1,
+          "id": 75220820,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930684": {
+      "id": 64930684,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75205400,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300090,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75299313,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300031,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 3,
+          "id": 67350100,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220390,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930685": {
+      "id": 64930685,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75250900,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300290,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75220620,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75250700,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        }
+      ]
+    },
+    "64930686": {
+      "id": 64930686,
+      "passives": [
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67301180,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75209760,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300760,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75230060,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        }
+      ]
+    },
+    "64930687": {
+      "id": 64930687,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75204500,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300610,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67301180,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300080,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        }
+      ]
+    },
+    "64930688": {
+      "id": 64930688,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75204500,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300760,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300290,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75250680,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        }
+      ]
+    },
+    "64930689": {
+      "id": 64930689,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75205400,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300020,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67301670,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300001,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 3,
+          "id": 67350350,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 3,
+          "id": 67350000,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930690": {
+      "id": 64930690,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75205400,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67301670,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67301660,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75250460,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220400,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220210,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 36300000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 30
+        }
+      ]
+    },
+    "64930691": {
+      "id": 64930691,
+      "passives": [
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75258311,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 440000,
+          "learnTime": 7200,
+          "learnItemId1": 23421093,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 3,
+          "id": 67300370,
+          "needLv": 30,
+          "needAwaken": 1,
+          "learnPointId": 100001,
+          "learnPointVal": 1000000,
+          "learnTime": 7200,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 2
+        },
+        {
+          "potential": false,
+          "job": 1,
+          "id": 75220860,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 13100000,
+          "learnTime": 540000,
+          "learnItemId1": 23421095,
+          "learnItemCount1": 20
+        },
+        {
+          "potential": false,
+          "job": 2,
+          "id": 75250721,
+          "needLv": 70,
+          "needAwaken": 3,
+          "learnPointId": 100001,
+          "learnPointVal": 20000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 40
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220540,
+          "needTraining": 5,
+          "needLv": 1,
+          "needAwaken": 0,
+          "learnPointId": 100001,
+          "learnPointVal": 50000000,
+          "learnTime": 540000,
+          "learnItemId1": 23421097,
+          "learnItemCount1": 100
+        },
+        {
+          "potential": true,
+          "job": 2,
+          "id": 75220720,
           "needTraining": 5,
           "needLv": 1,
           "needAwaken": 0,

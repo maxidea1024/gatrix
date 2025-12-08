@@ -1,0 +1,90 @@
+{
+  ":ChargeEvent": {
+    ":type": {
+      "id": "key",
+      "type": "number",
+      "group": "number",
+      "name": "text",
+      "localBitFlag": "bit",
+      "startDate": "string",
+      "endDate": "string",
+      "widget": "string",
+      "hudIcon": "string",
+      "spineAsset": "string",
+      "bgIllust": "string",
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ]
+    },
+    ":required": {
+      "type": 1,
+      "group": 1,
+      "name": 1,
+      "localBitFlag": 1
+    },
+    ":min": {
+      "contentsTerms": [
+        {
+          "Id": 81000000
+        }
+      ]
+    },
+    ":max": {
+      "contentsTerms": [
+        {
+          "Id": 81999999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "contentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ]
+    }
+  },
+  "ChargeEvent": {
+    "100180001": {
+      "id": 100180001,
+      "type": 1,
+      "group": 100000,
+      "name": "首充赠礼",
+      "localBitFlag": 192,
+      "startDate": "2025/10/20/00:00:00",
+      "endDate": "2026/11/20/23:59:59",
+      "widget": "PWBP_FirstChargeEventPopup",
+      "hudIcon": "WT_CH_Officer_CN_SukY0_S_Sprite",
+      "spineAsset": "CH_Officer_CN_SukY0",
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 10
+        }
+      ]
+    },
+    "100180002": {
+      "id": 100180002,
+      "type": 2,
+      "group": 200000,
+      "name": "连续充值活动",
+      "localBitFlag": 192,
+      "startDate": "2025/10/21/00:00:00",
+      "endDate": "2026/12/21/23:59:59",
+      "widget": "PWBP_EventContinuosCharge",
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 10
+        }
+      ]
+    }
+  }
+}

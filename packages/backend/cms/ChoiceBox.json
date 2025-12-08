@@ -24049,6 +24049,22 @@
       "choiceBoxQuantity": 1,
       "autoMax": false
     },
+    "3010056": {
+      "id": 3010056,
+      "choiceBoxGroup": 100094,
+      "rewardType": 7,
+      "choiceBoxId": 21350037,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3010057": {
+      "id": 3010057,
+      "choiceBoxGroup": 100094,
+      "rewardType": 7,
+      "choiceBoxId": 21350061,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
     "3010060": {
       "id": 3010060,
       "choiceBoxGroup": 100094,
@@ -24358,6 +24374,22 @@
       "choiceBoxGroup": 100095,
       "rewardType": 7,
       "choiceBoxId": 21350017,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3020038": {
+      "id": 3020038,
+      "choiceBoxGroup": 100095,
+      "rewardType": 7,
+      "choiceBoxId": 21300609,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3020039": {
+      "id": 3020039,
+      "choiceBoxGroup": 100095,
+      "rewardType": 7,
+      "choiceBoxId": 21300610,
       "choiceBoxQuantity": 1,
       "autoMax": false
     },
@@ -37182,6 +37214,3342 @@
       "choiceBoxGroup": 100155,
       "rewardType": 7,
       "choiceBoxId": 21300608,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002636": {
+      "id": 3002636,
+      "choiceBoxGroup": 100156,
+      "rewardType": 9,
+      "choiceBoxId": 70175006,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002637": {
+      "id": 3002637,
+      "choiceBoxGroup": 100156,
+      "rewardType": 9,
+      "choiceBoxId": 70175007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002638": {
+      "id": 3002638,
+      "choiceBoxGroup": 100156,
+      "rewardType": 9,
+      "choiceBoxId": 70175008,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002639": {
+      "id": 3002639,
+      "choiceBoxGroup": 100157,
+      "rewardType": 5,
+      "choiceBoxId": 22265204,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002640": {
+      "id": 3002640,
+      "choiceBoxGroup": 100157,
+      "rewardType": 5,
+      "choiceBoxId": 22265205,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002641": {
+      "id": 3002641,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610008,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002642": {
+      "id": 3002642,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610009,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002643": {
+      "id": 3002643,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610010,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002644": {
+      "id": 3002644,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610011,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002645": {
+      "id": 3002645,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610012,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002646": {
+      "id": 3002646,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610015,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002647": {
+      "id": 3002647,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610013,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002648": {
+      "id": 3002648,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610014,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002649": {
+      "id": 3002649,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610016,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002650": {
+      "id": 3002650,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610049,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002651": {
+      "id": 3002651,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610050,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002652": {
+      "id": 3002652,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610051,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002653": {
+      "id": 3002653,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610052,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002654": {
+      "id": 3002654,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610053,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002655": {
+      "id": 3002655,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610056,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002656": {
+      "id": 3002656,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610054,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002657": {
+      "id": 3002657,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610055,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002658": {
+      "id": 3002658,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610057,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002659": {
+      "id": 3002659,
+      "choiceBoxGroup": 100158,
+      "rewardType": 2,
+      "choiceBoxId": 23610074,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002660": {
+      "id": 3002660,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610017,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002661": {
+      "id": 3002661,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610018,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002662": {
+      "id": 3002662,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610019,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002663": {
+      "id": 3002663,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610020,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002664": {
+      "id": 3002664,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610021,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002665": {
+      "id": 3002665,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610024,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002666": {
+      "id": 3002666,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610022,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002667": {
+      "id": 3002667,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610023,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002668": {
+      "id": 3002668,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610025,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002669": {
+      "id": 3002669,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610058,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002670": {
+      "id": 3002670,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610059,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002671": {
+      "id": 3002671,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610060,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002672": {
+      "id": 3002672,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610061,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002673": {
+      "id": 3002673,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610062,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002674": {
+      "id": 3002674,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610065,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002675": {
+      "id": 3002675,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610063,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002676": {
+      "id": 3002676,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610064,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002677": {
+      "id": 3002677,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610066,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002678": {
+      "id": 3002678,
+      "choiceBoxGroup": 100159,
+      "rewardType": 2,
+      "choiceBoxId": 23610075,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002679": {
+      "id": 3002679,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610035,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002680": {
+      "id": 3002680,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610036,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002681": {
+      "id": 3002681,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610037,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002682": {
+      "id": 3002682,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610038,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002683": {
+      "id": 3002683,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610039,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002684": {
+      "id": 3002684,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610040,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002685": {
+      "id": 3002685,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610041,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002686": {
+      "id": 3002686,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610042,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002687": {
+      "id": 3002687,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610043,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002688": {
+      "id": 3002688,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610044,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002689": {
+      "id": 3002689,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23700112,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002690": {
+      "id": 3002690,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23700097,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002691": {
+      "id": 3002691,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610067,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002692": {
+      "id": 3002692,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610068,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002693": {
+      "id": 3002693,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610069,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002694": {
+      "id": 3002694,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610070,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002695": {
+      "id": 3002695,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610071,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002696": {
+      "id": 3002696,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610072,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002697": {
+      "id": 3002697,
+      "choiceBoxGroup": 100160,
+      "rewardType": 2,
+      "choiceBoxId": 23610076,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002698": {
+      "id": 3002698,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23400008,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002699": {
+      "id": 3002699,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23400009,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002700": {
+      "id": 3002700,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23400010,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002701": {
+      "id": 3002701,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405051,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002702": {
+      "id": 3002702,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405062,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002703": {
+      "id": 3002703,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405091,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002704": {
+      "id": 3002704,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405100,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002705": {
+      "id": 3002705,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405135,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002706": {
+      "id": 3002706,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405225,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002707": {
+      "id": 3002707,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405052,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002708": {
+      "id": 3002708,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405108,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002709": {
+      "id": 3002709,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405093,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002710": {
+      "id": 3002710,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405132,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002711": {
+      "id": 3002711,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405053,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002712": {
+      "id": 3002712,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405105,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002713": {
+      "id": 3002713,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405103,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002714": {
+      "id": 3002714,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405066,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002715": {
+      "id": 3002715,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405124,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002716": {
+      "id": 3002716,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405095,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002717": {
+      "id": 3002717,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405107,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002718": {
+      "id": 3002718,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405127,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002719": {
+      "id": 3002719,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405059,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002720": {
+      "id": 3002720,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405226,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002721": {
+      "id": 3002721,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405060,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002722": {
+      "id": 3002722,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405081,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002723": {
+      "id": 3002723,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405099,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002724": {
+      "id": 3002724,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405065,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002725": {
+      "id": 3002725,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405136,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002726": {
+      "id": 3002726,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405116,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002727": {
+      "id": 3002727,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405079,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002728": {
+      "id": 3002728,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405064,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002729": {
+      "id": 3002729,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405191,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002730": {
+      "id": 3002730,
+      "choiceBoxGroup": 100161,
+      "rewardType": 2,
+      "choiceBoxId": 23405227,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002731": {
+      "id": 3002731,
+      "choiceBoxGroup": 100162,
+      "rewardType": 7,
+      "choiceBoxId": 21300010,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002732": {
+      "id": 3002732,
+      "choiceBoxGroup": 100162,
+      "rewardType": 7,
+      "choiceBoxId": 21350081,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002733": {
+      "id": 3002733,
+      "choiceBoxGroup": 100162,
+      "rewardType": 7,
+      "choiceBoxId": 21350062,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002734": {
+      "id": 3002734,
+      "choiceBoxGroup": 100162,
+      "rewardType": 2,
+      "choiceBoxId": 23411004,
+      "choiceBoxQuantity": 30,
+      "autoMax": true
+    },
+    "3002735": {
+      "id": 3002735,
+      "choiceBoxGroup": 100163,
+      "rewardType": 7,
+      "choiceBoxId": 21300001,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002736": {
+      "id": 3002736,
+      "choiceBoxGroup": 100163,
+      "rewardType": 7,
+      "choiceBoxId": 21300191,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002737": {
+      "id": 3002737,
+      "choiceBoxGroup": 100163,
+      "rewardType": 7,
+      "choiceBoxId": 21300595,
+      "choiceBoxQuantity": 1,
+      "autoMax": true
+    },
+    "3002738": {
+      "id": 3002738,
+      "choiceBoxGroup": 100163,
+      "rewardType": 2,
+      "choiceBoxId": 23411004,
+      "choiceBoxQuantity": 30,
+      "autoMax": true
+    },
+    "3002786": {
+      "id": 3002786,
+      "choiceBoxGroup": 100170,
+      "rewardType": 2,
+      "choiceBoxId": 23347001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002787": {
+      "id": 3002787,
+      "choiceBoxGroup": 100170,
+      "rewardType": 2,
+      "choiceBoxId": 23347007,
+      "choiceBoxQuantity": 10,
+      "autoMax": false
+    },
+    "3002788": {
+      "id": 3002788,
+      "choiceBoxGroup": 100170,
+      "rewardType": 2,
+      "choiceBoxId": 23347006,
+      "choiceBoxQuantity": 2,
+      "autoMax": false
+    },
+    "3002789": {
+      "id": 3002789,
+      "choiceBoxGroup": 100170,
+      "rewardType": 2,
+      "choiceBoxId": 23347005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002790": {
+      "id": 3002790,
+      "choiceBoxGroup": 100171,
+      "rewardType": 2,
+      "choiceBoxId": 23411004,
+      "choiceBoxQuantity": 5,
+      "autoMax": false
+    },
+    "3002791": {
+      "id": 3002791,
+      "choiceBoxGroup": 100171,
+      "rewardType": 2,
+      "choiceBoxId": 23411003,
+      "choiceBoxQuantity": 10,
+      "autoMax": false
+    },
+    "3002792": {
+      "id": 3002792,
+      "choiceBoxGroup": 100171,
+      "rewardType": 2,
+      "choiceBoxId": 23411002,
+      "choiceBoxQuantity": 20,
+      "autoMax": false
+    },
+    "3002793": {
+      "id": 3002793,
+      "choiceBoxGroup": 100171,
+      "rewardType": 2,
+      "choiceBoxId": 23411001,
+      "choiceBoxQuantity": 40,
+      "autoMax": false
+    },
+    "3002795": {
+      "id": 3002795,
+      "choiceBoxGroup": 100172,
+      "rewardType": 2,
+      "choiceBoxId": 23410002,
+      "choiceBoxQuantity": 15,
+      "autoMax": false
+    },
+    "3002796": {
+      "id": 3002796,
+      "choiceBoxGroup": 100172,
+      "rewardType": 2,
+      "choiceBoxId": 23410001,
+      "choiceBoxQuantity": 45,
+      "autoMax": false
+    },
+    "3002797": {
+      "id": 3002797,
+      "choiceBoxGroup": 100172,
+      "rewardType": 2,
+      "choiceBoxId": 23410000,
+      "choiceBoxQuantity": 135,
+      "autoMax": false
+    },
+    "3002798": {
+      "id": 3002798,
+      "choiceBoxGroup": 100172,
+      "rewardType": 2,
+      "choiceBoxId": 23409999,
+      "choiceBoxQuantity": 270,
+      "autoMax": false
+    },
+    "3002799": {
+      "id": 3002799,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348014,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002800": {
+      "id": 3002800,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002801": {
+      "id": 3002801,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348016,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002802": {
+      "id": 3002802,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348017,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002803": {
+      "id": 3002803,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348020,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002804": {
+      "id": 3002804,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348022,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002805": {
+      "id": 3002805,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348025,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002806": {
+      "id": 3002806,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348026,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002807": {
+      "id": 3002807,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348027,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002808": {
+      "id": 3002808,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348028,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002809": {
+      "id": 3002809,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348036,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002810": {
+      "id": 3002810,
+      "choiceBoxGroup": 100173,
+      "rewardType": 2,
+      "choiceBoxId": 23348039,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002811": {
+      "id": 3002811,
+      "choiceBoxGroup": 100174,
+      "rewardType": 2,
+      "choiceBoxId": 23348084,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002812": {
+      "id": 3002812,
+      "choiceBoxGroup": 100174,
+      "rewardType": 2,
+      "choiceBoxId": 23348085,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002813": {
+      "id": 3002813,
+      "choiceBoxGroup": 100174,
+      "rewardType": 2,
+      "choiceBoxId": 23348086,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002814": {
+      "id": 3002814,
+      "choiceBoxGroup": 100174,
+      "rewardType": 2,
+      "choiceBoxId": 23348087,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002815": {
+      "id": 3002815,
+      "choiceBoxGroup": 100174,
+      "rewardType": 2,
+      "choiceBoxId": 23348078,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002816": {
+      "id": 3002816,
+      "choiceBoxGroup": 100174,
+      "rewardType": 2,
+      "choiceBoxId": 23348088,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002817": {
+      "id": 3002817,
+      "choiceBoxGroup": 100175,
+      "rewardType": 2,
+      "choiceBoxId": 23348545,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002818": {
+      "id": 3002818,
+      "choiceBoxGroup": 100175,
+      "rewardType": 2,
+      "choiceBoxId": 23348546,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002819": {
+      "id": 3002819,
+      "choiceBoxGroup": 100175,
+      "rewardType": 2,
+      "choiceBoxId": 23348547,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002820": {
+      "id": 3002820,
+      "choiceBoxGroup": 100175,
+      "rewardType": 2,
+      "choiceBoxId": 23348548,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002821": {
+      "id": 3002821,
+      "choiceBoxGroup": 100175,
+      "rewardType": 2,
+      "choiceBoxId": 23348549,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002822": {
+      "id": 3002822,
+      "choiceBoxGroup": 100175,
+      "rewardType": 2,
+      "choiceBoxId": 23348550,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002823": {
+      "id": 3002823,
+      "choiceBoxGroup": 100176,
+      "rewardType": 2,
+      "choiceBoxId": 23411004,
+      "choiceBoxQuantity": 30,
+      "autoMax": false
+    },
+    "3002824": {
+      "id": 3002824,
+      "choiceBoxGroup": 100176,
+      "rewardType": 7,
+      "choiceBoxId": 21200002,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002825": {
+      "id": 3002825,
+      "choiceBoxGroup": 100176,
+      "rewardType": 7,
+      "choiceBoxId": 21200003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002826": {
+      "id": 3002826,
+      "choiceBoxGroup": 100176,
+      "rewardType": 7,
+      "choiceBoxId": 21200004,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002827": {
+      "id": 3002827,
+      "choiceBoxGroup": 100176,
+      "rewardType": 7,
+      "choiceBoxId": 21200005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002871": {
+      "id": 3002871,
+      "choiceBoxGroup": 100177,
+      "rewardType": 7,
+      "choiceBoxId": 21300012,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002872": {
+      "id": 3002872,
+      "choiceBoxGroup": 100177,
+      "rewardType": 7,
+      "choiceBoxId": 21300011,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002873": {
+      "id": 3002873,
+      "choiceBoxGroup": 100177,
+      "rewardType": 7,
+      "choiceBoxId": 21300021,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002874": {
+      "id": 3002874,
+      "choiceBoxGroup": 100178,
+      "rewardType": 7,
+      "choiceBoxId": 21300605,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002875": {
+      "id": 3002875,
+      "choiceBoxGroup": 100178,
+      "rewardType": 7,
+      "choiceBoxId": 21350078,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002876": {
+      "id": 3002876,
+      "choiceBoxGroup": 100178,
+      "rewardType": 7,
+      "choiceBoxId": 21300599,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002888": {
+      "id": 3002888,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22123001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002889": {
+      "id": 3002889,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22123003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002890": {
+      "id": 3002890,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22123004,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002891": {
+      "id": 3002891,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22123005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002892": {
+      "id": 3002892,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22123006,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002893": {
+      "id": 3002893,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22123007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002894": {
+      "id": 3002894,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22123009,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002895": {
+      "id": 3002895,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22123010,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002896": {
+      "id": 3002896,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002897": {
+      "id": 3002897,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002898": {
+      "id": 3002898,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133004,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002899": {
+      "id": 3002899,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002900": {
+      "id": 3002900,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133006,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002901": {
+      "id": 3002901,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002902": {
+      "id": 3002902,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133008,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002903": {
+      "id": 3002903,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133010,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002904": {
+      "id": 3002904,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133012,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002905": {
+      "id": 3002905,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133013,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002906": {
+      "id": 3002906,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133014,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002907": {
+      "id": 3002907,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002908": {
+      "id": 3002908,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133018,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002909": {
+      "id": 3002909,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133019,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002910": {
+      "id": 3002910,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22133020,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002911": {
+      "id": 3002911,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143002,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002912": {
+      "id": 3002912,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002913": {
+      "id": 3002913,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143004,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002914": {
+      "id": 3002914,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002915": {
+      "id": 3002915,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143006,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002916": {
+      "id": 3002916,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002917": {
+      "id": 3002917,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143008,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002918": {
+      "id": 3002918,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143009,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002919": {
+      "id": 3002919,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143011,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002920": {
+      "id": 3002920,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143012,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002921": {
+      "id": 3002921,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143013,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002922": {
+      "id": 3002922,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002923": {
+      "id": 3002923,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143016,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002924": {
+      "id": 3002924,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143017,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002925": {
+      "id": 3002925,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143018,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002926": {
+      "id": 3002926,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22143020,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002927": {
+      "id": 3002927,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22212023,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002928": {
+      "id": 3002928,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22212024,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002929": {
+      "id": 3002929,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22212026,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002930": {
+      "id": 3002930,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002931": {
+      "id": 3002931,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223002,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002932": {
+      "id": 3002932,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002933": {
+      "id": 3002933,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223004,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002934": {
+      "id": 3002934,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002935": {
+      "id": 3002935,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223009,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002936": {
+      "id": 3002936,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223013,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002937": {
+      "id": 3002937,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223014,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002938": {
+      "id": 3002938,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002939": {
+      "id": 3002939,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223016,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002940": {
+      "id": 3002940,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223017,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002941": {
+      "id": 3002941,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22223018,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002942": {
+      "id": 3002942,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002943": {
+      "id": 3002943,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233002,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002944": {
+      "id": 3002944,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002945": {
+      "id": 3002945,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233004,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002946": {
+      "id": 3002946,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002947": {
+      "id": 3002947,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002948": {
+      "id": 3002948,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233008,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002949": {
+      "id": 3002949,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233011,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002950": {
+      "id": 3002950,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233013,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002951": {
+      "id": 3002951,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233014,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002952": {
+      "id": 3002952,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002953": {
+      "id": 3002953,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233016,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002954": {
+      "id": 3002954,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233017,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002955": {
+      "id": 3002955,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233018,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002956": {
+      "id": 3002956,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233023,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002957": {
+      "id": 3002957,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233027,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002958": {
+      "id": 3002958,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233029,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002959": {
+      "id": 3002959,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233030,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002960": {
+      "id": 3002960,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233031,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002961": {
+      "id": 3002961,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233032,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002962": {
+      "id": 3002962,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233033,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002963": {
+      "id": 3002963,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233035,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002964": {
+      "id": 3002964,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233036,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002965": {
+      "id": 3002965,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233037,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002966": {
+      "id": 3002966,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233038,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002967": {
+      "id": 3002967,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233039,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002968": {
+      "id": 3002968,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22233040,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002969": {
+      "id": 3002969,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002970": {
+      "id": 3002970,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243002,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002971": {
+      "id": 3002971,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002972": {
+      "id": 3002972,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243004,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002973": {
+      "id": 3002973,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002974": {
+      "id": 3002974,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002975": {
+      "id": 3002975,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243009,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002976": {
+      "id": 3002976,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243013,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002977": {
+      "id": 3002977,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243014,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002978": {
+      "id": 3002978,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002979": {
+      "id": 3002979,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243016,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002980": {
+      "id": 3002980,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243017,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002981": {
+      "id": 3002981,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243019,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002982": {
+      "id": 3002982,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243020,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002983": {
+      "id": 3002983,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243021,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002984": {
+      "id": 3002984,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243022,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002985": {
+      "id": 3002985,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243023,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002986": {
+      "id": 3002986,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243025,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002987": {
+      "id": 3002987,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243026,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002988": {
+      "id": 3002988,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243027,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002989": {
+      "id": 3002989,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243028,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002990": {
+      "id": 3002990,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243029,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002991": {
+      "id": 3002991,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243031,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002992": {
+      "id": 3002992,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243032,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002993": {
+      "id": 3002993,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243033,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002994": {
+      "id": 3002994,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243034,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002995": {
+      "id": 3002995,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243035,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002996": {
+      "id": 3002996,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243036,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002997": {
+      "id": 3002997,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22243037,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002998": {
+      "id": 3002998,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253004,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3002999": {
+      "id": 3002999,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003000": {
+      "id": 3003000,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003001": {
+      "id": 3003001,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253008,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003002": {
+      "id": 3003002,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253011,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003003": {
+      "id": 3003003,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003004": {
+      "id": 3003004,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253021,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003005": {
+      "id": 3003005,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253023,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003006": {
+      "id": 3003006,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253025,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003007": {
+      "id": 3003007,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253029,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003008": {
+      "id": 3003008,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253031,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003009": {
+      "id": 3003009,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253033,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003010": {
+      "id": 3003010,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253037,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003011": {
+      "id": 3003011,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253039,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003012": {
+      "id": 3003012,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22253041,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003013": {
+      "id": 3003013,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22254007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003014": {
+      "id": 3003014,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22323001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003015": {
+      "id": 3003015,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22323003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003016": {
+      "id": 3003016,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22323005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003017": {
+      "id": 3003017,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22323007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003018": {
+      "id": 3003018,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22323009,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003019": {
+      "id": 3003019,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22323013,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003020": {
+      "id": 3003020,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22323015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003021": {
+      "id": 3003021,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22323017,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003022": {
+      "id": 3003022,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003023": {
+      "id": 3003023,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003024": {
+      "id": 3003024,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003025": {
+      "id": 3003025,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003026": {
+      "id": 3003026,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333011,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003027": {
+      "id": 3003027,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333013,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003028": {
+      "id": 3003028,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003029": {
+      "id": 3003029,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333017,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003030": {
+      "id": 3003030,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333023,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003031": {
+      "id": 3003031,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333027,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003032": {
+      "id": 3003032,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333029,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003033": {
+      "id": 3003033,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333031,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003034": {
+      "id": 3003034,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333032,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003035": {
+      "id": 3003035,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333033,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003036": {
+      "id": 3003036,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333035,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003037": {
+      "id": 3003037,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333036,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003038": {
+      "id": 3003038,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333037,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003039": {
+      "id": 3003039,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22333039,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003040": {
+      "id": 3003040,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003041": {
+      "id": 3003041,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003042": {
+      "id": 3003042,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343004,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003043": {
+      "id": 3003043,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 70100439,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003044": {
+      "id": 3003044,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003045": {
+      "id": 3003045,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343009,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003046": {
+      "id": 3003046,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343013,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003047": {
+      "id": 3003047,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343014,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003048": {
+      "id": 3003048,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003049": {
+      "id": 3003049,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343017,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003050": {
+      "id": 3003050,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343019,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003051": {
+      "id": 3003051,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343021,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003052": {
+      "id": 3003052,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343023,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003053": {
+      "id": 3003053,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343025,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003054": {
+      "id": 3003054,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343027,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003055": {
+      "id": 3003055,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343029,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003056": {
+      "id": 3003056,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343031,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003057": {
+      "id": 3003057,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343033,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003058": {
+      "id": 3003058,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343035,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003059": {
+      "id": 3003059,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343036,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003060": {
+      "id": 3003060,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22343037,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003061": {
+      "id": 3003061,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22423004,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003062": {
+      "id": 3003062,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22423007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003063": {
+      "id": 3003063,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22423008,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003064": {
+      "id": 3003064,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22433001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003065": {
+      "id": 3003065,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22433002,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003066": {
+      "id": 3003066,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003067": {
+      "id": 3003067,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003068": {
+      "id": 3003068,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003069": {
+      "id": 3003069,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003070": {
+      "id": 3003070,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443008,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003071": {
+      "id": 3003071,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443009,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003072": {
+      "id": 3003072,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443010,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003073": {
+      "id": 3003073,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443011,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003074": {
+      "id": 3003074,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443012,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003075": {
+      "id": 3003075,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443013,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003076": {
+      "id": 3003076,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443014,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003077": {
+      "id": 3003077,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003078": {
+      "id": 3003078,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443016,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003079": {
+      "id": 3003079,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22443018,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003080": {
+      "id": 3003080,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22513001,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003081": {
+      "id": 3003081,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22513005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003082": {
+      "id": 3003082,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22513007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003083": {
+      "id": 3003083,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22513015,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003084": {
+      "id": 3003084,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22513017,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003085": {
+      "id": 3003085,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22513019,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003086": {
+      "id": 3003086,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22513021,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003087": {
+      "id": 3003087,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613002,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003088": {
+      "id": 3003088,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613003,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003089": {
+      "id": 3003089,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613004,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003090": {
+      "id": 3003090,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613005,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003091": {
+      "id": 3003091,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613006,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003092": {
+      "id": 3003092,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613007,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003093": {
+      "id": 3003093,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613008,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003094": {
+      "id": 3003094,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613010,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003095": {
+      "id": 3003095,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613011,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003096": {
+      "id": 3003096,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613012,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003097": {
+      "id": 3003097,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613013,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003098": {
+      "id": 3003098,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613014,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003099": {
+      "id": 3003099,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613016,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003100": {
+      "id": 3003100,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613017,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003101": {
+      "id": 3003101,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613018,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003102": {
+      "id": 3003102,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613021,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003103": {
+      "id": 3003103,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613022,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003104": {
+      "id": 3003104,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613023,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003105": {
+      "id": 3003105,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613024,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003106": {
+      "id": 3003106,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613025,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003107": {
+      "id": 3003107,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613026,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003108": {
+      "id": 3003108,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613028,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003109": {
+      "id": 3003109,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613029,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003110": {
+      "id": 3003110,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613030,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003111": {
+      "id": 3003111,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613031,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003112": {
+      "id": 3003112,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613032,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003113": {
+      "id": 3003113,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613033,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003114": {
+      "id": 3003114,
+      "choiceBoxGroup": 100182,
+      "rewardType": 7,
+      "choiceBoxId": 22613035,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003115": {
+      "id": 3003115,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100207,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003116": {
+      "id": 3003116,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100208,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003117": {
+      "id": 3003117,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100222,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003118": {
+      "id": 3003118,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100237,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003119": {
+      "id": 3003119,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100251,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003120": {
+      "id": 3003120,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100253,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003121": {
+      "id": 3003121,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100277,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003122": {
+      "id": 3003122,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100303,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003123": {
+      "id": 3003123,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100433,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003124": {
+      "id": 3003124,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100439,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003125": {
+      "id": 3003125,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100448,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003126": {
+      "id": 3003126,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100458,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003127": {
+      "id": 3003127,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100510,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003128": {
+      "id": 3003128,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100524,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003129": {
+      "id": 3003129,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100592,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003130": {
+      "id": 3003130,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100594,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003131": {
+      "id": 3003131,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100640,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003132": {
+      "id": 3003132,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100644,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003133": {
+      "id": 3003133,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100867,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003134": {
+      "id": 3003134,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100868,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003135": {
+      "id": 3003135,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100869,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003136": {
+      "id": 3003136,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100870,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003137": {
+      "id": 3003137,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100871,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003138": {
+      "id": 3003138,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100873,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003139": {
+      "id": 3003139,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100874,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003140": {
+      "id": 3003140,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100875,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003141": {
+      "id": 3003141,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100876,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003142": {
+      "id": 3003142,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70100877,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003143": {
+      "id": 3003143,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101050,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003144": {
+      "id": 3003144,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101052,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003145": {
+      "id": 3003145,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101054,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003146": {
+      "id": 3003146,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101056,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003147": {
+      "id": 3003147,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101058,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003148": {
+      "id": 3003148,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101062,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003149": {
+      "id": 3003149,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101064,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003150": {
+      "id": 3003150,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101066,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003151": {
+      "id": 3003151,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101068,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003152": {
+      "id": 3003152,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101070,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003153": {
+      "id": 3003153,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101190,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003154": {
+      "id": 3003154,
+      "choiceBoxGroup": 100183,
+      "rewardType": 9,
+      "choiceBoxId": 70101368,
       "choiceBoxQuantity": 1,
       "autoMax": false
     }

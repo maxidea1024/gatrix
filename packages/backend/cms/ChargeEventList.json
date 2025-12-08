@@ -1,0 +1,151 @@
+{
+  ":ChargeEventList": {
+    ":type": {
+      "id": "key",
+      "group": "number",
+      "order": "number",
+      "name": "text",
+      "nameTextFormat": [
+        "text"
+      ],
+      "desc": "text",
+      "descTextFormat": [
+        "text"
+      ],
+      "color": "string",
+      "mail": "number",
+      "cashShopId": "number",
+      "needPurchaseTierPrice": "text",
+      "stepRewardFixedId": [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number"
+      ]
+    },
+    ":required": {
+      "group": 1,
+      "order": 1,
+      "name": 1,
+      "desc": 1,
+      "mail": 1,
+      "stepRewardFixedId": [
+        1
+      ]
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "mail": [
+        "Mail"
+      ]
+    }
+  },
+  "ChargeEventList": {
+    "100190001": {
+      "id": 100190001,
+      "group": 100000,
+      "order": 1,
+      "name": "首充赠礼",
+      "desc": "상품을 구매하고 3일동안 매일 보상을 받으세요!",
+      "mail": 92100007,
+      "cashShopId": 10510201,
+      "stepRewardFixedId": [
+        95790001,
+        95790002,
+        95790003
+      ]
+    },
+    "100190002": {
+      "id": 100190002,
+      "group": 100000,
+      "order": 2,
+      "name": "超值赠礼",
+      "desc": "상품을 구매하고 3일동안 매일 보상을 받으세요!",
+      "mail": 92100007,
+      "cashShopId": 10510202,
+      "stepRewardFixedId": [
+        95790004,
+        95790005,
+        95790006
+      ]
+    },
+    "100190003": {
+      "id": 100190003,
+      "group": 100000,
+      "order": 3,
+      "name": "豪华赠礼",
+      "desc": "상품을 구매하고 3일동안 매일 보상을 받으세요!",
+      "mail": 92100007,
+      "cashShopId": 10510203,
+      "stepRewardFixedId": [
+        95790007,
+        95790008,
+        95790009
+      ]
+    },
+    "100190004": {
+      "id": 100190004,
+      "group": 200000,
+      "order": 1,
+      "name": "每日满6元充值金额解锁",
+      "desc": "상품 누적 금액에 따라 보너스 보상을 받으세요!",
+      "color": "fff8b6",
+      "mail": 92100007,
+      "needPurchaseTierPrice": "1",
+      "stepRewardFixedId": [
+        95790010,
+        95790011,
+        95790012,
+        95790013,
+        95790014,
+        95790015,
+        95790016,
+        95790017,
+        95790018,
+        95790019,
+        95790020,
+        95790021,
+        95790022,
+        95790023
+      ]
+    },
+    "100190005": {
+      "id": 100190005,
+      "group": 200000,
+      "order": 2,
+      "name": "每日满30元充值金额解锁",
+      "desc": "상품 누적 금액에 따라 보너스 보상을 받으세요!",
+      "color": "fff8b6",
+      "mail": 92100007,
+      "needPurchaseTierPrice": "5",
+      "stepRewardFixedId": [
+        95790024,
+        95790025,
+        95790026,
+        95790027,
+        95790028,
+        95790029,
+        95790030,
+        95790031,
+        95790032,
+        95790033,
+        95790034,
+        95790035,
+        95790036,
+        95790037
+      ]
+    }
+  }
+}

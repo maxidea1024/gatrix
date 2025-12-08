@@ -1,0 +1,5605 @@
+{
+  ":Village": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "isBackcountry": "bool",
+      "backgroundMap": "string",
+      "consumeItemId": "number",
+      "advInitDay": "number",
+      "advMaxDay": "number",
+      "maxUseAdvItem": "number",
+      "combatVal": "number",
+      "gatheringVal": "number",
+      "observationVal": "number",
+      "climateLandFeature": "number",
+      "randLandFeature": [
+        {
+          "Id": "number",
+          "Amount": "number",
+          "IsDuplicated": "bool"
+        },
+        {
+          "Id": "number",
+          "Amount": "number",
+          "IsDuplicated": "bool"
+        }
+      ],
+      "plunderLandFeatureGroupId": "number",
+      "exploreMode": "number",
+      "trainingMode": "number",
+      "plunderMode": "number",
+      "lv": "number",
+      "villageImage": "string",
+      "exploreImage": "string",
+      "plunderImage": "string",
+      "isInhabited": "bool",
+      "friendshipDefault": "number",
+      "friendshipTimeMax": "number",
+      "regionId": "number",
+      "favorTradeGoodsCategory": "number",
+      "favorTradeGoodsCategories": [
+        "number",
+        "number"
+      ],
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        },
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ],
+      "costItemId": "number",
+      "advExpVal": "number",
+      "costItemAmount": "number",
+      "discoveryId": "number",
+      "itemRatio": "number",
+      "AdventureReward": "number",
+      "waterDropRate": "number",
+      "waterCountMin": "number",
+      "waterCountMax": "number",
+      "foodDropRate": "number",
+      "foodCountMin": "number",
+      "foodCountMax": "number",
+      "woodDropRate": "number",
+      "woodCountMin": "number",
+      "woodCountMax": "number",
+      "villageDiscoveryGroup": [
+        "number",
+        "number"
+      ],
+      "exchangeCount": [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number"
+      ],
+      "exchangeVillageListGroup": "number",
+      "friendshipFirstReward0": "number",
+      "friendshipFirstReward1": "number",
+      "friendshipFirstReward2": "number",
+      "friendshipFirstReward3": "number",
+      "friendshipFirstReward4": "number",
+      "friendshipFirstReward5": "number",
+      "friendshipFirstReward6": "number",
+      "friendshipWeekReward0": "number",
+      "friendshipWeekReward1": "number",
+      "friendshipWeekReward2": "number",
+      "friendshipWeekReward3": "number",
+      "friendshipWeekReward4": "number",
+      "friendshipWeekReward5": "number",
+      "friendshipWeekReward6": "number",
+      "negoPricePoint": "number",
+      "negoGetGoodsPoint": "number"
+    },
+    ":required": {
+      "randLandFeature": [
+        {
+          "Id": 1,
+          "Amount": 1,
+          "IsDuplicated": 1
+        }
+      ],
+      "lv": 1,
+      "friendshipDefault": 1,
+      "friendshipTimeMax": 1,
+      "favorTradeGoodsCategory": 1,
+      "favorTradeGoodsCategories": [
+        1,
+        1
+      ],
+      "itemRatio": 1,
+      "waterDropRate": 1,
+      "waterCountMin": 1,
+      "waterCountMax": 1,
+      "foodDropRate": 1,
+      "foodCountMin": 1,
+      "foodCountMax": 1,
+      "woodDropRate": 1,
+      "woodCountMin": 1,
+      "woodCountMax": 1,
+      "villageDiscoveryGroup": [
+        1,
+        1
+      ]
+    },
+    ":requiredInObject": {
+      "randLandFeature": [
+        {
+          "Id": 1,
+          "Amount": 1,
+          "IsDuplicated": 1
+        },
+        {
+          "Id": 1,
+          "Amount": 1,
+          "IsDuplicated": 1
+        }
+      ],
+      "contentsTerms": [
+        {
+          "Id": 1,
+          "Count": 1
+        },
+        {
+          "Id": 1,
+          "Count": 1
+        }
+      ]
+    },
+    ":min": {
+      "consumeItemId": 23000000,
+      "climateLandFeature": 77000000,
+      "randLandFeature": [
+        {
+          "Id": 77100000
+        },
+        {
+          "Id": 77100000
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700000,
+      "trainingMode": 77700000,
+      "plunderMode": 77700000,
+      "regionId": 12000000,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000
+        },
+        {
+          "Id": 81000000
+        }
+      ],
+      "costItemId": 23000000,
+      "AdventureReward": 90000000,
+      "friendshipFirstReward0": 94000000,
+      "friendshipFirstReward1": 94000000,
+      "friendshipFirstReward2": 94000000,
+      "friendshipFirstReward3": 94000000,
+      "friendshipFirstReward4": 94000000,
+      "friendshipFirstReward5": 94000000,
+      "friendshipFirstReward6": 94000000,
+      "friendshipWeekReward0": 94000000,
+      "friendshipWeekReward1": 94000000,
+      "friendshipWeekReward2": 94000000,
+      "friendshipWeekReward3": 94000000,
+      "friendshipWeekReward4": 94000000,
+      "friendshipWeekReward5": 94000000,
+      "friendshipWeekReward6": 94000000
+    },
+    ":max": {
+      "consumeItemId": 23999999,
+      "climateLandFeature": 77099999,
+      "randLandFeature": [
+        {
+          "Id": 77199999
+        },
+        {
+          "Id": 77199999
+        }
+      ],
+      "plunderLandFeatureGroupId": 77199999,
+      "exploreMode": 77799999,
+      "trainingMode": 77799999,
+      "plunderMode": 77799999,
+      "regionId": 12099999,
+      "favorTradeGoodsCategory": 19,
+      "favorTradeGoodsCategories": [
+        19,
+        19
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81999999
+        },
+        {
+          "Id": 81999999
+        }
+      ],
+      "costItemId": 23999999,
+      "AdventureReward": 90999999,
+      "friendshipFirstReward0": 95999999,
+      "friendshipFirstReward1": 95999999,
+      "friendshipFirstReward2": 95999999,
+      "friendshipFirstReward3": 95999999,
+      "friendshipFirstReward4": 95999999,
+      "friendshipFirstReward5": 95999999,
+      "friendshipFirstReward6": 95999999,
+      "friendshipWeekReward0": 95999999,
+      "friendshipWeekReward1": 95999999,
+      "friendshipWeekReward2": 95999999,
+      "friendshipWeekReward3": 95999999,
+      "friendshipWeekReward4": 95999999,
+      "friendshipWeekReward5": 95999999,
+      "friendshipWeekReward6": 95999999
+    },
+    ":enum": {},
+    ":links": {
+      "consumeItemId": [
+        "Item"
+      ],
+      "climateLandFeature": [
+        "LandFeature"
+      ],
+      "randLandFeature": [
+        {
+          "Id": [
+            "LandFeatureGroup"
+          ]
+        },
+        {
+          "Id": [
+            "LandFeatureGroup"
+          ]
+        }
+      ],
+      "plunderLandFeatureGroupId": [
+        "LandFeatureGroup"
+      ],
+      "exploreMode": [
+        "AdventureEventMode"
+      ],
+      "trainingMode": [
+        "AdventureEventMode"
+      ],
+      "plunderMode": [
+        "AdventureEventMode"
+      ],
+      "regionId": [
+        "Region"
+      ],
+      "contentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        },
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ],
+      "costItemId": [
+        "Item"
+      ],
+      "AdventureReward": [
+        "Reward"
+      ],
+      "friendshipFirstReward0": [
+        "RewardFixed"
+      ],
+      "friendshipFirstReward1": [
+        "RewardFixed"
+      ],
+      "friendshipFirstReward2": [
+        "RewardFixed"
+      ],
+      "friendshipFirstReward3": [
+        "RewardFixed"
+      ],
+      "friendshipFirstReward4": [
+        "RewardFixed"
+      ],
+      "friendshipFirstReward5": [
+        "RewardFixed"
+      ],
+      "friendshipFirstReward6": [
+        "RewardFixed"
+      ],
+      "friendshipWeekReward0": [
+        "RewardFixed"
+      ],
+      "friendshipWeekReward1": [
+        "RewardFixed"
+      ],
+      "friendshipWeekReward2": [
+        "RewardFixed"
+      ],
+      "friendshipWeekReward3": [
+        "RewardFixed"
+      ],
+      "friendshipWeekReward4": [
+        "RewardFixed"
+      ],
+      "friendshipWeekReward5": [
+        "RewardFixed"
+      ],
+      "friendshipWeekReward6": [
+        "RewardFixed"
+      ]
+    }
+  },
+  "Village": {
+    "70500000": {
+      "id": 70500000,
+      "name": "스비아인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000700,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 75,
+      "costItemAmount": 1,
+      "discoveryId": 70412300,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1000,
+        1000
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 50,
+      "negoGetGoodsPoint": 50
+    },
+    "70500001": {
+      "id": 70500001,
+      "name": "흑해 인근 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 58,
+      "gatheringVal": 58,
+      "observationVal": 58,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 1,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000400,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 156,
+      "costItemAmount": 1,
+      "discoveryId": 70412301,
+      "itemRatio": 300,
+      "AdventureReward": 90134696,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1001,
+        1001
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 50,
+      "negoGetGoodsPoint": 50
+    },
+    "70500002": {
+      "id": 70500002,
+      "name": "튀르크족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 58,
+      "gatheringVal": 58,
+      "observationVal": 58,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 1,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001600,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 156,
+      "costItemAmount": 1,
+      "discoveryId": 70412302,
+      "itemRatio": 300,
+      "AdventureReward": 90134696,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1002,
+        1002
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 50,
+      "negoGetGoodsPoint": 50
+    },
+    "70500003": {
+      "id": 70500003,
+      "name": "루르인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 58,
+      "gatheringVal": 58,
+      "observationVal": 58,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001100,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 287,
+      "costItemAmount": 1,
+      "discoveryId": 70412303,
+      "itemRatio": 300,
+      "AdventureReward": 90134696,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1003,
+        1003
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 110,
+      "negoGetGoodsPoint": 140
+    },
+    "70500004": {
+      "id": 70500004,
+      "name": "카슈카이족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 58,
+      "gatheringVal": 58,
+      "observationVal": 58,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001100,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 287,
+      "costItemAmount": 1,
+      "discoveryId": 70412304,
+      "itemRatio": 300,
+      "AdventureReward": 90134696,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1004,
+        1004
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 110,
+      "negoGetGoodsPoint": 140
+    },
+    "70500005": {
+      "id": 70500005,
+      "name": "베르베르인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 43,
+      "gatheringVal": 43,
+      "observationVal": 43,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 1,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 215,
+      "costItemAmount": 1,
+      "discoveryId": 70412305,
+      "itemRatio": 300,
+      "AdventureReward": 90134695,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1005,
+        1005
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 60,
+      "negoGetGoodsPoint": 65
+    },
+    "70500006": {
+      "id": 70500006,
+      "name": "누비아인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 88,
+      "gatheringVal": 88,
+      "observationVal": 88,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 2,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001600,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 263,
+      "costItemAmount": 1,
+      "discoveryId": 70412306,
+      "itemRatio": 300,
+      "AdventureReward": 90134698,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1006,
+        1006
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 90,
+      "negoGetGoodsPoint": 110
+    },
+    "70500007": {
+      "id": 70500007,
+      "name": "바리족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 135,
+      "gatheringVal": 135,
+      "observationVal": 135,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 2,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001600,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 263,
+      "costItemAmount": 1,
+      "discoveryId": 70412307,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1007,
+        1007
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 90,
+      "negoGetGoodsPoint": 110
+    },
+    "70500008": {
+      "id": 70500008,
+      "name": "바간다족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 135,
+      "gatheringVal": 135,
+      "observationVal": 135,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001600,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 263,
+      "costItemAmount": 1,
+      "discoveryId": 70412308,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1008,
+        1008
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 90,
+      "negoGetGoodsPoint": 110
+    },
+    "70500009": {
+      "id": 70500009,
+      "name": "말링케족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 28,
+      "gatheringVal": 28,
+      "observationVal": 28,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 2,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 239,
+      "costItemAmount": 1,
+      "discoveryId": 70412309,
+      "itemRatio": 300,
+      "AdventureReward": 90134695,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1009,
+        1009
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 80,
+      "negoGetGoodsPoint": 95
+    },
+    "70500010": {
+      "id": 70500010,
+      "name": "요루바족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 28,
+      "gatheringVal": 28,
+      "observationVal": 28,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 2,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 239,
+      "costItemAmount": 1,
+      "discoveryId": 70412310,
+      "itemRatio": 300,
+      "AdventureReward": 90134695,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1010,
+        1010
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 80,
+      "negoGetGoodsPoint": 95
+    },
+    "70500011": {
+      "id": 70500011,
+      "name": "반투족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 28,
+      "gatheringVal": 28,
+      "observationVal": 28,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 2,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 239,
+      "costItemAmount": 1,
+      "discoveryId": 70412311,
+      "itemRatio": 300,
+      "AdventureReward": 90134695,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1011,
+        1011
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 80,
+      "negoGetGoodsPoint": 95
+    },
+    "70500012": {
+      "id": 70500012,
+      "name": "후투족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 43,
+      "gatheringVal": 43,
+      "observationVal": 43,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 2,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001800,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 263,
+      "costItemAmount": 1,
+      "discoveryId": 70412312,
+      "itemRatio": 300,
+      "AdventureReward": 90134695,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1012,
+        1012
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 90,
+      "negoGetGoodsPoint": 110
+    },
+    "70500013": {
+      "id": 70500013,
+      "name": "산족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 43,
+      "gatheringVal": 43,
+      "observationVal": 43,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 2,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001800,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 263,
+      "costItemAmount": 1,
+      "discoveryId": 70412313,
+      "itemRatio": 300,
+      "AdventureReward": 90134695,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1013,
+        1013
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 90,
+      "negoGetGoodsPoint": 110
+    },
+    "70500014": {
+      "id": 70500014,
+      "name": "쇼나족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 58,
+      "gatheringVal": 58,
+      "observationVal": 58,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001800,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 287,
+      "costItemAmount": 1,
+      "discoveryId": 70412314,
+      "itemRatio": 300,
+      "AdventureReward": 90134696,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1014,
+        1014
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 100,
+      "negoGetGoodsPoint": 125
+    },
+    "70500015": {
+      "id": 70500015,
+      "name": "말라가시인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 58,
+      "gatheringVal": 58,
+      "observationVal": 58,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001800,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 287,
+      "costItemAmount": 1,
+      "discoveryId": 70412315,
+      "itemRatio": 300,
+      "AdventureReward": 90134696,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1015,
+        1015
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 100,
+      "negoGetGoodsPoint": 125
+    },
+    "70500016": {
+      "id": 70500016,
+      "name": "인도양, 서쪽의 섬",
+      "isBackcountry": true,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 58,
+      "gatheringVal": 58,
+      "observationVal": 58,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": false,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12010200,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 287,
+      "costItemAmount": 1,
+      "discoveryId": 70412316,
+      "itemRatio": 300,
+      "AdventureReward": 90134696,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1016,
+        1016
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 110,
+      "negoGetGoodsPoint": 140
+    },
+    "70500017": {
+      "id": 70500017,
+      "name": "대서양, 남쪽의 섬",
+      "isBackcountry": true,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 58,
+      "gatheringVal": 58,
+      "observationVal": 58,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": false,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12010900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 287,
+      "costItemAmount": 1,
+      "discoveryId": 70412317,
+      "itemRatio": 300,
+      "AdventureReward": 90134696,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1017,
+        1017
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 110,
+      "negoGetGoodsPoint": 140
+    },
+    "70500018": {
+      "id": 70500018,
+      "name": "과라니족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000600,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412318,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1018,
+        1018
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 120,
+      "negoGetGoodsPoint": 155
+    },
+    "70500019": {
+      "id": 70500019,
+      "name": "보로로족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000600,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412319,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1019,
+        1019
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 120,
+      "negoGetGoodsPoint": 155
+    },
+    "70500020": {
+      "id": 70500020,
+      "name": "시리오노족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000600,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412320,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1020,
+        1020
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 120,
+      "negoGetGoodsPoint": 155
+    },
+    "70500021": {
+      "id": 70500021,
+      "name": "케추아족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000600,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412321,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1021,
+        1021
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 120,
+      "negoGetGoodsPoint": 155
+    },
+    "70500022": {
+      "id": 70500022,
+      "name": "히바로족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 14,
+      "gatheringVal": 14,
+      "observationVal": 14,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 215,
+      "costItemAmount": 1,
+      "discoveryId": 70412322,
+      "itemRatio": 300,
+      "AdventureReward": 90134694,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1022,
+        1022
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 70,
+      "negoGetGoodsPoint": 80
+    },
+    "70500023": {
+      "id": 70500023,
+      "name": "위토토족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 14,
+      "gatheringVal": 14,
+      "observationVal": 14,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 215,
+      "costItemAmount": 1,
+      "discoveryId": 70412323,
+      "itemRatio": 300,
+      "AdventureReward": 90134694,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1023,
+        1023
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 70,
+      "negoGetGoodsPoint": 80
+    },
+    "70500024": {
+      "id": 70500024,
+      "name": "투카노족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 14,
+      "gatheringVal": 14,
+      "observationVal": 14,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 215,
+      "costItemAmount": 1,
+      "discoveryId": 70412324,
+      "itemRatio": 300,
+      "AdventureReward": 90134694,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1024,
+        1024
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 70,
+      "negoGetGoodsPoint": 80
+    },
+    "70500025": {
+      "id": 70500025,
+      "name": "무라족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 14,
+      "gatheringVal": 14,
+      "observationVal": 14,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 215,
+      "costItemAmount": 1,
+      "discoveryId": 70412325,
+      "itemRatio": 300,
+      "AdventureReward": 90134694,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1025,
+        1025
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 70,
+      "negoGetGoodsPoint": 80
+    },
+    "70500026": {
+      "id": 70500026,
+      "name": "신대륙, 서쪽의 섬",
+      "isBackcountry": true,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 88,
+      "gatheringVal": 88,
+      "observationVal": 88,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": false,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12010700,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 400,
+      "costItemAmount": 1,
+      "discoveryId": 70412326,
+      "itemRatio": 300,
+      "AdventureReward": 90134698,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1026,
+        1026
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 130,
+      "negoGetGoodsPoint": 170
+    },
+    "70500027": {
+      "id": 70500027,
+      "name": "긴 귀족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 135,
+      "gatheringVal": 135,
+      "observationVal": 135,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12010700,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 545,
+      "costItemAmount": 1,
+      "discoveryId": 70412327,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1027,
+        1027
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 160,
+      "negoGetGoodsPoint": 215
+    },
+    "70500028": {
+      "id": 70500028,
+      "name": "코아우일테칸족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 263,
+      "costItemAmount": 1,
+      "discoveryId": 70412328,
+      "itemRatio": 300,
+      "AdventureReward": 90134699,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1028,
+        1028
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 70,
+      "negoGetGoodsPoint": 80
+    },
+    "70500029": {
+      "id": 70500029,
+      "name": "코만치족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 88,
+      "gatheringVal": 88,
+      "observationVal": 88,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 263,
+      "costItemAmount": 1,
+      "discoveryId": 70412329,
+      "itemRatio": 300,
+      "AdventureReward": 90134698,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1029,
+        1029
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 70,
+      "negoGetGoodsPoint": 80
+    },
+    "70500030": {
+      "id": 70500030,
+      "name": "아파치족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 135,
+      "gatheringVal": 135,
+      "observationVal": 135,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001300,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 545,
+      "costItemAmount": 1,
+      "discoveryId": 70412330,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1030,
+        1030
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 160,
+      "negoGetGoodsPoint": 215
+    },
+    "70500031": {
+      "id": 70500031,
+      "name": "치누크족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Sail_01_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001300,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 650,
+      "costItemAmount": 1,
+      "discoveryId": 70412331,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1031,
+        1031
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 180,
+      "negoGetGoodsPoint": 245
+    },
+    "70500032": {
+      "id": 70500032,
+      "name": "샤이엔족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 263,
+      "costItemAmount": 1,
+      "discoveryId": 70412332,
+      "itemRatio": 300,
+      "AdventureReward": 90134699,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1032,
+        1032
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 70,
+      "negoGetGoodsPoint": 80
+    },
+    "70500033": {
+      "id": 70500033,
+      "name": "포니족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 263,
+      "costItemAmount": 1,
+      "discoveryId": 70412333,
+      "itemRatio": 300,
+      "AdventureReward": 90134699,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1033,
+        1033
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 70,
+      "negoGetGoodsPoint": 80
+    },
+    "70500034": {
+      "id": 70500034,
+      "name": "수족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 263,
+      "costItemAmount": 1,
+      "discoveryId": 70412334,
+      "itemRatio": 300,
+      "AdventureReward": 90134699,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1034,
+        1034
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 70,
+      "negoGetGoodsPoint": 80
+    },
+    "70500035": {
+      "id": 70500035,
+      "name": "극지, 설산의 만",
+      "isBackcountry": true,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": false,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001300,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412335,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1035,
+        1035
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 120,
+      "negoGetGoodsPoint": 155
+    },
+    "70500036": {
+      "id": 70500036,
+      "name": "이누이트족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001500,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412336,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1036,
+        1036
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 120,
+      "negoGetGoodsPoint": 155
+    },
+    "70500037": {
+      "id": 70500037,
+      "name": "네네츠인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001504,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412337,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1037,
+        1037
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 1000,
+      "negoGetGoodsPoint": 1000
+    },
+    "70500038": {
+      "id": 70500038,
+      "name": "극지, 빙하의 섬",
+      "isBackcountry": true,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": false,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001504,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412338,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1038,
+        1038
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 1000,
+      "negoGetGoodsPoint": 1000
+    },
+    "70500039": {
+      "id": 70500039,
+      "name": "극지, 설산의 섬",
+      "isBackcountry": true,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": false,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001503,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412339,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1039,
+        1039
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 1000,
+      "negoGetGoodsPoint": 1000
+    },
+    "70500040": {
+      "id": 70500040,
+      "name": "야쿠트인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001504,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412340,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1040,
+        1040
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 1000,
+      "negoGetGoodsPoint": 1000
+    },
+    "70500041": {
+      "id": 70500041,
+      "name": "축치인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001503,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 650,
+      "costItemAmount": 1,
+      "discoveryId": 70412341,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1041,
+        1041
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 180,
+      "negoGetGoodsPoint": 245
+    },
+    "70500042": {
+      "id": 70500042,
+      "name": "경흥의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000300,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 650,
+      "costItemAmount": 1,
+      "discoveryId": 70412342,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1042,
+        1042
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 150,
+      "negoGetGoodsPoint": 200
+    },
+    "70500043": {
+      "id": 70500043,
+      "name": "부안의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000301,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 460,
+      "costItemAmount": 1,
+      "discoveryId": 70412343,
+      "itemRatio": 300,
+      "AdventureReward": 90134699,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1043,
+        1043
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 140,
+      "negoGetGoodsPoint": 185
+    },
+    "70500044": {
+      "id": 70500044,
+      "name": "에미시의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000302,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 650,
+      "costItemAmount": 1,
+      "discoveryId": 70412344,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1044,
+        1044
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 150,
+      "negoGetGoodsPoint": 200
+    },
+    "70500045": {
+      "id": 70500045,
+      "name": "에치젠의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000302,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 460,
+      "costItemAmount": 1,
+      "discoveryId": 70412345,
+      "itemRatio": 300,
+      "AdventureReward": 90134699,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1045,
+        1045
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 140,
+      "negoGetGoodsPoint": 185
+    },
+    "70500046": {
+      "id": 70500046,
+      "name": "규슈의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000302,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 460,
+      "costItemAmount": 1,
+      "discoveryId": 70412346,
+      "itemRatio": 300,
+      "AdventureReward": 90134699,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1046,
+        1046
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 140,
+      "negoGetGoodsPoint": 185
+    },
+    "70500047": {
+      "id": 70500047,
+      "name": "황허, 한족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000800,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 460,
+      "costItemAmount": 1,
+      "discoveryId": 70412347,
+      "itemRatio": 300,
+      "AdventureReward": 90134699,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1047,
+        1047
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 140,
+      "negoGetGoodsPoint": 185
+    },
+    "70500048": {
+      "id": 70500048,
+      "name": "장강, 투자족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000800,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 460,
+      "costItemAmount": 1,
+      "discoveryId": 70412348,
+      "itemRatio": 300,
+      "AdventureReward": 90134699,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1048,
+        1048
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 140,
+      "negoGetGoodsPoint": 185
+    },
+    "70500049": {
+      "id": 70500049,
+      "name": "아미족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001400,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 460,
+      "costItemAmount": 1,
+      "discoveryId": 70412349,
+      "itemRatio": 300,
+      "AdventureReward": 90134699,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1049,
+        1049
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 140,
+      "negoGetGoodsPoint": 185
+    },
+    "70500050": {
+      "id": 70500050,
+      "name": "오리야인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12002000,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412350,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1050,
+        1050
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 120,
+      "negoGetGoodsPoint": 155
+    },
+    "70500051": {
+      "id": 70500051,
+      "name": "버마족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12002000,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412351,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1051,
+        1051
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 120,
+      "negoGetGoodsPoint": 155
+    },
+    "70500052": {
+      "id": 70500052,
+      "name": "크메르족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000100,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412352,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1052,
+        1052
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 120,
+      "negoGetGoodsPoint": 155
+    },
+    "70500053": {
+      "id": 70500053,
+      "name": "말레이족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000100,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412353,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1053,
+        1053
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 120,
+      "negoGetGoodsPoint": 155
+    },
+    "70500054": {
+      "id": 70500054,
+      "name": "멜라네시아인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 103,
+      "gatheringVal": 103,
+      "observationVal": 103,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001700,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 460,
+      "costItemAmount": 1,
+      "discoveryId": 70412354,
+      "itemRatio": 300,
+      "AdventureReward": 90134699,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1054,
+        1054
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 190,
+      "negoGetGoodsPoint": 260
+    },
+    "70500055": {
+      "id": 70500055,
+      "name": "야우루족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 135,
+      "gatheringVal": 135,
+      "observationVal": 135,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001700,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 545,
+      "costItemAmount": 1,
+      "discoveryId": 70412355,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1055,
+        1055
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 160,
+      "negoGetGoodsPoint": 215
+    },
+    "70500056": {
+      "id": 70500056,
+      "name": "나우오족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 135,
+      "gatheringVal": 135,
+      "observationVal": 135,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001700,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 545,
+      "costItemAmount": 1,
+      "discoveryId": 70412356,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1056,
+        1056
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 160,
+      "negoGetGoodsPoint": 215
+    },
+    "70500057": {
+      "id": 70500057,
+      "name": "칼 카툰 구족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001700,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 650,
+      "costItemAmount": 1,
+      "discoveryId": 70412357,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1057,
+        1057
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 170,
+      "negoGetGoodsPoint": 230
+    },
+    "70500058": {
+      "id": 70500058,
+      "name": "마오리족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001700,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412358,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1058,
+        1058
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 200,
+      "negoGetGoodsPoint": 275
+    },
+    "70500059": {
+      "id": 70500059,
+      "name": "하와이 선주민의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 4,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12010100,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412359,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1059,
+        1059
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 1000,
+      "negoGetGoodsPoint": 1000
+    },
+    "70500060": {
+      "id": 70500060,
+      "name": "시과요족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 58,
+      "gatheringVal": 58,
+      "observationVal": 58,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 3,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001900,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 263,
+      "costItemAmount": 1,
+      "discoveryId": 70412360,
+      "itemRatio": 300,
+      "AdventureReward": 90134696,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1060,
+        1060
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 70,
+      "negoGetGoodsPoint": 80
+    },
+    "70500061": {
+      "id": 70500061,
+      "name": "야간족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000600,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412361,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1061,
+        1061
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 120,
+      "negoGetGoodsPoint": 155
+    },
+    "70500062": {
+      "id": 70500062,
+      "name": "극지, 신대륙의 남쪽",
+      "isBackcountry": true,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": false,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12011300,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412362,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1062,
+        1062
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 1000,
+      "negoGetGoodsPoint": 1000
+    },
+    "70500063": {
+      "id": 70500063,
+      "name": "극지, 아프리카의 남쪽",
+      "isBackcountry": true,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": false,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12010500,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412363,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1063,
+        1063
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 1000,
+      "negoGetGoodsPoint": 1000
+    },
+    "70500064": {
+      "id": 70500064,
+      "name": "사미족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 135,
+      "gatheringVal": 135,
+      "observationVal": 135,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001500,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 650,
+      "costItemAmount": 1,
+      "discoveryId": 70412364,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1064,
+        1064
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 190,
+      "negoGetGoodsPoint": 260
+    },
+    "70500065": {
+      "id": 70500065,
+      "name": "케트인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001504,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412365,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1065,
+        1065
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 1000,
+      "negoGetGoodsPoint": 1000
+    },
+    "70500066": {
+      "id": 70500066,
+      "name": "버뮤다 섬의 마을",
+      "isBackcountry": true,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 58,
+      "gatheringVal": 58,
+      "observationVal": 58,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 1,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": false,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001300,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412369,
+      "itemRatio": 300,
+      "AdventureReward": 90134696,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1066,
+        1066
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 200,
+      "negoGetGoodsPoint": 275
+    },
+    "70500067": {
+      "id": 70500067,
+      "name": "통가타푸 섬의 마을",
+      "isBackcountry": true,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 200,
+      "gatheringVal": 200,
+      "observationVal": 200,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 1,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": false,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12010700,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412370,
+      "itemRatio": 300,
+      "AdventureReward": 90134700,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1067,
+        1067
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 200,
+      "negoGetGoodsPoint": 275
+    },
+    "70500068": {
+      "id": 70500068,
+      "name": "데네인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001504,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412371,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1068,
+        1068
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 140,
+      "negoGetGoodsPoint": 185
+    },
+    "70500069": {
+      "id": 70500069,
+      "name": "툴레인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Sail_02_Sprite",
+      "exploreImage": "Illustration_Loading_Sail_02_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001504,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 336,
+      "costItemAmount": 1,
+      "discoveryId": 70412372,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1069,
+        1069
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 140,
+      "negoGetGoodsPoint": 185
+    },
+    "70500070": {
+      "id": 70500070,
+      "name": "싱할라족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12010200,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412374,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1070,
+        1070
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 200,
+      "negoGetGoodsPoint": 275
+    },
+    "70500071": {
+      "id": 70500071,
+      "name": "루시타니아인의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 5,
+      "gatheringVal": 5,
+      "observationVal": 5,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12000500,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412375,
+      "itemRatio": 300,
+      "AdventureReward": 90134694,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1071,
+        1071
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 5,
+      "negoGetGoodsPoint": 10
+    },
+    "70500072": {
+      "id": 70500072,
+      "name": "프랑크족의 마을",
+      "isBackcountry": false,
+      "backgroundMap": "M_Adventure_Grassland",
+      "consumeItemId": 23700001,
+      "advInitDay": 2,
+      "advMaxDay": 4,
+      "maxUseAdvItem": 5,
+      "combatVal": 73,
+      "gatheringVal": 73,
+      "observationVal": 73,
+      "randLandFeature": [
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": true
+        },
+        {
+          "Id": 77100000,
+          "Amount": 1,
+          "IsDuplicated": false
+        }
+      ],
+      "plunderLandFeatureGroupId": 77100000,
+      "exploreMode": 77700001,
+      "trainingMode": 77700002,
+      "plunderMode": 77700002,
+      "lv": 5,
+      "villageImage": "Illustration_Loading_Port_01_Sprite",
+      "exploreImage": "Illustration_Loading_Port_01_Sprite",
+      "plunderImage": "WT_Village_Plunder_01_Sprite",
+      "isInhabited": true,
+      "friendshipDefault": 40000,
+      "friendshipTimeMax": 60000,
+      "regionId": 12001200,
+      "favorTradeGoodsCategory": 0,
+      "favorTradeGoodsCategories": [
+        0,
+        0
+      ],
+      "costItemId": 23700001,
+      "advExpVal": 680,
+      "costItemAmount": 1,
+      "discoveryId": 70412378,
+      "itemRatio": 300,
+      "AdventureReward": 90134697,
+      "waterDropRate": 200,
+      "waterCountMin": 3,
+      "waterCountMax": 7,
+      "foodDropRate": 200,
+      "foodCountMin": 3,
+      "foodCountMax": 7,
+      "woodDropRate": 200,
+      "woodCountMin": 1,
+      "woodCountMax": 3,
+      "villageDiscoveryGroup": [
+        1072,
+        1072
+      ],
+      "exchangeCount": [
+        0,
+        0,
+        1,
+        2,
+        2,
+        3,
+        4
+      ],
+      "negoPricePoint": 5,
+      "negoGetGoodsPoint": 10
+    }
+  }
+}

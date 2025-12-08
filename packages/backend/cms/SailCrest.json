@@ -1876,9 +1876,9 @@
       "crestUiIcon": "Icon_Sail_Crest_Christmas0_Sprite",
       "isExposure": true,
       "applypointId": 100001,
-      "applypointval": 126500,
+      "applypointval": 20000,
       "unlockpointId": 100001,
-      "unlockpointval": 1009500,
+      "unlockpointval": 157500,
       "unlockitemsId": [
         23348105
       ],
@@ -2073,6 +2073,22 @@
       "unlockpointval": 19500,
       "unlockitemsId": [
         23348555
+      ],
+      "unlockitemsval": [
+        1
+      ]
+    },
+    "47100127": {
+      "id": 47100127,
+      "cresticon": "Texture_sail_Crest_CN_Bird",
+      "crestUiIcon": "Icon_sail_Crest_CN_Bird_Sprite",
+      "isExposure": false,
+      "applypointId": 100001,
+      "applypointval": 2500,
+      "unlockpointId": 100001,
+      "unlockpointval": 19500,
+      "unlockitemsId": [
+        23348558
       ],
       "unlockitemsval": [
         1

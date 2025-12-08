@@ -118,6 +118,10 @@
         {
           "maxLevel": "number",
           "rewardId": "number"
+        },
+        {
+          "maxLevel": "number",
+          "rewardId": "number"
         }
       ]
     },
@@ -135,6 +139,10 @@
         1
       ],
       "rewardGroup": [
+        {
+          "maxLevel": 1,
+          "rewardId": 1
+        },
         {
           "maxLevel": 1,
           "rewardId": 1
@@ -306,11 +314,17 @@
         },
         {
           "maxLevel": 1
+        },
+        {
+          "maxLevel": 1
         }
       ]
     },
     ":max": {
       "rewardGroup": [
+        {
+          "maxLevel": 1000
+        },
         {
           "maxLevel": 1000
         },
@@ -611,6 +625,14 @@
           "rewardId": [
             "Reward"
           ]
+        },
+        {
+          "maxLevel": [
+            "CompanyExp"
+          ],
+          "rewardId": [
+            "Reward"
+          ]
         }
       ]
     }
@@ -621,8 +643,8 @@
       "name": "북해",
       "dispatchGroup": 300,
       "majorTrandStartDate": 1670889600,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -732,8 +754,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -742,8 +768,8 @@
       "name": "동지중해",
       "dispatchGroup": 301,
       "majorTrandStartDate": 1672333200,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -853,8 +879,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -863,8 +893,8 @@
       "name": "서지중해 및 대서양",
       "dispatchGroup": 302,
       "majorTrandStartDate": 1673776800,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -974,8 +1004,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -984,8 +1018,8 @@
       "name": "아프리카 서부",
       "dispatchGroup": 303,
       "majorTrandStartDate": 1675220400,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -1095,8 +1129,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -1105,8 +1143,8 @@
       "name": "아프리카 남부",
       "dispatchGroup": 304,
       "majorTrandStartDate": 1676664000,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -1216,8 +1254,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -1226,8 +1268,8 @@
       "name": "아프리카 동부",
       "dispatchGroup": 305,
       "majorTrandStartDate": 1678107600,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -1337,8 +1379,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -1347,8 +1393,8 @@
       "name": "아라비아 및 서인도",
       "dispatchGroup": 306,
       "majorTrandStartDate": 1679551200,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -1458,8 +1504,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -1468,8 +1518,8 @@
       "name": "동인도 및 인도차이나",
       "dispatchGroup": 307,
       "majorTrandStartDate": 1680994800,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -1579,8 +1629,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -1589,8 +1643,8 @@
       "name": "남아시아",
       "dispatchGroup": 308,
       "majorTrandStartDate": 1682438400,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -1700,8 +1754,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -1710,8 +1768,8 @@
       "name": "동아시아",
       "dispatchGroup": 309,
       "majorTrandStartDate": 1683882000,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -1821,8 +1879,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -1831,8 +1893,8 @@
       "name": "극동아시아",
       "dispatchGroup": 310,
       "majorTrandStartDate": 1685325600,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -1942,8 +2004,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -1952,8 +2018,8 @@
       "name": "오세아니아",
       "dispatchGroup": 311,
       "majorTrandStartDate": 1686769200,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -2063,8 +2129,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -2073,8 +2143,8 @@
       "name": "오세아니아 동부",
       "dispatchGroup": 312,
       "majorTrandStartDate": 1688212800,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -2184,8 +2254,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -2194,8 +2268,8 @@
       "name": "북극해",
       "dispatchGroup": 313,
       "majorTrandStartDate": 1689656400,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -2305,8 +2379,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -2315,8 +2393,8 @@
       "name": "남아메리카",
       "dispatchGroup": 314,
       "majorTrandStartDate": 1691100000,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -2426,8 +2504,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -2436,8 +2518,8 @@
       "name": "아메리카 동부",
       "dispatchGroup": 315,
       "majorTrandStartDate": 1692543600,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -2547,8 +2629,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -2557,8 +2643,8 @@
       "name": "북아메리카 서부",
       "dispatchGroup": 316,
       "majorTrandStartDate": 1693987200,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -2668,8 +2754,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -2678,8 +2768,8 @@
       "name": "태평양",
       "dispatchGroup": 317,
       "majorTrandStartDate": 1695430800,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -2789,8 +2879,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     },
@@ -2799,8 +2893,8 @@
       "name": "남극해",
       "dispatchGroup": 318,
       "majorTrandStartDate": 1696874400,
-      "liveEvent": 99800184,
-      "liveEventReward": 90121356,
+      "liveEvent": 99809112,
+      "liveEventReward": 90121843,
       "smugglePoint": {
         "Rate": 500,
         "MinValue": 1,
@@ -2910,8 +3004,12 @@
           "rewardId": 90121357
         },
         {
-          "maxLevel": 200,
+          "maxLevel": 98,
           "rewardId": 90121615
+        },
+        {
+          "maxLevel": 200,
+          "rewardId": 90121835
         }
       ]
     }

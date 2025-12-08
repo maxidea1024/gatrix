@@ -1392,6 +1392,54 @@
       "isLinked": false,
       "obstacleType": 3,
       "totalObjectCheck": false
+    },
+    "60200054": {
+      "id": 60200054,
+      "name": "유령선 독안개",
+      "blueprint": "BP_BMO_PoisonFog",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000025,
+      "activationTiming": 2,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65501181,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": true,
+      "obstacleType": 1,
+      "totalObjectCheck": true
+    },
+    "60200055": {
+      "id": 60200055,
+      "name": "소용돌이",
+      "blueprint": "BP_BMO_Vortex_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000013,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65501186,
+          "Val2": 1000
+        }
+      ],
+      "passives": [
+        {
+          "Id": 67490013
+        },
+        {
+          "Id": 67490014
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
     }
   }
 }

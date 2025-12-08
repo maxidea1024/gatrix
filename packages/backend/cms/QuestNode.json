@@ -56698,6 +56698,18 @@
         89035131
       ]
     },
+    "83035131": {
+      "id": 83035131,
+      "name": "투자",
+      "script": "Joan_CN_05_03_1.json",
+      "blockScriptByMateCondition": false,
+      "needMateId": [
+        21200001
+      ],
+      "questGoalId": [
+        89035075
+      ]
+    },
     "83500001": {
       "id": 83500001,
       "script": "Union_PushDebt.json",
@@ -70850,7 +70862,7 @@
     },
     "83660083": {
       "id": 83660083,
-      "script": "SpecialSynthesis1_20_4.json",
+      "script": "SpecialSynthesis1_20_4_1.json",
       "blockScriptByMateCondition": true,
       "questGoalId": [
         89350095,
@@ -97900,6 +97912,710 @@
       "blockScriptByMateCondition": true,
       "questGoalId": [
         89701458
+      ]
+    },
+    "83851459": {
+      "id": 83851459,
+      "script": "2025Event_Halloween_Battle.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83851460": {
+      "id": 83851460,
+      "script": "Union_AccumBase2.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701459
+      ]
+    },
+    "83851461": {
+      "id": 83851461,
+      "script": "Union_AccumBase2.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701460
+      ]
+    },
+    "83851462": {
+      "id": 83851462,
+      "script": "Union_AccumBase2.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701461
+      ]
+    },
+    "83851463": {
+      "id": 83851463,
+      "script": "Union_AccumBase.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701462
+      ]
+    },
+    "83851464": {
+      "id": 83851464,
+      "script": "Union_AccumBase2.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701463
+      ]
+    },
+    "83851465": {
+      "id": 83851465,
+      "script": "Union_AccumBase2.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701464
+      ]
+    },
+    "83851466": {
+      "id": 83851466,
+      "script": "Union_AccumBase2.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701465
+      ]
+    },
+    "83851467": {
+      "id": 83851467,
+      "script": "Union_AccumBase.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701466
+      ]
+    },
+    "83851468": {
+      "id": 83851468,
+      "script": "Lighthouse_N46.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83851469": {
+      "id": 83851469,
+      "script": "Lighthouse_N50.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83851470": {
+      "id": 83851470,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701467
+      ]
+    },
+    "83851471": {
+      "id": 83851471,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701468
+      ]
+    },
+    "83851472": {
+      "id": 83851472,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701469
+      ]
+    },
+    "83851473": {
+      "id": 83851473,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701470
+      ]
+    },
+    "83851474": {
+      "id": 83851474,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701471
+      ]
+    },
+    "83851475": {
+      "id": 83851475,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701472
+      ]
+    },
+    "83851476": {
+      "id": 83851476,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701473
+      ]
+    },
+    "83851477": {
+      "id": 83851477,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701474
+      ]
+    },
+    "83851478": {
+      "id": 83851478,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701475
+      ]
+    },
+    "83851479": {
+      "id": 83851479,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701476
+      ]
+    },
+    "83851480": {
+      "id": 83851480,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701477
+      ]
+    },
+    "83851481": {
+      "id": 83851481,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701478
+      ]
+    },
+    "83851482": {
+      "id": 83851482,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701479
+      ]
+    },
+    "83851483": {
+      "id": 83851483,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701480
+      ]
+    },
+    "83851484": {
+      "id": 83851484,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701481
+      ]
+    },
+    "83851485": {
+      "id": 83851485,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701482
+      ]
+    },
+    "83851486": {
+      "id": 83851486,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701483
+      ]
+    },
+    "83851487": {
+      "id": 83851487,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701484
+      ]
+    },
+    "83851488": {
+      "id": 83851488,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701485
+      ]
+    },
+    "83851489": {
+      "id": 83851489,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701486
+      ]
+    },
+    "83851490": {
+      "id": 83851490,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701487
+      ]
+    },
+    "83851491": {
+      "id": 83851491,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701488
+      ]
+    },
+    "83851492": {
+      "id": 83851492,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701489
+      ]
+    },
+    "83851493": {
+      "id": 83851493,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701490
+      ]
+    },
+    "83851494": {
+      "id": 83851494,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701491
+      ]
+    },
+    "83851495": {
+      "id": 83851495,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701492
+      ]
+    },
+    "83851496": {
+      "id": 83851496,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701493
+      ]
+    },
+    "83851497": {
+      "id": 83851497,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701494
+      ]
+    },
+    "83851498": {
+      "id": 83851498,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701495
+      ]
+    },
+    "83851499": {
+      "id": 83851499,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701496
+      ]
+    },
+    "83851500": {
+      "id": 83851500,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701497
+      ]
+    },
+    "83851501": {
+      "id": 83851501,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701498
+      ]
+    },
+    "83851502": {
+      "id": 83851502,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701499
+      ]
+    },
+    "83851503": {
+      "id": 83851503,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701500
+      ]
+    },
+    "83851504": {
+      "id": 83851504,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701501
+      ]
+    },
+    "83851505": {
+      "id": 83851505,
+      "script": "2025Event_Halloween_Battle90.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83851506": {
+      "id": 83851506,
+      "script": "Lighthouse_O46.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83851507": {
+      "id": 83851507,
+      "script": "Lighthouse_O50.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83851508": {
+      "id": 83851508,
+      "script": "SpecialSynthesis_Battle.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83851509": {
+      "id": 83851509,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701502
+      ]
+    },
+    "83851510": {
+      "id": 83851510,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701503
+      ]
+    },
+    "83851511": {
+      "id": 83851511,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701504
+      ]
+    },
+    "83851512": {
+      "id": 83851512,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701505
+      ]
+    },
+    "83851513": {
+      "id": 83851513,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701506
+      ]
+    },
+    "83851514": {
+      "id": 83851514,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701507
+      ]
+    },
+    "83851515": {
+      "id": 83851515,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701508
+      ]
+    },
+    "83851516": {
+      "id": 83851516,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701509
+      ]
+    },
+    "83851517": {
+      "id": 83851517,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701510
+      ]
+    },
+    "83851518": {
+      "id": 83851518,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701511
+      ]
+    },
+    "83851519": {
+      "id": 83851519,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701512
+      ]
+    },
+    "83851520": {
+      "id": 83851520,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701513
+      ]
+    },
+    "83851521": {
+      "id": 83851521,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701514
+      ]
+    },
+    "83851522": {
+      "id": 83851522,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701515
+      ]
+    },
+    "83851523": {
+      "id": 83851523,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701516
+      ]
+    },
+    "83851524": {
+      "id": 83851524,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701517
+      ]
+    },
+    "83851525": {
+      "id": 83851525,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701518
+      ]
+    },
+    "83851526": {
+      "id": 83851526,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701519
+      ]
+    },
+    "83851527": {
+      "id": 83851527,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701520
+      ]
+    },
+    "83851528": {
+      "id": 83851528,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701521
+      ]
+    },
+    "83851529": {
+      "id": 83851529,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701522
+      ]
+    },
+    "83851530": {
+      "id": 83851530,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701523
+      ]
+    },
+    "83851531": {
+      "id": 83851531,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701524
+      ]
+    },
+    "83851532": {
+      "id": 83851532,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701525
+      ]
+    },
+    "83851533": {
+      "id": 83851533,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701526
+      ]
+    },
+    "83851534": {
+      "id": 83851534,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701527
+      ]
+    },
+    "83851535": {
+      "id": 83851535,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701528
+      ]
+    },
+    "83851536": {
+      "id": 83851536,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701529
+      ]
+    },
+    "83851537": {
+      "id": 83851537,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701530
+      ]
+    },
+    "83851538": {
+      "id": 83851538,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701531
+      ]
+    },
+    "83851539": {
+      "id": 83851539,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701532
+      ]
+    },
+    "83851540": {
+      "id": 83851540,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701533
+      ]
+    },
+    "83851541": {
+      "id": 83851541,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701534
+      ]
+    },
+    "83851542": {
+      "id": 83851542,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701535
+      ]
+    },
+    "83851543": {
+      "id": 83851543,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701536
+      ]
+    },
+    "83851544": {
+      "id": 83851544,
+      "script": "EliteCN_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701536
+      ]
+    },
+    "83851545": {
+      "id": 83851545,
+      "script": "EliteCN_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701536
+      ]
+    },
+    "83851546": {
+      "id": 83851546,
+      "script": "EliteCN_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701536
       ]
     },
     "83900001": {

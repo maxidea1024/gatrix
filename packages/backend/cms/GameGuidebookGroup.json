@@ -1,0 +1,131 @@
+{
+  ":GameGuidebookGroup": {
+    ":type": {
+      "id": "key",
+      "order": "number",
+      "guideMainTitle": "text"
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "GameGuidebookGroup": {
+    "1": {
+      "id": 1,
+      "order": 1,
+      "guideMainTitle": "기본"
+    },
+    "2": {
+      "id": 2,
+      "order": 2,
+      "guideMainTitle": "선단"
+    },
+    "3": {
+      "id": 3,
+      "order": 3,
+      "guideMainTitle": "함대"
+    },
+    "4": {
+      "id": 4,
+      "order": 4,
+      "guideMainTitle": "항해"
+    },
+    "5": {
+      "id": 5,
+      "order": 5,
+      "guideMainTitle": "국가"
+    },
+    "6": {
+      "id": 6,
+      "order": 6,
+      "guideMainTitle": "제독"
+    },
+    "7": {
+      "id": 7,
+      "order": 7,
+      "guideMainTitle": "항해사"
+    },
+    "8": {
+      "id": 8,
+      "order": 8,
+      "guideMainTitle": "선박"
+    },
+    "9": {
+      "id": 9,
+      "order": 9,
+      "guideMainTitle": "교역"
+    },
+    "10": {
+      "id": 10,
+      "order": 10,
+      "guideMainTitle": "전투"
+    },
+    "11": {
+      "id": 11,
+      "order": 11,
+      "guideMainTitle": "모험"
+    },
+    "12": {
+      "id": 12,
+      "order": 12,
+      "guideMainTitle": "지도"
+    },
+    "13": {
+      "id": 13,
+      "order": 13,
+      "guideMainTitle": "부품"
+    },
+    "14": {
+      "id": 14,
+      "order": 14,
+      "guideMainTitle": "장비"
+    },
+    "15": {
+      "id": 15,
+      "order": 15,
+      "guideMainTitle": "도시"
+    },
+    "16": {
+      "id": 16,
+      "order": 16,
+      "guideMainTitle": "투자"
+    },
+    "17": {
+      "id": 17,
+      "order": 17,
+      "guideMainTitle": "상회"
+    },
+    "18": {
+      "id": 18,
+      "order": 18,
+      "guideMainTitle": "생산"
+    },
+    "19": {
+      "id": 19,
+      "order": 19,
+      "guideMainTitle": "PVP"
+    },
+    "20": {
+      "id": 20,
+      "order": 20,
+      "guideMainTitle": "수집"
+    },
+    "21": {
+      "id": 21,
+      "order": 21,
+      "guideMainTitle": "도구"
+    },
+    "22": {
+      "id": 22,
+      "order": 22,
+      "guideMainTitle": "거래소"
+    },
+    "23": {
+      "id": 23,
+      "order": 23,
+      "guideMainTitle": "친구"
+    }
+  }
+}

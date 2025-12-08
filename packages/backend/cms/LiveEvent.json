@@ -21,6 +21,8 @@
       "name": 1,
       "loginBgmTag": 1,
       "loginVoiceSoundTag": 1,
+      "startDate": 1,
+      "endDate": 1,
       "localBitflag": 1,
       "isQuest": 1
     },
@@ -64,6 +66,23 @@
     }
   },
   "LiveEvent": {
+    "99800000": {
+      "id": 99800000,
+      "name": "테스트용",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2023/03/01/00:00:00",
+      "endDate": "2023/03/30/23:59:59",
+      "localBitflag": 127,
+      "isQuest": true,
+      "eventMateJob": [
+        21402003
+      ],
+      "eventMateBuffGradeC": 38090003,
+      "eventMateBuffGradeB": 38090004,
+      "eventMateBuffGradeA": 38090005,
+      "eventMateBuffGradeS": 38090006
+    },
     "99800001": {
       "id": 99800001,
       "name": "보름달에 소원을",
@@ -279,8 +298,8 @@
       "name": "전투 경쟁",
       "loginBgmTag": "Default",
       "loginVoiceSoundTag": "Default",
-      "startDate": "2025/10/01/00:00:00",
-      "endDate": "2025/10/07/23:59:59",
+      "startDate": "2025/10/29/00:00:00",
+      "endDate": "2025/11/04/23:59:59",
       "localBitflag": 31,
       "isQuest": false
     },
@@ -2943,6 +2962,586 @@
       "endDate": "2025/10/14/23:59:59",
       "localBitflag": 27,
       "isQuest": true
+    },
+    "99809079": {
+      "id": 99809079,
+      "name": "할로윈 육지 탐험",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/29/00:00:00",
+      "endDate": "2025/11/18/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99809080": {
+      "id": 99809080,
+      "name": "호박 소품 만들기",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/29/00:00:00",
+      "endDate": "2025/11/18/23:59:59",
+      "localBitflag": 27,
+      "isQuest": true
+    },
+    "99809081": {
+      "id": 99809081,
+      "name": "호박 스프의 달인",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/29/00:00:00",
+      "endDate": "2025/11/18/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99809082": {
+      "id": 99809082,
+      "name": "동방의 모험 경쟁전",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/05/00:00:00",
+      "endDate": "2025/11/11/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99809083": {
+      "id": 99809083,
+      "name": "4시즌_대모험36",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/29/18:00:00",
+      "endDate": "2025/10/29/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809084": {
+      "id": 99809084,
+      "name": "4시즌_대모험37",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/30/18:00:00",
+      "endDate": "2025/10/30/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809085": {
+      "id": 99809085,
+      "name": "4시즌_대모험38",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/31/18:00:00",
+      "endDate": "2025/10/31/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809086": {
+      "id": 99809086,
+      "name": "4시즌_대모험39",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/01/18:00:00",
+      "endDate": "2025/11/01/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809087": {
+      "id": 99809087,
+      "name": "4시즌_대모험40",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/02/18:00:00",
+      "endDate": "2025/11/02/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809088": {
+      "id": 99809088,
+      "name": "4시즌_대모험41",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/03/18:00:00",
+      "endDate": "2025/11/03/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809089": {
+      "id": 99809089,
+      "name": "4시즌_대모험42",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/04/18:00:00",
+      "endDate": "2025/11/04/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809090": {
+      "id": 99809090,
+      "name": "4시즌_대모험43",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/05/18:00:00",
+      "endDate": "2025/11/05/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809091": {
+      "id": 99809091,
+      "name": "4시즌_대모험44",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/06/18:00:00",
+      "endDate": "2025/11/06/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809092": {
+      "id": 99809092,
+      "name": "4시즌_대모험45",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/07/18:00:00",
+      "endDate": "2025/11/07/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809093": {
+      "id": 99809093,
+      "name": "4시즌_대모험46",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/08/18:00:00",
+      "endDate": "2025/11/08/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809094": {
+      "id": 99809094,
+      "name": "4시즌_대모험47",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/09/18:00:00",
+      "endDate": "2025/11/09/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809095": {
+      "id": 99809095,
+      "name": "4시즌_대모험48",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/10/18:00:00",
+      "endDate": "2025/11/10/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809096": {
+      "id": 99809096,
+      "name": "4시즌_대모험49",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/11/18:00:00",
+      "endDate": "2025/11/11/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809097": {
+      "id": 99809097,
+      "name": "4시즌_대모험50",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/12/18:00:00",
+      "endDate": "2025/11/12/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809098": {
+      "id": 99809098,
+      "name": "4시즌_대모험51",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/13/18:00:00",
+      "endDate": "2025/11/13/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809099": {
+      "id": 99809099,
+      "name": "4시즌_대모험52",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/14/18:00:00",
+      "endDate": "2025/11/14/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809100": {
+      "id": 99809100,
+      "name": "4시즌_대모험53",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/15/18:00:00",
+      "endDate": "2025/11/15/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809101": {
+      "id": 99809101,
+      "name": "4시즌_대모험54",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/16/18:00:00",
+      "endDate": "2025/11/16/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809102": {
+      "id": 99809102,
+      "name": "4시즌_대모험55",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/17/18:00:00",
+      "endDate": "2025/11/17/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809103": {
+      "id": 99809103,
+      "name": "4시즌_대모험56",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/18/18:00:00",
+      "endDate": "2025/11/18/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809104": {
+      "id": 99809104,
+      "name": "4시즌_대모험57",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/19/18:00:00",
+      "endDate": "2025/11/19/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809105": {
+      "id": 99809105,
+      "name": "4시즌_대모험58",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/20/18:00:00",
+      "endDate": "2025/11/20/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809106": {
+      "id": 99809106,
+      "name": "4시즌_대모험59",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/21/18:00:00",
+      "endDate": "2025/11/21/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809107": {
+      "id": 99809107,
+      "name": "4시즌_대모험60",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/22/18:00:00",
+      "endDate": "2025/11/22/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809108": {
+      "id": 99809108,
+      "name": "4시즌_대모험61",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/23/18:00:00",
+      "endDate": "2025/11/23/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809109": {
+      "id": 99809109,
+      "name": "4시즌_대모험62",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/24/18:00:00",
+      "endDate": "2025/11/24/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809110": {
+      "id": 99809110,
+      "name": "4시즌_대모험63",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/25/18:00:00",
+      "endDate": "2025/11/25/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809111": {
+      "id": 99809111,
+      "name": "할로윈 BGM",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/10/29/00:00:00",
+      "endDate": "2025/11/18/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99809112": {
+      "id": 99809112,
+      "name": "복권 이벤트",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/19/00:00:00",
+      "endDate": "2025/12/14/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809113": {
+      "id": 99809113,
+      "name": "동방의 모험 경쟁전",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/03/00:00:00",
+      "endDate": "2025/12/09/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99809114": {
+      "id": 99809114,
+      "name": "4시즌_대모험64",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/26/18:00:00",
+      "endDate": "2025/11/26/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809115": {
+      "id": 99809115,
+      "name": "4시즌_대모험65",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/27/18:00:00",
+      "endDate": "2025/11/27/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809116": {
+      "id": 99809116,
+      "name": "4시즌_대모험66",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/28/18:00:00",
+      "endDate": "2025/11/28/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809117": {
+      "id": 99809117,
+      "name": "4시즌_대모험67",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/29/18:00:00",
+      "endDate": "2025/11/29/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809118": {
+      "id": 99809118,
+      "name": "4시즌_대모험68",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/30/18:00:00",
+      "endDate": "2025/11/30/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809119": {
+      "id": 99809119,
+      "name": "4시즌_대모험69",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/01/18:00:00",
+      "endDate": "2025/12/01/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809120": {
+      "id": 99809120,
+      "name": "4시즌_대모험70",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/02/18:00:00",
+      "endDate": "2025/12/02/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809121": {
+      "id": 99809121,
+      "name": "4시즌_대모험71",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/03/18:00:00",
+      "endDate": "2025/12/03/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809122": {
+      "id": 99809122,
+      "name": "4시즌_대모험72",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/04/18:00:00",
+      "endDate": "2025/12/04/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809123": {
+      "id": 99809123,
+      "name": "4시즌_대모험73",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/05/18:00:00",
+      "endDate": "2025/12/05/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809124": {
+      "id": 99809124,
+      "name": "4시즌_대모험74",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/06/18:00:00",
+      "endDate": "2025/12/06/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809125": {
+      "id": 99809125,
+      "name": "4시즌_대모험75",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/07/18:00:00",
+      "endDate": "2025/12/07/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809126": {
+      "id": 99809126,
+      "name": "4시즌_대모험76",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/08/18:00:00",
+      "endDate": "2025/12/08/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809127": {
+      "id": 99809127,
+      "name": "4시즌_대모험77",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/09/18:00:00",
+      "endDate": "2025/12/09/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809128": {
+      "id": 99809128,
+      "name": "4시즌_대모험78",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/10/18:00:00",
+      "endDate": "2025/12/10/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809129": {
+      "id": 99809129,
+      "name": "4시즌_대모험79",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/11/18:00:00",
+      "endDate": "2025/12/11/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809130": {
+      "id": 99809130,
+      "name": "4시즌_대모험80",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/12/18:00:00",
+      "endDate": "2025/12/12/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809131": {
+      "id": 99809131,
+      "name": "4시즌_대모험81",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/13/18:00:00",
+      "endDate": "2025/12/13/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809132": {
+      "id": 99809132,
+      "name": "4시즌_대모험82",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/14/18:00:00",
+      "endDate": "2025/12/14/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809133": {
+      "id": 99809133,
+      "name": "4시즌_대모험83",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/15/18:00:00",
+      "endDate": "2025/12/15/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809134": {
+      "id": 99809134,
+      "name": "4시즌_대모험84",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/16/18:00:00",
+      "endDate": "2025/12/16/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809139": {
+      "id": 99809139,
+      "name": "북해의 모험 경쟁전",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2026/01/21/00:00:00",
+      "endDate": "2026/01/27/23:59:59",
+      "localBitflag": 192,
+      "isQuest": true
+    },
+    "99809146": {
+      "id": 99809146,
+      "name": "시즌 1",
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/12/26/00:00:00",
+      "endDate": "2026/01/29/23:59:59",
+      "localBitflag": 96,
+      "isQuest": false
     }
   }
 }

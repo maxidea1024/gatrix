@@ -6958,6 +6958,830 @@
           "Reward": 95961559
         }
       ]
+    },
+    "78290077": {
+      "id": 78290077,
+      "rankingRef": 79,
+      "termsDesc": "누적 전투의 증거",
+      "useGuildRank": true,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000150,
+      "eventRankingTermsTargets": [
+        23340012
+      ],
+      "achievementTermsId": 87000150,
+      "achievementTermsTargets": [
+        23340012
+      ],
+      "goals": [
+        {
+          "Count": 1000,
+          "Reward": 95961547
+        },
+        {
+          "Count": 3000,
+          "Reward": 95961548
+        },
+        {
+          "Count": 6000,
+          "Reward": 95961549
+        },
+        {
+          "Count": 12000,
+          "Reward": 95961550
+        },
+        {
+          "Count": 18000,
+          "Reward": 95961551
+        },
+        {
+          "Count": 24000,
+          "Reward": 95961552
+        },
+        {
+          "Count": 30000,
+          "Reward": 95961553
+        },
+        {
+          "Count": 41000,
+          "Reward": 95961554
+        },
+        {
+          "Count": 52000,
+          "Reward": 95961555
+        },
+        {
+          "Count": 75000,
+          "Reward": 95961558
+        }
+      ]
+    },
+    "78290078": {
+      "id": 78290078,
+      "rankingRef": 80,
+      "termsDesc": "누적 동방 모험 주화",
+      "useGuildRank": true,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000150,
+      "eventRankingTermsTargets": [
+        23340155
+      ],
+      "achievementTermsId": 87000150,
+      "achievementTermsTargets": [
+        23340155
+      ],
+      "goals": [
+        {
+          "Count": 500,
+          "Reward": 95961547
+        },
+        {
+          "Count": 1000,
+          "Reward": 95961548
+        },
+        {
+          "Count": 1500,
+          "Reward": 95961549
+        },
+        {
+          "Count": 2000,
+          "Reward": 95961550
+        },
+        {
+          "Count": 2500,
+          "Reward": 95961551
+        },
+        {
+          "Count": 3000,
+          "Reward": 95961552
+        },
+        {
+          "Count": 3500,
+          "Reward": 95961553
+        },
+        {
+          "Count": 4000,
+          "Reward": 95961554
+        },
+        {
+          "Count": 4500,
+          "Reward": 95961555
+        },
+        {
+          "Count": 5000,
+          "Reward": 95961557
+        }
+      ]
+    },
+    "78290079": {
+      "id": 78290079,
+      "rankingRef": 81,
+      "termsDesc": "가축 1회 최고 순이익",
+      "useGuildRank": true,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000171,
+      "eventRankingTermsTargets": [
+        2
+      ],
+      "achievementTermsId": 87000171,
+      "achievementTermsTargets": [
+        2
+      ],
+      "goals": [
+        {
+          "Count": 1000000,
+          "Reward": 95961547
+        },
+        {
+          "Count": 3000000,
+          "Reward": 95961548
+        },
+        {
+          "Count": 7000000,
+          "Reward": 95961549
+        },
+        {
+          "Count": 15000000,
+          "Reward": 95961550
+        },
+        {
+          "Count": 30000000,
+          "Reward": 95961551
+        },
+        {
+          "Count": 50000000,
+          "Reward": 95961552
+        },
+        {
+          "Count": 100000000,
+          "Reward": 95961553
+        },
+        {
+          "Count": 200000000,
+          "Reward": 95961554
+        },
+        {
+          "Count": 350000000,
+          "Reward": 95961555
+        },
+        {
+          "Count": 500000000,
+          "Reward": 95961556
+        }
+      ]
+    },
+    "78290080": {
+      "id": 78290080,
+      "rankingRef": 82,
+      "termsDesc": "누적 투자 금액",
+      "useGuildRank": true,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000017,
+      "achievementTermsId": 87000017,
+      "goals": [
+        {
+          "Count": 25000000,
+          "Reward": 95961547
+        },
+        {
+          "Count": 50000000,
+          "Reward": 95961548
+        },
+        {
+          "Count": 100000000,
+          "Reward": 95961549
+        },
+        {
+          "Count": 200000000,
+          "Reward": 95961550
+        },
+        {
+          "Count": 400000000,
+          "Reward": 95961551
+        },
+        {
+          "Count": 800000000,
+          "Reward": 95961552
+        },
+        {
+          "Count": 1500000000,
+          "Reward": 95961553
+        },
+        {
+          "Count": 2500000000,
+          "Reward": 95961554
+        },
+        {
+          "Count": 4000000000,
+          "Reward": 95961555
+        },
+        {
+          "Count": 7500000000,
+          "Reward": 95961559
+        }
+      ]
+    },
+    "78290081": {
+      "id": 78290081,
+      "rankingRef": 83,
+      "termsDesc": "누적 전투의 증거",
+      "useGuildRank": true,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000150,
+      "eventRankingTermsTargets": [
+        23340012
+      ],
+      "achievementTermsId": 87000150,
+      "achievementTermsTargets": [
+        23340012
+      ],
+      "goals": [
+        {
+          "Count": 1000,
+          "Reward": 95961547
+        },
+        {
+          "Count": 3000,
+          "Reward": 95961548
+        },
+        {
+          "Count": 6000,
+          "Reward": 95961549
+        },
+        {
+          "Count": 12000,
+          "Reward": 95961550
+        },
+        {
+          "Count": 18000,
+          "Reward": 95961551
+        },
+        {
+          "Count": 24000,
+          "Reward": 95961552
+        },
+        {
+          "Count": 30000,
+          "Reward": 95961553
+        },
+        {
+          "Count": 41000,
+          "Reward": 95961554
+        },
+        {
+          "Count": 52000,
+          "Reward": 95961555
+        },
+        {
+          "Count": 75000,
+          "Reward": 95961558
+        }
+      ]
+    },
+    "78290082": {
+      "id": 78290082,
+      "rankingRef": 84,
+      "termsDesc": "누적 동방 모험 주화",
+      "useGuildRank": true,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000150,
+      "eventRankingTermsTargets": [
+        23340155
+      ],
+      "achievementTermsId": 87000150,
+      "achievementTermsTargets": [
+        23340155
+      ],
+      "goals": [
+        {
+          "Count": 500,
+          "Reward": 95961547
+        },
+        {
+          "Count": 1000,
+          "Reward": 95961548
+        },
+        {
+          "Count": 1500,
+          "Reward": 95961549
+        },
+        {
+          "Count": 2000,
+          "Reward": 95961550
+        },
+        {
+          "Count": 2500,
+          "Reward": 95961551
+        },
+        {
+          "Count": 3000,
+          "Reward": 95961552
+        },
+        {
+          "Count": 3500,
+          "Reward": 95961553
+        },
+        {
+          "Count": 4000,
+          "Reward": 95961554
+        },
+        {
+          "Count": 4500,
+          "Reward": 95961555
+        },
+        {
+          "Count": 5000,
+          "Reward": 95961557
+        }
+      ]
+    },
+    "78290083": {
+      "id": 78290083,
+      "rankingRef": 85,
+      "termsDesc": "섬유 누적 순이익",
+      "useGuildRank": true,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000171,
+      "eventRankingTermsTargets": [
+        10
+      ],
+      "achievementTermsId": 87000171,
+      "achievementTermsTargets": [
+        10
+      ],
+      "goals": [
+        {
+          "Count": 1000000,
+          "Reward": 95961547
+        },
+        {
+          "Count": 3000000,
+          "Reward": 95961548
+        },
+        {
+          "Count": 7000000,
+          "Reward": 95961549
+        },
+        {
+          "Count": 15000000,
+          "Reward": 95961550
+        },
+        {
+          "Count": 30000000,
+          "Reward": 95961551
+        },
+        {
+          "Count": 50000000,
+          "Reward": 95961552
+        },
+        {
+          "Count": 100000000,
+          "Reward": 95961553
+        },
+        {
+          "Count": 200000000,
+          "Reward": 95961554
+        },
+        {
+          "Count": 350000000,
+          "Reward": 95961555
+        },
+        {
+          "Count": 500000000,
+          "Reward": 95961556
+        }
+      ]
+    },
+    "78290089": {
+      "id": 78290089,
+      "rankingRef": 91,
+      "termsDesc": "누적 거래 점수",
+      "useGuildRank": true,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000125,
+      "achievementTermsId": 87000125,
+      "goals": [
+        {
+          "Count": 1000,
+          "Reward": 95961685
+        },
+        {
+          "Count": 3000,
+          "Reward": 95961686
+        },
+        {
+          "Count": 7000,
+          "Reward": 95961687
+        },
+        {
+          "Count": 15000,
+          "Reward": 95961688
+        },
+        {
+          "Count": 30000,
+          "Reward": 95961689
+        },
+        {
+          "Count": 50000,
+          "Reward": 95961690
+        },
+        {
+          "Count": 100000,
+          "Reward": 95961691
+        },
+        {
+          "Count": 200000,
+          "Reward": 95961692
+        },
+        {
+          "Count": 350000,
+          "Reward": 95961693
+        },
+        {
+          "Count": 500000,
+          "Reward": 95961694
+        }
+      ]
+    },
+    "78290090": {
+      "id": 78290090,
+      "rankingRef": 92,
+      "termsDesc": "누적 투자 금액",
+      "useGuildRank": true,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000017,
+      "achievementTermsId": 87000017,
+      "goals": [
+        {
+          "Count": 25000,
+          "Reward": 95961685
+        },
+        {
+          "Count": 50000,
+          "Reward": 95961686
+        },
+        {
+          "Count": 100000,
+          "Reward": 95961687
+        },
+        {
+          "Count": 200000,
+          "Reward": 95961688
+        },
+        {
+          "Count": 400000,
+          "Reward": 95961689
+        },
+        {
+          "Count": 800000,
+          "Reward": 95961690
+        },
+        {
+          "Count": 1500000,
+          "Reward": 95961691
+        },
+        {
+          "Count": 2500000,
+          "Reward": 95961692
+        },
+        {
+          "Count": 4000000,
+          "Reward": 95961693
+        },
+        {
+          "Count": 7500000,
+          "Reward": 95961697
+        }
+      ]
+    },
+    "78290091": {
+      "id": 78290091,
+      "rankingRef": 93,
+      "termsDesc": "누적 전투의 증거",
+      "useGuildRank": true,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000150,
+      "eventRankingTermsTargets": [
+        23340012
+      ],
+      "achievementTermsId": 87000150,
+      "achievementTermsTargets": [
+        23340012
+      ],
+      "goals": [
+        {
+          "Count": 100,
+          "Reward": 95961685
+        },
+        {
+          "Count": 300,
+          "Reward": 95961686
+        },
+        {
+          "Count": 600,
+          "Reward": 95961687
+        },
+        {
+          "Count": 1200,
+          "Reward": 95961688
+        },
+        {
+          "Count": 1800,
+          "Reward": 95961689
+        },
+        {
+          "Count": 2400,
+          "Reward": 95961690
+        },
+        {
+          "Count": 3000,
+          "Reward": 95961691
+        },
+        {
+          "Count": 4100,
+          "Reward": 95961692
+        },
+        {
+          "Count": 5200,
+          "Reward": 95961693
+        },
+        {
+          "Count": 7500,
+          "Reward": 95961696
+        }
+      ]
+    },
+    "78290092": {
+      "id": 78290092,
+      "rankingRef": 94,
+      "termsDesc": "누적 북해의 모험 주화",
+      "useGuildRank": true,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000150,
+      "eventRankingTermsTargets": [
+        23340187
+      ],
+      "achievementTermsId": 87000150,
+      "achievementTermsTargets": [
+        23340187
+      ],
+      "goals": [
+        {
+          "Count": 500,
+          "Reward": 95961685
+        },
+        {
+          "Count": 1000,
+          "Reward": 95961686
+        },
+        {
+          "Count": 1500,
+          "Reward": 95961687
+        },
+        {
+          "Count": 2000,
+          "Reward": 95961688
+        },
+        {
+          "Count": 2500,
+          "Reward": 95961689
+        },
+        {
+          "Count": 3000,
+          "Reward": 95961690
+        },
+        {
+          "Count": 3500,
+          "Reward": 95961691
+        },
+        {
+          "Count": 4000,
+          "Reward": 95961692
+        },
+        {
+          "Count": 4500,
+          "Reward": 95961693
+        },
+        {
+          "Count": 5000,
+          "Reward": 95961695
+        }
+      ]
+    },
+    "78290093": {
+      "id": 78290093,
+      "rankingRef": 95,
+      "termsDesc": "전투력 경쟁",
+      "useGuildRank": false,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000173,
+      "achievementTermsId": 87000173,
+      "goals": [
+        {
+          "Count": 1000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 2000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 3000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 4000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 5000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 6000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 7000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 8000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 9000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 10000,
+          "Reward": 95961776
+        }
+      ]
+    },
+    "78290094": {
+      "id": 78290094,
+      "rankingRef": 96,
+      "termsDesc": "전투력 경쟁",
+      "useGuildRank": false,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000173,
+      "achievementTermsId": 87000173,
+      "goals": [
+        {
+          "Count": 11000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 12000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 13000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 14000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 15000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 16000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 17000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 18000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 19000,
+          "Reward": 95961776
+        },
+        {
+          "Count": 20000,
+          "Reward": 95961776
+        }
+      ]
+    },
+    "78290095": {
+      "id": 78290095,
+      "rankingRef": 97,
+      "termsDesc": "성장 경쟁",
+      "useGuildRank": false,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000001,
+      "achievementTermsId": 87000001,
+      "goals": [
+        {
+          "Count": 2,
+          "Reward": 95961777
+        },
+        {
+          "Count": 3,
+          "Reward": 95961777
+        },
+        {
+          "Count": 4,
+          "Reward": 95961777
+        },
+        {
+          "Count": 5,
+          "Reward": 95961777
+        },
+        {
+          "Count": 6,
+          "Reward": 95961777
+        },
+        {
+          "Count": 7,
+          "Reward": 95961777
+        },
+        {
+          "Count": 8,
+          "Reward": 95961777
+        },
+        {
+          "Count": 9,
+          "Reward": 95961777
+        },
+        {
+          "Count": 10,
+          "Reward": 95961777
+        }
+      ]
+    },
+    "78290096": {
+      "id": 78290096,
+      "rankingRef": 98,
+      "termsDesc": "성장 경쟁",
+      "useGuildRank": false,
+      "useNationRank": false,
+      "eventRankingTermsType": 1,
+      "eventRankingTermsId": 87000001,
+      "achievementTermsId": 87000001,
+      "goals": [
+        {
+          "Count": 11,
+          "Reward": 95961777
+        },
+        {
+          "Count": 12,
+          "Reward": 95961777
+        },
+        {
+          "Count": 13,
+          "Reward": 95961777
+        },
+        {
+          "Count": 14,
+          "Reward": 95961777
+        },
+        {
+          "Count": 15,
+          "Reward": 95961777
+        },
+        {
+          "Count": 16,
+          "Reward": 95961777
+        },
+        {
+          "Count": 17,
+          "Reward": 95961777
+        },
+        {
+          "Count": 18,
+          "Reward": 95961777
+        },
+        {
+          "Count": 19,
+          "Reward": 95961777
+        },
+        {
+          "Count": 20,
+          "Reward": 95961778
+        }
+      ]
     }
   }
 }

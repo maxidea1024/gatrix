@@ -27181,6 +27181,86 @@
       "setBaseAnchor": false,
       "battleMapLayerId": 69240001
     },
+    "64490105": {
+      "id": 64490105,
+      "name": "25년 할로윈 강적",
+      "levelName": "PVE_River1_01",
+      "tileMapName": "PVE_River1_01_Lighthouse",
+      "isReflectTopdown": false,
+      "bDriftByCurrent": false,
+      "bgm": 96000023,
+      "maxTurn": 20,
+      "BattleTurnBoostId": 66200005,
+      "weatherChangeTurn": 999,
+      "weatherChangeRate": 300,
+      "weatherStartType": 1,
+      "weatherStartId": 13200008,
+      "windChangeTurn": 999,
+      "windChangeRate": 300,
+      "windStartType": 0,
+      "windStartSpeed": 0,
+      "windStartDirection": 0,
+      "windRandDirectionMax": 1,
+      "windRandSpeedMax": 5,
+      "waveChangeTurn": 999,
+      "waveChangeRate": 300,
+      "wave": [
+        "Raid_MobyDick"
+      ],
+      "waveProb": [
+        100
+      ],
+      "currentChangeTurn": 999,
+      "currentChangeRate": 300,
+      "current": [
+        "PVE_River1_07"
+      ],
+      "currentProb": [
+        100
+      ],
+      "setBaseAnchor": false,
+      "battleMapLayerId": 69240001
+    },
+    "64490106": {
+      "id": 64490106,
+      "name": "엘리트 빅터 러셀 개편",
+      "levelName": "PVE_Bay_08",
+      "tileMapName": "PVE_Bay_08_NewElite03",
+      "isReflectTopdown": false,
+      "bDriftByCurrent": false,
+      "bgm": 96000023,
+      "maxTurn": 20,
+      "BattleTurnBoostId": 66200005,
+      "weatherChangeTurn": 999,
+      "weatherChangeRate": 300,
+      "weatherStartType": 1,
+      "weatherStartId": 13200008,
+      "windChangeTurn": 999,
+      "windChangeRate": 300,
+      "windStartType": 0,
+      "windStartSpeed": 0,
+      "windStartDirection": 0,
+      "windRandDirectionMax": 1,
+      "windRandSpeedMax": 5,
+      "waveChangeTurn": 999,
+      "waveChangeRate": 300,
+      "wave": [
+        "Raid_MobyDick"
+      ],
+      "waveProb": [
+        100
+      ],
+      "currentChangeTurn": 999,
+      "currentChangeRate": 300,
+      "current": [
+        "PVE_River1_07"
+      ],
+      "currentProb": [
+        100
+      ],
+      "setBaseAnchor": false,
+      "battleMapLayerId": 69240001
+    },
     "64499001": {
       "id": 64499001,
       "name": "토벌_에드워드_티치",
@@ -30160,6 +30240,166 @@
       "windChangeTurn": 999,
       "windChangeRate": 300,
       "windStartType": 0,
+      "windStartSpeed": 0,
+      "windStartDirection": 0,
+      "windRandDirectionMax": 1,
+      "windRandSpeedMax": 5,
+      "waveChangeTurn": 999,
+      "waveChangeRate": 300,
+      "wave": [
+        "Raid_MobyDick"
+      ],
+      "waveProb": [
+        100
+      ],
+      "currentChangeTurn": 999,
+      "currentChangeRate": 300,
+      "current": [
+        "PVE_River1_07"
+      ],
+      "currentProb": [
+        100
+      ],
+      "setBaseAnchor": false,
+      "battleMapLayerId": 69240001
+    },
+    "64499077": {
+      "id": 64499077,
+      "name": "폐허의 등대 N 46층",
+      "levelName": "PVE_River1_01",
+      "tileMapName": "PVE_River1_01_Lighthouse",
+      "isReflectTopdown": false,
+      "bDriftByCurrent": false,
+      "bgm": 96000023,
+      "maxTurn": 15,
+      "BattleTurnBoostId": 66200009,
+      "weatherChangeTurn": 999,
+      "weatherChangeRate": 300,
+      "weatherStartType": 1,
+      "weatherStartId": 13200000,
+      "windChangeTurn": 999,
+      "windChangeRate": 300,
+      "windStartType": 0,
+      "windStartSpeed": 0,
+      "windStartDirection": 0,
+      "windRandDirectionMax": 1,
+      "windRandSpeedMax": 5,
+      "waveChangeTurn": 999,
+      "waveChangeRate": 300,
+      "wave": [
+        "Raid_MobyDick"
+      ],
+      "waveProb": [
+        100
+      ],
+      "currentChangeTurn": 999,
+      "currentChangeRate": 300,
+      "current": [
+        "PVE_River1_07"
+      ],
+      "currentProb": [
+        100
+      ],
+      "setBaseAnchor": false,
+      "battleMapLayerId": 69240001
+    },
+    "64499078": {
+      "id": 64499078,
+      "name": "폐허의 등대 N 50층",
+      "levelName": "PVE_River1_01",
+      "tileMapName": "PVE_River1_01_Lighthouse",
+      "isReflectTopdown": false,
+      "bDriftByCurrent": false,
+      "bgm": 96000023,
+      "maxTurn": 15,
+      "BattleTurnBoostId": 66200009,
+      "weatherChangeTurn": 999,
+      "weatherChangeRate": 300,
+      "weatherStartType": 1,
+      "weatherStartId": 13200000,
+      "windChangeTurn": 999,
+      "windChangeRate": 300,
+      "windStartType": 0,
+      "windStartSpeed": 0,
+      "windStartDirection": 0,
+      "windRandDirectionMax": 1,
+      "windRandSpeedMax": 5,
+      "waveChangeTurn": 999,
+      "waveChangeRate": 300,
+      "wave": [
+        "Raid_MobyDick"
+      ],
+      "waveProb": [
+        100
+      ],
+      "currentChangeTurn": 999,
+      "currentChangeRate": 300,
+      "current": [
+        "PVE_River1_07"
+      ],
+      "currentProb": [
+        100
+      ],
+      "setBaseAnchor": false,
+      "battleMapLayerId": 69240001
+    },
+    "64499079": {
+      "id": 64499079,
+      "name": "폐허의 등대 O 46층",
+      "levelName": "PVE_River1_01",
+      "tileMapName": "PVE_River1_01_Lighthouse",
+      "isReflectTopdown": false,
+      "bDriftByCurrent": false,
+      "bgm": 96000023,
+      "maxTurn": 15,
+      "BattleTurnBoostId": 66200009,
+      "weatherChangeTurn": 999,
+      "weatherChangeRate": 300,
+      "weatherStartType": 1,
+      "weatherStartId": 13200013,
+      "windChangeTurn": 999,
+      "windChangeRate": 300,
+      "windStartType": 1,
+      "windStartSpeed": 0,
+      "windStartDirection": 0,
+      "windRandDirectionMax": 1,
+      "windRandSpeedMax": 5,
+      "waveChangeTurn": 999,
+      "waveChangeRate": 300,
+      "wave": [
+        "Raid_MobyDick"
+      ],
+      "waveProb": [
+        100
+      ],
+      "currentChangeTurn": 999,
+      "currentChangeRate": 300,
+      "current": [
+        "PVE_River1_07"
+      ],
+      "currentProb": [
+        100
+      ],
+      "setBaseAnchor": false,
+      "battleMapLayerId": 69240001
+    },
+    "64499080": {
+      "id": 64499080,
+      "name": "폐허의 등대 O 50층",
+      "levelName": "PVE_River1_01",
+      "tileMapName": "PVE_River1_01_Lighthouse",
+      "isReflectTopdown": false,
+      "bDriftByCurrent": false,
+      "bgm": 96000023,
+      "maxTurn": 15,
+      "BattleTurnBoostId": 66200009,
+      "weatherChangeTurn": 999,
+      "weatherChangeRate": 300,
+      "weatherStartType": 1,
+      "weatherStartId": 13200013,
+      "windChangeTurn": 999,
+      "windChangeRate": 300,
+      "windStartType": 1,
       "windStartSpeed": 0,
       "windStartDirection": 0,
       "windRandDirectionMax": 1,

@@ -2583,6 +2583,76 @@
       "assetType": 1,
       "detailMode": 1
     },
+    "46000315": {
+      "id": 46000315,
+      "partType": 1,
+      "assetName": "SK_Ship_GoldenChenggong_Sail",
+      "assetType": 1,
+      "detailMode": 1
+    },
+    "46000316": {
+      "id": 46000316,
+      "partType": 1,
+      "assetName": "SK_Ship_GoldenVasa_Sail",
+      "assetType": 1,
+      "detailMode": 1
+    },
+    "46000317": {
+      "id": 46000317,
+      "partType": 1,
+      "assetName": "SK_Ship_GoldenDeZeven_Sail",
+      "assetType": 1,
+      "detailMode": 1
+    },
+    "46000318": {
+      "id": 46000318,
+      "partType": 1,
+      "assetName": "SK_Ship_Avatar_R_Ghost_Sail",
+      "assetType": 1,
+      "detailMode": 1
+    },
+    "46000319": {
+      "id": 46000319,
+      "partType": 1,
+      "assetName": "SK_Ship_GoldenIngermanland_Sail",
+      "assetType": 1,
+      "detailMode": 1
+    },
+    "46000320": {
+      "id": 46000320,
+      "partType": 1,
+      "assetName": "SK_Ship_GloriousJunk_Sail",
+      "assetType": 1,
+      "detailMode": 1
+    },
+    "46000321": {
+      "id": 46000321,
+      "partType": 1,
+      "assetName": "SK_Ship_VictoriousJunk_Sail",
+      "assetType": 1,
+      "detailMode": 1
+    },
+    "46000322": {
+      "id": 46000322,
+      "partType": 1,
+      "assetName": "SK_Ship_SpecialJunk_Sail",
+      "assetType": 1,
+      "detailMode": 1
+    },
+    "46000323": {
+      "id": 46000323,
+      "partType": 1,
+      "assetName": "SK_Ship_Avatar_PresentOfChristmas_Sail",
+      "assetType": 1,
+      "detailMode": 1
+    },
+    "46000324": {
+      "id": 46000324,
+      "partType": 1,
+      "assetName": "SK_Ship_RedDragon_Sail",
+      "assetType": 1,
+      "detailMode": 1
+    },
     "46100001": {
       "id": 46100001,
       "partType": 2,
@@ -5985,6 +6055,15 @@
       "detailMode": 3,
       "drawDistance": 7000
     },
+    "46800008": {
+      "id": 46800008,
+      "partType": 105,
+      "assetName": "P_HalloweenGhostElite_Battle_Idle",
+      "assetType": 4,
+      "socket": "SK_Ship_Body_Bone",
+      "detailMode": 3,
+      "drawDistance": 7000
+    },
     "46900001": {
       "id": 46900001,
       "partType": 7,
@@ -6364,8 +6443,7 @@
       "drawDistance": 7000,
       "materials": [
         {
-          "index": 0,
-          "name": "M_BigFlagpole_3yearFlag_Inst"
+          "index": 0
         }
       ]
     },
@@ -6411,6 +6489,51 @@
         {
           "index": 0,
           "name": "M_BigFlagpole_InvestSeason4_03_Inst"
+        }
+      ]
+    },
+    "46900030": {
+      "id": 46900030,
+      "partType": 7,
+      "assetName": "SK_Ship_BackFlag_Default",
+      "assetType": 1,
+      "socket": "SOCKET_SK_Ship_Body_BackFlag",
+      "detailMode": 3,
+      "drawDistance": 7000,
+      "materials": [
+        {
+          "index": 0,
+          "name": "M_BigFlagpole_InvestSeason5_01_Inst"
+        }
+      ]
+    },
+    "46900031": {
+      "id": 46900031,
+      "partType": 7,
+      "assetName": "SK_Ship_BackFlag_Default",
+      "assetType": 1,
+      "socket": "SOCKET_SK_Ship_Body_BackFlag",
+      "detailMode": 3,
+      "drawDistance": 7000,
+      "materials": [
+        {
+          "index": 0,
+          "name": "M_BigFlagpole_InvestSeason5_02_Inst"
+        }
+      ]
+    },
+    "46900032": {
+      "id": 46900032,
+      "partType": 7,
+      "assetName": "SK_Ship_BackFlag_Default",
+      "assetType": 1,
+      "socket": "SOCKET_SK_Ship_Body_BackFlag",
+      "detailMode": 3,
+      "drawDistance": 7000,
+      "materials": [
+        {
+          "index": 0,
+          "name": "M_BigFlagpole_InvestSeason5_03_Inst"
         }
       ]
     }

@@ -1,0 +1,226 @@
+/**
+ * Internationalization for Gatrix Operations Dashboard
+ */
+
+const translations = {
+  en: {
+    refresh: 'Refresh',
+    quickActions: 'Quick Actions',
+    scalingPresets: 'Scaling Presets:',
+    minimal: 'Minimal',
+    standard: 'Standard',
+    high: 'High Traffic',
+    updateAll: 'Update All',
+    services: 'Services',
+    loading: 'Loading services...',
+    logs: 'Logs',
+    serviceLogs: 'Service Logs',
+    operationsLog: 'Operations Log',
+    waitingForOps: 'Waiting for operations...',
+    selectService: 'Select Service',
+    clear: 'Clear',
+    realtime: 'Realtime',
+    selectServiceToViewLogs: 'Select a service to view logs',
+    replicas: 'Replicas',
+    image: 'Image',
+    scale: 'Scale',
+    update: 'Update',
+    rollback: 'Rollback',
+    viewLogs: 'Logs',
+    tasks: 'Tasks',
+    version: 'Version',
+    tag: 'Tag',
+    healthy: 'Healthy',
+    partial: 'Partial',
+    unhealthy: 'Unhealthy',
+    confirmScale: 'Scale {service} to how many replicas?',
+    confirmUpdate: 'Update {service} to version:',
+    confirmRollback: 'Rollback {service} to previous version?',
+    confirmRollbackWithVersion: 'Rollback {service} to version {version}?',
+    selectVersionToRollback: 'Select version to rollback {service}:',
+    selectVersionToUpdate: 'Select version to update {service}:',
+    enterNewVersion: 'Or enter new version...',
+    noPreviousVersion: 'No previous version available for rollback',
+    confirmPreset: 'Apply {preset} scaling preset?',
+    current: 'Current',
+    success: 'Success',
+    error: 'Error',
+    operationSuccess: 'Operation completed successfully',
+    operationFailed: 'Operation failed',
+    scalingStarted: 'Scaling {service} to {replicas} replicas...',
+    scalingComplete: '{service} scaled to {replicas} replicas',
+    presetApplied: '{preset} preset applied',
+    allServicesUpdated: 'All services update initiated',
+    enterVersion: 'Please enter a version',
+    noServices: 'No services found',
+    serviceDetails: 'Service Details',
+    currentState: 'Current State',
+    desiredState: 'Desired State',
+    node: 'Node',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+    updating: 'Updating...',
+    rollingBack: 'Rolling back...',
+    updatingTo: 'Updating to {version}...',
+    rollingBackTo: 'Rolling back to {version}...',
+    scalingTo: 'Scaling to {replicas} replicas...',
+  },
+  ko: {
+    refresh: '새로고침',
+    quickActions: '빠른 작업',
+    scalingPresets: '스케일링 프리셋:',
+    minimal: '최소',
+    standard: '표준',
+    high: '고트래픽',
+    updateAll: '전체 업데이트',
+    services: '서비스',
+    loading: '서비스 로딩 중...',
+    logs: '로그',
+    serviceLogs: '서비스 로그',
+    operationsLog: '작업 로그',
+    waitingForOps: '작업 대기 중...',
+    selectService: '서비스 선택',
+    clear: '지우기',
+    realtime: '실시간',
+    selectServiceToViewLogs: '로그를 볼 서비스를 선택하세요',
+    replicas: '레플리카',
+    image: '이미지',
+    scale: '스케일',
+    update: '업데이트',
+    rollback: '롤백',
+    viewLogs: '로그',
+    tasks: '태스크',
+    version: '버전',
+    tag: '태그',
+    healthy: '정상',
+    partial: '부분',
+    unhealthy: '비정상',
+    confirmScale: '{service}를 몇 개의 레플리카로 조정할까요?',
+    confirmUpdate: '{service}를 어떤 버전으로 업데이트할까요:',
+    confirmRollback: '{service}를 이전 버전으로 롤백할까요?',
+    confirmRollbackWithVersion: '{service}를 버전 {version}으로 롤백할까요?',
+    selectVersionToRollback: '{service}를 롤백할 버전을 선택하세요:',
+    selectVersionToUpdate: '{service}를 업데이트할 버전을 선택하세요:',
+    enterNewVersion: '또는 새 버전을 입력하세요...',
+    noPreviousVersion: '롤백할 이전 버전이 없습니다',
+    confirmPreset: '{preset} 스케일링 프리셋을 적용할까요?',
+    current: '현재',
+    success: '성공',
+    error: '오류',
+    operationSuccess: '작업이 성공적으로 완료되었습니다',
+    operationFailed: '작업이 실패했습니다',
+    scalingStarted: '{service}를 {replicas}개로 스케일링 중...',
+    scalingComplete: '{service}가 {replicas}개로 스케일링 완료',
+    presetApplied: '{preset} 프리셋이 적용되었습니다',
+    allServicesUpdated: '전체 서비스 업데이트가 시작되었습니다',
+    enterVersion: '버전을 입력하세요',
+    noServices: '서비스를 찾을 수 없습니다',
+    serviceDetails: '서비스 상세',
+    currentState: '현재 상태',
+    desiredState: '원하는 상태',
+    node: '노드',
+    cancel: '취소',
+    confirm: '확인',
+    updating: '업데이트 중...',
+    rollingBack: '롤백 중...',
+    updatingTo: '{version}으로 업데이트 중...',
+    rollingBackTo: '{version}으로 롤백 중...',
+    scalingTo: '{replicas}개로 스케일링 중...',
+  },
+  zh: {
+    refresh: '刷新',
+    quickActions: '快速操作',
+    scalingPresets: '扩缩容预设:',
+    minimal: '最小',
+    standard: '标准',
+    high: '高流量',
+    updateAll: '全部更新',
+    services: '服务',
+    loading: '加载服务中...',
+    logs: '日志',
+    serviceLogs: '服务日志',
+    operationsLog: '操作日志',
+    waitingForOps: '等待操作...',
+    selectService: '选择服务',
+    clear: '清除',
+    realtime: '实时',
+    selectServiceToViewLogs: '选择服务以查看日志',
+    replicas: '副本',
+    image: '镜像',
+    scale: '扩缩',
+    update: '更新',
+    rollback: '回滚',
+    viewLogs: '日志',
+    tasks: '任务',
+    version: '版本',
+    tag: '标签',
+    healthy: '健康',
+    partial: '部分',
+    unhealthy: '不健康',
+    confirmScale: '将 {service} 扩缩到多少副本？',
+    confirmUpdate: '将 {service} 更新到版本:',
+    confirmRollback: '将 {service} 回滚到之前版本？',
+    confirmRollbackWithVersion: '将 {service} 回滚到版本 {version}？',
+    selectVersionToRollback: '选择要回滚 {service} 的版本：',
+    selectVersionToUpdate: '选择要更新 {service} 的版本：',
+    enterNewVersion: '或输入新版本...',
+    noPreviousVersion: '没有可回滚的之前版本',
+    confirmPreset: '应用 {preset} 扩缩容预设？',
+    current: '当前',
+    success: '成功',
+    error: '错误',
+    operationSuccess: '操作成功完成',
+    operationFailed: '操作失败',
+    scalingStarted: '正在将 {service} 扩展到 {replicas} 个副本...',
+    scalingComplete: '{service} 已扩展到 {replicas} 个副本',
+    presetApplied: '{preset} 预设已应用',
+    allServicesUpdated: '全部服务更新已启动',
+    enterVersion: '请输入版本',
+    noServices: '未找到服务',
+    serviceDetails: '服务详情',
+    currentState: '当前状态',
+    desiredState: '期望状态',
+    node: '节点',
+    cancel: '取消',
+    confirm: '确认',
+    updating: '更新中...',
+    rollingBack: '回滚中...',
+    updatingTo: '正在更新到 {version}...',
+    rollingBackTo: '正在回滚到 {version}...',
+    scalingTo: '正在扩展到 {replicas} 个副本...',
+  }
+};
+
+let currentLang = localStorage.getItem('lang') || 'en';
+
+function t(key, replacements = {}) {
+  let text = translations[currentLang][key] || translations.en[key] || key;
+  Object.entries(replacements).forEach(([k, v]) => {
+    text = text.replace(`{${k}}`, v);
+  });
+  return text;
+}
+
+function changeLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  updateI18n();
+  // Re-render dynamic content with forceRender to update localized texts
+  if (typeof loadServices === 'function') {
+    loadServices(true);
+  }
+}
+
+function updateI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  const langSelect = document.getElementById('langSelect');
+  if (langSelect) langSelect.value = currentLang;
+}
+
+// Initialize language on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateI18n();
+});
+

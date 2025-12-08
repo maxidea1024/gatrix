@@ -1,0 +1,1283 @@
+{
+  ":GuildBuff": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "category": "number",
+      "groupNo": "number",
+      "groupOrder": "number",
+      "guildLevelRequired": "number",
+      "getGuildResourceId": "number",
+      "getGuildResourceVal": "number",
+      "worldBuffId": "number",
+      "needDonation": [
+        {
+          "ItemId": "number",
+          "ItemVal": "number",
+          "Score": "number"
+        },
+        {
+          "ItemId": "number",
+          "ItemVal": "number",
+          "Score": "number"
+        },
+        {
+          "ItemId": "number",
+          "ItemVal": "number",
+          "Score": "number"
+        }
+      ]
+    },
+    ":required": {
+      "name": 1,
+      "category": 1
+    },
+    ":requiredInObject": {
+      "needDonation": [
+        {
+          "ItemId": 1,
+          "ItemVal": 1,
+          "Score": 1
+        },
+        {
+          "ItemId": 1,
+          "ItemVal": 1,
+          "Score": 1
+        },
+        {
+          "ItemId": 1,
+          "ItemVal": 1,
+          "Score": 1
+        }
+      ]
+    },
+    ":min": {
+      "category": 0,
+      "groupNo": 1500000,
+      "getGuildResourceId": 150000,
+      "worldBuffId": 38000000,
+      "needDonation": [
+        {
+          "ItemId": 23000000
+        },
+        {
+          "ItemId": 23000000
+        },
+        {
+          "ItemId": 23000000
+        }
+      ]
+    },
+    ":max": {
+      "category": 3,
+      "groupNo": 1599999,
+      "getGuildResourceId": 199999,
+      "worldBuffId": 38099999,
+      "needDonation": [
+        {
+          "ItemId": 23999999
+        },
+        {
+          "ItemId": 23999999
+        },
+        {
+          "ItemId": 23999999
+        }
+      ]
+    },
+    ":enum": {},
+    ":asset": {},
+    ":links": {
+      "groupNo": [
+        "GuildBuff"
+      ],
+      "getGuildResourceId": [
+        "GuildResource"
+      ],
+      "worldBuffId": [
+        "WorldBuff"
+      ],
+      "needDonation": [
+        {
+          "ItemId": [
+            "Item"
+          ]
+        },
+        {
+          "ItemId": [
+            "Item"
+          ]
+        },
+        {
+          "ItemId": [
+            "Item"
+          ]
+        }
+      ]
+    }
+  },
+  "GuildBuff": {
+    "1500000": {
+      "id": 1500000,
+      "name": "하자 확인 LV1",
+      "category": 2,
+      "groupNo": 1500000,
+      "groupOrder": 1,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 30000,
+      "worldBuffId": 38097022
+    },
+    "1500001": {
+      "id": 1500001,
+      "name": "하자 확인 LV2",
+      "category": 2,
+      "groupNo": 1500000,
+      "groupOrder": 2,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 33000,
+      "worldBuffId": 38097057,
+      "needDonation": [
+        {
+          "ItemId": 23420010,
+          "ItemVal": 1500,
+          "Score": 2
+        },
+        {
+          "ItemId": 23420037,
+          "ItemVal": 4000,
+          "Score": 2
+        }
+      ]
+    },
+    "1500002": {
+      "id": 1500002,
+      "name": "하자 확인 LV3",
+      "category": 2,
+      "groupNo": 1500000,
+      "groupOrder": 3,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 36000,
+      "worldBuffId": 38097058,
+      "needDonation": [
+        {
+          "ItemId": 23420004,
+          "ItemVal": 300,
+          "Score": 4
+        },
+        {
+          "ItemId": 23421023,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500004": {
+      "id": 1500004,
+      "name": "물리적 협상 LV1",
+      "category": 2,
+      "groupNo": 1500004,
+      "groupOrder": 1,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 30000,
+      "worldBuffId": 38097023
+    },
+    "1500005": {
+      "id": 1500005,
+      "name": "물리적 협상 LV2",
+      "category": 2,
+      "groupNo": 1500004,
+      "groupOrder": 2,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 33000,
+      "worldBuffId": 38097060,
+      "needDonation": [
+        {
+          "ItemId": 23420022,
+          "ItemVal": 1500,
+          "Score": 2
+        },
+        {
+          "ItemId": 23421026,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500006": {
+      "id": 1500006,
+      "name": "물리적 협상 LV3",
+      "category": 2,
+      "groupNo": 1500004,
+      "groupOrder": 3,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 36000,
+      "worldBuffId": 38097061,
+      "needDonation": [
+        {
+          "ItemId": 23420007,
+          "ItemVal": 300,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421022,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500008": {
+      "id": 1500008,
+      "name": "꼼꼼한 준비 LV1",
+      "category": 2,
+      "groupNo": 1500008,
+      "groupOrder": 1,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 30000,
+      "worldBuffId": 38097024
+    },
+    "1500009": {
+      "id": 1500009,
+      "name": "꼼꼼한 준비 LV2",
+      "category": 2,
+      "groupNo": 1500008,
+      "groupOrder": 2,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 33000,
+      "worldBuffId": 38097063,
+      "needDonation": [
+        {
+          "ItemId": 23420034,
+          "ItemVal": 1500,
+          "Score": 2
+        },
+        {
+          "ItemId": 23421024,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500010": {
+      "id": 1500010,
+      "name": "꼼꼼한 준비 LV3",
+      "category": 2,
+      "groupNo": 1500008,
+      "groupOrder": 3,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 36000,
+      "worldBuffId": 38097064,
+      "needDonation": [
+        {
+          "ItemId": 23420019,
+          "ItemVal": 300,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421019,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500012": {
+      "id": 1500012,
+      "name": "상품 관리 LV1",
+      "category": 2,
+      "groupNo": 1500012,
+      "groupOrder": 1,
+      "guildLevelRequired": 5,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 50000,
+      "worldBuffId": 38097025
+    },
+    "1500013": {
+      "id": 1500013,
+      "name": "상품 관리 LV2",
+      "category": 2,
+      "groupNo": 1500012,
+      "groupOrder": 2,
+      "guildLevelRequired": 5,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 60000,
+      "worldBuffId": 38097066,
+      "needDonation": [
+        {
+          "ItemId": 23421015,
+          "ItemVal": 2000,
+          "Score": 4
+        },
+        {
+          "ItemId": 23421016,
+          "ItemVal": 5000,
+          "Score": 3
+        }
+      ]
+    },
+    "1500018": {
+      "id": 1500018,
+      "name": "상인의 간파 LV1",
+      "category": 2,
+      "groupNo": 1500018,
+      "groupOrder": 1,
+      "guildLevelRequired": 7,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 70000,
+      "worldBuffId": 38097027
+    },
+    "1500019": {
+      "id": 1500019,
+      "name": "상인의 간파 LV2",
+      "category": 2,
+      "groupNo": 1500018,
+      "groupOrder": 2,
+      "guildLevelRequired": 7,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 77000,
+      "worldBuffId": 38097070,
+      "needDonation": [
+        {
+          "ItemId": 23420020,
+          "ItemVal": 2000,
+          "Score": 3
+        },
+        {
+          "ItemId": 23420038,
+          "ItemVal": 6000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500020": {
+      "id": 1500020,
+      "name": "상인의 간파 LV3",
+      "category": 2,
+      "groupNo": 1500018,
+      "groupOrder": 3,
+      "guildLevelRequired": 7,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 84000,
+      "worldBuffId": 38097071,
+      "needDonation": [
+        {
+          "ItemId": 23420029,
+          "ItemVal": 400,
+          "Score": 4
+        },
+        {
+          "ItemId": 23420008,
+          "ItemVal": 2000,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421017,
+          "ItemVal": 6000,
+          "Score": 2
+        }
+      ]
+    },
+    "1500027": {
+      "id": 1500027,
+      "name": "내적 친밀감 LV1",
+      "category": 2,
+      "groupNo": 1500027,
+      "groupOrder": 1,
+      "guildLevelRequired": 9,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 90000,
+      "worldBuffId": 38097030
+    },
+    "1500029": {
+      "id": 1500029,
+      "name": "상회의 위세 LV1",
+      "category": 2,
+      "groupNo": 1500029,
+      "groupOrder": 1,
+      "guildLevelRequired": 10,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 100000,
+      "worldBuffId": 38097031
+    },
+    "1500030": {
+      "id": 1500030,
+      "name": "상회의 위세 LV2",
+      "category": 2,
+      "groupNo": 1500029,
+      "groupOrder": 2,
+      "guildLevelRequired": 10,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 110000,
+      "worldBuffId": 38097077,
+      "needDonation": [
+        {
+          "ItemId": 23420020,
+          "ItemVal": 2500,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421025,
+          "ItemVal": 8000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500031": {
+      "id": 1500031,
+      "name": "상회의 위세 LV3",
+      "category": 2,
+      "groupNo": 1500029,
+      "groupOrder": 3,
+      "guildLevelRequired": 10,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 120000,
+      "worldBuffId": 38097078,
+      "needDonation": [
+        {
+          "ItemId": 23420030,
+          "ItemVal": 500,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421001,
+          "ItemVal": 2500,
+          "Score": 1
+        }
+      ]
+    },
+    "1500033": {
+      "id": 1500033,
+      "name": "상인의 통찰 LV1",
+      "category": 2,
+      "groupNo": 1500033,
+      "groupOrder": 1,
+      "guildLevelRequired": 11,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 110000,
+      "worldBuffId": 38097032
+    },
+    "1500034": {
+      "id": 1500034,
+      "name": "상인의 통찰 LV2",
+      "category": 2,
+      "groupNo": 1500033,
+      "groupOrder": 2,
+      "guildLevelRequired": 11,
+      "getGuildResourceId": 150001,
+      "getGuildResourceVal": 16500,
+      "worldBuffId": 38097080,
+      "needDonation": [
+        {
+          "ItemId": 23421004,
+          "ItemVal": 100,
+          "Score": 2
+        },
+        {
+          "ItemId": 23421006,
+          "ItemVal": 500,
+          "Score": 4
+        },
+        {
+          "ItemId": 23420021,
+          "ItemVal": 2500,
+          "Score": 3
+        }
+      ]
+    },
+    "1500035": {
+      "id": 1500035,
+      "name": "재력 추구 LV1",
+      "category": 1,
+      "groupNo": 1500035,
+      "groupOrder": 1,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 30000,
+      "worldBuffId": 38097011
+    },
+    "1500036": {
+      "id": 1500036,
+      "name": "재력 추구 LV2",
+      "category": 1,
+      "groupNo": 1500035,
+      "groupOrder": 2,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 33000,
+      "worldBuffId": 38097081,
+      "needDonation": [
+        {
+          "ItemId": 23420010,
+          "ItemVal": 1500,
+          "Score": 2
+        },
+        {
+          "ItemId": 23420037,
+          "ItemVal": 4000,
+          "Score": 2
+        }
+      ]
+    },
+    "1500037": {
+      "id": 1500037,
+      "name": "재력 추구 LV3",
+      "category": 1,
+      "groupNo": 1500035,
+      "groupOrder": 3,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 36000,
+      "worldBuffId": 38097082,
+      "needDonation": [
+        {
+          "ItemId": 23420004,
+          "ItemVal": 300,
+          "Score": 4
+        },
+        {
+          "ItemId": 23421023,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500039": {
+      "id": 1500039,
+      "name": "탐험 초급 교본 LV1",
+      "category": 1,
+      "groupNo": 1500039,
+      "groupOrder": 1,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 30000,
+      "worldBuffId": 38097012
+    },
+    "1500040": {
+      "id": 1500040,
+      "name": "탐험 초급 교본 LV2",
+      "category": 1,
+      "groupNo": 1500039,
+      "groupOrder": 2,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 33000,
+      "worldBuffId": 38097084,
+      "needDonation": [
+        {
+          "ItemId": 23420022,
+          "ItemVal": 1500,
+          "Score": 2
+        },
+        {
+          "ItemId": 23421026,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500041": {
+      "id": 1500041,
+      "name": "탐험 초급 교본 LV3",
+      "category": 1,
+      "groupNo": 1500039,
+      "groupOrder": 3,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 36000,
+      "worldBuffId": 38097085,
+      "needDonation": [
+        {
+          "ItemId": 23420007,
+          "ItemVal": 300,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421022,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500043": {
+      "id": 1500043,
+      "name": "어망 도입 LV1",
+      "category": 1,
+      "groupNo": 1500043,
+      "groupOrder": 1,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 30000,
+      "worldBuffId": 38097013
+    },
+    "1500044": {
+      "id": 1500044,
+      "name": "어망 도입 LV2",
+      "category": 1,
+      "groupNo": 1500043,
+      "groupOrder": 2,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 33000,
+      "worldBuffId": 38097087,
+      "needDonation": [
+        {
+          "ItemId": 23420034,
+          "ItemVal": 1500,
+          "Score": 2
+        },
+        {
+          "ItemId": 23421024,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500045": {
+      "id": 1500045,
+      "name": "어망 도입 LV3",
+      "category": 1,
+      "groupNo": 1500043,
+      "groupOrder": 3,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 36000,
+      "worldBuffId": 38097088,
+      "needDonation": [
+        {
+          "ItemId": 23420019,
+          "ItemVal": 300,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421019,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500047": {
+      "id": 1500047,
+      "name": "부유물 수집 LV1",
+      "category": 1,
+      "groupNo": 1500047,
+      "groupOrder": 1,
+      "guildLevelRequired": 5,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 50000,
+      "worldBuffId": 38097014
+    },
+    "1500048": {
+      "id": 1500048,
+      "name": "부유물 수집 LV2",
+      "category": 1,
+      "groupNo": 1500047,
+      "groupOrder": 2,
+      "guildLevelRequired": 5,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 60000,
+      "worldBuffId": 38097090,
+      "needDonation": [
+        {
+          "ItemId": 23421015,
+          "ItemVal": 2000,
+          "Score": 4
+        },
+        {
+          "ItemId": 23421016,
+          "ItemVal": 5000,
+          "Score": 3
+        }
+      ]
+    },
+    "1500049": {
+      "id": 1500049,
+      "name": "부유물 수집 LV3",
+      "category": 1,
+      "groupNo": 1500047,
+      "groupOrder": 3,
+      "guildLevelRequired": 5,
+      "getGuildResourceId": 150001,
+      "getGuildResourceVal": 7500,
+      "worldBuffId": 38097091,
+      "needDonation": [
+        {
+          "ItemId": 23420029,
+          "ItemVal": 400,
+          "Score": 4
+        },
+        {
+          "ItemId": 23420009,
+          "ItemVal": 2000,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421018,
+          "ItemVal": 5000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500053": {
+      "id": 1500053,
+      "name": "탐험 중급 교본 LV1",
+      "category": 1,
+      "groupNo": 1500053,
+      "groupOrder": 1,
+      "guildLevelRequired": 7,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 70000,
+      "worldBuffId": 38097016
+    },
+    "1500054": {
+      "id": 1500054,
+      "name": "탐험 중급 교본 LV2",
+      "category": 1,
+      "groupNo": 1500053,
+      "groupOrder": 2,
+      "guildLevelRequired": 7,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 77000,
+      "worldBuffId": 38097094,
+      "needDonation": [
+        {
+          "ItemId": 23420020,
+          "ItemVal": 2000,
+          "Score": 3
+        },
+        {
+          "ItemId": 23420038,
+          "ItemVal": 6000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500055": {
+      "id": 1500055,
+      "name": "탐험 중급 교본 LV3",
+      "category": 1,
+      "groupNo": 1500053,
+      "groupOrder": 3,
+      "guildLevelRequired": 7,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 84000,
+      "worldBuffId": 38097095,
+      "needDonation": [
+        {
+          "ItemId": 23421008,
+          "ItemVal": 400,
+          "Score": 3
+        },
+        {
+          "ItemId": 23420008,
+          "ItemVal": 2000,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421017,
+          "ItemVal": 6000,
+          "Score": 2
+        }
+      ]
+    },
+    "1500059": {
+      "id": 1500059,
+      "name": "식수 공수 LV1",
+      "category": 1,
+      "groupNo": 1500059,
+      "groupOrder": 1,
+      "guildLevelRequired": 9,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 90000,
+      "worldBuffId": 38097018
+    },
+    "1500060": {
+      "id": 1500060,
+      "name": "식수 공수 LV2",
+      "category": 1,
+      "groupNo": 1500059,
+      "groupOrder": 2,
+      "guildLevelRequired": 9,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 108000,
+      "worldBuffId": 38097098,
+      "needDonation": [
+        {
+          "ItemId": 23421015,
+          "ItemVal": 2500,
+          "Score": 4
+        },
+        {
+          "ItemId": 23421020,
+          "ItemVal": 7000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500062": {
+      "id": 1500062,
+      "name": "월척의 대가 LV1",
+      "category": 1,
+      "groupNo": 1500062,
+      "groupOrder": 1,
+      "guildLevelRequired": 9,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 90000,
+      "worldBuffId": 38097019
+    },
+    "1500064": {
+      "id": 1500064,
+      "name": "탐험 상급 교본 LV1",
+      "category": 1,
+      "groupNo": 1500064,
+      "groupOrder": 1,
+      "guildLevelRequired": 10,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 100000,
+      "worldBuffId": 38097020
+    },
+    "1500065": {
+      "id": 1500065,
+      "name": "탐험 상급 교본 LV2",
+      "category": 1,
+      "groupNo": 1500064,
+      "groupOrder": 2,
+      "guildLevelRequired": 10,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 110000,
+      "worldBuffId": 38097101,
+      "needDonation": [
+        {
+          "ItemId": 23420020,
+          "ItemVal": 2500,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421025,
+          "ItemVal": 8000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500066": {
+      "id": 1500066,
+      "name": "탐험 상급 교본 LV3",
+      "category": 1,
+      "groupNo": 1500064,
+      "groupOrder": 3,
+      "guildLevelRequired": 10,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 120000,
+      "worldBuffId": 38097102,
+      "needDonation": [
+        {
+          "ItemId": 23420016,
+          "ItemVal": 500,
+          "Score": 4
+        },
+        {
+          "ItemId": 23421001,
+          "ItemVal": 2500,
+          "Score": 1
+        }
+      ]
+    },
+    "1500068": {
+      "id": 1500068,
+      "name": "빠른 항해 LV1",
+      "category": 1,
+      "groupNo": 1500068,
+      "groupOrder": 1,
+      "guildLevelRequired": 11,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 110000,
+      "worldBuffId": 38097021
+    },
+    "1500070": {
+      "id": 1500070,
+      "name": "포격 강화 LV1",
+      "category": 3,
+      "groupNo": 1500070,
+      "groupOrder": 1,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 30000,
+      "worldBuffId": 38097000
+    },
+    "1500071": {
+      "id": 1500071,
+      "name": "포격 강화 LV2",
+      "category": 3,
+      "groupNo": 1500070,
+      "groupOrder": 2,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 33000,
+      "worldBuffId": 38097033,
+      "needDonation": [
+        {
+          "ItemId": 23420010,
+          "ItemVal": 1500,
+          "Score": 2
+        },
+        {
+          "ItemId": 23420037,
+          "ItemVal": 4000,
+          "Score": 2
+        }
+      ]
+    },
+    "1500072": {
+      "id": 1500072,
+      "name": "포격 강화 LV3",
+      "category": 3,
+      "groupNo": 1500070,
+      "groupOrder": 3,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 36000,
+      "worldBuffId": 38097034,
+      "needDonation": [
+        {
+          "ItemId": 23420004,
+          "ItemVal": 300,
+          "Score": 4
+        },
+        {
+          "ItemId": 23421023,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500074": {
+      "id": 1500074,
+      "name": "백병 강화 LV1",
+      "category": 3,
+      "groupNo": 1500074,
+      "groupOrder": 1,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 30000,
+      "worldBuffId": 38097001
+    },
+    "1500075": {
+      "id": 1500075,
+      "name": "백병 강화 LV2",
+      "category": 3,
+      "groupNo": 1500074,
+      "groupOrder": 2,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 33000,
+      "worldBuffId": 38097036,
+      "needDonation": [
+        {
+          "ItemId": 23420022,
+          "ItemVal": 1500,
+          "Score": 2
+        },
+        {
+          "ItemId": 23421026,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500076": {
+      "id": 1500076,
+      "name": "백병 강화 LV3",
+      "category": 3,
+      "groupNo": 1500074,
+      "groupOrder": 3,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 36000,
+      "worldBuffId": 38097037,
+      "needDonation": [
+        {
+          "ItemId": 23420007,
+          "ItemVal": 300,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421022,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500078": {
+      "id": 1500078,
+      "name": "충파 강화 LV1",
+      "category": 3,
+      "groupNo": 1500078,
+      "groupOrder": 1,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 30000,
+      "worldBuffId": 38097002
+    },
+    "1500079": {
+      "id": 1500079,
+      "name": "충파 강화 LV2",
+      "category": 3,
+      "groupNo": 1500078,
+      "groupOrder": 2,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 33000,
+      "worldBuffId": 38097039,
+      "needDonation": [
+        {
+          "ItemId": 23420034,
+          "ItemVal": 1500,
+          "Score": 2
+        },
+        {
+          "ItemId": 23421024,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500080": {
+      "id": 1500080,
+      "name": "충파 강화 LV3",
+      "category": 3,
+      "groupNo": 1500078,
+      "groupOrder": 3,
+      "guildLevelRequired": 3,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 36000,
+      "worldBuffId": 38097040,
+      "needDonation": [
+        {
+          "ItemId": 23420019,
+          "ItemVal": 300,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421019,
+          "ItemVal": 4000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500082": {
+      "id": 1500082,
+      "name": "수화물 포격 LV1",
+      "category": 3,
+      "groupNo": 1500082,
+      "groupOrder": 1,
+      "guildLevelRequired": 5,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 50000,
+      "worldBuffId": 38097003
+    },
+    "1500083": {
+      "id": 1500083,
+      "name": "수화물 포격 LV2",
+      "category": 3,
+      "groupNo": 1500082,
+      "groupOrder": 2,
+      "guildLevelRequired": 5,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 60000,
+      "worldBuffId": 38097042,
+      "needDonation": [
+        {
+          "ItemId": 23421015,
+          "ItemVal": 2000,
+          "Score": 4
+        },
+        {
+          "ItemId": 23421016,
+          "ItemVal": 5000,
+          "Score": 3
+        }
+      ]
+    },
+    "1500088": {
+      "id": 1500088,
+      "name": "명중 강화 LV1",
+      "category": 3,
+      "groupNo": 1500088,
+      "groupOrder": 1,
+      "guildLevelRequired": 7,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 70000,
+      "worldBuffId": 38097005
+    },
+    "1500089": {
+      "id": 1500089,
+      "name": "명중 강화 LV2",
+      "category": 3,
+      "groupNo": 1500088,
+      "groupOrder": 2,
+      "guildLevelRequired": 7,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 77000,
+      "worldBuffId": 38097046,
+      "needDonation": [
+        {
+          "ItemId": 23420020,
+          "ItemVal": 2000,
+          "Score": 3
+        },
+        {
+          "ItemId": 23420038,
+          "ItemVal": 6000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500090": {
+      "id": 1500090,
+      "name": "명중 강화 LV3",
+      "category": 3,
+      "groupNo": 1500088,
+      "groupOrder": 3,
+      "guildLevelRequired": 7,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 84000,
+      "worldBuffId": 38097047,
+      "needDonation": [
+        {
+          "ItemId": 23421014,
+          "ItemVal": 400,
+          "Score": 4
+        },
+        {
+          "ItemId": 23420008,
+          "ItemVal": 2000,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421017,
+          "ItemVal": 6000,
+          "Score": 2
+        }
+      ]
+    },
+    "1500094": {
+      "id": 1500094,
+      "name": "일방적인 검술 LV1",
+      "category": 3,
+      "groupNo": 1500094,
+      "groupOrder": 1,
+      "guildLevelRequired": 9,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 90000,
+      "worldBuffId": 38097007
+    },
+    "1500095": {
+      "id": 1500095,
+      "name": "일방적인 검술 LV2",
+      "category": 3,
+      "groupNo": 1500094,
+      "groupOrder": 2,
+      "guildLevelRequired": 9,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 108000,
+      "worldBuffId": 38097050,
+      "needDonation": [
+        {
+          "ItemId": 23421015,
+          "ItemVal": 2500,
+          "Score": 4
+        },
+        {
+          "ItemId": 23421020,
+          "ItemVal": 7000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500097": {
+      "id": 1500097,
+      "name": "연쇄 회복 LV1",
+      "category": 3,
+      "groupNo": 1500097,
+      "groupOrder": 1,
+      "guildLevelRequired": 9,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 90000,
+      "worldBuffId": 38097008
+    },
+    "1500099": {
+      "id": 1500099,
+      "name": "태세 정비 LV1",
+      "category": 3,
+      "groupNo": 1500099,
+      "groupOrder": 1,
+      "guildLevelRequired": 10,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 100000,
+      "worldBuffId": 38097009
+    },
+    "1500100": {
+      "id": 1500100,
+      "name": "태세 정비 LV2",
+      "category": 3,
+      "groupNo": 1500099,
+      "groupOrder": 2,
+      "guildLevelRequired": 10,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 110000,
+      "worldBuffId": 38097053,
+      "needDonation": [
+        {
+          "ItemId": 23420020,
+          "ItemVal": 2500,
+          "Score": 3
+        },
+        {
+          "ItemId": 23421025,
+          "ItemVal": 8000,
+          "Score": 1
+        }
+      ]
+    },
+    "1500101": {
+      "id": 1500101,
+      "name": "태세 정비 LV3",
+      "category": 3,
+      "groupNo": 1500099,
+      "groupOrder": 3,
+      "guildLevelRequired": 10,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 120000,
+      "worldBuffId": 38097054,
+      "needDonation": [
+        {
+          "ItemId": 23421006,
+          "ItemVal": 500,
+          "Score": 4
+        },
+        {
+          "ItemId": 23421001,
+          "ItemVal": 2500,
+          "Score": 1
+        }
+      ]
+    },
+    "1500103": {
+      "id": 1500103,
+      "name": "쾌속의 수 LV1",
+      "category": 3,
+      "groupNo": 1500103,
+      "groupOrder": 1,
+      "guildLevelRequired": 11,
+      "getGuildResourceId": 150000,
+      "getGuildResourceVal": 110000,
+      "worldBuffId": 38097010
+    }
+  }
+}

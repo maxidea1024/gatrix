@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gatrix Ops Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1>🚀 Gatrix Operations <span class="stack-chip" id="stackName">Loading...</span></h1>
+      </div>
+      <div class="header-right">
+        <select id="langSelect" onchange="changeLang(this.value)">
+          <option value="en">English</option>
+          <option value="ko">한국어</option>
+          <option value="zh">中文</option>
+        </select>
+        <button class="btn btn-refresh" onclick="refreshAll()">🔄 <span data-i18n="refresh">Refresh</span></button>
+      </div>
+    </header>
+
+    <!-- Quick Actions -->
+    <section class="section">
+      <h2 data-i18n="quickActions">Quick Actions</h2>
+      <div class="quick-actions">
+        <div class="preset-group">
+          <span data-i18n="scalingPresets">Scaling Presets:</span>
+          <button class="btn btn-preset" onclick="applyPreset('minimal')">
+            📦 <span data-i18n="minimal">Minimal</span>
+          </button>
+          <button class="btn btn-preset" onclick="applyPreset('standard')">
+            ⚖️ <span data-i18n="standard">Standard</span>
+          </button>
+          <button class="btn btn-preset" onclick="applyPreset('high')">
+            🚀 <span data-i18n="high">High Traffic</span>
+          </button>
+        </div>
+        <div class="update-group">
+          <input type="text" id="versionInput" placeholder="e.g., 1.0.0" class="version-input" oninput="toggleUpdateAllBtn()">
+          <button class="btn btn-primary" id="updateAllBtn" onclick="updateAllServices()" disabled>
+            ⬆️ <span data-i18n="updateAll">Update All</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="section">
+      <h2 data-i18n="services">Services</h2>
+      <div class="services-grid" id="servicesGrid">
+        <div class="loading" data-i18n="loading">Loading services...</div>
+      </div>
+    </section>
+
+    <!-- Operations Log -->
+    <section class="section logs-section" id="opsLogsSection">
+      <div class="logs-header">
+        <h2 data-i18n="operationsLog">Operations Log</h2>
+        <label class="checkbox-label">
+          <input type="checkbox" id="opsLogCheckbox" checked onchange="toggleOpsLog()">
+          <span data-i18n="realtime">Realtime</span>
+        </label>
+        <button class="btn btn-small" onclick="clearOpsLogs()">🗑️ <span data-i18n="clear">Clear</span></button>
+        <button class="btn btn-small btn-fullscreen" onclick="toggleFullscreen('opsLogsSection')" title="Fullscreen">⛶</button>
+      </div>
+      <div class="logs-container ops-logs" id="opsLogsContainer">
+        <div class="log-placeholder" data-i18n="waitingForOps">Waiting for operations...</div>
+      </div>
+    </section>
+
+    <!-- Service Logs Panel -->
+    <section class="section logs-section" id="serviceLogsSection">
+      <div class="logs-header">
+        <h2 data-i18n="serviceLogs">Service Logs</h2>
+        <select id="logServiceSelect" onchange="handleLogServiceChange()">
+          <option value="">-- <span data-i18n="selectService">Select Service</span> --</option>
+        </select>
+        <label class="checkbox-label">
+          <input type="checkbox" id="tailCheckbox" checked onchange="handleTailChange()">
+          <span data-i18n="realtime">Realtime</span>
+        </label>
+        <button class="btn btn-small" onclick="clearLogs()">🗑️ <span data-i18n="clear">Clear</span></button>
+        <button class="btn btn-small btn-fullscreen" onclick="toggleFullscreen('serviceLogsSection')" title="Fullscreen">⛶</button>
+      </div>
+      <div class="logs-container" id="logsContainer">
+        <div class="log-placeholder" data-i18n="selectServiceToViewLogs">Select a service to view logs</div>
+      </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">Service Details</h3>
+          <button class="btn-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+      </div>
+    </div>
+
+    <!-- Dialog Modal -->
+    <div class="modal" id="dialogModal">
+      <div class="modal-content dialog-content">
+        <div class="modal-header">
+          <h3 id="dialogTitle">Confirm</h3>
+          <button class="btn-close" onclick="closeDialog(false)">×</button>
+        </div>
+        <div class="modal-body">
+          <p id="dialogMessage"></p>
+          <div class="dialog-input-wrapper" id="dialogInputWrapper" style="display: none;">
+            <input type="text" id="dialogInput" class="dialog-input" />
+          </div>
+          <div class="dialog-actions">
+            <button class="btn btn-cancel" onclick="closeDialog(false)" data-i18n="cancel">Cancel</button>
+            <button class="btn btn-primary" onclick="closeDialog(true)" data-i18n="confirm">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Version Select Modal -->
+    <div class="modal" id="versionModal">
+      <div class="modal-content dialog-content">
+        <div class="modal-header">
+          <h3 id="versionDialogTitle">Select Version</h3>
+          <button class="btn-close" onclick="closeVersionDialog()">×</button>
+        </div>
+        <div class="modal-body">
+          <p id="versionDialogMessage"></p>
+          <div class="version-list" id="versionList"></div>
+          <div class="dialog-actions">
+            <button class="btn btn-cancel" onclick="closeVersionDialog()" data-i18n="cancel">Cancel</button>
+            <button class="btn btn-primary" id="versionConfirmBtn" onclick="confirmVersionSelection()" disabled data-i18n="confirm">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

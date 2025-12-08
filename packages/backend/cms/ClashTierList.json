@@ -59,6 +59,11 @@
           "Id": "number",
           "weekly": "number",
           "grade": "number"
+        },
+        {
+          "Id": "number",
+          "weekly": "number",
+          "grade": "number"
         }
       ],
       "icon": "string"
@@ -116,6 +121,10 @@
         {
           "weekly": 92000000,
           "grade": 92000000
+        },
+        {
+          "weekly": 92000000,
+          "grade": 92000000
         }
       ]
     },
@@ -124,6 +133,10 @@
       "rewardDraw": 95999999,
       "rewardDefeat": 95999999,
       "seasonReward": [
+        {
+          "weekly": 92999999,
+          "grade": 92999999
+        },
         {
           "weekly": 92999999,
           "grade": 92999999
@@ -245,6 +258,14 @@
           "grade": [
             "Mail"
           ]
+        },
+        {
+          "weekly": [
+            "Mail"
+          ],
+          "grade": [
+            "Mail"
+          ]
         }
       ]
     }
@@ -263,6 +284,9 @@
       "valueMax": 0,
       "rewardVictory": 95940146,
       "seasonReward": [
+        {
+          "Id": 0
+        },
         {
           "Id": 0
         },
@@ -352,6 +376,11 @@
           "Id": 9,
           "weekly": 92001601,
           "grade": 92001623
+        },
+        {
+          "Id": 10,
+          "weekly": 92001645,
+          "grade": 92001667
         }
       ],
       "icon": "WT_ClashTierIconBronze03_Sprite"
@@ -415,6 +444,11 @@
           "Id": 9,
           "weekly": 92001602,
           "grade": 92001624
+        },
+        {
+          "Id": 10,
+          "weekly": 92001646,
+          "grade": 92001668
         }
       ],
       "icon": "WT_ClashTierIconBronze02_Sprite"
@@ -478,6 +512,11 @@
           "Id": 9,
           "weekly": 92001603,
           "grade": 92001625
+        },
+        {
+          "Id": 10,
+          "weekly": 92001647,
+          "grade": 92001669
         }
       ],
       "icon": "WT_ClashTierIconBronze01_Sprite"
@@ -541,6 +580,11 @@
           "Id": 9,
           "weekly": 92001604,
           "grade": 92001626
+        },
+        {
+          "Id": 10,
+          "weekly": 92001648,
+          "grade": 92001670
         }
       ],
       "icon": "WT_ClashTierIconSilver03_Sprite"
@@ -604,6 +648,11 @@
           "Id": 9,
           "weekly": 92001605,
           "grade": 92001627
+        },
+        {
+          "Id": 10,
+          "weekly": 92001649,
+          "grade": 92001671
         }
       ],
       "icon": "WT_ClashTierIconSilver02_Sprite"
@@ -667,6 +716,11 @@
           "Id": 9,
           "weekly": 92001606,
           "grade": 92001628
+        },
+        {
+          "Id": 10,
+          "weekly": 92001650,
+          "grade": 92001672
         }
       ],
       "icon": "WT_ClashTierIconSilver01_Sprite"
@@ -730,6 +784,11 @@
           "Id": 9,
           "weekly": 92001607,
           "grade": 92001629
+        },
+        {
+          "Id": 10,
+          "weekly": 92001651,
+          "grade": 92001673
         }
       ],
       "icon": "WT_ClashTierIconGold03_Sprite"
@@ -793,6 +852,11 @@
           "Id": 9,
           "weekly": 92001608,
           "grade": 92001630
+        },
+        {
+          "Id": 10,
+          "weekly": 92001652,
+          "grade": 92001674
         }
       ],
       "icon": "WT_ClashTierIconGold02_Sprite"
@@ -856,6 +920,11 @@
           "Id": 9,
           "weekly": 92001609,
           "grade": 92001631
+        },
+        {
+          "Id": 10,
+          "weekly": 92001653,
+          "grade": 92001675
         }
       ],
       "icon": "WT_ClashTierIconGold01_Sprite"
@@ -919,6 +988,11 @@
           "Id": 9,
           "weekly": 92001610,
           "grade": 92001632
+        },
+        {
+          "Id": 10,
+          "weekly": 92001654,
+          "grade": 92001676
         }
       ],
       "icon": "WT_ClashTierIconPlatinum03_Sprite"
@@ -982,6 +1056,11 @@
           "Id": 9,
           "weekly": 92001611,
           "grade": 92001633
+        },
+        {
+          "Id": 10,
+          "weekly": 92001655,
+          "grade": 92001677
         }
       ],
       "icon": "WT_ClashTierIconPlatinum02_Sprite"
@@ -1045,6 +1124,11 @@
           "Id": 9,
           "weekly": 92001612,
           "grade": 92001634
+        },
+        {
+          "Id": 10,
+          "weekly": 92001656,
+          "grade": 92001678
         }
       ],
       "icon": "WT_ClashTierIconPlatinum01_Sprite"
@@ -1108,6 +1192,11 @@
           "Id": 9,
           "weekly": 92001613,
           "grade": 92001635
+        },
+        {
+          "Id": 10,
+          "weekly": 92001657,
+          "grade": 92001679
         }
       ],
       "icon": "WT_ClashTierIconMaster03_Sprite"
@@ -1171,6 +1260,11 @@
           "Id": 9,
           "weekly": 92001614,
           "grade": 92001636
+        },
+        {
+          "Id": 10,
+          "weekly": 92001658,
+          "grade": 92001680
         }
       ],
       "icon": "WT_ClashTierIconMaster02_Sprite"
@@ -1234,6 +1328,11 @@
           "Id": 9,
           "weekly": 92001615,
           "grade": 92001637
+        },
+        {
+          "Id": 10,
+          "weekly": 92001659,
+          "grade": 92001681
         }
       ],
       "icon": "WT_ClashTierIconMaster01_Sprite"
@@ -1297,6 +1396,11 @@
           "Id": 9,
           "weekly": 92001616,
           "grade": 92001638
+        },
+        {
+          "Id": 10,
+          "weekly": 92001660,
+          "grade": 92001682
         }
       ],
       "icon": "WT_ClashTierIconGrandMaster03_Sprite"
@@ -1360,6 +1464,11 @@
           "Id": 9,
           "weekly": 92001617,
           "grade": 92001639
+        },
+        {
+          "Id": 10,
+          "weekly": 92001661,
+          "grade": 92001683
         }
       ],
       "icon": "WT_ClashTierIconGrandMaster02_Sprite"
@@ -1423,6 +1532,11 @@
           "Id": 9,
           "weekly": 92001618,
           "grade": 92001640
+        },
+        {
+          "Id": 10,
+          "weekly": 92001662,
+          "grade": 92001684
         }
       ],
       "icon": "WT_ClashTierIconGrandMaster01_Sprite"
@@ -1486,6 +1600,11 @@
           "Id": 9,
           "weekly": 92001619,
           "grade": 92001641
+        },
+        {
+          "Id": 10,
+          "weekly": 92001663,
+          "grade": 92001685
         }
       ],
       "icon": "WT_ClashTierIconChallenger03_Sprite"
@@ -1549,6 +1668,11 @@
           "Id": 9,
           "weekly": 92001620,
           "grade": 92001642
+        },
+        {
+          "Id": 10,
+          "weekly": 92001664,
+          "grade": 92001686
         }
       ],
       "icon": "WT_ClashTierIconChallenger02_Sprite"
@@ -1612,6 +1736,11 @@
           "Id": 9,
           "weekly": 92001621,
           "grade": 92001643
+        },
+        {
+          "Id": 10,
+          "weekly": 92001665,
+          "grade": 92001687
         }
       ],
       "icon": "WT_ClashTierIconChallenger01_Sprite"
@@ -1673,7 +1802,11 @@
         },
         {
           "Id": 9,
-          "weekly": 92001622,
+          "weekly": 92001622
+        },
+        {
+          "Id": 10,
+          "weekly": 92001666,
           "grade": 92001644
         }
       ],

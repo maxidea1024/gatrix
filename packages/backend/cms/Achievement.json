@@ -3899,7 +3899,7 @@
     "80003684": {
       "id": 80003684,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50,
       "step": 1,
       "achievementType": 0,
@@ -3923,7 +3923,7 @@
     "80003685": {
       "id": 80003685,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50,
       "step": 2,
       "achievementType": 0,
@@ -3948,7 +3948,7 @@
     "80003686": {
       "id": 80003686,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 50,
       "step": 3,
       "achievementType": 0,
@@ -3973,7 +3973,7 @@
     "80003687": {
       "id": 80003687,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 51,
       "step": 1,
       "achievementType": 0,
@@ -3997,7 +3997,7 @@
     "80003688": {
       "id": 80003688,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 51,
       "step": 2,
       "achievementType": 0,
@@ -4022,7 +4022,7 @@
     "80003689": {
       "id": 80003689,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 51,
       "step": 3,
       "achievementType": 0,
@@ -4269,7 +4269,7 @@
     "80003699": {
       "id": 80003699,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 55,
       "step": 1,
       "achievementType": 0,
@@ -4293,7 +4293,7 @@
     "80003700": {
       "id": 80003700,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 55,
       "step": 2,
       "achievementType": 0,
@@ -4318,7 +4318,7 @@
     "80003701": {
       "id": 80003701,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 55,
       "step": 3,
       "achievementType": 0,
@@ -4565,7 +4565,7 @@
     "80003711": {
       "id": 80003711,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 59,
       "step": 1,
       "achievementType": 0,
@@ -4589,7 +4589,7 @@
     "80003712": {
       "id": 80003712,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 59,
       "step": 2,
       "achievementType": 0,
@@ -4614,7 +4614,7 @@
     "80003713": {
       "id": 80003713,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 59,
       "step": 3,
       "achievementType": 0,
@@ -4787,7 +4787,7 @@
     "80003720": {
       "id": 80003720,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 62,
       "step": 1,
       "achievementType": 0,
@@ -4811,7 +4811,7 @@
     "80003721": {
       "id": 80003721,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 62,
       "step": 2,
       "achievementType": 0,
@@ -4836,7 +4836,7 @@
     "80003722": {
       "id": 80003722,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 62,
       "step": 3,
       "achievementType": 0,
@@ -5453,7 +5453,7 @@
     "80003747": {
       "id": 80003747,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 71,
       "step": 1,
       "achievementType": 0,
@@ -5477,7 +5477,7 @@
     "80003748": {
       "id": 80003748,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 71,
       "step": 2,
       "achievementType": 0,
@@ -5502,7 +5502,7 @@
     "80003749": {
       "id": 80003749,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 71,
       "step": 3,
       "achievementType": 0,
@@ -6637,7 +6637,7 @@
     "80003795": {
       "id": 80003795,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 87,
       "step": 1,
       "achievementType": 0,
@@ -6661,7 +6661,7 @@
     "80003796": {
       "id": 80003796,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 87,
       "step": 2,
       "achievementType": 0,
@@ -6686,7 +6686,7 @@
     "80003797": {
       "id": 80003797,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 87,
       "step": 3,
       "achievementType": 0,
@@ -6859,7 +6859,7 @@
     "80003804": {
       "id": 80003804,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 90,
       "step": 1,
       "achievementType": 0,
@@ -6883,7 +6883,7 @@
     "80003805": {
       "id": 80003805,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 90,
       "step": 2,
       "achievementType": 0,
@@ -6908,7 +6908,7 @@
     "80003806": {
       "id": 80003806,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 90,
       "step": 3,
       "achievementType": 0,
@@ -7081,7 +7081,7 @@
     "80003813": {
       "id": 80003813,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 93,
       "step": 1,
       "achievementType": 0,
@@ -7105,7 +7105,7 @@
     "80003814": {
       "id": 80003814,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 93,
       "step": 2,
       "achievementType": 0,
@@ -7130,7 +7130,7 @@
     "80003815": {
       "id": 80003815,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 93,
       "step": 3,
       "achievementType": 0,
@@ -7747,7 +7747,7 @@
     "80003840": {
       "id": 80003840,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 102,
       "step": 1,
       "achievementType": 0,
@@ -7771,7 +7771,7 @@
     "80003841": {
       "id": 80003841,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 102,
       "step": 2,
       "achievementType": 0,
@@ -7796,7 +7796,7 @@
     "80003842": {
       "id": 80003842,
       "name": "{0} 애호가",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 102,
       "step": 3,
       "achievementType": 0,
@@ -11384,7 +11384,7 @@
     "80004481": {
       "id": 80004481,
       "name": "궁극의 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 173,
       "step": 1,
       "achievementType": 0,
@@ -11409,7 +11409,7 @@
     "80004482": {
       "id": 80004482,
       "name": "궁극의 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 174,
       "step": 1,
       "achievementType": 0,
@@ -11509,7 +11509,7 @@
     "80004486": {
       "id": 80004486,
       "name": "궁극의 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 178,
       "step": 1,
       "achievementType": 0,
@@ -11609,7 +11609,7 @@
     "80004490": {
       "id": 80004490,
       "name": "궁극의 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 182,
       "step": 1,
       "achievementType": 0,
@@ -11684,7 +11684,7 @@
     "80004493": {
       "id": 80004493,
       "name": "궁극의 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 185,
       "step": 1,
       "achievementType": 0,
@@ -11909,7 +11909,7 @@
     "80004502": {
       "id": 80004502,
       "name": "궁극의 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 194,
       "step": 1,
       "achievementType": 0,
@@ -12309,7 +12309,7 @@
     "80004518": {
       "id": 80004518,
       "name": "궁극의 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 210,
       "step": 1,
       "achievementType": 0,
@@ -12384,7 +12384,7 @@
     "80004521": {
       "id": 80004521,
       "name": "궁극의 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 213,
       "step": 1,
       "achievementType": 0,
@@ -12459,7 +12459,7 @@
     "80004524": {
       "id": 80004524,
       "name": "궁극의 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 216,
       "step": 1,
       "achievementType": 0,
@@ -12684,7 +12684,7 @@
     "80004533": {
       "id": 80004533,
       "name": "궁극의 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 225,
       "step": 1,
       "achievementType": 0,
@@ -14030,7 +14030,7 @@
     "80006626": {
       "id": 80006626,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 382,
       "step": 1,
       "achievementType": 0,
@@ -14270,7 +14270,7 @@
     "80006636": {
       "id": 80006636,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 392,
       "step": 1,
       "achievementType": 0,
@@ -14294,7 +14294,7 @@
     "80006637": {
       "id": 80006637,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 393,
       "step": 1,
       "achievementType": 0,
@@ -14486,7 +14486,7 @@
     "80006645": {
       "id": 80006645,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 401,
       "step": 1,
       "achievementType": 0,
@@ -14750,7 +14750,7 @@
     "80006656": {
       "id": 80006656,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 412,
       "step": 1,
       "achievementType": 0,
@@ -14894,7 +14894,7 @@
     "80006662": {
       "id": 80006662,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 418,
       "step": 1,
       "achievementType": 0,
@@ -14942,7 +14942,7 @@
     "80006664": {
       "id": 80006664,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 420,
       "step": 1,
       "achievementType": 0,
@@ -14966,7 +14966,7 @@
     "80006665": {
       "id": 80006665,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 421,
       "step": 1,
       "achievementType": 0,
@@ -14990,7 +14990,7 @@
     "80006666": {
       "id": 80006666,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 422,
       "step": 1,
       "achievementType": 0,
@@ -15038,7 +15038,7 @@
     "80006668": {
       "id": 80006668,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 424,
       "step": 1,
       "achievementType": 0,
@@ -15110,7 +15110,7 @@
     "80006671": {
       "id": 80006671,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 427,
       "step": 1,
       "achievementType": 0,
@@ -15302,7 +15302,7 @@
     "80006679": {
       "id": 80006679,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 435,
       "step": 1,
       "achievementType": 0,
@@ -15446,7 +15446,7 @@
     "80006685": {
       "id": 80006685,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 441,
       "step": 1,
       "achievementType": 0,
@@ -15878,7 +15878,7 @@
     "80006703": {
       "id": 80006703,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 459,
       "step": 1,
       "achievementType": 0,
@@ -15950,7 +15950,7 @@
     "80006706": {
       "id": 80006706,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 462,
       "step": 1,
       "achievementType": 0,
@@ -16022,7 +16022,7 @@
     "80006709": {
       "id": 80006709,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 465,
       "step": 1,
       "achievementType": 0,
@@ -16046,7 +16046,7 @@
     "80006710": {
       "id": 80006710,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 466,
       "step": 1,
       "achievementType": 0,
@@ -16094,7 +16094,7 @@
     "80006712": {
       "id": 80006712,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 468,
       "step": 1,
       "achievementType": 0,
@@ -16166,7 +16166,7 @@
     "80006715": {
       "id": 80006715,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 471,
       "step": 1,
       "achievementType": 0,
@@ -16238,7 +16238,7 @@
     "80006718": {
       "id": 80006718,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 474,
       "step": 1,
       "achievementType": 0,
@@ -16934,7 +16934,7 @@
     "80006747": {
       "id": 80006747,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 503,
       "step": 1,
       "achievementType": 0,
@@ -17006,7 +17006,7 @@
     "80006750": {
       "id": 80006750,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 506,
       "step": 1,
       "achievementType": 0,
@@ -17150,7 +17150,7 @@
     "80006756": {
       "id": 80006756,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 512,
       "step": 1,
       "achievementType": 0,
@@ -17294,7 +17294,7 @@
     "80006762": {
       "id": 80006762,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 518,
       "step": 1,
       "achievementType": 0,
@@ -17462,7 +17462,7 @@
     "80006769": {
       "id": 80006769,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 525,
       "step": 1,
       "achievementType": 0,
@@ -17486,7 +17486,7 @@
     "80006770": {
       "id": 80006770,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 526,
       "step": 1,
       "achievementType": 0,
@@ -17654,7 +17654,7 @@
     "80006777": {
       "id": 80006777,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 533,
       "step": 1,
       "achievementType": 0,
@@ -17702,7 +17702,7 @@
     "80006779": {
       "id": 80006779,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 535,
       "step": 1,
       "achievementType": 0,
@@ -17918,7 +17918,7 @@
     "80006788": {
       "id": 80006788,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 544,
       "step": 1,
       "achievementType": 0,
@@ -18494,7 +18494,7 @@
     "80006812": {
       "id": 80006812,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 568,
       "step": 1,
       "achievementType": 0,
@@ -18710,7 +18710,7 @@
     "80006821": {
       "id": 80006821,
       "name": "{0}의 단골 선단",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 577,
       "step": 1,
       "achievementType": 0,
@@ -20091,7 +20091,7 @@
     "80008496": {
       "id": 80008496,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 710,
       "step": 1,
       "achievementType": 0,
@@ -20115,7 +20115,7 @@
     "80008497": {
       "id": 80008497,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 710,
       "step": 2,
       "achievementType": 0,
@@ -20140,7 +20140,7 @@
     "80008498": {
       "id": 80008498,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 710,
       "step": 3,
       "achievementType": 0,
@@ -20831,7 +20831,7 @@
     "80008526": {
       "id": 80008526,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 720,
       "step": 1,
       "achievementType": 0,
@@ -20855,7 +20855,7 @@
     "80008527": {
       "id": 80008527,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 720,
       "step": 2,
       "achievementType": 0,
@@ -20880,7 +20880,7 @@
     "80008528": {
       "id": 80008528,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 720,
       "step": 3,
       "achievementType": 0,
@@ -20905,7 +20905,7 @@
     "80008529": {
       "id": 80008529,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 721,
       "step": 1,
       "achievementType": 0,
@@ -20929,7 +20929,7 @@
     "80008530": {
       "id": 80008530,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 721,
       "step": 2,
       "achievementType": 0,
@@ -20954,7 +20954,7 @@
     "80008531": {
       "id": 80008531,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 721,
       "step": 3,
       "achievementType": 0,
@@ -21497,7 +21497,7 @@
     "80008553": {
       "id": 80008553,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 729,
       "step": 1,
       "achievementType": 0,
@@ -21521,7 +21521,7 @@
     "80008554": {
       "id": 80008554,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 729,
       "step": 2,
       "achievementType": 0,
@@ -21546,7 +21546,7 @@
     "80008555": {
       "id": 80008555,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 729,
       "step": 3,
       "achievementType": 0,
@@ -22311,7 +22311,7 @@
     "80008586": {
       "id": 80008586,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 740,
       "step": 1,
       "achievementType": 0,
@@ -22335,7 +22335,7 @@
     "80008587": {
       "id": 80008587,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 740,
       "step": 2,
       "achievementType": 0,
@@ -22360,7 +22360,7 @@
     "80008588": {
       "id": 80008588,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 740,
       "step": 3,
       "achievementType": 0,
@@ -22755,7 +22755,7 @@
     "80008604": {
       "id": 80008604,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 746,
       "step": 1,
       "achievementType": 0,
@@ -22779,7 +22779,7 @@
     "80008605": {
       "id": 80008605,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 746,
       "step": 2,
       "achievementType": 0,
@@ -22804,7 +22804,7 @@
     "80008606": {
       "id": 80008606,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 746,
       "step": 3,
       "achievementType": 0,
@@ -22903,7 +22903,7 @@
     "80008610": {
       "id": 80008610,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 748,
       "step": 1,
       "achievementType": 0,
@@ -22927,7 +22927,7 @@
     "80008611": {
       "id": 80008611,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 748,
       "step": 2,
       "achievementType": 0,
@@ -22952,7 +22952,7 @@
     "80008612": {
       "id": 80008612,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 748,
       "step": 3,
       "achievementType": 0,
@@ -22977,7 +22977,7 @@
     "80008613": {
       "id": 80008613,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 749,
       "step": 1,
       "achievementType": 0,
@@ -23001,7 +23001,7 @@
     "80008614": {
       "id": 80008614,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 749,
       "step": 2,
       "achievementType": 0,
@@ -23026,7 +23026,7 @@
     "80008615": {
       "id": 80008615,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 749,
       "step": 3,
       "achievementType": 0,
@@ -23051,7 +23051,7 @@
     "80008616": {
       "id": 80008616,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 750,
       "step": 1,
       "achievementType": 0,
@@ -23075,7 +23075,7 @@
     "80008617": {
       "id": 80008617,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 750,
       "step": 2,
       "achievementType": 0,
@@ -23100,7 +23100,7 @@
     "80008618": {
       "id": 80008618,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 750,
       "step": 3,
       "achievementType": 0,
@@ -23199,7 +23199,7 @@
     "80008622": {
       "id": 80008622,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 752,
       "step": 1,
       "achievementType": 0,
@@ -23223,7 +23223,7 @@
     "80008623": {
       "id": 80008623,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 752,
       "step": 2,
       "achievementType": 0,
@@ -23248,7 +23248,7 @@
     "80008624": {
       "id": 80008624,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 752,
       "step": 3,
       "achievementType": 0,
@@ -23421,7 +23421,7 @@
     "80008631": {
       "id": 80008631,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 755,
       "step": 1,
       "achievementType": 0,
@@ -23445,7 +23445,7 @@
     "80008632": {
       "id": 80008632,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 755,
       "step": 2,
       "achievementType": 0,
@@ -23470,7 +23470,7 @@
     "80008633": {
       "id": 80008633,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 755,
       "step": 3,
       "achievementType": 0,
@@ -24013,7 +24013,7 @@
     "80008655": {
       "id": 80008655,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 763,
       "step": 1,
       "achievementType": 0,
@@ -24037,7 +24037,7 @@
     "80008656": {
       "id": 80008656,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 763,
       "step": 2,
       "achievementType": 0,
@@ -24062,7 +24062,7 @@
     "80008657": {
       "id": 80008657,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 763,
       "step": 3,
       "achievementType": 0,
@@ -24457,7 +24457,7 @@
     "80008673": {
       "id": 80008673,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 769,
       "step": 1,
       "achievementType": 0,
@@ -24481,7 +24481,7 @@
     "80008674": {
       "id": 80008674,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 769,
       "step": 2,
       "achievementType": 0,
@@ -24506,7 +24506,7 @@
     "80008675": {
       "id": 80008675,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 769,
       "step": 3,
       "achievementType": 0,
@@ -25789,7 +25789,7 @@
     "80008727": {
       "id": 80008727,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 787,
       "step": 1,
       "achievementType": 0,
@@ -25813,7 +25813,7 @@
     "80008728": {
       "id": 80008728,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 787,
       "step": 2,
       "achievementType": 0,
@@ -25838,7 +25838,7 @@
     "80008729": {
       "id": 80008729,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 787,
       "step": 3,
       "achievementType": 0,
@@ -26011,7 +26011,7 @@
     "80008736": {
       "id": 80008736,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 790,
       "step": 1,
       "achievementType": 0,
@@ -26035,7 +26035,7 @@
     "80008737": {
       "id": 80008737,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 790,
       "step": 2,
       "achievementType": 0,
@@ -26060,7 +26060,7 @@
     "80008738": {
       "id": 80008738,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 790,
       "step": 3,
       "achievementType": 0,
@@ -26233,7 +26233,7 @@
     "80008745": {
       "id": 80008745,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 793,
       "step": 1,
       "achievementType": 0,
@@ -26257,7 +26257,7 @@
     "80008746": {
       "id": 80008746,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 793,
       "step": 2,
       "achievementType": 0,
@@ -26282,7 +26282,7 @@
     "80008747": {
       "id": 80008747,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 793,
       "step": 3,
       "achievementType": 0,
@@ -26307,7 +26307,7 @@
     "80008748": {
       "id": 80008748,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 794,
       "step": 1,
       "achievementType": 0,
@@ -26331,7 +26331,7 @@
     "80008749": {
       "id": 80008749,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 794,
       "step": 2,
       "achievementType": 0,
@@ -26356,7 +26356,7 @@
     "80008750": {
       "id": 80008750,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 794,
       "step": 3,
       "achievementType": 0,
@@ -26455,7 +26455,7 @@
     "80008754": {
       "id": 80008754,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 796,
       "step": 1,
       "achievementType": 0,
@@ -26479,7 +26479,7 @@
     "80008755": {
       "id": 80008755,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 796,
       "step": 2,
       "achievementType": 0,
@@ -26504,7 +26504,7 @@
     "80008756": {
       "id": 80008756,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 796,
       "step": 3,
       "achievementType": 0,
@@ -26677,7 +26677,7 @@
     "80008763": {
       "id": 80008763,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 799,
       "step": 1,
       "achievementType": 0,
@@ -26701,7 +26701,7 @@
     "80008764": {
       "id": 80008764,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 799,
       "step": 2,
       "achievementType": 0,
@@ -26726,7 +26726,7 @@
     "80008765": {
       "id": 80008765,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 799,
       "step": 3,
       "achievementType": 0,
@@ -26899,7 +26899,7 @@
     "80008772": {
       "id": 80008772,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 802,
       "step": 1,
       "achievementType": 0,
@@ -26923,7 +26923,7 @@
     "80008773": {
       "id": 80008773,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 802,
       "step": 2,
       "achievementType": 0,
@@ -26948,7 +26948,7 @@
     "80008774": {
       "id": 80008774,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 802,
       "step": 3,
       "achievementType": 0,
@@ -29045,7 +29045,7 @@
     "80008859": {
       "id": 80008859,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 831,
       "step": 1,
       "achievementType": 0,
@@ -29069,7 +29069,7 @@
     "80008860": {
       "id": 80008860,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 831,
       "step": 2,
       "achievementType": 0,
@@ -29094,7 +29094,7 @@
     "80008861": {
       "id": 80008861,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 831,
       "step": 3,
       "achievementType": 0,
@@ -29267,7 +29267,7 @@
     "80008868": {
       "id": 80008868,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 834,
       "step": 1,
       "achievementType": 0,
@@ -29291,7 +29291,7 @@
     "80008869": {
       "id": 80008869,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 834,
       "step": 2,
       "achievementType": 0,
@@ -29316,7 +29316,7 @@
     "80008870": {
       "id": 80008870,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 834,
       "step": 3,
       "achievementType": 0,
@@ -29711,7 +29711,7 @@
     "80008886": {
       "id": 80008886,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 840,
       "step": 1,
       "achievementType": 0,
@@ -29735,7 +29735,7 @@
     "80008887": {
       "id": 80008887,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 840,
       "step": 2,
       "achievementType": 0,
@@ -29760,7 +29760,7 @@
     "80008888": {
       "id": 80008888,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 840,
       "step": 3,
       "achievementType": 0,
@@ -30155,7 +30155,7 @@
     "80008904": {
       "id": 80008904,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 846,
       "step": 1,
       "achievementType": 0,
@@ -30179,7 +30179,7 @@
     "80008905": {
       "id": 80008905,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 846,
       "step": 2,
       "achievementType": 0,
@@ -30204,7 +30204,7 @@
     "80008906": {
       "id": 80008906,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 846,
       "step": 3,
       "achievementType": 0,
@@ -30673,7 +30673,7 @@
     "80008925": {
       "id": 80008925,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 853,
       "step": 1,
       "achievementType": 0,
@@ -30697,7 +30697,7 @@
     "80008926": {
       "id": 80008926,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 853,
       "step": 2,
       "achievementType": 0,
@@ -30722,7 +30722,7 @@
     "80008927": {
       "id": 80008927,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 853,
       "step": 3,
       "achievementType": 0,
@@ -30747,7 +30747,7 @@
     "80008928": {
       "id": 80008928,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 854,
       "step": 1,
       "achievementType": 0,
@@ -30771,7 +30771,7 @@
     "80008929": {
       "id": 80008929,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 854,
       "step": 2,
       "achievementType": 0,
@@ -30796,7 +30796,7 @@
     "80008930": {
       "id": 80008930,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 854,
       "step": 3,
       "achievementType": 0,
@@ -31265,7 +31265,7 @@
     "80008949": {
       "id": 80008949,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 861,
       "step": 1,
       "achievementType": 0,
@@ -31289,7 +31289,7 @@
     "80008950": {
       "id": 80008950,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 861,
       "step": 2,
       "achievementType": 0,
@@ -31314,7 +31314,7 @@
     "80008951": {
       "id": 80008951,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 861,
       "step": 3,
       "achievementType": 0,
@@ -31413,7 +31413,7 @@
     "80008955": {
       "id": 80008955,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 863,
       "step": 1,
       "achievementType": 0,
@@ -31437,7 +31437,7 @@
     "80008956": {
       "id": 80008956,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 863,
       "step": 2,
       "achievementType": 0,
@@ -31462,7 +31462,7 @@
     "80008957": {
       "id": 80008957,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 863,
       "step": 3,
       "achievementType": 0,
@@ -32079,7 +32079,7 @@
     "80008982": {
       "id": 80008982,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 872,
       "step": 1,
       "achievementType": 0,
@@ -32103,7 +32103,7 @@
     "80008983": {
       "id": 80008983,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 872,
       "step": 2,
       "achievementType": 0,
@@ -32128,7 +32128,7 @@
     "80008984": {
       "id": 80008984,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 872,
       "step": 3,
       "achievementType": 0,
@@ -33855,7 +33855,7 @@
     "80009054": {
       "id": 80009054,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 896,
       "step": 1,
       "achievementType": 0,
@@ -33879,7 +33879,7 @@
     "80009055": {
       "id": 80009055,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 896,
       "step": 2,
       "achievementType": 0,
@@ -33904,7 +33904,7 @@
     "80009056": {
       "id": 80009056,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 896,
       "step": 3,
       "achievementType": 0,
@@ -34521,7 +34521,7 @@
     "80009081": {
       "id": 80009081,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 905,
       "step": 1,
       "achievementType": 0,
@@ -34545,7 +34545,7 @@
     "80009082": {
       "id": 80009082,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 905,
       "step": 2,
       "achievementType": 0,
@@ -34570,7 +34570,7 @@
     "80009083": {
       "id": 80009083,
       "name": "{0} 발전의 일등공신",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 905,
       "step": 3,
       "achievementType": 0,
@@ -35498,7 +35498,7 @@
     "80009612": {
       "id": 80009612,
       "name": "투자계의 도전자",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1001,
       "step": 1,
       "achievementType": 0,
@@ -35801,7 +35801,7 @@
     "80010631": {
       "id": 80010631,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1035,
       "step": 1,
       "achievementType": 0,
@@ -36041,7 +36041,7 @@
     "80010641": {
       "id": 80010641,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1045,
       "step": 1,
       "achievementType": 0,
@@ -36065,7 +36065,7 @@
     "80010642": {
       "id": 80010642,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1046,
       "step": 1,
       "achievementType": 0,
@@ -36257,7 +36257,7 @@
     "80010650": {
       "id": 80010650,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1054,
       "step": 1,
       "achievementType": 0,
@@ -36521,7 +36521,7 @@
     "80010661": {
       "id": 80010661,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1065,
       "step": 1,
       "achievementType": 0,
@@ -36665,7 +36665,7 @@
     "80010667": {
       "id": 80010667,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1071,
       "step": 1,
       "achievementType": 0,
@@ -36713,7 +36713,7 @@
     "80010669": {
       "id": 80010669,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1073,
       "step": 1,
       "achievementType": 0,
@@ -36737,7 +36737,7 @@
     "80010670": {
       "id": 80010670,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1074,
       "step": 1,
       "achievementType": 0,
@@ -36761,7 +36761,7 @@
     "80010671": {
       "id": 80010671,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1075,
       "step": 1,
       "achievementType": 0,
@@ -36809,7 +36809,7 @@
     "80010673": {
       "id": 80010673,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1077,
       "step": 1,
       "achievementType": 0,
@@ -36881,7 +36881,7 @@
     "80010676": {
       "id": 80010676,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1080,
       "step": 1,
       "achievementType": 0,
@@ -37073,7 +37073,7 @@
     "80010684": {
       "id": 80010684,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1088,
       "step": 1,
       "achievementType": 0,
@@ -37217,7 +37217,7 @@
     "80010690": {
       "id": 80010690,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1094,
       "step": 1,
       "achievementType": 0,
@@ -37649,7 +37649,7 @@
     "80010708": {
       "id": 80010708,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1112,
       "step": 1,
       "achievementType": 0,
@@ -37721,7 +37721,7 @@
     "80010711": {
       "id": 80010711,
       "name": "{0}의 귀빈",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1115,
       "step": 1,
       "achievementType": 0,
@@ -37793,7 +37793,7 @@
     "80010714": {
       "id": 80010714,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1118,
       "step": 1,
       "achievementType": 0,
@@ -37817,7 +37817,7 @@
     "80010715": {
       "id": 80010715,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1119,
       "step": 1,
       "achievementType": 0,
@@ -37865,7 +37865,7 @@
     "80010717": {
       "id": 80010717,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1121,
       "step": 1,
       "achievementType": 0,
@@ -37937,7 +37937,7 @@
     "80010720": {
       "id": 80010720,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1124,
       "step": 1,
       "achievementType": 0,
@@ -38009,7 +38009,7 @@
     "80010723": {
       "id": 80010723,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1127,
       "step": 1,
       "achievementType": 0,
@@ -38705,7 +38705,7 @@
     "80010752": {
       "id": 80010752,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1156,
       "step": 1,
       "achievementType": 0,
@@ -38777,7 +38777,7 @@
     "80010755": {
       "id": 80010755,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1159,
       "step": 1,
       "achievementType": 0,
@@ -38921,7 +38921,7 @@
     "80010761": {
       "id": 80010761,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1165,
       "step": 1,
       "achievementType": 0,
@@ -39065,7 +39065,7 @@
     "80010767": {
       "id": 80010767,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1171,
       "step": 1,
       "achievementType": 0,
@@ -39233,7 +39233,7 @@
     "80010774": {
       "id": 80010774,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1178,
       "step": 1,
       "achievementType": 0,
@@ -39257,7 +39257,7 @@
     "80010775": {
       "id": 80010775,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1179,
       "step": 1,
       "achievementType": 0,
@@ -39425,7 +39425,7 @@
     "80010782": {
       "id": 80010782,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1186,
       "step": 1,
       "achievementType": 0,
@@ -39473,7 +39473,7 @@
     "80010784": {
       "id": 80010784,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1188,
       "step": 1,
       "achievementType": 0,
@@ -39689,7 +39689,7 @@
     "80010793": {
       "id": 80010793,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1197,
       "step": 1,
       "achievementType": 0,
@@ -40265,7 +40265,7 @@
     "80010817": {
       "id": 80010817,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1221,
       "step": 1,
       "achievementType": 0,
@@ -40481,7 +40481,7 @@
     "80010826": {
       "id": 80010826,
       "name": "{0}의 귀빈",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1230,
       "step": 1,
       "achievementType": 0,
@@ -41069,7 +41069,7 @@
     "80013977": {
       "id": 80013977,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2001,
       "step": 1,
       "achievementType": 0,
@@ -41717,7 +41717,7 @@
     "80014004": {
       "id": 80014004,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2028,
       "step": 1,
       "achievementType": 0,
@@ -41885,7 +41885,7 @@
     "80014011": {
       "id": 80014011,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2035,
       "step": 1,
       "achievementType": 0,
@@ -41957,7 +41957,7 @@
     "80014014": {
       "id": 80014014,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2038,
       "step": 1,
       "achievementType": 0,
@@ -42005,7 +42005,7 @@
     "80014016": {
       "id": 80014016,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2040,
       "step": 1,
       "achievementType": 0,
@@ -42053,7 +42053,7 @@
     "80014018": {
       "id": 80014018,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2042,
       "step": 1,
       "achievementType": 0,
@@ -42461,7 +42461,7 @@
     "80014035": {
       "id": 80014035,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2059,
       "step": 1,
       "achievementType": 0,
@@ -42629,7 +42629,7 @@
     "80014042": {
       "id": 80014042,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2066,
       "step": 1,
       "achievementType": 0,
@@ -42821,7 +42821,7 @@
     "80014050": {
       "id": 80014050,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2074,
       "step": 1,
       "achievementType": 0,
@@ -42845,7 +42845,7 @@
     "80014051": {
       "id": 80014051,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2075,
       "step": 1,
       "achievementType": 0,
@@ -42917,7 +42917,7 @@
     "80014054": {
       "id": 80014054,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2078,
       "step": 1,
       "achievementType": 0,
@@ -42965,7 +42965,7 @@
     "80014056": {
       "id": 80014056,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2080,
       "step": 1,
       "achievementType": 0,
@@ -43661,7 +43661,7 @@
     "80014085": {
       "id": 80014085,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2109,
       "step": 1,
       "achievementType": 0,
@@ -43685,7 +43685,7 @@
     "80014086": {
       "id": 80014086,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2110,
       "step": 1,
       "achievementType": 0,
@@ -43901,7 +43901,7 @@
     "80014095": {
       "id": 80014095,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2119,
       "step": 1,
       "achievementType": 0,
@@ -44021,7 +44021,7 @@
     "80014100": {
       "id": 80014100,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2124,
       "step": 1,
       "achievementType": 0,
@@ -44069,7 +44069,7 @@
     "80014102": {
       "id": 80014102,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2126,
       "step": 1,
       "achievementType": 0,
@@ -44093,7 +44093,7 @@
     "80014103": {
       "id": 80014103,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2127,
       "step": 1,
       "achievementType": 0,
@@ -44117,7 +44117,7 @@
     "80014104": {
       "id": 80014104,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2128,
       "step": 1,
       "achievementType": 0,
@@ -44141,7 +44141,7 @@
     "80014105": {
       "id": 80014105,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2129,
       "step": 1,
       "achievementType": 0,
@@ -44189,7 +44189,7 @@
     "80014107": {
       "id": 80014107,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2131,
       "step": 1,
       "achievementType": 0,
@@ -44741,7 +44741,7 @@
     "80014130": {
       "id": 80014130,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2154,
       "step": 1,
       "achievementType": 0,
@@ -44909,7 +44909,7 @@
     "80014137": {
       "id": 80014137,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2161,
       "step": 1,
       "achievementType": 0,
@@ -46133,7 +46133,7 @@
     "80014188": {
       "id": 80014188,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2212,
       "step": 1,
       "achievementType": 0,
@@ -46181,7 +46181,7 @@
     "80014190": {
       "id": 80014190,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2214,
       "step": 1,
       "achievementType": 0,
@@ -46565,7 +46565,7 @@
     "80014206": {
       "id": 80014206,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2230,
       "step": 1,
       "achievementType": 0,
@@ -46613,7 +46613,7 @@
     "80014208": {
       "id": 80014208,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2232,
       "step": 1,
       "achievementType": 0,
@@ -46685,7 +46685,7 @@
     "80014211": {
       "id": 80014211,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2235,
       "step": 1,
       "achievementType": 0,
@@ -46733,7 +46733,7 @@
     "80014213": {
       "id": 80014213,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2237,
       "step": 1,
       "achievementType": 0,
@@ -46757,7 +46757,7 @@
     "80014214": {
       "id": 80014214,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2238,
       "step": 1,
       "achievementType": 0,
@@ -47597,7 +47597,7 @@
     "80014249": {
       "id": 80014249,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2273,
       "step": 1,
       "achievementType": 0,
@@ -48221,7 +48221,7 @@
     "80014275": {
       "id": 80014275,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2299,
       "step": 1,
       "achievementType": 0,
@@ -48581,7 +48581,7 @@
     "80014290": {
       "id": 80014290,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2314,
       "step": 1,
       "achievementType": 0,
@@ -48725,7 +48725,7 @@
     "80014296": {
       "id": 80014296,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2320,
       "step": 1,
       "achievementType": 0,
@@ -49925,7 +49925,7 @@
     "80014346": {
       "id": 80014346,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2370,
       "step": 1,
       "achievementType": 0,
@@ -49973,7 +49973,7 @@
     "80014348": {
       "id": 80014348,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2372,
       "step": 1,
       "achievementType": 0,
@@ -50237,7 +50237,7 @@
     "80014359": {
       "id": 80014359,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2383,
       "step": 1,
       "achievementType": 0,
@@ -50357,7 +50357,7 @@
     "80014364": {
       "id": 80014364,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2388,
       "step": 1,
       "achievementType": 0,
@@ -50453,7 +50453,7 @@
     "80014368": {
       "id": 80014368,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2392,
       "step": 1,
       "achievementType": 0,
@@ -50765,7 +50765,7 @@
     "80014381": {
       "id": 80014381,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2405,
       "step": 1,
       "achievementType": 0,
@@ -50837,7 +50837,7 @@
     "80014384": {
       "id": 80014384,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2408,
       "step": 1,
       "achievementType": 0,
@@ -50981,7 +50981,7 @@
     "80014390": {
       "id": 80014390,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2414,
       "step": 1,
       "achievementType": 0,
@@ -51941,7 +51941,7 @@
     "80014430": {
       "id": 80014430,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2454,
       "step": 1,
       "achievementType": 0,
@@ -51965,7 +51965,7 @@
     "80014431": {
       "id": 80014431,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2455,
       "step": 1,
       "achievementType": 0,
@@ -52013,7 +52013,7 @@
     "80014433": {
       "id": 80014433,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2457,
       "step": 1,
       "achievementType": 0,
@@ -52061,7 +52061,7 @@
     "80014435": {
       "id": 80014435,
       "name": "{0}의 선장",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 2459,
       "step": 1,
       "achievementType": 0,
@@ -54419,7 +54419,7 @@
     "80014534": {
       "id": 80014534,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2555,
       "step": 1,
       "achievementType": 0,
@@ -55067,7 +55067,7 @@
     "80014561": {
       "id": 80014561,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2572,
       "step": 1,
       "achievementType": 0,
@@ -55259,7 +55259,7 @@
     "80014569": {
       "id": 80014569,
       "name": "{0}의 선장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2580,
       "step": 1,
       "achievementType": 0,
@@ -55859,7 +55859,7 @@
     "80015584": {
       "id": 80015584,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5000,
       "step": 1,
       "achievementType": 0,
@@ -56027,7 +56027,7 @@
     "80015591": {
       "id": 80015591,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5007,
       "step": 1,
       "achievementType": 0,
@@ -56315,7 +56315,7 @@
     "80015603": {
       "id": 80015603,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5019,
       "step": 1,
       "achievementType": 0,
@@ -56363,7 +56363,7 @@
     "80015605": {
       "id": 80015605,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5021,
       "step": 1,
       "achievementType": 0,
@@ -56459,7 +56459,7 @@
     "80015609": {
       "id": 80015609,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5025,
       "step": 1,
       "achievementType": 0,
@@ -56699,7 +56699,7 @@
     "80015619": {
       "id": 80015619,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5035,
       "step": 1,
       "achievementType": 0,
@@ -56723,7 +56723,7 @@
     "80015620": {
       "id": 80015620,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5036,
       "step": 1,
       "achievementType": 0,
@@ -56795,7 +56795,7 @@
     "80015623": {
       "id": 80015623,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5039,
       "step": 1,
       "achievementType": 0,
@@ -56843,7 +56843,7 @@
     "80015625": {
       "id": 80015625,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5041,
       "step": 1,
       "achievementType": 0,
@@ -56939,7 +56939,7 @@
     "80015629": {
       "id": 80015629,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5045,
       "step": 1,
       "achievementType": 0,
@@ -57059,7 +57059,7 @@
     "80015634": {
       "id": 80015634,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5050,
       "step": 1,
       "achievementType": 0,
@@ -57155,7 +57155,7 @@
     "80015638": {
       "id": 80015638,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5054,
       "step": 1,
       "achievementType": 0,
@@ -57275,7 +57275,7 @@
     "80015643": {
       "id": 80015643,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5059,
       "step": 1,
       "achievementType": 0,
@@ -57299,7 +57299,7 @@
     "80015644": {
       "id": 80015644,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5060,
       "step": 1,
       "achievementType": 0,
@@ -57587,7 +57587,7 @@
     "80015656": {
       "id": 80015656,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5072,
       "step": 1,
       "achievementType": 0,
@@ -57635,7 +57635,7 @@
     "80015658": {
       "id": 80015658,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5074,
       "step": 1,
       "achievementType": 0,
@@ -57971,7 +57971,7 @@
     "80015672": {
       "id": 80015672,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5088,
       "step": 1,
       "achievementType": 0,
@@ -58067,7 +58067,7 @@
     "80015676": {
       "id": 80015676,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5092,
       "step": 1,
       "achievementType": 0,
@@ -58427,7 +58427,7 @@
     "80015691": {
       "id": 80015691,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5107,
       "step": 1,
       "achievementType": 0,
@@ -58451,7 +58451,7 @@
     "80015692": {
       "id": 80015692,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5108,
       "step": 1,
       "achievementType": 0,
@@ -58715,7 +58715,7 @@
     "80015703": {
       "id": 80015703,
       "name": "다재다능한 {0}",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 5119,
       "step": 1,
       "achievementType": 0,
@@ -60347,7 +60347,7 @@
     "80015774": {
       "id": 80015774,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5186,
       "step": 1,
       "achievementType": 0,
@@ -62507,7 +62507,7 @@
     "80015864": {
       "id": 80015864,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5199,
       "step": 1,
       "achievementType": 0,
@@ -63611,7 +63611,7 @@
     "80015910": {
       "id": 80015910,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5209,
       "step": 1,
       "achievementType": 0,
@@ -63803,7 +63803,7 @@
     "80015918": {
       "id": 80015918,
       "name": "다재다능한 {0}",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5217,
       "step": 1,
       "achievementType": 0,
@@ -73040,7 +73040,7 @@
     "80021018": {
       "id": 80021018,
       "name": "무기류 거래의 달인",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12115,
       "step": 1,
       "achievementType": 0,
@@ -73064,7 +73064,7 @@
     "80021019": {
       "id": 80021019,
       "name": "총포류 거래의 달인",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12116,
       "step": 1,
       "achievementType": 0,
@@ -82805,7 +82805,7 @@
     "80035002": {
       "id": 80035002,
       "name": "아름다운 밤하늘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12181,
       "step": 1,
       "achievementType": 0,
@@ -82823,7 +82823,7 @@
     "80035003": {
       "id": 80035003,
       "name": "아름다운 밤하늘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12181,
       "step": 2,
       "achievementType": 0,
@@ -82842,7 +82842,7 @@
     "80035004": {
       "id": 80035004,
       "name": "아름다운 밤하늘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12181,
       "step": 3,
       "achievementType": 0,
@@ -82861,7 +82861,7 @@
     "80035005": {
       "id": 80035005,
       "name": "아름다운 밤하늘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12181,
       "step": 4,
       "achievementType": 0,
@@ -82880,7 +82880,7 @@
     "80035006": {
       "id": 80035006,
       "name": "아름다운 밤하늘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12181,
       "step": 5,
       "achievementType": 0,
@@ -83369,7 +83369,7 @@
     "80035512": {
       "id": 80035512,
       "name": "인간의 힘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12187,
       "step": 1,
       "achievementType": 0,
@@ -83387,7 +83387,7 @@
     "80035513": {
       "id": 80035513,
       "name": "인간의 힘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12187,
       "step": 2,
       "achievementType": 0,
@@ -83406,7 +83406,7 @@
     "80035514": {
       "id": 80035514,
       "name": "인간의 힘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12187,
       "step": 3,
       "achievementType": 0,
@@ -83425,7 +83425,7 @@
     "80035515": {
       "id": 80035515,
       "name": "인간의 힘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12187,
       "step": 4,
       "achievementType": 0,
@@ -83444,7 +83444,7 @@
     "80035516": {
       "id": 80035516,
       "name": "인간의 힘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12187,
       "step": 5,
       "achievementType": 0,
@@ -83651,7 +83651,7 @@
     "80035527": {
       "id": 80035527,
       "name": "선인들의 발자취",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12190,
       "step": 1,
       "achievementType": 0,
@@ -83669,7 +83669,7 @@
     "80035528": {
       "id": 80035528,
       "name": "선인들의 발자취",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12190,
       "step": 2,
       "achievementType": 0,
@@ -83688,7 +83688,7 @@
     "80035529": {
       "id": 80035529,
       "name": "선인들의 발자취",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12190,
       "step": 3,
       "achievementType": 0,
@@ -83707,7 +83707,7 @@
     "80035530": {
       "id": 80035530,
       "name": "선인들의 발자취",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12190,
       "step": 4,
       "achievementType": 0,
@@ -83726,7 +83726,7 @@
     "80035531": {
       "id": 80035531,
       "name": "선인들의 발자취",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12190,
       "step": 5,
       "achievementType": 0,
@@ -83745,7 +83745,7 @@
     "80035532": {
       "id": 80035532,
       "name": "트레저 헌터",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12191,
       "step": 1,
       "achievementType": 0,
@@ -83763,7 +83763,7 @@
     "80035533": {
       "id": 80035533,
       "name": "트레저 헌터",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12191,
       "step": 2,
       "achievementType": 0,
@@ -83782,7 +83782,7 @@
     "80035534": {
       "id": 80035534,
       "name": "트레저 헌터",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12191,
       "step": 3,
       "achievementType": 0,
@@ -83801,7 +83801,7 @@
     "80035535": {
       "id": 80035535,
       "name": "트레저 헌터",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12191,
       "step": 4,
       "achievementType": 0,
@@ -83820,7 +83820,7 @@
     "80035536": {
       "id": 80035536,
       "name": "트레저 헌터",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12191,
       "step": 5,
       "achievementType": 0,
@@ -89108,6 +89108,78 @@
       "reward": 94011003,
       "category": 5
     },
+    "80045226": {
+      "id": 80045226,
+      "name": "{0} 격파",
+      "localBitFlag": 192,
+      "order": 12337,
+      "step": 1,
+      "achievementType": 0,
+      "jobType": 3,
+      "isStackBeforeOpen": false,
+      "isHidden": false,
+      "achievementTermsId": 87000066,
+      "achievementTarget": [
+        15010831
+      ],
+      "achievementCount": 1,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "OceanNpc"
+        }
+      ],
+      "reward": 94011003,
+      "category": 5
+    },
+    "80045227": {
+      "id": 80045227,
+      "name": "{0} 격파",
+      "localBitFlag": 192,
+      "order": 12337,
+      "step": 1,
+      "achievementType": 0,
+      "jobType": 3,
+      "isStackBeforeOpen": false,
+      "isHidden": false,
+      "achievementTermsId": 87000066,
+      "achievementTarget": [
+        15010832
+      ],
+      "achievementCount": 1,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "OceanNpc"
+        }
+      ],
+      "reward": 94011003,
+      "category": 5
+    },
+    "80045228": {
+      "id": 80045228,
+      "name": "{0} 격파",
+      "localBitFlag": 192,
+      "order": 12337,
+      "step": 1,
+      "achievementType": 0,
+      "jobType": 3,
+      "isStackBeforeOpen": false,
+      "isHidden": false,
+      "achievementTermsId": 87000066,
+      "achievementTarget": [
+        15010833
+      ],
+      "achievementCount": 1,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "OceanNpc"
+        }
+      ],
+      "reward": 94011003,
+      "category": 5
+    },
     "80045250": {
       "id": 80045250,
       "name": "평화로운 한때",
@@ -91434,7 +91506,7 @@
     "80045688": {
       "id": 80045688,
       "name": "토벌",
-      "localBitFlag": 219,
+      "localBitFlag": 27,
       "order": 1,
       "achievementType": 1,
       "jobType": 1,
@@ -112762,7 +112834,7 @@
     "80049050": {
       "id": 80049050,
       "name": "요리 연구가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1501,
       "step": 1,
       "achievementType": 0,
@@ -112780,7 +112852,7 @@
     "80049051": {
       "id": 80049051,
       "name": "요리 연구가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1501,
       "step": 2,
       "achievementType": 0,
@@ -112799,7 +112871,7 @@
     "80049052": {
       "id": 80049052,
       "name": "요리 연구가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1501,
       "step": 3,
       "achievementType": 0,
@@ -112818,7 +112890,7 @@
     "80049053": {
       "id": 80049053,
       "name": "요리 연구가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1501,
       "step": 4,
       "achievementType": 0,
@@ -112837,7 +112909,7 @@
     "80049054": {
       "id": 80049054,
       "name": "요리 연구가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1501,
       "step": 5,
       "achievementType": 0,
@@ -112856,7 +112928,7 @@
     "80049055": {
       "id": 80049055,
       "name": "요리 연구가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1501,
       "step": 6,
       "achievementType": 0,
@@ -112875,7 +112947,7 @@
     "80049056": {
       "id": 80049056,
       "name": "요리 연구가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1501,
       "step": 7,
       "achievementType": 0,
@@ -112894,7 +112966,7 @@
     "80049057": {
       "id": 80049057,
       "name": "요리 연구가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1501,
       "step": 8,
       "achievementType": 0,
@@ -112913,7 +112985,7 @@
     "80049058": {
       "id": 80049058,
       "name": "요리 연구가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1501,
       "step": 9,
       "achievementType": 0,
@@ -112932,7 +113004,7 @@
     "80049059": {
       "id": 80049059,
       "name": "요리 연구가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1501,
       "step": 10,
       "achievementType": 0,
@@ -112951,7 +113023,7 @@
     "80049060": {
       "id": 80049060,
       "name": "골조 설계사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1502,
       "step": 1,
       "achievementType": 0,
@@ -112969,7 +113041,7 @@
     "80049061": {
       "id": 80049061,
       "name": "골조 설계사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1502,
       "step": 2,
       "achievementType": 0,
@@ -112988,7 +113060,7 @@
     "80049062": {
       "id": 80049062,
       "name": "골조 설계사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1502,
       "step": 3,
       "achievementType": 0,
@@ -113007,7 +113079,7 @@
     "80049063": {
       "id": 80049063,
       "name": "골조 설계사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1502,
       "step": 4,
       "achievementType": 0,
@@ -113026,7 +113098,7 @@
     "80049064": {
       "id": 80049064,
       "name": "골조 설계사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1502,
       "step": 5,
       "achievementType": 0,
@@ -113045,7 +113117,7 @@
     "80049065": {
       "id": 80049065,
       "name": "골조 설계사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1502,
       "step": 6,
       "achievementType": 0,
@@ -113064,7 +113136,7 @@
     "80049066": {
       "id": 80049066,
       "name": "골조 설계사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1502,
       "step": 7,
       "achievementType": 0,
@@ -113083,7 +113155,7 @@
     "80049067": {
       "id": 80049067,
       "name": "골조 설계사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1502,
       "step": 8,
       "achievementType": 0,
@@ -113102,7 +113174,7 @@
     "80049068": {
       "id": 80049068,
       "name": "골조 설계사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1502,
       "step": 9,
       "achievementType": 0,
@@ -113121,7 +113193,7 @@
     "80049069": {
       "id": 80049069,
       "name": "골조 설계사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1502,
       "step": 10,
       "achievementType": 0,
@@ -113731,7 +113803,7 @@
     "80049101": {
       "id": 80049101,
       "name": "{0} 생산 전문가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1507,
       "step": 1,
       "achievementType": 0,
@@ -113755,7 +113827,7 @@
     "80049102": {
       "id": 80049102,
       "name": "{0} 생산 전문가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1508,
       "step": 1,
       "achievementType": 0,
@@ -113779,7 +113851,7 @@
     "80049103": {
       "id": 80049103,
       "name": "{0} 생산 전문가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1509,
       "step": 1,
       "achievementType": 0,
@@ -113803,7 +113875,7 @@
     "80049104": {
       "id": 80049104,
       "name": "{0} 생산 전문가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1510,
       "step": 1,
       "achievementType": 0,
@@ -113827,7 +113899,7 @@
     "80049105": {
       "id": 80049105,
       "name": "{0} 생산 전문가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1511,
       "step": 1,
       "achievementType": 0,
@@ -133683,7 +133755,7 @@
     "80050952": {
       "id": 80050952,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1,
       "achievementType": 3,
       "jobType": 0,
@@ -133704,7 +133776,7 @@
     "80050953": {
       "id": 80050953,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1,
       "achievementType": 3,
       "jobType": 0,
@@ -133726,7 +133798,7 @@
     "80050954": {
       "id": 80050954,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2,
       "achievementType": 3,
       "jobType": 0,
@@ -133747,7 +133819,7 @@
     "80050955": {
       "id": 80050955,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2,
       "achievementType": 3,
       "jobType": 0,
@@ -133769,7 +133841,7 @@
     "80050956": {
       "id": 80050956,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 3,
       "achievementType": 3,
       "jobType": 0,
@@ -133790,7 +133862,7 @@
     "80050957": {
       "id": 80050957,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 3,
       "achievementType": 3,
       "jobType": 0,
@@ -133812,7 +133884,7 @@
     "80050958": {
       "id": 80050958,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 4,
       "achievementType": 3,
       "jobType": 0,
@@ -133833,7 +133905,7 @@
     "80050959": {
       "id": 80050959,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 4,
       "achievementType": 3,
       "jobType": 0,
@@ -133855,7 +133927,7 @@
     "80050960": {
       "id": 80050960,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5,
       "achievementType": 3,
       "jobType": 0,
@@ -133876,7 +133948,7 @@
     "80050961": {
       "id": 80050961,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5,
       "achievementType": 3,
       "jobType": 0,
@@ -133898,7 +133970,7 @@
     "80050962": {
       "id": 80050962,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 6,
       "achievementType": 3,
       "jobType": 0,
@@ -133919,7 +133991,7 @@
     "80050963": {
       "id": 80050963,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 6,
       "achievementType": 3,
       "jobType": 0,
@@ -133941,7 +134013,7 @@
     "80050964": {
       "id": 80050964,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 7,
       "achievementType": 3,
       "jobType": 0,
@@ -133962,7 +134034,7 @@
     "80050965": {
       "id": 80050965,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 7,
       "achievementType": 3,
       "jobType": 0,
@@ -133984,7 +134056,7 @@
     "80050966": {
       "id": 80050966,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 8,
       "achievementType": 3,
       "jobType": 0,
@@ -134005,7 +134077,7 @@
     "80050967": {
       "id": 80050967,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 8,
       "achievementType": 3,
       "jobType": 0,
@@ -134027,7 +134099,7 @@
     "80050968": {
       "id": 80050968,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 9,
       "achievementType": 3,
       "jobType": 0,
@@ -134048,7 +134120,7 @@
     "80050969": {
       "id": 80050969,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 9,
       "achievementType": 3,
       "jobType": 0,
@@ -134070,7 +134142,7 @@
     "80050970": {
       "id": 80050970,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 10,
       "achievementType": 3,
       "jobType": 0,
@@ -134091,7 +134163,7 @@
     "80050971": {
       "id": 80050971,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 10,
       "achievementType": 3,
       "jobType": 0,
@@ -134113,7 +134185,7 @@
     "80050972": {
       "id": 80050972,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 11,
       "achievementType": 3,
       "jobType": 0,
@@ -134134,7 +134206,7 @@
     "80050973": {
       "id": 80050973,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 11,
       "achievementType": 3,
       "jobType": 0,
@@ -134156,7 +134228,7 @@
     "80050974": {
       "id": 80050974,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12,
       "achievementType": 3,
       "jobType": 0,
@@ -134177,7 +134249,7 @@
     "80050975": {
       "id": 80050975,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12,
       "achievementType": 3,
       "jobType": 0,
@@ -134199,7 +134271,7 @@
     "80050976": {
       "id": 80050976,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 13,
       "achievementType": 3,
       "jobType": 0,
@@ -134220,7 +134292,7 @@
     "80050977": {
       "id": 80050977,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 13,
       "achievementType": 3,
       "jobType": 0,
@@ -134242,7 +134314,7 @@
     "80050978": {
       "id": 80050978,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 14,
       "achievementType": 3,
       "jobType": 0,
@@ -134263,7 +134335,7 @@
     "80050979": {
       "id": 80050979,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 14,
       "achievementType": 3,
       "jobType": 0,
@@ -134285,7 +134357,7 @@
     "80050980": {
       "id": 80050980,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 15,
       "achievementType": 3,
       "jobType": 0,
@@ -134306,7 +134378,7 @@
     "80050981": {
       "id": 80050981,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 15,
       "achievementType": 3,
       "jobType": 0,
@@ -134328,7 +134400,7 @@
     "80050982": {
       "id": 80050982,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 16,
       "achievementType": 3,
       "jobType": 0,
@@ -134349,7 +134421,7 @@
     "80050983": {
       "id": 80050983,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 16,
       "achievementType": 3,
       "jobType": 0,
@@ -134371,7 +134443,7 @@
     "80050984": {
       "id": 80050984,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1,
       "achievementType": 3,
       "jobType": 0,
@@ -134393,7 +134465,7 @@
     "80050985": {
       "id": 80050985,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2,
       "achievementType": 3,
       "jobType": 0,
@@ -134415,7 +134487,7 @@
     "80050986": {
       "id": 80050986,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 3,
       "achievementType": 3,
       "jobType": 0,
@@ -134437,7 +134509,7 @@
     "80050987": {
       "id": 80050987,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 4,
       "achievementType": 3,
       "jobType": 0,
@@ -134459,7 +134531,7 @@
     "80050988": {
       "id": 80050988,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5,
       "achievementType": 3,
       "jobType": 0,
@@ -134481,7 +134553,7 @@
     "80050989": {
       "id": 80050989,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 6,
       "achievementType": 3,
       "jobType": 0,
@@ -134503,7 +134575,7 @@
     "80050990": {
       "id": 80050990,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 7,
       "achievementType": 3,
       "jobType": 0,
@@ -134525,7 +134597,7 @@
     "80050991": {
       "id": 80050991,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 8,
       "achievementType": 3,
       "jobType": 0,
@@ -134547,7 +134619,7 @@
     "80050992": {
       "id": 80050992,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1,
       "achievementType": 3,
       "jobType": 0,
@@ -134569,7 +134641,7 @@
     "80050993": {
       "id": 80050993,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2,
       "achievementType": 3,
       "jobType": 0,
@@ -134591,7 +134663,7 @@
     "80050994": {
       "id": 80050994,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 3,
       "achievementType": 3,
       "jobType": 0,
@@ -134613,7 +134685,7 @@
     "80050995": {
       "id": 80050995,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 4,
       "achievementType": 3,
       "jobType": 0,
@@ -134635,7 +134707,7 @@
     "80050996": {
       "id": 80050996,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5,
       "achievementType": 3,
       "jobType": 0,
@@ -134657,7 +134729,7 @@
     "80050997": {
       "id": 80050997,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 6,
       "achievementType": 3,
       "jobType": 0,
@@ -134679,7 +134751,7 @@
     "80050998": {
       "id": 80050998,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 7,
       "achievementType": 3,
       "jobType": 0,
@@ -134701,7 +134773,7 @@
     "80050999": {
       "id": 80050999,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 8,
       "achievementType": 3,
       "jobType": 0,
@@ -134723,7 +134795,7 @@
     "80051000": {
       "id": 80051000,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1,
       "achievementType": 3,
       "jobType": 0,
@@ -134744,7 +134816,7 @@
     "80051001": {
       "id": 80051001,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1,
       "achievementType": 3,
       "jobType": 0,
@@ -134766,7 +134838,7 @@
     "80051002": {
       "id": 80051002,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2,
       "achievementType": 3,
       "jobType": 0,
@@ -134787,7 +134859,7 @@
     "80051003": {
       "id": 80051003,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2,
       "achievementType": 3,
       "jobType": 0,
@@ -134809,7 +134881,7 @@
     "80051004": {
       "id": 80051004,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 3,
       "achievementType": 3,
       "jobType": 0,
@@ -134830,7 +134902,7 @@
     "80051005": {
       "id": 80051005,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 3,
       "achievementType": 3,
       "jobType": 0,
@@ -134852,7 +134924,7 @@
     "80051006": {
       "id": 80051006,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 4,
       "achievementType": 3,
       "jobType": 0,
@@ -134873,7 +134945,7 @@
     "80051007": {
       "id": 80051007,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 4,
       "achievementType": 3,
       "jobType": 0,
@@ -134895,7 +134967,7 @@
     "80051008": {
       "id": 80051008,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5,
       "achievementType": 3,
       "jobType": 0,
@@ -134916,7 +134988,7 @@
     "80051009": {
       "id": 80051009,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5,
       "achievementType": 3,
       "jobType": 0,
@@ -134938,7 +135010,7 @@
     "80051010": {
       "id": 80051010,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 6,
       "achievementType": 3,
       "jobType": 0,
@@ -134959,7 +135031,7 @@
     "80051011": {
       "id": 80051011,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 6,
       "achievementType": 3,
       "jobType": 0,
@@ -134981,7 +135053,7 @@
     "80051012": {
       "id": 80051012,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 7,
       "achievementType": 3,
       "jobType": 0,
@@ -135002,7 +135074,7 @@
     "80051013": {
       "id": 80051013,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 7,
       "achievementType": 3,
       "jobType": 0,
@@ -135024,7 +135096,7 @@
     "80051014": {
       "id": 80051014,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 8,
       "achievementType": 3,
       "jobType": 0,
@@ -135045,7 +135117,7 @@
     "80051015": {
       "id": 80051015,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 8,
       "achievementType": 3,
       "jobType": 0,
@@ -135067,7 +135139,7 @@
     "80051016": {
       "id": 80051016,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 9,
       "achievementType": 3,
       "jobType": 0,
@@ -135088,7 +135160,7 @@
     "80051017": {
       "id": 80051017,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 9,
       "achievementType": 3,
       "jobType": 0,
@@ -135110,7 +135182,7 @@
     "80051018": {
       "id": 80051018,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 10,
       "achievementType": 3,
       "jobType": 0,
@@ -135131,7 +135203,7 @@
     "80051019": {
       "id": 80051019,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 10,
       "achievementType": 3,
       "jobType": 0,
@@ -135153,7 +135225,7 @@
     "80051020": {
       "id": 80051020,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 11,
       "achievementType": 3,
       "jobType": 0,
@@ -135174,7 +135246,7 @@
     "80051021": {
       "id": 80051021,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 11,
       "achievementType": 3,
       "jobType": 0,
@@ -135196,7 +135268,7 @@
     "80051022": {
       "id": 80051022,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12,
       "achievementType": 3,
       "jobType": 0,
@@ -135217,7 +135289,7 @@
     "80051023": {
       "id": 80051023,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 12,
       "achievementType": 3,
       "jobType": 0,
@@ -135239,7 +135311,7 @@
     "80051024": {
       "id": 80051024,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 13,
       "achievementType": 3,
       "jobType": 0,
@@ -135260,7 +135332,7 @@
     "80051025": {
       "id": 80051025,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 13,
       "achievementType": 3,
       "jobType": 0,
@@ -135282,7 +135354,7 @@
     "80051026": {
       "id": 80051026,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 14,
       "achievementType": 3,
       "jobType": 0,
@@ -135303,7 +135375,7 @@
     "80051027": {
       "id": 80051027,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 14,
       "achievementType": 3,
       "jobType": 0,
@@ -135325,7 +135397,7 @@
     "80051028": {
       "id": 80051028,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 15,
       "achievementType": 3,
       "jobType": 0,
@@ -135346,7 +135418,7 @@
     "80051029": {
       "id": 80051029,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 15,
       "achievementType": 3,
       "jobType": 0,
@@ -135368,7 +135440,7 @@
     "80051030": {
       "id": 80051030,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 16,
       "achievementType": 3,
       "jobType": 0,
@@ -135389,7 +135461,7 @@
     "80051031": {
       "id": 80051031,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 16,
       "achievementType": 3,
       "jobType": 0,
@@ -135411,7 +135483,7 @@
     "80051032": {
       "id": 80051032,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 1,
       "achievementType": 3,
       "jobType": 0,
@@ -135433,7 +135505,7 @@
     "80051033": {
       "id": 80051033,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 2,
       "achievementType": 3,
       "jobType": 0,
@@ -135455,7 +135527,7 @@
     "80051034": {
       "id": 80051034,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 3,
       "achievementType": 3,
       "jobType": 0,
@@ -135477,7 +135549,7 @@
     "80051035": {
       "id": 80051035,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 4,
       "achievementType": 3,
       "jobType": 0,
@@ -135499,7 +135571,7 @@
     "80051036": {
       "id": 80051036,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 5,
       "achievementType": 3,
       "jobType": 0,
@@ -135521,7 +135593,7 @@
     "80051037": {
       "id": 80051037,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 6,
       "achievementType": 3,
       "jobType": 0,
@@ -135543,7 +135615,7 @@
     "80051038": {
       "id": 80051038,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 7,
       "achievementType": 3,
       "jobType": 0,
@@ -135565,7 +135637,7 @@
     "80051039": {
       "id": 80051039,
       "name": "달성 보상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "order": 8,
       "achievementType": 3,
       "jobType": 0,
@@ -135765,7 +135837,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        31
+        32
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135787,7 +135859,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        31
+        32
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135808,7 +135880,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        41
+        42
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135830,7 +135902,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        41
+        42
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135851,7 +135923,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        61
+        62
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135873,7 +135945,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        61
+        62
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135894,7 +135966,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        68
+        69
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135916,7 +135988,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        68
+        69
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135937,7 +136009,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        79
+        80
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135959,7 +136031,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        79
+        80
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -135980,7 +136052,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        106
+        107
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136002,7 +136074,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        106
+        107
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136023,7 +136095,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        119
+        120
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136045,7 +136117,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        119
+        120
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136066,7 +136138,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        125
+        126
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136088,7 +136160,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        125
+        126
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136109,7 +136181,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        129
+        130
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136131,7 +136203,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        129
+        130
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136152,7 +136224,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        145
+        146
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136174,7 +136246,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        145
+        146
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136195,7 +136267,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        148
+        149
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136217,7 +136289,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        148
+        149
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136238,7 +136310,7 @@
       "jobType": 0,
       "extra": [
         20000001,
-        151
+        152
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136260,7 +136332,7 @@
       "needQuestPassId": 99100000,
       "extra": [
         20000001,
-        151
+        152
       ],
       "isStackBeforeOpen": true,
       "isHidden": false,
@@ -136275,7 +136347,7 @@
     "80099901": {
       "id": 80099901,
       "name": "달성 보상",
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "order": 1,
       "achievementType": 3,
       "jobType": 0,
@@ -136297,7 +136369,7 @@
     "80099902": {
       "id": 80099902,
       "name": "달성 보상",
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "order": 2,
       "achievementType": 3,
       "jobType": 0,
@@ -136319,7 +136391,7 @@
     "80099903": {
       "id": 80099903,
       "name": "달성 보상",
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "order": 3,
       "achievementType": 3,
       "jobType": 0,
@@ -136341,7 +136413,7 @@
     "80099904": {
       "id": 80099904,
       "name": "달성 보상",
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "order": 4,
       "achievementType": 3,
       "jobType": 0,
@@ -136363,7 +136435,7 @@
     "80099905": {
       "id": 80099905,
       "name": "달성 보상",
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "order": 5,
       "achievementType": 3,
       "jobType": 0,
@@ -136385,7 +136457,7 @@
     "80099906": {
       "id": 80099906,
       "name": "달성 보상",
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "order": 6,
       "achievementType": 3,
       "jobType": 0,
@@ -136407,7 +136479,7 @@
     "80099907": {
       "id": 80099907,
       "name": "달성 보상",
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "order": 7,
       "achievementType": 3,
       "jobType": 0,
@@ -136429,7 +136501,7 @@
     "80099908": {
       "id": 80099908,
       "name": "달성 보상",
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "order": 8,
       "achievementType": 3,
       "jobType": 0,
@@ -136451,7 +136523,7 @@
     "80099909": {
       "id": 80099909,
       "name": "달성 보상",
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "order": 9,
       "achievementType": 3,
       "jobType": 0,
@@ -136473,7 +136545,7 @@
     "80099910": {
       "id": 80099910,
       "name": "달성 보상",
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "order": 10,
       "achievementType": 3,
       "jobType": 0,

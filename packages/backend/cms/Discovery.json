@@ -362,7 +362,7 @@
     "70401000": {
       "id": 70401000,
       "name": "가야 철갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -387,7 +387,7 @@
     "70401001": {
       "id": 70401001,
       "name": "가타멜라타 기마상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -412,7 +412,7 @@
     "70401002": {
       "id": 70401002,
       "name": "검투사의 투구",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -438,7 +438,7 @@
     "70401003": {
       "id": 70401003,
       "name": "게르",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -463,7 +463,7 @@
     "70401004": {
       "id": 70401004,
       "name": "게클랭의 마상창",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -489,7 +489,7 @@
     "70401006": {
       "id": 70401006,
       "name": "골각기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -514,7 +514,7 @@
     "70401007": {
       "id": 70401007,
       "name": "관두의",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -540,7 +540,7 @@
     "70401009": {
       "id": 70401009,
       "name": "그리스 문자의 석판",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -565,7 +565,7 @@
     "70401010": {
       "id": 70401010,
       "name": "그리스의 불",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -597,7 +597,7 @@
     "70401011": {
       "id": 70401011,
       "name": "금각만의 쇠사슬",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -622,7 +622,7 @@
     "70401012": {
       "id": 70401012,
       "name": "금루옥의",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -654,7 +654,7 @@
     "70401013": {
       "id": 70401013,
       "name": "길가메시의 서사시",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -679,7 +679,7 @@
     "70401014": {
       "id": 70401014,
       "name": "나라티하파테 왕의 비수",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -705,7 +705,7 @@
     "70401015": {
       "id": 70401015,
       "name": "나르메르 팔레트",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -730,7 +730,7 @@
     "70401016": {
       "id": 70401016,
       "name": "나일로미터",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -755,7 +755,7 @@
     "70401017": {
       "id": 70401017,
       "name": "네로황제의 대리석상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -780,7 +780,7 @@
     "70401018": {
       "id": 70401018,
       "name": "네르바 황제의 동상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -805,7 +805,7 @@
     "70401020": {
       "id": 70401020,
       "name": "다리우스 1세의 투구",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -831,7 +831,7 @@
     "70401021": {
       "id": 70401021,
       "name": "다리우스 3세의 갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -857,7 +857,7 @@
     "70401022": {
       "id": 70401022,
       "name": "데메트리오스 1세의 갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -883,7 +883,7 @@
     "70401023": {
       "id": 70401023,
       "name": "동고",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -908,7 +908,7 @@
     "70401024": {
       "id": 70401024,
       "name": "라발나스왕의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -934,7 +934,7 @@
     "70401025": {
       "id": 70401025,
       "name": "라브렌체프 사본",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -959,7 +959,7 @@
     "70401027": {
       "id": 70401027,
       "name": "람세스 2세의 머리 장식",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -984,7 +984,7 @@
     "70401028": {
       "id": 70401028,
       "name": "람세스 2세의 벽화",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1009,7 +1009,7 @@
     "70401029": {
       "id": 70401029,
       "name": "람캄행 대왕의 비문",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -1034,7 +1034,7 @@
     "70401030": {
       "id": 70401030,
       "name": "렙티스마그나의 비너스상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -1059,7 +1059,7 @@
     "70401031": {
       "id": 70401031,
       "name": "로마건국사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -1084,7 +1084,7 @@
     "70401032": {
       "id": 70401032,
       "name": "로제타스톤",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -1109,7 +1109,7 @@
     "70401033": {
       "id": 70401033,
       "name": "롤로의 투구",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -1135,7 +1135,7 @@
     "70401034": {
       "id": 70401034,
       "name": "롬파이어",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -1161,7 +1161,7 @@
     "70401035": {
       "id": 70401035,
       "name": "롱고 롱고",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -1186,7 +1186,7 @@
     "70401036": {
       "id": 70401036,
       "name": "룬문자 비석",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -1211,7 +1211,7 @@
     "70401037": {
       "id": 70401037,
       "name": "리디아 화폐",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1268,7 +1268,7 @@
     "70401039": {
       "id": 70401039,
       "name": "마라조섬의 토기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1293,7 +1293,7 @@
     "70401042": {
       "id": 70401042,
       "name": "메르엔프타하 비문",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1318,7 +1318,7 @@
     "70401043": {
       "id": 70401043,
       "name": "멘카우라왕의 삼신상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -1343,7 +1343,7 @@
     "70401044": {
       "id": 70401044,
       "name": "묠니르",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -1376,7 +1376,7 @@
     "70401045": {
       "id": 70401045,
       "name": "무령왕릉 지석",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1401,7 +1401,7 @@
     "70401047": {
       "id": 70401047,
       "name": "미라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -1426,7 +1426,7 @@
     "70401048": {
       "id": 70401048,
       "name": "바다 민족의 갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -1452,7 +1452,7 @@
     "70401049": {
       "id": 70401049,
       "name": "바다 민족의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -1485,7 +1485,7 @@
     "70401050": {
       "id": 70401050,
       "name": "바이바르스의 창",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -1511,7 +1511,7 @@
     "70401051": {
       "id": 70401051,
       "name": "바이킹 소드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1537,7 +1537,7 @@
     "70401052": {
       "id": 70401052,
       "name": "바이킹의 철 방패",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -1562,7 +1562,7 @@
     "70401054": {
       "id": 70401054,
       "name": "배터시의 방패",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1587,7 +1587,7 @@
     "70401055": {
       "id": 70401055,
       "name": "백제 금동대향로",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -1612,7 +1612,7 @@
     "70401057": {
       "id": 70401057,
       "name": "베히스툰 암각비",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1637,7 +1637,7 @@
     "70401059": {
       "id": 70401059,
       "name": "봉니",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -1662,7 +1662,7 @@
     "70401060": {
       "id": 70401060,
       "name": "비블로스 문자의 비석 조각",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1694,7 +1694,7 @@
     "70401064": {
       "id": 70401064,
       "name": "사기(발견물)@사기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -1719,7 +1719,7 @@
     "70401065": {
       "id": 70401065,
       "name": "사르코파구스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1744,7 +1744,7 @@
     "70401066": {
       "id": 70401066,
       "name": "사리사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -1769,7 +1769,7 @@
     "70401067": {
       "id": 70401067,
       "name": "사자의 서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -1801,7 +1801,7 @@
     "70401068": {
       "id": 70401068,
       "name": "사포의 시집",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -1826,7 +1826,7 @@
     "70401069": {
       "id": 70401069,
       "name": "삼국사기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -1851,7 +1851,7 @@
     "70401070": {
       "id": 70401070,
       "name": "삼국유사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -1876,7 +1876,7 @@
     "70401071": {
       "id": 70401071,
       "name": "설형문자점토판",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1908,7 +1908,7 @@
     "70401072": {
       "id": 70401072,
       "name": "셀레우코스 1세의 대리석상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1933,7 +1933,7 @@
     "70401073": {
       "id": 70401073,
       "name": "소머리가 달린 여왕의 리라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -1958,7 +1958,7 @@
     "70401074": {
       "id": 70401074,
       "name": "소크라테스의 독배",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -1990,7 +1990,7 @@
     "70401075": {
       "id": 70401075,
       "name": "수메르의 전차",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -2015,7 +2015,7 @@
     "70401076": {
       "id": 70401076,
       "name": "스키피오의 투구",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -2041,7 +2041,7 @@
     "70401077": {
       "id": 70401077,
       "name": "시민관",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -2067,7 +2067,7 @@
     "70401078": {
       "id": 70401078,
       "name": "신소부 여왕의 귀걸이",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -2093,7 +2093,7 @@
     "70401080": {
       "id": 70401080,
       "name": "아가멤논의 황금마스크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -2118,7 +2118,7 @@
     "70401081": {
       "id": 70401081,
       "name": "아그리피나의 머리 장식",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -2144,7 +2144,7 @@
     "70401082": {
       "id": 70401082,
       "name": "아노야타왕의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -2170,7 +2170,7 @@
     "70401083": {
       "id": 70401083,
       "name": "아바스의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -2196,7 +2196,7 @@
     "70401084": {
       "id": 70401084,
       "name": "아부심벨 거상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -2221,7 +2221,7 @@
     "70401085": {
       "id": 70401085,
       "name": "아우구스투스 대리석상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -2246,7 +2246,7 @@
     "70401086": {
       "id": 70401086,
       "name": "아우렐리아누스의 투구",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -2278,7 +2278,7 @@
     "70401087": {
       "id": 70401087,
       "name": "아우렐리우스 기마상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -2303,7 +2303,7 @@
     "70401089": {
       "id": 70401089,
       "name": "아트라하시스 서사시",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -2335,7 +2335,7 @@
     "70401091": {
       "id": 70401091,
       "name": "아파다나의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -2360,7 +2360,7 @@
     "70401092": {
       "id": 70401092,
       "name": "안토니누스의 왕홀",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -2385,7 +2385,7 @@
     "70401093": {
       "id": 70401093,
       "name": "알렉산더 대왕의 갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -2411,7 +2411,7 @@
     "70401094": {
       "id": 70401094,
       "name": "알렉산더 대왕의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -2437,7 +2437,7 @@
     "70401095": {
       "id": 70401095,
       "name": "알렉산더 대왕의 석관",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -2469,7 +2469,7 @@
     "70401096": {
       "id": 70401096,
       "name": "압형토기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -2494,7 +2494,7 @@
     "70401097": {
       "id": 70401097,
       "name": "앵가석",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -2519,7 +2519,7 @@
     "70401098": {
       "id": 70401098,
       "name": "야요이 토기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -2544,7 +2544,7 @@
     "70401099": {
       "id": 70401099,
       "name": "에누마 엘리시",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -2569,7 +2569,7 @@
     "70401100": {
       "id": 70401100,
       "name": "에비 일의상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -2594,7 +2594,7 @@
     "70401101": {
       "id": 70401101,
       "name": "에파미논다스의 갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -2620,7 +2620,7 @@
     "70401102": {
       "id": 70401102,
       "name": "엑스칼리버",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -2653,7 +2653,7 @@
     "70401103": {
       "id": 70401103,
       "name": "여수장우중문시",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -2678,7 +2678,7 @@
     "70401104": {
       "id": 70401104,
       "name": "영애 승람",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -2703,7 +2703,7 @@
     "70401105": {
       "id": 70401105,
       "name": "오도아케르의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -2729,7 +2729,7 @@
     "70401106": {
       "id": 70401106,
       "name": "오르메카의 거대 두상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -2754,7 +2754,7 @@
     "70401107": {
       "id": 70401107,
       "name": "오벨리스크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -2786,7 +2786,7 @@
     "70401108": {
       "id": 70401108,
       "name": "오스트라콘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -2811,7 +2811,7 @@
     "70401110": {
       "id": 70401110,
       "name": "왕들의 무덤",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -2836,7 +2836,7 @@
     "70401111": {
       "id": 70401111,
       "name": "요크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -2862,7 +2862,7 @@
     "70401112": {
       "id": 70401112,
       "name": "우르의 군기함",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -2887,7 +2887,7 @@
     "70401113": {
       "id": 70401113,
       "name": "원융",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -2912,7 +2912,7 @@
     "70401114": {
       "id": 70401114,
       "name": "원초연대기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -2937,7 +2937,7 @@
     "70401115": {
       "id": 70401115,
       "name": "원통인장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -2962,7 +2962,7 @@
     "70401118": {
       "id": 70401118,
       "name": "유익인면수신상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -2987,7 +2987,7 @@
     "70401120": {
       "id": 70401120,
       "name": "은자 피에르의 지팡이",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -3013,7 +3013,7 @@
     "70401121": {
       "id": 70401121,
       "name": "이고리 원정기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -3038,7 +3038,7 @@
     "70401122": {
       "id": 70401122,
       "name": "이집트 평화교섭 문서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -3063,7 +3063,7 @@
     "70401123": {
       "id": 70401123,
       "name": "이집트문자의 석판",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -3088,7 +3088,7 @@
     "70401124": {
       "id": 70401124,
       "name": "이집트의 벽화",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -3113,7 +3113,7 @@
     "70401126": {
       "id": 70401126,
       "name": "일본 토우",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -3138,7 +3138,7 @@
     "70401127": {
       "id": 70401127,
       "name": "잉카의 석벽",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -3163,7 +3163,7 @@
     "70401129": {
       "id": 70401129,
       "name": "자치통감",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -3188,7 +3188,7 @@
     "70401130": {
       "id": 70401130,
       "name": "작",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -3213,7 +3213,7 @@
     "70401132": {
       "id": 70401132,
       "name": "정도전의 사세구",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -3238,7 +3238,7 @@
     "70401133": {
       "id": 70401133,
       "name": "정화함대의 나침반",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -3263,7 +3263,7 @@
     "70401135": {
       "id": 70401135,
       "name": "제갈노",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -3289,7 +3289,7 @@
     "70401136": {
       "id": 70401136,
       "name": "제노비아 여왕의 작은 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -3314,7 +3314,7 @@
     "70401140": {
       "id": 70401140,
       "name": "차스키의 어깨가방",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -3339,7 +3339,7 @@
     "70401141": {
       "id": 70401141,
       "name": "찬드라굽타 왕의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -3372,7 +3372,7 @@
     "70401143": {
       "id": 70401143,
       "name": "천마도장니",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -3397,7 +3397,7 @@
     "70401144": {
       "id": 70401144,
       "name": "카노푸스 단지",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -3422,7 +3422,7 @@
     "70401145": {
       "id": 70401145,
       "name": "카라칼라 황제의 대리석상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -3447,7 +3447,7 @@
     "70401146": {
       "id": 70401146,
       "name": "카르투슈",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -3472,7 +3472,7 @@
     "70401147": {
       "id": 70401147,
       "name": "카이사르의 갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -3504,7 +3504,7 @@
     "70401149": {
       "id": 70401149,
       "name": "카이사리온 대리석상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -3529,7 +3529,7 @@
     "70401150": {
       "id": 70401150,
       "name": "칸슐왕의 팔찌",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -3555,7 +3555,7 @@
     "70401151": {
       "id": 70401151,
       "name": "칼리굴라 황제의 흉상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -3580,7 +3580,7 @@
     "70401153": {
       "id": 70401153,
       "name": "코모두스 황제의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -3606,7 +3606,7 @@
     "70401154": {
       "id": 70401154,
       "name": "쿠빌라이칸의 안장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -3631,7 +3631,7 @@
     "70401155": {
       "id": 70401155,
       "name": "쿠페의 목창",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -3657,7 +3657,7 @@
     "70401156": {
       "id": 70401156,
       "name": "쿠푸왕의 상아상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -3682,7 +3682,7 @@
     "70401157": {
       "id": 70401157,
       "name": "쿠푸왕의 지팡이",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -3708,7 +3708,7 @@
     "70401158": {
       "id": 70401158,
       "name": "크레타 문자 점토판",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -3740,7 +3740,7 @@
     "70401159": {
       "id": 70401159,
       "name": "크로케아 모르스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -3766,7 +3766,7 @@
     "70401160": {
       "id": 70401160,
       "name": "크세르크세스 1세의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -3791,7 +3791,7 @@
     "70401161": {
       "id": 70401161,
       "name": "클레오파트라상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -3816,7 +3816,7 @@
     "70401162": {
       "id": 70401162,
       "name": "클레오파트라의 가슴 장식",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -3842,7 +3842,7 @@
     "70401164": {
       "id": 70401164,
       "name": "클로비스 찌르개",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -3867,7 +3867,7 @@
     "70401166": {
       "id": 70401166,
       "name": "토크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -3893,7 +3893,7 @@
     "70401167": {
       "id": 70401167,
       "name": "토템 폴",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -3918,7 +3918,7 @@
     "70401168": {
       "id": 70401168,
       "name": "톨텍의 전사상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -3943,7 +3943,7 @@
     "70401169": {
       "id": 70401169,
       "name": "투그릴베그의 왕관",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -3969,7 +3969,7 @@
     "70401170": {
       "id": 70401170,
       "name": "투탕카멘왕의 황금마스크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -4002,7 +4002,7 @@
     "70401171": {
       "id": 70401171,
       "name": "투트모세 3세의 연대기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4027,7 +4027,7 @@
     "70401172": {
       "id": 70401172,
       "name": "트라야누스 황제의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4052,7 +4052,7 @@
     "70401173": {
       "id": 70401173,
       "name": "파스파 문자의 석판",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -4077,7 +4077,7 @@
     "70401175": {
       "id": 70401175,
       "name": "파칼 왕의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4102,7 +4102,7 @@
     "70401177": {
       "id": 70401177,
       "name": "팔렌케의 석관",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4127,7 +4127,7 @@
     "70401180": {
       "id": 70401180,
       "name": "프톨레마이오스 1세의 왕홀",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -4152,7 +4152,7 @@
     "70401182": {
       "id": 70401182,
       "name": "하트셉수트 여왕 석상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -4177,7 +4177,7 @@
     "70401184": {
       "id": 70401184,
       "name": "한니발 대리석상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -4202,7 +4202,7 @@
     "70401185": {
       "id": 70401185,
       "name": "한서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4227,7 +4227,7 @@
     "70401186": {
       "id": 70401186,
       "name": "함무라비법전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4259,7 +4259,7 @@
     "70401187": {
       "id": 70401187,
       "name": "헤임스크링글라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -4284,7 +4284,7 @@
     "70401188": {
       "id": 70401188,
       "name": "호부",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -4309,7 +4309,7 @@
     "70401189": {
       "id": 70401189,
       "name": "혼천의",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4334,7 +4334,7 @@
     "70401190": {
       "id": 70401190,
       "name": "화랑세기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -4359,7 +4359,7 @@
     "70401194": {
       "id": 70401194,
       "name": "흡혈귀 전설",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -4391,7 +4391,7 @@
     "70401195": {
       "id": 70401195,
       "name": "히타이트 전차",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -4416,7 +4416,7 @@
     "70401196": {
       "id": 70401196,
       "name": "히타이트 조약문",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4441,7 +4441,7 @@
     "70401197": {
       "id": 70401197,
       "name": "히타이트법전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -4466,7 +4466,7 @@
     "70401198": {
       "id": 70401198,
       "name": "히포크라테스 선서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -4491,7 +4491,7 @@
     "70401199": {
       "id": 70401199,
       "name": "힐 스톤",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4516,7 +4516,7 @@
     "70401200": {
       "id": 70401200,
       "name": "혼일강리역대국도지도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -4541,7 +4541,7 @@
     "70401201": {
       "id": 70401201,
       "name": "오나거",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4566,7 +4566,7 @@
     "70401202": {
       "id": 70401202,
       "name": "다빈치 오니솝터",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -4591,7 +4591,7 @@
     "70402000": {
       "id": 70402000,
       "name": "가네샤상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -4616,7 +4616,7 @@
     "70402001": {
       "id": 70402001,
       "name": "가루다 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -4641,7 +4641,7 @@
     "70402002": {
       "id": 70402002,
       "name": "경교비",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -4666,7 +4666,7 @@
     "70402004": {
       "id": 70402004,
       "name": "골리앗의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -4692,7 +4692,7 @@
     "70402005": {
       "id": 70402005,
       "name": "관세음보살상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -4712,12 +4712,12 @@
           "Count": 1
         }
       ],
-      "isUsedDiscovery": false
+      "isUsedDiscovery": true
     },
     "70402006": {
       "id": 70402006,
       "name": "구카이의 석장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -4742,7 +4742,7 @@
     "70402007": {
       "id": 70402007,
       "name": "그리스도의 성의",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -4767,7 +4767,7 @@
     "70402008": {
       "id": 70402008,
       "name": "금강저",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4792,7 +4792,7 @@
     "70402009": {
       "id": 70402009,
       "name": "금동관음보살입상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4817,7 +4817,7 @@
     "70402011": {
       "id": 70402011,
       "name": "나가 위의 부처",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4842,7 +4842,7 @@
     "70402012": {
       "id": 70402012,
       "name": "나라싱하상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -4867,7 +4867,7 @@
     "70402013": {
       "id": 70402013,
       "name": "남해기귀내법전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -4892,7 +4892,7 @@
     "70402014": {
       "id": 70402014,
       "name": "냐미냐미상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -4917,7 +4917,7 @@
     "70402015": {
       "id": 70402015,
       "name": "냐우의 가면",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -4943,7 +4943,7 @@
     "70402016": {
       "id": 70402016,
       "name": "네이트상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -4968,7 +4968,7 @@
     "70402017": {
       "id": 70402017,
       "name": "논어",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -4993,7 +4993,7 @@
     "70402018": {
       "id": 70402018,
       "name": "니벨룽겐의 반지",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -5026,7 +5026,7 @@
     "70402019": {
       "id": 70402019,
       "name": "니아메상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -5051,7 +5051,7 @@
     "70402020": {
       "id": 70402020,
       "name": "다니엘서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -5071,12 +5071,12 @@
           "Count": 1
         }
       ],
-      "isUsedDiscovery": false
+      "isUsedDiscovery": true
     },
     "70402021": {
       "id": 70402021,
       "name": "다즈보그의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -5101,7 +5101,7 @@
     "70402022": {
       "id": 70402022,
       "name": "도조지의 종",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -5126,7 +5126,7 @@
     "70402023": {
       "id": 70402023,
       "name": "드와라팔라상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -5151,7 +5151,7 @@
     "70402024": {
       "id": 70402024,
       "name": "락슈미 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -5176,7 +5176,7 @@
     "70402025": {
       "id": 70402025,
       "name": "락슈미의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -5201,7 +5201,7 @@
     "70402026": {
       "id": 70402026,
       "name": "란손상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -5226,7 +5226,7 @@
     "70402027": {
       "id": 70402027,
       "name": "롱기누스의 창",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -5252,7 +5252,7 @@
     "70402028": {
       "id": 70402028,
       "name": "리그베다",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -5277,7 +5277,7 @@
     "70402029": {
       "id": 70402029,
       "name": "마누법전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -5302,7 +5302,7 @@
     "70402030": {
       "id": 70402030,
       "name": "마조상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -5327,7 +5327,7 @@
     "70402031": {
       "id": 70402031,
       "name": "마케마케 암각화",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -5352,7 +5352,7 @@
     "70402032": {
       "id": 70402032,
       "name": "만다라도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -5377,7 +5377,7 @@
     "70402033": {
       "id": 70402033,
       "name": "무슈후슈 벽화",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -5402,7 +5402,7 @@
     "70402034": {
       "id": 70402034,
       "name": "믹틀란테쿠틀리의 상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -5434,7 +5434,7 @@
     "70402035": {
       "id": 70402035,
       "name": "바롱의 가면",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -5460,7 +5460,7 @@
     "70402036": {
       "id": 70402036,
       "name": "바스테트상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -5485,7 +5485,7 @@
     "70402037": {
       "id": 70402037,
       "name": "반야경",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -5510,7 +5510,7 @@
     "70402038": {
       "id": 70402038,
       "name": "백화",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -5535,7 +5535,7 @@
     "70402039": {
       "id": 70402039,
       "name": "벨레스의 목상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -5560,7 +5560,7 @@
     "70402040": {
       "id": 70402040,
       "name": "벽하원군상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -5585,7 +5585,7 @@
     "70402041": {
       "id": 70402041,
       "name": "보리스 글렙의 성상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -5610,7 +5610,7 @@
     "70402042": {
       "id": 70402042,
       "name": "보생불",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -5635,7 +5635,7 @@
     "70402043": {
       "id": 70402043,
       "name": "부두교의 십자가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -5660,7 +5660,7 @@
     "70402044": {
       "id": 70402044,
       "name": "부두교의 제단",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -5685,7 +5685,7 @@
     "70402045": {
       "id": 70402045,
       "name": "분별선악보응경",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -5710,7 +5710,7 @@
     "70402046": {
       "id": 70402046,
       "name": "불공성취여래",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -5735,7 +5735,7 @@
     "70402047": {
       "id": 70402047,
       "name": "브라마상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -5760,7 +5760,7 @@
     "70402048": {
       "id": 70402048,
       "name": "비라코차의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -5785,7 +5785,7 @@
     "70402049": {
       "id": 70402049,
       "name": "비블리오테케",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -5810,7 +5810,7 @@
     "70402050": {
       "id": 70402050,
       "name": "비슈누상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -5835,7 +5835,7 @@
     "70402051": {
       "id": 70402051,
       "name": "사라스바티 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -5860,7 +5860,7 @@
     "70402052": {
       "id": 70402052,
       "name": "사마베다",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -5885,7 +5885,7 @@
     "70402053": {
       "id": 70402053,
       "name": "사해문서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -5910,7 +5910,7 @@
     "70402054": {
       "id": 70402054,
       "name": "상좌부 불교의 불전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -5935,7 +5935,7 @@
     "70402055": {
       "id": 70402055,
       "name": "석가모니 불상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -5960,7 +5960,7 @@
     "70402056": {
       "id": 70402056,
       "name": "석가모니의 사리함",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -5985,7 +5985,7 @@
     "70402057": {
       "id": 70402057,
       "name": "석굴암 불상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -6010,7 +6010,7 @@
     "70402060": {
       "id": 70402060,
       "name": "성황신",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6035,7 +6035,7 @@
     "70402061": {
       "id": 70402061,
       "name": "세라피스상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -6060,7 +6060,7 @@
     "70402062": {
       "id": 70402062,
       "name": "세미상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -6085,7 +6085,7 @@
     "70402063": {
       "id": 70402063,
       "name": "소코상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -6110,7 +6110,7 @@
     "70402064": {
       "id": 70402064,
       "name": "솔로몬의 반지",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -6136,7 +6136,7 @@
     "70402065": {
       "id": 70402065,
       "name": "수리야상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -6161,7 +6161,7 @@
     "70402066": {
       "id": 70402066,
       "name": "수켈루스 신상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -6186,7 +6186,7 @@
     "70402067": {
       "id": 70402067,
       "name": "스바로그의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -6211,7 +6211,7 @@
     "70402068": {
       "id": 70402068,
       "name": "시바상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6243,7 +6243,7 @@
     "70402069": {
       "id": 70402069,
       "name": "시우코아틀상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6268,7 +6268,7 @@
     "70402070": {
       "id": 70402070,
       "name": "시페 토텍 도자기상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -6293,7 +6293,7 @@
     "70402071": {
       "id": 70402071,
       "name": "시페 토텍의 가면",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -6318,7 +6318,7 @@
     "70402072": {
       "id": 70402072,
       "name": "신통기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -6343,7 +6343,7 @@
     "70402073": {
       "id": 70402073,
       "name": "십계",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -6368,7 +6368,7 @@
     "70402074": {
       "id": 70402074,
       "name": "아그니상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -6393,7 +6393,7 @@
     "70402075": {
       "id": 70402075,
       "name": "아누비스 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -6418,7 +6418,7 @@
     "70402076": {
       "id": 70402076,
       "name": "아누케트상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -6443,7 +6443,7 @@
     "70402077": {
       "id": 70402077,
       "name": "아레스상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6468,7 +6468,7 @@
     "70402078": {
       "id": 70402078,
       "name": "아르고나우티카",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -6493,7 +6493,7 @@
     "70402079": {
       "id": 70402079,
       "name": "아르테미스 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6518,7 +6518,7 @@
     "70402080": {
       "id": 70402080,
       "name": "아몬상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -6543,7 +6543,7 @@
     "70402081": {
       "id": 70402081,
       "name": "아미타불",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6568,7 +6568,7 @@
     "70402082": {
       "id": 70402082,
       "name": "아베스타",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -6593,7 +6593,7 @@
     "70402083": {
       "id": 70402083,
       "name": "아소카 석주",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -6618,7 +6618,7 @@
     "70402084": {
       "id": 70402084,
       "name": "아스타르테상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6643,7 +6643,7 @@
     "70402085": {
       "id": 70402085,
       "name": "아촉불",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6668,7 +6668,7 @@
     "70402086": {
       "id": 70402086,
       "name": "아타르바베다",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6693,7 +6693,7 @@
     "70402087": {
       "id": 70402087,
       "name": "아테나상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -6718,7 +6718,7 @@
     "70402088": {
       "id": 70402088,
       "name": "아폴론상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6743,7 +6743,7 @@
     "70402089": {
       "id": 70402089,
       "name": "아프로디테 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6775,7 +6775,7 @@
     "70402090": {
       "id": 70402090,
       "name": "야주르베다",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -6800,7 +6800,7 @@
     "70402092": {
       "id": 70402092,
       "name": "언약의 궤",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -6825,7 +6825,7 @@
     "70402093": {
       "id": 70402093,
       "name": "에녹서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -6850,7 +6850,7 @@
     "70402094": {
       "id": 70402094,
       "name": "에수상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -6875,7 +6875,7 @@
     "70402095": {
       "id": 70402095,
       "name": "에아의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -6900,7 +6900,7 @@
     "70402096": {
       "id": 70402096,
       "name": "에티엔의 지팡이",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -6925,7 +6925,7 @@
     "70402097": {
       "id": 70402097,
       "name": "오니안코폰상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -6950,7 +6950,7 @@
     "70402098": {
       "id": 70402098,
       "name": "오뒤두아상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -6975,7 +6975,7 @@
     "70402099": {
       "id": 70402099,
       "name": "오시리스상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -7000,7 +7000,7 @@
     "70402100": {
       "id": 70402100,
       "name": "올로룬상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -7025,7 +7025,7 @@
     "70402101": {
       "id": 70402101,
       "name": "옹중석",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -7050,7 +7050,7 @@
     "70402102": {
       "id": 70402102,
       "name": "왓 프라시산펫",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -7082,7 +7082,7 @@
     "70402103": {
       "id": 70402103,
       "name": "우르남무 법전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -7107,7 +7107,7 @@
     "70402104": {
       "id": 70402104,
       "name": "우샤스상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -7132,7 +7132,7 @@
     "70402105": {
       "id": 70402105,
       "name": "우이칠로포츠틀리상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -7157,7 +7157,7 @@
     "70402106": {
       "id": 70402106,
       "name": "우파니샤드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -7182,7 +7182,7 @@
     "70402107": {
       "id": 70402107,
       "name": "운쿨룬쿨루상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -7207,7 +7207,7 @@
     "70402108": {
       "id": 70402108,
       "name": "유마경",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -7232,7 +7232,7 @@
     "70402109": {
       "id": 70402109,
       "name": "유스티티아상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -7257,7 +7257,7 @@
     "70402110": {
       "id": 70402110,
       "name": "응게워상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -7282,7 +7282,7 @@
     "70402111": {
       "id": 70402111,
       "name": "이시스 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -7307,7 +7307,7 @@
     "70402112": {
       "id": 70402112,
       "name": "인드라상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -7332,7 +7332,7 @@
     "70402113": {
       "id": 70402113,
       "name": "인안나상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -7357,7 +7357,7 @@
     "70402114": {
       "id": 70402114,
       "name": "잉카 왕족의 미라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -7382,7 +7382,7 @@
     "70402115": {
       "id": 70402115,
       "name": "재규어 전사의 가면",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -7408,7 +7408,7 @@
     "70402116": {
       "id": 70402116,
       "name": "재규어 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -7433,7 +7433,7 @@
     "70402117": {
       "id": 70402117,
       "name": "제드 기둥 부적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -7458,7 +7458,7 @@
     "70402118": {
       "id": 70402118,
       "name": "제우스상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -7483,7 +7483,7 @@
     "70402119": {
       "id": 70402119,
       "name": "젤링 비석",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -7508,7 +7508,7 @@
     "70402120": {
       "id": 70402120,
       "name": "주천석",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -7533,7 +7533,7 @@
     "70402121": {
       "id": 70402121,
       "name": "중론",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -7558,7 +7558,7 @@
     "70402122": {
       "id": 70402122,
       "name": "착상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -7583,7 +7583,7 @@
     "70402123": {
       "id": 70402123,
       "name": "창세기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -7603,12 +7603,12 @@
           "Count": 1
         }
       ],
-      "isUsedDiscovery": false
+      "isUsedDiscovery": true
     },
     "70402124": {
       "id": 70402124,
       "name": "치나라트불상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -7633,7 +7633,7 @@
     "70402125": {
       "id": 70402125,
       "name": "칠십인역 성서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -7658,7 +7658,7 @@
     "70402126": {
       "id": 70402126,
       "name": "카날로아상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -7683,7 +7683,7 @@
     "70402127": {
       "id": 70402127,
       "name": "카니슈카 왕의 사리함",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -7708,7 +7708,7 @@
     "70402128": {
       "id": 70402128,
       "name": "카마푸아아상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -7733,7 +7733,7 @@
     "70402129": {
       "id": 70402129,
       "name": "카타콤",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -7758,7 +7758,7 @@
     "70402130": {
       "id": 70402130,
       "name": "카타콤의 석판",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -7783,7 +7783,7 @@
     "70402131": {
       "id": 70402131,
       "name": "카파도키아 벽화",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -7808,7 +7808,7 @@
     "70402132": {
       "id": 70402132,
       "name": "타팍 야우리",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -7833,7 +7833,7 @@
     "70402134": {
       "id": 70402134,
       "name": "칼리상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -7858,7 +7858,7 @@
     "70402135": {
       "id": 70402135,
       "name": "칼리의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -7883,7 +7883,7 @@
     "70402136": {
       "id": 70402136,
       "name": "케찰코아틀 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -7908,7 +7908,7 @@
     "70402137": {
       "id": 70402137,
       "name": "코코펠리의 벽화",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -7933,7 +7933,7 @@
     "70402138": {
       "id": 70402138,
       "name": "크눔상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -7958,7 +7958,7 @@
     "70402139": {
       "id": 70402139,
       "name": "크리슈나상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -7983,7 +7983,7 @@
     "70402140": {
       "id": 70402140,
       "name": "태극도설",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -8008,7 +8008,7 @@
     "70402141": {
       "id": 70402141,
       "name": "태양의 배",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -8033,7 +8033,7 @@
     "70402142": {
       "id": 70402142,
       "name": "태평청령서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -8058,7 +8058,7 @@
     "70402143": {
       "id": 70402143,
       "name": "테스카틀리포카상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -8083,7 +8083,7 @@
     "70402144": {
       "id": 70402144,
       "name": "템플기사단장의 갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -8116,7 +8116,7 @@
     "70402145": {
       "id": 70402145,
       "name": "통곡의 벽",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -8141,7 +8141,7 @@
     "70402146": {
       "id": 70402146,
       "name": "트랄로크상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -8166,7 +8166,7 @@
     "70402147": {
       "id": 70402147,
       "name": "파차마마상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -8191,7 +8191,7 @@
     "70402148": {
       "id": 70402148,
       "name": "팔만대장경",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -8216,7 +8216,7 @@
     "70402149": {
       "id": 70402149,
       "name": "페룬의 목상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -8241,7 +8241,7 @@
     "70402150": {
       "id": 70402150,
       "name": "펠레상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -8266,7 +8266,7 @@
     "70402151": {
       "id": 70402151,
       "name": "포세이돈 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -8291,7 +8291,7 @@
     "70402152": {
       "id": 70402152,
       "name": "폴리아후상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -8316,7 +8316,7 @@
     "70402153": {
       "id": 70402153,
       "name": "프로메테우스의 사슬",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -8341,7 +8341,7 @@
     "70402154": {
       "id": 70402154,
       "name": "하누만상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -8366,7 +8366,7 @@
     "70402155": {
       "id": 70402155,
       "name": "하누만의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -8391,7 +8391,7 @@
     "70402156": {
       "id": 70402156,
       "name": "하데스상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -8416,7 +8416,7 @@
     "70402157": {
       "id": 70402157,
       "name": "하토르상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -8441,7 +8441,7 @@
     "70402158": {
       "id": 70402158,
       "name": "하트 스카라베",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -8473,7 +8473,7 @@
     "70402160": {
       "id": 70402160,
       "name": "헤라 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -8498,7 +8498,7 @@
     "70402161": {
       "id": 70402161,
       "name": "헤르메스상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -8523,7 +8523,7 @@
     "70402162": {
       "id": 70402162,
       "name": "헤스티아상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -8548,7 +8548,7 @@
     "70402163": {
       "id": 70402163,
       "name": "헤파이스토스상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -8573,7 +8573,7 @@
     "70402164": {
       "id": 70402164,
       "name": "현계론",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -8598,7 +8598,7 @@
     "70402165": {
       "id": 70402165,
       "name": "호루스상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -8623,7 +8623,7 @@
     "70402167": {
       "id": 70402167,
       "name": "화엄경",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -8673,7 +8673,7 @@
     "70402170": {
       "id": 70402170,
       "name": "호프 다이아몬드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -8698,7 +8698,7 @@
     "70402171": {
       "id": 70402171,
       "name": "피렌체 다이아몬드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -8723,7 +8723,7 @@
     "70402172": {
       "id": 70402172,
       "name": "상시 다이아몬드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -8748,7 +8748,7 @@
     "70402173": {
       "id": 70402173,
       "name": "리전트 다이아몬드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -8773,7 +8773,7 @@
     "70402175": {
       "id": 70402175,
       "name": "하지키 토기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -8798,7 +8798,7 @@
     "70402176": {
       "id": 70402176,
       "name": "마욜리카",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -8823,7 +8823,7 @@
     "70402177": {
       "id": 70402177,
       "name": "동선 청동북",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -8848,7 +8848,7 @@
     "70402178": {
       "id": 70402178,
       "name": "베냉 장식판",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -8873,7 +8873,7 @@
     "70402179": {
       "id": 70402179,
       "name": "구장산술",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -8898,7 +8898,7 @@
     "70402180": {
       "id": 70402180,
       "name": "산학계몽",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -8923,7 +8923,7 @@
     "70402183": {
       "id": 70402183,
       "name": "윈드재머 상상도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -8948,7 +8948,7 @@
     "70402185": {
       "id": 70402185,
       "name": "존 맨더빌 여행기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -36186,7 +36186,7 @@
     "70410000": {
       "id": 70410000,
       "name": "첸링",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -36211,7 +36211,7 @@
     "70410001": {
       "id": 70410001,
       "name": "경복궁",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -36248,7 +36248,7 @@
     "70410002": {
       "id": 70410002,
       "name": "고창 지석묘군",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -36273,7 +36273,7 @@
     "70410003": {
       "id": 70410003,
       "name": "광개토대왕릉비",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -36305,7 +36305,7 @@
     "70410004": {
       "id": 70410004,
       "name": "귀마르의 피라미드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -36330,7 +36330,7 @@
     "70410005": {
       "id": 70410005,
       "name": "그레이트 짐바브웨",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -36355,7 +36355,7 @@
     "70410006": {
       "id": 70410006,
       "name": "김유신 묘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -36380,7 +36380,7 @@
     "70410007": {
       "id": 70410007,
       "name": "나람신의 전승비",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -36405,7 +36405,7 @@
     "70410009": {
       "id": 70410009,
       "name": "누라게",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -36430,7 +36430,7 @@
     "70410010": {
       "id": 70410010,
       "name": "누비아 피라미드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -36462,7 +36462,7 @@
     "70410011": {
       "id": 70410011,
       "name": "니네베",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -36487,7 +36487,7 @@
     "70410012": {
       "id": 70410012,
       "name": "디오니소스 극장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -36512,7 +36512,7 @@
     "70410013": {
       "id": 70410013,
       "name": "라가시",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -36537,7 +36537,7 @@
     "70410014": {
       "id": 70410014,
       "name": "란세오 메도스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -36562,7 +36562,7 @@
     "70410015": {
       "id": 70410015,
       "name": "렙티스마그나",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -36587,7 +36587,7 @@
     "70410016": {
       "id": 70410016,
       "name": "로도스 중세 도시",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -36612,7 +36612,7 @@
     "70410017": {
       "id": 70410017,
       "name": "룽먼 석굴",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -36637,7 +36637,7 @@
     "70410018": {
       "id": 70410018,
       "name": "류리크의 무덤",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -36662,7 +36662,7 @@
     "70410019": {
       "id": 70410019,
       "name": "마추픽추",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -36704,7 +36704,7 @@
     "70410020": {
       "id": 70410020,
       "name": "만리장성",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -36736,7 +36736,7 @@
     "70410021": {
       "id": 70410021,
       "name": "만쿠니움 요새",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -36761,7 +36761,7 @@
     "70410022": {
       "id": 70410022,
       "name": "모헨조다로",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -36786,7 +36786,7 @@
     "70410023": {
       "id": 70410023,
       "name": "무당산 오룡궁",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -36811,7 +36811,7 @@
     "70410024": {
       "id": 70410024,
       "name": "무령왕릉",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -36836,7 +36836,7 @@
     "70410025": {
       "id": 70410025,
       "name": "미륵사지 석탑",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -36861,7 +36861,7 @@
     "70410026": {
       "id": 70410026,
       "name": "미케네",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -36886,7 +36886,7 @@
     "70410027": {
       "id": 70410027,
       "name": "베르기나 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -36911,7 +36911,7 @@
     "70410028": {
       "id": 70410028,
       "name": "보르시파",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -36953,7 +36953,7 @@
     "70410029": {
       "id": 70410029,
       "name": "복건토루",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -36978,7 +36978,7 @@
     "70410030": {
       "id": 70410030,
       "name": "비명의 신전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -37010,7 +37010,7 @@
     "70410031": {
       "id": 70410031,
       "name": "비블로스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37035,7 +37035,7 @@
     "70410032": {
       "id": 70410032,
       "name": "빌라 아드리아나",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -37060,7 +37060,7 @@
     "70410033": {
       "id": 70410033,
       "name": "산나이마루야마",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -37085,7 +37085,7 @@
     "70410034": {
       "id": 70410034,
       "name": "서펜트 마운드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -37110,7 +37110,7 @@
     "70410035": {
       "id": 70410035,
       "name": "소주 원림",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37135,7 +37135,7 @@
     "70410036": {
       "id": 70410036,
       "name": "쇼소인",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -37160,7 +37160,7 @@
     "70410037": {
       "id": 70410037,
       "name": "숭례문",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37185,7 +37185,7 @@
     "70410038": {
       "id": 70410038,
       "name": "썬 대거",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37210,7 +37210,7 @@
     "70410039": {
       "id": 70410039,
       "name": "아르테미스 신전 터",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -37235,7 +37235,7 @@
     "70410040": {
       "id": 70410040,
       "name": "아즈치성",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37272,7 +37272,7 @@
     "70410041": {
       "id": 70410041,
       "name": "아카쿠스 암각화 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -37297,7 +37297,7 @@
     "70410042": {
       "id": 70410042,
       "name": "아폴로 에피큐리우스 신전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37322,7 +37322,7 @@
     "70410043": {
       "id": 70410043,
       "name": "아피아의 가도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -37347,7 +37347,7 @@
     "70410044": {
       "id": 70410044,
       "name": "알타이산맥의 암각화 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -37372,7 +37372,7 @@
     "70410045": {
       "id": 70410045,
       "name": "어퍼 스바네티",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -37397,7 +37397,7 @@
     "70410046": {
       "id": 70410046,
       "name": "에피다우루스의 원형 극장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37422,7 +37422,7 @@
     "70410047": {
       "id": 70410047,
       "name": "올림피아 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -37454,7 +37454,7 @@
     "70410048": {
       "id": 70410048,
       "name": "우루크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37479,7 +37479,7 @@
     "70410049": {
       "id": 70410049,
       "name": "우르",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -37558,7 +37558,7 @@
     "70410051": {
       "id": 70410051,
       "name": "자금성",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -37595,7 +37595,7 @@
     "70410052": {
       "id": 70410052,
       "name": "절벽 궁전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -37645,7 +37645,7 @@
     "70410054": {
       "id": 70410054,
       "name": "진시황릉",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -37670,7 +37670,7 @@
     "70410055": {
       "id": 70410055,
       "name": "창경궁",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37695,7 +37695,7 @@
     "70410056": {
       "id": 70410056,
       "name": "창덕궁",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -37720,7 +37720,7 @@
     "70410057": {
       "id": 70410057,
       "name": "천마총",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -37752,7 +37752,7 @@
     "70410058": {
       "id": 70410058,
       "name": "첨성대",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37777,7 +37777,7 @@
     "70410059": {
       "id": 70410059,
       "name": "초가 잔빌",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -37827,7 +37827,7 @@
     "70410061": {
       "id": 70410061,
       "name": "총고니 암각화 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -37852,7 +37852,7 @@
     "70410062": {
       "id": 70410062,
       "name": "치첸이트사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -37883,7 +37883,7 @@
     "70410063": {
       "id": 70410063,
       "name": "카르나크 거석군",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -37915,7 +37915,7 @@
     "70410064": {
       "id": 70410064,
       "name": "카르타고 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -37940,7 +37940,7 @@
     "70410065": {
       "id": 70410065,
       "name": "카파도키아 동굴수도원",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37965,7 +37965,7 @@
     "70410066": {
       "id": 70410066,
       "name": "카호키아",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -37990,7 +37990,7 @@
     "70410067": {
       "id": 70410067,
       "name": "캄페체 요새 도시",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -38015,7 +38015,7 @@
     "70410068": {
       "id": 70410068,
       "name": "코판 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -38040,7 +38040,7 @@
     "70410069": {
       "id": 70410069,
       "name": "콘스탄티누스의 개선문",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38065,7 +38065,7 @@
     "70410070": {
       "id": 70410070,
       "name": "콜로세움",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -38097,7 +38097,7 @@
     "70410071": {
       "id": 70410071,
       "name": "쿠스코",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -38122,7 +38122,7 @@
     "70410072": {
       "id": 70410072,
       "name": "크노소스 궁전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -38154,7 +38154,7 @@
     "70410073": {
       "id": 70410073,
       "name": "타실리 나제르",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -38179,7 +38179,7 @@
     "70410074": {
       "id": 70410074,
       "name": "테노치티틀란",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38204,7 +38204,7 @@
     "70410075": {
       "id": 70410075,
       "name": "테오티우아칸",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -38229,7 +38229,7 @@
     "70410076": {
       "id": 70410076,
       "name": "테피토쿠라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38254,7 +38254,7 @@
     "70410077": {
       "id": 70410077,
       "name": "토로 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -38279,7 +38279,7 @@
     "70410078": {
       "id": 70410078,
       "name": "토페트",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38304,7 +38304,7 @@
     "70410079": {
       "id": 70410079,
       "name": "툴룸",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38329,7 +38329,7 @@
     "70410080": {
       "id": 70410080,
       "name": "트로이 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -38354,7 +38354,7 @@
     "70410081": {
       "id": 70410081,
       "name": "트위펠폰테인",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -38379,7 +38379,7 @@
     "70410082": {
       "id": 70410082,
       "name": "파르테논 신전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -38404,7 +38404,7 @@
     "70410083": {
       "id": 70410083,
       "name": "파포스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -38429,7 +38429,7 @@
     "70410084": {
       "id": 70410084,
       "name": "팔렌케",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -38454,7 +38454,7 @@
     "70410085": {
       "id": 70410085,
       "name": "페르세폴리스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -38485,7 +38485,7 @@
     "70410086": {
       "id": 70410086,
       "name": "포럼 목욕탕",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38510,7 +38510,7 @@
     "70410087": {
       "id": 70410087,
       "name": "포로 로마노",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -38535,7 +38535,7 @@
     "70410088": {
       "id": 70410088,
       "name": "포폴 부",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -38560,7 +38560,7 @@
     "70410089": {
       "id": 70410089,
       "name": "폼페이 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -38585,7 +38585,7 @@
     "70410090": {
       "id": 70410090,
       "name": "푸에블로 타오스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38610,7 +38610,7 @@
     "70410091": {
       "id": 70410091,
       "name": "푼트국의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -38635,7 +38635,7 @@
     "70410092": {
       "id": 70410092,
       "name": "하드리아누스의 성벽",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38667,7 +38667,7 @@
     "70410093": {
       "id": 70410093,
       "name": "하트라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -38692,7 +38692,7 @@
     "70410094": {
       "id": 70410094,
       "name": "해인사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38717,7 +38717,7 @@
     "70410095": {
       "id": 70410095,
       "name": "헤이아우",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -38742,7 +38742,7 @@
     "70410096": {
       "id": 70410096,
       "name": "호류사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38767,7 +38767,7 @@
     "70410097": {
       "id": 70410097,
       "name": "후마나 평원",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -38792,7 +38792,7 @@
     "70411000": {
       "id": 70411000,
       "name": "기자의 대 스핑크스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38824,7 +38824,7 @@
     "70411001": {
       "id": 70411001,
       "name": "러산 대불",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -38861,7 +38861,7 @@
     "70411002": {
       "id": 70411002,
       "name": "난마돌",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -38886,7 +38886,7 @@
     "70411003": {
       "id": 70411003,
       "name": "노군 조상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -38911,7 +38911,7 @@
     "70411004": {
       "id": 70411004,
       "name": "노트르담 대성당",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38936,7 +38936,7 @@
     "70411005": {
       "id": 70411005,
       "name": "달곡굴 비사문당",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -38961,7 +38961,7 @@
     "70411006": {
       "id": 70411006,
       "name": "델포이 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -38993,7 +38993,7 @@
     "70411007": {
       "id": 70411007,
       "name": "독수리와 재규어의 부조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -39018,7 +39018,7 @@
     "70411008": {
       "id": 70411008,
       "name": "라노 라라쿠",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -39043,7 +39043,7 @@
     "70411009": {
       "id": 70411009,
       "name": "랄리벨라 암굴 성당군",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -39074,7 +39074,7 @@
     "70411010": {
       "id": 70411010,
       "name": "말위야 미나렛",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -39106,7 +39106,7 @@
     "70411011": {
       "id": 70411011,
       "name": "메테오라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -39143,7 +39143,7 @@
     "70411012": {
       "id": 70411012,
       "name": "미스트라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -39168,7 +39168,7 @@
     "70411013": {
       "id": 70411013,
       "name": "보로부두르",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -39199,7 +39199,7 @@
     "70411014": {
       "id": 70411014,
       "name": "불국사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -39224,7 +39224,7 @@
     "70411015": {
       "id": 70411015,
       "name": "사투르누스 신전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -39249,7 +39249,7 @@
     "70411016": {
       "id": 70411016,
       "name": "생트샤펠",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -39274,7 +39274,7 @@
     "70411017": {
       "id": 70411017,
       "name": "석굴암",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -39299,7 +39299,7 @@
     "70411018": {
       "id": 70411018,
       "name": "소림사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -39324,7 +39324,7 @@
     "70411019": {
       "id": 70411019,
       "name": "스톤헨지",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -39356,7 +39356,7 @@
     "70411020": {
       "id": 70411020,
       "name": "아부심벨 신전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -39398,7 +39398,7 @@
     "70411021": {
       "id": 70411021,
       "name": "아후 아키비",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -39423,7 +39423,7 @@
     "70411022": {
       "id": 70411022,
       "name": "아후통가리키",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -39448,7 +39448,7 @@
     "70411023": {
       "id": 70411023,
       "name": "악숨 석주군",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -39485,7 +39485,7 @@
     "70411024": {
       "id": 70411024,
       "name": "앙코르와트",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -39510,7 +39510,7 @@
     "70411025": {
       "id": 70411025,
       "name": "양 머리의 스핑크스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -39542,7 +39542,7 @@
     "70411026": {
       "id": 70411026,
       "name": "에치미아진 대성당",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -39567,7 +39567,7 @@
     "70411027": {
       "id": 70411027,
       "name": "엘레우시스 신전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -39599,7 +39599,7 @@
     "70411028": {
       "id": 70411028,
       "name": "윈강 석굴",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -39624,7 +39624,7 @@
     "70411029": {
       "id": 70411029,
       "name": "카르나크 신전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -39656,7 +39656,7 @@
     "70411030": {
       "id": 70411030,
       "name": "코나라크 태양신 사원",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -39681,7 +39681,7 @@
     "70411031": {
       "id": 70411031,
       "name": "코나라크의 수레바퀴",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -39706,7 +39706,7 @@
     "70411032": {
       "id": 70411032,
       "name": "쿠푸왕의 피라미드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -39737,7 +39737,7 @@
     "70411034": {
       "id": 70411034,
       "name": "태양의 돌",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -39769,7 +39769,7 @@
     "70411035": {
       "id": 70411035,
       "name": "태양의 신전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -39794,7 +39794,7 @@
     "70411036": {
       "id": 70411036,
       "name": "투트모세 1세의 오벨리스크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -39819,7 +39819,7 @@
     "70411037": {
       "id": 70411037,
       "name": "파간유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -39844,7 +39844,7 @@
     "70411038": {
       "id": 70411038,
       "name": "파에스툼 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -39869,7 +39869,7 @@
     "70411039": {
       "id": 70411039,
       "name": "호투 마투아 왕의 모아이",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -39900,7 +39900,7 @@
     "70411040": {
       "id": 70411040,
       "name": "스네프루의 붉은 피라미드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -39925,7 +39925,7 @@
     "70411041": {
       "id": 70411041,
       "name": "벨렝탑",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -39957,7 +39957,7 @@
     "70411043": {
       "id": 70411043,
       "name": "카이르완 대 모스크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -39988,7 +39988,7 @@
     "70411044": {
       "id": 70411044,
       "name": "슈웨다곤 파고다",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40019,7 +40019,7 @@
     "70411045": {
       "id": 70411045,
       "name": "사브라타 원형극장",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -40044,7 +40044,7 @@
     "70411046": {
       "id": 70411046,
       "name": "베니함마드 요새 도시",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 2,
@@ -40069,7 +40069,7 @@
     "70411047": {
       "id": 70411047,
       "name": "젠네 모스크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -40094,7 +40094,7 @@
     "70411048": {
       "id": 70411048,
       "name": "페트라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40126,7 +40126,7 @@
     "70411049": {
       "id": 70411049,
       "name": "필레 신전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40158,7 +40158,7 @@
     "70411050": {
       "id": 70411050,
       "name": "반디아가라 절벽",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -40183,7 +40183,7 @@
     "70411051": {
       "id": 70411051,
       "name": "마다인 살레",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40208,7 +40208,7 @@
     "70411052": {
       "id": 70411052,
       "name": "쿠크 초기 농경지",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40233,7 +40233,7 @@
     "70411053": {
       "id": 70411053,
       "name": "노브고로드 성 소피아 성당",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40258,7 +40258,7 @@
     "70411054": {
       "id": 70411054,
       "name": "우르네스 목조 교회",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40283,7 +40283,7 @@
     "70411055": {
       "id": 70411055,
       "name": "이눅슈크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40308,7 +40308,7 @@
     "70411056": {
       "id": 70411056,
       "name": "고대 문명의 유적",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40340,7 +40340,7 @@
     "70411057": {
       "id": 70411057,
       "name": "고대 문명의 천문대",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40372,7 +40372,7 @@
     "70411058": {
       "id": 70411058,
       "name": "사막의 눈",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40404,7 +40404,7 @@
     "70411059": {
       "id": 70411059,
       "name": "피사의 사탑",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -40436,7 +40436,7 @@
     "70411062": {
       "id": 70411062,
       "name": "알함브라 궁전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40461,7 +40461,7 @@
     "70411063": {
       "id": 70411063,
       "name": "알라무트 요새",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -40486,7 +40486,7 @@
     "70411064": {
       "id": 70411064,
       "name": "마시아프 성",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 3,
@@ -47810,13 +47810,13 @@
     },
     "70412375": {
       "id": 70412375,
-      "name": "두로 양조장",
-      "localBitFlag": 27,
+      "name": "루시타니아인의 마을",
+      "localBitFlag": 219,
       "discoveryType": 19,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
-      "icon": "Discovery_Card_70500071_Sprite",
-      "desc": "여러 품종의 포도가 재배되는 지역에 생긴 양조장.\n오랜 전통을 가지고 있으며, 두로 지역에서 생산된 와인은 일품이라고 한다.",
+      "icon": "Discovery_Card_NorthSea4_Sprite",
+      "desc": "루시타니아인이 모여 살아가는 작은 마을.",
       "needAdventurerLV": 5,
       "basicDiscoveryRate": 1000,
       "discoveryAdventurerExp": 310,
@@ -47828,6 +47828,106 @@
         {
           "Type": 1,
           "Id": 23420004,
+          "Count": 1
+        }
+      ],
+      "isUsedDiscovery": true
+    },
+    "70412376": {
+      "id": 70412376,
+      "name": "쾰른",
+      "localBitFlag": 219,
+      "discoveryType": 13,
+      "discoveryGroup": 4,
+      "discoveryGrade": 1,
+      "icon": "Discovery_Card_NorthSea1_1_Sprite",
+      "desc": "라인강을 따라 펼쳐진 상업의 중심지.\n한자동맹 서부 교역망의 요충지로, 상인과 장인의 활기가 넘치는 도시이다.",
+      "needAdventurerLV": 5,
+      "basicDiscoveryRate": 1000,
+      "discoveryAdventurerExp": 310,
+      "discoveryContributiveness": 1,
+      "discoveryAdventureFame": 120,
+      "discoveryPoint": 1000,
+      "discoveryDucat": 26190,
+      "relateItem": [
+        {
+          "Type": 1,
+          "Id": 23421022,
+          "Count": 1
+        }
+      ],
+      "isUsedDiscovery": true
+    },
+    "70412377": {
+      "id": 70412377,
+      "name": "스트라스부르",
+      "localBitFlag": 219,
+      "discoveryType": 13,
+      "discoveryGroup": 4,
+      "discoveryGrade": 1,
+      "icon": "Discovery_Card_NorthSea2_Sprite",
+      "desc": "라인강 중류에 자리 잡은 상업의 거점.\n동서 유럽 무역의 연결점이자 다양한 민족이 공존하는 문화 도시로이다.",
+      "needAdventurerLV": 5,
+      "basicDiscoveryRate": 1000,
+      "discoveryAdventurerExp": 310,
+      "discoveryContributiveness": 1,
+      "discoveryAdventureFame": 120,
+      "discoveryPoint": 1000,
+      "discoveryDucat": 26190,
+      "relateItem": [
+        {
+          "Type": 1,
+          "Id": 23421022,
+          "Count": 1
+        }
+      ],
+      "isUsedDiscovery": true
+    },
+    "70412378": {
+      "id": 70412378,
+      "name": "프랑크족의 마을",
+      "localBitFlag": 27,
+      "discoveryType": 19,
+      "discoveryGroup": 4,
+      "discoveryGrade": 1,
+      "icon": "Discovery_Card_NorthSea4_Sprite",
+      "desc": "프랑크족의 후예들이 모여 살아가는 작은 농촌 마을.\n농업 자원과 오래된 문화적 정보를 얻을 수 있다.",
+      "needAdventurerLV": 5,
+      "basicDiscoveryRate": 1000,
+      "discoveryAdventurerExp": 310,
+      "discoveryContributiveness": 1,
+      "discoveryAdventureFame": 120,
+      "discoveryPoint": 1000,
+      "discoveryDucat": 26190,
+      "relateItem": [
+        {
+          "Type": 1,
+          "Id": 23421019,
+          "Count": 1
+        }
+      ],
+      "isUsedDiscovery": true
+    },
+    "70412379": {
+      "id": 70412379,
+      "name": "미사용",
+      "localBitFlag": 0,
+      "discoveryType": 19,
+      "discoveryGroup": 4,
+      "discoveryGrade": 1,
+      "icon": "Discovery_Card_NorthSea4_Sprite",
+      "desc": "미사용",
+      "needAdventurerLV": 5,
+      "basicDiscoveryRate": 1000,
+      "discoveryAdventurerExp": 310,
+      "discoveryContributiveness": 1,
+      "discoveryAdventureFame": 120,
+      "discoveryPoint": 1000,
+      "discoveryDucat": 26190,
+      "relateItem": [
+        {
+          "Type": 1,
+          "Id": 23421019,
           "Count": 1
         }
       ],
@@ -65576,7 +65676,7 @@
     "70416000": {
       "id": 70416000,
       "name": "갈리아인과 그의 처",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -65601,7 +65701,7 @@
     "70416001": {
       "id": 70416001,
       "name": "검은 방울새의 성모",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -65626,7 +65726,7 @@
     "70416002": {
       "id": 70416002,
       "name": "겐지 이야기 화첩",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -65651,7 +65751,7 @@
     "70416003": {
       "id": 70416003,
       "name": "고사관수도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -65676,7 +65776,7 @@
     "70416004": {
       "id": 70416004,
       "name": "골고다 언덕",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -65701,7 +65801,7 @@
     "70416005": {
       "id": 70416005,
       "name": "그리스도의 세례",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -65726,7 +65826,7 @@
     "70416006": {
       "id": 70416006,
       "name": "내경도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -65751,7 +65851,7 @@
     "70416007": {
       "id": 70416007,
       "name": "4명의 사도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -65776,7 +65876,7 @@
     "70416008": {
       "id": 70416008,
       "name": "네덜란드의 속담",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -65801,7 +65901,7 @@
     "70416009": {
       "id": 70416009,
       "name": "다비드",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -65826,7 +65926,7 @@
     "70416010": {
       "id": 70416010,
       "name": "라오콘",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -65851,7 +65951,7 @@
     "70416011": {
       "id": 70416011,
       "name": "마기의 예배",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -65876,7 +65976,7 @@
     "70416012": {
       "id": 70416012,
       "name": "마리아의 수태고지",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -65901,7 +66001,7 @@
     "70416014": {
       "id": 70416014,
       "name": "막달라 마리아",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -65926,7 +66026,7 @@
     "70416015": {
       "id": 70416015,
       "name": "막시밀리안의 수렵",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -65951,7 +66051,7 @@
     "70416016": {
       "id": 70416016,
       "name": "메추리와 난초",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -65976,7 +66076,7 @@
     "70416018": {
       "id": 70416018,
       "name": "모견도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -66001,7 +66101,7 @@
     "70416019": {
       "id": 70416019,
       "name": "모나리자",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -66026,7 +66126,7 @@
     "70416020": {
       "id": 70416020,
       "name": "모세",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66051,7 +66151,7 @@
     "70416021": {
       "id": 70416021,
       "name": "목우도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66076,7 +66176,7 @@
     "70416022": {
       "id": 70416022,
       "name": "몽유도원도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66101,7 +66201,7 @@
     "70416023": {
       "id": 70416023,
       "name": "밀로의 비너스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66126,7 +66226,7 @@
     "70416024": {
       "id": 70416024,
       "name": "바이외 태피스트리",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66151,7 +66251,7 @@
     "70416025": {
       "id": 70416025,
       "name": "베일을 쓴 여인",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -66176,7 +66276,7 @@
     "70416026": {
       "id": 70416026,
       "name": "부춘산거도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66201,7 +66301,7 @@
     "70416027": {
       "id": 70416027,
       "name": "비너스의 탄생",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -66226,7 +66326,7 @@
     "70416028": {
       "id": 70416028,
       "name": "비트루비우스의 인체도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66251,7 +66351,7 @@
     "70416029": {
       "id": 70416029,
       "name": "사계산수도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66276,7 +66376,7 @@
     "70416030": {
       "id": 70416030,
       "name": "사모트라케의 니케상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66301,7 +66401,7 @@
     "70416031": {
       "id": 70416031,
       "name": "살리에라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66326,7 +66426,7 @@
     "70416032": {
       "id": 70416032,
       "name": "생 드니의 순교",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66351,7 +66451,7 @@
     "70416033": {
       "id": 70416033,
       "name": "성가족",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66376,7 +66476,7 @@
     "70416034": {
       "id": 70416034,
       "name": "성녀 베로니카",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66401,7 +66501,7 @@
     "70416035": {
       "id": 70416035,
       "name": "성모자와 두천사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66426,7 +66526,7 @@
     "70416036": {
       "id": 70416036,
       "name": "성모자와 성 요한",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66451,7 +66551,7 @@
     "70416037": {
       "id": 70416037,
       "name": "성모자와 아기 성 요한",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -66476,7 +66576,7 @@
     "70416038": {
       "id": 70416038,
       "name": "성모승천",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -66501,7 +66601,7 @@
     "70416039": {
       "id": 70416039,
       "name": "성 안나와 성모자",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66526,7 +66626,7 @@
     "70416040": {
       "id": 70416040,
       "name": "성 제롬과 사자",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -66551,7 +66651,7 @@
     "70416041": {
       "id": 70416041,
       "name": "세례자 요한",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -66576,7 +66676,7 @@
     "70416042": {
       "id": 70416042,
       "name": "수월관음도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66601,7 +66701,7 @@
     "70416043": {
       "id": 70416043,
       "name": "수태고지",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -66626,7 +66726,7 @@
     "70416044": {
       "id": 70416044,
       "name": "승리",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -66651,7 +66751,7 @@
     "70416045": {
       "id": 70416045,
       "name": "신사임당초서병풍",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66676,7 +66776,7 @@
     "70416046": {
       "id": 70416046,
       "name": "아담과 이브",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -66696,12 +66796,12 @@
           "Count": 1
         }
       ],
-      "isUsedDiscovery": false
+      "isUsedDiscovery": true
     },
     "70416047": {
       "id": 70416047,
       "name": "아르놀피니의 결혼",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -66726,7 +66826,7 @@
     "70416048": {
       "id": 70416048,
       "name": "아마노하시다테도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -66751,7 +66851,7 @@
     "70416049": {
       "id": 70416049,
       "name": "아폭시오메노스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -66776,7 +66876,7 @@
     "70416050": {
       "id": 70416050,
       "name": "알페의 성합",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66801,7 +66901,7 @@
     "70416051": {
       "id": 70416051,
       "name": "암굴의 성모",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -66826,7 +66926,7 @@
     "70416052": {
       "id": 70416052,
       "name": "여사잠도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66851,7 +66951,7 @@
     "70416053": {
       "id": 70416053,
       "name": "성 스테파노의 설교",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -66876,7 +66976,7 @@
     "70416054": {
       "id": 70416054,
       "name": "예수의 부활",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66901,7 +67001,7 @@
     "70416055": {
       "id": 70416055,
       "name": "예수의 승천",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66926,7 +67026,7 @@
     "70416056": {
       "id": 70416056,
       "name": "오마도권",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66951,7 +67051,7 @@
     "70416057": {
       "id": 70416057,
       "name": "우르비노의 비너스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -66976,7 +67076,7 @@
     "70416058": {
       "id": 70416058,
       "name": "원반던지기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -67001,7 +67101,7 @@
     "70416059": {
       "id": 70416059,
       "name": "유딧",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67026,7 +67126,7 @@
     "70416060": {
       "id": 70416060,
       "name": "제왕도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67051,7 +67151,7 @@
     "70416061": {
       "id": 70416061,
       "name": "조모입녀병풍",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -67076,7 +67176,7 @@
     "70416062": {
       "id": 70416062,
       "name": "조춘도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -67101,7 +67201,7 @@
     "70416063": {
       "id": 70416063,
       "name": "천지창조",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -67126,7 +67226,7 @@
     "70416064": {
       "id": 70416064,
       "name": "초충도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -67151,7 +67251,7 @@
     "70416065": {
       "id": 70416065,
       "name": "최후의 만찬",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -67176,7 +67276,7 @@
     "70416066": {
       "id": 70416066,
       "name": "최후의 심판",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -67201,7 +67301,7 @@
     "70416067": {
       "id": 70416067,
       "name": "추림만학도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -67226,7 +67326,7 @@
     "70416068": {
       "id": 70416068,
       "name": "카피톨리나 늑대상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -67251,7 +67351,7 @@
     "70416069": {
       "id": 70416069,
       "name": "뒤러의 코뿔소",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -67276,7 +67376,7 @@
     "70416070": {
       "id": 70416070,
       "name": "붉은 터번을 두른 남자의 초상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67301,7 +67401,7 @@
     "70416071": {
       "id": 70416071,
       "name": "풍우귀목도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -67326,7 +67426,7 @@
     "70416072": {
       "id": 70416072,
       "name": "프리마베라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -67351,7 +67451,7 @@
     "70416073": {
       "id": 70416073,
       "name": "피에타",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -67376,7 +67476,7 @@
     "70416074": {
       "id": 70416074,
       "name": "홍백부용도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -67401,7 +67501,7 @@
     "70416075": {
       "id": 70416075,
       "name": "힌튼 세인트 메리 모자이크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67426,7 +67526,7 @@
     "70416076": {
       "id": 70416076,
       "name": "이사벨라 데스테 초상화",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -67451,7 +67551,7 @@
     "70416077": {
       "id": 70416077,
       "name": "엘리자베스 비제 르 브룅 자화상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -67476,7 +67576,7 @@
     "70417001": {
       "id": 70417001,
       "name": "게 볼그",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -67502,7 +67602,7 @@
     "70417002": {
       "id": 70417002,
       "name": "겐지 이야기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -67527,7 +67627,7 @@
     "70417003": {
       "id": 70417003,
       "name": "경국대전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -67552,7 +67652,7 @@
     "70417004": {
       "id": 70417004,
       "name": "경극 의상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -67578,7 +67678,7 @@
     "70417005": {
       "id": 70417005,
       "name": "고가츠 인형",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67603,7 +67703,7 @@
     "70417006": {
       "id": 70417006,
       "name": "고금 와카집",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -67628,7 +67728,7 @@
     "70417008": {
       "id": 70417008,
       "name": "고려도경",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67653,7 +67753,7 @@
     "70417009": {
       "id": 70417009,
       "name": "고정핀",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -67678,7 +67778,7 @@
     "70417010": {
       "id": 70417010,
       "name": "곤자쿠 이야기집",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -67703,7 +67803,7 @@
     "70417011": {
       "id": 70417011,
       "name": "공작 브로치",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67728,7 +67828,7 @@
     "70417013": {
       "id": 70417013,
       "name": "구슬레",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67753,7 +67853,7 @@
     "70417014": {
       "id": 70417014,
       "name": "근데르",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67778,7 +67878,7 @@
     "70417015": {
       "id": 70417015,
       "name": "귀부인의 드레스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67804,7 +67904,7 @@
     "70417016": {
       "id": 70417016,
       "name": "그리스 안내기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -67829,7 +67929,7 @@
     "70417017": {
       "id": 70417017,
       "name": "그린란드 사람들의 사가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67854,7 +67954,7 @@
     "70417018": {
       "id": 70417018,
       "name": "금 그릇",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67879,7 +67979,7 @@
     "70417019": {
       "id": 70417019,
       "name": "금 나이프",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67904,7 +68004,7 @@
     "70417020": {
       "id": 70417020,
       "name": "금 머리 장식",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -67930,7 +68030,7 @@
     "70417021": {
       "id": 70417021,
       "name": "나가라케르타가마",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -67955,7 +68055,7 @@
     "70417022": {
       "id": 70417022,
       "name": "나각",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -67981,7 +68081,7 @@
     "70417023": {
       "id": 70417023,
       "name": "나자르 본주",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -68006,7 +68106,7 @@
     "70417024": {
       "id": 70417024,
       "name": "난정서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -68031,7 +68131,7 @@
     "70417026": {
       "id": 70417026,
       "name": "뇌절",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -68057,7 +68157,7 @@
     "70417027": {
       "id": 70417027,
       "name": "다리우리",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -68082,7 +68182,7 @@
     "70417028": {
       "id": 70417028,
       "name": "다빈치 노트",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -68107,7 +68207,7 @@
     "70417029": {
       "id": 70417029,
       "name": "단가행",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -68132,7 +68232,7 @@
     "70417030": {
       "id": 70417030,
       "name": "당삼채",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -68157,7 +68257,7 @@
     "70417031": {
       "id": 70417031,
       "name": "대당서역기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -68182,7 +68282,7 @@
     "70417032": {
       "id": 70417032,
       "name": "더로우의 서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -68207,7 +68307,7 @@
     "70417034": {
       "id": 70417034,
       "name": "돌도끼",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -68232,7 +68332,7 @@
     "70417035": {
       "id": 70417035,
       "name": "동방견문록",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -68257,7 +68357,7 @@
     "70417036": {
       "id": 70417036,
       "name": "듀란달",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -68283,7 +68383,7 @@
     "70417037": {
       "id": 70417037,
       "name": "드라크마 은화",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -68308,7 +68408,7 @@
     "70417038": {
       "id": 70417038,
       "name": "디저리두",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -68333,7 +68433,7 @@
     "70417039": {
       "id": 70417039,
       "name": "라마야나",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -68358,7 +68458,7 @@
     "70417040": {
       "id": 70417040,
       "name": "람세스 2세의 강궁",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -68384,7 +68484,7 @@
     "70417042": {
       "id": 70417042,
       "name": "로마법 대전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -68409,7 +68509,7 @@
     "70417043": {
       "id": 70417043,
       "name": "롤랑의 뿔나팔",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -68434,7 +68534,7 @@
     "70417044": {
       "id": 70417044,
       "name": "루바이야트",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -68459,7 +68559,7 @@
     "70417045": {
       "id": 70417045,
       "name": "루이스의 체스 기물",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -68484,7 +68584,7 @@
     "70417046": {
       "id": 70417046,
       "name": "리시마코스 동전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -68509,7 +68609,7 @@
     "70417047": {
       "id": 70417047,
       "name": "리어 팔",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -68534,7 +68634,7 @@
     "70417048": {
       "id": 70417048,
       "name": "린디스판 복음서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -68559,7 +68659,7 @@
     "70417049": {
       "id": 70417049,
       "name": "마두금",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -68584,7 +68684,7 @@
     "70417050": {
       "id": 70417050,
       "name": "마쿠라노소시",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -68609,7 +68709,7 @@
     "70417051": {
       "id": 70417051,
       "name": "마하바라타",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -68634,7 +68734,7 @@
     "70417052": {
       "id": 70417052,
       "name": "만엽집",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -68659,7 +68759,7 @@
     "70417053": {
       "id": 70417053,
       "name": "말린체의 목걸이",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -68685,7 +68785,7 @@
     "70417054": {
       "id": 70417054,
       "name": "맘루크의 커틀러스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -68711,7 +68811,7 @@
     "70417055": {
       "id": 70417055,
       "name": "멀린의 지팡이",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -68744,7 +68844,7 @@
     "70417059": {
       "id": 70417059,
       "name": "몬테수마 2세의 지팡이",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -68769,7 +68869,7 @@
     "70417060": {
       "id": 70417060,
       "name": "무라마사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -68795,7 +68895,7 @@
     "70417061": {
       "id": 70417061,
       "name": "무캇디마",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -68820,7 +68920,7 @@
     "70417063": {
       "id": 70417063,
       "name": "미스테카의 귀걸이",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -68846,7 +68946,7 @@
     "70417066": {
       "id": 70417066,
       "name": "발리하",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -68871,7 +68971,7 @@
     "70417067": {
       "id": 70417067,
       "name": "발뭉",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -68897,7 +68997,7 @@
     "70417068": {
       "id": 70417068,
       "name": "방장기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -68922,7 +69022,7 @@
     "70417071": {
       "id": 70417071,
       "name": "뱀의 여신상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -68947,7 +69047,7 @@
     "70417072": {
       "id": 70417072,
       "name": "벽사 조각상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -68972,7 +69072,7 @@
     "70417074": {
       "id": 70417074,
       "name": "봄빌랴",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -68997,7 +69097,7 @@
     "70417076": {
       "id": 70417076,
       "name": "불씨잡변",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -69022,7 +69122,7 @@
     "70417077": {
       "id": 70417077,
       "name": "붉은 에이리크 사가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -69047,7 +69147,7 @@
     "70417078": {
       "id": 70417078,
       "name": "브류나크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -69073,7 +69173,7 @@
     "70417079": {
       "id": 70417079,
       "name": "비블리오테카 히스토리카",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -69098,7 +69198,7 @@
     "70417082": {
       "id": 70417082,
       "name": "사자왕의 갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -69124,7 +69224,7 @@
     "70417083": {
       "id": 70417083,
       "name": "산투르",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -69149,7 +69249,7 @@
     "70417084": {
       "id": 70417084,
       "name": "살라딘의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -69175,7 +69275,7 @@
     "70417085": {
       "id": 70417085,
       "name": "살로메의 베일",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -69200,7 +69300,7 @@
     "70417086": {
       "id": 70417086,
       "name": "삼국지",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -69225,7 +69325,7 @@
     "70417087": {
       "id": 70417087,
       "name": "삼국지연의",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -69250,7 +69350,7 @@
     "70417088": {
       "id": 70417088,
       "name": "상감세공 갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -69275,7 +69375,7 @@
     "70417089": {
       "id": 70417089,
       "name": "상아 피리",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -69300,7 +69400,7 @@
     "70417090": {
       "id": 70417090,
       "name": "생황",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -69325,7 +69425,7 @@
     "70417091": {
       "id": 70417091,
       "name": "샤르카의 머리 장식",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -69351,7 +69451,7 @@
     "70417093": {
       "id": 70417093,
       "name": "서유기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -69376,7 +69476,7 @@
     "70417095": {
       "id": 70417095,
       "name": "선녀의 무용복",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -69402,7 +69502,7 @@
     "70417096": {
       "id": 70417096,
       "name": "성왕 갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -69428,7 +69528,7 @@
     "70417097": {
       "id": 70417097,
       "name": "세네트",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -69453,7 +69553,7 @@
     "70417098": {
       "id": 70417098,
       "name": "세이렌의 하프",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -69485,7 +69585,7 @@
     "70417099": {
       "id": 70417099,
       "name": "소네트집",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -69510,7 +69610,7 @@
     "70417100": {
       "id": 70417100,
       "name": "손자병법",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -69535,7 +69635,7 @@
     "70417102": {
       "id": 70417102,
       "name": "수호전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -69560,7 +69660,7 @@
     "70417107": {
       "id": 70417107,
       "name": "슬릿 드럼",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -69585,7 +69685,7 @@
     "70417109": {
       "id": 70417109,
       "name": "시야사트 나메",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -69610,7 +69710,7 @@
     "70417110": {
       "id": 70417110,
       "name": "신곡",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -69635,7 +69735,7 @@
     "70417111": {
       "id": 70417111,
       "name": "신기한 투구 장식",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -69661,7 +69761,7 @@
     "70417112": {
       "id": 70417112,
       "name": "신농본초경",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -69686,7 +69786,7 @@
     "70417113": {
       "id": 70417113,
       "name": "신라 금관",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -69712,7 +69812,7 @@
     "70417114": {
       "id": 70417114,
       "name": "신문고",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -69737,7 +69837,7 @@
     "70417118": {
       "id": 70417118,
       "name": "아르페 성궤",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -69762,7 +69862,7 @@
     "70417120": {
       "id": 70417120,
       "name": "아스맛족 머리 장식",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -69788,7 +69888,7 @@
     "70417121": {
       "id": 70417121,
       "name": "아이올로스의 공",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -69813,7 +69913,7 @@
     "70417122": {
       "id": 70417122,
       "name": "아프리카의 별",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -69838,7 +69938,7 @@
     "70417124": {
       "id": 70417124,
       "name": "알마게스트",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -69863,7 +69963,7 @@
     "70417127": {
       "id": 70417127,
       "name": "양금수수마노배",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -69888,7 +69988,7 @@
     "70417128": {
       "id": 70417128,
       "name": "에르난 코르테스의 총",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -69914,7 +70014,7 @@
     "70417129": {
       "id": 70417129,
       "name": "엘 시드의 노래",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -69939,7 +70039,7 @@
     "70417130": {
       "id": 70417130,
       "name": "역사",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -69964,7 +70064,7 @@
     "70417131": {
       "id": 70417131,
       "name": "영락대전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -69989,7 +70089,7 @@
     "70417132": {
       "id": 70417132,
       "name": "오디세이아",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -70014,7 +70114,7 @@
     "70417133": {
       "id": 70417133,
       "name": "오토 1세의 왕관",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -70039,7 +70139,7 @@
     "70417134": {
       "id": 70417134,
       "name": "오현비파",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -70064,7 +70164,7 @@
     "70417135": {
       "id": 70417135,
       "name": "옥새",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -70089,7 +70189,7 @@
     "70417136": {
       "id": 70417136,
       "name": "와레루 다함마트",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -70114,7 +70214,7 @@
     "70417137": {
       "id": 70417137,
       "name": "와양 쿨릿",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -70139,7 +70239,7 @@
     "70417139": {
       "id": 70417139,
       "name": "완함",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -70164,7 +70264,7 @@
     "70417140": {
       "id": 70417140,
       "name": "요한 기사단장의 방패",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -70189,7 +70289,7 @@
     "70417141": {
       "id": 70417141,
       "name": "우라노메트리아",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -70214,7 +70314,7 @@
     "70417142": {
       "id": 70417142,
       "name": "우치습유이야기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -70239,7 +70339,7 @@
     "70417143": {
       "id": 70417143,
       "name": "운남 참마도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -70264,7 +70364,7 @@
     "70417144": {
       "id": 70417144,
       "name": "울리울리",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -70289,7 +70389,7 @@
     "70417145": {
       "id": 70417145,
       "name": "월계관",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -70314,7 +70414,7 @@
     "70417148": {
       "id": 70417148,
       "name": "육임 식반",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -70339,7 +70439,7 @@
     "70417149": {
       "id": 70417149,
       "name": "의학 전범",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -70364,7 +70464,7 @@
     "70417150": {
       "id": 70417150,
       "name": "의학 전서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -70389,7 +70489,7 @@
     "70417151": {
       "id": 70417151,
       "name": "이븐 바투타 여행기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -70421,7 +70521,7 @@
     "70417152": {
       "id": 70417152,
       "name": "이파치예프스키 사본",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -70446,7 +70546,7 @@
     "70417153": {
       "id": 70417153,
       "name": "이페왕의 두상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -70471,7 +70571,7 @@
     "70417155": {
       "id": 70417155,
       "name": "일리아스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -70496,7 +70596,7 @@
     "70417159": {
       "id": 70417159,
       "name": "자야바르만 7세의 두상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -70521,7 +70621,7 @@
     "70417160": {
       "id": 70417160,
       "name": "장궁",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -70546,7 +70646,7 @@
     "70417161": {
       "id": 70417161,
       "name": "장한가",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -70571,7 +70671,7 @@
     "70417162": {
       "id": 70417162,
       "name": "전립",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -70597,7 +70697,7 @@
     "70417163": {
       "id": 70417163,
       "name": "젬베",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -70622,7 +70722,7 @@
     "70417164": {
       "id": 70417164,
       "name": "조선경국전",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -70647,7 +70747,7 @@
     "70417165": {
       "id": 70417165,
       "name": "주르나",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -70672,7 +70772,7 @@
     "70417167": {
       "id": 70417167,
       "name": "중추첩",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -70697,7 +70797,7 @@
     "70417168": {
       "id": 70417168,
       "name": "챠후챠스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -70722,7 +70822,7 @@
     "70417170": {
       "id": 70417170,
       "name": "청룡언월도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -70748,7 +70848,7 @@
     "70417173": {
       "id": 70417173,
       "name": "춘망",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -70773,7 +70873,7 @@
     "70417174": {
       "id": 70417174,
       "name": "칠지도",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -70798,7 +70898,7 @@
     "70417176": {
       "id": 70417176,
       "name": "카를대제의 왕관",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -70824,7 +70924,7 @@
     "70417177": {
       "id": 70417177,
       "name": "카샤카",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -70849,7 +70949,7 @@
     "70417178": {
       "id": 70417178,
       "name": "케나",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -70874,7 +70974,7 @@
     "70417179": {
       "id": 70417179,
       "name": "켈스의 서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -70899,7 +70999,7 @@
     "70417180": {
       "id": 70417180,
       "name": "코라",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -70924,7 +71024,7 @@
     "70417181": {
       "id": 70417181,
       "name": "코시모의 메달",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -70949,7 +71049,7 @@
     "70417182": {
       "id": 70417182,
       "name": "코이누르",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -70975,7 +71075,7 @@
     "70417184": {
       "id": 70417184,
       "name": "콜라다",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -71001,7 +71101,7 @@
     "70417186": {
       "id": 70417186,
       "name": "쿠아우테목의 창",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -71027,7 +71127,7 @@
     "70417187": {
       "id": 70417187,
       "name": "쿠 스틱",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -71053,7 +71153,7 @@
     "70417188": {
       "id": 70417188,
       "name": "클랩스틱",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -71078,7 +71178,7 @@
     "70417189": {
       "id": 70417189,
       "name": "클리브 솔리스",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -71103,7 +71203,7 @@
     "70417190": {
       "id": 70417190,
       "name": "키푸",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -71128,7 +71228,7 @@
     "70417191": {
       "id": 70417191,
       "name": "태공망의 낚싯대",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -71153,7 +71253,7 @@
     "70417192": {
       "id": 70417192,
       "name": "태양신조금식",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -71178,7 +71278,7 @@
     "70417193": {
       "id": 70417193,
       "name": "태평기",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -71203,7 +71303,7 @@
     "70417196": {
       "id": 70417196,
       "name": "테오도라의 무용 의상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -71229,7 +71329,7 @@
     "70417197": {
       "id": 70417197,
       "name": "튜턴 기사단장의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -71254,7 +71354,7 @@
     "70417198": {
       "id": 70417198,
       "name": "트리스탄의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -71280,7 +71380,7 @@
     "70417199": {
       "id": 70417199,
       "name": "틀라솔테오틀 여신상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -71305,7 +71405,7 @@
     "70417200": {
       "id": 70417200,
       "name": "티조나",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -71331,7 +71431,7 @@
     "70417202": {
       "id": 70417202,
       "name": "파이완 민족의상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -71357,7 +71457,7 @@
     "70417204": {
       "id": 70417204,
       "name": "포우나무",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -71383,7 +71483,7 @@
     "70417205": {
       "id": 70417205,
       "name": "포이",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -71408,7 +71508,7 @@
     "70417206": {
       "id": 70417206,
       "name": "폴리크라테스의 반지",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -71434,7 +71534,7 @@
     "70417207": {
       "id": 70417207,
       "name": "풍신첩",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -71459,7 +71559,7 @@
     "70417208": {
       "id": 70417208,
       "name": "프라가라흐",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -71485,7 +71585,7 @@
     "70417209": {
       "id": 70417209,
       "name": "프리드리히 1세의 갑옷",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -71510,7 +71610,7 @@
     "70417212": {
       "id": 70417212,
       "name": "합성궁",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 1,
@@ -71536,7 +71636,7 @@
     "70417214": {
       "id": 70417214,
       "name": "헤르메스 문서",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -71561,7 +71661,7 @@
     "70417215": {
       "id": 70417215,
       "name": "현자의 돌",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -71586,7 +71686,7 @@
     "70417216": {
       "id": 70417216,
       "name": "황금야마상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -71611,7 +71711,7 @@
     "70417218": {
       "id": 70417218,
       "name": "황제내경",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -71636,7 +71736,7 @@
     "70417219": {
       "id": 70417219,
       "name": "훈민정음",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -71661,7 +71761,7 @@
     "70417221": {
       "id": 70417221,
       "name": "흑태자의 루비",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -71686,7 +71786,7 @@
     "70417223": {
       "id": 70417223,
       "name": "성자의 지팡이",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -71718,7 +71818,7 @@
     "70417224": {
       "id": 70417224,
       "name": "아서왕의 성배",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -71750,7 +71850,7 @@
     "70417225": {
       "id": 70417225,
       "name": "세드나상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -72839,7 +72939,7 @@
     "70418048": {
       "id": 70418048,
       "name": "에테멘앙키",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 14,
       "discoveryGroup": 4,
       "discoveryGrade": 5,
@@ -72864,7 +72964,7 @@
     "70418049": {
       "id": 70418049,
       "name": "아펜니노 거상",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 4,
@@ -73046,7 +73146,7 @@
     "70490000": {
       "id": 70490000,
       "name": "낡은 상자",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -73399,7 +73499,7 @@
     "70417226": {
       "id": 70417226,
       "name": "유픽 가면",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -73424,7 +73524,7 @@
     "70417227": {
       "id": 70417227,
       "name": "켈루트비악",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -73449,7 +73549,7 @@
     "70417228": {
       "id": 70417228,
       "name": "킬라우트",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -73474,7 +73574,7 @@
     "70417229": {
       "id": 70417229,
       "name": "타우티루트",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -73499,7 +73599,7 @@
     "70417230": {
       "id": 70417230,
       "name": "쿨릭",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -73524,7 +73624,7 @@
     "70417231": {
       "id": 70417231,
       "name": "유픽 의류",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -73549,7 +73649,7 @@
     "70417232": {
       "id": 70417232,
       "name": "유픽 인형",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 1,
@@ -73574,7 +73674,7 @@
     "70417233": {
       "id": 70417233,
       "name": "카키박",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 2,
@@ -73599,7 +73699,7 @@
     "70417234": {
       "id": 70417234,
       "name": "울루",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -73624,7 +73724,7 @@
     "70417235": {
       "id": 70417235,
       "name": "눈고글",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -73649,7 +73749,7 @@
     "70417236": {
       "id": 70417236,
       "name": "파쿠",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 4,
@@ -73674,7 +73774,7 @@
     "70417237": {
       "id": 70417237,
       "name": "두로 와인",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -73699,7 +73799,7 @@
     "70411060": {
       "id": 70411060,
       "name": "흐발시",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 12,
       "discoveryGroup": 4,
       "discoveryGrade": 1,
@@ -73899,7 +73999,7 @@
     "70402168": {
       "id": 70402168,
       "name": "투필락",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 16,
       "discoveryGroup": 5,
       "discoveryGrade": 5,
@@ -73924,7 +74024,7 @@
     "70401203": {
       "id": 70401203,
       "name": "카르마크",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -73949,7 +74049,7 @@
     "70401204": {
       "id": 70401204,
       "name": "투픽",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 2,
@@ -73974,7 +74074,7 @@
     "70401205": {
       "id": 70401205,
       "name": "다빈치 전차",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -73999,7 +74099,7 @@
     "70401206": {
       "id": 70401206,
       "name": "다빈치 자동 드럼",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 4,
@@ -74024,7 +74124,7 @@
     "70401207": {
       "id": 70401207,
       "name": "여제 이리나의 장식함",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,
@@ -74049,7 +74149,7 @@
     "70401208": {
       "id": 70401208,
       "name": "콜트",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 15,
       "discoveryGroup": 5,
       "discoveryGrade": 3,
@@ -74099,7 +74199,7 @@
     "70401210": {
       "id": 70401210,
       "name": "리차드가 그린 아서왕의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -74124,7 +74224,7 @@
     "70401211": {
       "id": 70401211,
       "name": "리차드가 그린 주와이외즈",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -74149,7 +74249,7 @@
     "70401212": {
       "id": 70401212,
       "name": "리차드가 그린 커타나",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 17,
       "discoveryGroup": 6,
       "discoveryGrade": 3,
@@ -74174,7 +74274,7 @@
     "70401213": {
       "id": 70401213,
       "name": "리차드의 검",
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "discoveryType": 18,
       "discoveryGroup": 6,
       "discoveryGrade": 5,

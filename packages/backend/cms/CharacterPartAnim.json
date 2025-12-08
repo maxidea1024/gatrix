@@ -2818,7 +2818,7 @@
       "face_acc": "Town_Stand_01",
       "tool": [
         "DEFAULT",
-        "DEFAULT"
+        "Town_Binding_Harass_01"
       ]
     },
     "Sea_Sinking_01": {
@@ -3436,8 +3436,8 @@
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
       "weapon": [
-        "DEFAULT",
-        "DEFAULT"
+        "NOANIM",
+        "NOANIM"
       ],
       "face_acc": "Town_Stand_01",
       "tool": [
@@ -3452,8 +3452,8 @@
       "hat": "Town_Stand_01",
       "cape": "DEFAULT",
       "weapon": [
-        "DEFAULT",
-        "DEFAULT"
+        "NOANIM",
+        "NOANIM"
       ],
       "face_acc": "Town_Stand_01",
       "tool": [
@@ -3678,6 +3678,134 @@
       "weapon": [
         "Town_Stand_01",
         "Town_Stand_01"
+      ],
+      "face_acc": "Town_Stand_01",
+      "tool": [
+        "DEFAULT",
+        "DEFAULT"
+      ]
+    },
+    "Ship_DeckOutskirtsNPC_04": {
+      "id": "Ship_DeckOutskirtsNPC_04",
+      "face": "Town_Stand_01",
+      "hair": "Town_Stand_01",
+      "hat": "Town_Stand_01",
+      "cape": "DEFAULT",
+      "weapon": [
+        "Town_Stand_01",
+        "Town_Stand_01"
+      ],
+      "face_acc": "Town_Stand_01",
+      "tool": [
+        "DEFAULT",
+        "DEFAULT"
+      ]
+    },
+    "Ship_DeckOutskirtsNPC_05": {
+      "id": "Ship_DeckOutskirtsNPC_05",
+      "face": "Town_Stand_01",
+      "hair": "Town_Stand_01",
+      "hat": "Town_Stand_01",
+      "cape": "DEFAULT",
+      "weapon": [
+        "Town_Stand_01",
+        "Town_Stand_01"
+      ],
+      "face_acc": "Town_Stand_01",
+      "tool": [
+        "DEFAULT",
+        "DEFAULT"
+      ]
+    },
+    "Town_Walk_04": {
+      "id": "Town_Walk_04",
+      "face": "Town_Stand_01",
+      "hair": "Town_Stand_01",
+      "hat": "Town_Stand_01",
+      "cape": "DEFAULT",
+      "weapon": [
+        "Town_Stand_01",
+        "Town_Stand_01"
+      ],
+      "face_acc": "Town_Stand_01",
+      "tool": [
+        "DEFAULT",
+        "DEFAULT"
+      ]
+    },
+    "Town_Shoot_01": {
+      "id": "Town_Shoot_01",
+      "face": "Town_Stand_01",
+      "hair": "Town_Stand_01",
+      "hat": "Town_Stand_01",
+      "cape": "Town_Stand_01",
+      "weapon": [
+        "NOANIM",
+        "NOANIM"
+      ],
+      "face_acc": "Town_Stand_01",
+      "tool": [
+        "DEFAULT",
+        "DEFAULT"
+      ]
+    },
+    "Town_Shoot_02": {
+      "id": "Town_Shoot_02",
+      "face": "Town_Stand_01",
+      "hair": "Town_Stand_01",
+      "hat": "Town_Stand_01",
+      "cape": "Town_Stand_01",
+      "weapon": [
+        "NOANIM",
+        "NOANIM"
+      ],
+      "face_acc": "Town_Stand_01",
+      "tool": [
+        "DEFAULT",
+        "DEFAULT"
+      ]
+    },
+    "Manufacture_Crafting_01": {
+      "id": "Manufacture_Crafting_01",
+      "face": "Town_Stand_01",
+      "hair": "Town_Stand_01",
+      "hat": "Town_Stand_01",
+      "cape": "Town_Stand_01",
+      "weapon": [
+        "NOANIM",
+        "NOANIM"
+      ],
+      "face_acc": "Town_Stand_01",
+      "tool": [
+        "DEFAULT",
+        "DEFAULT"
+      ]
+    },
+    "Manufacture_Crafting_02": {
+      "id": "Manufacture_Crafting_02",
+      "face": "Town_Stand_01",
+      "hair": "Town_Stand_01",
+      "hat": "Town_Stand_01",
+      "cape": "Town_Stand_01",
+      "weapon": [
+        "NOANIM",
+        "NOANIM"
+      ],
+      "face_acc": "Town_Stand_01",
+      "tool": [
+        "DEFAULT",
+        "DEFAULT"
+      ]
+    },
+    "Manufacture_Crafting_03": {
+      "id": "Manufacture_Crafting_03",
+      "face": "Town_Stand_01",
+      "hair": "Town_Stand_01",
+      "hat": "Town_Stand_01",
+      "cape": "Town_Stand_01",
+      "weapon": [
+        "NOANIM",
+        "NOANIM"
       ],
       "face_acc": "Town_Stand_01",
       "tool": [

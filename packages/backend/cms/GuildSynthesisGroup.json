@@ -15,6 +15,10 @@
       "icon": "string",
       "category": "number",
       "rewardGrade": "number",
+      "viewRewardGrade": [
+        "number",
+        "number"
+      ],
       "isPreview": "bool",
       "startDate": "string",
       "endDate": "string",
@@ -34,7 +38,6 @@
       "groupId": 1,
       "icon": 1,
       "category": 1,
-      "rewardGrade": 1,
       "isPreview": 1,
       "desc": 1,
       "guildLevelRequired": 1,
@@ -45,11 +48,19 @@
     ":min": {
       "category": 0,
       "rewardGrade": 0,
+      "viewRewardGrade": [
+        0,
+        0
+      ],
       "guildLevelRequired": 1
     },
     ":max": {
       "category": 1,
-      "rewardGrade": 8
+      "rewardGrade": 8,
+      "viewRewardGrade": [
+        8,
+        8
+      ]
     },
     ":enum": {},
     ":links": {}
@@ -60,15 +71,24 @@
       "groupName": "부품 합성",
       "popupTitle": "{0} 부품 합성",
       "popupTitleFormatTexts": [
-        "A등급"
+        "A, S"
       ],
       "groupNo": 10000,
       "groupId": 0,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 4,
+      "viewRewardGrade": [
+        4,
+        5
+      ],
       "isPreview": true,
-      "desc": "B등급 부품을 합성하여 A등급 부품을 얻습니다.",
+      "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다.",
+      "descFormatTexts": [
+        "B, A",
+        "부품",
+        "A, S"
+      ],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 1
@@ -78,15 +98,24 @@
       "groupName": "장비 합성",
       "popupTitle": "{0} 장비 합성",
       "popupTitleFormatTexts": [
-        "A등급"
+        "A, S"
       ],
       "groupNo": 10001,
       "groupId": 1,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 4,
+      "viewRewardGrade": [
+        4,
+        5
+      ],
       "isPreview": true,
-      "desc": "B등급 장비를 합성하여 A등급 장비를 얻습니다.",
+      "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다.",
+      "descFormatTexts": [
+        "B, A",
+        "장비",
+        "A, S"
+      ],
       "guildLevelRequired": 1,
       "isSpecial": false,
       "eventTag": 1
@@ -94,17 +123,26 @@
     "4002": {
       "id": 4002,
       "groupName": "부품 합성",
-      "popupTitle": "{0} 동급 부품 합성",
+      "popupTitle": "{0} 부품 합성",
       "popupTitleFormatTexts": [
-        "A"
+        "A, S"
       ],
       "groupNo": 10002,
       "groupId": 2,
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 4,
+      "viewRewardGrade": [
+        4,
+        5
+      ],
       "isPreview": true,
-      "desc": "A등급 부품을 합성하여 A등급 부품을 얻습니다.",
+      "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다.",
+      "descFormatTexts": [
+        "A, S",
+        "부품",
+        "A, S"
+      ],
       "guildLevelRequired": 1,
       "isSpecial": true,
       "eventTag": 2
@@ -112,17 +150,26 @@
     "4003": {
       "id": 4003,
       "groupName": "장비 합성",
-      "popupTitle": "{0} 동급 장비 합성",
+      "popupTitle": "{0} 장비 합성",
       "popupTitleFormatTexts": [
-        "A"
+        "A, S"
       ],
       "groupNo": 10003,
       "groupId": 3,
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 4,
+      "viewRewardGrade": [
+        4,
+        5
+      ],
       "isPreview": true,
-      "desc": "A등급 장비를 합성하여 A등급 장비를 얻습니다.",
+      "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다.",
+      "descFormatTexts": [
+        "A, S",
+        "장비",
+        "A, S"
+      ],
       "guildLevelRequired": 1,
       "isSpecial": true,
       "eventTag": 2
@@ -139,7 +186,11 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": true,
+      "endDate": "2020/01/01/00:00:00",
       "desc": "A등급 부품을 합성하여 S등급 부품을 얻습니다.",
       "guildLevelRequired": 1,
       "isSpecial": false,
@@ -157,7 +208,11 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": true,
+      "endDate": "2020/01/01/00:00:00",
       "desc": "A등급 장비를 합성하여 S등급 장비를 얻습니다.",
       "guildLevelRequired": 1,
       "isSpecial": false,
@@ -175,7 +230,11 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": true,
+      "endDate": "2020/01/01/00:00:00",
       "desc": "S등급 부품을 합성하여 S등급 부품을 얻습니다.",
       "guildLevelRequired": 1,
       "isSpecial": true,
@@ -193,7 +252,11 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": true,
+      "endDate": "2020/01/01/00:00:00",
       "desc": "S등급 장비를 합성하여 S등급 장비를 얻습니다.",
       "guildLevelRequired": 1,
       "isSpecial": true,
@@ -214,6 +277,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/06/25/00:00:00",
       "endDate": "2025/08/27/00:00:00",
@@ -242,6 +308,9 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/10/22/00:00:00",
@@ -270,6 +339,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/10/22/00:00:00",
@@ -298,6 +370,9 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/10/22/00:00:00",
       "endDate": "2025/11/19/00:00:00",
@@ -326,6 +401,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/10/22/00:00:00",
       "endDate": "2025/11/19/00:00:00",
@@ -354,6 +432,9 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/11/19/00:00:00",
       "endDate": "2025/12/17/00:00:00",
@@ -382,6 +463,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/11/19/00:00:00",
       "endDate": "2025/12/17/00:00:00",
@@ -410,6 +494,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 8,
+      "viewRewardGrade": [
+        8
+      ],
       "isPreview": false,
       "startDate": "2024/09/11/00:00:00",
       "endDate": "2024/12/04/00:00:00",
@@ -438,6 +525,9 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/10/22/00:00:00",
@@ -466,6 +556,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/10/22/00:00:00",
@@ -491,11 +584,16 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 4,
+      "viewRewardGrade": [
+        4
+      ],
       "isPreview": true,
-      "desc": "{0}등급 부품을 합성하여 {1}등급 부품을 얻습니다. 소모 시간이 적습니다.",
+      "endDate": "2020/01/01/00:00:00",
+      "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다. 소모 시간이 적습니다.",
       "descFormatTexts": [
-        "B",
-        "A"
+        "B, A",
+        "부품",
+        "A, S"
       ],
       "guildLevelRequired": 1,
       "isSpecial": false,
@@ -513,11 +611,16 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 4,
+      "viewRewardGrade": [
+        4
+      ],
       "isPreview": true,
-      "desc": "{0}등급 장비를 합성하여 {1}등급 장비를 얻습니다. 소모 시간이 적습니다.",
+      "endDate": "2020/01/01/00:00:00",
+      "desc": "{0}등급 {1}|hpp(을,를) 합성하여 {2}등급 {1}|hpp(을,를) 얻을 수 있습니다. 소모 시간이 적습니다.",
       "descFormatTexts": [
-        "B",
-        "A"
+        "B, A",
+        "장비",
+        "A, S"
       ],
       "guildLevelRequired": 1,
       "isSpecial": false,
@@ -535,7 +638,11 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": true,
+      "endDate": "2020/01/01/00:00:00",
       "desc": "{0}등급 부품을 합성하여 {1}등급 부품을 얻습니다. 소모 시간이 적습니다.",
       "descFormatTexts": [
         "A",
@@ -557,7 +664,11 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": true,
+      "endDate": "2020/01/01/00:00:00",
       "desc": "{0}등급 장비를 합성하여 {1}등급 장비를 얻습니다. 소모 시간이 적습니다.",
       "descFormatTexts": [
         "A",
@@ -582,6 +693,9 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/10/22/00:00:00",
       "endDate": "2025/11/19/00:00:00",
@@ -610,6 +724,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/10/22/00:00:00",
       "endDate": "2025/11/19/00:00:00",
@@ -638,6 +755,9 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/11/19/00:00:00",
       "endDate": "2025/12/17/00:00:00",
@@ -666,6 +786,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/11/19/00:00:00",
       "endDate": "2025/12/17/00:00:00",
@@ -688,6 +811,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2020/01/01/00:00:00",
       "endDate": "2020/01/02/00:00:00",
@@ -705,6 +831,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2020/01/01/00:00:00",
       "endDate": "2020/01/02/00:00:00",
@@ -728,6 +857,9 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/12/17/00:00:00",
@@ -756,6 +888,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": false,
       "startDate": "2025/09/24/00:00:00",
       "endDate": "2025/12/17/00:00:00",
@@ -784,6 +919,9 @@
       "icon": "Icon_Item_23430003_Sprite",
       "category": 0,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": true,
       "desc": "{0}등급 부품을 합성하여 {1}등급 부품을 얻습니다. 낮은 확률로 {2}|hpp(을,를) 얻을 수 있습니다.",
       "descFormatTexts": [
@@ -810,6 +948,9 @@
       "icon": "Icon_Item_23430002_Sprite",
       "category": 1,
       "rewardGrade": 5,
+      "viewRewardGrade": [
+        5
+      ],
       "isPreview": true,
       "desc": "{0}등급 장비를 합성하여 {1}등급 장비를 얻습니다. 낮은 확률로 {2}|hpp(을,를) 얻을 수 있습니다.",
       "descFormatTexts": [

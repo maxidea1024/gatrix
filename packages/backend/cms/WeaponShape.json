@@ -4238,7 +4238,7 @@
       "skeleton": "PistolSkins",
       "atlas": "PistolSkins0002",
       "skin": "1",
-      "color1": 15333119,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 4
@@ -4248,7 +4248,7 @@
       "skeleton": "SwordSkins",
       "atlas": "SwordSkins0002",
       "skin": "3",
-      "color1": 15333375,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 7
@@ -4258,7 +4258,7 @@
       "skeleton": "THMaceSkins",
       "atlas": "THMaceSkins0001",
       "skin": "26",
-      "color1": 15333631,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 8
@@ -4268,7 +4268,7 @@
       "skeleton": "SwordSkins",
       "atlas": "SwordSkins0002",
       "skin": "4",
-      "color1": 15333887,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 7
@@ -4278,7 +4278,7 @@
       "skeleton": "SwordSkins",
       "atlas": "SwordSkins0002",
       "skin": "5",
-      "color1": 15333887,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 7
@@ -4288,7 +4288,7 @@
       "skeleton": "CaneSkins",
       "atlas": "CaneSkins0001",
       "skin": "1",
-      "color1": 15333887,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 7
@@ -4298,7 +4298,7 @@
       "skeleton": "SwordSkins",
       "atlas": "SwordSkins0002",
       "skin": "6",
-      "color1": 15333887,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 7
@@ -4308,7 +4308,7 @@
       "skeleton": "FanSkins",
       "atlas": "FanSkins0001",
       "skin": "1",
-      "color1": 15333887,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 7
@@ -4318,7 +4318,7 @@
       "skeleton": "THSwordSkins",
       "atlas": "THSwordSkins0002",
       "skin": "13",
-      "color1": 15333887,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 8
@@ -4328,7 +4328,7 @@
       "skeleton": "SpearSkins",
       "atlas": "SpearSkins0001",
       "skin": "40",
-      "color1": 15333887,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 6
@@ -4338,10 +4338,90 @@
       "skeleton": "date_masamune",
       "atlas": "date_masamune",
       "skin": "2",
-      "color1": 15333887,
+      "color1": 15332863,
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 1
+    },
+    "34000384": {
+      "id": 34000384,
+      "skeleton": "THSwordSkins",
+      "atlas": "THSwordSkins0002",
+      "skin": "14",
+      "color1": 15332863,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 8
+    },
+    "34000385": {
+      "id": 34000385,
+      "skeleton": "SwordSkins",
+      "atlas": "SwordSkins0002",
+      "skin": "7",
+      "color1": 15332863,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 7
+    },
+    "34000386": {
+      "id": 34000386,
+      "skeleton": "PistolSkins",
+      "atlas": "PistolSkins0002",
+      "skin": "2",
+      "color1": 15332863,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 4
+    },
+    "34000387": {
+      "id": 34000387,
+      "skeleton": "PistolSkins",
+      "atlas": "PistolSkins0002",
+      "skin": "3",
+      "color1": 15332863,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 4
+    },
+    "34000388": {
+      "id": 34000388,
+      "skeleton": "FanSkins",
+      "atlas": "FanSkins0001",
+      "skin": "2",
+      "color1": 15332863,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 7
+    },
+    "34000389": {
+      "id": 34000389,
+      "skeleton": "date_masamune",
+      "atlas": "date_masamune",
+      "skin": "3",
+      "color1": 15333119,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 1
+    },
+    "34000390": {
+      "id": 34000390,
+      "skeleton": "SwordSkins",
+      "atlas": "SwordSkins0002",
+      "skin": "8",
+      "color1": 15333119,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 7
+    },
+    "34000391": {
+      "id": 34000391,
+      "skeleton": "SwordSkins",
+      "atlas": "SwordSkins0002",
+      "skin": "9",
+      "color1": 15333119,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 7
     }
   }
 }

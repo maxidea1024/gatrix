@@ -184,6 +184,27 @@
           "Type": 1
         }
       ]
+    },
+    "10300006": {
+      "id": 10300006,
+      "name": "무역 장려",
+      "rankingEffectVal": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "image": "WT_BD_Effect1052_Sprite",
+      "desc": "교역품 구매 가능 수량 {0}% 증가",
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
     }
   }
 }

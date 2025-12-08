@@ -213,7 +213,7 @@
         },
         {
           "job": 3,
-          "id": 65450068,
+          "id": 65450121,
           "needLv": 40,
           "needAwaken": 1
         },
@@ -1120,6 +1120,66 @@
         {
           "job": 3,
           "id": 65450119,
+          "needLv": 60,
+          "needAwaken": 2
+        }
+      ]
+    },
+    "65100032": {
+      "id": 65100032,
+      "name": "라이너스 라쳇",
+      "order": [
+        {
+          "job": 3,
+          "id": 65450118,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 2,
+          "id": 75000284,
+          "needLv": 20,
+          "needAwaken": 0
+        },
+        {
+          "job": 1,
+          "id": 75000261,
+          "needLv": 40,
+          "needAwaken": 1
+        },
+        {
+          "job": 2,
+          "id": 65450119,
+          "needLv": 60,
+          "needAwaken": 2
+        }
+      ]
+    },
+    "65100033": {
+      "id": 65100033,
+      "name": "황진화",
+      "order": [
+        {
+          "job": 3,
+          "id": 65450122,
+          "needLv": 1,
+          "needAwaken": 0
+        },
+        {
+          "job": 2,
+          "id": 75000298,
+          "needLv": 20,
+          "needAwaken": 0
+        },
+        {
+          "job": 1,
+          "id": 75000140,
+          "needLv": 40,
+          "needAwaken": 1
+        },
+        {
+          "job": 2,
+          "id": 75000299,
           "needLv": 60,
           "needAwaken": 2
         }

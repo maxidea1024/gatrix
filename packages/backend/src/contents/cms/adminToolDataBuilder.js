@@ -373,6 +373,72 @@ function makeCharacterDisplayName(characterCms) {
 }
 
 /**
+ * Make character display name in Chinese by translating each name part separately
+ * @param characterCms - Character CMS object
+ * @param loctab - Localization table (Korean -> Chinese)
+ * @returns Chinese character display name
+ */
+function makeCharacterDisplayNameCn(characterCms, loctab) {
+  if (!characterCms || !loctab) {
+    return makeCharacterDisplayName(characterCms);
+  }
+
+  let firstName = characterCms.firstName || '';
+  let middleName = characterCms.middleName || '';
+  let familyName = characterCms.familyName || '';
+  let particle = characterCms.particle || '';
+
+  // Extract original name (before @) and display name (after @) for localization lookup
+  // Format: "카탈리나(カタリーナ)@카탈리나" -> original="카탈리나(カタリーナ)", display="카탈리나"
+  let firstNameOriginal = firstName;
+  let middleNameOriginal = middleName;
+  let familyNameOriginal = familyName;
+  let particleOriginal = particle;
+
+  if (firstName.includes('@')) {
+    const arr = firstName.split('@');
+    firstNameOriginal = arr[0]; // Original with Japanese
+    firstName = arr[arr.length - 1]; // Display name
+  }
+  if (middleName.includes('@')) {
+    const arr = middleName.split('@');
+    middleNameOriginal = arr[0];
+    middleName = arr[arr.length - 1];
+  }
+  if (familyName.includes('@')) {
+    const arr = familyName.split('@');
+    familyNameOriginal = arr[0];
+    familyName = arr[arr.length - 1];
+  }
+  if (particle.includes('@')) {
+    const arr = particle.split('@');
+    particleOriginal = arr[0];
+    particle = arr[arr.length - 1];
+  }
+
+  // Translate each name part: try original first (with Japanese), then display name
+  const firstNameCn = firstName ? (loctab[firstNameOriginal] || loctab[firstName] || firstName) : '';
+  const middleNameCn = middleName ? (loctab[middleNameOriginal] || loctab[middleName] || middleName) : '';
+  const familyNameCn = familyName ? (loctab[familyNameOriginal] || loctab[familyName] || familyName) : '';
+  const particleCn = particle ? (loctab[particleOriginal] || loctab[particle] || particle) : '';
+
+  // Build Chinese name (Chinese names typically don't have spaces between parts)
+  // But we follow the same pattern as Korean for consistency
+  let mateNameCn = firstNameCn;
+  if (particleCn) {
+    mateNameCn += particleCn;
+  }
+  if (middleNameCn) {
+    mateNameCn += (mateNameCn ? ' ' : '') + middleNameCn;
+  }
+  if (familyNameCn) {
+    mateNameCn += (mateNameCn ? ' ' : '') + familyNameCn;
+  }
+
+  return mateNameCn;
+}
+
+/**
  * Parse CSV line handling quoted fields properly
  */
 function parseCSVLine(line) {
@@ -1293,11 +1359,146 @@ function generateUIListData(cmsDir, loctab = {}) {
       // Use formatItemName to handle placeholders
       let nameKr = formatItemName(item, allCmsTables);
 
+      // For CN: Use template-based translation for items with {0} placeholders
+      // Only use loctab if it's actually translated (not same as Korean)
+      let nameCn = loctab[nameKr];
+      if (nameCn === nameKr) {
+        nameCn = undefined; // Reset if not actually translated
+      }
+
+      // If no direct translation, try template-based translation
+      if (!nameCn && item.name && item.name.includes('{0}') && item.descFormat && item.descFormatType) {
+        // Try to find template translation (e.g., "{0} 도면" -> "{0}图纸")
+        const templateName = removeCommentFromName(item.name);
+        const templateCn = loctab[templateName];
+        if (templateCn && templateCn !== templateName) {
+          // Build translated placeholder values
+          const formatTextsCn = [];
+          for (let i = 0; i < item.descFormat.length; i++) {
+            const format = item.descFormat[i];
+            const formatType = item.descFormatType[i];
+            if (!format || !formatType) continue;
+
+            if (format.Type === DESC_FORMAT_TYPE.COUNT) {
+              formatTextsCn.push((formatType.target !== undefined && formatType.target !== null) ? formatType.target.toString() : '0');
+            } else if (format.Type === DESC_FORMAT_TYPE.CMS_NAME) {
+              if (format.TypeName && formatType.target !== undefined && formatType.target !== null) {
+                const table = allCmsTables[format.TypeName];
+                if (table && table[formatType.target]) {
+                  const targetItem = table[formatType.target];
+                  const targetNameKr = removeCommentFromName(targetItem.name || `${format.TypeName} ${formatType.target}`);
+                  formatTextsCn.push(loctab[targetNameKr] || targetNameKr);
+                } else {
+                  formatTextsCn.push(`${format.TypeName} ${formatType.target}`);
+                }
+              } else {
+                formatTextsCn.push('[Unknown]');
+              }
+            } else {
+              formatTextsCn.push('[Unknown]');
+            }
+          }
+          // Replace {0}, {1}, etc. with translated values
+          nameCn = stringFormat(templateCn, formatTextsCn);
+        }
+      }
+
+      // If still no translation, try phrase-then-token translation
+      if (!nameCn) {
+        try {
+          // First, try phrase matching with space-separated tokens
+          const spaceTokens = nameKr.split(/\s+/).filter(Boolean);
+          const translatedParts = [];
+          let i = 0;
+          while (i < spaceTokens.length) {
+            // Try longest phrase match first
+            let matched = false;
+            for (let len = spaceTokens.length - i; len > 1; len--) {
+              const phrase = spaceTokens.slice(i, i + len).join(' ');
+              const phraseCn = loctab[phrase];
+              if (phraseCn && phraseCn !== phrase) {
+                translatedParts.push(phraseCn);
+                i += len;
+                matched = true;
+                break;
+              }
+            }
+            if (!matched) {
+              // Single token - split by special delimiters
+              const token = spaceTokens[i];
+              const subParts = token.split(/([\[\]()_~])/);
+              for (const subPart of subParts) {
+                if (!subPart) continue;
+                if (/^[\[\]()_~]$/.test(subPart)) {
+                  translatedParts.push(subPart);
+                  continue;
+                }
+                const subCn = loctab[subPart];
+                if (subCn && subCn !== subPart) {
+                  translatedParts.push(subCn);
+                } else {
+                  // Try various pattern extractions
+                  let handled = false;
+
+                  // Pattern 1: Number prefix (e.g., "23등급" -> "23" + "等级")
+                  const numPrefixMatch = subPart.match(/^([0-9]+[~\-]?[0-9]*)(.+)$/);
+                  if (!handled && numPrefixMatch) {
+                    const numPart = numPrefixMatch[1];
+                    const textPart = numPrefixMatch[2];
+                    const textCn = loctab[textPart];
+                    if (textCn && textCn !== textPart) {
+                      translatedParts.push(numPart);
+                      translatedParts.push(textCn);
+                      handled = true;
+                    }
+                  }
+
+                  // Pattern 2: Suffix with 의 particle (e.g., "달토끼의" -> "月兔" + "的")
+                  if (!handled) {
+                    const particleMatch = subPart.match(/^(.+?)(의)$/);
+                    if (particleMatch) {
+                      const mainPart = particleMatch[1];
+                      const mainCn = loctab[mainPart];
+                      if (mainCn && mainCn !== mainPart) {
+                        translatedParts.push(mainCn);
+                        translatedParts.push('的');
+                        handled = true;
+                      }
+                    }
+                  }
+
+                  // Pattern 3: Number/roman numeral suffix (e.g., "선택권Ⅰ")
+                  if (!handled) {
+                    const suffixMatch = subPart.match(/^(.+?)([IⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+|[0-9]+)$/);
+                    if (suffixMatch) {
+                      const mainPart = suffixMatch[1];
+                      const suffix = suffixMatch[2];
+                      const mainCn = loctab[mainPart];
+                      translatedParts.push((mainCn && mainCn !== mainPart) ? mainCn : mainPart);
+                      translatedParts.push(suffix);
+                      handled = true;
+                    }
+                  }
+
+                  if (!handled) {
+                    translatedParts.push(subPart);
+                  }
+                }
+              }
+              i++;
+            }
+          }
+          nameCn = translatedParts.join('');
+        } catch {
+          nameCn = nameKr;
+        }
+      }
+
       uiListData.items.push({
         id: item.id,
         name: nameKr,
         nameKr: nameKr,
-        nameCn: loctab[nameKr] || nameKr,
+        nameCn: nameCn,
         nameEn: nameKr,
         type: item.type,
         grade: item.grade,
@@ -1447,6 +1648,19 @@ function generateUIListData(cmsDir, loctab = {}) {
   const pointTable = loadTable('Point');
   if (pointTable && pointTable.Point) {
     const pointList = [];
+
+    // Helper: token-wise translation fallback when full phrase not found
+    const translatePointByTokens = (kr) => {
+      if (!kr || !loctab) return kr;
+      try {
+        const tokens = kr.split(/\s+/).filter(Boolean);
+        const translated = tokens.map(t => (loctab[t] !== undefined ? loctab[t] : t));
+        return translated.join(' ');
+      } catch {
+        return kr;
+      }
+    };
+
     for (const [key, item] of Object.entries(pointTable.Point)) {
       if (!item || !item.id || key.startsWith(':')) {
         continue;
@@ -1460,7 +1674,8 @@ function generateUIListData(cmsDir, loctab = {}) {
         nameKr = nameKr.substring(0, atIndex).trim();
       }
 
-      let nameCn = loctab[nameKr] || nameKr;
+      // Use loctab first, fallback to token-wise translation
+      let nameCn = loctab[nameKr] || translatePointByTokens(nameKr);
       let nameEn = nameKr;
 
       // Check if this is a red gem and if it's paid or free
@@ -1537,12 +1752,16 @@ function generateUIListData(cmsDir, loctab = {}) {
       }
 
       // Special handling for "달성 보상" - add achievement target details with item names
+      // Build both Korean and Chinese versions simultaneously
+      let specialCaseCn = null;
       if (nameKr === '달성 보상' && achievement.achievementTarget && achievement.achievementTarget.length > 0) {
-        const targetDetails = [];
+        const targetDetailsKr = [];
+        const targetDetailsCn = [];
 
         for (let i = 0; i < Math.min(achievement.achievementTarget.length, 2); i++) {
           const targetId = achievement.achievementTarget[i];
-          let itemName = null;
+          let itemNameKr = null;
+          let itemNameCn = null;
 
           // Try to find the item in common tables
           const tablesToCheck = ['Quest', 'QuestNode', 'Item', 'Discovery', 'Ship', 'Mate', 'Character'];
@@ -1554,45 +1773,92 @@ function generateUIListData(cmsDir, loctab = {}) {
               if (tableName === 'Mate' && targetItem.characterId && preloadedTables['Character']) {
                 const character = preloadedTables['Character'][targetItem.characterId];
                 if (character) {
-                  itemName = removeCommentFromName(makeCharacterDisplayName(character));
+                  itemNameKr = removeCommentFromName(makeCharacterDisplayName(character));
+                  itemNameCn = loctab[itemNameKr];
+                  if (!itemNameCn || itemNameCn === itemNameKr) {
+                    itemNameCn = makeCharacterDisplayNameCn(character, loctab);
+                  }
                 }
               } else {
-                itemName = removeCommentFromName(targetItem.name || targetItem.Name || '');
+                itemNameKr = removeCommentFromName(targetItem.name || targetItem.Name || '');
 
                 // Special handling for Quest - format placeholders using formatTexts
                 if (tableName === 'Quest' && targetItem.formatTexts && Array.isArray(targetItem.formatTexts) && targetItem.formatTexts.length > 0) {
                   const formatValues = targetItem.formatTexts.map(ft => ft.Val || '');
                   if (formatValues.length > 0) {
-                    itemName = stringFormat(itemName, formatValues);
+                    itemNameKr = stringFormat(itemNameKr, formatValues);
                   }
+                }
+
+                // Translate item name to Chinese using phrase-first matching
+                itemNameCn = loctab[itemNameKr];
+                if (!itemNameCn || itemNameCn === itemNameKr) {
+                  // Try phrase-first translation for item names
+                  const tokens = itemNameKr.split(/\s+/).filter(Boolean);
+                  const translatedParts = [];
+                  let idx = 0;
+                  while (idx < tokens.length) {
+                    let matched = false;
+                    // Try longest phrase match first
+                    for (let len = tokens.length - idx; len > 1; len--) {
+                      const phrase = tokens.slice(idx, idx + len).join(' ');
+                      const phraseCn = loctab[phrase];
+                      if (phraseCn && phraseCn !== phrase) {
+                        translatedParts.push(phraseCn);
+                        idx += len;
+                        matched = true;
+                        break;
+                      }
+                    }
+                    if (!matched) {
+                      const token = tokens[idx];
+                      const tokenCn = loctab[token];
+                      translatedParts.push((tokenCn && tokenCn !== token) ? tokenCn : token);
+                      idx++;
+                    }
+                  }
+                  itemNameCn = translatedParts.join('');
                 }
               }
 
-              if (itemName) {
+              if (itemNameKr) {
                 break;
               }
             }
           }
 
-          if (itemName) {
-            targetDetails.push(`${targetId}:${itemName}`);
+          if (itemNameKr) {
+            targetDetailsKr.push(`${targetId}:${itemNameKr}`);
+            targetDetailsCn.push(`${targetId}:${itemNameCn || itemNameKr}`);
           } else {
-            targetDetails.push(`${targetId}`);
+            targetDetailsKr.push(`${targetId}`);
+            targetDetailsCn.push(`${targetId}`);
           }
         }
 
-        if (targetDetails.length > 0) {
-          nameKr = `달성 보상 (${targetDetails.join(', ')})`;
+        if (targetDetailsKr.length > 0) {
+          nameKr = `달성 보상 (${targetDetailsKr.join(', ')})`;
+          const baseCn = loctab['달성 보상'] || '达成奖励';
+          specialCaseCn = `${baseCn} (${targetDetailsCn.join(', ')})`;
         }
       }
 
       // Format placeholders using descFormat and achievementTarget
+      // Build both Korean and Chinese format texts separately
+      let nameCn = '';
+      const originalTemplate = achievement.name || `Achievement ${achievement.id}`;
+      // Remove @ comment from template
+      const templateAtIndex = originalTemplate.indexOf('@');
+      const cleanTemplate = templateAtIndex !== -1 ? originalTemplate.substring(0, templateAtIndex).trim() : originalTemplate;
+
       if (achievement.descFormat && Array.isArray(achievement.descFormat) && achievement.descFormat.length > 0) {
-        const formatTexts = [];
+        const formatTextsKr = [];
+        const formatTextsCn = [];
 
         for (let i = 0; i < achievement.descFormat.length; i++) {
           const format = achievement.descFormat[i];
-          let formatText = '';
+          let formatTextKr = '';
+          let formatTextCn = '';
 
           // Get the table name from Type or TypeName
           const tableName = format.TypeName || REWARD_TYPE_TO_TABLE[format.Type];
@@ -1617,34 +1883,102 @@ function generateUIListData(cmsDir, loctab = {}) {
               if (tableName === 'Mate' && targetItem.characterId && preloadedTables['Character']) {
                 const character = preloadedTables['Character'][targetItem.characterId];
                 if (character) {
-                  formatText = removeCommentFromName(makeCharacterDisplayName(character));
+                  formatTextKr = removeCommentFromName(makeCharacterDisplayName(character));
+                  // Translate character name to Chinese: first try full name, then translate each part
+                  formatTextCn = loctab[formatTextKr];
+                  if (!formatTextCn || formatTextCn === formatTextKr) {
+                    // Translate each name part (firstName, middleName, familyName, particle)
+                    formatTextCn = makeCharacterDisplayNameCn(character, loctab);
+                  }
                 } else {
-                  formatText = `Mate ${targetId}`;
+                  formatTextKr = `Mate ${targetId}`;
+                  formatTextCn = formatTextKr;
+                }
+              } else if (tableName === 'Character') {
+                // Direct Character reference
+                formatTextKr = removeCommentFromName(makeCharacterDisplayName(targetItem));
+                // Translate character name to Chinese: first try full name, then translate each part
+                formatTextCn = loctab[formatTextKr];
+                if (!formatTextCn || formatTextCn === formatTextKr) {
+                  formatTextCn = makeCharacterDisplayNameCn(targetItem, loctab);
                 }
               } else {
-                formatText = removeCommentFromName(targetItem.name || targetItem.Name || `${tableName} ${targetId}`);
+                formatTextKr = removeCommentFromName(targetItem.name || targetItem.Name || `${tableName} ${targetId}`);
+                // Translate target name to Chinese
+                formatTextCn = loctab[formatTextKr] || formatTextKr;
               }
             } else {
-              formatText = `${tableName} ${targetId}`;
+              formatTextKr = `${tableName} ${targetId}`;
+              formatTextCn = formatTextKr;
             }
           } else {
-            formatText = `Unknown ${i}`;
+            formatTextKr = `Unknown ${i}`;
+            formatTextCn = formatTextKr;
           }
 
-          formatTexts.push(formatText);
+          formatTextsKr.push(formatTextKr);
+          formatTextsCn.push(formatTextCn);
         }
 
-        // Replace placeholders {0}, {1}, etc.
-        if (formatTexts.length > 0) {
-          nameKr = stringFormat(nameKr, formatTexts);
+        // Replace placeholders {0}, {1}, etc. for Korean
+        if (formatTextsKr.length > 0) {
+          nameKr = stringFormat(nameKr, formatTextsKr);
         }
+
+        // Build Chinese name with priority:
+        // 1. Full text translation (e.g., "바르카 애호가" -> "轻木帆船爱好者")
+        // 2. Template translation with CN placeholders (e.g., "{0} 애호가" -> "{0}爱好者" with CN ship name)
+        // 3. Token-wise translation (split template and translate each part separately)
+        nameCn = loctab[nameKr];
+        if (!nameCn || nameCn === nameKr) {
+          // Try template translation: e.g., "{0} 애호가" -> "{0}爱好者"
+          const templateCn = loctab[cleanTemplate];
+          if (templateCn && templateCn !== cleanTemplate) {
+            // Template exists in loctab, use it with Chinese placeholder values
+            nameCn = stringFormat(templateCn, formatTextsCn);
+          } else {
+            // Fallback: Split template by placeholders and translate each part
+            // e.g., "{0} 애호가" -> translate "애호가" -> combine with translated {0}
+            const templateParts = cleanTemplate.split(/(\{[0-9]+\})/);
+            const translatedParts = templateParts.map(part => {
+              if (/^\{[0-9]+\}$/.test(part)) {
+                // This is a placeholder like {0}, {1}
+                const index = parseInt(part.slice(1, -1), 10);
+                return formatTextsCn[index] || part;
+              } else {
+                // Regular text - translate it
+                const trimmedPart = part.trim();
+                if (!trimmedPart) return part;
+                return loctab[trimmedPart] || trimmedPart;
+              }
+            });
+            nameCn = translatedParts.join('');
+          }
+        }
+      } else {
+        // No descFormat - just translate the name
+        nameCn = loctab[nameKr];
+        if (!nameCn || nameCn === nameKr) {
+          // Try token-wise translation
+          const tokens = nameKr.split(/\s+/).filter(Boolean);
+          const translatedTokens = tokens.map(token => {
+            const tokenCn = loctab[token];
+            return (tokenCn && tokenCn !== token) ? tokenCn : token;
+          });
+          nameCn = translatedTokens.join('');
+        }
+      }
+
+      // Use special case Chinese name if available (for "달성 보상" case)
+      if (specialCaseCn) {
+        nameCn = specialCaseCn;
       }
 
       uiListData.achievements.push({
         id: achievement.id,
         name: nameKr,
         nameKr: nameKr,
-        nameCn: loctab[nameKr] || nameKr,
+        nameCn: nameCn,
         nameEn: nameKr,
         type: achievement.achievementType,
         grade: achievement.grade,
@@ -2276,13 +2610,21 @@ function convertLocalizationTable(inputPath, outputPath) {
     // Parse CSV line
     const fields = parseCSVLine(line);
 
-    // We need at least 4 fields (field[1] = key, field[3] = chinese)
+    // We need at least 4 fields (field[0] = key, field[3] = chinese)
     if (fields.length < 4) {
       skippedCount++;
       continue;
     }
 
-    const key = fields[1];
+    // Use first field as key (remove leading comma if exists)
+    let key = fields[0];
+    if (key && key.startsWith(',')) {
+      key = key.substring(1);
+    }
+    // Remove @ comment suffix (e.g., "카탈리나@카탈리나" -> "카탈리나")
+    if (key && key.includes('@')) {
+      key = key.substring(0, key.indexOf('@'));
+    }
     const chinese = fields[3];
 
     // Skip if key is empty
@@ -2322,6 +2664,119 @@ function convertLocalizationTable(inputPath, outputPath) {
   ensureKey('도면', '图纸');
   ensureKey('계약서', '合同');
   ensureKey('인도 계약서', '引渡合同');
+  // Point items - material types (missing from locdata)
+  ensureKey('물자', '物资');
+  ensureKey('천', '布');
+  ensureKey('금속', '金属');
+  ensureKey('특수', '特殊');
+  ensureKey('천 물자', '布 物资');
+  ensureKey('금속 물자', '金属 物资');
+  ensureKey('특수 물자', '特殊 物资');
+  // Achievement placeholders
+  ensureKey('애호가', '爱好者');
+  // Item names - commonly missing translations
+  ensureKey('발주서', '订货单');
+  ensureKey('상자', '箱子');
+  ensureKey('공연', '表演');
+  ensureKey('전단지', '传单');
+  ensureKey('단풍', '枫叶');
+  ensureKey('세트', '套装');
+  ensureKey('달토끼', '月兔');
+  ensureKey('비법', '秘诀');
+  ensureKey('쪽지', '纸条');
+  ensureKey('장식용', '装饰用');
+  ensureKey('동방', '东方');
+  ensureKey('주화', '硬币');
+  ensureKey('동전', '硬币');
+  ensureKey('점토', '粘土');
+  ensureKey('사탕', '糖果');
+  ensureKey('꾸러미', '礼包');
+  ensureKey('틀', '模具');
+  ensureKey('스프', '汤');
+  ensureKey('깨송편', '芝麻松糕');
+  ensureKey('군밤', '糖炒栗子');
+  ensureKey('음식', '食物');
+  // Additional common translations
+  ensureKey('한국', '韩国');
+  ensureKey('기념', '纪念');
+  ensureKey('선택권', '选择券');
+  ensureKey('교환권', '兑换券');
+  ensureKey('호박색', '琥珀色');
+  ensureKey('모양', '形状');
+  ensureKey('의', '的');
+  ensureKey('급', '级');
+  ensureKey('가챠', '抽卡');
+  ensureKey('적힌', '写的');
+  ensureKey('비법이', '秘诀');
+  // Test/debug items
+  ensureKey('TEST', '测试');
+  ensureKey('(TEST)', '(测试)');
+  // More common translations
+  ensureKey('류향령', '刘香玲');
+  ensureKey('정기선', '定期船');
+  ensureKey('탑승권', '乘船券');
+  ensureKey('거래불가', '不可交易');
+  ensureKey('사면증', '赦免证');
+  ensureKey('보물', '宝物');
+  ensureKey('대형 코르벳', '大型帆船战舰');
+  // Particles and connectors
+  ensureKey('의', '的');
+  ensureKey('이', '');
+  // Ship/item related
+  ensureKey('도구점', '道具店');
+  ensureKey('구입', '购买');
+  ensureKey('특히', '特别');
+  // More missing translations
+  ensureKey('황금', '黄金');
+  ensureKey('순백', '纯白');
+  ensureKey('세라프', '天使');
+  ensureKey('제련', '冶炼');
+  ensureKey('파편', '碎片');
+  ensureKey('테스트', '测试');
+  ensureKey('더미', '虚拟');
+  ensureKey('테스트용', '测试用');
+  ensureKey('대표', '代表');
+  ensureKey('용', '用');
+  ensureKey('포문', '炮门');
+  ensureKey('광륜', '光轮');
+  ensureKey('블랙', '黑色');
+  ensureKey('레이븐', '乌鸦');
+  ensureKey('아이언', '铁');
+  ensureKey('사이즈', '尺寸');
+  ensureKey('탐사용', '探索用');
+  ensureKey('안택선', '安宅船');
+  // Compound words with particles
+  ensureKey('동방의', '东方的');
+  ensureKey('순백의', '纯白的');
+  ensureKey('초월의', '超越的');
+  // Names
+  ensureKey('발바커', '瓦尔巴克');
+  ensureKey('야코프', '雅可布');
+  // More common words
+  ensureKey('등급', '等级');
+  ensureKey('신물', '信物');
+  ensureKey('설계도', '设计图');
+  ensureKey('주조', '铸造');
+  ensureKey('공구', '工具');
+  ensureKey('도구', '工具');
+  // Grade patterns
+  ensureKey('S급', 'S级');
+  ensureKey('A급', 'A级');
+  ensureKey('B급', 'B级');
+  ensureKey('C급', 'C级');
+  // Trade status
+  ensureKey('거래 불가', '不可交易');
+  ensureKey('거래', '交易');
+  ensureKey('불가', '不可');
+  // Achievement related
+  ensureKey('전문가', '专家');
+  ensureKey('섬', '岛屿');
+  ensureKey('운명', '命运');
+  ensureKey('서쪽의', '西方的');
+  ensureKey('후라', '弗拉');
+  ensureKey('사라진섬', '消失的岛屿');
+  ensureKey('로어노크', '罗阿诺克');
+  ensureKey('제약', '制药');
 
   // Save to file only if outputPath is provided
   if (outputPath) {

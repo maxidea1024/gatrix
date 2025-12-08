@@ -10,6 +10,9 @@
       "seasonName": "text",
       "numberImage": "string",
       "startFX": "string",
+      "startDate": "string",
+      "endDate": "string",
+      "startDateText": "string",
       "startSE": "number",
       "startFxJobType": "number",
       "investItems": [
@@ -54,6 +57,8 @@
     ":required": {
       "name": 1,
       "seasonNumber": 1,
+      "startDate": 1,
+      "endDate": 1,
       "investItems": [
         {
           "Id": 1,
@@ -129,6 +134,9 @@
       ],
       "seasonNumber": 1,
       "startFX": "WBP_SeasonStartPopup1",
+      "startDate": "2025/01/01/00:00:00",
+      "endDate": "2025/03/23/23:59:59",
+      "startDateText": "2025/01/01/00:00:00",
       "startFxJobType": 0,
       "investItems": [
         {
@@ -177,6 +185,8 @@
       "seasonName": "인도양의 패자",
       "numberImage": "WT_SeasonStartNum_2_Sprite",
       "startFX": "WBP_BaseSeasonStartIntro_S02",
+      "startDate": "2025/03/24/00:00:00",
+      "endDate": "2025/06/22/23:59:59",
       "startSE": 96000915,
       "startFxJobType": 3,
       "investItems": [
@@ -226,6 +236,8 @@
       "seasonName": "황금의 시대",
       "numberImage": "WT_SeasonStartNum_3_Sprite",
       "startFX": "WBP_BaseSeasonStartIntro_S03",
+      "startDate": "2025/06/23/00:00:00",
+      "endDate": "2025/09/21/23:59:59",
       "startSE": 96000918,
       "startFxJobType": 3,
       "investItems": [
@@ -277,6 +289,8 @@
       "seasonName": "동방의 물결",
       "numberImage": "WT_SeasonStartNum_4_Sprite",
       "startFX": "WBP_BaseSeasonStartIntro_S04",
+      "startDate": "2025/09/22/00:00:00",
+      "endDate": "2025/12/14/23:59:59",
       "startSE": 96000930,
       "startFxJobType": 1,
       "investItems": [
@@ -302,7 +316,7 @@
         23401015
       ],
       "investRewardItemId": 23401015,
-      "viewRankingReward": false,
+      "viewRankingReward": true,
       "rankingRewardGroup": 1000,
       "nationRankingRewardGroup": [
         1001,
@@ -317,6 +331,59 @@
       "titleImage": "WT_InfoHeadTitle_Season4_Sprite",
       "BGImage": "WT_InfoHeadBG_Season4_Sprite",
       "isUnderDev": false
+    },
+    "100070005": {
+      "id": 100070005,
+      "name": "투자 시즌 {0}",
+      "nameFormatTexts": [
+        "5"
+      ],
+      "seasonNumber": 5,
+      "seasonName": "북해의 연맹",
+      "numberImage": "WT_SeasonStartNum_5_Sprite",
+      "startFX": "WBP_BaseSeasonStartIntro_S05",
+      "startDate": "2025/12/15/00:00:00",
+      "endDate": "2026/04/05/23:59:59",
+      "startSE": 96000937,
+      "startFxJobType": 2,
+      "investItems": [
+        {
+          "Id": 23401024,
+          "Value": 1000000,
+          "Description": "육지 탐험, 전투 보상, 거래 점수 보상에서 주로 획득합니다."
+        },
+        {
+          "Id": 23401025,
+          "Value": 100000000,
+          "Description": "순위 보상, 이벤트 보상, 투자 상자에서 낮은 확률로 획득할 수 있습니다."
+        },
+        {
+          "Id": 23401026,
+          "Value": 1000000000,
+          "Description": "순위 보상, 이벤트 보상, 투자 상자에서 매우 낮은 확률로 획득할 수 있습니다."
+        }
+      ],
+      "seasonRewardItemId": [
+        100003,
+        23810006,
+        23401016
+      ],
+      "investRewardItemId": 23401016,
+      "viewRankingReward": false,
+      "rankingRewardGroup": 1000,
+      "nationRankingRewardGroup": [
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006,
+        1007,
+        1008
+      ],
+      "titleImage": "WT_InfoHeadTitle_Season5_Sprite",
+      "BGImage": "WT_InfoHeadBG_Season5_Sprite",
+      "isUnderDev": true
     }
   }
 }

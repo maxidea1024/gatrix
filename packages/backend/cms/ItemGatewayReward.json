@@ -3,7 +3,8 @@
     ":type": {
       "id": "key",
       "name": "text",
-      "rewardFixed": "number"
+      "rewardFixed": "number",
+      "mailId": "number"
     },
     ":required": {},
     ":min": {},
@@ -15,17 +16,20 @@
     "100160001": {
       "id": 100160001,
       "name": "VIP1",
-      "rewardFixed": 94090001
+      "rewardFixed": 94090001,
+      "mailId": 92110064
     },
     "100160002": {
       "id": 100160002,
       "name": "VIP2",
-      "rewardFixed": 94090002
+      "rewardFixed": 94090002,
+      "mailId": 92110064
     },
     "100160003": {
       "id": 100160003,
       "name": "VIP3",
-      "rewardFixed": 94090003
+      "rewardFixed": 94090003,
+      "mailId": 92110064
     }
   }
 }

@@ -56468,6 +56468,172 @@
         }
       ]
     },
+    "61100699": {
+      "id": 61100699,
+      "name": "엘리트 리처드 헉슬리 개편",
+      "ship": [
+        {
+          "TemplateId": 62200564,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        }
+      ]
+    },
+    "61100700": {
+      "id": 61100700,
+      "name": "엘리트 니콜라스 플라멜 개편",
+      "ship": [
+        {
+          "TemplateId": 62200566,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200567,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200567,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200567,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200567,
+          "isCapture": false
+        }
+      ]
+    },
+    "61100701": {
+      "id": 61100701,
+      "name": "엘리트 빅터 러셀 개편",
+      "ship": [
+        {
+          "TemplateId": 62200568,
+          "isCapture": false
+        }
+      ]
+    },
+    "61100702": {
+      "id": 61100702,
+      "name": "엘리트 빅터 러셀 개편 수반함",
+      "ship": [
+        {
+          "TemplateId": 62200569,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200569,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200569,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200570,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200570,
+          "isCapture": false
+        }
+      ]
+    },
+    "61100703": {
+      "id": 61100703,
+      "name": "엘리트 리처드 헉슬리 개편 산하 함대",
+      "ship": [
+        {
+          "TemplateId": 62200571,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200565,
+          "isCapture": false
+        }
+      ]
+    },
+    "61100704": {
+      "id": 61100704,
+      "name": "엘리트 니콜라스 플라멜 개편 산하 함대",
+      "ship": [
+        {
+          "TemplateId": 62200572,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200567,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200567,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200567,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62200567,
+          "isCapture": false
+        }
+      ]
+    },
+    "61100705": {
+      "id": 61100705,
+      "name": "엘리트 빅터 러셀 개편 산하 함대",
+      "ship": [
+        {
+          "TemplateId": 62200573,
+          "isCapture": false
+        }
+      ]
+    },
     "61400001": {
       "id": 61400001,
       "name": "에드워드 티치",
@@ -69131,6 +69297,33 @@
         },
         {
           "TemplateId": 62502452,
+          "isCapture": false
+        }
+      ]
+    },
+    "61500463": {
+      "id": 61500463,
+      "name": "잉글랜드 사략 함대_수니타",
+      "shapeId": 15400002,
+      "ship": [
+        {
+          "TemplateId": 62502453,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62502454,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62502455,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62502456,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62502457,
           "isCapture": false
         }
       ]
@@ -82033,6 +82226,272 @@
         },
         {
           "TemplateId": 62702479,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700454": {
+      "id": 61700454,
+      "name": "25년 할로윈 이벤트 강적 유령선 LV50",
+      "ship": [
+        {
+          "TemplateId": 62702480,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700455": {
+      "id": 61700455,
+      "name": "25년 할로윈 이벤트 강적 유령선 LV60",
+      "ship": [
+        {
+          "TemplateId": 62702481,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700456": {
+      "id": 61700456,
+      "name": "25년 할로윈 이벤트 강적 유령선 LV70",
+      "ship": [
+        {
+          "TemplateId": 62702482,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700457": {
+      "id": 61700457,
+      "name": "25년 할로윈 이벤트 강적 유령선 LV80",
+      "ship": [
+        {
+          "TemplateId": 62702483,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700458": {
+      "id": 61700458,
+      "name": "25년 할로윈 이벤트 강적 유령선 LV90",
+      "ship": [
+        {
+          "TemplateId": 62702484,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700459": {
+      "id": 61700459,
+      "name": "25년 할로윈 이벤트 일반 LV20",
+      "ship": [
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700460": {
+      "id": 61700460,
+      "name": "25년 할로윈 이벤트 일반 LV30",
+      "ship": [
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700461": {
+      "id": 61700461,
+      "name": "25년 할로윈 이벤트 일반 LV35",
+      "ship": [
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700462": {
+      "id": 61700462,
+      "name": "25년 할로윈 이벤트 강적 유령선 일반 LV50",
+      "ship": [
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700463": {
+      "id": 61700463,
+      "name": "25년 할로윈 이벤트 강적 유령선 일반 LV60",
+      "ship": [
+        {
+          "TemplateId": 62702486,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702486,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702486,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700464": {
+      "id": 61700464,
+      "name": "25년 할로윈 이벤트 강적 유령선 일반 LV70",
+      "ship": [
+        {
+          "TemplateId": 62702487,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702487,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702487,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700465": {
+      "id": 61700465,
+      "name": "25년 할로윈 이벤트 강적 유령선 일반 LV80",
+      "ship": [
+        {
+          "TemplateId": 62702488,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702488,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702488,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700466": {
+      "id": 61700466,
+      "name": "25년 할로윈 이벤트 강적 유령선 일반 LV90",
+      "ship": [
+        {
+          "TemplateId": 62702489,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702489,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702489,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700467": {
+      "id": 61700467,
+      "name": "25년 할로윈 이벤트 일반 LV5",
+      "ship": [
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700468": {
+      "id": 61700468,
+      "name": "25년 할로윈 이벤트 일반 LV10",
+      "ship": [
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700469": {
+      "id": 61700469,
+      "name": "25년 할로윈 이벤트 일반 LV15",
+      "ship": [
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        }
+      ]
+    },
+    "61700470": {
+      "id": 61700470,
+      "name": "25년 할로윈 이벤트 일반 LV25",
+      "ship": [
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62702485,
           "isCapture": false
         }
       ]
@@ -97127,6 +97586,719 @@
         },
         {
           "TemplateId": 62803248,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810354": {
+      "id": 61810354,
+      "name": "폐허의 등대 N_46단계",
+      "ship": [
+        {
+          "TemplateId": 62803249,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803250,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803251,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803252,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803253,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803254,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803255,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810355": {
+      "id": 61810355,
+      "name": "폐허의 등대 N_47단계",
+      "ship": [
+        {
+          "TemplateId": 62803263,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803264,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803265,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803266,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803267,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803268,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803269,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810356": {
+      "id": 61810356,
+      "name": "폐허의 등대 N_48단계",
+      "ship": [
+        {
+          "TemplateId": 62803277,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803278,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803279,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803280,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803281,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803282,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803283,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810357": {
+      "id": 61810357,
+      "name": "폐허의 등대 N_49단계",
+      "ship": [
+        {
+          "TemplateId": 62803291,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803292,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803293,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803294,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803295,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803296,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803297,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810358": {
+      "id": 61810358,
+      "name": "폐허의 등대 N_50단계",
+      "ship": [
+        {
+          "TemplateId": 62803305,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803306,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803307,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803308,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803309,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803310,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803311,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810359": {
+      "id": 61810359,
+      "name": "폐허의 등대 N_46단계2",
+      "ship": [
+        {
+          "TemplateId": 62803256,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803257,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803258,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803259,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803260,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803261,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803262,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810360": {
+      "id": 61810360,
+      "name": "폐허의 등대 N_47단계2",
+      "ship": [
+        {
+          "TemplateId": 62803270,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803271,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803272,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803273,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803274,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803275,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803276,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810361": {
+      "id": 61810361,
+      "name": "폐허의 등대 N_48단계2",
+      "ship": [
+        {
+          "TemplateId": 62803284,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803285,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803286,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803287,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803288,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803289,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803290,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810362": {
+      "id": 61810362,
+      "name": "폐허의 등대 N_49단계2",
+      "ship": [
+        {
+          "TemplateId": 62803298,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803299,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803300,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803301,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803302,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803303,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803304,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810363": {
+      "id": 61810363,
+      "name": "폐허의 등대 N_50단계2",
+      "ship": [
+        {
+          "TemplateId": 62803312,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803313,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803314,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803315,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803316,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803317,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803318,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810364": {
+      "id": 61810364,
+      "name": "폐허의 등대 O_46단계",
+      "ship": [
+        {
+          "TemplateId": 62803319,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803320,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803321,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803322,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803323,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803324,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803325,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810365": {
+      "id": 61810365,
+      "name": "폐허의 등대 O_47단계",
+      "ship": [
+        {
+          "TemplateId": 62803333,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803334,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803335,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803336,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803337,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803338,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803339,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810366": {
+      "id": 61810366,
+      "name": "폐허의 등대 O_48단계",
+      "ship": [
+        {
+          "TemplateId": 62803347,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803348,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803349,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803350,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803351,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803352,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803353,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810367": {
+      "id": 61810367,
+      "name": "폐허의 등대 O_49단계",
+      "ship": [
+        {
+          "TemplateId": 62803361,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803362,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803363,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803364,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803365,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803366,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803367,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810368": {
+      "id": 61810368,
+      "name": "폐허의 등대 O_50단계",
+      "ship": [
+        {
+          "TemplateId": 62803375,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803376,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803377,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803378,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803379,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803380,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803381,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810369": {
+      "id": 61810369,
+      "name": "폐허의 등대 O_46단계2",
+      "ship": [
+        {
+          "TemplateId": 62803326,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803327,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803328,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810370": {
+      "id": 61810370,
+      "name": "폐허의 등대 O_47단계2",
+      "ship": [
+        {
+          "TemplateId": 62803340,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803341,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803342,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810371": {
+      "id": 61810371,
+      "name": "폐허의 등대 O_48단계2",
+      "ship": [
+        {
+          "TemplateId": 62803354,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803355,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803356,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810372": {
+      "id": 61810372,
+      "name": "폐허의 등대 O_49단계2",
+      "ship": [
+        {
+          "TemplateId": 62803368,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803369,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803370,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810373": {
+      "id": 61810373,
+      "name": "폐허의 등대 O_50단계2",
+      "ship": [
+        {
+          "TemplateId": 62803382,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803383,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803384,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803385
+        }
+      ]
+    },
+    "61810374": {
+      "id": 61810374,
+      "name": "폐허의 등대 O_46단계3",
+      "ship": [
+        {
+          "TemplateId": 62803329,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803330,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803331,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803332,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810375": {
+      "id": 61810375,
+      "name": "폐허의 등대 O_47단계3",
+      "ship": [
+        {
+          "TemplateId": 62803343,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803344,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803345,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803346,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810376": {
+      "id": 61810376,
+      "name": "폐허의 등대 O_48단계3",
+      "ship": [
+        {
+          "TemplateId": 62803357,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803358,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803359,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803360,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810377": {
+      "id": 61810377,
+      "name": "폐허의 등대 O_49단계3",
+      "ship": [
+        {
+          "TemplateId": 62803371,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803372,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803373,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803374,
+          "isCapture": false
+        }
+      ]
+    },
+    "61810378": {
+      "id": 61810378,
+      "name": "폐허의 등대 O_50단계3",
+      "ship": [
+        {
+          "TemplateId": 62803386,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803387,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803388,
+          "isCapture": false
+        },
+        {
+          "TemplateId": 62803389,
           "isCapture": false
         }
       ]

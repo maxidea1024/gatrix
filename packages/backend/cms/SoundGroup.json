@@ -1440,6 +1440,24 @@
         98000116
       ]
     },
+    "97000131": {
+      "id": 97000131,
+      "playType": 1,
+      "classAsset": "SC_BGMLogin",
+      "loopingCount": 0,
+      "soundId": [
+        98000117
+      ]
+    },
+    "97000132": {
+      "id": 97000132,
+      "playType": 1,
+      "classAsset": "SC_BGMBattle",
+      "loopingCount": 0,
+      "soundId": [
+        98000117
+      ]
+    },
     "97001001": {
       "id": 97001001,
       "playType": 1,
@@ -7484,6 +7502,15 @@
       "loopingCount": 1,
       "soundId": [
         98001866
+      ]
+    },
+    "97010340": {
+      "id": 97010340,
+      "playType": 1,
+      "classAsset": "SC_EffectUI",
+      "loopingCount": 0,
+      "soundId": [
+        98001867
       ]
     }
   }

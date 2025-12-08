@@ -112011,6 +112011,8246 @@
       ],
       "CashMarketLowerLimitPrice": 4700,
       "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554120": {
+      "id": 71554120,
+      "enchantGroup": 22265206,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 252
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 118
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554121": {
+      "id": 71554121,
+      "enchantGroup": 22265206,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 258
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 125
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554122": {
+      "id": 71554122,
+      "enchantGroup": 22265206,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 134
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554123": {
+      "id": 71554123,
+      "enchantGroup": 22265206,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 274
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 142
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554124": {
+      "id": 71554124,
+      "enchantGroup": 22265206,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 282
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 152
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554125": {
+      "id": 71554125,
+      "enchantGroup": 22265206,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 292
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 165
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554126": {
+      "id": 71554126,
+      "enchantGroup": 22265206,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 177
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554127": {
+      "id": 71554127,
+      "enchantGroup": 22265206,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 311
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 193
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554128": {
+      "id": 71554128,
+      "enchantGroup": 22265206,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 321
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 206
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554129": {
+      "id": 71554129,
+      "enchantGroup": 22265206,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 226
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554130": {
+      "id": 71554130,
+      "enchantGroup": 22265207,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 504
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 234
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 179
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554131": {
+      "id": 71554131,
+      "enchantGroup": 22265207,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 517
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 247
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 184
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554132": {
+      "id": 71554132,
+      "enchantGroup": 22265207,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 533
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 191
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554133": {
+      "id": 71554133,
+      "enchantGroup": 22265207,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 548
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 281
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 198
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554134": {
+      "id": 71554134,
+      "enchantGroup": 22265207,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 564
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 205
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554135": {
+      "id": 71554135,
+      "enchantGroup": 22265207,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 584
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 327
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 215
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554136": {
+      "id": 71554136,
+      "enchantGroup": 22265207,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 601
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 349
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 224
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554137": {
+      "id": 71554137,
+      "enchantGroup": 22265207,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 622
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 381
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 237
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554138": {
+      "id": 71554138,
+      "enchantGroup": 22265207,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 642
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 408
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 247
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554139": {
+      "id": 71554139,
+      "enchantGroup": 22265207,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 666
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 446
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 247
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554140": {
+      "id": 71554140,
+      "enchantGroup": 22265208,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 28
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 10
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554141": {
+      "id": 71554141,
+      "enchantGroup": 22265208,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 29
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554142": {
+      "id": 71554142,
+      "enchantGroup": 22265208,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 32
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554143": {
+      "id": 71554143,
+      "enchantGroup": 22265208,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 34
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 12
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554144": {
+      "id": 71554144,
+      "enchantGroup": 22265208,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 36
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 13
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554145": {
+      "id": 71554145,
+      "enchantGroup": 22265208,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 39
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 14
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554146": {
+      "id": 71554146,
+      "enchantGroup": 22265208,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 42
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 15
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554147": {
+      "id": 71554147,
+      "enchantGroup": 22265208,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 17
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554148": {
+      "id": 71554148,
+      "enchantGroup": 22265208,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 18
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554149": {
+      "id": 71554149,
+      "enchantGroup": 22265208,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 54
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 20
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554150": {
+      "id": 71554150,
+      "enchantGroup": 22265209,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 252
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 118
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554151": {
+      "id": 71554151,
+      "enchantGroup": 22265209,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 258
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 125
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554152": {
+      "id": 71554152,
+      "enchantGroup": 22265209,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 134
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554153": {
+      "id": 71554153,
+      "enchantGroup": 22265209,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 274
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 142
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554154": {
+      "id": 71554154,
+      "enchantGroup": 22265209,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 282
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 152
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554155": {
+      "id": 71554155,
+      "enchantGroup": 22265209,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 292
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 165
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554156": {
+      "id": 71554156,
+      "enchantGroup": 22265209,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 177
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554157": {
+      "id": 71554157,
+      "enchantGroup": 22265209,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 311
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 193
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554158": {
+      "id": 71554158,
+      "enchantGroup": 22265209,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 321
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 206
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554159": {
+      "id": 71554159,
+      "enchantGroup": 22265209,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 226
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554160": {
+      "id": 71554160,
+      "enchantGroup": 22265210,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 504
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 234
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 179
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554161": {
+      "id": 71554161,
+      "enchantGroup": 22265210,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 517
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 247
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 184
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554162": {
+      "id": 71554162,
+      "enchantGroup": 22265210,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 533
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 191
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554163": {
+      "id": 71554163,
+      "enchantGroup": 22265210,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 548
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 281
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 198
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554164": {
+      "id": 71554164,
+      "enchantGroup": 22265210,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 564
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 205
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554165": {
+      "id": 71554165,
+      "enchantGroup": 22265210,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 584
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 327
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 215
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554166": {
+      "id": 71554166,
+      "enchantGroup": 22265210,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 601
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 349
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 224
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554167": {
+      "id": 71554167,
+      "enchantGroup": 22265210,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 622
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 381
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 237
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554168": {
+      "id": 71554168,
+      "enchantGroup": 22265210,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 642
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 408
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 247
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554169": {
+      "id": 71554169,
+      "enchantGroup": 22265210,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 666
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 446
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 247
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554170": {
+      "id": 71554170,
+      "enchantGroup": 22265211,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 28
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 10
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554171": {
+      "id": 71554171,
+      "enchantGroup": 22265211,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 29
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554172": {
+      "id": 71554172,
+      "enchantGroup": 22265211,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 32
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554173": {
+      "id": 71554173,
+      "enchantGroup": 22265211,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 34
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 12
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554174": {
+      "id": 71554174,
+      "enchantGroup": 22265211,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 36
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 13
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554175": {
+      "id": 71554175,
+      "enchantGroup": 22265211,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 39
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 14
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554176": {
+      "id": 71554176,
+      "enchantGroup": 22265211,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 42
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 15
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554177": {
+      "id": 71554177,
+      "enchantGroup": 22265211,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 17
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554178": {
+      "id": 71554178,
+      "enchantGroup": 22265211,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 18
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554179": {
+      "id": 71554179,
+      "enchantGroup": 22265211,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 54
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 20
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554180": {
+      "id": 71554180,
+      "enchantGroup": 22265212,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 252
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 118
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554181": {
+      "id": 71554181,
+      "enchantGroup": 22265212,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 258
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 125
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554182": {
+      "id": 71554182,
+      "enchantGroup": 22265212,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 134
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554183": {
+      "id": 71554183,
+      "enchantGroup": 22265212,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 274
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 142
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554184": {
+      "id": 71554184,
+      "enchantGroup": 22265212,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 282
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 152
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554185": {
+      "id": 71554185,
+      "enchantGroup": 22265212,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 292
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 165
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554186": {
+      "id": 71554186,
+      "enchantGroup": 22265212,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 177
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554187": {
+      "id": 71554187,
+      "enchantGroup": 22265212,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 311
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 193
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554188": {
+      "id": 71554188,
+      "enchantGroup": 22265212,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 321
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 206
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554189": {
+      "id": 71554189,
+      "enchantGroup": 22265212,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 226
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554190": {
+      "id": 71554190,
+      "enchantGroup": 22265213,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 252
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 118
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554191": {
+      "id": 71554191,
+      "enchantGroup": 22265213,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 258
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 125
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554192": {
+      "id": 71554192,
+      "enchantGroup": 22265213,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 134
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554193": {
+      "id": 71554193,
+      "enchantGroup": 22265213,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 274
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 142
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554194": {
+      "id": 71554194,
+      "enchantGroup": 22265213,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 282
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 152
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554195": {
+      "id": 71554195,
+      "enchantGroup": 22265213,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 292
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 165
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554196": {
+      "id": 71554196,
+      "enchantGroup": 22265213,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 177
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554197": {
+      "id": 71554197,
+      "enchantGroup": 22265213,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 311
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 193
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554198": {
+      "id": 71554198,
+      "enchantGroup": 22265213,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 321
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 206
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554199": {
+      "id": 71554199,
+      "enchantGroup": 22265213,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 226
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554200": {
+      "id": 71554200,
+      "enchantGroup": 22265214,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 28
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 10
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554201": {
+      "id": 71554201,
+      "enchantGroup": 22265214,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 29
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554202": {
+      "id": 71554202,
+      "enchantGroup": 22265214,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 32
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554203": {
+      "id": 71554203,
+      "enchantGroup": 22265214,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 34
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 12
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554204": {
+      "id": 71554204,
+      "enchantGroup": 22265214,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 36
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 13
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554205": {
+      "id": 71554205,
+      "enchantGroup": 22265214,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 39
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 14
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554206": {
+      "id": 71554206,
+      "enchantGroup": 22265214,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 42
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 15
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554207": {
+      "id": 71554207,
+      "enchantGroup": 22265214,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 17
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554208": {
+      "id": 71554208,
+      "enchantGroup": 22265214,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 18
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554209": {
+      "id": 71554209,
+      "enchantGroup": 22265214,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 54
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 20
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554210": {
+      "id": 71554210,
+      "enchantGroup": 22265215,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 252
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 118
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554211": {
+      "id": 71554211,
+      "enchantGroup": 22265215,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 258
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 125
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554212": {
+      "id": 71554212,
+      "enchantGroup": 22265215,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 134
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554213": {
+      "id": 71554213,
+      "enchantGroup": 22265215,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 274
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 142
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554214": {
+      "id": 71554214,
+      "enchantGroup": 22265215,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 282
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 152
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554215": {
+      "id": 71554215,
+      "enchantGroup": 22265215,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 292
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 165
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554216": {
+      "id": 71554216,
+      "enchantGroup": 22265215,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 177
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554217": {
+      "id": 71554217,
+      "enchantGroup": 22265215,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 311
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 193
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554218": {
+      "id": 71554218,
+      "enchantGroup": 22265215,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 321
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 206
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554219": {
+      "id": 71554219,
+      "enchantGroup": 22265215,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 226
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554220": {
+      "id": 71554220,
+      "enchantGroup": 22265216,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 252
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 118
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554221": {
+      "id": 71554221,
+      "enchantGroup": 22265216,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 258
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 125
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554222": {
+      "id": 71554222,
+      "enchantGroup": 22265216,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 134
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554223": {
+      "id": 71554223,
+      "enchantGroup": 22265216,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 274
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 142
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554224": {
+      "id": 71554224,
+      "enchantGroup": 22265216,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 282
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 152
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554225": {
+      "id": 71554225,
+      "enchantGroup": 22265216,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 292
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 165
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554226": {
+      "id": 71554226,
+      "enchantGroup": 22265216,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 177
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554227": {
+      "id": 71554227,
+      "enchantGroup": 22265216,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 311
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 193
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554228": {
+      "id": 71554228,
+      "enchantGroup": 22265216,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 321
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 206
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554229": {
+      "id": 71554229,
+      "enchantGroup": 22265216,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 226
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554230": {
+      "id": 71554230,
+      "enchantGroup": 22265217,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 28
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 10
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554231": {
+      "id": 71554231,
+      "enchantGroup": 22265217,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 29
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554232": {
+      "id": 71554232,
+      "enchantGroup": 22265217,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 32
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554233": {
+      "id": 71554233,
+      "enchantGroup": 22265217,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 34
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 12
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554234": {
+      "id": 71554234,
+      "enchantGroup": 22265217,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 36
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 13
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554235": {
+      "id": 71554235,
+      "enchantGroup": 22265217,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 39
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 14
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554236": {
+      "id": 71554236,
+      "enchantGroup": 22265217,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 42
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 15
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 457
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554237": {
+      "id": 71554237,
+      "enchantGroup": 22265217,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 17
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 482
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554238": {
+      "id": 71554238,
+      "enchantGroup": 22265217,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 18
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 507
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554239": {
+      "id": 71554239,
+      "enchantGroup": 22265217,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 54
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 20
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 532
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554240": {
+      "id": 71554240,
+      "enchantGroup": 22265201,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 219
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 108
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 3
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 343
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554241": {
+      "id": 71554241,
+      "enchantGroup": 22265201,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 225
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 114
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 3
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 353
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554242": {
+      "id": 71554242,
+      "enchantGroup": 22265201,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 232
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 122
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 3
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554243": {
+      "id": 71554243,
+      "enchantGroup": 22265201,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 238
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 130
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 3
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 373
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554244": {
+      "id": 71554244,
+      "enchantGroup": 22265201,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 245
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 138
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 3
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 383
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554245": {
+      "id": 71554245,
+      "enchantGroup": 22265201,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 254
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 151
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 3
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 406
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554246": {
+      "id": 71554246,
+      "enchantGroup": 22265201,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 261
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 161
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 3
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 429
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554247": {
+      "id": 71554247,
+      "enchantGroup": 22265201,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 270
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 176
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 3
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 452
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554248": {
+      "id": 71554248,
+      "enchantGroup": 22265201,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 279
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 188
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 3
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 475
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554249": {
+      "id": 71554249,
+      "enchantGroup": 22265201,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 289
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 206
+        },
+        {
+          "Type": 1,
+          "Id": 75300560,
+          "Value": 3
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 498
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554250": {
+      "id": 71554250,
+      "enchantGroup": 22265202,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 219
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 108
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 343
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554251": {
+      "id": 71554251,
+      "enchantGroup": 22265202,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 225
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 114
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 353
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554252": {
+      "id": 71554252,
+      "enchantGroup": 22265202,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 232
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 122
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554253": {
+      "id": 71554253,
+      "enchantGroup": 22265202,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 238
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 130
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 373
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554254": {
+      "id": 71554254,
+      "enchantGroup": 22265202,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 245
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 138
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 383
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554255": {
+      "id": 71554255,
+      "enchantGroup": 22265202,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 254
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 151
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 406
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554256": {
+      "id": 71554256,
+      "enchantGroup": 22265202,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 261
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 161
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 429
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554257": {
+      "id": 71554257,
+      "enchantGroup": 22265202,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 270
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 176
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 452
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554258": {
+      "id": 71554258,
+      "enchantGroup": 22265202,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 279
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 188
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 475
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554259": {
+      "id": 71554259,
+      "enchantGroup": 22265202,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 289
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 206
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 498
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554260": {
+      "id": 71554260,
+      "enchantGroup": 22265203,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 40
+        },
+        {
+          "Type": 0,
+          "Id": 1127,
+          "Value": -10
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554261": {
+      "id": 71554261,
+      "enchantGroup": 22265203,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 43
+        },
+        {
+          "Type": 0,
+          "Id": 1127,
+          "Value": -10
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554262": {
+      "id": 71554262,
+      "enchantGroup": 22265203,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1127,
+          "Value": -10
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554263": {
+      "id": 71554263,
+      "enchantGroup": 22265203,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1127,
+          "Value": -11
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554264": {
+      "id": 71554264,
+      "enchantGroup": 22265203,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 52
+        },
+        {
+          "Type": 0,
+          "Id": 1127,
+          "Value": -11
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554265": {
+      "id": 71554265,
+      "enchantGroup": 22265203,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 57
+        },
+        {
+          "Type": 0,
+          "Id": 1127,
+          "Value": -12
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554266": {
+      "id": 71554266,
+      "enchantGroup": 22265203,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 61
+        },
+        {
+          "Type": 0,
+          "Id": 1127,
+          "Value": -12
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554267": {
+      "id": 71554267,
+      "enchantGroup": 22265203,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 66
+        },
+        {
+          "Type": 0,
+          "Id": 1127,
+          "Value": -13
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554268": {
+      "id": 71554268,
+      "enchantGroup": 22265203,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 71
+        },
+        {
+          "Type": 0,
+          "Id": 1127,
+          "Value": -14
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554269": {
+      "id": 71554269,
+      "enchantGroup": 22265203,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 78
+        },
+        {
+          "Type": 0,
+          "Id": 1127,
+          "Value": -15
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554270": {
+      "id": 71554270,
+      "enchantGroup": 22265204,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 219
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 90
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 343
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554271": {
+      "id": 71554271,
+      "enchantGroup": 22265204,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 225
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 95
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 353
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554272": {
+      "id": 71554272,
+      "enchantGroup": 22265204,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 232
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 102
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554273": {
+      "id": 71554273,
+      "enchantGroup": 22265204,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 238
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 108
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 373
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554274": {
+      "id": 71554274,
+      "enchantGroup": 22265204,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 245
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 115
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 383
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554275": {
+      "id": 71554275,
+      "enchantGroup": 22265204,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 254
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 126
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 406
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554276": {
+      "id": 71554276,
+      "enchantGroup": 22265204,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 261
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 134
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 429
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554277": {
+      "id": 71554277,
+      "enchantGroup": 22265204,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 270
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 147
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 452
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554278": {
+      "id": 71554278,
+      "enchantGroup": 22265204,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 279
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 157
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 475
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554279": {
+      "id": 71554279,
+      "enchantGroup": 22265204,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 289
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 172
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 498
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554280": {
+      "id": 71554280,
+      "enchantGroup": 22265205,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 219
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 90
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 343
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554281": {
+      "id": 71554281,
+      "enchantGroup": 22265205,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 225
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 95
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 353
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554282": {
+      "id": 71554282,
+      "enchantGroup": 22265205,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 232
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 102
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554283": {
+      "id": 71554283,
+      "enchantGroup": 22265205,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 238
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 108
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 373
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554284": {
+      "id": 71554284,
+      "enchantGroup": 22265205,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 245
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 115
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 383
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554285": {
+      "id": 71554285,
+      "enchantGroup": 22265205,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 254
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 126
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 406
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554286": {
+      "id": 71554286,
+      "enchantGroup": 22265205,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 261
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 134
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 429
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554287": {
+      "id": 71554287,
+      "enchantGroup": 22265205,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 270
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 147
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 452
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554288": {
+      "id": 71554288,
+      "enchantGroup": 22265205,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 279
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 157
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 475
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554289": {
+      "id": 71554289,
+      "enchantGroup": 22265205,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 289
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 172
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 498
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554290": {
+      "id": 71554290,
+      "enchantGroup": 22265218,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 439
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 204
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 155
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 343
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554291": {
+      "id": 71554291,
+      "enchantGroup": 22265218,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 451
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 216
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 160
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 353
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554292": {
+      "id": 71554292,
+      "enchantGroup": 22265218,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 465
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 232
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 166
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554293": {
+      "id": 71554293,
+      "enchantGroup": 22265218,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 478
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 246
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 172
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 373
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554294": {
+      "id": 71554294,
+      "enchantGroup": 22265218,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 492
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 262
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 178
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 383
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554295": {
+      "id": 71554295,
+      "enchantGroup": 22265218,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 509
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 286
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 187
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 406
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554296": {
+      "id": 71554296,
+      "enchantGroup": 22265218,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 524
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 305
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 195
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 429
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554297": {
+      "id": 71554297,
+      "enchantGroup": 22265218,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 543
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 205
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 452
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554298": {
+      "id": 71554298,
+      "enchantGroup": 22265218,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 560
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 356
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 215
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 475
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554299": {
+      "id": 71554299,
+      "enchantGroup": 22265218,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 580
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 390
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 215
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 8,
+          "Modifier": 1,
+          "Value": 498
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554300": {
+      "id": 71554300,
+      "enchantGroup": 22265219,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 252
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 98
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 7,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554301": {
+      "id": 71554301,
+      "enchantGroup": 22265219,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 258
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 104
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 7,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554302": {
+      "id": 71554302,
+      "enchantGroup": 22265219,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 112
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 7,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554303": {
+      "id": 71554303,
+      "enchantGroup": 22265219,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 274
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 118
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 7,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554304": {
+      "id": 71554304,
+      "enchantGroup": 22265219,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 282
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 126
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 7,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554305": {
+      "id": 71554305,
+      "enchantGroup": 22265219,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 292
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 137
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 7,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554306": {
+      "id": 71554306,
+      "enchantGroup": 22265219,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 147
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 7,
+          "Modifier": 1,
+          "Value": 508
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554307": {
+      "id": 71554307,
+      "enchantGroup": 22265219,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 311
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 160
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 7,
+          "Modifier": 1,
+          "Value": 661
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554308": {
+      "id": 71554308,
+      "enchantGroup": 22265219,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 321
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 172
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 7,
+          "Modifier": 1,
+          "Value": 891
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554309": {
+      "id": 71554309,
+      "enchantGroup": 22265219,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 188
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 7,
+          "Modifier": 1,
+          "Value": 1200
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554310": {
+      "id": 71554310,
+      "enchantGroup": 22265220,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 252
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 98
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 155
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554311": {
+      "id": 71554311,
+      "enchantGroup": 22265220,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 258
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 104
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 160
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554312": {
+      "id": 71554312,
+      "enchantGroup": 22265220,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 112
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 165
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554313": {
+      "id": 71554313,
+      "enchantGroup": 22265220,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 274
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 118
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 170
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554314": {
+      "id": 71554314,
+      "enchantGroup": 22265220,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 282
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 126
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 175
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554315": {
+      "id": 71554315,
+      "enchantGroup": 22265220,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 292
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 137
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 186
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554316": {
+      "id": 71554316,
+      "enchantGroup": 22265220,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 147
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 217
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554317": {
+      "id": 71554317,
+      "enchantGroup": 22265220,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 311
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 160
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 280
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554318": {
+      "id": 71554318,
+      "enchantGroup": 22265220,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 321
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 172
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 375
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554319": {
+      "id": 71554319,
+      "enchantGroup": 22265220,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 188
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 504
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554320": {
+      "id": 71554320,
+      "enchantGroup": 22265223,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 252
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 118
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554321": {
+      "id": 71554321,
+      "enchantGroup": 22265223,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 258
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 125
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554322": {
+      "id": 71554322,
+      "enchantGroup": 22265223,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 134
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554323": {
+      "id": 71554323,
+      "enchantGroup": 22265223,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 274
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 142
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554324": {
+      "id": 71554324,
+      "enchantGroup": 22265223,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 282
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 152
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554325": {
+      "id": 71554325,
+      "enchantGroup": 22265223,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 292
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 165
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554326": {
+      "id": 71554326,
+      "enchantGroup": 22265223,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 177
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 508
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554327": {
+      "id": 71554327,
+      "enchantGroup": 22265223,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 311
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 193
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 661
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554328": {
+      "id": 71554328,
+      "enchantGroup": 22265223,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 321
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 206
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 891
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554329": {
+      "id": 71554329,
+      "enchantGroup": 22265223,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 226
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 1200
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554330": {
+      "id": 71554330,
+      "enchantGroup": 22265224,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 504
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 234
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 179
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554331": {
+      "id": 71554331,
+      "enchantGroup": 22265224,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 517
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 247
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 184
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554332": {
+      "id": 71554332,
+      "enchantGroup": 22265224,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 533
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 191
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554333": {
+      "id": 71554333,
+      "enchantGroup": 22265224,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 548
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 281
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 198
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554334": {
+      "id": 71554334,
+      "enchantGroup": 22265224,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 564
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 205
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554335": {
+      "id": 71554335,
+      "enchantGroup": 22265224,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 584
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 327
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 215
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554336": {
+      "id": 71554336,
+      "enchantGroup": 22265224,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 601
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 349
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 224
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 508
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554337": {
+      "id": 71554337,
+      "enchantGroup": 22265224,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 622
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 381
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 237
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 661
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554338": {
+      "id": 71554338,
+      "enchantGroup": 22265224,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 642
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 408
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 247
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 891
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554339": {
+      "id": 71554339,
+      "enchantGroup": 22265224,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1077,
+          "Value": 666
+        },
+        {
+          "Type": 0,
+          "Id": 1122,
+          "Value": 446
+        },
+        {
+          "Type": 0,
+          "Id": 1043,
+          "Value": 247
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 1200
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554340": {
+      "id": 71554340,
+      "enchantGroup": 22265225,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 28
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 10
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554341": {
+      "id": 71554341,
+      "enchantGroup": 22265225,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 29
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554342": {
+      "id": 71554342,
+      "enchantGroup": 22265225,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 32
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554343": {
+      "id": 71554343,
+      "enchantGroup": 22265225,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 34
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 12
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554344": {
+      "id": 71554344,
+      "enchantGroup": 22265225,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 36
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 13
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554345": {
+      "id": 71554345,
+      "enchantGroup": 22265225,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 39
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 14
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554346": {
+      "id": 71554346,
+      "enchantGroup": 22265225,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 42
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 15
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 508
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554347": {
+      "id": 71554347,
+      "enchantGroup": 22265225,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 17
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 661
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554348": {
+      "id": 71554348,
+      "enchantGroup": 22265225,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 18
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 891
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554349": {
+      "id": 71554349,
+      "enchantGroup": 22265225,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 54
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 20
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 6,
+          "Modifier": 1,
+          "Value": 1200
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554350": {
+      "id": 71554350,
+      "enchantGroup": 22265226,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 252
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 118
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 155
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554351": {
+      "id": 71554351,
+      "enchantGroup": 22265226,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 258
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 125
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 160
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554352": {
+      "id": 71554352,
+      "enchantGroup": 22265226,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 134
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 165
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554353": {
+      "id": 71554353,
+      "enchantGroup": 22265226,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 274
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 142
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 170
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554354": {
+      "id": 71554354,
+      "enchantGroup": 22265226,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 282
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 152
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 175
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554355": {
+      "id": 71554355,
+      "enchantGroup": 22265226,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 292
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 165
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 186
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554356": {
+      "id": 71554356,
+      "enchantGroup": 22265226,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 177
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 217
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554357": {
+      "id": 71554357,
+      "enchantGroup": 22265226,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 311
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 193
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 280
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554358": {
+      "id": 71554358,
+      "enchantGroup": 22265226,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 321
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 206
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 375
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554359": {
+      "id": 71554359,
+      "enchantGroup": 22265226,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 226
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 504
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554360": {
+      "id": 71554360,
+      "enchantGroup": 22265227,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 252
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 118
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 155
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554361": {
+      "id": 71554361,
+      "enchantGroup": 22265227,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 258
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 125
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 160
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554362": {
+      "id": 71554362,
+      "enchantGroup": 22265227,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 266
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 134
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 165
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554363": {
+      "id": 71554363,
+      "enchantGroup": 22265227,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 274
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 142
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 170
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554364": {
+      "id": 71554364,
+      "enchantGroup": 22265227,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 282
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 152
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 175
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554365": {
+      "id": 71554365,
+      "enchantGroup": 22265227,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 292
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 165
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 186
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554366": {
+      "id": 71554366,
+      "enchantGroup": 22265227,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 300
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 177
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 217
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554367": {
+      "id": 71554367,
+      "enchantGroup": 22265227,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 311
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 193
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 280
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554368": {
+      "id": 71554368,
+      "enchantGroup": 22265227,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 321
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 206
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 375
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554369": {
+      "id": 71554369,
+      "enchantGroup": 22265227,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1079,
+          "Value": 333
+        },
+        {
+          "Type": 0,
+          "Id": 1123,
+          "Value": 226
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 504
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554370": {
+      "id": 71554370,
+      "enchantGroup": 22265228,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 28
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 10
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 155
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554371": {
+      "id": 71554371,
+      "enchantGroup": 22265228,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 29
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 160
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554372": {
+      "id": 71554372,
+      "enchantGroup": 22265228,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 32
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 165
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554373": {
+      "id": 71554373,
+      "enchantGroup": 22265228,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 34
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 12
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 170
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554374": {
+      "id": 71554374,
+      "enchantGroup": 22265228,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 36
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 13
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 175
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554375": {
+      "id": 71554375,
+      "enchantGroup": 22265228,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 39
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 14
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 186
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554376": {
+      "id": 71554376,
+      "enchantGroup": 22265228,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 42
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 15
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 217
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554377": {
+      "id": 71554377,
+      "enchantGroup": 22265228,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 17
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 280
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554378": {
+      "id": 71554378,
+      "enchantGroup": 22265228,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 18
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 375
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554379": {
+      "id": 71554379,
+      "enchantGroup": 22265228,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 54
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 20
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 3,
+          "Modifier": 1,
+          "Value": 504
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554380": {
+      "id": 71554380,
+      "enchantGroup": 22265140,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 28
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 10
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 10,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554381": {
+      "id": 71554381,
+      "enchantGroup": 22265140,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 29
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 10,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554382": {
+      "id": 71554382,
+      "enchantGroup": 22265140,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 32
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 10,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554383": {
+      "id": 71554383,
+      "enchantGroup": 22265140,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 34
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 12
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 10,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554384": {
+      "id": 71554384,
+      "enchantGroup": 22265140,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 36
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 13
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 10,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554385": {
+      "id": 71554385,
+      "enchantGroup": 22265140,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 39
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 14
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 10,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554386": {
+      "id": 71554386,
+      "enchantGroup": 22265140,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 42
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 15
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 10,
+          "Modifier": 1,
+          "Value": 508
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554387": {
+      "id": 71554387,
+      "enchantGroup": 22265140,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 17
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 10,
+          "Modifier": 1,
+          "Value": 661
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554388": {
+      "id": 71554388,
+      "enchantGroup": 22265140,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 18
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 10,
+          "Modifier": 1,
+          "Value": 891
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554389": {
+      "id": 71554389,
+      "enchantGroup": 22265140,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 54
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 20
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 10,
+          "Modifier": 1,
+          "Value": 1200
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554390": {
+      "id": 71554390,
+      "enchantGroup": 22265141,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 28
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 10
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 155
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554391": {
+      "id": 71554391,
+      "enchantGroup": 22265141,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 29
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 160
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554392": {
+      "id": 71554392,
+      "enchantGroup": 22265141,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 32
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 165
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554393": {
+      "id": 71554393,
+      "enchantGroup": 22265141,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 34
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 12
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 170
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554394": {
+      "id": 71554394,
+      "enchantGroup": 22265141,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 36
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 13
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 175
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554395": {
+      "id": 71554395,
+      "enchantGroup": 22265141,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 39
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 14
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 186
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554396": {
+      "id": 71554396,
+      "enchantGroup": 22265141,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 42
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 15
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 217
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554397": {
+      "id": 71554397,
+      "enchantGroup": 22265141,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 17
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 280
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554398": {
+      "id": 71554398,
+      "enchantGroup": 22265141,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 18
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 375
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554399": {
+      "id": 71554399,
+      "enchantGroup": 22265141,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 54
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 20
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 4,
+          "Modifier": 1,
+          "Value": 504
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554400": {
+      "id": 71554400,
+      "enchantGroup": 22265142,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 28
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 10
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 155
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554401": {
+      "id": 71554401,
+      "enchantGroup": 22265142,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 29
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 160
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554402": {
+      "id": 71554402,
+      "enchantGroup": 22265142,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 32
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 165
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554403": {
+      "id": 71554403,
+      "enchantGroup": 22265142,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 34
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 12
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 170
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554404": {
+      "id": 71554404,
+      "enchantGroup": 22265142,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 36
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 13
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 175
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554405": {
+      "id": 71554405,
+      "enchantGroup": 22265142,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 39
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 14
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 186
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554406": {
+      "id": 71554406,
+      "enchantGroup": 22265142,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 42
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 15
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 217
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554407": {
+      "id": 71554407,
+      "enchantGroup": 22265142,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 17
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 280
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554408": {
+      "id": 71554408,
+      "enchantGroup": 22265142,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 18
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 375
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554409": {
+      "id": 71554409,
+      "enchantGroup": 22265142,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 54
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 20
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 1,
+          "Modifier": 1,
+          "Value": 504
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554410": {
+      "id": 71554410,
+      "enchantGroup": 22265143,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 28
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 10
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554411": {
+      "id": 71554411,
+      "enchantGroup": 22265143,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 29
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554412": {
+      "id": 71554412,
+      "enchantGroup": 22265143,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 32
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554413": {
+      "id": 71554413,
+      "enchantGroup": 22265143,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 34
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 12
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554414": {
+      "id": 71554414,
+      "enchantGroup": 22265143,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 36
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 13
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554415": {
+      "id": 71554415,
+      "enchantGroup": 22265143,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 39
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 14
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554416": {
+      "id": 71554416,
+      "enchantGroup": 22265143,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 42
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 15
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 508
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554417": {
+      "id": 71554417,
+      "enchantGroup": 22265143,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 17
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 661
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554418": {
+      "id": 71554418,
+      "enchantGroup": 22265143,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 18
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 891
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554419": {
+      "id": 71554419,
+      "enchantGroup": 22265143,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 54
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 20
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 9,
+          "Modifier": 1,
+          "Value": 1200
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
+    },
+    "71554420": {
+      "id": 71554420,
+      "enchantGroup": 22265144,
+      "enchantLv": 1,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 28
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 10
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 363
+        }
+      ],
+      "CashMarketLowerLimitPrice": 200,
+      "CashMarketLowerLimitPricePiece": 200000
+    },
+    "71554421": {
+      "id": 71554421,
+      "enchantGroup": 22265144,
+      "enchantLv": 2,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 29
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 374
+        }
+      ],
+      "CashMarketLowerLimitPrice": 400,
+      "CashMarketLowerLimitPricePiece": 400000
+    },
+    "71554422": {
+      "id": 71554422,
+      "enchantGroup": 22265144,
+      "enchantLv": 3,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 32
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 11
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 385
+        }
+      ],
+      "CashMarketLowerLimitPrice": 700,
+      "CashMarketLowerLimitPricePiece": 700000
+    },
+    "71554423": {
+      "id": 71554423,
+      "enchantGroup": 22265144,
+      "enchantLv": 4,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 34
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 12
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 396
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1000,
+      "CashMarketLowerLimitPricePiece": 1000000
+    },
+    "71554424": {
+      "id": 71554424,
+      "enchantGroup": 22265144,
+      "enchantLv": 5,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 36
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 13
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 407
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1400,
+      "CashMarketLowerLimitPricePiece": 1400000
+    },
+    "71554425": {
+      "id": 71554425,
+      "enchantGroup": 22265144,
+      "enchantLv": 6,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 39
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 14
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 432
+        }
+      ],
+      "CashMarketLowerLimitPrice": 1900,
+      "CashMarketLowerLimitPricePiece": 1900000
+    },
+    "71554426": {
+      "id": 71554426,
+      "enchantGroup": 22265144,
+      "enchantLv": 7,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 42
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 15
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 508
+        }
+      ],
+      "CashMarketLowerLimitPrice": 2400,
+      "CashMarketLowerLimitPricePiece": 2400000
+    },
+    "71554427": {
+      "id": 71554427,
+      "enchantGroup": 22265144,
+      "enchantLv": 8,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 46
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 17
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 661
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3000,
+      "CashMarketLowerLimitPricePiece": 3000000
+    },
+    "71554428": {
+      "id": 71554428,
+      "enchantGroup": 22265144,
+      "enchantLv": 9,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 49
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 18
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 891
+        }
+      ],
+      "CashMarketLowerLimitPrice": 3900,
+      "CashMarketLowerLimitPricePiece": 3900000
+    },
+    "71554429": {
+      "id": 71554429,
+      "enchantGroup": 22265144,
+      "enchantLv": 10,
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1080,
+          "Value": 54
+        },
+        {
+          "Type": 0,
+          "Id": 1074,
+          "Value": 20
+        }
+      ],
+      "specialStat": [
+        {
+          "Type": 5,
+          "Modifier": 1,
+          "Value": 1200
+        }
+      ],
+      "CashMarketLowerLimitPrice": 4700,
+      "CashMarketLowerLimitPricePiece": 4700000
     }
   }
 }
