@@ -1025,7 +1025,7 @@ const DashboardPage: React.FC = () => {
                             { label: 'envVars', value: env.counts.vars, path: '/settings/kv' },
                             { label: 'envMessageTemplates', value: env.counts.messageTemplates, path: '/admin/maintenance-templates' },
                             { label: 'envSurveys', value: env.counts.surveys, path: '/game/surveys' },
-                            { label: 'envCoupons', value: env.counts.coupons, path: '/game/coupons' },
+                            { label: 'envCoupons', value: env.counts.coupons, path: '/game/coupon-settings' },
                             { label: 'envNotices', value: env.counts.serviceNotices, path: '/game/service-notices' },
                             { label: 'envIngamePopups', value: env.counts.ingamePopups, path: '/game/ingame-popup-notices' },
                             { label: 'envBanners', value: env.counts.banners, path: '/game/banners' },

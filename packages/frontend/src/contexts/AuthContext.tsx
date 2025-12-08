@@ -196,6 +196,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return false;
     }
 
+    // Check for wildcard permission '*' that grants all permissions
+    if (permissions.includes('*')) {
+      console.log(`[hasPermission] Return true - has wildcard permission`);
+      return true;
+    }
+
     const requiredPermissions = Array.isArray(permission) ? permission : [permission];
     const result = requiredPermissions.some(p => permissions.includes(p));
     console.log(`[hasPermission] Result: ${result}`);
