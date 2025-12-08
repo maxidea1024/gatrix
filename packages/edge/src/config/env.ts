@@ -14,6 +14,11 @@ export const config = {
   apiToken: process.env.EDGE_API_TOKEN || '',
   applicationName: process.env.EDGE_APPLICATION_NAME || 'edge-server',
 
+  // SDK required fields for metrics labels and service discovery
+  service: process.env.EDGE_SERVICE || 'edge',
+  group: process.env.EDGE_GROUP || 'default',
+  environment: process.env.EDGE_ENVIRONMENT || 'env_default',
+
   // Target environments (comma-separated)
   environments: (process.env.EDGE_ENVIRONMENTS || '')
     .split(',')

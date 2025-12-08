@@ -29,6 +29,11 @@ class SDKManager {
       apiToken: config.apiToken,
       applicationName: config.applicationName,
 
+      // SDK required fields
+      service: config.service,
+      group: config.group,
+      environment: config.environment,
+
       // Multi-environment mode for Edge
       environments: config.environments,
 

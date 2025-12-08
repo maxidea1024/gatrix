@@ -296,26 +296,31 @@ class ChatServerApp {
               gatrixUrl: backendUrl,
               apiToken: apiToken,
               applicationName: 'chat-server',
+              service: 'chat',
+              group: process.env.SERVICE_GROUP || 'development',
+              environment: process.env.ENVIRONMENT || 'env_default',
               logger: { level: 'info' },
-              serviceDiscovery: {
-                autoRegister: true,
-                labels: {
-                  service: 'chat',
-                  group: process.env.SERVICE_GROUP || 'development',
-                },
-                ports: {
-                  http: [config.port],
-                },
-                status: 'ready',
-                meta: {
-                  instanceName: 'chat-server-1',
-                },
-              },
             });
 
             await gatrixSdk.initialize();
+
+            // Manually register service
+            const result = await gatrixSdk.registerService({
+              labels: {
+                service: 'chat',
+                group: process.env.SERVICE_GROUP || 'development',
+              },
+              ports: {
+                web: config.port,
+              },
+              status: 'ready',
+              meta: {
+                instanceName: 'chat-server-1',
+              },
+            });
+
             logger.info('Chat Server service registered to Service Discovery via SDK', {
-              instanceId: gatrixSdk.getServiceInstanceId(),
+              instanceId: result.instanceId,
             });
           } catch (error: any) {
             logger.warn('Chat Server service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });

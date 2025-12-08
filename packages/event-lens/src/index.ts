@@ -51,26 +51,31 @@ async function start() {
         gatrixUrl: backendUrl,
         apiToken: apiToken,
         applicationName: 'event-lens',
+        service: 'event-lens',
+        group: process.env.SERVICE_GROUP || 'development',
+        environment: process.env.ENVIRONMENT || 'env_default',
         logger: { level: 'info' },
-        serviceDiscovery: {
-          autoRegister: true,
-          labels: {
-            service: 'event-lens',
-            group: process.env.SERVICE_GROUP || 'development',
-          },
-          ports: {
-            http: [config.port],
-          },
-          status: 'ready',
-          meta: {
-            instanceName: 'event-lens-1',
-          },
-        },
       });
 
       await gatrixSdk.initialize();
+
+      // Manually register service
+      const result = await gatrixSdk.registerService({
+        labels: {
+          service: 'event-lens',
+          group: process.env.SERVICE_GROUP || 'development',
+        },
+        ports: {
+          web: config.port,
+        },
+        status: 'ready',
+        meta: {
+          instanceName: 'event-lens-1',
+        },
+      });
+
       logger.info('Event-Lens service registered to Service Discovery via SDK', {
-        instanceId: gatrixSdk.getServiceInstanceId(),
+        instanceId: result.instanceId,
       });
     } catch (error: any) {
       logger.warn('Event-Lens service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });
