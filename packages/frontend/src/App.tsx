@@ -96,6 +96,7 @@ import GrafanaDashboardPage from './pages/admin/GrafanaDashboardPage';
 import EventLensProjectsPage from './pages/admin/EventLensProjectsPage';
 import DataManagementPage from './pages/admin/DataManagementPage';
 import EnvironmentsPage from './pages/settings/EnvironmentsPage';
+import KeyValuePage from './pages/settings/KeyValuePage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Pages - Game
@@ -391,6 +392,13 @@ const AppContent: React.FC = () => {
                             <MainLayout>
                               <SystemSettingsPage />
                             </MainLayout>
+                          </ProtectedRoute>
+                        } />
+                        <Route path="/settings/kv" element={
+                          <ProtectedRoute requiredRoles={['admin']}>
+                            <EnvironmentAwareLayout>
+                              <KeyValuePage />
+                            </EnvironmentAwareLayout>
                           </ProtectedRoute>
                         } />
 

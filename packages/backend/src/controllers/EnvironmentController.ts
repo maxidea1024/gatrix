@@ -8,6 +8,7 @@ import { AuthenticatedRequest } from '../middleware/auth';
 import logger from '../config/logger';
 import knex from '../config/knex';
 import { EnvironmentCopyService, CopyOptions } from '../services/EnvironmentCopyService';
+import { initializeSystemKVForEnvironment } from '../utils/systemKV';
 
 export class EnvironmentController {
   /**
@@ -116,9 +117,12 @@ export class EnvironmentController {
         createdBy: userId
       });
 
-      // Create predefined segments for the new environment (only if no base environment)
+      // Create predefined segments and system KV for the new environment (only if no base environment)
       if (!baseEnvironmentId) {
         await RemoteConfigSegment.createPredefinedSegments(environment.id, userId);
+        // Initialize system-defined KV items ($channels, $platforms, $clientVersionPassiveData)
+        await initializeSystemKVForEnvironment(environment.id);
+        logger.info(`System KV items initialized for new environment: ${environmentName}`);
       }
 
       // Copy data from base environment if provided

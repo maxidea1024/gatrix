@@ -2534,7 +2534,9 @@
     "allEnvironments": "All environments accessible",
     "noPermissions": "No permissions granted",
     "noEnvironments": "No accessible environments",
-    "authType": "Authentication Type"
+    "authType": "Authentication Type",
+    "superAdminAccess": "Super Admin Access",
+    "superAdminAccessDesc": "You have unrestricted access to all features. Any new features added will be automatically accessible."
   },
   "roles": {
     "admin": "admin",

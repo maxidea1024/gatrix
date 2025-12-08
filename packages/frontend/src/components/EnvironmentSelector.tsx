@@ -92,11 +92,18 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
 
   const handleChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
+    // Skip if manage menu item (handled by onClick)
     if (value === '__manage__') {
-      navigate('/settings/environments');
       return;
     }
     switchEnvironment(value);
+  };
+
+  const handleManageClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handleSelectClose();
+    navigate('/settings/environments');
   };
 
   console.log('[EnvironmentSelector] isLoading:', isLoading, 'environments.length:', environments.length, 'currentEnvironmentId:', currentEnvironmentId);
@@ -353,7 +360,7 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
           {canManageEnvironments && (
             <>
               <Divider sx={{ my: 0.5 }} />
-              <MenuItem value="__manage__">
+              <MenuItem value="__manage__" onClick={handleManageClick}>
                 <ListItemIcon sx={{ minWidth: 28 }}>
                   <SettingsIcon fontSize="small" />
                 </ListItemIcon>

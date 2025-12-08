@@ -261,7 +261,18 @@ const KeyValuePage: React.FC = () => {
                     <TableRow key={item.varKey} hover>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontFamily: 'monospace',
+                              cursor: 'pointer',
+                              '&:hover': {
+                                textDecoration: 'underline',
+                                color: 'primary.main',
+                              },
+                            }}
+                            onClick={() => handleEdit(item)}
+                          >
                             {item.varKey.replace('kv:', '')}
                           </Typography>
                           <Tooltip title={t('common.copy')}>

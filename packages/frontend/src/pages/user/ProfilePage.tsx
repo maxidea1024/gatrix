@@ -273,7 +273,7 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+    <Box sx={{ p: 3, maxWidth: 1200 }}>
       {/* Profile Header */}
       <Card sx={{ mb: 3, overflow: 'visible' }}>
         <Box
@@ -410,7 +410,24 @@ const ProfilePage: React.FC = () => {
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{t('profile.permissionsDesc')}</Typography>
                 <Divider sx={{ mb: 2 }} />
 
-                {permissions.length > 0 ? (
+                {permissions.includes('*') ? (
+                  <Box sx={{
+                    p: 2,
+                    borderRadius: 1,
+                    bgcolor: alpha(theme.palette.success.main, 0.1),
+                    border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <SecurityIcon sx={{ color: 'success.main' }} />
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'success.main' }}>
+                        {t('profile.superAdminAccess')}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('profile.superAdminAccessDesc')}
+                    </Typography>
+                  </Box>
+                ) : permissions.length > 0 ? (
                   <Stack spacing={2}>
                     {Object.entries(PERMISSION_CATEGORIES).map(([categoryKey, category]) => {
                       const categoryPermissions = category.permissions.filter(p => permissions.includes(p));

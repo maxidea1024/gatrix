@@ -95,6 +95,41 @@ export async function initializeSystemKV(): Promise<void> {
 }
 
 /**
+ * Initialize system-defined KV items for a specific environment
+ * This should be called when creating a new environment without a base environment
+ */
+export async function initializeSystemKVForEnvironment(environmentId: string): Promise<void> {
+  try {
+    logger.info(`Initializing system-defined KV items for environment ${environmentId}...`);
+
+    for (const def of SYSTEM_KV_DEFINITIONS) {
+      await VarsModel.defineSystemKV(
+        def.key,
+        def.value,
+        def.valueType,
+        def.description,
+        def.isCopyable,
+        environmentId
+      );
+      logger.info(`System KV initialized for env ${environmentId}: ${def.key}`);
+    }
+
+    logger.info(`Successfully initialized ${SYSTEM_KV_DEFINITIONS.length} system KV items for environment ${environmentId}`);
+  } catch (error) {
+    logger.error(`Error initializing system KV items for environment ${environmentId}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Get all system KV definitions
+ * Useful for checking what system KVs should exist
+ */
+export function getSystemKVDefinitions(): SystemKVDefinition[] {
+  return [...SYSTEM_KV_DEFINITIONS];
+}
+
+/**
  * Define a new system KV item programmatically
  * Use this function to add system KV items at runtime
  */

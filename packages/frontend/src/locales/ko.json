@@ -2534,7 +2534,9 @@
     "allEnvironments": "모든 환경 접근 가능",
     "noPermissions": "부여된 권한이 없습니다",
     "noEnvironments": "접근 가능한 환경이 없습니다",
-    "authType": "인증 방식"
+    "authType": "인증 방식",
+    "superAdminAccess": "슈퍼 관리자 권한",
+    "superAdminAccessDesc": "모든 기능에 제한 없이 접근할 수 있습니다. 새로운 기능이 추가되어도 자동으로 권한이 부여됩니다."
   },
   "roles": {
     "admin": "관리자",

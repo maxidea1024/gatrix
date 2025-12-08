@@ -1098,8 +1098,8 @@ const DashboardPage: React.FC = () => {
                 {t('dashboard.quickActionsTitle')}
               </Typography>
               <Grid container spacing={2}>
-                {quickActions.slice(0, 8).map((action) => (
-                  <Grid key={action.key} size={{ xs: 12, sm: 6 }}>
+                {quickActions.slice(0, 12).map((action) => (
+                  <Grid key={action.key} size={{ xs: 12, sm: 6, md: 4 }}>
                     <QuickActionCard
                       title={action.title}
                       description={action.description}

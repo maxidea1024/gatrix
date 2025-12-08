@@ -411,7 +411,8 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
                 setFormData({ ...formData, arrayElementType: newElementType });
                 setPreviousArrayElementType(newElementType);
               }}
-              helperText={t('settings.kv.arrayElementTypeHelp')}
+              disabled={isSystemDefined}
+              helperText={isSystemDefined ? t('settings.kv.systemDefinedTypeHelp') : t('settings.kv.arrayElementTypeHelp')}
             >
               <MenuItem value="string">String</MenuItem>
               <MenuItem value="number">Number</MenuItem>
