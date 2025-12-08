@@ -21,7 +21,11 @@ export interface MaintenanceDetail {
 
 export const maintenanceService = {
   async getStatus(): Promise<{ isUnderMaintenance: boolean; detail: MaintenanceDetail | null }> {
-    const res = await apiService.get<{ isUnderMaintenance: boolean; detail: MaintenanceDetail | null }>(`/admin/maintenance/isUnderMaintenance`);
+    // Add cache-busting to avoid browser caching stale maintenance status
+    const res = await apiService.get<{ isUnderMaintenance: boolean; detail: MaintenanceDetail | null }>(
+      `/admin/maintenance/isUnderMaintenance`,
+      { headers: { 'Cache-Control': 'no-cache' } }
+    );
     return res.data as any;
   },
   async setStatus(payload: { isMaintenance: boolean; type?: MaintenanceType; startsAt?: string | null; endsAt?: string | null; kickExistingPlayers?: boolean; kickDelayMinutes?: number; message?: string; messages?: MaintenanceDetail['messages'] }) {

@@ -53,7 +53,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     const key = this.getInstanceKey(serviceType, instance.instanceId);
 
     try {
-      const lease = this.client.lease(ttlSeconds);
+      // Disable autoKeepAlive - SDK is responsible for sending heartbeat via /api/v1/server/services/status
+      // This prevents stale service instances from being kept alive when SDK restarts without unregistering
+      const lease = this.client.lease(ttlSeconds, { autoKeepAlive: false });
       const now = new Date().toISOString();
 
       // Ensure createdAt is set
@@ -78,34 +80,50 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
   async heartbeat(instanceId: string, serviceType: string): Promise<void> {
     const key = this.getInstanceKey(serviceType, instanceId);
-    const lease = this.leases.get(`${serviceType}:${instanceId}`);
+    const leaseKey = `${serviceType}:${instanceId}`;
+    let lease = this.leases.get(leaseKey);
 
-    if (lease) {
-      // Check if service is in inactive state
-      try {
-        const value = await this.client.get(key).string();
-        if (value) {
-          const instance: ServiceInstance = JSON.parse(value);
-          if (instance.status === 'terminated' || instance.status === 'error' || instance.status === 'no-response') {
-            logger.warn(
-              `Ignoring heartbeat for inactive service: ${serviceType}:${instanceId} (current status: ${instance.status})`,
-            );
-            return;
-          }
+    // Check if service exists and is in inactive state
+    try {
+      const value = await this.client.get(key).string();
+      if (!value) {
+        logger.warn(`Service not found for heartbeat: ${serviceType}:${instanceId}`);
+        return;
+      }
+
+      const instance: ServiceInstance = JSON.parse(value);
+      if (instance.status === 'terminated' || instance.status === 'error' || instance.status === 'no-response') {
+        logger.warn(
+          `Ignoring heartbeat for inactive service: ${serviceType}:${instanceId} (current status: ${instance.status})`,
+        );
+        return;
+      }
+
+      const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
+
+      if (lease) {
+        // Renew existing lease
+        try {
+          await lease.keepaliveOnce();
+        } catch (error) {
+          // Lease may have expired, create new one
+          logger.warn(`Lease expired for ${leaseKey}, creating new lease`);
+          lease = this.client.lease(heartbeatTTL, { autoKeepAlive: false });
+          instance.updatedAt = new Date().toISOString();
+          await lease.put(key).value(JSON.stringify(instance));
+          this.leases.set(leaseKey, lease);
         }
-      } catch (error) {
-        logger.warn(`Failed to check service status for heartbeat: ${serviceType}:${instanceId}`, error);
+      } else {
+        // No lease in memory (backend restarted), create new lease with TTL
+        logger.debug(`Creating new lease for heartbeat: ${leaseKey}`);
+        lease = this.client.lease(heartbeatTTL, { autoKeepAlive: false });
+        instance.updatedAt = new Date().toISOString();
+        await lease.put(key).value(JSON.stringify(instance));
+        this.leases.set(leaseKey, lease);
       }
-
-      // Renew lease
-      try {
-        await lease.keepaliveOnce();
-      } catch (error) {
-        logger.error(`Heartbeat failed for ${serviceType}:${instanceId}:`, error);
-        throw error;
-      }
-    } else {
-      logger.warn(`No lease found for ${serviceType}:${instanceId}`);
+    } catch (error) {
+      logger.error(`Heartbeat failed for ${serviceType}:${instanceId}:`, error);
+      throw error;
     }
   }
 
@@ -145,9 +163,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
               this.leases.delete(leaseKey);
             }
 
-            // Create new lease with configured TTL
+            // Create new lease with configured TTL (no autoKeepAlive for terminated services)
             const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
-            const newLease = this.client.lease(terminatedTTL);
+            const newLease = this.client.lease(terminatedTTL, { autoKeepAlive: false });
             await newLease.put(key).value(JSON.stringify(serviceData));
             this.leases.set(leaseKey, newLease);
 
@@ -205,7 +223,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
           // Create new lease with configured TTL
           const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
-          lease = this.client.lease(heartbeatTTL);
+          lease = this.client.lease(heartbeatTTL, { autoKeepAlive: false });
           await lease.put(key).value(JSON.stringify(newInstance));
           this.leases.set(leaseKey, lease);
 
@@ -251,18 +269,34 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
         // Create new lease with configured TTL
         const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
-        const newLease = this.client.lease(terminatedTTL);
+        const newLease = this.client.lease(terminatedTTL, { autoKeepAlive: false });
         await newLease.put(key).value(JSON.stringify(instance));
         this.leases.set(leaseKey, newLease);
         lease = newLease;
 
         logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${instance.status} (TTL: ${terminatedTTL}s)`);
       } else {
-        // For other statuses, use existing lease
+        // For other statuses (ready, etc.)
+        const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
+
         if (lease) {
-          await lease.put(key).value(JSON.stringify(instance));
+          // Renew existing lease and update value
+          try {
+            await lease.keepaliveOnce();
+            await lease.put(key).value(JSON.stringify(instance));
+          } catch (error) {
+            // Lease may have expired, create new one
+            logger.warn(`Lease expired for ${leaseKey}, creating new lease`);
+            const newLease = this.client.lease(heartbeatTTL, { autoKeepAlive: false });
+            await newLease.put(key).value(JSON.stringify(instance));
+            this.leases.set(leaseKey, newLease);
+          }
         } else {
-          await this.client.put(key).value(JSON.stringify(instance));
+          // No lease in memory (backend restarted), create new lease with TTL
+          logger.debug(`Creating new lease for ${leaseKey} (no existing lease in memory)`);
+          const newLease = this.client.lease(heartbeatTTL, { autoKeepAlive: false });
+          await newLease.put(key).value(JSON.stringify(instance));
+          this.leases.set(leaseKey, newLease);
         }
 
         logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${instance.status}`);
@@ -476,7 +510,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
             }
           }
 
-          const newLease = this.client.lease(terminatedTTL);
+          const newLease = this.client.lease(terminatedTTL, { autoKeepAlive: false });
           await newLease.put(key).value(JSON.stringify(service));
           this.leases.set(leaseKey, newLease);
 

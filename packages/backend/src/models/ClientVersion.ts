@@ -361,14 +361,21 @@ export class ClientVersionModel {
     try {
       const insertedIds: number[] = [];
 
+      // Get environment ID from context
+      const envId = getCurrentEnvironmentId();
+      if (!envId) {
+        throw new Error('Environment ID is required for bulk creating client versions');
+      }
+
       // 먼저 모든 데이터를 삽입
       await db.transaction(async (trx) => {
         for (const item of data) {
           // tags 필드는 별도 테이블에서 관리하므로 제거
-          const { tags, ...clientVersionData } = item as any;
+          const { tags, environmentId: _envId, ...clientVersionData } = item as any;
 
           const [insertId] = await trx('g_client_versions').insert({
             ...clientVersionData,
+            environmentId: envId,
             createdAt: new Date(),
             updatedAt: new Date()
           });

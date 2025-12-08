@@ -57,6 +57,11 @@ import { useUserStats } from '@/hooks/useSWR';
 import api from '@/services/api';
 import { useNavigate } from 'react-router-dom';
 import { PERMISSIONS } from '@/types/permissions';
+import { crashService } from '@/services/crashService';
+import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
+import { CrashEvent } from '@/types/crash';
+import { BugReport as BugReportIcon } from '@mui/icons-material';
+import { useEnvironment } from '@/contexts/EnvironmentContext';
 
 // Stats card component with modern design
 interface StatsCardProps {
@@ -258,6 +263,7 @@ const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isAdminUser = isAdmin();
+  const { switchEnvironment, currentEnvironmentId } = useEnvironment();
 
   const [alertsSummary, setAlertsSummary] = useState<{ total: number; firing: number }>({
     total: 0,
@@ -268,6 +274,10 @@ const DashboardPage: React.FC = () => {
   const [activitiesLoading, setActivitiesLoading] = useState(false);
   const [environmentsWithCounts, setEnvironmentsWithCounts] = useState<EnvironmentWithCounts[]>([]);
   const [envCountsLoading, setEnvCountsLoading] = useState(false);
+  const [recentCrashEvents, setRecentCrashEvents] = useState<CrashEvent[]>([]);
+  const [crashEventsLoading, setCrashEventsLoading] = useState(false);
+  const [maintenanceStatus, setMaintenanceStatus] = useState<{ isUnderMaintenance: boolean; detail: MaintenanceDetail | null } | null>(null);
+  const [maintenanceLoading, setMaintenanceLoading] = useState(false);
 
   // Map API response fields to local names
   const stats = {
@@ -326,10 +336,10 @@ const DashboardPage: React.FC = () => {
     if (hasPermission(PERMISSIONS.SERVERS_VIEW)) {
       actions.push({
         key: 'servers',
-        title: t('sidebar.servers'),
+        title: t('sidebar.serverList'),
         description: t('dashboard.quickActions.serversDesc'),
         icon: <CloudQueueIcon />,
-        path: '/admin/servers',
+        path: '/admin/server-list',
       });
     }
 
@@ -556,6 +566,58 @@ const DashboardPage: React.FC = () => {
     return () => { isMounted = false; };
   }, [isAdminUser, hasPermission]);
 
+  // Load recent crash events
+  useEffect(() => {
+    if (!isAdminUser || !hasPermission(PERMISSIONS.CRASH_EVENTS_VIEW)) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadCrashEvents = async () => {
+      try {
+        setCrashEventsLoading(true);
+        const response = await crashService.getCrashEvents({ limit: 10, sortBy: 'createdAt', sortOrder: 'desc' });
+        if (isMounted) {
+          setRecentCrashEvents(response.data || []);
+        }
+      } catch {
+        // Silently fail
+      } finally {
+        if (isMounted) setCrashEventsLoading(false);
+      }
+    };
+
+    loadCrashEvents();
+    return () => { isMounted = false; };
+  }, [isAdminUser, hasPermission]);
+
+  // Load maintenance status
+  useEffect(() => {
+    if (!isAdminUser || !hasPermission(PERMISSIONS.MAINTENANCE_VIEW)) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadMaintenanceStatus = async () => {
+      try {
+        setMaintenanceLoading(true);
+        const status = await maintenanceService.getStatus();
+        if (isMounted) {
+          setMaintenanceStatus(status);
+        }
+      } catch {
+        // Silently fail
+      } finally {
+        if (isMounted) setMaintenanceLoading(false);
+      }
+    };
+
+    loadMaintenanceStatus();
+    return () => { isMounted = false; };
+  }, [isAdminUser, hasPermission]);
+
   // Load environment data counts
   useEffect(() => {
     if (!isAdminUser) {
@@ -716,6 +778,84 @@ const DashboardPage: React.FC = () => {
         </Box>
       </Paper>
 
+      {/* Maintenance Status - Shown at top when active or scheduled */}
+      {isAdminUser && maintenanceStatus?.isUnderMaintenance && maintenanceStatus?.detail && (
+        <Box sx={{ mb: 4 }}>
+          <Card sx={{ borderLeft: 4, borderColor: 'warning.main' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                <Typography variant="h6" fontWeight={600}>
+                  {t('dashboard.maintenanceStatus')}
+                </Typography>
+                <Tooltip title={t('dashboard.viewDetails')}>
+                  <IconButton size="small" onClick={() => navigate('/admin/maintenance')}>
+                    <OpenInNewIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              {(() => {
+                const detail = maintenanceStatus.detail;
+                const now = new Date();
+                const startsAt = detail.startsAt ? new Date(detail.startsAt) : null;
+                const endsAt = detail.endsAt ? new Date(detail.endsAt) : null;
+                const isActive = startsAt ? now >= startsAt : true;
+
+                return (
+                  <Box>
+                    <Chip
+                      label={isActive ? t('dashboard.maintenanceActive') : t('dashboard.maintenanceScheduled')}
+                      color={isActive ? 'error' : 'warning'}
+                      size="small"
+                      sx={{ mb: 2 }}
+                    />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="text.secondary">
+                          {t('dashboard.maintenanceType')}
+                        </Typography>
+                        <Typography variant="body2" fontWeight={500}>
+                          {detail.type === 'emergency' ? t('maintenance.types.emergency') : t('maintenance.types.regular')}
+                        </Typography>
+                      </Box>
+                      {startsAt && (
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('dashboard.maintenanceStartsAt')}
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            {startsAt.toLocaleString()}
+                          </Typography>
+                        </Box>
+                      )}
+                      {endsAt && (
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('dashboard.maintenanceEndsAt')}
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            {endsAt.toLocaleString()}
+                          </Typography>
+                        </Box>
+                      )}
+                      {detail.message && (
+                        <Box sx={{ mt: 1, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {t('dashboard.maintenanceMessage')}
+                          </Typography>
+                          <Typography variant="body2" sx={{ mt: 0.5 }}>
+                            {detail.message}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+                );
+              })()}
+            </CardContent>
+          </Card>
+        </Box>
+      )}
+
       {/* Stats Section - Only for Admins with USERS_VIEW permission */}
       {isAdminUser && hasPermission(PERMISSIONS.USERS_VIEW) && (
         <Box sx={{ mb: 4 }}>
@@ -875,47 +1015,66 @@ const DashboardPage: React.FC = () => {
                       </Box>
                     ) : env.counts ? (
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="caption" color="text.secondary">
-                            {t('dashboard.envTemplates')}
-                          </Typography>
-                          <Typography variant="caption" fontWeight={600}>
-                            {env.counts.templates}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="caption" color="text.secondary">
-                            {t('dashboard.envGameWorlds')}
-                          </Typography>
-                          <Typography variant="caption" fontWeight={600}>
-                            {env.counts.gameWorlds}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="caption" color="text.secondary">
-                            {t('dashboard.envNotices')}
-                          </Typography>
-                          <Typography variant="caption" fontWeight={600}>
-                            {env.counts.serviceNotices + env.counts.ingamePopups}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="caption" color="text.secondary">
-                            {t('dashboard.envBanners')}
-                          </Typography>
-                          <Typography variant="caption" fontWeight={600}>
-                            {env.counts.banners}
-                          </Typography>
-                        </Box>
-                        <Divider sx={{ my: 0.5 }} />
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="caption" color="text.secondary" fontWeight={600}>
-                            {t('dashboard.envTotal')}
-                          </Typography>
-                          <Typography variant="caption" fontWeight={700} color="primary.main">
-                            {env.counts.total}
-                          </Typography>
-                        </Box>
+                        {(() => {
+                          // Environment-specific data only (exclude global data like tags, apiTokens)
+                          const envItems = [
+                            { label: 'envTemplates', value: env.counts.templates, path: '/admin/remote-config' },
+                            { label: 'envGameWorlds', value: env.counts.gameWorlds, path: '/admin/game-worlds' },
+                            { label: 'envClientVersions', value: env.counts.clientVersions, path: '/admin/client-versions' },
+                            { label: 'envSegments', value: env.counts.segments, path: '/admin/remote-config' },
+                            { label: 'envVars', value: env.counts.vars, path: '/settings/kv' },
+                            { label: 'envMessageTemplates', value: env.counts.messageTemplates, path: '/admin/maintenance-templates' },
+                            { label: 'envSurveys', value: env.counts.surveys, path: '/game/surveys' },
+                            { label: 'envCoupons', value: env.counts.coupons, path: '/game/coupons' },
+                            { label: 'envNotices', value: env.counts.serviceNotices, path: '/game/service-notices' },
+                            { label: 'envIngamePopups', value: env.counts.ingamePopups, path: '/game/ingame-popup-notices' },
+                            { label: 'envBanners', value: env.counts.banners, path: '/game/banners' },
+                            { label: 'envJobs', value: env.counts.jobs, path: '/admin/jobs' },
+                          ];
+                          const envTotal = envItems.reduce((sum, item) => sum + item.value, 0);
+                          return (
+                            <>
+                              {envItems.map((item) => (
+                                <Box
+                                  key={item.label}
+                                  sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    cursor: 'pointer',
+                                    py: 0.25,
+                                    px: 0.5,
+                                    mx: -0.5,
+                                    borderRadius: 0.5,
+                                    '&:hover': { bgcolor: 'action.hover' },
+                                  }}
+                                  onClick={() => {
+                                    // Switch to this environment before navigating (only if different)
+                                    if (env.id !== currentEnvironmentId) {
+                                      switchEnvironment(env.id);
+                                    }
+                                    navigate(item.path);
+                                  }}
+                                >
+                                  <Typography variant="caption" color="text.secondary">
+                                    {t(`dashboard.${item.label}`)}
+                                  </Typography>
+                                  <Typography variant="caption" fontWeight={600}>
+                                    {item.value}
+                                  </Typography>
+                                </Box>
+                              ))}
+                              <Divider sx={{ my: 0.5 }} />
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                                  {t('dashboard.envTotal')}
+                                </Typography>
+                                <Typography variant="caption" fontWeight={700} color="primary.main">
+                                  {envTotal}
+                                </Typography>
+                              </Box>
+                            </>
+                          );
+                        })()}
                       </Box>
                     ) : (
                       <Typography variant="caption" color="text.secondary">
@@ -1043,6 +1202,89 @@ const DashboardPage: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Recent Crash Events */}
+      {isAdminUser && hasPermission(PERMISSIONS.CRASH_EVENTS_VIEW) && (
+        <Box sx={{ mt: 4 }}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="h6" fontWeight={600}>
+                    {t('dashboard.recentCrashEvents')}
+                  </Typography>
+                  {recentCrashEvents.length > 0 && (
+                    <Chip label={recentCrashEvents.length} size="small" color="error" />
+                  )}
+                </Box>
+                <Tooltip title={t('dashboard.viewAll')}>
+                  <IconButton size="small" onClick={() => navigate('/admin/crash-events')}>
+                    <OpenInNewIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+
+              {crashEventsLoading ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} height={48} />
+                  ))}
+                </Box>
+              ) : recentCrashEvents.length > 0 ? (
+                <List disablePadding dense>
+                  {recentCrashEvents.slice(0, 10).map((event, index) => (
+                    <React.Fragment key={event.id}>
+                      <ListItem
+                        disablePadding
+                        sx={{ py: 1, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+                        onClick={() => navigate(`/admin/crash-events?id=${event.id}`)}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <Avatar
+                            sx={{
+                              width: 28,
+                              height: 28,
+                              bgcolor: alpha(theme.palette.error.main, 0.1),
+                              color: 'error.main',
+                              fontSize: 12,
+                            }}
+                          >
+                            <BugReportIcon sx={{ fontSize: 16 }} />
+                          </Avatar>
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Typography variant="body2" noWrap sx={{ maxWidth: 400 }}>
+                              {event.firstLine || event.crashId}
+                            </Typography>
+                          }
+                          secondary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
+                              <Chip label={event.platform} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
+                              <Chip label={event.branch} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
+                              {event.appVersion && (
+                                <Chip label={`v${event.appVersion}`} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
+                              )}
+                              <Typography variant="caption" color="text.secondary">
+                                {new Date(event.createdAt).toLocaleString()}
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                      </ListItem>
+                      {index < Math.min(recentCrashEvents.length, 10) - 1 && <Divider />}
+                    </React.Fragment>
+                  ))}
+                </List>
+              ) : (
+                <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+                  <Typography variant="body2">{t('dashboard.noCrashEvents')}</Typography>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        </Box>
+      )}
     </Box>
   );
 };

@@ -2,15 +2,12 @@
  * Migration: Extend environments table for multi-environment support
  *
  * This migration:
- * 1. Creates g_projects table with ULID as primary key
- * 2. Changes g_environments.id from INT to CHAR(26) (ULID)
- * 3. Adds new columns to g_environments table
- *    - environmentType: Type classification (development, staging, production)
- *    - isSystemDefined: Whether this is a system-defined environment (cannot be deleted)
- *    - displayOrder: Display order for UI
- *    - color: Color for UI display
- *    - projectId: Reference to g_projects
- * 4. Creates predefined environments (development, qa, production)
+ * 1. Creates g_projects table
+ * 2. Adds new columns to g_environments table
+ *    - environmentType, isSystemDefined, displayOrder, color, projectId
+ * 3. Creates predefined environments (development, qa, production)
+ *
+ * Note: g_environments table is already created in 005 with VARCHAR(127) id
  */
 
 // Helper function to check if a column exists
@@ -22,7 +19,7 @@ async function columnExists(connection, tableName, columnName) {
   return rows[0].cnt > 0;
 }
 
-// Simple ULID generator for migration (no external dependencies)
+// Simple ULID generator for migration
 function generateUlid() {
   const ENCODING = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
   const ENCODING_LEN = ENCODING.length;
@@ -56,9 +53,9 @@ function generateEnvironmentId(environmentName) {
 }
 
 exports.up = async function(connection) {
-  console.log('Starting multi-environment support migration with ULID...');
+  console.log('Starting multi-environment support migration...');
 
-  // 1. Create projects table with ULID
+  // 1. Create projects table
   console.log('Creating g_projects table...');
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_projects (
@@ -81,7 +78,7 @@ exports.up = async function(connection) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
-  // Insert default project with ULID
+  // Insert default project
   const defaultProjectId = generateUlid();
   await connection.execute(`
     INSERT INTO g_projects (id, projectName, displayName, description, isDefault, createdBy)
@@ -89,347 +86,112 @@ exports.up = async function(connection) {
     ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
   `, [defaultProjectId]);
 
-  console.log('??g_projects table created');
+  console.log('✓ g_projects table created');
 
-  // 2. Migrate g_environments to use ULID
-  console.log('Migrating g_environments to use ULID...');
-
-  // 2.1 Get existing environment data
-  const [existingEnvs] = await connection.execute(`
-    SELECT * FROM g_environments
-  `);
-
-  // 2.2 Get tables that reference g_environments
-  const referencingTables = [
-    { table: 'g_remote_config_templates', fk: 'fk_rc_template_environment', column: 'environmentId' },
-    { table: 'g_remote_config_change_requests', fk: 'fk_rc_cr_target_environment', column: 'targetEnvironmentId' },
-    { table: 'g_remote_config_change_requests', fk: 'fk_rc_cr_source_environment', column: 'sourceEnvironmentId' },
-    { table: 'g_remote_config_promotions', fk: 'fk_rc_promo_source_env', column: 'sourceEnvironmentId' },
-    { table: 'g_remote_config_promotions', fk: 'fk_rc_promo_target_env', column: 'targetEnvironmentId' },
-    { table: 'g_remote_config_metrics', fk: 'fk_rc_metrics_environment', column: 'environmentId' }
-  ];
-
-  // 2.3 Drop foreign keys referencing g_environments
-  for (const ref of referencingTables) {
-    try {
-      const [tableExists] = await connection.execute(`
-        SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
-      `, [ref.table]);
-
-      if (tableExists[0].cnt > 0) {
-        await connection.execute(`ALTER TABLE ${ref.table} DROP FOREIGN KEY ${ref.fk}`);
-        console.log(`??Dropped FK ${ref.fk} from ${ref.table}`);
-      }
-    } catch (e) {
-      console.log(`FK ${ref.fk} may not exist, continuing...`);
-    }
-  }
-
-  // 2.4 Create mapping from old INT id to new environment ID ({environmentName}.{ulid})
-  const idMapping = {};
-  for (const env of existingEnvs) {
-    idMapping[env.id] = generateEnvironmentId(env.environmentName);
-  }
-
-  // 2.5 Add new environment ID column to g_environments (if not exists)
-  if (!await columnExists(connection, 'g_environments', 'newId')) {
-    await connection.execute(`
-      ALTER TABLE g_environments
-      ADD COLUMN newId VARCHAR(127) NULL AFTER id
-    `);
-  }
-
-  // 2.6 Populate new ULID values
-  for (const [oldId, newId] of Object.entries(idMapping)) {
-    await connection.execute(`
-      UPDATE g_environments SET newId = ? WHERE id = ?
-    `, [newId, oldId]);
-  }
-
-  // 2.7 Update referencing tables with new ULID values
-  for (const ref of referencingTables) {
-    try {
-      const [tableExists] = await connection.execute(`
-        SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
-      `, [ref.table]);
-
-      if (tableExists[0].cnt === 0) {
-        console.log(`Table ${ref.table} does not exist, skipping...`);
-        continue;
-      }
-
-      // Check if the column exists before trying to migrate
-      if (!await columnExists(connection, ref.table, ref.column)) {
-        console.log(`Column ${ref.column} does not exist in ${ref.table}, skipping...`);
-        continue;
-      }
-
-      // Add new ULID column (if not exists)
-      if (!await columnExists(connection, ref.table, `${ref.column}New`)) {
-        await connection.execute(`
-          ALTER TABLE ${ref.table}
-          ADD COLUMN ${ref.column}New CHAR(26) NULL AFTER ${ref.column}
-        `);
-      }
-
-      // Migrate data
-      for (const [oldId, newId] of Object.entries(idMapping)) {
-        await connection.execute(`
-          UPDATE ${ref.table} SET ${ref.column}New = ? WHERE ${ref.column} = ?
-        `, [newId, oldId]);
-      }
-
-      // Drop old column and rename new column (if old column still exists)
-      if (await columnExists(connection, ref.table, ref.column)) {
-        await connection.execute(`ALTER TABLE ${ref.table} DROP COLUMN ${ref.column}`);
-      }
-      if (await columnExists(connection, ref.table, `${ref.column}New`)) {
-        await connection.execute(`ALTER TABLE ${ref.table} CHANGE ${ref.column}New ${ref.column} CHAR(26) NOT NULL`);
-      }
-
-      console.log(`??Migrated ${ref.table}.${ref.column} to ULID`);
-    } catch (e) {
-      console.log(`Error migrating ${ref.table}.${ref.column}:`, e.message);
-    }
-  }
-
-  // 2.8 Drop old primary key and set new one (if newId column exists)
-  if (await columnExists(connection, 'g_environments', 'newId')) {
-    // Check if old id column still exists (INT type)
-    const [oldIdInfo] = await connection.execute(`
-      SELECT DATA_TYPE, EXTRA FROM INFORMATION_SCHEMA.COLUMNS
-      WHERE TABLE_SCHEMA = DATABASE()
-      AND TABLE_NAME = 'g_environments'
-      AND COLUMN_NAME = 'id'
-    `);
-
-    if (oldIdInfo.length > 0 && oldIdInfo[0].DATA_TYPE === 'int') {
-      // First, remove AUTO_INCREMENT before dropping PRIMARY KEY
-      if (oldIdInfo[0].EXTRA && oldIdInfo[0].EXTRA.includes('auto_increment')) {
-        await connection.execute(`ALTER TABLE g_environments MODIFY id INT NOT NULL`);
-      }
-      await connection.execute(`ALTER TABLE g_environments DROP PRIMARY KEY`);
-      await connection.execute(`ALTER TABLE g_environments DROP COLUMN id`);
-    }
-
-    await connection.execute(`ALTER TABLE g_environments CHANGE newId id CHAR(26) NOT NULL`);
-
-    // Check if primary key exists
-    const [pkExists] = await connection.execute(`
-      SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-      WHERE TABLE_SCHEMA = DATABASE()
-      AND TABLE_NAME = 'g_environments'
-      AND CONSTRAINT_TYPE = 'PRIMARY KEY'
-    `);
-
-    if (pkExists[0].cnt === 0) {
-      await connection.execute(`ALTER TABLE g_environments ADD PRIMARY KEY (id)`);
-    }
-  }
-
-  console.log('??Migrated g_environments.id to ULID');
-
-  // 2.9 Recreate foreign keys
-  for (const ref of referencingTables) {
-    try {
-      const [tableExists] = await connection.execute(`
-        SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
-      `, [ref.table]);
-
-      if (tableExists[0].cnt === 0) {
-        continue;
-      }
-
-      // Check if the column exists before trying to add FK
-      if (!await columnExists(connection, ref.table, ref.column)) {
-        console.log(`Column ${ref.column} does not exist in ${ref.table}, skipping FK creation...`);
-        continue;
-      }
-
-      await connection.execute(`
-        ALTER TABLE ${ref.table}
-        ADD CONSTRAINT ${ref.fk} FOREIGN KEY (${ref.column}) REFERENCES g_environments(id)
-      `);
-      console.log(`??Recreated FK ${ref.fk} on ${ref.table}`);
-    } catch (e) {
-      console.log(`Error recreating FK ${ref.fk}:`, e.message);
-    }
-  }
-
-  // 3. Add new columns to g_environments
+  // 2. Add new columns to g_environments (already has VARCHAR(127) id from 005)
   console.log('Adding new columns to g_environments...');
 
   // Check and add environmentType column
-  const [envTypeExists] = await connection.execute(`
-    SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_SCHEMA = DATABASE()
-    AND TABLE_NAME = 'g_environments'
-    AND COLUMN_NAME = 'environmentType'
-  `);
-
-  if (envTypeExists[0].cnt === 0) {
+  if (!await columnExists(connection, 'g_environments', 'environmentType')) {
     await connection.execute(`
       ALTER TABLE g_environments
       ADD COLUMN environmentType ENUM('development', 'staging', 'production') NOT NULL DEFAULT 'development'
       AFTER description
     `);
-    console.log('??Added environmentType column');
+    console.log('✓ Added environmentType column');
   }
 
   // Check and add isSystemDefined column
-  const [sysDefExists] = await connection.execute(`
-    SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_SCHEMA = DATABASE()
-    AND TABLE_NAME = 'g_environments'
-    AND COLUMN_NAME = 'isSystemDefined'
-  `);
-
-  if (sysDefExists[0].cnt === 0) {
+  if (!await columnExists(connection, 'g_environments', 'isSystemDefined')) {
     await connection.execute(`
       ALTER TABLE g_environments
       ADD COLUMN isSystemDefined BOOLEAN NOT NULL DEFAULT FALSE
       AFTER environmentType
     `);
-    console.log('??Added isSystemDefined column');
+    console.log('✓ Added isSystemDefined column');
   }
 
   // Check and add displayOrder column
-  const [orderExists] = await connection.execute(`
-    SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_SCHEMA = DATABASE()
-    AND TABLE_NAME = 'g_environments'
-    AND COLUMN_NAME = 'displayOrder'
-  `);
-
-  if (orderExists[0].cnt === 0) {
+  if (!await columnExists(connection, 'g_environments', 'displayOrder')) {
     await connection.execute(`
       ALTER TABLE g_environments
       ADD COLUMN displayOrder INT NOT NULL DEFAULT 0
       AFTER isSystemDefined
     `);
-    console.log('??Added displayOrder column');
+    console.log('✓ Added displayOrder column');
   }
 
   // Check and add color column
-  const [colorExists] = await connection.execute(`
-    SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_SCHEMA = DATABASE()
-    AND TABLE_NAME = 'g_environments'
-    AND COLUMN_NAME = 'color'
-  `);
-
-  if (colorExists[0].cnt === 0) {
+  if (!await columnExists(connection, 'g_environments', 'color')) {
     await connection.execute(`
       ALTER TABLE g_environments
       ADD COLUMN color VARCHAR(7) NOT NULL DEFAULT '#607D8B'
       AFTER displayOrder
     `);
-    console.log('??Added color column');
+    console.log('✓ Added color column');
   }
 
   // Check and add projectId column
-  const [projIdExists] = await connection.execute(`
-    SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_SCHEMA = DATABASE()
-    AND TABLE_NAME = 'g_environments'
-    AND COLUMN_NAME = 'projectId'
-  `);
-
-  if (projIdExists[0].cnt === 0) {
+  if (!await columnExists(connection, 'g_environments', 'projectId')) {
     await connection.execute(`
       ALTER TABLE g_environments
-      ADD COLUMN projectId CHAR(26) NULL
+      ADD COLUMN projectId VARCHAR(127) NULL
       AFTER color
     `);
 
     // Add foreign key for projectId
     await connection.execute(`
       ALTER TABLE g_environments
-      ADD CONSTRAINT fk_rc_env_project FOREIGN KEY (projectId) REFERENCES g_projects(id) ON DELETE SET NULL
+      ADD CONSTRAINT fk_env_project FOREIGN KEY (projectId) REFERENCES g_projects(id) ON DELETE SET NULL
     `);
-    console.log('??Added projectId column with foreign key');
+    console.log('✓ Added projectId column with foreign key');
   }
 
-  // 4. Get the default project ID
+  // 3. Get the default project ID
   const [defaultProject] = await connection.execute(`
     SELECT id FROM g_projects WHERE isDefault = TRUE LIMIT 1
   `);
   const projectId = defaultProject[0]?.id || defaultProjectId;
 
-  // 5. Update existing environments or insert predefined ones
-  console.log('Creating/updating predefined environments...');
+  // 4. Insert predefined environments
+  console.log('Creating predefined environments...');
 
-  // Check if predefined environments exist
-  const [devEnv] = await connection.execute(`
-    SELECT id FROM g_environments WHERE environmentName = 'development'
-  `);
-  const [qaEnv] = await connection.execute(`
-    SELECT id FROM g_environments WHERE environmentName = 'qa'
-  `);
-  const [prodEnv] = await connection.execute(`
-    SELECT id FROM g_environments WHERE environmentName = 'production'
-  `);
+  // Development environment
+  await connection.execute(`
+    INSERT INTO g_environments
+    (id, environmentName, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
+    VALUES (?, 'development', 'Development', 'Development environment for testing and feature development', 'development', TRUE, TRUE, 1, '#4CAF50', ?, FALSE, 1, 1)
+    ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
+  `, [generateEnvironmentId('development'), projectId]);
 
-  if (devEnv.length > 0) {
-    await connection.execute(`
-      UPDATE g_environments
-      SET environmentType = 'development', isSystemDefined = TRUE, isDefault = TRUE, displayOrder = 1, color = '#4CAF50', projectId = ?
-      WHERE environmentName = 'development'
-    `, [projectId]);
-  } else {
-    await connection.execute(`
-      INSERT INTO g_environments
-      (id, environmentName, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
-      VALUES (?, 'development', 'Development', 'Development environment for testing and feature development', 'development', TRUE, TRUE, 1, '#4CAF50', ?, FALSE, 1, 1)
-    `, [generateEnvironmentId('development'), projectId]);
-  }
+  // QA environment
+  await connection.execute(`
+    INSERT INTO g_environments
+    (id, environmentName, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
+    VALUES (?, 'qa', 'QA', 'QA environment for quality assurance testing', 'staging', TRUE, FALSE, 2, '#FF9800', ?, TRUE, 1, 1)
+    ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
+  `, [generateEnvironmentId('qa'), projectId]);
 
-  if (qaEnv.length > 0) {
-    await connection.execute(`
-      UPDATE g_environments
-      SET environmentType = 'staging', isSystemDefined = TRUE, displayOrder = 2, color = '#FF9800', projectId = ?
-      WHERE environmentName = 'qa'
-    `, [projectId]);
-  } else {
-    await connection.execute(`
-      INSERT INTO g_environments
-      (id, environmentName, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
-      VALUES (?, 'qa', 'QA', 'QA environment for quality assurance testing', 'staging', TRUE, FALSE, 2, '#FF9800', ?, TRUE, 1, 1)
-    `, [generateEnvironmentId('qa'), projectId]);
-  }
+  // Production environment
+  await connection.execute(`
+    INSERT INTO g_environments
+    (id, environmentName, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
+    VALUES (?, 'production', 'Production', 'Production environment for live users', 'production', TRUE, FALSE, 3, '#F44336', ?, TRUE, 2, 1)
+    ON DUPLICATE KEY UPDATE displayName = VALUES(displayName)
+  `, [generateEnvironmentId('production'), projectId]);
 
-  if (prodEnv.length > 0) {
-    await connection.execute(`
-      UPDATE g_environments
-      SET environmentType = 'production', isSystemDefined = TRUE, displayOrder = 3, color = '#F44336', projectId = ?
-      WHERE environmentName = 'production'
-    `, [projectId]);
-  } else {
-    await connection.execute(`
-      INSERT INTO g_environments
-      (id, environmentName, displayName, description, environmentType, isSystemDefined, isDefault, displayOrder, color, projectId, requiresApproval, requiredApprovers, createdBy)
-      VALUES (?, 'production', 'Production', 'Production environment for live users', 'production', TRUE, FALSE, 3, '#F44336', ?, TRUE, 2, 1)
-    `, [generateEnvironmentId('production'), projectId]);
-  }
-
-  console.log('??Predefined environments created/updated');
+  console.log('✓ Predefined environments created');
   console.log('Multi-environment support migration completed successfully');
 };
 
 exports.down = async function(connection) {
   console.log('Rolling back multi-environment support migration...');
-  console.log('WARNING: This rollback will convert ULIDs back to INT IDs. Data may be lost.');
 
   // Remove foreign key constraint first
   try {
-    await connection.execute(`
-      ALTER TABLE g_environments DROP FOREIGN KEY fk_rc_env_project
-    `);
+    await connection.execute(`ALTER TABLE g_environments DROP FOREIGN KEY fk_env_project`);
   } catch (e) {
-    console.log('Foreign key fk_rc_env_project may not exist, continuing...');
+    console.log('Foreign key fk_env_project may not exist, continuing...');
   }
 
   // Remove added columns from g_environments
@@ -437,31 +199,21 @@ exports.down = async function(connection) {
 
   for (const column of columnsToRemove) {
     try {
-      const [exists] = await connection.execute(`
-        SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_SCHEMA = DATABASE()
-        AND TABLE_NAME = 'g_environments'
-        AND COLUMN_NAME = ?
-      `, [column]);
-
-      if (exists[0].cnt > 0) {
-        await connection.execute(`
-          ALTER TABLE g_environments DROP COLUMN ${column}
-        `);
-        console.log(`??Dropped column: ${column}`);
+      if (await columnExists(connection, 'g_environments', column)) {
+        await connection.execute(`ALTER TABLE g_environments DROP COLUMN ${column}`);
+        console.log(`✓ Dropped column: ${column}`);
       }
     } catch (e) {
       console.log(`Error dropping column ${column}:`, e.message);
     }
   }
 
-  // Note: Converting ULID back to INT is complex and may result in data loss
-  // This rollback does not convert the id column back to INT
-  console.log('Note: The id column remains as CHAR(26). Manual intervention may be required.');
+  // Delete predefined environments
+  await connection.execute(`DELETE FROM g_environments WHERE environmentName IN ('development', 'qa', 'production')`);
 
   // Drop projects table
   await connection.execute('DROP TABLE IF EXISTS g_projects');
-  console.log('??Dropped g_projects table');
+  console.log('✓ Dropped g_projects table');
 
   console.log('Multi-environment support migration rollback completed');
 };

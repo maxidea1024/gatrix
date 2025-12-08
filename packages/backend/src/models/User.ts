@@ -697,12 +697,16 @@ export class UserModel {
 
   /**
    * Check if user has a specific permission
+   * Supports wildcard '*' permission that grants all permissions
    */
   static async hasPermission(userId: number, permission: string): Promise<boolean> {
     try {
+      // Check for wildcard permission or exact match
       const result = await db('g_user_permissions')
         .where('userId', userId)
-        .where('permission', permission)
+        .where(function() {
+          this.where('permission', permission).orWhere('permission', '*');
+        })
         .first();
 
       return !!result;
@@ -714,12 +718,16 @@ export class UserModel {
 
   /**
    * Check if user has any of the specified permissions
+   * Supports wildcard '*' permission that grants all permissions
    */
   static async hasAnyPermission(userId: number, permissions: string[]): Promise<boolean> {
     try {
+      // Check for wildcard permission or any of the specified permissions
       const result = await db('g_user_permissions')
         .where('userId', userId)
-        .whereIn('permission', permissions)
+        .where(function() {
+          this.whereIn('permission', permissions).orWhere('permission', '*');
+        })
         .first();
 
       return !!result;

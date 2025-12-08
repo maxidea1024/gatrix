@@ -113,7 +113,7 @@ exports.up = async function(connection) {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_remote_config_segments (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      environmentId INT NOT NULL,
+      environmentId VARCHAR(127) NOT NULL,
       segmentName VARCHAR(200) NOT NULL,
       displayName VARCHAR(300) NOT NULL,
       description TEXT NULL,
@@ -138,7 +138,7 @@ exports.up = async function(connection) {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_remote_config_metrics (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      environmentId INT NOT NULL,
+      environmentId VARCHAR(127) NOT NULL,
       templateId INT NULL,
       configKey VARCHAR(200) NOT NULL,
       eventType VARCHAR(50) NOT NULL,
@@ -164,7 +164,7 @@ exports.up = async function(connection) {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_remote_config_campaigns (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      environmentId INT NOT NULL,
+      environmentId VARCHAR(127) NOT NULL,
       templateId INT NOT NULL,
       campaignName VARCHAR(200) NOT NULL,
       displayName VARCHAR(300) NOT NULL,
