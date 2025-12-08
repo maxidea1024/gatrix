@@ -47,10 +47,10 @@ Access:
 - Prometheus: http://localhost:59091
 - Backend: http://localhost:55000
 
-## Production-like
+## Production-like (Local Build)
 
 ```bash
-# Bring up production-like stack
+# Bring up production-like stack (builds images locally)
 docker compose up -d
 
 # Tear down
@@ -60,6 +60,117 @@ docker compose down --remove-orphans
 Access:
 - Grafana: http://localhost:54000
 - Prometheus: http://localhost:59091
+
+## Production Deployment (Pre-built Images)
+
+Production environments use pre-built images from Tencent Cloud Registry.
+
+### Registry Information
+
+- **Registry**: `uwocn.tencentcloudcr.com`
+- **Namespace**: `uwocn`
+- **Image**: `uwocn`
+- **Tag Format**: `{service}-{version}` (e.g., `backend-1.0.0`, `frontend-latest`)
+
+### Building and Pushing Images
+
+#### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `yarn docker:build:prod` | Build all service images (no version bump) |
+| `yarn docker:build:prod:push` | Bump patch version, build and push all images |
+| `yarn docker:push` | Push already built images |
+| `yarn docker:login` | Login to Tencent Cloud Registry |
+
+#### Script Options
+
+```bash
+# Show help
+yarn docker:build:prod --help
+
+# Build all services without version bump
+yarn docker:build:prod
+
+# Bump patch version, build and push
+yarn docker:build:prod --bump patch --push
+
+# Bump minor version for a specific service
+yarn docker:build:prod --bump minor --service backend --push
+
+# Build only frontend
+yarn docker:build:prod --service frontend
+```
+
+**Options:**
+- `--bump, -b <type>`: Version bump type (`patch`, `minor`, `major`)
+- `--push, -p`: Push to registry after building
+- `--service, -s <name>`: Service to build (`backend`, `frontend`, `event-lens`, `chat-server`, `edge`, `all`)
+- `--login, -l`: Login to registry before pushing
+- `--help, -h`: Show help message
+
+### Running Production Stack
+
+```bash
+# Set the version to deploy
+export GATRIX_VERSION=1.0.0
+
+# Pull latest images
+yarn docker:prod:pull
+
+# Start production stack
+yarn docker:prod
+
+# View logs
+yarn docker:prod:logs
+
+# Stop production stack
+yarn docker:prod:down
+```
+
+### Production Environment Variables
+
+Create a `.env` file with production settings:
+
+```env
+# Version
+GATRIX_VERSION=1.0.0
+
+# Data storage
+DATA_ROOT=/data/gatrix
+
+# Database
+DB_ROOT_PASSWORD=secure-root-password
+DB_NAME=gatrix
+DB_USER=gatrix_user
+DB_PASSWORD=secure-db-password
+
+# Security
+JWT_SECRET=your-production-jwt-secret
+JWT_REFRESH_SECRET=your-production-refresh-secret
+SESSION_SECRET=your-production-session-secret
+
+# Admin
+ADMIN_EMAIL=admin@yourcompany.com
+ADMIN_PASSWORD=secure-admin-password
+
+# Monitoring
+MONITORING_ENABLED=true
+GRAFANA_ADMIN_PASSWORD=secure-grafana-password
+```
+
+### Image Tags
+
+Each service generates two tags:
+- **Version tag**: `{service}-{version}` (e.g., `backend-1.2.3`)
+- **Latest tag**: `{service}-latest` (e.g., `backend-latest`)
+
+**Services:**
+- `backend` - Backend API server
+- `frontend` - Frontend Nginx server
+- `event-lens` - Event analytics server
+- `chat-server` - WebSocket chat server
+- `edge` - Edge server for clients
 
 ## Data Persistence
 
