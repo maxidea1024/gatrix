@@ -1890,6 +1890,10 @@ function generateUIListData(cmsDir, loctab = {}) {
                     // Translate each name part (firstName, middleName, familyName, particle)
                     formatTextCn = makeCharacterDisplayNameCn(character, loctab);
                   }
+                  // Debug log for particle translation issue
+                  if (character.particle && character.particle.includes('나')) {
+                    console.log(`   [DEBUG] Character ${character.id}: particle="${character.particle}", loctab['나']="${loctab['나']}", formatTextCn="${formatTextCn}"`);
+                  }
                 } else {
                   formatTextKr = `Mate ${targetId}`;
                   formatTextCn = formatTextKr;
@@ -3383,7 +3387,7 @@ Examples:
   let loctab = {};
   if (buildLocalization || buildRewards || buildUILists || buildEvents) {
     const loctabSource = path.join(cmsDir, 'locdata', 'locdata');
-    const loadedLoctab = convertLocalizationTable(loctabSource, null); // Pass null to skip file output
+    const loadedLoctab = convertLocalizationTable(loctabSource, null);
     if (loadedLoctab) {
       loctab = loadedLoctab;
     }
