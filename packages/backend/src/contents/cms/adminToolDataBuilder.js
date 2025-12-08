@@ -397,23 +397,23 @@ function makeCharacterDisplayNameCn(characterCms, loctab) {
 
   if (firstName.includes('@')) {
     const arr = firstName.split('@');
-    firstNameOriginal = arr[0]; // Original with Japanese
-    firstName = arr[arr.length - 1]; // Display name
+    firstNameOriginal = arr[0].trim(); // Original with Japanese
+    firstName = arr[arr.length - 1].trim(); // Display name
   }
   if (middleName.includes('@')) {
     const arr = middleName.split('@');
-    middleNameOriginal = arr[0];
-    middleName = arr[arr.length - 1];
+    middleNameOriginal = arr[0].trim();
+    middleName = arr[arr.length - 1].trim();
   }
   if (familyName.includes('@')) {
     const arr = familyName.split('@');
-    familyNameOriginal = arr[0];
-    familyName = arr[arr.length - 1];
+    familyNameOriginal = arr[0].trim();
+    familyName = arr[arr.length - 1].trim();
   }
   if (particle.includes('@')) {
     const arr = particle.split('@');
-    particleOriginal = arr[0];
-    particle = arr[arr.length - 1];
+    particleOriginal = arr[0].trim();
+    particle = arr[arr.length - 1].trim();
   }
 
   // Translate each name part: try original first (with Japanese), then display name
@@ -2582,7 +2582,8 @@ function convertLocalizationTable(inputPath, outputPath) {
   }
 
   const content = fs.readFileSync(inputPath, 'utf8');
-  const lines = content.split('\n');
+  // Handle both Windows (CRLF) and Unix (LF) line endings
+  const lines = content.split(/\r?\n/);
 
   const loctab = {};
   const keyLowerCaseMap = new Map();
@@ -2621,9 +2622,17 @@ function convertLocalizationTable(inputPath, outputPath) {
     if (key && key.startsWith(',')) {
       key = key.substring(1);
     }
+    // Trim whitespace from key
+    if (key) {
+      key = key.trim();
+    }
     // Remove @ comment suffix (e.g., "카탈리나@카탈리나" -> "카탈리나")
     if (key && key.includes('@')) {
       key = key.substring(0, key.indexOf('@'));
+    }
+    // Unescape backslash-escaped characters (e.g., "\," -> ",", "\\" -> "\")
+    if (key && key.includes('\\')) {
+      key = key.replace(/\\(.)/g, '$1');
     }
     const chinese = fields[3];
 
@@ -2777,6 +2786,25 @@ function convertLocalizationTable(inputPath, outputPath) {
   ensureKey('사라진섬', '消失的岛屿');
   ensureKey('로어노크', '罗阿诺克');
   ensureKey('제약', '制药');
+  // Item names
+  ensureKey('할로윈', '万圣节');
+  ensureKey('역병', '瘟疫');
+  ensureKey('크림', '奶油');
+  ensureKey('연맹', '联盟');
+  ensureKey('증서', '证书');
+  ensureKey('홍바오', '红包');
+  ensureKey('라쳇', '拉切特');
+  ensureKey('밤낮', '昼夜');
+  ensureKey('염장', '腌制');
+  ensureKey('훈연', '熏制');
+  ensureKey('공정', '工艺');
+  ensureKey('수첩', '手册');
+  ensureKey('슈네', '舒奈');
+  ensureKey('베이', '贝伊');
+  ensureKey('해', '海');
+  // Nations - missing translations in locdata
+  ensureKey('주화 약탈단', '铸币掠夺队');
+  ensureKey('주화', '铸币');
 
   // Save to file only if outputPath is provided
   if (outputPath) {
