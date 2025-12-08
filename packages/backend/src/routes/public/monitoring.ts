@@ -14,20 +14,13 @@ router.get('/prometheus/targets', async (_req, res) => {
 
     for (const s of services) {
       const serviceType = s.labels.service || 'unknown';
-      // Choose port for metrics
-      // All services expose /metrics on their main HTTP ports
-      let port = 80;
       const metricsPath = '/metrics';
-      if (serviceType === 'chat') {
-        port = (s.ports.http && s.ports.http[0]) || 5100;
-      } else if (serviceType === 'backend') {
-        port = (s.ports.http && s.ports.http[0]) || 5000;
-      } else if (serviceType === 'event-lens') {
-        port = (s.ports.http && s.ports.http[0]) || 5200;
-      } else if (serviceType === 'idle') {
-        port = (s.ports.http && s.ports.http[0]) || 9999;
-      } else {
-        port = (s.ports.http && s.ports.http[0]) || 80;
+
+      // Only use metricsApi port (SDK standard: 9337)
+      // Skip services without metricsApi port configured
+      const port = s.ports.metricsApi;
+      if (!port) {
+        continue;
       }
 
       const target = `${s.internalAddress}:${port}`;

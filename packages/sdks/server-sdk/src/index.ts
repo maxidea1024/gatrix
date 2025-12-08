@@ -27,8 +27,8 @@ export {
 export { Logger, LogLevel, LogFormat, getLogger } from './utils/logger';
 
 // Export metrics helpers
-export { attachExpressMetrics, attachFastifyMetrics } from './utils/metrics';
 export { SdkMetrics } from './utils/sdkMetrics';
+export { createMetricsServer, MetricsServerConfig, MetricsServerInstance } from './services/MetricsServer';
 
 // Default export
 export { GatrixServerSDK as default } from './GatrixServerSDK';

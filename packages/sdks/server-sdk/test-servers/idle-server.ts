@@ -5,16 +5,13 @@
  * No business logic, just event monitoring
  */
 
-import { GatrixServerSDK, getLogger, attachExpressMetrics } from '../src/index';
-import express from 'express';
+import { GatrixServerSDK, getLogger, createMetricsServer } from '../src/index';
 
 const logger = getLogger('IDLE-SERVER');
 
 async function main() {
   logger.info('Starting Idle Server...');
 
-  // Initialize Express app for metrics
-  const app = express();
   const metricsPort = parseInt(process.env.METRICS_PORT || '9999');
   const instanceName = process.env.INSTANCE_NAME || 'idle-1';
 
@@ -23,6 +20,9 @@ async function main() {
     gatrixUrl: process.env.GATRIX_URL || 'http://localhost:55000',
     apiToken: process.env.API_TOKEN || 'gatrix-unsecured-server-api-token',
     applicationName: 'idle',
+    service: 'idle', // Required: service name for identification
+    group: process.env.SERVICE_GROUP || 'development', // Required: service group
+    environment: process.env.ENVIRONMENT || 'env_dev', // Required: environment
 
     // Redis for events
     redis: {
@@ -43,6 +43,21 @@ async function main() {
       timeOffset: 9,
       timestampFormat: 'local',
     },
+
+    // Metrics configuration
+    metrics: {
+      port: metricsPort, // Metrics server port
+    },
+  });
+
+  // Create metrics server (standalone, consistent port)
+  const metricsServer = createMetricsServer({
+    port: metricsPort,
+    applicationName: 'idle',
+    service: 'idle',
+    group: process.env.SERVICE_GROUP || 'development',
+    environment: process.env.ENVIRONMENT || 'env_dev',
+    logger,
   });
 
   try {
@@ -50,11 +65,8 @@ async function main() {
     await sdk.initialize();
     logger.info('SDK initialized successfully');
 
-    // Attach HTTP metrics and start server
-    attachExpressMetrics(app, { enabled: true, metricsPath: '/metrics', registry: sdk.getMetricsRegistry?.() });
-    app.listen(metricsPort, () => {
-      logger.info(`Metrics server listening on port ${metricsPort}`);
-    });
+    // Start metrics server
+    metricsServer.start();
 
     // Register service
     logger.info('Registering service...');
@@ -198,6 +210,8 @@ async function main() {
 
     async function handleShutdown() {
       try {
+        logger.info('Stopping metrics server...');
+        await metricsServer.stop();
         logger.info('Unregistering service...');
         await sdk.serviceDiscovery.unregister();
         logger.info('Service unregistered');

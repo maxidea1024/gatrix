@@ -214,7 +214,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
             hostname: '',
             externalAddress: '',
             internalAddress: '',
-            ports: { tcp: [], udp: [], http: [] },
+            ports: {}, // Empty ports for auto-registered instance
             status: input.status || 'ready',
             createdAt: now,
             updatedAt: now,
@@ -423,7 +423,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
               hostname: '',
               externalAddress: '',
               internalAddress: '',
-              ports: { tcp: [], udp: [], http: [] },
+              ports: {}, // Empty ports for deleted instance
               status: 'terminated',
               createdAt: now,
               updatedAt: now,

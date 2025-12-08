@@ -29,9 +29,13 @@ import { GatrixServerSDK } from '@gatrix/server-sdk';
 
 // Create SDK instance
 const sdk = new GatrixServerSDK({
+  // Required
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token', // Optional: defaults to 'gatrix-unsecured-server-api-token' for testing
   applicationName: 'your-app-name',
+  service: 'worldd',     // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
+  group: 'kr-1',         // Service group (e.g., 'kr', 'us', 'production')
+  environment: 'env_prod', // Environment identifier (e.g., 'env_prod', 'env_staging')
 });
 
 // Initialize SDK (loads cache)
@@ -53,6 +57,9 @@ For testing purposes, you can omit the `apiToken` field. The SDK will automatica
 const sdk = new GatrixServerSDK({
   gatrixUrl: 'http://localhost:5000',
   applicationName: 'test-server',
+  service: 'test-service',
+  group: 'test-group',
+  environment: 'env_dev',
   // apiToken is optional - defaults to 'gatrix-unsecured-server-api-token'
 });
 ```
@@ -69,9 +76,13 @@ const sdk = new GatrixServerSDK({
 
 ```typescript
 const sdk = new GatrixServerSDK({
+  // Required
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'your-app-name',
+  service: 'worldd',       // Service name for identification
+  group: 'kr-1',           // Service group for categorization
+  environment: 'env_prod', // Environment identifier
 });
 ```
 
@@ -79,9 +90,15 @@ const sdk = new GatrixServerSDK({
 
 ```typescript
 const sdk = new GatrixServerSDK({
+  // Required
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'your-app-name',
+  service: 'worldd',
+  group: 'kr-1',
+  environment: 'env_prod',
+
+  // Optional - Redis (for event handling)
   redis: {
     host: 'localhost',
     port: 6379,
@@ -99,6 +116,9 @@ const sdk = new GatrixServerSDK({
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-server-api-token',
   applicationName: 'your-app-name',
+  service: 'worldd',       // Service name (e.g., 'auth', 'lobby', 'world', 'chat')
+  group: 'kr-1',           // Service group (e.g., 'kr', 'us', 'production')
+  environment: 'env_prod', // Environment (e.g., 'env_prod', 'env_staging')
 
   // Optional - Redis (for event handling)
   redis: {
@@ -113,6 +133,12 @@ const sdk = new GatrixServerSDK({
     enabled: true,
     ttl: 300, // seconds (only used with 'polling' refreshMethod)
     refreshMethod: 'polling', // 'polling' | 'event' | 'manual'. Default: 'polling'
+  },
+
+  // Optional - Metrics
+  metrics: {
+    enabled: true, // Enable SDK internal metrics (default: true)
+    port: 9337,    // Metrics server port (default: 9337 or SDK_METRICS_PORT env)
   },
 
   // Optional - Logger
@@ -137,6 +163,21 @@ const sdk = new GatrixServerSDK({
   },
 });
 ```
+
+### Required Configuration Fields
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `gatrixUrl` | string | Gatrix backend URL | `https://api.gatrix.com` |
+| `apiToken` | string | Server API Token | `your-server-api-token` |
+| `applicationName` | string | Application name | `my-game-server` |
+| `service` | string | Service name for identification | `auth`, `lobby`, `world`, `chat` |
+| `group` | string | Service group for categorization | `kr`, `us`, `production` |
+| `environment` | string | Environment identifier | `env_prod`, `env_staging`, `env_dev` |
+
+These required fields (`service`, `group`, `environment`) are used consistently across:
+- **Metrics labels**: All SDK metrics include these as default labels for filtering in Grafana
+- **Service Discovery**: Automatically applied when registering services
 
 ## API Reference
 
@@ -393,6 +434,9 @@ const sdk = new GatrixServerSDK({
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
+  service: 'worldd',
+  group: 'kr-1',
+  environment: 'env_prod',
   cache: {
     enabled: true,
     ttl: 300, // Required for polling: refresh every 300 seconds
@@ -413,6 +457,9 @@ const sdk = new GatrixServerSDK({
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
+  service: 'worldd',
+  group: 'kr-1',
+  environment: 'env_prod',
   redis: {
     host: 'localhost',
     port: 6379,
@@ -437,6 +484,9 @@ const sdk = new GatrixServerSDK({
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
+  service: 'worldd',
+  group: 'kr-1',
+  environment: 'env_prod',
   cache: {
     enabled: true,
     // ttl is NOT used in manual mode
@@ -588,8 +638,9 @@ const { instanceId, externalAddress } = await sdk.registerService({
   hostname: 'game-server-1', // Optional: auto-detected from os.hostname() if omitted
   internalAddress: '10.0.0.1', // Optional: auto-detected from first NIC if omitted
   ports: {
-    tcp: [7777],
-    http: [8080],
+    game: 7777,             // Named port: { serviceName: port }
+    web: 8080,
+    // metricsApi is automatically added from SDK config (default: 9337)
   },
   status: 'ready',
   stats: {
@@ -610,6 +661,7 @@ console.log('External address:', externalAddress); // Auto-detected by backend
 - `internalAddress` is optional and will be auto-detected from the first network interface if omitted
 - `labels.service` is required; other labels are optional
 - `meta` is immutable after registration
+- `ports.metricsApi` is automatically added from SDK's `metrics.port` config (default: 9337)
 
 #### Update Service Status
 
@@ -662,40 +714,6 @@ console.log('Service:', service);
 ```typescript
 await sdk.unregisterService();
 ```
-
-
-#### Config-based Auto Registration (optional)
-
-Instead of calling `registerService()` manually, you can configure service discovery in the SDK config and let the SDK auto-register during `initialize()`:
-
-```typescript
-const sdk = new GatrixServerSDK({
-  gatrixUrl: 'https://api.gatrix.com',
-  apiToken: 'your-token',
-  applicationName: 'world-server',
-  serviceDiscovery: {
-    autoRegister: true,
-    labels: {
-      service: 'worldd', // Required service type
-      group: 'kr-1',     // Optional group
-      env: 'production',
-    },
-    ports: {
-      http: [8080],
-      tcp: [7777],
-    },
-    status: 'ready',
-    meta: {
-      instanceName: 'world-1',
-      startTime: new Date().toISOString(),
-    },
-  },
-});
-
-await sdk.initialize(); // This will internally call registerService() using the config
-```
-
-> Note: Auto-registration does not change how you unregister. You should still call `sdk.unregisterService()` (or `sdk.serviceDiscovery.unregister()`) during shutdown to remove the instance from service discovery.
 
 #### Service Maintenance
 
@@ -943,6 +961,110 @@ console.log('Output Format:', logger.getFormat());
 console.log('Context:', logger.getContext());
 ```
 
+## Metrics Server
+
+The SDK provides an independent metrics server for Prometheus scraping. All services use a consistent port (default: 9337) for metrics collection.
+
+### Creating a Metrics Server
+
+```typescript
+import { createMetricsServer, getLogger } from '@gatrix/server-sdk';
+
+const logger = getLogger('MY-SERVER');
+const metricsServer = createMetricsServer({
+  port: 9337,              // Default: 9337 or SDK_METRICS_PORT env
+  applicationName: 'my-game-server',
+  service: 'worldd',       // Service name (required)
+  group: 'kr-1',           // Service group (required)
+  environment: 'env_prod', // Environment (required)
+  logger,
+});
+
+// Start the metrics server
+metricsServer.start();
+
+// Stop when shutting down
+await metricsServer.stop();
+```
+
+### Default Labels
+
+All metrics automatically include these default labels:
+- `sdk`: `gatrix-server-sdk`
+- `service`: Service name from config
+- `group`: Service group from config
+- `environment`: Environment from config
+- `application`: Application name from config
+
+### Creating Custom Metrics
+
+```typescript
+// Create a gauge for tracking online players
+const playersOnline = metricsServer.createGauge(
+  'players_online',
+  'Number of players currently online',
+  ['server_id', 'region']
+);
+
+// Update the metric
+playersOnline.labels('world-1', 'kr').set(150);
+playersOnline.labels('world-2', 'us').set(230);
+
+// Create a counter for events
+const eventsProcessed = metricsServer.createCounter(
+  'events_processed_total',
+  'Total events processed',
+  ['event_type']
+);
+
+// Increment the counter
+eventsProcessed.labels('login').inc();
+eventsProcessed.labels('logout').inc();
+
+// Create a histogram for response times
+const responseTime = metricsServer.createHistogram(
+  'request_duration_seconds',
+  'Request duration in seconds',
+  ['endpoint'],
+  [0.01, 0.05, 0.1, 0.5, 1, 5]
+);
+
+// Observe a value
+responseTime.labels('/api/v1/users').observe(0.123);
+```
+
+### Registering External Metrics
+
+You can register existing prom-client metrics:
+
+```typescript
+import { Counter } from 'prom-client';
+
+const customCounter = new Counter({
+  name: 'custom_events_total',
+  help: 'Custom events counter',
+  labelNames: ['type'],
+});
+
+metricsServer.registerExternalMetric(customCounter);
+```
+
+### Accessing the Registry
+
+```typescript
+// Get the prom-client registry
+const registry = metricsServer.getRegistry();
+
+// Manually get metrics output
+const metrics = await registry.metrics();
+```
+
+### Metrics Endpoint
+
+The metrics server exposes:
+- `GET /metrics` - Prometheus metrics endpoint
+- `GET /health` - Health check endpoint (returns 200 OK)
+
 ## HTTP Retry Configuration
 
 The SDK includes automatic retry logic with exponential backoff for failed HTTP requests.
@@ -956,6 +1078,9 @@ const sdk = new GatrixServerSDK({
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
+  service: 'worldd',
+  group: 'kr-1',
+  environment: 'env_prod',
   // Default retry config (no need to specify)
   retry: {
     enabled: true,
@@ -983,6 +1108,9 @@ const sdk = new GatrixServerSDK({
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
+  service: 'worldd',
+  group: 'kr-1',
+  environment: 'env_prod',
   retry: {
     enabled: true,
     maxRetries: -1, // Infinite retries
@@ -1001,6 +1129,9 @@ const sdk = new GatrixServerSDK({
   gatrixUrl: 'https://api.gatrix.com',
   apiToken: 'your-token',
   applicationName: 'your-app',
+  service: 'worldd',
+  group: 'kr-1',
+  environment: 'env_prod',
   retry: {
     enabled: false,
   },

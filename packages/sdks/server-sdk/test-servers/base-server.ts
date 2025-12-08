@@ -233,7 +233,8 @@ export class BaseTestServer {
       hostname: os.hostname(),
       internalAddress: internalIp,
       ports: {
-        http: [this.config.port],
+        web: this.config.port,
+        // metricsApi is automatically added by SDK
       },
       status: 'ready',
       meta: {

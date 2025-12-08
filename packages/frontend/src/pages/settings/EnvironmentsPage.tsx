@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { PERMISSIONS } from '../../types/permissions';
 import {
@@ -75,6 +75,10 @@ const EnvironmentsPage: React.FC = () => {
   const [selectedEnvForEdit, setSelectedEnvForEdit] = useState<Environment | null>(null);
   const [editEnv, setEditEnv] = useState<UpdateEnvironmentData>({});
   const [updating, setUpdating] = useState(false);
+
+  // Refs for focus management
+  const addNameFieldRef = useRef<HTMLInputElement>(null);
+  const editDisplayNameFieldRef = useRef<HTMLInputElement>(null);
 
   const loadEnvironments = useCallback(async () => {
     setLoading(true);
@@ -448,7 +452,17 @@ const EnvironmentsPage: React.FC = () => {
       />
 
       {/* Add Environment Dialog */}
-      <Dialog open={addDialogOpen} onClose={handleCloseAddDialog} maxWidth="sm" fullWidth>
+      <Dialog
+        open={addDialogOpen}
+        onClose={handleCloseAddDialog}
+        maxWidth="sm"
+        fullWidth
+        TransitionProps={{
+          onEntered: () => {
+            setTimeout(() => addNameFieldRef.current?.focus(), 100);
+          },
+        }}
+      >
         <DialogTitle>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <AddIcon />
@@ -462,6 +476,7 @@ const EnvironmentsPage: React.FC = () => {
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
+              inputRef={addNameFieldRef}
               label={t('environments.name')}
               value={newEnv.environmentName}
               onChange={(e) => setNewEnv({ ...newEnv, environmentName: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '') })}
@@ -674,7 +689,17 @@ const EnvironmentsPage: React.FC = () => {
       </Dialog>
 
       {/* Edit Environment Dialog */}
-      <Dialog open={editDialogOpen} onClose={handleCloseEditDialog} maxWidth="sm" fullWidth>
+      <Dialog
+        open={editDialogOpen}
+        onClose={handleCloseEditDialog}
+        maxWidth="sm"
+        fullWidth
+        TransitionProps={{
+          onEntered: () => {
+            setTimeout(() => editDisplayNameFieldRef.current?.focus(), 100);
+          },
+        }}
+      >
         <DialogTitle>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <EditIcon />
@@ -696,6 +721,7 @@ const EnvironmentsPage: React.FC = () => {
           />
 
           <TextField
+            inputRef={editDisplayNameFieldRef}
             label={t('environments.displayName')}
             value={editEnv.displayName || ''}
             onChange={(e) => setEditEnv({ ...editEnv, displayName: e.target.value })}

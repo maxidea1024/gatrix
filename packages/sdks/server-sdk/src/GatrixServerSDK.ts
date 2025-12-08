@@ -81,6 +81,9 @@ export class GatrixServerSDK {
     // Initialize metrics first
     this.metrics = new SdkMetrics({
       enabled: configWithDefaults.metrics?.enabled !== false,
+      service: configWithDefaults.service,
+      group: configWithDefaults.group,
+      environment: configWithDefaults.environment,
       applicationName: configWithDefaults.applicationName,
       registry: configWithDefaults.metrics?.registry,
     });
@@ -128,6 +131,18 @@ export class GatrixServerSDK {
       throw createError(ErrorCode.INVALID_CONFIG, 'applicationName is required');
     }
 
+    if (!config.service) {
+      throw createError(ErrorCode.INVALID_CONFIG, 'service is required');
+    }
+
+    if (!config.group) {
+      throw createError(ErrorCode.INVALID_CONFIG, 'group is required');
+    }
+
+    if (!config.environment) {
+      throw createError(ErrorCode.INVALID_CONFIG, 'environment is required');
+    }
+
     // Validate URL format
     try {
       new URL(config.gatrixUrl);
@@ -146,28 +161,6 @@ export class GatrixServerSDK {
     if (config.metrics) {
       if (config.metrics.enabled !== undefined && typeof config.metrics.enabled !== 'boolean') {
         throw createError(ErrorCode.INVALID_CONFIG, 'metrics.enabled must be a boolean');
-      }
-    }
-
-    // Validate serviceDiscovery config
-    if (config.serviceDiscovery) {
-      const sd = config.serviceDiscovery;
-
-      // If autoRegister is enabled, validate required fields
-      if (sd.autoRegister) {
-        if (!sd.labels || !sd.labels.service) {
-          throw createError(
-            ErrorCode.INVALID_CONFIG,
-            'serviceDiscovery.labels.service is required when autoRegister is enabled'
-          );
-        }
-
-        if (!sd.ports || (!sd.ports.tcp?.length && !sd.ports.udp?.length && !sd.ports.http?.length)) {
-          throw createError(
-            ErrorCode.INVALID_CONFIG,
-            'serviceDiscovery.ports must have at least one port when autoRegister is enabled'
-          );
-        }
       }
     }
 
@@ -193,44 +186,6 @@ export class GatrixServerSDK {
         'redis config is required when cache.refreshMethod is "event"'
       );
     }
-  }
-
-  /**
-   * Auto-register service to service discovery if configured
-   */
-  private async autoRegisterServiceIfConfigured(): Promise<void> {
-    const serviceDiscoveryConfig = this.config.serviceDiscovery;
-    if (!serviceDiscoveryConfig?.autoRegister) {
-      return;
-    }
-
-    // Note: labels and ports are already validated in validateConfig()
-    const { labels, hostname, internalAddress, ports, status, stats, meta } = serviceDiscoveryConfig;
-
-    this.logger.info('Auto-registering service via serviceDiscovery config', {
-      labels,
-      ports,
-      status: status ?? 'ready',
-      hostname: hostname ?? 'auto',
-      internalAddress: internalAddress ?? 'auto',
-    });
-
-    const result = await this.serviceDiscovery.register({
-      labels: labels!, // Already validated in validateConfig()
-      hostname,
-      internalAddress,
-      ports: ports!, // Already validated in validateConfig()
-      status,
-      stats,
-      meta,
-    });
-
-    this.logger.info('Service auto-registered via serviceDiscovery config', {
-      instanceId: result.instanceId,
-      hostname: result.hostname,
-      internalAddress: result.internalAddress,
-      externalAddress: result.externalAddress,
-    });
   }
 
   /**
@@ -289,9 +244,6 @@ export class GatrixServerSDK {
         this.eventListener = new EventListener(this.config.redis, this.cacheManager, this.logger, this.metrics);
         await this.eventListener.initialize();
       }
-
-      // Auto-register service discovery if configured
-      await this.autoRegisterServiceIfConfigured();
 
       this.initialized = true;
 
@@ -860,9 +812,19 @@ export class GatrixServerSDK {
 
   /**
    * Register this service instance via Backend API
+   * Note: metricsApi port is automatically added from SDK config (default: 9337)
    */
   async registerService(input: RegisterServiceInput): Promise<{ instanceId: string; hostname: string; internalAddress: string; externalAddress: string }> {
-    const result = await this.serviceDiscovery.register(input);
+    // Auto-add metricsApi port from metrics config (default: 9337)
+    const metricsPort = this.config.metrics?.port ?? parseInt(process.env.SDK_METRICS_PORT || '9337', 10);
+    const inputWithMetrics = {
+      ...input,
+      ports: {
+        ...input.ports,
+        metricsApi: metricsPort,
+      },
+    };
+    const result = await this.serviceDiscovery.register(inputWithMetrics);
     return result;
   }
 

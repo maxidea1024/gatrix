@@ -85,6 +85,87 @@ Behavior:
 
 Note: We will request permission before installing new dependencies (prom-client) in these packages.
 
+## SDK Metrics Server
+
+The Server SDK provides an independent metrics server for Prometheus scraping. All services using the SDK can expose metrics on a consistent port (default: 9337).
+
+### Quick Setup
+
+```typescript
+import { GatrixServerSDK, createMetricsServer, getLogger } from '@gatrix/server-sdk';
+
+const logger = getLogger('MY-SERVER');
+
+// Create SDK with required identification fields
+const sdk = new GatrixServerSDK({
+  gatrixUrl: 'http://localhost:55000',
+  apiToken: 'your-api-token',
+  applicationName: 'my-game-server',
+  service: 'worldd',       // Required: service name
+  group: 'kr-1',           // Required: service group
+  environment: 'env_prod', // Required: environment
+  metrics: {
+    port: 9337,            // Optional: default is 9337
+  },
+});
+
+// Create standalone metrics server
+const metricsServer = createMetricsServer({
+  port: 9337,
+  applicationName: 'my-game-server',
+  service: 'worldd',
+  group: 'kr-1',
+  environment: 'env_prod',
+  logger,
+});
+
+// Start metrics server
+metricsServer.start();
+```
+
+### Default Labels
+
+All SDK metrics automatically include these default labels:
+- `sdk`: `gatrix-server-sdk`
+- `service`: Service name from config
+- `group`: Service group from config
+- `environment`: Environment from config
+- `application`: Application name from config
+
+These labels enable filtering and aggregation in Grafana dashboards.
+
+### Service Discovery Integration
+
+When registering a service, the SDK automatically reports the `metricsApi` port:
+
+```typescript
+const result = await sdk.registerService({
+  labels: { service: 'worldd', group: 'kr-1' },
+  ports: {
+    game: 7777,   // Named port: { serviceName: port }
+    web: 8080,
+    // metricsApi is automatically added from SDK config (default: 9337)
+  },
+  status: 'ready',
+});
+```
+
+Prometheus can then discover and scrape metrics from all registered services via the Backend HTTP-SD endpoint.
+
+### Custom Metrics
+
+```typescript
+// Create custom metrics
+const playersOnline = metricsServer.createGauge(
+  'players_online',
+  'Number of players currently online',
+  ['server_id']
+);
+
+// Update metrics
+playersOnline.labels('world-1').set(150);
+```
+
 ## Admin Panel Integration
 
 - Sidebar adds a "Grafana" item under the Admin Panel section.

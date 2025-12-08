@@ -6,10 +6,13 @@
 
 import api from './api';
 
+/**
+ * Service Ports - Named port mapping
+ * Format: { serviceName: port }
+ * Example: { game: 7777, web: 8080, metricsApi: 9337 }
+ */
 export interface ServicePorts {
-  tcp?: number[];
-  udp?: number[];
-  http?: number[];
+  [serviceName: string]: number;
 }
 
 export interface ServiceLabels {

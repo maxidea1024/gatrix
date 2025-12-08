@@ -6,10 +6,20 @@
 
 export type ServiceStatus = 'initializing' | 'ready' | 'shutting_down' | 'error' | 'terminated' | 'no-response';
 
+/**
+ * Service Ports - Named port mapping
+ * Format: { serviceName: port }
+ * Example: { game: 7777, web: 8080, metricsApi: 9337 }
+ *
+ * Common port names:
+ * - game: Main game server port
+ * - web: HTTP/REST API port
+ * - websocket: WebSocket server port
+ * - grpc: gRPC server port
+ * - metricsApi: Prometheus metrics port (default: 9337)
+ */
 export interface ServicePorts {
-  tcp?: number[];
-  udp?: number[];
-  http?: number[];
+  [serviceName: string]: number;
 }
 
 /**

@@ -2,8 +2,6 @@
  * SDK Configuration Types
  */
 
-import type { ServiceLabels, ServicePorts, ServiceStatus } from './api';
-
 export interface RedisConfig {
   host: string;
   port: number;
@@ -28,11 +26,14 @@ export interface LoggerConfig {
 
 /**
  * Metrics Configuration
+ * NOTE: Metrics is disabled by default. Set enabled: true to activate.
  */
 export interface MetricsConfig {
-  enabled?: boolean; // Enable SDK internal metrics (default: true)
+  enabled?: boolean; // Enable SDK internal metrics (default: false - must be explicitly enabled)
   // Use 'any' to avoid hard dependency on prom-client types
   registry?: any; // Optional custom prom-client Registry to register metrics into
+  // Metrics server configuration
+  port?: number; // Metrics server port (default: 9337 or SDK_METRICS_PORT env)
 }
 
 /**
@@ -47,19 +48,7 @@ export interface RetryConfig {
   retryableStatusCodes?: number[]; // HTTP status codes to retry (default: [408, 429, 500, 502, 503, 504])
 }
 
-/**
- * Service Discovery Configuration
- */
-export interface ServiceDiscoveryConfig {
-  autoRegister?: boolean; // Auto-register service during SDK initialization (default: false)
-  labels?: ServiceLabels; // Service labels (required when autoRegister is true; must include labels.service)
-  hostname?: string; // Optional explicit hostname; defaults to os.hostname() when omitted
-  internalAddress?: string; // Optional explicit internal address; defaults to first NIC address when omitted
-  ports?: ServicePorts; // Service ports (required when autoRegister is true)
-  status?: ServiceStatus; // Initial service status. Default: 'ready'
-  stats?: Record<string, any>; // Optional instance statistics to send on registration
-  meta?: Record<string, any>; // Optional static metadata (immutable after registration)
-}
+
 
 /**
  * Features Configuration
@@ -89,6 +78,9 @@ export interface GatrixSDKConfig {
   gatrixUrl: string; // Gatrix backend URL (e.g., https://api.gatrix.com)
   apiToken: string; // Server API Token (required; use 'gatrix-unsecured-server-api-token' for testing)
   applicationName: string; // Application name
+  service: string; // Service name for identification (e.g., 'auth', 'lobby', 'world', 'chat'). Used in metrics labels and service discovery.
+  group: string; // Service group for categorization (e.g., 'kr', 'us', 'production'). Used in metrics labels and service discovery.
+  environment: string; // Environment identifier (e.g., 'env_prod', 'env_staging'). Used in metrics labels and service discovery.
 
   // Optional - World ID for world-specific maintenance checks
   worldId?: string; // Game world ID (e.g., 'world-1', 'asia-1'). Required for isMaintenance() to check world-level maintenance.
@@ -107,9 +99,6 @@ export interface GatrixSDKConfig {
 
   // Optional - Metrics settings
   metrics?: MetricsConfig;
-
-  // Optional - Service discovery settings (auto-registration)
-  serviceDiscovery?: ServiceDiscoveryConfig;
 
   // Optional - Feature toggles (for selective caching)
   features?: FeaturesConfig;

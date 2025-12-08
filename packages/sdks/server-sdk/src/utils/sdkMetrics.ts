@@ -6,6 +6,9 @@
 
 export type SdkMetricsOptions = {
   enabled?: boolean;
+  service?: string;
+  group?: string;
+  environment?: string;
   applicationName?: string;
   registry?: any; // prom-client Registry (typed as any to avoid hard dep on types)
 };
@@ -29,7 +32,8 @@ export class SdkMetrics {
   private httpRequestDuration: any | undefined;
 
   constructor(opts: SdkMetricsOptions = {}) {
-    this.enabled = opts.enabled !== false;
+    // Metrics disabled by default - must be explicitly enabled
+    this.enabled = opts.enabled === true;
 
     if (!this.enabled) return;
 
@@ -41,6 +45,9 @@ export class SdkMetrics {
       // Default labels to help multi-instance setups
       this.registry.setDefaultLabels({
         sdk: 'gatrix-server-sdk',
+        service: opts.service || 'unknown',
+        group: opts.group || 'unknown',
+        environment: opts.environment || 'unknown',
         application: opts.applicationName || 'unknown',
       });
 
