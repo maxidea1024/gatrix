@@ -1346,11 +1346,11 @@ const ServerListPage: React.FC = () => {
                           case 'status':
                             return (
                               <TableCell key={column.id}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                   {getStatusBadge(service.status)}
                                   <FavoriteIcon
                                     sx={{
-                                      fontSize: 12,
+                                      fontSize: 14,
                                       color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
                                       opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
                                       animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
@@ -1525,11 +1525,11 @@ const ServerListPage: React.FC = () => {
                         {/* Header: Type + Status */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
                           {getTypeChip(service.labels.service)}
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             {getStatusBadge(service.status)}
                             <FavoriteIcon
                               sx={{
-                                fontSize: 10,
+                                fontSize: 12,
                                 color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
                                 opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
                                 animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
@@ -1677,11 +1677,11 @@ const ServerListPage: React.FC = () => {
                               />
                             )}
                           </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             {getStatusBadge(service.status)}
                             <FavoriteIcon
                               sx={{
-                                fontSize: 12,
+                                fontSize: 14,
                                 color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
                                 opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
                                 animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
