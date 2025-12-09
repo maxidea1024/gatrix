@@ -248,7 +248,6 @@ interface EnvironmentDataCounts {
   jobs: number;
   clientVersions: number;
   apiTokens: number;
-  total: number;
 }
 
 interface EnvironmentWithCounts extends Environment {
@@ -646,8 +645,8 @@ const DashboardPage: React.FC = () => {
           ? allEnvs
           : allEnvs.filter((env: Environment) => access?.environmentIds?.includes(env.id));
 
-        // Limit to first 4 environments for dashboard display
-        const displayEnvs = accessibleEnvs.slice(0, 4);
+        // Show all accessible environments
+        const displayEnvs = accessibleEnvs;
 
         // Initialize with loading state
         setEnvironmentsWithCounts(displayEnvs.map((env: Environment) => ({ ...env, loading: true })));
@@ -673,7 +672,6 @@ const DashboardPage: React.FC = () => {
               jobs: rawData.jobs?.count ?? 0,
               clientVersions: rawData.clientVersions?.count ?? 0,
               apiTokens: rawData.apiTokens?.count ?? 0,
-              total: rawData.total ?? 0,
             } : null;
             return {
               ...env,
@@ -979,8 +977,16 @@ const DashboardPage: React.FC = () => {
             </Tooltip>
           </Box>
           <Grid container spacing={2}>
-            {environmentsWithCounts.map((env) => (
-              <Grid key={env.id} size={{ xs: 12, sm: 6, md: 3 }}>
+            {(() => {
+              const count = environmentsWithCounts.length;
+              const mdSize = count === 1 ? 12 : count === 2 ? 6 : count === 3 ? 4 : 3;
+              const smSize = count === 1 ? 12 : 6;
+              // Calculate empty cards needed to fill the row (4 columns on md)
+              const emptyCardsCount = count >= 4 ? (4 - (count % 4)) % 4 : 0;
+
+              return environmentsWithCounts.map((env) => {
+              return (
+              <Grid key={env.id} size={{ xs: 12, sm: smSize, md: mdSize }}>
                 <Card
                   sx={{
                     height: '100%',
@@ -1014,67 +1020,89 @@ const DashboardPage: React.FC = () => {
                         <Skeleton width="70%" height={20} />
                       </Box>
                     ) : env.counts ? (
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                        {(() => {
-                          // Environment-specific data only (exclude global data like tags, apiTokens)
-                          const envItems = [
-                            { label: 'envTemplates', value: env.counts.templates, path: '/admin/remote-config' },
-                            { label: 'envGameWorlds', value: env.counts.gameWorlds, path: '/admin/game-worlds' },
-                            { label: 'envClientVersions', value: env.counts.clientVersions, path: '/admin/client-versions' },
-                            { label: 'envSegments', value: env.counts.segments, path: '/admin/remote-config' },
-                            { label: 'envVars', value: env.counts.vars, path: '/settings/kv' },
-                            { label: 'envMessageTemplates', value: env.counts.messageTemplates, path: '/admin/maintenance-templates' },
-                            { label: 'envSurveys', value: env.counts.surveys, path: '/game/surveys' },
-                            { label: 'envCoupons', value: env.counts.coupons, path: '/game/coupon-settings' },
-                            { label: 'envNotices', value: env.counts.serviceNotices, path: '/game/service-notices' },
-                            { label: 'envIngamePopups', value: env.counts.ingamePopups, path: '/game/ingame-popup-notices' },
-                            { label: 'envBanners', value: env.counts.banners, path: '/game/banners' },
-                            { label: 'envJobs', value: env.counts.jobs, path: '/admin/jobs' },
-                          ];
-                          const envTotal = envItems.reduce((sum, item) => sum + item.value, 0);
-                          return (
-                            <>
-                              {envItems.map((item) => (
-                                <Box
-                                  key={item.label}
-                                  sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    cursor: 'pointer',
-                                    py: 0.25,
-                                    px: 0.5,
-                                    mx: -0.5,
-                                    borderRadius: 0.5,
-                                    '&:hover': { bgcolor: 'action.hover' },
-                                  }}
-                                  onClick={() => {
-                                    // Switch to this environment before navigating (only if different)
-                                    if (env.id !== currentEnvironmentId) {
-                                      switchEnvironment(env.id);
-                                    }
-                                    navigate(item.path);
-                                  }}
-                                >
-                                  <Typography variant="caption" color="text.secondary">
-                                    {t(`dashboard.${item.label}`)}
-                                  </Typography>
-                                  <Typography variant="caption" fontWeight={600}>
-                                    {item.value}
-                                  </Typography>
-                                </Box>
-                              ))}
-                              <Divider sx={{ my: 0.5 }} />
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <Typography variant="caption" color="text.secondary" fontWeight={600}>
-                                  {t('dashboard.envTotal')}
-                                </Typography>
-                                <Typography variant="caption" fontWeight={700} color="primary.main">
-                                  {envTotal}
-                                </Typography>
-                              </Box>
-                            </>
-                          );
-                        })()}
+                      <Box
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(2, 1fr)',
+                          gap: 0.5,
+                        }}
+                      >
+                        {[
+                          { label: 'envTemplates', value: env.counts.templates, path: '/admin/remote-config' },
+                          { label: 'envGameWorlds', value: env.counts.gameWorlds, path: '/admin/game-worlds' },
+                          { label: 'envClientVersions', value: env.counts.clientVersions, path: '/admin/client-versions' },
+                          { label: 'envSegments', value: env.counts.segments, path: '/admin/remote-config' },
+                          { label: 'envVars', value: env.counts.vars, path: '/settings/kv' },
+                          { label: 'envMessageTemplates', value: env.counts.messageTemplates, path: '/admin/maintenance-templates' },
+                          { label: 'envSurveys', value: env.counts.surveys, path: '/game/surveys' },
+                          { label: 'envCoupons', value: env.counts.coupons, path: '/game/coupon-settings' },
+                          { label: 'envNotices', value: env.counts.serviceNotices, path: '/game/service-notices' },
+                          { label: 'envIngamePopups', value: env.counts.ingamePopups, path: '/game/ingame-popup-notices' },
+                          { label: 'envBanners', value: env.counts.banners, path: '/game/banners' },
+                          { label: 'envJobs', value: env.counts.jobs, path: '/admin/jobs' },
+                        ].map((item) => (
+                          <Box
+                            key={item.label}
+                            onClick={() => {
+                              if (env.id !== currentEnvironmentId) {
+                                switchEnvironment(env.id);
+                              }
+                              navigate(item.path);
+                            }}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'stretch',
+                              height: 24,
+                              borderRadius: 0.5,
+                              border: 1,
+                              borderColor: 'divider',
+                              overflow: 'hidden',
+                              cursor: 'pointer',
+                              '&:hover': {
+                                borderColor: 'primary.main',
+                                '& .env-count-label': {
+                                  bgcolor: 'action.hover',
+                                },
+                                '& .env-count-value': {
+                                  bgcolor: 'primary.dark',
+                                },
+                              },
+                            }}
+                          >
+                            <Box
+                              className="env-count-label"
+                              sx={{
+                                flex: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                px: 1,
+                                fontSize: '0.7rem',
+                                color: 'text.secondary',
+                                bgcolor: 'background.paper',
+                                transition: 'background-color 0.15s',
+                              }}
+                            >
+                              {t(`dashboard.${item.label}`)}
+                            </Box>
+                            <Box
+                              className="env-count-value"
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                minWidth: 28,
+                                px: 0.5,
+                                fontSize: '0.7rem',
+                                fontWeight: 700,
+                                color: 'primary.contrastText',
+                                bgcolor: item.value > 0 ? 'primary.main' : 'action.disabledBackground',
+                                transition: 'background-color 0.15s',
+                              }}
+                            >
+                              {item.value}
+                            </Box>
+                          </Box>
+                        ))}
                       </Box>
                     ) : (
                       <Typography variant="caption" color="text.secondary">
@@ -1084,7 +1112,69 @@ const DashboardPage: React.FC = () => {
                   </CardContent>
                 </Card>
               </Grid>
-            ))}
+              );
+            }).concat(
+              // Add empty placeholder cards to fill the row
+              Array.from({ length: emptyCardsCount }).map((_, idx) => (
+                <Grid key={`empty-${idx}`} size={{ xs: 12, sm: smSize, md: mdSize }}>
+                  <Card
+                    onClick={() => navigate('/settings/environments')}
+                    sx={{
+                      height: '100%',
+                      border: '1px dashed',
+                      borderColor: 'divider',
+                      boxShadow: 'none',
+                      bgcolor: 'transparent',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': {
+                        borderColor: 'primary.main',
+                        bgcolor: 'action.hover',
+                        transform: 'translateY(-2px)',
+                        '& .add-icon': {
+                          color: 'primary.main',
+                          transform: 'scale(1.1)',
+                        },
+                        '& .add-text': {
+                          color: 'text.primary',
+                        },
+                      },
+                    }}
+                  >
+                    <CardContent
+                      sx={{
+                        p: 2,
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: 200,
+                      }}
+                    >
+                      <SettingsIcon
+                        className="add-icon"
+                        sx={{
+                          fontSize: 32,
+                          color: 'text.disabled',
+                          mb: 1,
+                          transition: 'all 0.2s ease-in-out',
+                        }}
+                      />
+                      <Typography
+                        className="add-text"
+                        variant="caption"
+                        color="text.disabled"
+                        sx={{ transition: 'color 0.2s ease-in-out' }}
+                      >
+                        {t('sidebar.environments')}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))
+            );
+            })()}
           </Grid>
         </Box>
       )}

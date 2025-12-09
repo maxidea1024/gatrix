@@ -1890,10 +1890,6 @@ function generateUIListData(cmsDir, loctab = {}) {
                     // Translate each name part (firstName, middleName, familyName, particle)
                     formatTextCn = makeCharacterDisplayNameCn(character, loctab);
                   }
-                  // Debug log for particle translation issue
-                  if (character.particle && character.particle.includes('나')) {
-                    console.log(`   [DEBUG] Character ${character.id}: particle="${character.particle}", loctab['나']="${loctab['나']}", formatTextCn="${formatTextCn}"`);
-                  }
                 } else {
                   formatTextKr = `Mate ${targetId}`;
                   formatTextCn = formatTextKr;
@@ -2809,6 +2805,8 @@ function convertLocalizationTable(inputPath, outputPath) {
   // Nations - missing translations in locdata
   ensureKey('주화 약탈단', '铸币掠夺队');
   ensureKey('주화', '铸币');
+  // Character particle - CSV only has 나(Na), need standalone 나
+  ensureKey('나', '罗');
 
   // Save to file only if outputPath is provided
   if (outputPath) {

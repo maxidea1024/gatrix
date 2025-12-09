@@ -177,7 +177,7 @@ services:
     command: yarn workspace @gatrix/frontend dev
 
   # etcd for service discovery (optional)
-  # Note: Ports changed from 52879/52880 to 52379/52380 for Windows compatibility
+  # Note: No external ports exposed - only accessible within Docker network
   etcd:
     image: quay.io/coreos/etcd:v3.5.12
     container_name: gatrix-etcd-dev
@@ -194,9 +194,11 @@ services:
       - --initial-cluster-token=etcd-cluster-dev
       - --initial-cluster-state=new
       - --log-level=info
-    ports:
-      - "127.0.0.1:52379:2379"
-      - "127.0.0.1:52380:2380"
+    # Ports removed - etcd only needs to be accessible within Docker network
+    # If you need external access, uncomment and use non-conflicting ports:
+    # ports:
+    #   - "127.0.0.1:${ETCD_CLIENT_PORT:-52379}:2379"
+    #   - "127.0.0.1:${ETCD_PEER_PORT:-52380}:2380"
     volumes:
       - ${DATA_ROOT:-./data}/etcd:/etcd-data
     networks:
@@ -228,11 +230,12 @@ services:
         soft: 262144
         hard: 262144
     healthcheck:
-      test: [ "CMD-SHELL", "wget --spider -q http://127.0.0.1:8123/ping && wget -q -O- 'http://127.0.0.1:8123/?query=SELECT%201' | grep -q '^1$'" ]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
+      # Simplified healthcheck - just check if HTTP endpoint responds
+      test: [ "CMD-SHELL", "wget --spider -q http://127.0.0.1:8123/ping || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Event Lens Server for development (with hot reload)
   event-lens-dev:

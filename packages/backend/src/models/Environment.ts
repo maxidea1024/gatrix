@@ -234,11 +234,11 @@ export class Environment extends Model implements EnvironmentData {
     vars: { count: number; items: Array<{ id: string; varKey: string }> };
     messageTemplates: { count: number; items: Array<{ id: string; name: string }> };
     serviceNotices: { count: number; items: Array<{ id: string; title: string }> };
-    ingamePopups: { count: number; items: Array<{ id: string; title: string }> };
-    surveys: { count: number; items: Array<{ id: string; name: string }> };
+    ingamePopups: { count: number; items: Array<{ id: string; description: string }> };
+    surveys: { count: number; items: Array<{ id: string; surveyTitle: string }> };
     coupons: { count: number; items: Array<{ id: string; name: string }> };
-    banners: { count: number; items: Array<{ id: string; name: string }> };
-    jobs: { count: number; items: Array<{ id: string; jobName: string }> };
+    banners: { count: number; items: Array<{ bannerId: string; name: string }> };
+    jobs: { count: number; items: Array<{ id: string; name: string }> };
     clientVersions: { count: number; items: Array<{ id: string; version: string; platform: string }> };
     apiTokens: { count: number; items: Array<{ id: string; name: string }> };
     total: number;
@@ -291,11 +291,11 @@ export class Environment extends Model implements EnvironmentData {
       safeQuery<{ id: string; varKey: string }>('g_vars', ['id', 'varKey']),
       safeQuery<{ id: string; name: string }>('g_message_templates', ['id', 'name']),
       safeQuery<{ id: string; title: string }>('g_service_notices', ['id', 'title']),
-      safeQuery<{ id: string; title: string }>('g_ingame_popup_notices', ['id', 'title']),
-      safeQuery<{ id: string; name: string }>('g_surveys', ['id', 'name']),
-      safeQuery<{ id: string; name: string }>('g_coupons', ['id', 'name']),
-      safeQuery<{ id: string; name: string }>('g_banners', ['id', 'name']),
-      safeQuery<{ id: string; jobName: string }>('g_jobs', ['id', 'jobName']),
+      safeQuery<{ id: string; description: string }>('g_ingame_popup_notices', ['id', 'description']),
+      safeQuery<{ id: string; surveyTitle: string }>('g_surveys', ['id', 'surveyTitle']),
+      safeQuery<{ id: string; name: string }>('g_coupon_settings', ['id', 'name']),
+      safeQuery<{ bannerId: string; name: string }>('g_banners', ['bannerId', 'name']),
+      safeQuery<{ id: string; name: string }>('g_jobs', ['id', 'name']),
       safeQuery<{ id: string; version: string; platform: string }>('g_client_versions', ['id', 'version', 'platform']),
       safeQuery<{ tokenId: string }>('g_api_access_token_environments', ['tokenId']),
     ]);
