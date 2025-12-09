@@ -4194,6 +4194,7 @@
       "region": "地区",
       "env": "环境",
       "role": "角色",
+      "hostname": "主机名",
       "internalAddress": "内部IP",
       "externalAddress": "外部IP"
     },
@@ -4204,6 +4205,22 @@
       "error": "错误",
       "terminated": "已终止",
       "noResponse": "无响应"
+    },
+    "statusTooltip": {
+      "initializing": "服务器正在启动并加载配置。准备就绪后将自动转换为'在线'状态。",
+      "ready": "服务器正常运行并接受连接。",
+      "shuttingDown": "服务器正在进行正常关闭。新连接可能会被拒绝。",
+      "error": "服务器遇到错误，可能无法正常运行。请检查服务器日志以获取详细信息。",
+      "terminated": "服务器已关闭或已停止。这是最终状态。",
+      "noResponse": "服务器在预期时间内未发送心跳。服务器可能无响应或存在网络问题。"
+    },
+    "healthCheck": {
+      "tooltip": "检查服务器健康状态（调用 /health 端点）",
+      "healthyTooltip": "健康 ({{latency}}ms)",
+      "unhealthyTooltip": "不健康: {{error}}",
+      "success": "服务器健康 ({{latency}}ms)",
+      "failed": "服务器健康检查失败: {{error}}",
+      "error": "无法执行健康检查"
     },
     "table": {
       "instanceId": "实例ID",
@@ -4218,7 +4235,8 @@
       "stats": "统计",
       "meta": "元信息",
       "createdAt": "创建时间",
-      "updatedAt": "更新时间"
+      "updatedAt": "更新时间",
+      "actions": "操作"
     }
   },
   "REWARD_TYPE_POINT": "点数",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { PERMISSIONS } from '../../types/permissions';
 import {
@@ -54,6 +54,7 @@ import {
   Pause as PauseIcon,
   PlayArrow as PlayArrowIcon,
   CleaningServices as CleaningServicesIcon,
+  NetworkCheck as NetworkCheckIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -80,6 +81,7 @@ import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../componen
 import { useDebounce } from '../../hooks/useDebounce';
 import serviceDiscoveryService, { ServiceInstance } from '../../services/serviceDiscoveryService';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { RelativeTime } from '../../components/common/RelativeTime';
 
 // View mode type
 type ViewMode = 'list' | 'grid' | 'card';
@@ -191,8 +193,17 @@ const ServerListPage: React.FC = () => {
   // Track updated service IDs for highlight effect (with status)
   const [updatedServiceIds, setUpdatedServiceIds] = useState<Map<string, ServiceStatus>>(new Map());
 
+  // Track newly added service IDs for appearance animation
+  const [newServiceIds, setNewServiceIds] = useState<Set<string>>(new Set());
+
   // Cleanup confirmation dialog
   const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false);
+
+  // Health check state: Map<serviceKey, { loading: boolean, result?: { healthy: boolean, latency: number, error?: string } }>
+  const [healthCheckStatus, setHealthCheckStatus] = useState<Map<string, {
+    loading: boolean;
+    result?: { healthy: boolean; latency: number; error?: string }
+  }>>(new Map());
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -209,6 +220,7 @@ const ServerListPage: React.FC = () => {
     { id: 'meta', labelKey: 'serverList.table.meta', visible: true },
     { id: 'createdAt', labelKey: 'serverList.table.createdAt', visible: true },
     { id: 'updatedAt', labelKey: 'serverList.table.updatedAt', visible: true },
+    { id: 'actions', labelKey: 'serverList.table.actions', visible: true },
   ];
 
   // Column configuration state (persisted in localStorage)
@@ -255,7 +267,7 @@ const ServerListPage: React.FC = () => {
     '/admin/services',
     () => serviceDiscoveryService.getServices(),
     {
-      revalidateOnFocus: true, // Refetch on window focus to get latest inactive services
+      revalidateOnFocus: false, // SSE handles real-time updates, no need to refetch on focus
       revalidateOnReconnect: true, // Refetch on reconnect
       refreshInterval: 0, // Disable auto-refresh, SSE handles real-time updates
       dedupingInterval: 0, // Don't dedupe requests
@@ -321,21 +333,37 @@ const ServerListPage: React.FC = () => {
               setServices((prev) => {
                 const index = prev.findIndex((s) => s.instanceId === event.data.instanceId && s.labels.service === event.data.labels.service);
                 if (index >= 0) {
-                  // Update existing - highlight the updated service with status color
-                  const serviceKey = `${event.data.labels.service}-${event.data.instanceId}`;
-                  setUpdatedServiceIds((prev) => new Map(prev).set(serviceKey, event.data.status));
-                  setTimeout(() => {
-                    setUpdatedServiceIds((prev) => {
-                      const newMap = new Map(prev);
-                      newMap.delete(serviceKey);
-                      return newMap;
-                    });
-                  }, 2000);
+                  // Update existing - only highlight if status actually changed (not just heartbeat update)
+                  const prevService = prev[index];
+                  const statusChanged = prevService.status !== event.data.status;
+
+                  if (statusChanged) {
+                    const serviceKey = `${event.data.labels.service}-${event.data.instanceId}`;
+                    setUpdatedServiceIds((prevIds) => new Map(prevIds).set(serviceKey, event.data.status));
+                    setTimeout(() => {
+                      setUpdatedServiceIds((prevIds) => {
+                        const newMap = new Map(prevIds);
+                        newMap.delete(serviceKey);
+                        return newMap;
+                      });
+                    }, 2000);
+                  }
 
                   const newServices = [...prev];
                   newServices[index] = event.data;
                   return newServices;
                 } else {
+                  // Add new service - trigger appearance animation
+                  const serviceKey = `${event.data.labels.service}-${event.data.instanceId}`;
+                  setNewServiceIds((prevIds) => new Set(prevIds).add(serviceKey));
+                  setTimeout(() => {
+                    setNewServiceIds((prevIds) => {
+                      const newSet = new Set(prevIds);
+                      newSet.delete(serviceKey);
+                      return newSet;
+                    });
+                  }, 1000); // Animation duration
+
                   // Add new service and sort by createdAt (ascending - oldest first, newest last)
                   const newServices = [...prev, event.data];
                   newServices.sort((a, b) => {
@@ -401,6 +429,69 @@ const ServerListPage: React.FC = () => {
     localStorage.setItem('serverListViewMode', mode);
   };
 
+  // Health check a service
+  const handleHealthCheck = async (service: ServiceInstance) => {
+    const serviceKey = `${service.labels.service}-${service.instanceId}`;
+
+    // Set loading state
+    setHealthCheckStatus(prev => new Map(prev).set(serviceKey, { loading: true }));
+
+    try {
+      const result = await serviceDiscoveryService.healthCheck(service.labels.service, service.instanceId);
+
+      setHealthCheckStatus(prev => new Map(prev).set(serviceKey, {
+        loading: false,
+        result: {
+          healthy: result.healthy,
+          latency: result.latency,
+          error: result.error
+        }
+      }));
+
+      // Show snackbar with result
+      if (result.healthy) {
+        enqueueSnackbar(
+          t('serverList.healthCheck.success', { latency: result.latency }),
+          { variant: 'success' }
+        );
+      } else {
+        enqueueSnackbar(
+          t('serverList.healthCheck.failed', { error: result.error || 'Unknown error' }),
+          { variant: 'error' }
+        );
+      }
+
+      // Clear result after 10 seconds
+      setTimeout(() => {
+        setHealthCheckStatus(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(serviceKey);
+          return newMap;
+        });
+      }, 10000);
+    } catch (error: any) {
+      setHealthCheckStatus(prev => new Map(prev).set(serviceKey, {
+        loading: false,
+        result: {
+          healthy: false,
+          latency: 0,
+          error: error.message || 'Request failed'
+        }
+      }));
+
+      enqueueSnackbar(
+        t('serverList.healthCheck.error'),
+        { variant: 'error' }
+      );
+    }
+  };
+
+  // Check if service has a web port for health check
+  const hasWebPort = (service: ServiceInstance): boolean => {
+    const ports = service.ports;
+    return !!(ports?.web || ports?.http || ports?.api);
+  };
+
   // Clean up terminated, error, and no-response servers
   const handleCleanupClick = () => {
     setCleanupDialogOpen(true);
@@ -436,60 +527,122 @@ const ServerListPage: React.FC = () => {
     setCleanupDialogOpen(false);
   };
 
+  // Extract unique values from current services for filter options
+  const uniqueServices = useMemo(() =>
+    [...new Set(services.map(s => s.labels.service))].sort(),
+    [services]
+  );
+  const uniqueInstanceIds = useMemo(() =>
+    [...new Set(services.map(s => s.instanceId))].sort(),
+    [services]
+  );
+  const uniqueStatuses = useMemo(() =>
+    [...new Set(services.map(s => s.status))].sort(),
+    [services]
+  );
+  const uniqueGroups = useMemo(() =>
+    [...new Set(services.map(s => s.labels.group).filter(Boolean))].sort() as string[],
+    [services]
+  );
+  const uniqueRegions = useMemo(() =>
+    [...new Set(services.map(s => s.labels.region).filter(Boolean))].sort() as string[],
+    [services]
+  );
+  const uniqueEnvs = useMemo(() =>
+    [...new Set(services.map(s => s.labels.env).filter(Boolean))].sort() as string[],
+    [services]
+  );
+  const uniqueRoles = useMemo(() =>
+    [...new Set(services.map(s => s.labels.role).filter(Boolean))].sort() as string[],
+    [services]
+  );
+  const uniqueInternalAddresses = useMemo(() =>
+    [...new Set(services.map(s => s.internalAddress).filter(Boolean))].sort(),
+    [services]
+  );
+  const uniqueExternalAddresses = useMemo(() =>
+    [...new Set(services.map(s => s.externalAddress).filter(Boolean))].sort(),
+    [services]
+  );
+  const uniqueHostnames = useMemo(() =>
+    [...new Set(services.map(s => s.hostname).filter(Boolean))].sort(),
+    [services]
+  );
+
+  // Status label mapping
+  const statusLabels: Record<string, string> = {
+    initializing: t('serverList.status.initializing'),
+    ready: t('serverList.status.ready'),
+    shutting_down: t('serverList.status.shuttingDown'),
+    error: t('serverList.status.error'),
+    terminated: t('serverList.status.terminated'),
+    'no-response': t('serverList.status.noResponse'),
+  };
+
   // Filter configuration
   const availableFilterDefinitions: FilterDefinition[] = [
     {
       key: 'service',
       label: t('serverList.filters.service'),
       type: 'select',
-      options: (serviceTypes || []).map((type) => ({ value: type, label: type })),
+      options: uniqueServices.map((type) => ({ value: type, label: type })),
     },
     {
       key: 'status',
       label: t('serverList.filters.status'),
       type: 'select',
-      options: [
-        { value: 'initializing', label: t('serverList.status.initializing') },
-        { value: 'ready', label: t('serverList.status.ready') },
-        { value: 'shutting_down', label: t('serverList.status.shuttingDown') },
-        { value: 'error', label: t('serverList.status.error') },
-        { value: 'terminated', label: t('serverList.status.terminated') },
-      ],
+      options: uniqueStatuses.map((status) => ({
+        value: status,
+        label: statusLabels[status] || status
+      })),
     },
     {
       key: 'instanceId',
       label: t('serverList.filters.instanceId'),
-      type: 'text',
+      type: 'select',
+      options: uniqueInstanceIds.map((id) => ({ value: id, label: id })),
     },
     {
       key: 'group',
       label: t('serverList.filters.group'),
-      type: 'text',
+      type: 'select',
+      options: uniqueGroups.map((g) => ({ value: g, label: g })),
     },
     {
       key: 'region',
       label: t('serverList.filters.region'),
-      type: 'text',
+      type: 'select',
+      options: uniqueRegions.map((r) => ({ value: r, label: r })),
     },
     {
       key: 'env',
       label: t('serverList.filters.env'),
-      type: 'text',
+      type: 'select',
+      options: uniqueEnvs.map((e) => ({ value: e, label: e })),
     },
     {
       key: 'role',
       label: t('serverList.filters.role'),
-      type: 'text',
+      type: 'select',
+      options: uniqueRoles.map((r) => ({ value: r, label: r })),
+    },
+    {
+      key: 'hostname',
+      label: t('serverList.filters.hostname'),
+      type: 'select',
+      options: uniqueHostnames.map((h) => ({ value: h, label: h })),
     },
     {
       key: 'internalAddress',
       label: t('serverList.filters.internalAddress'),
-      type: 'text',
+      type: 'select',
+      options: uniqueInternalAddresses.map((a) => ({ value: a, label: a })),
     },
     {
       key: 'externalAddress',
       label: t('serverList.filters.externalAddress'),
-      type: 'text',
+      type: 'select',
+      options: uniqueExternalAddresses.map((a) => ({ value: a, label: a })),
     },
   ];
 
@@ -566,11 +719,16 @@ const ServerListPage: React.FC = () => {
         service.internalAddress.toLowerCase().includes(searchLower) ||
         Object.entries(service.labels).some(([key, value]) =>
           value && value.toLowerCase().includes(searchLower)
+        ) ||
+        // Search in ports (name:port format)
+        Object.entries(service.ports || {}).some(([name, port]) =>
+          name.toLowerCase().includes(searchLower) ||
+          String(port).includes(searchLower)
         );
       if (!matchesSearch) return false;
     }
 
-    // Dynamic filters
+    // Dynamic filters (all are now select type with exact match)
     for (const filter of activeFilters) {
       if (filter.key === 'service' && filter.value && service.labels.service !== filter.value) {
         return false;
@@ -578,25 +736,28 @@ const ServerListPage: React.FC = () => {
       if (filter.key === 'status' && filter.value && service.status !== filter.value) {
         return false;
       }
-      if (filter.key === 'instanceId' && filter.value && !service.instanceId.toLowerCase().includes(filter.value.toLowerCase())) {
+      if (filter.key === 'instanceId' && filter.value && service.instanceId !== filter.value) {
         return false;
       }
-      if (filter.key === 'group' && filter.value && !service.labels.group?.toLowerCase().includes(filter.value.toLowerCase())) {
+      if (filter.key === 'group' && filter.value && service.labels.group !== filter.value) {
         return false;
       }
-      if (filter.key === 'region' && filter.value && !service.labels.region?.toLowerCase().includes(filter.value.toLowerCase())) {
+      if (filter.key === 'region' && filter.value && service.labels.region !== filter.value) {
         return false;
       }
-      if (filter.key === 'env' && filter.value && !service.labels.env?.toLowerCase().includes(filter.value.toLowerCase())) {
+      if (filter.key === 'env' && filter.value && service.labels.env !== filter.value) {
         return false;
       }
-      if (filter.key === 'role' && filter.value && !service.labels.role?.toLowerCase().includes(filter.value.toLowerCase())) {
+      if (filter.key === 'role' && filter.value && service.labels.role !== filter.value) {
         return false;
       }
-      if (filter.key === 'internalAddress' && filter.value && !service.internalAddress?.toLowerCase().includes(filter.value.toLowerCase())) {
+      if (filter.key === 'hostname' && filter.value && service.hostname !== filter.value) {
         return false;
       }
-      if (filter.key === 'externalAddress' && filter.value && !service.externalAddress?.toLowerCase().includes(filter.value.toLowerCase())) {
+      if (filter.key === 'internalAddress' && filter.value && service.internalAddress !== filter.value) {
+        return false;
+      }
+      if (filter.key === 'externalAddress' && filter.value && service.externalAddress !== filter.value) {
         return false;
       }
     }
@@ -604,7 +765,7 @@ const ServerListPage: React.FC = () => {
     return true;
   });
 
-  // Apply sorting
+  // Apply sorting for table view
   const displayServices = [...filteredServices].sort((a, b) => {
     let aValue: any;
     let bValue: any;
@@ -635,15 +796,23 @@ const ServerListPage: React.FC = () => {
     return 0;
   });
 
+  // Grid/Card view always sorted by createdAt ascending (oldest first, newest last)
+  // This prevents visual disruption when new servers are added
+  const gridDisplayServices = [...filteredServices].sort((a, b) => {
+    const aTime = new Date(a.createdAt).getTime();
+    const bTime = new Date(b.createdAt).getTime();
+    return aTime - bTime;
+  });
+
   // Status badge component
   const getStatusBadge = (status: ServiceInstance['status']) => {
     const statusConfig = {
-      ready: { color: 'success' as const, icon: <CheckCircleIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.ready') },
-      error: { color: 'error' as const, icon: <ErrorIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.error') },
-      initializing: { color: 'warning' as const, icon: <HourglassEmptyIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.initializing') },
-      shutting_down: { color: 'info' as const, icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.shuttingDown') },
-      terminated: { color: 'default' as const, icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.terminated') },
-      'no-response': { color: 'warning' as const, icon: <WarningIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.noResponse') },
+      ready: { color: 'success' as const, icon: <CheckCircleIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.ready'), tooltipKey: 'ready' },
+      error: { color: 'error' as const, icon: <ErrorIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.error'), tooltipKey: 'error' },
+      initializing: { color: 'warning' as const, icon: <HourglassEmptyIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.initializing'), tooltipKey: 'initializing' },
+      shutting_down: { color: 'info' as const, icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.shuttingDown'), tooltipKey: 'shuttingDown' },
+      terminated: { color: 'default' as const, icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.terminated'), tooltipKey: 'terminated' },
+      'no-response': { color: 'warning' as const, icon: <WarningIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.noResponse'), tooltipKey: 'noResponse' },
     };
 
     const config = statusConfig[status];
@@ -654,19 +823,21 @@ const ServerListPage: React.FC = () => {
           label={status}
           color="default"
           size="small"
-          sx={{ fontWeight: 600 }}
+          sx={{ fontWeight: 600, borderRadius: 1 }}
         />
       );
     }
 
     return (
-      <Chip
-        icon={config.icon}
-        label={config.label}
-        color={config.color}
-        size="small"
-        sx={{ fontWeight: 600 }}
-      />
+      <Tooltip title={t(`serverList.statusTooltip.${config.tooltipKey}`)} arrow placement="top">
+        <Chip
+          icon={config.icon}
+          label={config.label}
+          color={config.color}
+          size="small"
+          sx={{ fontWeight: 600, borderRadius: 1 }}
+        />
+      </Tooltip>
     );
   };
 
@@ -682,7 +853,28 @@ const ServerListPage: React.FC = () => {
     );
   };
 
-  // Get highlight color based on status
+  // Get background color based on status (for normal state)
+  const getStatusBgColor = (status: ServiceStatus, theme: any) => {
+    const isDark = theme.palette.mode === 'dark';
+    switch (status) {
+      case 'ready':
+        return 'transparent'; // Online - keep current color (no tint)
+      case 'initializing':
+        return isDark ? alpha(theme.palette.warning.main, 0.06) : alpha(theme.palette.warning.main, 0.04);
+      case 'shutting_down':
+        return isDark ? alpha(theme.palette.info.main, 0.06) : alpha(theme.palette.info.main, 0.04);
+      case 'error':
+        return isDark ? alpha(theme.palette.error.main, 0.08) : alpha(theme.palette.error.main, 0.05);
+      case 'terminated':
+        return isDark ? alpha(theme.palette.grey[500], 0.08) : alpha(theme.palette.grey[500], 0.05);
+      case 'no-response':
+        return isDark ? alpha(theme.palette.warning.main, 0.08) : alpha(theme.palette.warning.main, 0.05);
+      default:
+        return 'transparent';
+    }
+  };
+
+  // Get highlight color based on status (for update animation)
   const getHighlightColor = (status: ServiceStatus, theme: any) => {
     const isDark = theme.palette.mode === 'dark';
     switch (status) {
@@ -986,7 +1178,7 @@ const ServerListPage: React.FC = () => {
                 <TableRow>
                   {columns.filter(col => col.visible).map((column) => (
                     <TableCell key={column.id}>
-                      {column.id !== 'ports' && column.id !== 'stats' && column.id !== 'meta' && column.id !== 'labels' ? (
+                      {column.id !== 'ports' && column.id !== 'stats' && column.id !== 'meta' && column.id !== 'labels' && column.id !== 'actions' ? (
                         <TableSortLabel
                           active={sortBy === column.id}
                           direction={sortBy === column.id ? sortOrder : 'asc'}
@@ -1015,6 +1207,7 @@ const ServerListPage: React.FC = () => {
                     const serviceKey = `${service.labels.service}-${service.instanceId}`;
                     const updatedStatus = updatedServiceIds.get(serviceKey);
                     const isUpdated = updatedStatus !== undefined;
+                    const isNew = newServiceIds.has(serviceKey);
                     // Use service.status for highlight color (current status)
                     const highlightStatus = updatedStatus || service.status;
                     return (
@@ -1024,14 +1217,22 @@ const ServerListPage: React.FC = () => {
                       sx={{
                         bgcolor: isUpdated
                           ? (theme) => getHighlightColor(highlightStatus, theme)
-                          : 'transparent',
-                        animation: isUpdated ? `flashEffect-${highlightStatus} 2s ease-out` : 'none',
+                          : (theme) => getStatusBgColor(service.status, theme),
+                        animation: isNew
+                          ? 'appearEffect 0.5s ease-out'
+                          : isUpdated
+                            ? `flashEffect-${highlightStatus} 2s ease-out`
+                            : 'none',
+                        '@keyframes appearEffect': {
+                          '0%': { opacity: 0, transform: 'scale(0.95)' },
+                          '100%': { opacity: 1, transform: 'scale(1)' },
+                        },
                         [`@keyframes flashEffect-${highlightStatus}`]: {
                           '0%': {
                             bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme),
                           },
                           '100%': {
-                            bgcolor: 'transparent',
+                            bgcolor: (theme) => getStatusBgColor(service.status, theme),
                           },
                         },
                       }}
@@ -1111,40 +1312,21 @@ const ServerListPage: React.FC = () => {
                               </TableCell>
                             );
                           case 'ports':
+                            const portEntries = Object.entries(service.ports || {});
                             return (
                               <TableCell key={column.id}>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                  {service.ports.tcp && service.ports.tcp.length > 0 && (
-                                    <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                                      <Typography variant="caption" color="text.secondary" sx={{ minWidth: '35px' }}>TCP:</Typography>
-                                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                        {service.ports.tcp.map((port, idx) => (
-                                          <Chip key={`${service.instanceId}-tcp-${idx}`} label={port} size="small" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', height: '20px' }} />
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-                                  {service.ports.udp && service.ports.udp.length > 0 && (
-                                    <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                                      <Typography variant="caption" color="text.secondary" sx={{ minWidth: '35px' }}>UDP:</Typography>
-                                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                        {service.ports.udp.map((port, idx) => (
-                                          <Chip key={`${service.instanceId}-udp-${idx}`} label={port} size="small" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', height: '20px' }} />
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-                                  {service.ports.http && service.ports.http.length > 0 && (
-                                    <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                                      <Typography variant="caption" color="text.secondary" sx={{ minWidth: '35px' }}>HTTP:</Typography>
-                                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                        {service.ports.http.map((port, idx) => (
-                                          <Chip key={`${service.instanceId}-http-${idx}`} label={port} size="small" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', height: '20px' }} />
-                                        ))}
-                                      </Box>
-                                    </Box>
-                                  )}
-                                </Box>
+                                {portEntries.length > 0 && (
+                                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                                    {portEntries.map(([name, port]) => (
+                                      <Chip
+                                        key={`${service.instanceId}-${name}`}
+                                        label={`${name}:${port}`}
+                                        size="small"
+                                        sx={{ fontFamily: 'monospace', fontSize: '0.7rem', height: '20px' }}
+                                      />
+                                    ))}
+                                  </Box>
+                                )}
                               </TableCell>
                             );
                           case 'status':
@@ -1184,17 +1366,53 @@ const ServerListPage: React.FC = () => {
                           case 'createdAt':
                             return (
                               <TableCell key={column.id}>
-                                <Typography variant="body2" color="text.secondary">
-                                  {formatDateTimeDetailed(service.createdAt)}
-                                </Typography>
+                                <RelativeTime date={service.createdAt} />
                               </TableCell>
                             );
                           case 'updatedAt':
                             return (
                               <TableCell key={column.id}>
-                                <Typography variant="body2" color="text.secondary">
-                                  {formatDateTimeDetailed(service.updatedAt)}
-                                </Typography>
+                                <RelativeTime date={service.updatedAt} />
+                              </TableCell>
+                            );
+                          case 'actions':
+                            const actionsServiceKey = `${service.labels.service}-${service.instanceId}`;
+                            const actionsHealthStatus = healthCheckStatus.get(actionsServiceKey);
+                            return (
+                              <TableCell key={column.id}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  {hasWebPort(service) && (
+                                    <Tooltip title={
+                                      actionsHealthStatus?.result
+                                        ? (actionsHealthStatus.result.healthy
+                                            ? t('serverList.healthCheck.healthyTooltip', { latency: actionsHealthStatus.result.latency })
+                                            : t('serverList.healthCheck.unhealthyTooltip', { error: actionsHealthStatus.result.error }))
+                                        : t('serverList.healthCheck.tooltip')
+                                    } arrow>
+                                      <IconButton
+                                        size="small"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleHealthCheck(service);
+                                        }}
+                                        disabled={actionsHealthStatus?.loading}
+                                        sx={{
+                                          width: 28,
+                                          height: 28,
+                                          color: actionsHealthStatus?.result
+                                            ? (actionsHealthStatus.result.healthy ? 'success.main' : 'error.main')
+                                            : 'action.active',
+                                        }}
+                                      >
+                                        {actionsHealthStatus?.loading ? (
+                                          <CircularProgress size={14} />
+                                        ) : (
+                                          <NetworkCheckIcon fontSize="small" />
+                                        )}
+                                      </IconButton>
+                                    </Tooltip>
+                                  )}
+                                </Box>
                               </TableCell>
                             );
                           default:
@@ -1211,229 +1429,318 @@ const ServerListPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Grid View - Table-like grid layout */}
-      {!isLoading && viewMode === 'grid' && (
-        <Card>
+      {/* Grid View - Compact uniform tiles */}
+      {!isLoading && viewMode === 'grid' && (() => {
+        const colCount = 5; // 5 columns
+        const itemCount = gridDisplayServices.length;
+        const emptyCount = itemCount > 0 ? (colCount - (itemCount % colCount)) % colCount : 0;
+
+        return (
           <Box sx={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-            gap: 0,
-            border: '1px dashed',
-            borderColor: 'divider',
-            borderRadius: 1,
-            overflow: 'hidden',
+            gridTemplateColumns: 'repeat(5, 1fr)',
+            gap: 0.5,
+            '@media (max-width: 1400px)': { gridTemplateColumns: 'repeat(4, 1fr)' },
+            '@media (max-width: 1100px)': { gridTemplateColumns: 'repeat(3, 1fr)' },
+            '@media (max-width: 800px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
+            '@media (max-width: 500px)': { gridTemplateColumns: '1fr' },
           }}>
-          {displayServices.length === 0 ? (
-            <Box sx={{ p: 4, gridColumn: '1 / -1', textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
-                {t('serverList.noData')}
-              </Typography>
-            </Box>
-          ) : (
-            displayServices.map((service) => {
-              const serviceKey = `${service.labels.service}-${service.instanceId}`;
-              const updatedStatus = updatedServiceIds.get(serviceKey);
-              const isUpdated = updatedStatus !== undefined;
-              // Use service.status for highlight color (current status)
-              const highlightStatus = updatedStatus || service.status;
-              const label = `${service.labels.service}:${service.instanceId.substring(0, 8)}... | ${service.hostname} | ${getStatusBadge(service.status).props.label}`;
-              return (
-                <Tooltip key={serviceKey} title={
-                  <Box>
-                    <Typography variant="caption" sx={{ display: 'block' }}>ID: {service.instanceId}</Typography>
-                    <Typography variant="caption" sx={{ display: 'block' }}>Service: {service.labels.service}</Typography>
-                    {service.labels.group && (
-                      <Typography variant="caption" sx={{ display: 'block' }}>Group: {service.labels.group}</Typography>
-                    )}
-                    <Typography variant="caption" sx={{ display: 'block' }}>Hostname: {service.hostname}</Typography>
-                    <Typography variant="caption" sx={{ display: 'block' }}>External: {service.externalAddress}</Typography>
-                    <Typography variant="caption" sx={{ display: 'block' }}>Internal: {service.internalAddress}</Typography>
-                    {service.stats && Object.keys(service.stats).length > 0 && (
-                      <>
-                        {Object.entries(service.stats).map(([key, value]) => (
-                          <Typography key={`${service.instanceId}-${key}`} variant="caption" sx={{ display: 'block' }}>
-                            {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
-                          </Typography>
-                        ))}
-                      </>
-                    )}
-                    <Typography variant="caption" sx={{ display: 'block' }}>Updated: {formatDateTimeDetailed(service.updatedAt)}</Typography>
-                  </Box>
-                } arrow>
-                  <Box
-                    sx={{
-                      p: 1,
-                      borderRight: '1px dashed',
-                      borderBottom: '1px dashed',
-                      borderColor: 'divider',
-                      fontSize: '0.8125rem',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      cursor: 'default',
-                      bgcolor: isUpdated
-                        ? (theme) => getHighlightColor(highlightStatus, theme)
-                        : 'transparent',
-                      animation: isUpdated ? `flashEffect-${highlightStatus} 2s ease-out` : 'none',
-                      [`@keyframes flashEffect-${highlightStatus}`]: {
-                        '0%': {
-                          bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme),
-                        },
-                        '100%': {
-                          bgcolor: 'transparent',
-                        },
-                      },
-                      '&:hover': {
-                        bgcolor: 'action.hover',
-                      },
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
-                      {getTypeChip(service.labels.service)}
-                      {getStatusBadge(service.status)}
-                    </Box>
-                    <Typography variant="caption" sx={{ display: 'block', fontFamily: 'monospace' }}>
-                      {service.hostname}
-                    </Typography>
-                  </Box>
-                </Tooltip>
-              );
-            })
-          )}
-          </Box>
-        </Card>
-      )}
-
-      {/* Card View - Cards in grid layout */}
-      {!isLoading && viewMode === 'card' && (
-        <Card>
-          <CardContent>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 2 }}>
-          {displayServices.length === 0 ? (
-            <Card>
-              <CardContent>
-                <Typography variant="body2" color="text.secondary" align="center">
-                  {t('serverList.noData')}
-                </Typography>
-              </CardContent>
-            </Card>
-          ) : (
-            displayServices.map((service) => {
-              const serviceKey = `${service.labels.service}-${service.instanceId}`;
-              const updatedStatus = updatedServiceIds.get(serviceKey);
-              const isUpdated = updatedStatus !== undefined;
-              // Use service.status for highlight color (current status)
-              const highlightStatus = updatedStatus || service.status;
-              return (
-              <Card
-                key={serviceKey}
-                sx={{
-                  '&:hover': { boxShadow: 3 },
-                  bgcolor: isUpdated
-                    ? (theme) => getHighlightColor(highlightStatus, theme)
-                    : 'background.paper',
-                  animation: isUpdated ? `flashEffect-${highlightStatus} 2s ease-out` : 'none',
-                  [`@keyframes flashEffect-${highlightStatus}`]: {
-                    '0%': {
-                      bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme),
-                    },
-                    '100%': {
-                      bgcolor: 'background.paper',
-                    },
-                  },
-                }}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                      {getTypeChip(service.labels.service)}
-                      {service.labels.group && (
-                        <Chip
-                          label={service.labels.group}
-                          size="small"
-                          variant="outlined"
-                          color="primary"
-                          sx={{ fontWeight: 600 }}
-                        />
-                      )}
-                    </Box>
-                    {getStatusBadge(service.status)}
-                  </Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                    {service.instanceId}
+            {gridDisplayServices.length === 0 ? (
+              <Card sx={{ gridColumn: '1 / -1' }}>
+                <CardContent sx={{ py: 4, textAlign: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('serverList.noData')}
                   </Typography>
-                  <Typography variant="body2" sx={{ fontFamily: 'monospace', mb: 1 }}>
-                    {service.hostname}
-                  </Typography>
-                  {/* Custom labels */}
-                  {Object.entries(service.labels)
-                    .filter(([key]) => key !== 'service' && key !== 'group')
-                    .length > 0 && (
-                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mb: 1 }}>
-                      {Object.entries(service.labels)
-                        .filter(([key]) => key !== 'service' && key !== 'group')
-                        .map(([key, value]) => (
-                          <Chip
-                            key={`${service.instanceId}-${key}`}
-                            label={`${key}=${value}`}
-                            size="small"
-                            variant="outlined"
-                            sx={{ fontSize: '0.7rem', height: '22px' }}
-                          />
-                        ))}
-                    </Box>
-                  )}
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 2 }}>
-                    <Typography variant="caption" color="text.secondary">
-                      External: {service.externalAddress}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Internal: {service.internalAddress}
-                    </Typography>
-                    {service.ports.tcp && service.ports.tcp.length > 0 && (
-                      <Typography variant="caption" color="text.secondary">
-                        TCP: {service.ports.tcp.join(', ')}
-                      </Typography>
-                    )}
-                    {service.ports.udp && service.ports.udp.length > 0 && (
-                      <Typography variant="caption" color="text.secondary">
-                        UDP: {service.ports.udp.join(', ')}
-                      </Typography>
-                    )}
-                    {service.ports.http && service.ports.http.length > 0 && (
-                      <Typography variant="caption" color="text.secondary">
-                        HTTP: {service.ports.http.join(', ')}
-                      </Typography>
-                    )}
-                    {service.stats && Object.keys(service.stats).length > 0 && (
-                      <>
-                        {Object.entries(service.stats).map(([key, value]) => (
-                          <Typography key={`${service.instanceId}-${key}`} variant="caption" color="text.secondary">
-                            {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
-                          </Typography>
-                        ))}
-                      </>
-                    )}
-                    {service.meta && Object.keys(service.meta).length > 0 && (
-                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 1 }}>
-                        {Object.entries(service.meta).map(([key, value]) => (
-                          <Chip key={`${service.instanceId}-${key}`} label={`${key}: ${value}`} size="small" variant="outlined" />
-                        ))}
-                      </Box>
-                    )}
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                      {formatDateTimeDetailed(service.updatedAt)}
-                    </Typography>
-                  </Box>
                 </CardContent>
               </Card>
-              );
-            })
-          )}
-            </Box>
-          </CardContent>
-        </Card>
-      )}
+            ) : (
+              <>
+                {gridDisplayServices.map((service) => {
+                  const serviceKey = `${service.labels.service}-${service.instanceId}`;
+                  const updatedStatus = updatedServiceIds.get(serviceKey);
+                  const isUpdated = updatedStatus !== undefined;
+                  const isNew = newServiceIds.has(serviceKey);
+                  const highlightStatus = updatedStatus || service.status;
+                  const ports = Object.entries(service.ports || {});
+                  return (
+                    <Card
+                      key={serviceKey}
+                      sx={{
+                        height: 110,
+                        cursor: 'default',
+                        transition: 'all 0.15s ease-in-out',
+                        bgcolor: isUpdated
+                          ? (theme) => getHighlightColor(highlightStatus, theme)
+                          : (theme) => getStatusBgColor(service.status, theme) || 'background.paper',
+                        animation: isNew
+                          ? 'appearEffect 0.5s ease-out'
+                          : isUpdated
+                            ? `flashEffect-${highlightStatus} 2s ease-out`
+                            : 'none',
+                        '@keyframes appearEffect': {
+                          '0%': { opacity: 0, transform: 'scale(0.9)' },
+                          '100%': { opacity: 1, transform: 'scale(1)' },
+                        },
+                        [`@keyframes flashEffect-${highlightStatus}`]: {
+                          '0%': { bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme) },
+                          '100%': { bgcolor: (theme) => getStatusBgColor(service.status, theme) || 'background.paper' },
+                        },
+                        '&:hover': {
+                          boxShadow: 2,
+                        },
+                      }}
+                    >
+                      <CardContent sx={{ p: 1, '&:last-child': { pb: 1 }, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                        {/* Header: Type + Status */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                          {getTypeChip(service.labels.service)}
+                          {getStatusBadge(service.status)}
+                        </Box>
+                        {/* Hostname */}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontFamily: 'monospace',
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {service.hostname}
+                        </Typography>
+                        {/* Group label if exists */}
+                        {service.labels.group && (
+                          <Typography variant="caption" color="primary.main" sx={{ fontSize: '0.65rem', fontWeight: 500 }}>
+                            {service.labels.group}
+                          </Typography>
+                        )}
+                        {/* Spacer */}
+                        <Box sx={{ flex: 1 }} />
+                        {/* Footer: IP + Ports */}
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                          <Typography sx={{ fontFamily: 'monospace', fontSize: '0.75rem', color: 'text.secondary' }}>
+                            {service.externalAddress}
+                          </Typography>
+                          {ports.length > 0 && (
+                            <Typography sx={{ fontFamily: 'monospace', fontSize: '0.7rem', color: 'text.disabled', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {ports.map(([n, p]) => `${n}:${p}`).join(' ')}
+                            </Typography>
+                          )}
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+                {/* Empty placeholder cards */}
+                {Array.from({ length: emptyCount }).map((_, idx) => (
+                  <Card
+                    key={`empty-${idx}`}
+                    variant="outlined"
+                    sx={{
+                      height: 110,
+                      borderStyle: 'dashed',
+                      borderColor: 'divider',
+                      bgcolor: (theme) => theme.palette.mode === 'dark'
+                        ? 'rgba(0, 0, 0, 0.2)'
+                        : 'rgba(0, 0, 0, 0.04)',
+                    }}
+                  />
+                ))}
+              </>
+            )}
+          </Box>
+        );
+      })()}
+
+      {/* Card View - Uniform detailed cards in grid layout */}
+      {!isLoading && viewMode === 'card' && (() => {
+        const colCount = 3;
+        const itemCount = gridDisplayServices.length;
+        const emptyCount = itemCount > 0 ? (colCount - (itemCount % colCount)) % colCount : 0;
+
+        return (
+          <Box sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 1.5,
+            '@media (max-width: 1200px)': { gridTemplateColumns: 'repeat(2, 1fr)' },
+            '@media (max-width: 768px)': { gridTemplateColumns: '1fr' },
+          }}>
+            {gridDisplayServices.length === 0 ? (
+              <Card sx={{ gridColumn: '1 / -1' }}>
+                <CardContent sx={{ py: 4, textAlign: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('serverList.noData')}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                {gridDisplayServices.map((service) => {
+                  const serviceKey = `${service.labels.service}-${service.instanceId}`;
+                  const updatedStatus = updatedServiceIds.get(serviceKey);
+                  const isUpdated = updatedStatus !== undefined;
+                  const isNew = newServiceIds.has(serviceKey);
+                  const highlightStatus = updatedStatus || service.status;
+                  const customLabels = Object.entries(service.labels).filter(([key]) => key !== 'service' && key !== 'group');
+                  const ports = Object.entries(service.ports || {});
+
+                  return (
+                    <Card
+                      key={serviceKey}
+                      sx={{
+                        height: 200,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        transition: 'all 0.15s ease-in-out',
+                        '&:hover': { boxShadow: 3 },
+                        bgcolor: isUpdated
+                          ? (theme) => getHighlightColor(highlightStatus, theme)
+                          : (theme) => getStatusBgColor(service.status, theme) || 'background.paper',
+                        animation: isNew
+                          ? 'appearEffect 0.5s ease-out'
+                          : isUpdated
+                            ? `flashEffect-${highlightStatus} 2s ease-out`
+                            : 'none',
+                        '@keyframes appearEffect': {
+                          '0%': { opacity: 0, transform: 'scale(0.9)' },
+                          '100%': { opacity: 1, transform: 'scale(1)' },
+                        },
+                        [`@keyframes flashEffect-${highlightStatus}`]: {
+                          '0%': { bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme) },
+                          '100%': { bgcolor: (theme) => getStatusBgColor(service.status, theme) || 'background.paper' },
+                        },
+                      }}
+                    >
+                      <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        {/* Header: Type + Group + Status */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                            {getTypeChip(service.labels.service)}
+                            {service.labels.group && (
+                              <Chip
+                                label={service.labels.group}
+                                size="small"
+                                variant="outlined"
+                                color="primary"
+                                sx={{ fontWeight: 500, height: 20, fontSize: '0.7rem' }}
+                              />
+                            )}
+                          </Box>
+                          {getStatusBadge(service.status)}
+                        </Box>
+
+                        {/* Hostname */}
+                        <Typography
+                          variant="body2"
+                          sx={{ fontFamily: 'monospace', fontWeight: 600 }}
+                        >
+                          {service.hostname}
+                        </Typography>
+
+                        {/* Instance ID */}
+                        <Typography
+                          variant="caption"
+                          color="text.disabled"
+                          sx={{ fontFamily: 'monospace', fontSize: '0.65rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                        >
+                          {service.instanceId}
+                        </Typography>
+
+                        {/* Info Grid */}
+                        <Box sx={{
+                          mt: 1,
+                          display: 'grid',
+                          gridTemplateColumns: 'auto 1fr',
+                          gap: 0.25,
+                          '& .label': { color: 'text.secondary', fontSize: '0.8rem', minWidth: 55 },
+                          '& .value': { fontFamily: 'monospace', fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+                        }}>
+                          <Typography className="label">External</Typography>
+                          <Typography className="value">{service.externalAddress}</Typography>
+                          <Typography className="label">Internal</Typography>
+                          <Typography className="value">{service.internalAddress}</Typography>
+                          {ports.length > 0 && (
+                            <>
+                              <Typography className="label">Ports</Typography>
+                              <Typography className="value">{ports.map(([n, p]) => `${n}:${p}`).join(', ')}</Typography>
+                            </>
+                          )}
+                        </Box>
+
+                        {/* Custom labels */}
+                        {customLabels.length > 0 && (
+                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
+                            {customLabels.map(([key, value]) => (
+                              <Chip
+                                key={`${service.instanceId}-${key}`}
+                                label={`${key}=${value}`}
+                                size="small"
+                                variant="outlined"
+                                sx={{ fontSize: '0.65rem', height: 18 }}
+                              />
+                            ))}
+                          </Box>
+                        )}
+
+                        {/* Spacer */}
+                        <Box sx={{ flex: 1 }} />
+
+                        {/* Stats */}
+                        {service.stats && Object.keys(service.stats).length > 0 && (
+                          <Box sx={{
+                            mt: 1,
+                            p: 0.75,
+                            bgcolor: 'action.hover',
+                            borderRadius: 1,
+                            display: 'flex',
+                            gap: 2,
+                            flexWrap: 'wrap',
+                            justifyContent: 'center',
+                          }}>
+                            {Object.entries(service.stats).map(([key, value]) => (
+                              <Box key={`${service.instanceId}-${key}`} sx={{ textAlign: 'center' }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.6rem' }}>
+                                  {key}
+                                </Typography>
+                                <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
+                                  {typeof value === 'number' ? value.toFixed(1) : String(value)}
+                                </Typography>
+                              </Box>
+                            ))}
+                          </Box>
+                        )}
+
+                        {/* Footer: Updated time */}
+                        <Box sx={{ mt: 0.5, pt: 0.5, borderTop: 1, borderColor: 'divider', display: 'flex', justifyContent: 'flex-end' }}>
+                          <RelativeTime date={service.updatedAt} variant="caption" color="text.disabled" />
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+                {/* Empty placeholder cards */}
+                {Array.from({ length: emptyCount }).map((_, idx) => (
+                  <Card
+                    key={`empty-card-${idx}`}
+                    variant="outlined"
+                    sx={{
+                      height: 200,
+                      borderStyle: 'dashed',
+                      borderColor: 'divider',
+                      bgcolor: (theme) => theme.palette.mode === 'dark'
+                        ? 'rgba(0, 0, 0, 0.2)'
+                        : 'rgba(0, 0, 0, 0.04)',
+                    }}
+                  />
+                ))}
+              </>
+            )}
+          </Box>
+        );
+      })()}
 
       {/* Column Settings Popover */}
       <Popover

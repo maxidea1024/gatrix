@@ -4146,6 +4146,7 @@
       "region": "Region",
       "env": "Environment",
       "role": "Role",
+      "hostname": "Hostname",
       "internalAddress": "Internal IP",
       "externalAddress": "External IP"
     },
@@ -4156,6 +4157,22 @@
       "error": "Error",
       "terminated": "Terminated",
       "noResponse": "No Response"
+    },
+    "statusTooltip": {
+      "initializing": "The server is starting up and loading configuration. It will automatically transition to 'Online' when ready.",
+      "ready": "The server is running normally and accepting connections.",
+      "shuttingDown": "The server is in the process of graceful shutdown. New connections may be refused.",
+      "error": "The server encountered an error and may not be functioning correctly. Check the server logs for details.",
+      "terminated": "The server has been shut down or has stopped. This is the final state.",
+      "noResponse": "The server has not sent a heartbeat within the expected interval. It may be unresponsive or experiencing network issues."
+    },
+    "healthCheck": {
+      "tooltip": "Check server health (ping /health endpoint)",
+      "healthyTooltip": "Healthy ({{latency}}ms)",
+      "unhealthyTooltip": "Unhealthy: {{error}}",
+      "success": "Server is healthy ({{latency}}ms)",
+      "failed": "Server health check failed: {{error}}",
+      "error": "Failed to perform health check"
     },
     "table": {
       "instanceId": "Instance ID",
@@ -4170,7 +4187,8 @@
       "stats": "Stats",
       "meta": "Meta Info",
       "createdAt": "Created At",
-      "updatedAt": "Updated At"
+      "updatedAt": "Updated At",
+      "actions": "Actions"
     }
   },
   "REWARD_TYPE_POINT": "Point",

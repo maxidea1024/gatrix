@@ -206,6 +206,97 @@ router.get('/config', ServiceDiscoveryConfigController.getConfig);
 router.put('/config', ServiceDiscoveryConfigController.updateConfig);
 
 /**
+ * Health check a service instance
+ * POST /api/v1/admin/services/:type/:instanceId/health
+ * Pings the service's web port /health endpoint
+ */
+router.post('/:type/:instanceId/health', async (req: Request, res: Response) => {
+  try {
+    const { type, instanceId } = req.params;
+
+    if (!type || !instanceId) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'type and instanceId are required' },
+      });
+    }
+
+    // Get the service instance to find its web port and address
+    const services = await serviceDiscoveryService.getServices(type);
+    const service = services.find(s => s.instanceId === instanceId);
+
+    if (!service) {
+      return res.status(404).json({
+        success: false,
+        error: { message: 'Service not found' },
+      });
+    }
+
+    // Check if service has a web port
+    const webPort = service.ports?.web || service.ports?.http || service.ports?.api;
+    if (!webPort) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Service does not have a web/http/api port' },
+      });
+    }
+
+    // Determine which address to use (prefer internal for server-to-server communication)
+    const address = service.internalAddress || service.externalAddress;
+    const healthUrl = `http://${address}:${webPort}/health`;
+
+    logger.info(`Health checking service: ${type}:${instanceId} at ${healthUrl}`);
+
+    // Make HTTP request to the service's health endpoint
+    const axios = (await import('axios')).default;
+    const startTime = Date.now();
+
+    try {
+      const response = await axios.get(healthUrl, {
+        timeout: 5000, // 5 second timeout
+      });
+      const latency = Date.now() - startTime;
+
+      res.json({
+        success: true,
+        data: {
+          healthy: true,
+          status: response.status,
+          latency,
+          response: response.data,
+          url: healthUrl,
+        },
+      });
+    } catch (healthError: any) {
+      const latency = Date.now() - startTime;
+      const status = healthError.response?.status || 0;
+      const message = healthError.code === 'ECONNREFUSED'
+        ? 'Connection refused'
+        : healthError.code === 'ETIMEDOUT' || healthError.code === 'ECONNABORTED'
+          ? 'Connection timeout'
+          : healthError.message || 'Unknown error';
+
+      res.json({
+        success: true,
+        data: {
+          healthy: false,
+          status,
+          latency,
+          error: message,
+          url: healthUrl,
+        },
+      });
+    }
+  } catch (error) {
+    logger.error('Error during health check:', error);
+    res.status(500).json({
+      success: false,
+      error: { message: 'Failed to perform health check' },
+    });
+  }
+});
+
+/**
  * Delete a service instance
  * DELETE /api/v1/admin/services/:type/:instanceId
  */

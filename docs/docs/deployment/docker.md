@@ -220,11 +220,11 @@ All persistent data (MySQL, Redis, ClickHouse, logs, etc.) is stored under the `
 
 The `DATA_ROOT` environment variable controls where all Docker volumes are stored:
 
-| Service | Host Path | Container Path |
+| Service | Host Path / Volume | Container Path |
 |---------|-----------|----------------|
 | MySQL | `${DATA_ROOT}/mysql` | `/var/lib/mysql` |
 | Redis | `${DATA_ROOT}/redis` | `/data` |
-| ClickHouse | `${DATA_ROOT}/clickhouse` | `/var/lib/clickhouse` |
+| ClickHouse | `clickhouse-data` (named volume) | `/var/lib/clickhouse` |
 | Backend Logs | `${DATA_ROOT}/backend/logs` | `/app/logs` |
 | Backend Data | `${DATA_ROOT}/backend/data` | `/app/data` |
 | Event Lens Logs | `${DATA_ROOT}/event-lens/logs` | `/app/logs` |
@@ -255,7 +255,6 @@ Result: All data stored in `/data/gatrix/mysql`, `/data/gatrix/redis`, etc. (abs
 ${DATA_ROOT}/
 ├── mysql/              # MySQL database files
 ├── redis/              # Redis persistence
-├── clickhouse/         # ClickHouse data
 ├── backend/
 │   ├── logs/           # Backend application logs
 │   └── data/           # Backend data files
@@ -268,6 +267,9 @@ ${DATA_ROOT}/
 ├── prometheus/         # Prometheus metrics storage
 ├── grafana/            # Grafana dashboards & settings
 └── loki/               # Loki log aggregation
+
+# Managed by Docker (named volumes):
+# - clickhouse-data     # ClickHouse data (use docker volume commands)
 ```
 
 ### Important Notes
@@ -275,6 +277,63 @@ ${DATA_ROOT}/
 1. **Directory Permissions**: Ensure the `DATA_ROOT` directory has proper permissions for Docker to read/write
 2. **Data Migration**: When switching from named volumes to bind mounts, existing data needs to be migrated manually
 3. **Backup**: All persistent data is in one location, making backup easier
+
+### ClickHouse Named Volume
+
+**ClickHouse uses a Docker named volume (`clickhouse-data`) instead of a bind mount.** This is intentional and should not be changed.
+
+#### Why Named Volume?
+
+ClickHouse's MergeTree storage engine uses atomic file rename operations during data writes:
+1. Data is first written to a temporary directory (`tmp_insert_*`)
+2. The directory is atomically renamed to its final location
+
+This works perfectly on native Linux filesystems but **fails on certain configurations**:
+- **Windows Docker Desktop**: NTFS bind mounts don't support atomic renames properly
+- **Some network filesystems**: NFS/CIFS may have similar issues
+
+**Symptoms of bind mount issues:**
+```
+filesystem error: in rename: No such file or directory
+["/var/lib/clickhouse/store/.../tmp_insert_202512_1_1_0/"]
+["/var/lib/clickhouse/store/.../202512_1_1_0/"]
+```
+
+#### Volume Management
+
+Since ClickHouse uses a named volume, data is managed differently:
+
+```bash
+# List Docker volumes
+docker volume ls | grep clickhouse
+
+# Inspect volume
+docker volume inspect gatrix_clickhouse-data
+
+# Backup ClickHouse data
+docker run --rm -v gatrix_clickhouse-data:/source -v $(pwd):/backup alpine \
+  tar czf /backup/clickhouse-backup.tar.gz -C /source .
+
+# Restore ClickHouse data
+docker run --rm -v gatrix_clickhouse-data:/target -v $(pwd):/backup alpine \
+  tar xzf /backup/clickhouse-backup.tar.gz -C /target
+
+# Remove volume (WARNING: deletes all ClickHouse data)
+docker volume rm gatrix_clickhouse-data
+```
+
+#### If You Must Use Bind Mount (Linux Only)
+
+If you need bind mount for easier data access on a Linux server, ensure:
+1. The host is running native Linux (not WSL or Docker Desktop)
+2. The filesystem is ext4 or XFS
+3. Add to docker-compose:
+```yaml
+volumes:
+  - ${DATA_ROOT}/clickhouse:/var/lib/clickhouse
+```
+
+**Note**: This is not recommended and may cause issues on some systems.
 
 ## Team Rule
 

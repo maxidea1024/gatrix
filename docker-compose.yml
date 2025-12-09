@@ -138,6 +138,9 @@ services:
       start_period: 30s
 
   # ClickHouse
+  # NOTE: Using named volume instead of bind mount to avoid filesystem compatibility issues
+  # ClickHouse's MergeTree engine requires atomic rename operations that may fail with bind mounts
+  # on certain filesystems (especially Windows NTFS, but can also occur on some Linux configurations)
   clickhouse:
     image: clickhouse/clickhouse-server:24.12.2.29
     container_name: gatrix-clickhouse
@@ -147,7 +150,7 @@ services:
       - "${CLICKHOUSE_HTTP_PORT:-58123}:8123"
       - "${CLICKHOUSE_NATIVE_PORT:-59000}:9000"
     volumes:
-      - ${DATA_ROOT:-./data}/clickhouse:/var/lib/clickhouse
+      - clickhouse-data:/var/lib/clickhouse
     networks:
       - gatrix-network
     healthcheck:
@@ -521,3 +524,6 @@ networks:
     ipam:
       config:
         - subnet: 172.22.0.0/16
+
+volumes:
+  clickhouse-data:

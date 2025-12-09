@@ -83,6 +83,22 @@ class ServiceDiscoveryService {
   }
 
   /**
+   * Health check a service instance
+   * Pings the service's web port /health endpoint
+   */
+  async healthCheck(serviceType: string, instanceId: string): Promise<{
+    healthy: boolean;
+    status: number;
+    latency: number;
+    response?: any;
+    error?: string;
+    url: string;
+  }> {
+    const response = await api.post(`/admin/services/${serviceType}/${instanceId}/health`);
+    return response.data;
+  }
+
+  /**
    * Create SSE connection for real-time updates
    * Safari compatibility: Add timestamp to prevent caching
    */
