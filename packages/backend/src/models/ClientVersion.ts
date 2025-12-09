@@ -225,9 +225,10 @@ export class ClientVersionModel {
     }
   }
 
-  static async findById(id: number): Promise<any | null> {
+  static async findById(id: number, trx?: any): Promise<any | null> {
     try {
-      const clientVersion = await db('g_client_versions as cv')
+      const query = trx ? trx('g_client_versions as cv') : db('g_client_versions as cv');
+      const clientVersion = await query
         .leftJoin('g_users as creator', 'cv.createdBy', 'creator.id')
         .leftJoin('g_users as updater', 'cv.updatedBy', 'updater.id')
         .select([

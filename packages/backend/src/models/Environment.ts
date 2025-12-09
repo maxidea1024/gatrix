@@ -250,6 +250,7 @@ export class Environment extends Model implements EnvironmentData {
     const safeQuery = async <T>(
       tableName: string,
       selectColumns: string[],
+      modifyQuery?: (builder: any) => void
     ): Promise<{ count: number; items: T[] }> => {
       try {
         // Check if table has environmentId column
@@ -257,11 +258,21 @@ export class Environment extends Model implements EnvironmentData {
         if (columns[0].length === 0) {
           return { count: 0, items: [] };
         }
-        const countResult = await knex(tableName).where('environmentId', this.id).count('* as count').first();
+
+        let query = knex(tableName).where('environmentId', this.id);
+        if (modifyQuery) {
+          modifyQuery(query);
+        }
+
+        // Clone query for count
+        const countQuery = query.clone().count('* as count').first();
+        const countResult = await countQuery;
         const count = Number(countResult?.count || 0);
+
         const items = count > 0
-          ? await knex(tableName).where('environmentId', this.id).select(selectColumns).limit(maxItems)
+          ? await query.clone().select(selectColumns).limit(maxItems)
           : [];
+
         return { count, items: items as T[] };
       } catch {
         return { count: 0, items: [] };
@@ -287,8 +298,18 @@ export class Environment extends Model implements EnvironmentData {
       safeQuery<{ id: string; name: string }>('g_remote_config_templates', ['id', 'name']),
       safeQuery<{ id: string; worldId: string; name: string }>('g_game_worlds', ['id', 'worldId', 'name']),
       safeQuery<{ id: string; name: string }>('g_remote_config_segments', ['id', 'name']),
+      // Tags are global now, but if column exists we count, otherwise 0.
+      // Since we just removed environmentId from tags in logic, safeQuery might fail or return 0 if column missing.
+      // But typically safeQuery checks for column existence.
+      // The user wants tags to be global, so getting "related data" for environment might not make sense for tags anymore.
+      // However, for consistency, if column remains (rollback) it counts. 
+      // If column is gone (migration applied), safeQuery returns 0.
       safeQuery<{ id: string; name: string }>('g_tags', ['id', 'name']),
-      safeQuery<{ id: string; varKey: string }>('g_vars', ['id', 'varKey']),
+      safeQuery<{ id: string; varKey: string }>('g_vars', ['id', 'varKey'], (qb) => {
+        qb.where(function (this: any) {
+          this.where('varKey', 'like', 'kv:%').orWhere('varKey', 'like', '$%');
+        });
+      }),
       safeQuery<{ id: string; name: string }>('g_message_templates', ['id', 'name']),
       safeQuery<{ id: string; title: string }>('g_service_notices', ['id', 'title']),
       safeQuery<{ id: string; description: string }>('g_ingame_popup_notices', ['id', 'description']),
