@@ -246,10 +246,11 @@ export class ClientVersionModel {
       }
 
       // 태그 정보 로드
-      const tags = await this.getTags(id);
+      const tags = await this.getTags(id, trx);
 
       // 점검 메시지 로케일 정보 로드
-      const maintenanceLocales = await db('g_client_version_maintenance_locales')
+      const localesQuery = trx ? trx('g_client_version_maintenance_locales') : db('g_client_version_maintenance_locales');
+      const maintenanceLocales = await localesQuery
         .where('clientVersionId', id)
         .select('lang', 'message');
 
@@ -294,7 +295,7 @@ export class ClientVersionModel {
           await trx('g_client_version_maintenance_locales').insert(localeInserts);
         }
 
-        return await this.findById(insertId);
+        return await this.findById(insertId, trx);
       });
     } catch (error) {
       logger.error('Error creating client version:', error);
@@ -338,7 +339,7 @@ export class ClientVersionModel {
           }
         }
 
-        return await this.findById(id);
+        return await this.findById(id, trx);
       });
     } catch (error) {
       logger.error('Error updating client version:', error);
@@ -534,9 +535,10 @@ export class ClientVersionModel {
     }
   }
 
-  static async getTags(clientVersionId: number): Promise<any[]> {
+  static async getTags(clientVersionId: number, trx?: any): Promise<any[]> {
     try {
-      const tags = await db('g_tag_assignments as ta')
+      const query = trx ? trx('g_tag_assignments as ta') : db('g_tag_assignments as ta');
+      const tags = await query
         .join('g_tags as t', 'ta.tagId', 't.id')
         .select(['t.id', 't.name', 't.color', 't.description'])
         .where('ta.entityType', 'client_version')
