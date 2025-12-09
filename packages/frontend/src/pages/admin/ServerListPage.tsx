@@ -55,6 +55,7 @@ import {
   PlayArrow as PlayArrowIcon,
   CleaningServices as CleaningServicesIcon,
   NetworkCheck as NetworkCheckIcon,
+  Favorite as FavoriteIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -196,6 +197,9 @@ const ServerListPage: React.FC = () => {
   // Track newly added service IDs for appearance animation
   const [newServiceIds, setNewServiceIds] = useState<Set<string>>(new Set());
 
+  // Track heartbeat for pulse animation
+  const [heartbeatIds, setHeartbeatIds] = useState<Set<string>>(new Set());
+
   // Cleanup confirmation dialog
   const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false);
 
@@ -332,13 +336,14 @@ const ServerListPage: React.FC = () => {
             if (event.type === 'put') {
               setServices((prev) => {
                 const index = prev.findIndex((s) => s.instanceId === event.data.instanceId && s.labels.service === event.data.labels.service);
+                const serviceKey = `${event.data.labels.service}-${event.data.instanceId}`;
+
                 if (index >= 0) {
                   // Update existing - only highlight if status actually changed (not just heartbeat update)
                   const prevService = prev[index];
                   const statusChanged = prevService.status !== event.data.status;
 
                   if (statusChanged) {
-                    const serviceKey = `${event.data.labels.service}-${event.data.instanceId}`;
                     setUpdatedServiceIds((prevIds) => new Map(prevIds).set(serviceKey, event.data.status));
                     setTimeout(() => {
                       setUpdatedServiceIds((prevIds) => {
@@ -349,12 +354,21 @@ const ServerListPage: React.FC = () => {
                     }, 2000);
                   }
 
+                  // Trigger heartbeat pulse animation (for any update including heartbeat)
+                  setHeartbeatIds((prevIds) => new Set(prevIds).add(serviceKey));
+                  setTimeout(() => {
+                    setHeartbeatIds((prevIds) => {
+                      const newSet = new Set(prevIds);
+                      newSet.delete(serviceKey);
+                      return newSet;
+                    });
+                  }, 600); // Short pulse duration
+
                   const newServices = [...prev];
                   newServices[index] = event.data;
                   return newServices;
                 } else {
                   // Add new service - trigger appearance animation
-                  const serviceKey = `${event.data.labels.service}-${event.data.instanceId}`;
                   setNewServiceIds((prevIds) => new Set(prevIds).add(serviceKey));
                   setTimeout(() => {
                     setNewServiceIds((prevIds) => {
@@ -1332,7 +1346,24 @@ const ServerListPage: React.FC = () => {
                           case 'status':
                             return (
                               <TableCell key={column.id}>
-                                {getStatusBadge(service.status)}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  {getStatusBadge(service.status)}
+                                  <FavoriteIcon
+                                    sx={{
+                                      fontSize: 12,
+                                      color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
+                                      opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
+                                      animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
+                                      '@keyframes heartbeat': {
+                                        '0%': { transform: 'scale(1)' },
+                                        '25%': { transform: 'scale(1.3)' },
+                                        '50%': { transform: 'scale(1)' },
+                                        '75%': { transform: 'scale(1.2)' },
+                                        '100%': { transform: 'scale(1)' },
+                                      },
+                                    }}
+                                  />
+                                </Box>
                               </TableCell>
                             );
                           case 'stats':
@@ -1494,7 +1525,24 @@ const ServerListPage: React.FC = () => {
                         {/* Header: Type + Status */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
                           {getTypeChip(service.labels.service)}
-                          {getStatusBadge(service.status)}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            {getStatusBadge(service.status)}
+                            <FavoriteIcon
+                              sx={{
+                                fontSize: 10,
+                                color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
+                                opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
+                                animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
+                                '@keyframes heartbeat': {
+                                  '0%': { transform: 'scale(1)' },
+                                  '25%': { transform: 'scale(1.3)' },
+                                  '50%': { transform: 'scale(1)' },
+                                  '75%': { transform: 'scale(1.2)' },
+                                  '100%': { transform: 'scale(1)' },
+                                },
+                              }}
+                            />
+                          </Box>
                         </Box>
                         {/* Hostname */}
                         <Typography
@@ -1629,7 +1677,24 @@ const ServerListPage: React.FC = () => {
                               />
                             )}
                           </Box>
-                          {getStatusBadge(service.status)}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            {getStatusBadge(service.status)}
+                            <FavoriteIcon
+                              sx={{
+                                fontSize: 12,
+                                color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
+                                opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
+                                animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
+                                '@keyframes heartbeat': {
+                                  '0%': { transform: 'scale(1)' },
+                                  '25%': { transform: 'scale(1.3)' },
+                                  '50%': { transform: 'scale(1)' },
+                                  '75%': { transform: 'scale(1.2)' },
+                                  '100%': { transform: 'scale(1)' },
+                                },
+                              }}
+                            />
+                          </Box>
                         </Box>
 
                         {/* Hostname */}
