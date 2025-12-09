@@ -626,13 +626,61 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
   /**
    * Clean up all inactive services (terminated, error, no-response)
-   * Only delete services that have been inactive longer than terminated TTL.
+   * Deletes inactive services from Redis immediately (bypassing TTL wait).
    */
   async cleanupInactiveServices(serviceTypes: string[]): Promise<{ deletedCount: number; serviceTypes: string[] }> {
-    // With Hybrid Redis approach, cleanup is automated by Redis TTL.
-    // However, we might want to ensure consistency or clean up stragglers in Etcd if any.
-    // For now, we mainly rely on Redis TTL.
-    return { deletedCount: 0, serviceTypes };
+    const client = redisClient.getClient();
+    if (!client) {
+      logger.warn('Redis client not available for cleanup');
+      return { deletedCount: 0, serviceTypes };
+    }
+
+    let totalDeletedCount = 0;
+    const affectedServiceTypes: string[] = [];
+
+    try {
+      // Get all inactive services from Redis
+      const inactiveServices = await this.getInactiveFromRedis();
+
+      if (inactiveServices.length === 0) {
+        logger.info('No inactive services to clean up');
+        return { deletedCount: 0, serviceTypes: [] };
+      }
+
+      // Delete each inactive service
+      for (const service of inactiveServices) {
+        try {
+          const serviceType = service.labels.service;
+          const instanceId = service.instanceId;
+          const key = `service-discovery:inactive:${serviceType}:${instanceId}`;
+
+          // Delete from Redis
+          await client.del(key);
+          totalDeletedCount++;
+
+          // Track affected service types
+          if (!affectedServiceTypes.includes(serviceType)) {
+            affectedServiceTypes.push(serviceType);
+          }
+
+          // Broadcast delete event to SSE clients
+          this.broadcastEvent({
+            type: 'delete',
+            instance: service,
+          });
+
+          logger.info(`🗑️ Cleaned up inactive service: ${serviceType}:${instanceId}`);
+        } catch (error) {
+          logger.error(`Failed to cleanup service ${service.labels.service}:${service.instanceId}:`, error);
+        }
+      }
+
+      logger.info(`✅ Cleanup complete: ${totalDeletedCount} inactive services deleted`);
+    } catch (error) {
+      logger.error('Failed to cleanup inactive services:', error);
+    }
+
+    return { deletedCount: totalDeletedCount, serviceTypes: affectedServiceTypes };
   }
 
   /**
