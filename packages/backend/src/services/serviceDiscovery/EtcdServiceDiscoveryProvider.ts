@@ -13,6 +13,7 @@ import {
   WatchCallback,
   UpdateServiceStatusInput,
 } from '../../types/serviceDiscovery';
+import redisClient from '../../config/redis';
 
 // Dynamic import to make etcd3 optional
 let Etcd3: any;
@@ -149,8 +150,8 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
         logger.info(`Service deleted permanently: ${serviceType}:${instanceId}`);
       } else {
-        // Graceful unregister: mark as terminated with configured TTL
-        // First, get the current service data
+        // Graceful unregister
+        // Move to Redis as inactive with TTL, then remove from Etcd
         const currentValue = await this.client.get(key).string();
         if (currentValue) {
           try {
@@ -160,22 +161,20 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
             serviceData.status = 'terminated';
             serviceData.updatedAt = new Date().toISOString();
 
-            // Clear old lease
+            // Save to Redis with TTL
+            await this.saveInactiveToRedis(serviceData);
+
+            // Remove from Etcd
             if (lease) {
               await lease.revoke();
               this.leases.delete(leaseKey);
+            } else {
+              await this.client.delete().key(key);
             }
 
-            // Create new lease with configured TTL (no autoKeepAlive for terminated services)
-            const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
-            const newLease = this.client.lease(terminatedTTL, { autoKeepAlive: false });
-            await newLease.put(key).value(JSON.stringify(serviceData));
-            this.leases.set(leaseKey, newLease);
-
-            logger.info(`Service marked as terminated: ${serviceType}:${instanceId} (will be cleaned up in ${terminatedTTL}s)`);
+            logger.info(`Service moved to inactive (Redis): ${serviceType}:${instanceId}`);
           } catch (parseError) {
             logger.warn(`Failed to parse service data for ${serviceType}:${instanceId}, deleting instead:`, parseError);
-            // Fallback to deletion if parsing fails
             if (lease) {
               await lease.revoke();
               this.leases.delete(leaseKey);
@@ -184,12 +183,11 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
             }
           }
         } else {
-          // Service not found, just clean up lease
+          // Service not found, cleaning up local lease
           if (lease) {
             await lease.revoke();
             this.leases.delete(leaseKey);
           }
-          logger.warn(`Service not found for graceful unregister: ${serviceType}:${instanceId}`);
         }
       }
     } catch (error) {
@@ -259,25 +257,28 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
       instance.updatedAt = new Date().toISOString();
 
-      // For terminated/error servers, create a new lease with configured TTL
+      // For terminated/error servers, move to Redis and delete from Etcd
       if (instance.status === 'terminated' || instance.status === 'error') {
-        // Revoke old lease if exists
+        const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
+
+        // Save to Redis
+        await this.saveInactiveToRedis(instance);
+
+        // Delete from Etcd
         if (lease) {
           try {
             await lease.revoke();
+            this.leases.delete(leaseKey);
           } catch (error) {
-            logger.warn(`Failed to revoke old lease for ${leaseKey}:`, error);
+            logger.warn(`Failed to revoke lease for ${leaseKey}:`, error);
           }
+        } else {
+          await this.client.delete().key(key);
         }
 
-        // Create new lease with configured TTL
-        const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
-        const newLease = this.client.lease(terminatedTTL, { autoKeepAlive: false });
-        await newLease.put(key).value(JSON.stringify(instance));
-        this.leases.set(leaseKey, newLease);
-        lease = newLease;
-
-        logger.debug(`Service status updated: ${serviceType}:${input.instanceId} -> ${instance.status} (TTL: ${terminatedTTL}s)`);
+        logger.debug(`Service moved to inactive (Redis): ${serviceType}:${input.instanceId} -> ${instance.status}`);
+        // Return early since it's removed from Etcd
+        return;
       } else {
         // For other statuses (ready, etc.)
         const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
@@ -314,6 +315,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     let instances: ServiceInstance[] = [];
 
     try {
+      // 1. Get Active services from Etcd
       const prefix = serviceType ? this.getTypePrefix(serviceType) : '/services/';
       const keys = await this.client.getAll().prefix(prefix).keys();
 
@@ -323,6 +325,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           instances.push(JSON.parse(value));
         }
       }
+
+      // 2. Get Inactive services from Redis
+      const inactiveInstances = await this.getInactiveFromRedis(serviceType);
+      instances = [...instances, ...inactiveInstances];
 
       // Filter by serviceGroup if specified
       if (serviceGroup) {
@@ -344,41 +350,17 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
   }
 
   async getInactiveServices(serviceType?: string, serviceGroup?: string): Promise<ServiceInstance[]> {
-    // In etcd mode, we need to check all services including those with terminated status
-    // because getServices() only returns active services
-    const inactiveServices: ServiceInstance[] = [];
-
+    // In new hybrid mode, get inactive from Redis
     try {
-      // Get all services from etcd with prefix
-      const prefix = '/services/';
-      const services = await this.client.getAll().prefix(prefix).strings();
-      logger.info(`getInactiveServices: Found ${Object.keys(services).length} total services in etcd`);
+      let inactiveServices = await this.getInactiveFromRedis(serviceType);
 
-      for (const [key, value] of Object.entries(services)) {
-        try {
-          const service = JSON.parse(value as string);
-
-          // Filter by status
-          if (service.status === 'terminated' || service.status === 'error' || service.status === 'no-response') {
-            // Filter by serviceType if provided
-            if (serviceType && service.labels?.service !== serviceType) {
-              continue;
-            }
-            // Filter by serviceGroup if provided
-            if (serviceGroup && service.labels?.group !== serviceGroup) {
-              continue;
-            }
-            logger.info(`getInactiveServices: Found inactive service ${service.labels?.service}:${service.instanceId} with status=${service.status}`);
-            inactiveServices.push(service);
-          }
-        } catch (parseError) {
-          logger.warn(`Failed to parse service data from key ${key}:`, parseError);
-        }
+      if (serviceGroup) {
+        inactiveServices = inactiveServices.filter(s => s.labels?.group === serviceGroup);
       }
 
       return inactiveServices;
     } catch (error) {
-      logger.error('Failed to get inactive services from etcd:', error);
+      logger.error('Failed to get inactive services:', error);
       return [];
     }
   }
@@ -501,24 +483,24 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           service.status = 'no-response';
           service.updatedAt = new Date(now).toISOString();
 
-          const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
+          // Move to Redis
+          await this.saveInactiveToRedis(service);
 
-          // Best-effort: switch the key to a new lease with terminated TTL
+          // Remove from Etcd
           const existingLease = this.leases.get(leaseKey);
           if (existingLease) {
             try {
               await existingLease.revoke();
+              this.leases.delete(leaseKey);
             } catch (error) {
-              logger.warn(`Failed to revoke old lease for ${leaseKey} while marking no-response:`, error);
+              logger.warn(`Failed to revoke lease for ${leaseKey} while marking no-response:`, error);
             }
+          } else {
+            await this.client.delete().key(key);
           }
 
-          const newLease = this.client.lease(terminatedTTL, { autoKeepAlive: false });
-          await newLease.put(key).value(JSON.stringify(service));
-          this.leases.set(leaseKey, newLease);
-
           logger.info(
-            `Service marked as no-response: ${service.labels.service}:${service.instanceId} (TTL: ${terminatedTTL}s)`,
+            `Service moved to inactive (Redis, no-response): ${service.labels.service}:${service.instanceId}`,
           );
         } catch (error) {
           logger.error(
@@ -537,53 +519,10 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
    * Only delete services that have been inactive longer than terminated TTL.
    */
   async cleanupInactiveServices(serviceTypes: string[]): Promise<{ deletedCount: number; serviceTypes: string[] }> {
-    let totalDeletedCount = 0;
-
-    try {
-      const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
-      const now = Date.now();
-
-      // Get all services and filter by status + age
-      const allServices = await this.getServices();
-      const inactiveServices = allServices.filter((s) => {
-        if (s.status !== 'terminated' && s.status !== 'error' && s.status !== 'no-response') {
-          return false;
-        }
-
-        if (!s.updatedAt) {
-          // If we do not have updatedAt, be conservative and delete
-          return true;
-        }
-
-        const updatedAtMs = new Date(s.updatedAt).getTime();
-        if (!updatedAtMs || Number.isNaN(updatedAtMs)) {
-          return true;
-        }
-
-        const diffSeconds = (now - updatedAtMs) / 1000;
-        return diffSeconds >= terminatedTTL;
-      });
-
-      // Delete each old inactive service
-      for (const service of inactiveServices) {
-        try {
-          const key = this.getInstanceKey(service.labels.service, service.instanceId);
-          await this.client.delete().key(key).exec();
-          totalDeletedCount++;
-          logger.info(`🗑️ Deleted inactive service from etcd: ${service.labels.service}:${service.instanceId}`);
-        } catch (error) {
-          logger.error(`Failed to delete service ${service.labels.service}:${service.instanceId}:`, error);
-        }
-      }
-
-      logger.info(
-        `✅ Cleanup completed: ${totalDeletedCount} inactive services deleted from etcd (older than ${terminatedTTL}s)`,
-      );
-      return { deletedCount: totalDeletedCount, serviceTypes };
-    } catch (error) {
-      logger.error('Failed to cleanup inactive services:', error);
-      throw error;
-    }
+    // With Hybrid Redis approach, cleanup is automated by Redis TTL.
+    // However, we might want to ensure consistency or clean up stragglers in Etcd if any.
+    // For now, we mainly rely on Redis TTL.
+    return { deletedCount: 0, serviceTypes };
   }
 
   /**
@@ -685,6 +624,53 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
   private getTypePrefix(type: string): string {
     return `/services/${type}/`;
+  }
+
+  // Redis interactions
+  private async saveInactiveToRedis(instance: ServiceInstance): Promise<void> {
+    const client = redisClient.getClient();
+    if (!client) return;
+
+    const ttl = config?.serviceDiscovery?.terminatedTTL || 300;
+    const key = `service-discovery:inactive:${instance.labels.service}:${instance.instanceId}`;
+
+    await client.set(key, JSON.stringify(instance), { EX: ttl });
+  }
+
+  private async getInactiveFromRedis(serviceType?: string): Promise<ServiceInstance[]> {
+    const client = redisClient.getClient();
+    if (!client) return [];
+
+    const pattern = serviceType
+      ? `service-discovery:inactive:${serviceType}:*`
+      : `service-discovery:inactive:*:*`;
+
+    const instances: ServiceInstance[] = [];
+
+    // Scan keys
+    const keys: string[] = [];
+    for await (const key of client.scanIterator({ MATCH: pattern, COUNT: 100 })) {
+      keys.push(key);
+    }
+
+    if (keys.length === 0) return [];
+
+    // MGET values
+    // Redis MGET requires keys spread arguments in some clients, or array in others. 
+    // node-redis v4 .mGet accepts array.
+    const values = await client.mGet(keys);
+
+    for (const val of values) {
+      if (val) {
+        try {
+          instances.push(JSON.parse(val));
+        } catch (e) {
+          logger.warn('Failed to parse inactive service from Redis', e);
+        }
+      }
+    }
+
+    return instances;
   }
 }
 

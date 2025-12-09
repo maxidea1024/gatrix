@@ -431,6 +431,14 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         return aTime - bTime;
       });
 
+      // Merge inactive services (for UI visibility of terminated/no-response)
+      try {
+        const inactiveInstances = await this.getInactiveServices(serviceType, serviceGroup);
+        instances = [...instances, ...inactiveInstances];
+      } catch (error) {
+        logger.warn('Failed to fetch inactive services to merge:', error);
+      }
+
       return instances;
     } catch (error) {
       logger.error('Failed to get services:', error);
@@ -443,57 +451,34 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
 
     try {
       if (serviceType) {
-        // Get meta keys for this service type
-        const metaKeys = await this.scanKeys(`services:${serviceType}:meta:*`);
-        for (const metaKey of metaKeys) {
-          const parts = metaKey.split(':');
-          if (parts.length === 4) {
-            const instanceId = parts[3];
-            const statKey = this.getStatKey(serviceType, instanceId);
+        // Get inactive collection for this service type
+        const inactiveCollectionKey = `services:${serviceType}:inactive`;
+        const inactiveData = await this.client.hgetall(inactiveCollectionKey);
 
-            // Check if stat key exists
-            const statExists = await this.client.exists(statKey);
-            if (!statExists) {
-              // Stat key doesn't exist, so this is an inactive service
-              try {
-                const metaValue = await this.client.get(metaKey);
-                if (metaValue) {
-                  const instance = JSON.parse(metaValue);
-                  instance.status = 'terminated';
-                  instance.updatedAt = new Date().toISOString();
-                  instances.push(instance);
-                }
-              } catch (error) {
-                logger.error('Failed to parse inactive instance:', error);
-              }
-            }
+        for (const value of Object.values(inactiveData)) {
+          try {
+            instances.push(JSON.parse(value));
+          } catch (e) {
+            logger.warn(`Failed to parse inactive service entry`, e);
           }
         }
       } else {
-        // Get all meta keys
-        const metaKeys = await this.scanKeys('services:*:meta:*');
-        for (const metaKey of metaKeys) {
-          const parts = metaKey.split(':');
-          if (parts.length === 4) {
-            const serviceTypeFromKey = parts[1];
-            const instanceId = parts[3];
-            const statKey = this.getStatKey(serviceTypeFromKey, instanceId);
+        // Scan for all inactive collections: services:*:inactive
+        // Note: Keys might be "services:{type}:inactive". 
+        // We scan for keys ending with ":inactive" and starting with "services:"
+        const pattern = 'services:*:inactive';
+        const inactiveKeys = await this.scanKeys(pattern);
 
-            // Check if stat key exists
-            const statExists = await this.client.exists(statKey);
-            if (!statExists) {
-              // Stat key doesn't exist, so this is an inactive service
-              try {
-                const metaValue = await this.client.get(metaKey);
-                if (metaValue) {
-                  const instance = JSON.parse(metaValue);
-                  instance.status = 'terminated';
-                  instance.updatedAt = new Date().toISOString();
-                  instances.push(instance);
-                }
-              } catch (error) {
-                logger.error('Failed to parse inactive instance:', error);
-              }
+        for (const key of inactiveKeys) {
+          // Avoid matching "inactive:*" keys if any
+          if (!key.endsWith(':inactive')) continue;
+
+          const inactiveData = await this.client.hgetall(key);
+          for (const value of Object.values(inactiveData)) {
+            try {
+              instances.push(JSON.parse(value));
+            } catch (e) {
+              logger.warn(`Failed to parse inactive service entry`, e);
             }
           }
         }
