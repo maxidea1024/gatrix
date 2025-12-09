@@ -143,7 +143,7 @@ const TagsPage: React.FC = () => {
       {/* Header toolbar */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
         <Typography variant="h4" sx={{ fontWeight: 600, flex: 1 }}>{t('tags.title')}</Typography>
-        <TextField size="small" placeholder={t('common.search')} value={query} onChange={(e)=>setQuery(e.target.value)} sx={{ maxWidth: 300 }} />
+        <TextField size="small" placeholder={t('common.search')} value={query} onChange={(e) => setQuery(e.target.value)} sx={{ maxWidth: 300 }} />
       </Box>
 
       {/* Create form (like GitHub new label row) */}
@@ -157,7 +157,7 @@ const TagsPage: React.FC = () => {
               <TextField
                 label={t('tags.name')}
                 value={newName}
-                onChange={(e)=>setNewName(e.target.value)}
+                onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && newName.trim()) {
                     handleCreate();
@@ -168,7 +168,7 @@ const TagsPage: React.FC = () => {
               <TextField
                 label={t('tags.description')}
                 value={newDescription}
-                onChange={(e)=>setNewDescription(e.target.value)}
+                onChange={(e) => setNewDescription(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && newName.trim()) {
                     handleCreate();
@@ -185,8 +185,8 @@ const TagsPage: React.FC = () => {
                 <Typography variant="body2" sx={{ minWidth: 80 }}>{newColor}</Typography>
               </Stack>
               <Stack direction="row" spacing={1}>
-                <Button variant="outlined" onClick={()=>{ setNewName(''); setNewDescription(''); }}>{t('common.cancel')}</Button>
-                <Button variant="contained" onClick={handleCreate} disabled={!newName.trim()}>태그 추가</Button>
+                <Button variant="outlined" onClick={() => { setNewName(''); setNewDescription(''); }}>{t('common.cancel')}</Button>
+                <Button variant="contained" onClick={handleCreate} disabled={!newName.trim()}>{t('tags.addTag')}</Button>
               </Stack>
             </Stack>
           </CardContent>
@@ -221,20 +221,38 @@ const TagsPage: React.FC = () => {
                 ) : (
                   filtered.map(tag => (
                     <TableRow key={tag.id} hover>
-                    <TableCell sx={{ width: 260 }}>
-                      <Stack direction="row" spacing={1} alignItems="center">
+                      <TableCell sx={{ width: 260 }}>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          {editingId === tag.id ? (
+                            <Chip label={editName || 'label'} size="small" sx={{ bgcolor: editColor, color: '#fff' }} />
+                          ) : (
+                            <Tooltip title={tag.description || t('tags.noDescription')} arrow>
+                              <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }} />
+                            </Tooltip>
+                          )}
+                          {editingId === tag.id && (
+                            <TextField
+                              size="small"
+                              value={editName}
+                              onChange={(e) => setEditName(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  handleSaveEdit();
+                                } else if (e.key === 'Escape') {
+                                  cancelEdit();
+                                }
+                              }}
+                              sx={{ maxWidth: 160 }}
+                            />
+                          )}
+                        </Stack>
+                      </TableCell>
+                      <TableCell sx={{ minWidth: 300 }}>
                         {editingId === tag.id ? (
-                          <Chip label={editName || 'label'} size="small" sx={{ bgcolor: editColor, color: '#fff' }} />
-                        ) : (
-                          <Tooltip title={tag.description || t('tags.noDescription')} arrow>
-                            <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }} />
-                          </Tooltip>
-                        )}
-                        {editingId === tag.id && (
                           <TextField
                             size="small"
-                            value={editName}
-                            onChange={(e)=>setEditName(e.target.value)}
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
                                 handleSaveEdit();
@@ -242,83 +260,65 @@ const TagsPage: React.FC = () => {
                                 cancelEdit();
                               }
                             }}
-                            sx={{ maxWidth: 160 }}
+                            fullWidth
                           />
-                        )}
-                      </Stack>
-                    </TableCell>
-                    <TableCell sx={{ minWidth: 300 }}>
-                      {editingId === tag.id ? (
-                        <TextField
-                          size="small"
-                          value={editDescription}
-                          onChange={(e)=>setEditDescription(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              handleSaveEdit();
-                            } else if (e.key === 'Escape') {
-                              cancelEdit();
-                            }
-                          }}
-                          fullWidth
-                        />
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">{tag.description || '-'}</Typography>
-                      )}
-                    </TableCell>
-                    <TableCell sx={{ width: 100 }}>
-                      {editingId === tag.id ? (
-                        <ColorPicker
-                          value={editColor}
-                          onChange={setEditColor}
-                          label={t('common.color')}
-                          size="small"
-                        />
-                      ) : (
-                        <Box
-                          sx={{
-                            width: 32,
-                            height: 32,
-                            bgcolor: tag.color,
-                            borderRadius: 1,
-                            border: '1px solid',
-                            borderColor: 'divider',
-                          }}
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell sx={{ width: 180 }}>{formatDateTimeDetailed(tag.createdAt || '')}</TableCell>
-                    <TableCell sx={{ width: 180 }}>{formatDateTimeDetailed(tag.updatedAt || '')}</TableCell>
-                    <TableCell sx={{ width: 180 }}>
-                      {tag.createdByName ? (
-                        <Box>
-                          <Typography variant="body2">{tag.createdByName}</Typography>
-                          {tag.createdByEmail && (
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                              {tag.createdByEmail}
-                            </Typography>
-                          )}
-                        </Box>
-                      ) : (
-                        '-'
-                      )}
-                    </TableCell>
-                    {canManage && (
-                      <TableCell align="right" sx={{ width: 140 }}>
-                        {editingId === tag.id ? (
-                          <Stack direction="row" spacing={1} justifyContent="flex-end">
-                            <IconButton size="small" color="primary" onClick={()=>saveEdit(tag.id)} disabled={!editName.trim()}><SaveIcon fontSize="small" /></IconButton>
-                            <IconButton size="small" onClick={cancelEdit}><CloseIcon fontSize="small" /></IconButton>
-                          </Stack>
                         ) : (
-                          <Stack direction="row" spacing={1} justifyContent="flex-end">
-                            <IconButton size="small" onClick={()=>startEdit(tag)}><EditIcon fontSize="small" /></IconButton>
-                            <IconButton size="small" color="error" onClick={()=>openDeleteDialog(tag)}><DeleteIcon fontSize="small" /></IconButton>
-                          </Stack>
+                          <Typography variant="body2" color="text.secondary">{tag.description || '-'}</Typography>
                         )}
                       </TableCell>
-                    )}
-                  </TableRow>
+                      <TableCell sx={{ width: 100 }}>
+                        {editingId === tag.id ? (
+                          <ColorPicker
+                            value={editColor}
+                            onChange={setEditColor}
+                            label={t('common.color')}
+                            size="small"
+                          />
+                        ) : (
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              bgcolor: tag.color,
+                              borderRadius: 1,
+                              border: '1px solid',
+                              borderColor: 'divider',
+                            }}
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ width: 180 }}>{formatDateTimeDetailed(tag.createdAt || '')}</TableCell>
+                      <TableCell sx={{ width: 180 }}>{formatDateTimeDetailed(tag.updatedAt || '')}</TableCell>
+                      <TableCell sx={{ width: 180 }}>
+                        {tag.createdByName ? (
+                          <Box>
+                            <Typography variant="body2">{tag.createdByName}</Typography>
+                            {tag.createdByEmail && (
+                              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                {tag.createdByEmail}
+                              </Typography>
+                            )}
+                          </Box>
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      {canManage && (
+                        <TableCell align="right" sx={{ width: 140 }}>
+                          {editingId === tag.id ? (
+                            <Stack direction="row" spacing={1} justifyContent="flex-end">
+                              <IconButton size="small" color="primary" onClick={() => saveEdit(tag.id)} disabled={!editName.trim()}><SaveIcon fontSize="small" /></IconButton>
+                              <IconButton size="small" onClick={cancelEdit}><CloseIcon fontSize="small" /></IconButton>
+                            </Stack>
+                          ) : (
+                            <Stack direction="row" spacing={1} justifyContent="flex-end">
+                              <IconButton size="small" onClick={() => startEdit(tag)}><EditIcon fontSize="small" /></IconButton>
+                              <IconButton size="small" color="error" onClick={() => openDeleteDialog(tag)}><DeleteIcon fontSize="small" /></IconButton>
+                            </Stack>
+                          )}
+                        </TableCell>
+                      )}
+                    </TableRow>
                   ))
                 )}
               </TableBody>

@@ -56,7 +56,7 @@ const createUserSchema = Joi.object({
 
 const setEnvironmentAccessSchema = Joi.object({
   allowAllEnvironments: Joi.boolean().required(),
-  environmentIds: Joi.array().items(Joi.string().length(26)).default([]),
+  environmentIds: Joi.array().items(Joi.string().min(1).max(127)).default([]),
 });
 
 export class UserController {

@@ -113,7 +113,7 @@ const ProfilePage: React.FC = () => {
   if (!user) {
     return (
       <Box sx={{ p: 3 }} display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <Typography>Loading...</Typography>
+        <Typography>{t('common.loading')}</Typography>
       </Box>
     );
   }
@@ -262,12 +262,12 @@ const ProfilePage: React.FC = () => {
   // Get auth type label
   const getAuthTypeLabel = (authType: string) => {
     switch (authType) {
-      case 'local': return 'Email / Password';
-      case 'google': return 'Google';
-      case 'github': return 'GitHub';
-      case 'qq': return 'QQ';
-      case 'wechat': return 'WeChat';
-      case 'baidu': return 'Baidu';
+      case 'local': return t('auth.providers.local');
+      case 'google': return t('auth.providers.google');
+      case 'github': return t('auth.providers.github');
+      case 'qq': return t('auth.providers.qq');
+      case 'wechat': return t('auth.providers.wechat');
+      case 'baidu': return t('auth.providers.baidu');
       default: return authType;
     }
   };

@@ -614,7 +614,23 @@ const DashboardPage: React.FC = () => {
     };
 
     loadMaintenanceStatus();
-    return () => { isMounted = false; };
+
+    // Listen for SSE maintenance status changes from MainLayout
+    const handleMaintenanceChange = (event: CustomEvent<{ isUnderMaintenance: boolean; detail: MaintenanceDetail | null }>) => {
+      if (isMounted) {
+        setMaintenanceStatus({
+          isUnderMaintenance: event.detail.isUnderMaintenance,
+          detail: event.detail.detail
+        });
+      }
+    };
+
+    window.addEventListener('maintenance-status-change', handleMaintenanceChange as EventListener);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('maintenance-status-change', handleMaintenanceChange as EventListener);
+    };
   }, [isAdminUser, hasPermission]);
 
   // Load environment data counts
@@ -963,28 +979,33 @@ const DashboardPage: React.FC = () => {
         </Box>
       )}
 
-      {/* Environment Data Overview - Only for Admins */}
-      {isAdminUser && environmentsWithCounts.length > 0 && (
+      {/* Environment Data Overview */}
+      {environmentsWithCounts.length > 0 && (
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
             <Typography variant="h6" fontWeight={600}>
               {t('dashboard.environmentOverview')}
             </Typography>
-            <Tooltip title={t('sidebar.environments')}>
-              <IconButton size="small" onClick={() => navigate('/settings/environments')}>
-                <OpenInNewIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+            {hasPermission(PERMISSIONS.ENVIRONMENTS_MANAGE) && (
+              <Tooltip title={t('sidebar.environments')}>
+                <IconButton size="small" onClick={() => navigate('/settings/environments')}>
+                  <OpenInNewIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
           </Box>
           <Grid container spacing={2}>
             {(() => {
               const count = environmentsWithCounts.length;
-              const mdSize = count === 1 ? 12 : count === 2 ? 6 : count === 3 ? 4 : 3;
-              const smSize = count === 1 ? 12 : 6;
+              // Always use 4-column layout (fixed card size)
+              const mdSize = 3;
+              const smSize = 6;
               // Calculate empty cards needed to fill the row (4 columns on md)
-              const emptyCardsCount = count >= 4 ? (4 - (count % 4)) % 4 : 0;
+              const canManageEnvs = hasPermission(PERMISSIONS.ENVIRONMENTS_MANAGE);
+              const emptyCardsCount = (4 - (count % 4)) % 4 || (count < 4 ? 4 - count : 0);
 
               return environmentsWithCounts.map((env) => {
+              const isCurrentEnv = env.id === currentEnvironmentId;
               return (
               <Grid key={env.id} size={{ xs: 12, sm: smSize, md: mdSize }}>
                 <Card
@@ -992,6 +1013,10 @@ const DashboardPage: React.FC = () => {
                     height: '100%',
                     borderTop: `3px solid ${env.color || theme.palette.primary.main}`,
                     transition: 'all 0.2s ease-in-out',
+                    ...(isCurrentEnv && {
+                      boxShadow: `0 0 0 2px ${env.color || theme.palette.primary.main}40`,
+                      bgcolor: `${env.color || theme.palette.primary.main}08`,
+                    }),
                     '&:hover': {
                       transform: 'translateY(-2px)',
                       boxShadow: theme.shadows[4],
@@ -1009,9 +1034,44 @@ const DashboardPage: React.FC = () => {
                           mr: 1,
                         }}
                       />
-                      <Typography variant="subtitle2" fontWeight={600} noWrap>
+                      <Typography variant="subtitle2" fontWeight={600} noWrap sx={{ flex: 1 }}>
                         {env.displayName || env.environmentName}
                       </Typography>
+                      {isCurrentEnv ? (
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            ml: 1,
+                            px: 0.75,
+                            py: 0.25,
+                            borderRadius: 1,
+                            bgcolor: `${env.color || theme.palette.primary.main}20`,
+                            color: env.color || theme.palette.primary.main,
+                            fontWeight: 600,
+                            fontSize: '0.65rem',
+                          }}
+                        >
+                          {t('common.current')}
+                        </Typography>
+                      ) : (
+                        <Tooltip title={t('environments.switchTo', { name: env.displayName || env.environmentName })}>
+                          <IconButton
+                            size="small"
+                            onClick={() => switchEnvironment(env.id)}
+                            sx={{
+                              ml: 0.5,
+                              p: 0.5,
+                              color: 'text.secondary',
+                              '&:hover': {
+                                color: env.color || theme.palette.primary.main,
+                                bgcolor: `${env.color || theme.palette.primary.main}15`,
+                              },
+                            }}
+                          >
+                            <ArrowForwardIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     </Box>
                     {env.loading || envCountsLoading ? (
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
@@ -1118,27 +1178,29 @@ const DashboardPage: React.FC = () => {
               Array.from({ length: emptyCardsCount }).map((_, idx) => (
                 <Grid key={`empty-${idx}`} size={{ xs: 12, sm: smSize, md: mdSize }}>
                   <Card
-                    onClick={() => navigate('/settings/environments')}
+                    onClick={canManageEnvs ? () => navigate('/settings/environments') : undefined}
                     sx={{
                       height: '100%',
                       border: '1px dashed',
                       borderColor: 'divider',
                       boxShadow: 'none',
                       bgcolor: 'transparent',
-                      cursor: 'pointer',
+                      cursor: canManageEnvs ? 'pointer' : 'default',
                       transition: 'all 0.2s ease-in-out',
-                      '&:hover': {
-                        borderColor: 'primary.main',
-                        bgcolor: 'action.hover',
-                        transform: 'translateY(-2px)',
-                        '& .add-icon': {
-                          color: 'primary.main',
-                          transform: 'scale(1.1)',
+                      ...(canManageEnvs && {
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          bgcolor: 'action.hover',
+                          transform: 'translateY(-2px)',
+                          '& .add-icon': {
+                            color: 'primary.main',
+                            transform: 'scale(1.1)',
+                          },
+                          '& .add-text': {
+                            color: 'text.primary',
+                          },
                         },
-                        '& .add-text': {
-                          color: 'text.primary',
-                        },
-                      },
+                      }),
                     }}
                   >
                     <CardContent
@@ -1152,23 +1214,27 @@ const DashboardPage: React.FC = () => {
                         minHeight: 200,
                       }}
                     >
-                      <SettingsIcon
-                        className="add-icon"
-                        sx={{
-                          fontSize: 32,
-                          color: 'text.disabled',
-                          mb: 1,
-                          transition: 'all 0.2s ease-in-out',
-                        }}
-                      />
-                      <Typography
-                        className="add-text"
-                        variant="caption"
-                        color="text.disabled"
-                        sx={{ transition: 'color 0.2s ease-in-out' }}
-                      >
-                        {t('sidebar.environments')}
-                      </Typography>
+                      {canManageEnvs && (
+                        <>
+                          <SettingsIcon
+                            className="add-icon"
+                            sx={{
+                              fontSize: 32,
+                              color: 'text.disabled',
+                              mb: 1,
+                              transition: 'all 0.2s ease-in-out',
+                            }}
+                          />
+                          <Typography
+                            className="add-text"
+                            variant="caption"
+                            color="text.disabled"
+                            sx={{ transition: 'color 0.2s ease-in-out' }}
+                          >
+                            {t('sidebar.environments')}
+                          </Typography>
+                        </>
+                      )}
                     </CardContent>
                   </Card>
                 </Grid>

@@ -712,7 +712,7 @@
     "environmentAccessDesc": "Allows access to {{name}} environment.",
     "permissions": "Permissions",
     "permissionsSelected": "selected",
-    "permissionsCount": "",
+    "permissionsCount": " ",
     "selectPermissions": "Set Permissions",
     "selectPermissionsDesc": "Select the permissions to grant to the admin. Without any permissions, the admin cannot access the admin pages.",
     "noPermissionsSelected": "No permissions selected.",
@@ -1526,6 +1526,7 @@
       "user_promote": "User Promote",
       "user_demote": "User Demote",
       "user_permissions_updated": "Permissions Updated",
+      "user.permissions_updated": "Permissions Updated",
       "password_change": "Password Change",
       "profile_update": "Profile Update",
       "whitelist_create": "Whitelist Create",
@@ -1629,6 +1630,14 @@
     }
   },
   "auth": {
+    "providers": {
+      "local": "Email / Password",
+      "google": "Google",
+      "github": "GitHub",
+      "qq": "QQ",
+      "wechat": "WeChat",
+      "baidu": "Baidu"
+    },
     "accountPending": "Account pending approval",
     "accountSuspended": "Account has been suspended",
     "alreadyHaveAccount": "Already have an account?",
@@ -2057,6 +2066,7 @@
       "randomColor": "Random Color",
       "selectColor": "Select Color"
     },
+    "current": "Current",
     "confirm": "Confirm",
     "confirmDelete": "Confirm Delete",
     "copied": "{{type}} \"{{value}}\" copied to clipboard",
@@ -2301,7 +2311,7 @@
     "loadStatsError": "Failed to load statistics",
     "never": "Never",
     "operational": "Operational",
-    "pendingApproval": "pendingApproval",
+    "pendingApproval": "Pending Approval",
     "profileManagement": "Profile Management",
     "profileManagementDesc": "Update your profile information, change password, and manage account settings.",
     "quickActionsTitle": "Quick Actions",
@@ -2647,14 +2657,14 @@
     "timezone": "Timezone"
   },
   "sidebar": {
-    "adminPanel": "ADMIN PANEL",
-    "gamePanel": "GAME MANAGEMENT",
-    "gameManagement": "GAME MANAGEMENT",
+    "adminPanel": "Admin Panel",
+    "gamePanel": "Game Management",
+    "gameManagement": "Game Management",
     "backToMain": "Back to Main",
     "chat": "Chat",
     "dashboard": "Dashboard",
     "logout": "Logout",
-    "navigation": "NAVIGATION",
+    "navigation": "Navigation",
     "profile": "Profile",
     "settingsPanel": "SETTINGS PANEL",
     "systemStats": "System Statistics",
@@ -2715,6 +2725,7 @@
     "inactive": "inactive"
   },
   "tags": {
+    "addTag": "Add Tag",
     "confirmDeleteMessage": "Are you sure you want to delete the tag \"{{name}}\"?",
     "description": "Description",
     "duplicateName": "A tag with the same name already exists.",
@@ -4453,6 +4464,7 @@
     "currentEnvironment": "Current Environment",
     "selectEnvironment": "Select Environment",
     "switchEnvironment": "Switch Environment",
+    "switchTo": "Switch to {{name}}",
     "switchedTo": "Environment Changed",
     "environmentSwitched": "Environment has been switched",
     "name": "Environment Name",

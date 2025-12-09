@@ -4,6 +4,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
 import 'dayjs/locale/en';
 import 'dayjs/locale/zh-cn';
@@ -11,6 +12,9 @@ import 'dayjs/locale/zh-cn';
 // Enable plugins
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(relativeTime);
+
+
 
 const DEFAULT_TZ = 'Asia/Seoul';
 const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm:ss';
@@ -35,10 +39,10 @@ export const getStoredDateTimeFormat = (): string => {
 };
 
 export const setStoredTimezone = (tz: string) => {
-  try { localStorage.setItem('settings.timezone', tz); } catch {}
+  try { localStorage.setItem('settings.timezone', tz); } catch { }
 };
 export const setStoredDateTimeFormat = (fmt: string) => {
-  try { localStorage.setItem('settings.datetimeFormat', fmt); } catch {}
+  try { localStorage.setItem('settings.datetimeFormat', fmt); } catch { }
 };
 
 // 내부: 다양한 문자열을 dayjs로 변환 (UTC -> 사용자 timezone)
@@ -152,44 +156,6 @@ export const formatUptime = (uptimeSeconds: number): string => {
 };
 
 /**
- * 상대 시간 포맷 (예: "2 minutes ago", "Just now")
- */
-export const formatRelativeTime = (date: string | Date | null | undefined): string => {
-  if (!date) return '-';
-
-  try {
-    const d = toDayjs(date);
-    if (!d) return '-';
-
-    const now = dayjs().tz(getStoredTimezone());
-    const diffMs = now.diff(d);
-
-    if (diffMs < 60000) { // Less than 1 minute
-      return 'Just now';
-    }
-
-    if (diffMs < 3600000) { // Less than 1 hour
-      const minutes = Math.floor(diffMs / 60000);
-      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    }
-
-    if (diffMs < 86400000) { // Less than 1 day
-      const hours = Math.floor(diffMs / 3600000);
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    }
-
-    const days = Math.floor(diffMs / 86400000);
-    if (days < 7) {
-      return `${days} day${days > 1 ? 's' : ''} ago`;
-    }
-
-    return formatDate(date);
-  } catch (error) {
-    return '-';
-  }
-};
-
-/**
  * 시간만 포맷 (HH:mm:ss)
  */
 export const formatTime = (date: string | Date | null | undefined): string => {
@@ -198,6 +164,20 @@ export const formatTime = (date: string | Date | null | undefined): string => {
     const d = toDayjs(date);
     return d ? d.format('HH:mm:ss') : '-';
   } catch { return '-'; }
+};
+
+/**
+ * 상대 시간 포맷 (예: "2 minutes ago", "Just now")
+ */
+export const formatRelativeTime = (date: string | Date | null | undefined): string => {
+  if (!date) return '-';
+
+  try {
+    const d = toDayjs(date);
+    return d ? d.fromNow() : '-';
+  } catch (error) {
+    return '-';
+  }
 };
 
 /**

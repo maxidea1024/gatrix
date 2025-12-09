@@ -1526,6 +1526,7 @@
       "user_promote": "사용자 승격",
       "user_demote": "사용자 강등",
       "user_permissions_updated": "권한 변경",
+      "user.permissions_updated": "권한 변경",
       "password_change": "비밀번호 변경",
       "profile_update": "프로필 수정",
       "whitelist_create": "화이트리스트 생성",
@@ -1629,6 +1630,14 @@
     }
   },
   "auth": {
+    "providers": {
+      "local": "이메일 / 비밀번호",
+      "google": "Google",
+      "github": "GitHub",
+      "qq": "QQ",
+      "wechat": "WeChat",
+      "baidu": "Baidu"
+    },
     "accountPending": "계정 승인 대기 중",
     "accountSuspended": "계정이 정지되었습니다",
     "alreadyHaveAccount": "이미 계정이 있으신가요?",
@@ -2057,6 +2066,7 @@
       "randomColor": "랜덤 색상",
       "selectColor": "색상 선택"
     },
+    "current": "현재",
     "confirm": "확인",
     "confirmDelete": "삭제 확인",
     "copied": "{{type}} \"{{value}}\"이(가) 클립보드에 복사되었습니다",
@@ -2715,6 +2725,7 @@
     "inactive": "비활성"
   },
   "tags": {
+    "addTag": "태그 추가",
     "confirmDeleteMessage": "정말로 \"{{name}}\" 태그를 삭제하시겠습니까?",
     "description": "설명",
     "duplicateName": "중복된 이름",
@@ -4451,6 +4462,7 @@
     "currentEnvironment": "현재 환경",
     "selectEnvironment": "환경 선택",
     "switchEnvironment": "환경 전환",
+    "switchTo": "{{name}}(으)로 전환",
     "switchedTo": "환경이 변경되었습니다",
     "environmentSwitched": "환경이 전환되었습니다",
     "name": "환경 이름",

@@ -13,7 +13,7 @@ import { pubSubService } from '../services/PubSubService';
 
 const setEnvironmentAccessSchema = Joi.object({
   allowAllEnvironments: Joi.boolean().required(),
-  environmentIds: Joi.array().items(Joi.string().length(26)).default([]),
+  environmentIds: Joi.array().items(Joi.string().min(1).max(127)).default([]),
 });
 
 // Super admin email - this account cannot be modified by anyone except themselves (name only)
@@ -1144,7 +1144,7 @@ export class AdminController {
       // Log audit
       const actorId = (req.user as any)?.id ?? (req.user as any)?.userId;
       await AuditLogModel.create({
-        action: 'user.permissions_updated',
+        action: 'user_permissions_updated',
         resourceType: 'user',
         resourceId: userId.toString(),
         userId: actorId,

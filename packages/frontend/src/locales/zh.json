@@ -1581,6 +1581,7 @@
       "user_promote": "用户提升",
       "user_demote": "用户降级",
       "user_permissions_updated": "权限更新",
+      "user.permissions_updated": "权限更新",
       "password_change": "密码更改",
       "profile_update": "个人资料更新",
       "whitelist_create": "白名单创建",
@@ -1684,6 +1685,14 @@
     }
   },
   "auth": {
+    "providers": {
+      "local": "电子邮箱 / 密码",
+      "google": "Google",
+      "github": "GitHub",
+      "qq": "QQ",
+      "wechat": "WeChat",
+      "baidu": "Baidu"
+    },
     "accountPending": "账户等待审批",
     "accountSuspended": "账户已被暂停",
     "alreadyHaveAccount": "已有账户？",
@@ -2111,6 +2120,7 @@
       "randomColor": "随机颜色",
       "selectColor": "选择颜色"
     },
+    "current": "当前",
     "confirm": "确认",
     "confirmDelete": "确认删除",
     "copied": "{{type}} \"{{value}}\" 已复制到剪贴板",
@@ -2767,6 +2777,7 @@
     "inactive": "非活跃"
   },
   "tags": {
+    "addTag": "添加标签",
     "confirmDeleteMessage": "您确定要删除标签\"{{name}}\"吗？",
     "description": "描述",
     "duplicateName": "重复名称",
@@ -4500,6 +4511,7 @@
     "currentEnvironment": "当前环境",
     "selectEnvironment": "选择环境",
     "switchEnvironment": "切换环境",
+    "switchTo": "切换到 {{name}}",
     "switchedTo": "环境已更改",
     "environmentSwitched": "环境已切换",
     "name": "环境名称",

@@ -59,7 +59,6 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
   const navigate = useNavigate();
   const { hasPermission } = useAuth();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
-  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const {
     environments,
     currentEnvironment,
@@ -70,20 +69,8 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
 
   const canManageEnvironments = hasPermission([PERMISSIONS.ENVIRONMENTS_MANAGE]);
 
-  // Handle tooltip visibility - hide when select is open
-  const handleTooltipOpen = useCallback(() => {
-    if (!isSelectOpen) {
-      setIsTooltipOpen(true);
-    }
-  }, [isSelectOpen]);
-
-  const handleTooltipClose = useCallback(() => {
-    setIsTooltipOpen(false);
-  }, []);
-
   const handleSelectOpen = useCallback(() => {
     setIsSelectOpen(true);
-    setIsTooltipOpen(false); // Immediately hide tooltip
   }, []);
 
   const handleSelectClose = useCallback(() => {
@@ -102,7 +89,7 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
   const handleManageClick = (event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    handleSelectClose();
+    setIsSelectOpen(false);
     navigate('/settings/environments');
   };
 
@@ -228,14 +215,6 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
     : '#757575';
 
   return (
-    <Tooltip
-      title={t('environments.switchEnvironment')}
-      arrow
-      open={isTooltipOpen && !isSelectOpen}
-      onOpen={handleTooltipOpen}
-      onClose={handleTooltipClose}
-      disableFocusListener
-    >
       <Box
         sx={{
           position: 'relative',
@@ -279,6 +258,7 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
         <Select
           value={currentEnvironmentId || ''}
           onChange={handleChange}
+          open={isSelectOpen}
           onOpen={handleSelectOpen}
           onClose={handleSelectClose}
           size={size}
@@ -372,7 +352,6 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
           )}
         </Select>
       </Box>
-    </Tooltip>
   );
 };
 

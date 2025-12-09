@@ -400,6 +400,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         prevMaintenanceRef.current = { isMaintenance: nextIsMaintenance, status: nextStatus, updatedAt: nextUpdatedAt };
 
         setMaintenanceStatus({ isMaintenance: nextIsMaintenance, status: nextStatus, detail: detail || null });
+
+        // Dispatch custom event for other components (e.g., DashboardPage) to listen
+        window.dispatchEvent(new CustomEvent('maintenance-status-change', {
+          detail: { isUnderMaintenance: nextIsMaintenance, detail: detail || null }
+        }));
       } else if (event.type === 'invitation_created' || event.type === 'invitation_deleted') {
         // 초대링크 이벤트를 다른 컴포넌트에 전달
         window.dispatchEvent(new CustomEvent('invitation-change', { detail: event }));
@@ -1448,6 +1453,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 {isDark ? <LightModeIcon /> : <DarkModeIcon />}
               </IconButton>
 
+              <LanguageSelector variant="text" size="medium" />
+
+              {/* 구분선 */}
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '24px',
+                  bgcolor: theme.palette.mode === 'dark'
+                    ? 'rgba(255, 255, 255, 0.2)'
+                    : 'rgba(0, 0, 0, 0.2)',
+                  mx: 1
+                }}
+              />
+
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <IconButton
                   onClick={handleUserMenuOpen}
@@ -1495,8 +1514,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   {user?.name || user?.email?.split('@')[0] || ''}
                 </Typography>
               </Box>
-
-              <LanguageSelector variant="text" size="medium" />
 
               {/* Environment Selector with Divider - Only for admin users with environments */}
               {hasEnvironmentAccess && (

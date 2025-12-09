@@ -104,8 +104,9 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
           setCurrentEnvironmentId(accessibleEnvs[0].id);
           storeEnvironmentId(accessibleEnvs[0].id);
         } else {
-          // No accessible environments
+          // No accessible environments - clear localStorage as well
           setCurrentEnvironmentId(null);
+          localStorage.removeItem(STORAGE_KEY);
         }
       }
     } catch (err) {
