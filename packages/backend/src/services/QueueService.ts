@@ -425,6 +425,13 @@ export class QueueService {
           logger.info('coupon:expire completed', { jobId: job.id, affected });
           break;
         }
+        case 'campaign-check': {
+          // Dynamic import to avoid circular dependency
+          const { CampaignScheduler } = await import('./campaignScheduler');
+          await CampaignScheduler.getInstance().checkAndUpdateCampaigns();
+          logger.info('campaign-check completed', { jobId: job.id });
+          break;
+        }
         default: {
           logger.info('Unhandled scheduler job type, logging only', { jobId: job.id, jobType, payload: job.data?.payload });
         }

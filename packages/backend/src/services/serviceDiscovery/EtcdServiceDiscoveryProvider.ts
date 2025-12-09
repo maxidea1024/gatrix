@@ -28,6 +28,8 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
   private client: any; // Etcd3 instance
   private leases: Map<string, any> = new Map(); // Map<string, Lease>
   private watchers: any[] = [];
+  private election: any; // Election campaign
+  private monitorInterval: NodeJS.Timeout | null = null;
 
   constructor(hosts: string) {
     if (!Etcd3) {
@@ -55,7 +57,8 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     try {
       // Disable autoKeepAlive - SDK is responsible for sending heartbeat via /api/v1/server/services/status
       // This prevents stale service instances from being kept alive when SDK restarts without unregistering
-      const lease = this.client.lease(ttlSeconds, { autoKeepAlive: false });
+      // Add safety buffer (+10s) to lease TTL to allow detection agent to see the expired heartbeat before key is deleted
+      const lease = this.client.lease(ttlSeconds + 10, { autoKeepAlive: false });
       const now = new Date().toISOString();
 
       // Ensure createdAt is set
@@ -108,7 +111,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         } catch (error) {
           // Lease may have expired, create new one
           logger.warn(`Lease expired for ${leaseKey}, creating new lease`);
-          lease = this.client.lease(heartbeatTTL, { autoKeepAlive: false });
+          lease = this.client.lease(heartbeatTTL + 10, { autoKeepAlive: false });
           instance.updatedAt = new Date().toISOString();
           await lease.put(key).value(JSON.stringify(instance));
           this.leases.set(leaseKey, lease);
@@ -116,7 +119,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       } else {
         // No lease in memory (backend restarted), create new lease with TTL
         logger.debug(`Creating new lease for heartbeat: ${leaseKey}`);
-        lease = this.client.lease(heartbeatTTL, { autoKeepAlive: false });
+        lease = this.client.lease(heartbeatTTL + 10, { autoKeepAlive: false });
         instance.updatedAt = new Date().toISOString();
         await lease.put(key).value(JSON.stringify(instance));
         this.leases.set(leaseKey, lease);
@@ -223,7 +226,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
           // Create new lease with configured TTL
           const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
-          lease = this.client.lease(heartbeatTTL, { autoKeepAlive: false });
+          lease = this.client.lease(heartbeatTTL + 10, { autoKeepAlive: false });
           await lease.put(key).value(JSON.stringify(newInstance));
           this.leases.set(leaseKey, lease);
 
@@ -287,14 +290,14 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           } catch (error) {
             // Lease may have expired, create new one
             logger.warn(`Lease expired for ${leaseKey}, creating new lease`);
-            const newLease = this.client.lease(heartbeatTTL, { autoKeepAlive: false });
+            const newLease = this.client.lease(heartbeatTTL + 10, { autoKeepAlive: false });
             await newLease.put(key).value(JSON.stringify(instance));
             this.leases.set(leaseKey, newLease);
           }
         } else {
           // No lease in memory (backend restarted), create new lease with TTL
           logger.debug(`Creating new lease for ${leaseKey} (no existing lease in memory)`);
-          const newLease = this.client.lease(heartbeatTTL, { autoKeepAlive: false });
+          const newLease = this.client.lease(heartbeatTTL + 10, { autoKeepAlive: false });
           await newLease.put(key).value(JSON.stringify(instance));
           this.leases.set(leaseKey, newLease);
         }
@@ -583,6 +586,49 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     }
   }
 
+  /**
+   * Start background monitoring with Leader Election
+   * Only the elected leader will perform finding unresponsive services and cleanup
+   */
+  async startMonitoring(): Promise<void> {
+    try {
+      // Create election campaign
+      this.election = this.client.election('/election/service-monitor');
+
+      // Listen for election events
+      this.election.on('elected', () => {
+        logger.info('👑 Backend Elected as Service Discovery Monitor Leader');
+
+        // Start monitoring loop
+        this.monitorInterval = setInterval(async () => {
+          try {
+            await this.detectNoResponseServices();
+
+            const inactiveServices = await this.getInactiveServices();
+            if (inactiveServices.length > 0) {
+              await this.cleanupInactiveServices([]);
+            }
+          } catch (error) {
+            logger.error('Monitor loop failed:', error);
+          }
+        }, 5000);
+      });
+
+      this.election.on('error', (err: any) => {
+        logger.error('Election error:', err);
+      });
+
+      // Campaign for leadership
+      logger.info('Campaigning for Service Discovery Monitor leadership...');
+      await this.election.campaign(config.admin.name || 'backend-node');
+
+    } catch (error) {
+      logger.error('Failed to start monitoring campaign:', error);
+      // Fallback: If election fails completely, maybe run without election? 
+      // For now, let's just log error to avoid dangerous double-writes if etcd is unstable
+    }
+  }
+
   async close(): Promise<void> {
     // Clear all heartbeat intervals
     this.leases.forEach((lease) => {
@@ -590,7 +636,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         clearInterval((lease as any)._heartbeatInterval);
       }
     });
-    
+
     // Revoke all leases
     for (const [key, lease] of this.leases.entries()) {
       try {
@@ -600,7 +646,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       }
     }
     this.leases.clear();
-    
+
     // Close watchers
     this.watchers.forEach(watcher => {
       try {
@@ -610,10 +656,25 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
       }
     });
     this.watchers = [];
-    
+
     // Close client
     this.client.close();
-    
+
+    // Stop monitoring if running
+    if (this.monitorInterval) {
+      clearInterval(this.monitorInterval);
+      this.monitorInterval = null;
+    }
+
+    // Resign from election
+    if (this.election) {
+      try {
+        await this.election.resign();
+      } catch (error) {
+        logger.warn('Failed to resign from election:', error);
+      }
+    }
+
     logger.info('EtcdServiceDiscoveryProvider closed');
   }
 

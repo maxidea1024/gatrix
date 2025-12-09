@@ -150,6 +150,15 @@ class ServiceDiscoveryService {
   }
 
   /**
+   * Start background monitoring (with leader election if supported)
+   */
+  async startMonitoring(): Promise<void> {
+    if (this.provider.startMonitoring) {
+      await this.provider.startMonitoring();
+    }
+  }
+
+  /**
    * Close service discovery provider
    */
   async close(): Promise<void> {

@@ -1,7 +1,7 @@
 import knex from '../config/knex';
 import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
-import { QueueService } from './QueueService';
+import { QueueService, queueService } from './QueueService';
 
 export class CampaignScheduler {
   private static instance: CampaignScheduler;
@@ -10,7 +10,7 @@ export class CampaignScheduler {
   private checkInProgress = false;
 
   private constructor() {
-    this.queueService = new QueueService();
+    this.queueService = queueService;
   }
 
   public static getInstance(): CampaignScheduler {
@@ -33,9 +33,18 @@ export class CampaignScheduler {
 
     try {
       // Schedule periodic check every minute using QueueService
-      await this.queueService.addJob('scheduler', 'campaign-check', {}, {
-        repeat: { pattern: '* * * * *' } // Every minute
-      });
+      // Check if job already exists to avoid redundant calls
+      const repeatables = await this.queueService.listRepeatable('scheduler');
+      const exists = repeatables.some(j => j.name === 'campaign-check');
+
+      if (!exists) {
+        await this.queueService.addJob('scheduler', 'campaign-check', {}, {
+          repeat: { pattern: '* * * * *' } // Every minute
+        });
+        logger.info('Scheduled campaign-check job');
+      } else {
+        logger.info('campaign-check job already scheduled');
+      }
 
       this.isRunning = true;
 
@@ -88,12 +97,12 @@ export class CampaignScheduler {
     this.checkInProgress = true;
     try {
       const now = new Date();
-      
+
       // Find campaigns that should start (draft/scheduled -> running)
       const campaignsToStart = await knex('g_remote_config_campaigns')
         .where('isActive', true)
         .whereIn('status', ['draft', 'scheduled'])
-        .where(function() {
+        .where(function () {
           this.whereNull('startDate').orWhere('startDate', '<=', now);
         });
 
@@ -150,7 +159,7 @@ export class CampaignScheduler {
           action: 'activated',
           reason: 'scheduler',
           timestamp: new Date(),
-          details: JSON.stringify({ 
+          details: JSON.stringify({
             scheduledStart: campaign.startDate,
             actualStart: new Date()
           })
@@ -195,7 +204,7 @@ export class CampaignScheduler {
           action: 'deactivated',
           reason: 'scheduler',
           timestamp: new Date(),
-          details: JSON.stringify({ 
+          details: JSON.stringify({
             scheduledEnd: campaign.endDate,
             actualEnd: new Date()
           })

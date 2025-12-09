@@ -139,6 +139,11 @@ export interface IServiceDiscoveryProvider {
   detectNoResponseServices?(): Promise<void>;
 
   /**
+   * Start background monitoring (with leader election if supported)
+   */
+  startMonitoring?(): Promise<void>;
+
+  /**
    * Clean up all inactive services (terminated, error, no-response)
    * @param serviceTypes - Array of service types to clean up
    * @returns Object with deletedCount and serviceTypes
