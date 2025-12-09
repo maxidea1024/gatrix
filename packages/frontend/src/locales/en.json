@@ -16,6 +16,7 @@
   "notifications": {
     "maintenance": {
       "started": "Service maintenance started",
+      "scheduled": "Service maintenance scheduled",
       "stopped": "Service maintenance stopped",
       "updated": "Maintenance settings updated"
     }

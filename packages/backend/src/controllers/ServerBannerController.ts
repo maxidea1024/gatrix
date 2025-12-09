@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Environment } from '../models/Environment';
 import { BannerModel } from '../models/Banner';
 import logger from '../config/logger';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
@@ -36,15 +37,26 @@ export class ServerBannerController {
 
           if (environments.length > 0) {
             // Multi-environment mode: fetch from all specified environments
-            for (const envId of environments) {
-              const envBanners = await BannerModel.findPublished(envId);
+            for (const envParam of environments) {
+              // Try to find environment by ID or Name
+              let env = await Environment.query().findById(envParam);
+              if (!env) {
+                env = await Environment.getByName(envParam);
+              }
 
-              // Add environmentId to each banner for client grouping
-              const bannersWithEnv = envBanners.map((b: any) => ({
-                ...b,
-                environmentId: envId,
-              }));
-              banners.push(...bannersWithEnv);
+              if (env) {
+                const envBanners = await BannerModel.findPublished(env.id);
+
+                // Add environmentId and environmentName to each banner for client grouping
+                const bannersWithEnv = envBanners.map((b: any) => ({
+                  ...b,
+                  environmentId: env!.id,
+                  environmentName: env!.environmentName,
+                }));
+                banners.push(...bannersWithEnv);
+              } else {
+                logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
+              }
             }
           } else {
             // Single-environment mode: use current environment (via context)

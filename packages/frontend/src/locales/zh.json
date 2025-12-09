@@ -16,6 +16,7 @@
   "notifications": {
     "maintenance": {
       "started": "服务维护已开始",
+      "scheduled": "服务维护已预约",
       "stopped": "服务维护已停止",
       "updated": "维护设置已更新"
     }

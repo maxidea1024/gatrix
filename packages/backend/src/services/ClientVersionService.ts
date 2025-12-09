@@ -1,5 +1,6 @@
 import { ClientVersionModel, ClientVersionAttributes, ClientVersionCreationAttributes, ClientStatus } from '../models/ClientVersion';
 import { pubSubService } from './PubSubService';
+import { Environment } from '../models/Environment';
 import logger from '../config/logger';
 import { applyMaintenanceStatusCalculationToArray, applyMaintenanceStatusCalculation } from '../utils/maintenanceUtils';
 
@@ -71,7 +72,7 @@ export interface BulkStatusUpdateRequest {
   maintenanceEndDate?: string;
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
-  maintenanceLocales?: Array<{lang: 'ko' | 'en' | 'zh', message: string}>;
+  maintenanceLocales?: Array<{ lang: 'ko' | 'en' | 'zh', message: string }>;
   messageTemplateId?: number;
 }
 
@@ -294,6 +295,28 @@ export class ClientVersionService {
     // Invalidate client version cache
     await pubSubService.invalidateByPattern('client_version:.*');
 
+    // Publish event
+    try {
+      let envName: string | undefined;
+      // result is ClientVersionAttributes, check environmentId
+      if (result.environmentId) {
+        const env = await Environment.query().findById(result.environmentId);
+        envName = env?.environmentName;
+      }
+
+      await pubSubService.publishSDKEvent({
+        type: 'client_version.updated',
+        data: {
+          id: result.id,
+          environmentId: result.environmentId,
+          environmentName: envName,
+          timestamp: Date.now()
+        }
+      });
+    } catch (err) {
+      logger.error('Failed to publish client version event', err);
+    }
+
     return result;
   }
 
@@ -371,6 +394,12 @@ export class ClientVersionService {
     // Invalidate client version cache
     await pubSubService.invalidateByPattern('client_version:.*');
 
+    // Publish generic update event (bulk op)
+    await pubSubService.publishSDKEvent({
+      type: 'client_version.updated',
+      data: { timestamp: Date.now() } // Bulk op, refresh all
+    });
+
     return result;
   }
 
@@ -388,6 +417,30 @@ export class ClientVersionService {
     await pubSubService.invalidateByPattern('client_version:.*');
 
     const updatedClientVersion = await this.getClientVersionById(id);
+
+    // Publish event
+    if (updatedClientVersion) {
+      try {
+        let envName: string | undefined;
+        if (updatedClientVersion.environmentId) {
+          const env = await Environment.query().findById(updatedClientVersion.environmentId);
+          envName = env?.environmentName;
+        }
+
+        await pubSubService.publishSDKEvent({
+          type: 'client_version.updated',
+          data: {
+            id: updatedClientVersion.id,
+            environmentId: updatedClientVersion.environmentId,
+            environmentName: envName,
+            timestamp: Date.now()
+          }
+        });
+      } catch (err) {
+        logger.error('Failed to publish client version event', err);
+      }
+    }
+
     return updatedClientVersion;
   }
 
@@ -396,6 +449,12 @@ export class ClientVersionService {
     const deletedRowsCount = 1;
 
     if (deletedRowsCount > 0) {
+      // Publish generic update event (deletion)
+      await pubSubService.publishSDKEvent({
+        type: 'client_version.updated',
+        data: { id, timestamp: Date.now() }
+      });
+
       // Invalidate client version cache
       await pubSubService.invalidateByPattern('client_version:.*');
     }
@@ -407,6 +466,12 @@ export class ClientVersionService {
     const result = await ClientVersionModel.bulkUpdateStatus(data);
 
     if (result > 0) {
+      // Publish generic update event (bulk status)
+      await pubSubService.publishSDKEvent({
+        type: 'client_version.updated',
+        data: { timestamp: Date.now() }
+      });
+
       // Invalidate client version cache
       await pubSubService.invalidateByPattern('client_version:.*');
     }

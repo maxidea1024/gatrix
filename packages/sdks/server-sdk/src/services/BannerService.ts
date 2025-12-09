@@ -52,13 +52,24 @@ export class BannerService {
     this.cachedBannersByEnv.clear();
     for (const banner of banners) {
       // In single-env mode, all data goes to 'default'
-      const envId = this.isMultiEnvironment()
-        ? ((banner as any).environmentId || this.defaultEnvId)
-        : this.defaultEnvId;
-      if (!this.cachedBannersByEnv.has(envId)) {
-        this.cachedBannersByEnv.set(envId, []);
+      let envKey = this.defaultEnvId;
+      if (this.isMultiEnvironment()) {
+        // Use environmentName if available (user preference), fallback to environmentId
+        // Also check if the configured environments contain the name or ID to ensure consistency
+        if (banner.environmentName && this.environments.includes(banner.environmentName)) {
+          envKey = banner.environmentName;
+        } else if (banner.environmentId && this.environments.includes(banner.environmentId)) {
+          envKey = banner.environmentId;
+        } else {
+          // Fallback: prefer name if available
+          envKey = banner.environmentName || banner.environmentId || this.defaultEnvId;
+        }
       }
-      this.cachedBannersByEnv.get(envId)!.push(banner);
+
+      if (!this.cachedBannersByEnv.has(envKey)) {
+        this.cachedBannersByEnv.set(envKey, []);
+      }
+      this.cachedBannersByEnv.get(envKey)!.push(banner);
     }
 
     this.logger.info('Banners fetched', {

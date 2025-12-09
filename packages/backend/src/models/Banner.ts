@@ -92,6 +92,7 @@ export interface Sequence {
 
 export interface BannerAttributes {
   bannerId: string;
+  environmentId?: string;
   name: string;
   description?: string;
   width: number;

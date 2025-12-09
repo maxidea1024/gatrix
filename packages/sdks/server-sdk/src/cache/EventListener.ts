@@ -67,7 +67,7 @@ export class EventListener {
         if (this.isShuttingDown) {
           // Avoid noisy error logs during intentional shutdown
           this.isConnected = false;
-          try { this.metrics?.setRedisConnected(false); } catch (_) {}
+          try { this.metrics?.setRedisConnected(false); } catch (_) { }
           return;
         }
         // Only log actual connection errors, not retry attempts
@@ -77,20 +77,20 @@ export class EventListener {
         // Mark as disconnected but do not attempt manual reconnect here
         // ioredis will handle reconnection automatically with retryStrategy
         this.isConnected = false;
-        try { this.metrics?.setRedisConnected(false); } catch (_) {}
+        try { this.metrics?.setRedisConnected(false); } catch (_) { }
       });
 
       this.subscriber.on('close', () => {
         if (this.isShuttingDown) {
           // Avoid noisy close logs during intentional shutdown
           this.isConnected = false;
-          try { this.metrics?.setRedisConnected(false); } catch (_) {}
+          try { this.metrics?.setRedisConnected(false); } catch (_) { }
           return;
         }
         this.logger.warn('Subscriber connection closed');
         // Mark as disconnected; rely on ioredis auto-reconnect
         this.isConnected = false;
-        try { this.metrics?.setRedisConnected(false); } catch (_) {}
+        try { this.metrics?.setRedisConnected(false); } catch (_) { }
       });
 
       // Log reconnection attempts and refresh cache once reconnected
@@ -109,7 +109,7 @@ export class EventListener {
           // (CacheManager.initialize() already loads initial data)
           if (!isFirstConnection) {
             this.logger.info('Redis connection restored successfully');
-            try { this.metrics?.setRedisConnected(true); this.metrics?.incRedisReconnect(); } catch (_) {}
+            try { this.metrics?.setRedisConnected(true); this.metrics?.incRedisReconnect(); } catch (_) { }
             try {
               await this.reinitializeCache();
             } catch {
@@ -122,7 +122,7 @@ export class EventListener {
       // Connect to Redis
       await this.subscriber.connect();
       isFirstConnection = false; // Mark first connection complete
-      try { this.metrics?.setRedisConnected(true); } catch (_) {}
+      try { this.metrics?.setRedisConnected(true); } catch (_) { }
 
       // Subscribe to SDK events channel
       await this.subscriber.subscribe(this.CHANNEL_NAME);
@@ -134,7 +134,7 @@ export class EventListener {
           try {
             const event = JSON.parse(message);
             this.logger.info('SDK Event received', { type: event.type, id: event.data?.id });
-            try { this.metrics?.incEventReceived(event.type); } catch (_) {}
+            try { this.metrics?.incEventReceived(event.type); } catch (_) { }
             await this.processEvent(event);
           } catch (error: any) {
             this.logger.error('Failed to parse event message', { error: error.message });
@@ -252,6 +252,9 @@ export class EventListener {
       'survey.settings.updated',
       'maintenance.settings.updated',
       'whitelist.updated',
+      'client_version.updated',
+      'banner.updated',
+      'service_notice.updated',
     ].includes(type);
   }
 
@@ -344,6 +347,45 @@ export class EventListener {
           this.logger.info('Service maintenance cache refreshed successfully');
         } catch (error) {
           this.logger.error('Failed to refresh service maintenance cache', { error });
+        }
+        break;
+
+      case 'client_version.updated':
+        this.logger.info('Client version updated event received, refreshing client version cache', {
+          id: event.data.id,
+          environment: event.data.environmentName || event.data.environmentId
+        });
+        try {
+          await this.cacheManager.getClientVersionService()?.refresh();
+          this.logger.info('Client version cache refreshed successfully');
+        } catch (error: any) {
+          this.logger.error('Failed to refresh client version cache', { error: error.message });
+        }
+        break;
+
+      case 'banner.updated':
+        this.logger.info('Banner updated event received, refreshing banner cache', {
+          id: event.data.id,
+          environment: event.data.environmentName || event.data.environmentId
+        });
+        try {
+          await this.cacheManager.getBannerService()?.refresh();
+          this.logger.info('Banner cache refreshed successfully');
+        } catch (error: any) {
+          this.logger.error('Failed to refresh banner cache', { error: error.message });
+        }
+        break;
+
+      case 'service_notice.updated':
+        this.logger.info('Service notice updated event received, refreshing service notice cache', {
+          id: event.data.id,
+          environment: event.data.environmentName || event.data.environmentId
+        });
+        try {
+          await this.cacheManager.getServiceNoticeService()?.refresh();
+          this.logger.info('Service notice cache refreshed successfully');
+        } catch (error: any) {
+          this.logger.error('Failed to refresh service notice cache', { error: error.message });
         }
         break;
 
@@ -452,7 +494,7 @@ export class EventListener {
       const message = JSON.stringify(event);
       await this.subscriber.publish(this.CHANNEL_NAME, message);
       this.logger.debug('Event published', { type: event.type });
-      try { this.metrics?.incEventPublished(event.type); } catch (_) {}
+      try { this.metrics?.incEventPublished(event.type); } catch (_) { }
     } catch (error: any) {
       this.logger.error('Failed to publish event', {
         type: event.type,
@@ -474,7 +516,7 @@ export class EventListener {
     // Mark as shutting down to suppress noisy connection logs
     this.isShuttingDown = true;
     this.isConnected = false;
-    try { this.metrics?.setRedisConnected(false); } catch (_) {}
+    try { this.metrics?.setRedisConnected(false); } catch (_) { }
 
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);

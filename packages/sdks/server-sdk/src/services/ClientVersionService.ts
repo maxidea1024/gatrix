@@ -53,13 +53,25 @@ export class ClientVersionService {
     this.cachedVersionsByEnv.clear();
     for (const version of versions) {
       // In single-env mode, all data goes to 'default'
-      const envId = this.isMultiEnvironment()
-        ? ((version as any).environmentId || this.defaultEnvId)
-        : this.defaultEnvId;
-      if (!this.cachedVersionsByEnv.has(envId)) {
-        this.cachedVersionsByEnv.set(envId, []);
+      let envKey = this.defaultEnvId;
+      if (this.isMultiEnvironment()) {
+        // Use environmentName if available (user preference), fallback to environmentId
+        // Also check if the configured environments contain the name or ID to ensure consistency
+        if (version.environmentName && this.environments.includes(version.environmentName)) {
+          envKey = version.environmentName;
+        } else if (version.environmentId && this.environments.includes(version.environmentId)) {
+          envKey = version.environmentId;
+        } else {
+          // Fallback: mostly for cases where response might not exactly match request due to case or resolving
+          // Prefer name if available
+          envKey = version.environmentName || version.environmentId || this.defaultEnvId;
+        }
       }
-      this.cachedVersionsByEnv.get(envId)!.push(version);
+
+      if (!this.cachedVersionsByEnv.has(envKey)) {
+        this.cachedVersionsByEnv.set(envKey, []);
+      }
+      this.cachedVersionsByEnv.get(envKey)!.push(version);
     }
 
     this.logger.info('Client versions fetched', {

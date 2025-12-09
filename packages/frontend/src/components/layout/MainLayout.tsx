@@ -121,6 +121,38 @@ const ripplePulseAnimation = keyframes`
   }
 `;
 
+// Maintenance banner pulse animation
+const maintenancePulseAnimation = keyframes`
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(244, 67, 54, 0);
+  }
+`;
+
+// Maintenance icon pulse animation
+const maintenanceIconPulse = keyframes`
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+`;
+
+// Marquee scrolling animation for maintenance message
+const marqueeScroll = keyframes`
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+`;
+
 interface MainLayoutProps {
   children: React.ReactNode;
 }
@@ -383,16 +415,22 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         const { isUnderMaintenance, detail } = event.data || {};
         maintenanceUpdatedBySSE.current = true;
 
-        // Toast: started / stopped / updated
+        // Toast: started / scheduled / stopped / updated
         const prev = prevMaintenanceRef.current;
         const nextIsMaintenance = !!isUnderMaintenance;
         const nextStatus = computeMaintenanceStatus(nextIsMaintenance, detail);
         const nextUpdatedAt = detail?.updatedAt || null;
         if (prev) {
           if (prev.isMaintenance !== nextIsMaintenance) {
-            enqueueSnackbar(nextIsMaintenance ? t('notifications.maintenance.started') : t('notifications.maintenance.stopped'), {
-              variant: nextIsMaintenance ? 'warning' : 'success'
-            });
+            if (nextIsMaintenance) {
+              // Check if it's scheduled (start time is in the future)
+              const isScheduled = detail?.startsAt && new Date(detail.startsAt) > new Date();
+              enqueueSnackbar(isScheduled ? t('notifications.maintenance.scheduled') : t('notifications.maintenance.started'), {
+                variant: 'warning'
+              });
+            } else {
+              enqueueSnackbar(t('notifications.maintenance.stopped'), { variant: 'success' });
+            }
           } else if (nextIsMaintenance && prev.updatedAt !== nextUpdatedAt) {
             enqueueSnackbar(t('notifications.maintenance.updated'), { variant: 'info' });
           }
@@ -1311,92 +1349,145 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 <Box
                   onClick={handleMaintenanceBannerClick}
                   sx={{
-                    flexGrow: 1,
                     mx: 2,
-                    px: 2,
-                    py: 0.75,
-                    borderRadius: 3,
-                    backgroundColor: 'rgba(244, 67, 54, 0.15)',
-                    border: '1px solid rgba(244, 67, 54, 0.3)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    flex: 1,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    height: 34,
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    border: maintenanceStatus.status === 'active'
+                      ? '1.5px solid #ef5350'
+                      : '1.5px solid #ffa726',
+                    background: maintenanceStatus.status === 'active'
+                      ? 'linear-gradient(135deg, #ef5350 0%, #e53935 100%)'
+                      : 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)',
+                    boxShadow: maintenanceStatus.status === 'active'
+                      ? '0 2px 12px rgba(239, 83, 80, 0.4)'
+                      : '0 2px 12px rgba(255, 167, 38, 0.4)',
+                    transition: 'all 0.3s ease',
+                    animation: maintenanceStatus.status === 'active'
+                      ? `${maintenancePulseAnimation} 2s ease-in-out infinite`
+                      : 'none',
                     '&:hover': {
-                      backgroundColor: 'rgba(244, 67, 54, 0.25)',
-                      borderColor: 'rgba(244, 67, 54, 0.5)',
+                      transform: 'translateY(-1px)',
+                      boxShadow: maintenanceStatus.status === 'active'
+                        ? '0 4px 16px rgba(239, 83, 80, 0.5)'
+                        : '0 4px 16px rgba(255, 167, 38, 0.5)',
                     },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Typography variant="body2" sx={{
-                      fontWeight: 700,
-                      fontSize: '0.8rem',
-                      color: getMaintenanceStatusDisplay(maintenanceStatus.status).color,
-                    }}>
-                      {getMaintenanceStatusDisplay(maintenanceStatus.status).icon} {t(getMaintenanceStatusDisplay(maintenanceStatus.status).label)}
-                    </Typography>
-                    {maintenanceStatus.detail?.type && (
-                      <Typography variant="body2" sx={{
+                  {/* Icon + Status */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      px: 1.5,
+                      height: '100%',
+                      flexShrink: 0,
+                      bgcolor: '#424242',
+                      borderRight: '1px solid rgba(255,255,255,0.2)',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        fontSize: '1rem',
+                        animation: `${maintenanceIconPulse} 1.5s ease-in-out infinite`,
+                        filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
+                      }}
+                    >
+                      {maintenanceStatus.status === 'active' ? '🔧' : '📅'}
+                    </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      <Typography sx={{
                         fontSize: '0.7rem',
-                        backgroundColor: getMaintenanceStatusDisplay(maintenanceStatus.status).bgColor,
-                        color: getMaintenanceStatusDisplay(maintenanceStatus.status).color,
-                        px: 1,
-                        py: 0.25,
-                        borderRadius: 1,
-                        fontWeight: 600
+                        fontWeight: 700,
+                        color: '#fff',
+                        lineHeight: 1.2,
+                        textShadow: '0 1px 2px rgba(0,0,0,0.2)',
                       }}>
-                        {t(`maintenance.types.${maintenanceStatus.detail.type}`)}
+                        {t(getMaintenanceStatusDisplay(maintenanceStatus.status).label)}
                       </Typography>
-                    )}
-                    {(maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt) && (
-                      <Typography variant="body2" sx={{
-                        fontSize: '0.75rem',
-                        color: 'text.secondary',
+                      <Typography sx={{
+                        fontSize: '0.6rem',
+                        fontWeight: 600,
+                        color: 'rgba(255,255,255,0.85)',
+                        lineHeight: 1.1,
+                        textTransform: 'uppercase',
                       }}>
-                        📅 {(() => {
-                          const start = maintenanceStatus.detail?.startsAt;
-                          const end = maintenanceStatus.detail?.endsAt;
-                          if (start && end) {
-                            return `${formatDateTimeDetailed(start)} ~ ${formatDateTimeDetailed(end)}`;
-                          } else if (start) {
-                            return `${formatDateTimeDetailed(start)} ${t('maintenance.start')}`;
-                          } else if (end) {
-                            return `${formatDateTimeDetailed(end)} ${t('maintenance.stop')}`;
-                          }
-                          return t('maintenance.immediateStartLabel');
-                        })()}
+                        {maintenanceStatus.detail?.type === 'emergency'
+                          ? t('maintenance.types.emergency')
+                          : t('maintenance.types.regular')}
                       </Typography>
-                    )}
-                    {maintenanceStatus.detail?.message && (
-                      <Typography variant="body2" sx={{
-                        fontSize: '0.75rem',
-                        color: '#fbbf24',
-                        fontStyle: 'italic',
-                        maxWidth: '300px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
+                    </Box>
+                  </Box>
+
+                  {/* Message - Marquee scrolling */}
+                  <Box
+                    sx={{
+                      flex: 1,
+                      minWidth: 0,
+                      overflow: 'hidden',
+                      position: 'relative',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      '&::before, &::after': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        bottom: 0,
+                        width: 20,
+                        zIndex: 1,
+                        pointerEvents: 'none',
+                      },
+                      '&::before': {
+                        left: 0,
+                        background: maintenanceStatus.status === 'active'
+                          ? 'linear-gradient(90deg, #e53935 0%, transparent 100%)'
+                          : 'linear-gradient(90deg, #fb8c00 0%, transparent 100%)',
+                      },
+                      '&::after': {
+                        right: 0,
+                        background: maintenanceStatus.status === 'active'
+                          ? 'linear-gradient(90deg, transparent 0%, #e53935 100%)'
+                          : 'linear-gradient(90deg, transparent 0%, #fb8c00 100%)',
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
                         whiteSpace: 'nowrap',
-                      }}>
-                        💬 {maintenanceStatus.detail.message}
-                      </Typography>
-                    )}
+                        animation: `${marqueeScroll} 15s linear infinite`,
+                        '&:hover': { animationPlayState: 'paused' },
+                      }}
+                    >
+                      {[0, 1].map((idx) => (
+                        <Typography
+                          key={idx}
+                          sx={{
+                            fontSize: '0.8rem',
+                            color: '#fff',
+                            fontWeight: 600,
+                            px: 4,
+                            textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                          }}
+                        >
+                          {maintenanceStatus.detail?.message
+                            ? maintenanceStatus.detail.message
+                            : maintenanceStatus.detail?.startsAt && maintenanceStatus.detail?.endsAt
+                              ? `${formatDateTimeDetailed(maintenanceStatus.detail.startsAt)} → ${formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}`
+                              : t('maintenance.clickToManageTooltip')}
+                        </Typography>
+                      ))}
+                    </Box>
                   </Box>
                 </Box>
               </Tooltip>
-            )}
-
-            {/* 점검 배너 우측 구분선 */}
-            {maintenanceStatus.isMaintenance && (
-              <Box
-                sx={{
-                  width: '1px',
-                  height: '24px',
-                  bgcolor: 'rgba(255, 255, 255, 0.2)',
-                  mx: 1
-                }}
-              />
             )}
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

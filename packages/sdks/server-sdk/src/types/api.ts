@@ -34,6 +34,7 @@ export interface ClientVersionMaintenanceLocale {
 export interface ClientVersion {
   id: number;
   environmentId?: string; // Environment ID for multi-environment support
+  environmentName?: string; // Environment Name (if available)
   platform: string;
   clientVersion: string;
   clientStatus: ClientStatus;
@@ -69,6 +70,7 @@ export type ServiceNoticeCategory = 'maintenance' | 'event' | 'notice' | 'promot
 export interface ServiceNotice {
   id: number;
   environmentId?: string;
+  environmentName?: string;
   isActive: boolean;
   category: ServiceNoticeCategory;
   platforms: string[];
@@ -139,6 +141,7 @@ export interface Sequence {
 export interface Banner {
   bannerId: string;
   environmentId?: string; // Environment ID for multi-environment support
+  environmentName?: string; // Environment Name (if available)
   name: string;
   description?: string;
   width: number;

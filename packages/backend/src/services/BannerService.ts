@@ -1,4 +1,5 @@
 import { ulid } from 'ulid';
+import { Environment } from '../models/Environment';
 import { BannerModel, BannerAttributes, BannerFilters, BannerStatus, Sequence } from '../models/Banner';
 import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
@@ -141,8 +142,27 @@ class BannerService {
         version: 1,
         status: 'draft',
         createdBy: input.createdBy,
-        updatedBy: input.createdBy,
       });
+
+      // Publish SDK Event
+      try {
+        let envName: string | undefined;
+        if (banner.environmentId) {
+          const env = await Environment.query().findById(banner.environmentId);
+          envName = env?.environmentName;
+        }
+        await pubSubService.publishSDKEvent({
+          type: 'banner.updated',
+          data: {
+            id: banner.bannerId,
+            environmentId: banner.environmentId,
+            environmentName: envName,
+            timestamp: Date.now()
+          }
+        });
+      } catch (err) {
+        logger.error('Failed to publish banner event', err);
+      }
 
       return banner;
     } catch (error) {
@@ -183,6 +203,26 @@ class BannerService {
         targetChannels: ['banner', 'admin']
       });
 
+      // Publish SDK Event
+      try {
+        let envName: string | undefined;
+        if (banner.environmentId) {
+          const env = await Environment.query().findById(banner.environmentId);
+          envName = env?.environmentName;
+        }
+        await pubSubService.publishSDKEvent({
+          type: 'banner.updated',
+          data: {
+            id: banner.bannerId,
+            environmentId: banner.environmentId,
+            environmentName: envName,
+            timestamp: Date.now()
+          }
+        });
+      } catch (err) {
+        logger.error('Failed to publish banner event', err);
+      }
+
       return banner;
     } catch (error) {
       if (error instanceof GatrixError) throw error;
@@ -197,7 +237,7 @@ class BannerService {
   static async deleteBanner(bannerId: string): Promise<void> {
     try {
       // Check if banner exists
-      await this.getBannerById(bannerId);
+      const banner = await this.getBannerById(bannerId);
 
       await BannerModel.delete(bannerId);
 
@@ -210,6 +250,26 @@ class BannerService {
         data: { bannerId, action: 'deleted' },
         targetChannels: ['banner', 'admin']
       });
+
+      // Publish SDK Event (Deletion)
+      try {
+        let envName: string | undefined;
+        if (banner.environmentId) {
+          const env = await Environment.query().findById(banner.environmentId);
+          envName = env?.environmentName;
+        }
+        await pubSubService.publishSDKEvent({
+          type: 'banner.updated',
+          data: {
+            id: bannerId,
+            environmentId: banner.environmentId,
+            environmentName: envName,
+            timestamp: Date.now()
+          }
+        });
+      } catch (err) {
+        logger.error('Failed to publish banner event', err);
+      }
     } catch (error) {
       if (error instanceof GatrixError) throw error;
       logger.error('Failed to delete banner', { error, bannerId });
@@ -234,6 +294,26 @@ class BannerService {
         targetChannels: ['banner', 'admin', 'client']
       });
 
+      // Publish SDK Event
+      try {
+        let envName: string | undefined;
+        if (banner.environmentId) {
+          const env = await Environment.query().findById(banner.environmentId);
+          envName = env?.environmentName;
+        }
+        await pubSubService.publishSDKEvent({
+          type: 'banner.updated',
+          data: {
+            id: banner.bannerId,
+            environmentId: banner.environmentId,
+            environmentName: envName,
+            timestamp: Date.now()
+          }
+        });
+      } catch (err) {
+        logger.error('Failed to publish banner event', err);
+      }
+
       return banner;
     } catch (error) {
       logger.error('Failed to publish banner', { error, bannerId });
@@ -257,6 +337,26 @@ class BannerService {
         data: { bannerId, action: 'archived' },
         targetChannels: ['banner', 'admin', 'client']
       });
+
+      // Publish SDK Event
+      try {
+        let envName: string | undefined;
+        if (banner.environmentId) {
+          const env = await Environment.query().findById(banner.environmentId);
+          envName = env?.environmentName;
+        }
+        await pubSubService.publishSDKEvent({
+          type: 'banner.updated',
+          data: {
+            id: banner.bannerId,
+            environmentId: banner.environmentId,
+            environmentName: envName,
+            timestamp: Date.now()
+          }
+        });
+      } catch (err) {
+        logger.error('Failed to publish banner event', err);
+      }
 
       return banner;
     } catch (error) {

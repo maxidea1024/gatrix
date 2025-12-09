@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import ClientVersionService from '../services/ClientVersionService';
 import { ClientVersionModel } from '../models/ClientVersion';
+import { Environment } from '../models/Environment';
 import { TagService } from '../services/TagService';
 import logger from '../config/logger';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
@@ -38,21 +39,32 @@ export class ServerClientVersionController {
 
           if (environments.length > 0) {
             // Multi-environment mode: fetch from all specified environments
-            for (const envId of environments) {
-              const result = await ClientVersionModel.findAll({
-                environmentId: envId,
-                limit: 1000,
-                offset: 0,
-                sortBy: 'clientVersion',
-                sortOrder: 'DESC',
-              });
+            for (const envParam of environments) {
+              // Try to find environment by ID or Name
+              let env = await Environment.query().findById(envParam);
+              if (!env) {
+                env = await Environment.getByName(envParam);
+              }
 
-              // Add environmentId to each version for client grouping
-              const versionsWithEnv = result.clientVersions.map((v: any) => ({
-                ...v,
-                environmentId: envId,
-              }));
-              clientVersions.push(...versionsWithEnv);
+              if (env) {
+                const result = await ClientVersionModel.findAll({
+                  environmentId: env.id,
+                  limit: 1000,
+                  offset: 0,
+                  sortBy: 'clientVersion',
+                  sortOrder: 'DESC',
+                });
+
+                // Add environmentId and environmentName to each version for client grouping
+                const versionsWithEnv = result.clientVersions.map((v: any) => ({
+                  ...v,
+                  environmentId: env!.id,
+                  environmentName: env!.environmentName,
+                }));
+                clientVersions.push(...versionsWithEnv);
+              } else {
+                logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
+              }
             }
           } else {
             // Single-environment mode: use current environment (via context)
@@ -62,6 +74,12 @@ export class ServerClientVersionController {
               sortBy: 'clientVersion',
               sortOrder: 'DESC',
             });
+            // Try to find environment info for current environment
+            // Since we don't have easy access to current env name here without extra query (it's in request context usually)
+            // We just return what we have. Most likely result.clientVersions items rely on their own fields.
+            // But ClientVersionModel.findAll usually filters by current env.
+            // We can try to attach environmentName if we can resolve it.
+            // But for single-env mode, SDK usually doesn't need to differentiate.
             clientVersions = result.clientVersions;
           }
 

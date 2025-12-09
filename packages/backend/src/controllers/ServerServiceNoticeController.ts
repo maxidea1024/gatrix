@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Environment } from '../models/Environment';
 import ServiceNoticeService from '../services/ServiceNoticeService';
 import logger from '../config/logger';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
@@ -36,19 +37,30 @@ export class ServerServiceNoticeController {
 
           if (environments.length > 0) {
             // Multi-environment mode: fetch from all specified environments
-            for (const envId of environments) {
-              const result = await ServiceNoticeService.getServiceNotices(
-                1,
-                1000,
-                { environmentId: envId, isActive: true }
-              );
+            for (const envParam of environments) {
+              // Try to find environment by ID or Name
+              let env = await Environment.query().findById(envParam);
+              if (!env) {
+                env = await Environment.getByName(envParam);
+              }
 
-              // Add environmentId to each notice for client grouping
-              const noticesWithEnv = result.notices.map((n: any) => ({
-                ...n,
-                environmentId: envId,
-              }));
-              notices.push(...noticesWithEnv);
+              if (env) {
+                const result = await ServiceNoticeService.getServiceNotices(
+                  1,
+                  1000,
+                  { environmentId: env.id, isActive: true }
+                );
+
+                // Add environmentId and environmentName to each notice for client grouping
+                const noticesWithEnv = result.notices.map((n: any) => ({
+                  ...n,
+                  environmentId: env!.id,
+                  environmentName: env!.environmentName,
+                }));
+                notices.push(...noticesWithEnv);
+              } else {
+                logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
+              }
             }
           } else {
             // Single-environment mode: use current environment (via context)

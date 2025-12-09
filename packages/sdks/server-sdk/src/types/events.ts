@@ -21,11 +21,16 @@ export type StandardEventType =
   | 'maintenance.settings.updated'
   | 'maintenance.started'
   | 'maintenance.ended'
-  | 'whitelist.updated';
+  | 'whitelist.updated'
+  | 'client_version.updated'
+  | 'banner.updated'
+  | 'service_notice.updated';
 
 export interface StandardEventData {
   id: number | string;
   timestamp: number;
+  environmentId?: string; // Optional environment ID
+  environmentName?: string; // Optional environment Name
   isVisible?: boolean | number; // For gameworld.updated, popup.updated events (MySQL returns 0/1)
   isActive?: boolean | number;  // For survey.updated events (MySQL returns 0/1)
   isMaintenance?: boolean; // For maintenance.settings.updated events

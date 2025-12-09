@@ -2,6 +2,9 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import database from '../config/database';
 import { convertDateFieldsFromMySQL, convertToMySQLDateTime } from '../utils/dateUtils';
 import { getCurrentEnvironmentId } from '../utils/environmentContext';
+import { pubSubService } from './PubSubService';
+import { Environment } from '../models/Environment';
+import logger from '../config/logger';
 
 export interface ServiceNotice {
   id: number;
@@ -35,7 +38,7 @@ export interface CreateServiceNoticeData {
   description?: string;
 }
 
-export interface UpdateServiceNoticeData extends Partial<CreateServiceNoticeData> {}
+export interface UpdateServiceNoticeData extends Partial<CreateServiceNoticeData> { }
 
 export interface ServiceNoticeFilters {
   isActive?: boolean;
@@ -272,6 +275,24 @@ class ServiceNoticeService {
       throw new Error('Failed to retrieve created service notice');
     }
 
+    // Publish SDK Event
+    try {
+      const env = await Environment.query().findById(envId);
+      const envName = env?.environmentName;
+
+      await pubSubService.publishSDKEvent({
+        type: 'service_notice.updated',
+        data: {
+          id: notice.id,
+          environmentId: envId,
+          environmentName: envName,
+          timestamp: Date.now()
+        }
+      });
+    } catch (err) {
+      logger.error('Failed to publish service notice event', err);
+    }
+
     return notice;
   }
 
@@ -352,6 +373,24 @@ class ServiceNoticeService {
       throw new Error('Service notice not found');
     }
 
+    // Publish SDK Event
+    try {
+      const env = await Environment.query().findById(envId);
+      const envName = env?.environmentName;
+
+      await pubSubService.publishSDKEvent({
+        type: 'service_notice.updated',
+        data: {
+          id: notice.id,
+          environmentId: envId,
+          environmentName: envName,
+          timestamp: Date.now()
+        }
+      });
+    } catch (err) {
+      logger.error('Failed to publish service notice event', err);
+    }
+
     return notice;
   }
 
@@ -362,6 +401,24 @@ class ServiceNoticeService {
     const pool = database.getPool();
     const envId = environmentId ?? getCurrentEnvironmentId();
     await pool.execute('DELETE FROM g_service_notices WHERE id = ? AND environmentId = ?', [id, envId]);
+
+    // Publish SDK Event (Deletion)
+    try {
+      const env = await Environment.query().findById(envId);
+      const envName = env?.environmentName;
+
+      await pubSubService.publishSDKEvent({
+        type: 'service_notice.updated',
+        data: {
+          id: id,
+          environmentId: envId,
+          environmentName: envName,
+          timestamp: Date.now()
+        }
+      });
+    } catch (err) {
+      logger.error('Failed to publish service notice event', err);
+    }
   }
 
   /**
@@ -377,6 +434,23 @@ class ServiceNoticeService {
       `DELETE FROM g_service_notices WHERE id IN (${placeholders}) AND environmentId = ?`,
       [...ids, envId]
     );
+
+    // Publish SDK Event (Deletion)
+    try {
+      const env = await Environment.query().findById(envId);
+      const envName = env?.environmentName;
+
+      await pubSubService.publishSDKEvent({
+        type: 'service_notice.updated',
+        data: {
+          timestamp: Date.now(),
+          environmentId: envId,
+          environmentName: envName
+        }
+      });
+    } catch (err) {
+      logger.error('Failed to publish service notice event', err);
+    }
   }
 
   /**
@@ -393,6 +467,24 @@ class ServiceNoticeService {
     const notice = await this.getServiceNoticeById(id, envId);
     if (!notice) {
       throw new Error('Service notice not found');
+    }
+
+    // Publish SDK Event
+    try {
+      const env = await Environment.query().findById(envId);
+      const envName = env?.environmentName;
+
+      await pubSubService.publishSDKEvent({
+        type: 'service_notice.updated',
+        data: {
+          id: notice.id,
+          environmentId: envId,
+          environmentName: envName,
+          timestamp: Date.now()
+        }
+      });
+    } catch (err) {
+      logger.error('Failed to publish service notice event', err);
     }
 
     return notice;

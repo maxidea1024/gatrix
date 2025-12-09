@@ -60,13 +60,24 @@ export class ServiceNoticeService {
     this.cachedNoticesByEnv.clear();
     for (const notice of notices) {
       // In single-env mode, all data goes to 'default'
-      const envId = this.isMultiEnvironment()
-        ? (notice.environmentId || this.defaultEnvId)
-        : this.defaultEnvId;
-      if (!this.cachedNoticesByEnv.has(envId)) {
-        this.cachedNoticesByEnv.set(envId, []);
+      let envKey = this.defaultEnvId;
+      if (this.isMultiEnvironment()) {
+        // Use environmentName if available (user preference), fallback to environmentId
+        // Also check if the configured environments contain the name or ID to ensure consistency
+        if (notice.environmentName && this.environments.includes(notice.environmentName)) {
+          envKey = notice.environmentName;
+        } else if (notice.environmentId && this.environments.includes(notice.environmentId)) {
+          envKey = notice.environmentId;
+        } else {
+          // Fallback: prefer name if available
+          envKey = notice.environmentName || notice.environmentId || this.defaultEnvId;
+        }
       }
-      this.cachedNoticesByEnv.get(envId)!.push(notice);
+
+      if (!this.cachedNoticesByEnv.has(envKey)) {
+        this.cachedNoticesByEnv.set(envKey, []);
+      }
+      this.cachedNoticesByEnv.get(envKey)!.push(notice);
     }
 
     this.logger.info('Service notices fetched', {

@@ -106,7 +106,7 @@ export interface GatrixSDKConfig {
   // Optional - Target environments (for Edge server)
   // When specified, SDK loads data for these environments instead of just the current one
   // Edge server uses this to serve requests for multiple environments
-  // Example: ['env_prod', 'env_staging', 'env_dev']
+  // Example: ['development', 'production'] or ['env_prod', 'env_staging']
   // If not specified or empty, SDK operates in single-environment mode
   environments?: string[];
 }
