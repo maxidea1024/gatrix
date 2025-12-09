@@ -404,7 +404,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         }
       } else {
         // Get all active instances by scanning meta keys
-        const metaKeys = await this.client.keys('services:*:meta:*');
+        const metaKeys = await this.scanKeys('services:*:meta:*');
         for (const metaKey of metaKeys) {
           // Extract serviceType and instanceId from key: services:{type}:meta:{id}
           const parts = metaKey.split(':');
@@ -444,7 +444,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
     try {
       if (serviceType) {
         // Get meta keys for this service type
-        const metaKeys = await this.client.keys(`services:${serviceType}:meta:*`);
+        const metaKeys = await this.scanKeys(`services:${serviceType}:meta:*`);
         for (const metaKey of metaKeys) {
           const parts = metaKey.split(':');
           if (parts.length === 4) {
@@ -471,7 +471,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         }
       } else {
         // Get all meta keys
-        const metaKeys = await this.client.keys('services:*:meta:*');
+        const metaKeys = await this.scanKeys('services:*:meta:*');
         for (const metaKey of metaKeys) {
           const parts = metaKey.split(':');
           if (parts.length === 4) {
@@ -554,7 +554,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
       logger.info('Starting Redis watch - subscribing to keyspace events');
 
       // Load existing services into trackedServices (meta + stat)
-      const metaKeys = await this.client.keys('services:*:meta:*');
+      const metaKeys = await this.scanKeys('services:*:meta:*');
       for (const metaKey of metaKeys) {
         const metaValue = await this.client.get(metaKey);
         if (metaValue) {
@@ -784,7 +784,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
           logger.info(`🗑️ Cleared inactive collection for ${serviceType}: ${inactiveEntryCount} entries deleted`);
 
           // Also delete all inactive item keys (services:{type}:inactive:{id})
-          const inactiveItemKeys = await this.client.keys(`services:${serviceType}:inactive:*`);
+          const inactiveItemKeys = await this.scanKeys(`services:${serviceType}:inactive:*`);
           if (inactiveItemKeys.length > 0) {
             await this.client.del(...inactiveItemKeys);
             logger.info(`🗑️ Deleted ${inactiveItemKeys.length} inactive item keys for ${serviceType}`);
@@ -805,7 +805,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         }
 
         // 2. Clean up terminated meta keys (meta without stat)
-        const metaKeys = await this.client.keys(`services:${serviceType}:meta:*`);
+        const metaKeys = await this.scanKeys(`services:${serviceType}:meta:*`);
         for (const metaKey of metaKeys) {
           const parts = metaKey.split(':');
           if (parts.length === 4) {
@@ -898,6 +898,20 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
     } catch (error) {
       logger.error('Failed to publish event:', error);
     }
+  }
+
+  /**
+   * Helper to scan keys safely using SCAN instead of KEYS
+   */
+  private async scanKeys(pattern: string): Promise<string[]> {
+    const keys: string[] = [];
+    // Use scanStream for non-blocking iteration
+    const stream = this.client.scanStream({ match: pattern, count: 100 });
+
+    for await (const chunk of stream) {
+      keys.push(...chunk);
+    }
+    return keys;
   }
 }
 

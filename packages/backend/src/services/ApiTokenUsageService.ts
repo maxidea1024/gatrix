@@ -93,7 +93,7 @@ export class ApiTokenUsageService {
       await client.set(metaKey, JSON.stringify({
         lastUsedAt: now,
         instanceId
-      }), 'EX', ttlSeconds);
+      }), { EX: ttlSeconds });
 
       // Ensure count key also has TTL (refresh on every usage)
       await client.expire(countKey, ttlSeconds);
@@ -132,15 +132,13 @@ export class ApiTokenUsageService {
     if (!client) return;
 
     try {
-      // Find all count keys: token_usage:count:*
-      // Note: In production with millions of keys, SCAN should be used. 
-      // For now, assuming manageable key set or use scanStream if supported by ioredis wrapper.
-      // using keys() for simplicity as per existing pattern, but SAFE practice is SCAN.
-      // However ioredis 'keys' is blocking. Let's use scan if possible? 
-      // Let's stick to keys() for now to match previous logic complexity, 
-      // but acknowledge that scan is better for massive scale.
       const pattern = 'token_usage:count:*';
-      const countKeys = await client.keys(pattern);
+      const countKeys: string[] = [];
+
+      // Use SCAN instead of KEYS to prevent blocking
+      for await (const key of client.scanIterator({ MATCH: pattern, COUNT: 100 })) {
+        countKeys.push(key);
+      }
 
       if (countKeys.length === 0) {
         return;
@@ -153,7 +151,7 @@ export class ApiTokenUsageService {
       for (const countKey of countKeys) {
         try {
           // Atomic GETSET to 0 to claim the current count without losing concurrent increments
-          const countStr = await client.getset(countKey, '0');
+          const countStr = await client.getSet(countKey, '0');
           const count = parseInt(countStr || '0', 10);
 
           if (count > 0) {
@@ -273,9 +271,15 @@ export class ApiTokenUsageService {
       if (!client) return;
 
       const pattern = 'api_token:*';
-      const keys = await client.keys(pattern);
+      const keys: string[] = [];
+
+      // Use SCAN instead of KEYS
+      for await (const key of client.scanIterator({ MATCH: pattern, COUNT: 100 })) {
+        keys.push(key);
+      }
+
       if (keys.length > 0) {
-        await client.del(...keys);
+        await client.del(keys);
       }
     } catch (error) {
       logger.error(`Failed to invalidate token cache for token ${tokenId}:`, error);
