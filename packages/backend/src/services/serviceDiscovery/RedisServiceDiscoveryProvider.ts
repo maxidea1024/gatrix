@@ -904,14 +904,24 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
    * Helper to scan keys safely using SCAN instead of KEYS
    */
   private async scanKeys(pattern: string): Promise<string[]> {
-    const keys: string[] = [];
-    // Use scanStream for non-blocking iteration
-    const stream = this.client.scanStream({ match: pattern, count: 100 });
+    return new Promise((resolve, reject) => {
+      const keys: string[] = [];
+      const stream = this.client.scanStream({ match: pattern, count: 100 });
 
-    for await (const chunk of stream) {
-      keys.push(...chunk);
-    }
-    return keys;
+      stream.on('data', (resultKeys: string[]) => {
+        // ioredis scanStream returns an array of keys
+        for (const key of resultKeys) {
+          keys.push(key);
+        }
+      });
+
+      stream.on('end', () => {
+        resolve(keys);
+      });
+
+      stream.on('error', (err) => {
+        reject(err);
+      });
+    });
   }
 }
-
