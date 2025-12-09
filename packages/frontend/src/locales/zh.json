@@ -1207,6 +1207,7 @@
     "immediateStart": "立即开始",
     "manualStop": "手动停止",
     "duration": "持续时间",
+    "remainingTime": "剩余时间",
     "validationTimeInPast": "开始时间已过期。请设置为未来时间。",
     "validationEndTimeInPast": "结束时间已过期。请设置为未来时间。",
     "validationEndBeforeStart": "结束时间早于开始时间。",

@@ -62,6 +62,8 @@ import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceSer
 import { CrashEvent } from '@/types/crash';
 import { BugReport as BugReportIcon } from '@mui/icons-material';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { computeMaintenanceStatus, getMaintenanceStatusDisplay } from '@/utils/maintenanceStatusUtils';
 
 // Stats card component with modern design
 interface StatsCardProps {
@@ -795,78 +797,215 @@ const DashboardPage: React.FC = () => {
       {/* Maintenance Status - Shown at top when active or scheduled */}
       {isAdminUser && maintenanceStatus?.isUnderMaintenance && maintenanceStatus?.detail && (
         <Box sx={{ mb: 4 }}>
-          <Card sx={{ borderLeft: 4, borderColor: 'warning.main' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6" fontWeight={600}>
-                  {t('dashboard.maintenanceStatus')}
-                </Typography>
-                <Tooltip title={t('dashboard.viewDetails')}>
-                  <IconButton size="small" onClick={() => navigate('/admin/maintenance')}>
-                    <OpenInNewIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-              {(() => {
-                const detail = maintenanceStatus.detail;
-                const now = new Date();
-                const startsAt = detail.startsAt ? new Date(detail.startsAt) : null;
-                const endsAt = detail.endsAt ? new Date(detail.endsAt) : null;
-                const isActive = startsAt ? now >= startsAt : true;
+          {(() => {
+            const detail = maintenanceStatus.detail;
+            const status = computeMaintenanceStatus(true, detail);
+            const statusDisplay = getMaintenanceStatusDisplay(status);
 
-                return (
-                  <Box>
-                    <Chip
-                      label={isActive ? t('dashboard.maintenanceActive') : t('dashboard.maintenanceScheduled')}
-                      color={isActive ? 'error' : 'warning'}
-                      size="small"
-                      sx={{ mb: 2 }}
-                    />
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {t('dashboard.maintenanceType')}
-                        </Typography>
-                        <Typography variant="body2" fontWeight={500}>
-                          {detail.type === 'emergency' ? t('maintenance.types.emergency') : t('maintenance.types.regular')}
-                        </Typography>
-                      </Box>
-                      {startsAt && (
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" color="text.secondary">
-                            {t('dashboard.maintenanceStartsAt')}
-                          </Typography>
-                          <Typography variant="body2" fontWeight={500}>
-                            {startsAt.toLocaleString()}
-                          </Typography>
-                        </Box>
-                      )}
-                      {endsAt && (
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" color="text.secondary">
-                            {t('dashboard.maintenanceEndsAt')}
-                          </Typography>
-                          <Typography variant="body2" fontWeight={500}>
-                            {endsAt.toLocaleString()}
-                          </Typography>
-                        </Box>
-                      )}
-                      {detail.message && (
-                        <Box sx={{ mt: 1, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
-                          <Typography variant="caption" color="text.secondary">
-                            {t('dashboard.maintenanceMessage')}
-                          </Typography>
-                          <Typography variant="body2" sx={{ mt: 0.5 }}>
-                            {detail.message}
-                          </Typography>
-                        </Box>
-                      )}
+            // Calculate duration if both start and end times are available
+            const getDuration = () => {
+              if (!detail.startsAt || !detail.endsAt) return null;
+              const start = new Date(detail.startsAt);
+              const end = new Date(detail.endsAt);
+              const diffMs = end.getTime() - start.getTime();
+              const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+              const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+              if (diffHours > 0) {
+                return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
+              }
+              return `${diffMinutes}${t('maintenance.minutesUnit')}`;
+            };
+
+            // Calculate remaining time
+            const getRemainingTime = () => {
+              if (!detail.endsAt) return null;
+              const now = new Date();
+              const end = new Date(detail.endsAt);
+              if (now >= end) return null;
+              const diffMs = end.getTime() - now.getTime();
+              const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+              const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+              if (diffHours > 0) {
+                return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
+              }
+              return `${diffMinutes}${t('maintenance.minutesUnit')}`;
+            };
+
+            const duration = getDuration();
+            const remaining = getRemainingTime();
+
+            return (
+              <Card sx={{
+                borderLeft: 4,
+                borderColor: statusDisplay.color,
+                background: (theme) => alpha(statusDisplay.color, theme.palette.mode === 'dark' ? 0.15 : 0.05)
+              }}>
+                <CardContent>
+                  {/* Header */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Typography variant="h6" fontWeight={600}>
+                        🔧 {t('dashboard.maintenanceStatus')}
+                      </Typography>
+                      <Chip
+                        icon={<Box sx={{ pl: 0.5, fontSize: '0.9rem' }}>{statusDisplay.icon}</Box>}
+                        label={t(statusDisplay.label)}
+                        size="small"
+                        sx={{
+                          bgcolor: alpha(statusDisplay.color, 0.15),
+                          color: statusDisplay.color,
+                          fontWeight: 600,
+                          '& .MuiChip-icon': { color: statusDisplay.color }
+                        }}
+                      />
                     </Box>
+                    <Tooltip title={t('dashboard.viewDetails')}>
+                      <IconButton size="small" onClick={() => navigate('/admin/maintenance')}>
+                        <OpenInNewIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
-                );
-              })()}
-            </CardContent>
-          </Card>
+
+                  {/* Main Info Grid */}
+                  <Grid container spacing={3}>
+                    {/* Left Column - Basic Info */}
+                    <Grid item xs={12} md={6}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                        {/* Type */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2" color="text.secondary" sx={{ minWidth: 100 }}>
+                            {t('maintenance.tooltipType')}
+                          </Typography>
+                          <Chip
+                            label={detail.type === 'emergency' ? t('maintenance.types.emergency') : t('maintenance.types.regular')}
+                            size="small"
+                            color={detail.type === 'emergency' ? 'error' : 'default'}
+                            sx={{ fontWeight: 500 }}
+                          />
+                        </Box>
+
+                        {/* Start Time */}
+                        {detail.startsAt && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ minWidth: 100 }}>
+                              {t('maintenance.tooltipStartTime')}
+                            </Typography>
+                            <Typography variant="body2" fontWeight={500}>
+                              📅 {formatDateTimeDetailed(detail.startsAt)}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* End Time */}
+                        {detail.endsAt && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ minWidth: 100 }}>
+                              {t('maintenance.tooltipEndTime')}
+                            </Typography>
+                            <Typography variant="body2" fontWeight={500}>
+                              📅 {formatDateTimeDetailed(detail.endsAt)}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Duration */}
+                        {duration && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ minWidth: 100 }}>
+                              {t('maintenance.tooltipDuration')}
+                            </Typography>
+                            <Typography variant="body2" fontWeight={500}>
+                              ⏱️ {duration}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </Grid>
+
+                    {/* Right Column - Additional Info */}
+                    <Grid item xs={12} md={6}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                        {/* Remaining Time */}
+                        {remaining && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ minWidth: 100 }}>
+                              {t('maintenance.remainingTime')}
+                            </Typography>
+                            <Typography variant="body2" fontWeight={600} sx={{ color: statusDisplay.color }}>
+                              ⏳ {remaining}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Kick Players */}
+                        {detail.kickExistingPlayers !== undefined && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ minWidth: 100 }}>
+                              {t('maintenance.kickExistingPlayers')}
+                            </Typography>
+                            <Chip
+                              label={detail.kickExistingPlayers ? t('common.yes') : t('common.no')}
+                              size="small"
+                              color={detail.kickExistingPlayers ? 'warning' : 'default'}
+                              sx={{ fontWeight: 500 }}
+                            />
+                          </Box>
+                        )}
+
+                        {/* Kick Delay */}
+                        {detail.kickExistingPlayers && detail.kickDelayMinutes !== undefined && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ minWidth: 100 }}>
+                              {t('maintenance.kickDelayMinutes')}
+                            </Typography>
+                            <Typography variant="body2" fontWeight={500}>
+                              {detail.kickDelayMinutes}{t('maintenance.minutesUnit')}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Updated By */}
+                        {detail.updatedBy && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ minWidth: 100 }}>
+                              {t('maintenance.updatedBy')}
+                            </Typography>
+                            <Typography variant="body2" fontWeight={500}>
+                              👤 {detail.updatedBy.name}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Updated At */}
+                        {detail.updatedAt && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ minWidth: 100 }}>
+                              {t('maintenance.updatedAt')}
+                            </Typography>
+                            <Typography variant="body2" fontWeight={500}>
+                              🕐 {formatDateTimeDetailed(detail.updatedAt)}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </Grid>
+                  </Grid>
+
+                  {/* Message */}
+                  {detail.message && (
+                    <Box sx={{ mt: 2.5, p: 2, bgcolor: (theme) => alpha(theme.palette.warning.main, 0.1), borderRadius: 1, border: 1, borderColor: 'divider' }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, display: 'block', mb: 0.5 }}>
+                        💬 {t('maintenance.tooltipMessage')}
+                      </Typography>
+                      <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                        {detail.message}
+                      </Typography>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })()}
         </Box>
       )}
 

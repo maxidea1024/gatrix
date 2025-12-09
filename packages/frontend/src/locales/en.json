@@ -1152,6 +1152,7 @@
     "immediateStart": "Start Immediately",
     "manualStop": "Stop Manually",
     "duration": "Duration",
+    "remainingTime": "Remaining",
     "validationTimeInPast": "Start time is in the past. Please set a future time.",
     "validationEndTimeInPast": "End time is in the past. Please set a future time.",
     "validationEndBeforeStart": "End time is earlier than start time.",
