@@ -301,6 +301,12 @@ const startServer = async () => {
         });
         logger.info('Redis Service Discovery watch initialized (keyspace notifications enabled)');
       } else if (serviceDiscoveryMode === 'etcd') {
+        // Start watching for service changes (required for SSE updates)
+        await serviceDiscoveryService.watchServices((event) => {
+          logger.debug(`Service Discovery event: ${event.type} ${event.instance.labels.service}:${event.instance.instanceId}`);
+        });
+        logger.info('etcd Service Discovery watch initialized');
+
         // Start automatic monitoring with Leader Election
         // Only the elected leader will perform finding unresponsive services and cleanup
         await serviceDiscoveryService.startMonitoring();

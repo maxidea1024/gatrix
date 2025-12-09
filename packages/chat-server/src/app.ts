@@ -154,12 +154,12 @@ class ChatServerApp {
     this.app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
       // Check if this is a client abort error (common and expected)
       const isClientAbort = error.message?.includes('request aborted') ||
-                           error.message?.includes('aborted') ||
-                           (error as any)?.code === 'ECONNABORTED' ||
-                           (error as any)?.code === 'ECONNRESET' ||
-                           (error as any)?.code === 'EPIPE' ||
-                           (error as any)?.type === 'request.aborted' ||
-                           error.name === 'BadRequestError';
+        error.message?.includes('aborted') ||
+        (error as any)?.code === 'ECONNABORTED' ||
+        (error as any)?.code === 'ECONNRESET' ||
+        (error as any)?.code === 'EPIPE' ||
+        (error as any)?.type === 'request.aborted' ||
+        error.name === 'BadRequestError';
 
       if (isClientAbort) {
         // Log client aborts at debug level only (not error level)
@@ -203,9 +203,6 @@ class ChatServerApp {
       this.gracefulShutdown('UNHANDLED_REJECTION');
     });
 
-    // Graceful shutdown signals
-    process.on('SIGTERM', () => this.gracefulShutdown('SIGTERM'));
-    process.on('SIGINT', () => this.gracefulShutdown('SIGINT'));
   }
 
 
@@ -273,6 +270,10 @@ class ChatServerApp {
         }
       });
 
+      // Register graceful shutdown signals early
+      process.on('SIGTERM', () => this.gracefulShutdown('SIGTERM'));
+      process.on('SIGINT', () => this.gracefulShutdown('SIGINT'));
+
       // Start listening - wrap in Promise to ensure it completes
       return new Promise<void>((resolve, reject) => {
         this.server.listen(config.port, config.host, async () => {
@@ -331,6 +332,8 @@ class ChatServerApp {
 
         this.server.on('error', reject);
       });
+
+
 
     } catch (error) {
       // Error already logged in initialize() method

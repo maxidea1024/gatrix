@@ -4,7 +4,7 @@
   "description": "Gatrix Chat Server - Real-time messaging service",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "yarn migrate:safe && nodemon src/index.ts",
+    "dev": "yarn migrate:safe && ts-node src/index.ts",
     "dev:no-migrate": "nodemon src/index.ts",
     "build": "tsc",
     "start": "yarn migrate:safe && node dist/index.js",

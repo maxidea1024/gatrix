@@ -350,6 +350,7 @@ services:
       target: development
     container_name: gatrix-chat-server-dev
     restart: unless-stopped
+    stop_grace_period: 30s
     environment:
       NODE_ENV: development
       LOG_FORMAT: json
@@ -411,7 +412,7 @@ services:
       - /app/node_modules
       - ${DATA_ROOT:-./data}/chat-server/uploads:/app/packages/chat-server/uploads
       - ${DATA_ROOT:-./data}/chat-server/logs:/app/packages/chat-server/logs
-    command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/chat-server dev"
+    command: sh -c "yarn workspace @gatrix/server-sdk build && cd packages/chat-server && yarn migrate:safe && exec node_modules/.bin/ts-node src/index.ts"
 
   # Edge Server for development (with hot reload)
   edge-dev:
