@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { forceSimulation, forceLink, forceManyBody, forceCollide, SimulationNodeDatum, SimulationLinkDatum } from 'd3-force';
+import { forceSimulation, forceLink, forceManyBody, forceCollide, SimulationNodeDatum, SimulationLinkDatum, ForceLink } from 'd3-force';
 import { useAuth } from '../../hooks/useAuth';
 import { PERMISSIONS } from '../../types/permissions';
 import {
@@ -134,6 +134,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
   // Track rumble and heartbeat animation states
   const [rumbleNodes, setRumbleNodes] = useState<Set<string>>(new Set());
   const [heartbeatAnimNodes, setHeartbeatAnimNodes] = useState<Set<string>>(new Set());
+  // Counter to force re-render of animate elements - Map<nodeId, counter>
+  const [rumbleCounter, setRumbleCounter] = useState<Map<string, number>>(new Map());
   const prevStatusRef = useRef<Map<string, string>>(new Map());
   const prevHeartbeatRef = useRef<Set<string>>(new Set());
 
@@ -259,6 +261,13 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
     if (newRumbleNodes.size > 0) {
       setRumbleNodes(prev => new Set([...prev, ...newRumbleNodes]));
 
+      // Increment rumble counter to force re-render of animate element
+      setRumbleCounter(prev => {
+        const next = new Map(prev);
+        newRumbleNodes.forEach(id => next.set(id, (prev.get(id) || 0) + 1));
+        return next;
+      });
+
       // Clear rumble after animation
       setTimeout(() => {
         setRumbleNodes(prev => {
@@ -270,7 +279,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
     }
   }, [services]);
 
-  // Detect heartbeat and trigger border animation
+  // Detect heartbeat and trigger rumble animation
   useEffect(() => {
     const newHeartbeatNodes = new Set<string>();
 
@@ -282,6 +291,13 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
 
     if (newHeartbeatNodes.size > 0) {
       setHeartbeatAnimNodes(prev => new Set([...prev, ...newHeartbeatNodes]));
+
+      // Increment rumble counter to force re-render of animate element
+      setRumbleCounter(prev => {
+        const next = new Map(prev);
+        newHeartbeatNodes.forEach(id => next.set(id, (prev.get(id) || 0) + 1));
+        return next;
+      });
 
       // Clear animation after 600ms
       setTimeout(() => {
@@ -296,45 +312,92 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
     prevHeartbeatRef.current = new Set(heartbeatIds);
   }, [heartbeatIds]);
 
-  // Initialize and update simulation only when service structure changes (add/remove)
+  // Initialize simulation once
   useEffect(() => {
-    // Get saved center position
+    if (simulationRef.current) return; // Already initialized
+
     const savedPos = getSavedCenterPosition();
 
-    // Create center node
+    // Create initial center node
     const centerNode: ClusterNode = {
       id: 'center',
       isCenter: true,
       radius: centerRadius,
       x: savedPos.x,
       y: savedPos.y,
-      fx: savedPos.x, // Fixed position (but can be dragged)
+      fx: savedPos.x,
       fy: savedPos.y,
     };
 
-    // Create service nodes - preserve existing positions if available
+    nodesRef.current = [centerNode];
+    linksRef.current = [];
+
+    // Create simulation once
+    const simulation = forceSimulation<ClusterNode>(nodesRef.current)
+      .force('link', forceLink<ClusterNode, ClusterLink>(linksRef.current)
+        .id(d => d.id)
+        .distance(100)
+        .strength(0.5))
+      .force('charge', forceManyBody<ClusterNode>()
+        .strength(-100))
+      .force('collision', forceCollide<ClusterNode>()
+        .radius(d => d.radius + 8)
+        .strength(0.8))
+      .alphaDecay(0.02) // Slower decay for smoother movement
+      .velocityDecay(0.3)
+      .on('tick', () => {
+        setNodes([...nodesRef.current]);
+        setLinks([...linksRef.current]);
+      });
+
+    simulationRef.current = simulation;
+
+    return () => {
+      simulation.stop();
+      simulationRef.current = null;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Update nodes when services change (add/remove)
+  useEffect(() => {
+    if (!simulationRef.current) return;
+
+    const savedPos = getSavedCenterPosition();
     const existingNodeMap = new Map<string, ClusterNode>();
     nodesRef.current.forEach(n => existingNodeMap.set(n.id, n));
 
     // Track new nodes for rumble effect
     const newNodeIds: string[] = [];
 
+    // Get or create center node
+    let centerNode = existingNodeMap.get('center');
+    if (!centerNode) {
+      centerNode = {
+        id: 'center',
+        isCenter: true,
+        radius: centerRadius,
+        x: savedPos.x,
+        y: savedPos.y,
+        fx: savedPos.x,
+        fy: savedPos.y,
+      };
+    }
+
+    // Create/update service nodes
     const serviceNodes: ClusterNode[] = services.map((service) => {
       const nodeId = `${service.labels.service}-${service.instanceId}`;
       const existing = existingNodeMap.get(nodeId);
 
       if (existing) {
-        // Preserve position for existing nodes
-        return {
-          ...existing,
-          service, // Update service data
-          isNew: false,
-        };
+        // Update service data but keep position
+        existing.service = service;
+        return existing;
       }
 
-      // New node - random position around center node
+      // New node - random position around center
       const angle = Math.random() * 2 * Math.PI;
-      const distance = 80 + Math.random() * 60; // Random distance 80-140px from center
+      const distance = 80 + Math.random() * 60;
       newNodeIds.push(nodeId);
 
       return {
@@ -342,8 +405,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
         service,
         isCenter: false,
         radius: nodeRadius,
-        x: savedPos.x + Math.cos(angle) * distance,
-        y: savedPos.y + Math.sin(angle) * distance,
+        x: (centerNode?.x ?? savedPos.x) + Math.cos(angle) * distance,
+        y: (centerNode?.y ?? savedPos.y) + Math.sin(angle) * distance,
         isNew: true,
       };
     });
@@ -363,44 +426,25 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
     const allNodes = [centerNode, ...serviceNodes];
     nodesRef.current = allNodes;
 
-    // Create links from each service node to center
+    // Create links
     const newLinks: ClusterLink[] = serviceNodes.map(node => ({
       source: 'center',
       target: node.id,
     }));
     linksRef.current = newLinks;
 
-    // Create or update simulation
-    if (simulationRef.current) {
-      simulationRef.current.stop();
+    // Update simulation with new nodes/links (don't recreate)
+    const simulation = simulationRef.current;
+    simulation.nodes(allNodes);
+    (simulation.force('link') as ForceLink<ClusterNode, ClusterLink>)?.links(newLinks);
+
+    // Gently restart with low alpha for smooth transition
+    const hasChanges = newNodeIds.length > 0 || allNodes.length !== existingNodeMap.size;
+    if (hasChanges) {
+      simulation.alpha(0.3).restart();
     }
-
-    // Note: No forceCenter - center node is fixed via fx/fy,
-    // and other nodes orbit around it via link force
-    const simulation = forceSimulation<ClusterNode>(allNodes)
-      .force('link', forceLink<ClusterNode, ClusterLink>(newLinks)
-        .id(d => d.id)
-        .distance(100)
-        .strength(0.5)) // Stronger link to keep nodes close to center
-      .force('charge', forceManyBody<ClusterNode>()
-        .strength(-100)) // Lighter repulsion between nodes
-      .force('collision', forceCollide<ClusterNode>()
-        .radius(d => d.radius + 8)
-        .strength(0.8))
-      .alphaDecay(0.05)
-      .velocityDecay(0.4)
-      .on('tick', () => {
-        setNodes([...allNodes]);
-        setLinks([...newLinks]);
-      });
-
-    simulationRef.current = simulation;
-
-    return () => {
-      simulation.stop();
-    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceIds, getSavedCenterPosition]); // Only re-run when service IDs change
+  }, [serviceIds, getSavedCenterPosition]);
 
   // Convert mouse position to SVG coordinates
   const mouseToSvgCoords = useCallback((e: MouseEvent | React.MouseEvent) => {
@@ -732,11 +776,17 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
               // Combine rumble triggers: status change OR heartbeat
               const shouldRumble = hasRumble || hasHeartbeatAnim;
 
+              // Get rumble count for this node to use as animation key
+              const currentRumbleCount = rumbleCounter.get(serviceKey) || 0;
+
               return (
                 <g
-                  key={node.id}
+                  key={`${node.id}-${currentRumbleCount}`}
                   transform={`translate(${node.x || 0}, ${node.y || 0})`}
-                  style={{ cursor: 'grab' }}
+                  style={{
+                    cursor: 'grab',
+                    animation: shouldRumble ? 'clusterBallPulse 0.4s ease-out' : 'none',
+                  }}
                   onMouseDown={(e) => handleMouseDown(node.id, e)}
                 >
                   {/* Outer glow for active services */}
@@ -763,23 +813,13 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
                     </circle>
                   )}
 
-                  {/* Main circle with rumble animation - use key to force re-render on rumble */}
+                  {/* Main circle */}
                   <circle
-                    key={shouldRumble ? `rumble-${Date.now()}` : 'normal'}
                     r={nodeRadius}
                     fill={nodeColor}
-                    stroke="#fff"
-                    strokeWidth="2"
-                  >
-                    {shouldRumble && (
-                      <animate
-                        attributeName="r"
-                        values={`${nodeRadius};${nodeRadius + 3};${nodeRadius - 1};${nodeRadius + 1};${nodeRadius}`}
-                        dur="0.4s"
-                        fill="freeze"
-                      />
-                    )}
-                  </circle>
+                    stroke={shouldRumble ? '#ffeb3b' : '#fff'}
+                    strokeWidth={shouldRumble ? 4 : 2}
+                  />
 
                   {/* Shine effect */}
                   <ellipse
@@ -2325,35 +2365,38 @@ const ServerListPage: React.FC = () => {
                           {getTypeChip(service.labels.service)}
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                             {getStatusBadge(service.status)}
-                            <Box
-                              sx={{
-                                width: 20,
-                                height: 20,
-                                borderRadius: '50%',
-                                border: 1,
-                                borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                bgcolor: 'background.paper',
-                              }}
-                            >
-                              <FavoriteIcon
+                            {/* Only show heartbeat icon for initializing/ready status */}
+                            {(service.status === 'initializing' || service.status === 'ready') && (
+                              <Box
                                 sx={{
-                                  fontSize: 12,
-                                  color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
-                                  opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
-                                  animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
-                                  '@keyframes heartbeat': {
-                                    '0%': { transform: 'scale(1)' },
-                                    '25%': { transform: 'scale(1.3)' },
-                                    '50%': { transform: 'scale(1)' },
-                                    '75%': { transform: 'scale(1.2)' },
-                                    '100%': { transform: 'scale(1)' },
-                                  },
+                                  width: 20,
+                                  height: 20,
+                                  borderRadius: '50%',
+                                  border: 1,
+                                  borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  bgcolor: 'background.paper',
                                 }}
-                              />
-                            </Box>
+                              >
+                                <FavoriteIcon
+                                  sx={{
+                                    fontSize: 12,
+                                    color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
+                                    opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
+                                    animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
+                                    '@keyframes heartbeat': {
+                                      '0%': { transform: 'scale(1)' },
+                                      '25%': { transform: 'scale(1.3)' },
+                                      '50%': { transform: 'scale(1)' },
+                                      '75%': { transform: 'scale(1.2)' },
+                                      '100%': { transform: 'scale(1)' },
+                                    },
+                                  }}
+                                />
+                              </Box>
+                            )}
                           </Box>
                         </Box>
                         {/* Hostname */}
@@ -2553,35 +2596,38 @@ const ServerListPage: React.FC = () => {
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             {getStatusBadge(service.status)}
-                            <Box
-                              sx={{
-                                width: 26,
-                                height: 26,
-                                borderRadius: '50%',
-                                border: 1,
-                                borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                bgcolor: 'background.paper',
-                              }}
-                            >
-                              <FavoriteIcon
+                            {/* Only show heartbeat icon for initializing/ready status */}
+                            {(service.status === 'initializing' || service.status === 'ready') && (
+                              <Box
                                 sx={{
-                                  fontSize: 14,
-                                  color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
-                                  opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
-                                  animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
-                                  '@keyframes heartbeat': {
-                                    '0%': { transform: 'scale(1)' },
-                                    '25%': { transform: 'scale(1.3)' },
-                                    '50%': { transform: 'scale(1)' },
-                                    '75%': { transform: 'scale(1.2)' },
-                                    '100%': { transform: 'scale(1)' },
-                                  },
+                                  width: 26,
+                                  height: 26,
+                                  borderRadius: '50%',
+                                  border: 1,
+                                  borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  bgcolor: 'background.paper',
                                 }}
-                              />
-                            </Box>
+                              >
+                                <FavoriteIcon
+                                  sx={{
+                                    fontSize: 14,
+                                    color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
+                                    opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
+                                    animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
+                                    '@keyframes heartbeat': {
+                                      '0%': { transform: 'scale(1)' },
+                                      '25%': { transform: 'scale(1.3)' },
+                                      '50%': { transform: 'scale(1)' },
+                                      '75%': { transform: 'scale(1.2)' },
+                                      '100%': { transform: 'scale(1)' },
+                                    },
+                                  }}
+                                />
+                              </Box>
+                            )}
                           </Box>
                         </Box>
 

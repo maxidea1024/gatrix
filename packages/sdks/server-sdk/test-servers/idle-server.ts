@@ -12,8 +12,10 @@ const logger = getLogger('IDLE-SERVER');
 async function main() {
   logger.info('Starting Idle Server...');
 
-  const metricsPort = parseInt(process.env.METRICS_PORT || '9999');
-  const instanceName = process.env.INSTANCE_NAME || 'idle-1';
+  // Support command line argument for port: npx ts-node idle-server.ts 11001
+  const portArg = process.argv[2];
+  const metricsPort = portArg ? parseInt(portArg) : parseInt(process.env.METRICS_PORT || '9999');
+  const instanceName = process.env.INSTANCE_NAME || `idle-${metricsPort}`;
 
   // SDK will provide its Registry for HTTP metrics to merge into
   const sdk = new GatrixServerSDK({
