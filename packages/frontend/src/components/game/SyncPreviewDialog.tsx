@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -17,8 +17,10 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  TableContainer,
   CircularProgress,
   Alert,
+  Checkbox,
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -27,12 +29,18 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { SyncPreviewResult } from '../../services/storeProductService';
+import { SyncPreviewResult, SyncAddItem, SyncUpdateItem, SyncDeleteItem } from '../../services/storeProductService';
+
+export interface SelectedSyncItems {
+  toAdd: number[];      // cmsProductId array
+  toUpdate: number[];   // cmsProductId array
+  toDelete: string[];   // id array
+}
 
 interface SyncPreviewDialogProps {
   open: boolean;
   onClose: () => void;
-  onApply: () => void;
+  onApply: (selected: SelectedSyncItems) => void;
   preview: SyncPreviewResult | null;
   loading: boolean;
 }
@@ -52,7 +60,92 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  // Selection state for each section
+  const [selectedAdd, setSelectedAdd] = useState<Set<number>>(new Set());
+  const [selectedUpdate, setSelectedUpdate] = useState<Set<number>>(new Set());
+  const [selectedDelete, setSelectedDelete] = useState<Set<string>>(new Set());
+
+  // Initialize selections when preview changes
+  useEffect(() => {
+    if (preview) {
+      setSelectedAdd(new Set(preview.toAdd.map(item => item.cmsProductId)));
+      setSelectedUpdate(new Set(preview.toUpdate.map(item => item.cmsProductId)));
+      setSelectedDelete(new Set(preview.toDelete.map(item => item.id)));
+    }
+  }, [preview]);
+
   const hasChanges = preview && preview.summary.totalChanges > 0;
+  const hasSelectedItems = selectedAdd.size > 0 || selectedUpdate.size > 0 || selectedDelete.size > 0;
+
+  // Toggle handlers
+  const handleToggleAdd = (cmsProductId: number) => {
+    setSelectedAdd(prev => {
+      const next = new Set(prev);
+      if (next.has(cmsProductId)) {
+        next.delete(cmsProductId);
+      } else {
+        next.add(cmsProductId);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleUpdate = (cmsProductId: number) => {
+    setSelectedUpdate(prev => {
+      const next = new Set(prev);
+      if (next.has(cmsProductId)) {
+        next.delete(cmsProductId);
+      } else {
+        next.add(cmsProductId);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleDelete = (id: string) => {
+    setSelectedDelete(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  // Select all handlers
+  const handleSelectAllAdd = (checked: boolean) => {
+    if (checked && preview) {
+      setSelectedAdd(new Set(preview.toAdd.map(item => item.cmsProductId)));
+    } else {
+      setSelectedAdd(new Set());
+    }
+  };
+
+  const handleSelectAllUpdate = (checked: boolean) => {
+    if (checked && preview) {
+      setSelectedUpdate(new Set(preview.toUpdate.map(item => item.cmsProductId)));
+    } else {
+      setSelectedUpdate(new Set());
+    }
+  };
+
+  const handleSelectAllDelete = (checked: boolean) => {
+    if (checked && preview) {
+      setSelectedDelete(new Set(preview.toDelete.map(item => item.id)));
+    } else {
+      setSelectedDelete(new Set());
+    }
+  };
+
+  const handleApply = () => {
+    onApply({
+      toAdd: Array.from(selectedAdd),
+      toUpdate: Array.from(selectedUpdate),
+      toDelete: Array.from(selectedDelete),
+    });
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -106,28 +199,45 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <AddIcon color="success" />
-                    {t('storeProducts.syncAddItems')} ({preview.toAdd.length})
+                    {t('storeProducts.syncAddItems')} ({selectedAdd.size}/{preview.toAdd.length})
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>{t('storeProducts.productId')}</TableCell>
-                        <TableCell>{t('storeProducts.productName')}</TableCell>
-                        <TableCell>{t('storeProducts.price')}</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {preview.toAdd.map((item) => (
-                        <TableRow key={item.productCode}>
-                          <TableCell>{item.productCode}</TableCell>
-                          <TableCell>{item.name}</TableCell>
-                          <TableCell>{item.price} CNY</TableCell>
+                  <TableContainer sx={{ maxHeight: 440 }}>
+                    <Table size="small" stickyHeader>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={selectedAdd.size === preview.toAdd.length}
+                              indeterminate={selectedAdd.size > 0 && selectedAdd.size < preview.toAdd.length}
+                              onChange={(e) => handleSelectAllAdd(e.target.checked)}
+                            />
+                          </TableCell>
+                          <TableCell>{t('storeProducts.cmsProductId')}</TableCell>
+                          <TableCell>{t('storeProducts.productId')}</TableCell>
+                          <TableCell>{t('storeProducts.productName')}</TableCell>
+                          <TableCell align="right">{t('storeProducts.price')}</TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHead>
+                      <TableBody>
+                        {preview.toAdd.map((item) => (
+                          <TableRow key={item.cmsProductId}>
+                            <TableCell padding="checkbox">
+                              <Checkbox
+                                checked={selectedAdd.has(item.cmsProductId)}
+                                onChange={() => handleToggleAdd(item.cmsProductId)}
+                              />
+                            </TableCell>
+                            <TableCell>{item.cmsProductId}</TableCell>
+                            <TableCell>{item.productCode}</TableCell>
+                            <TableCell>{item.name}</TableCell>
+                            <TableCell align="right">{item.price.toLocaleString()}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </AccordionDetails>
               </Accordion>
             )}
@@ -138,46 +248,63 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <EditIcon color="warning" />
-                    {t('storeProducts.syncUpdateItems')} ({preview.toUpdate.length})
+                    {t('storeProducts.syncUpdateItems')} ({selectedUpdate.size}/{preview.toUpdate.length})
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>{t('storeProducts.productId')}</TableCell>
-                        <TableCell>{t('storeProducts.productName')}</TableCell>
-                        <TableCell>{t('storeProducts.syncOldValue')}</TableCell>
-                        <TableCell>{t('storeProducts.syncNewValue')}</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {preview.toUpdate.map((item) => (
-                        item.changes.map((change, idx) => (
-                          <TableRow key={`${item.productCode}-${idx}`}>
-                            {idx === 0 ? (
-                              <>
-                                <TableCell rowSpan={item.changes.length}>{item.productCode}</TableCell>
-                                <TableCell rowSpan={item.changes.length}>{item.name}</TableCell>
-                              </>
-                            ) : null}
-                            <TableCell>
-                              <Typography variant="caption" color="text.secondary">
-                                {t(`storeProducts.${FIELD_LABELS[change.field] || change.field}`)}:
-                              </Typography>{' '}
-                              {String(change.oldValue || '-')}
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="caption" color="text.secondary">
-                                {t(`storeProducts.${FIELD_LABELS[change.field] || change.field}`)}:
-                              </Typography>{' '}
-                              {String(change.newValue || '-')}
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ))}
-                    </TableBody>
-                  </Table>
+                  <TableContainer sx={{ maxHeight: 440 }}>
+                    <Table size="small" stickyHeader>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={selectedUpdate.size === preview.toUpdate.length}
+                              indeterminate={selectedUpdate.size > 0 && selectedUpdate.size < preview.toUpdate.length}
+                              onChange={(e) => handleSelectAllUpdate(e.target.checked)}
+                            />
+                          </TableCell>
+                          <TableCell>{t('storeProducts.cmsProductId')}</TableCell>
+                          <TableCell>{t('storeProducts.productId')}</TableCell>
+                          <TableCell>{t('storeProducts.productName')}</TableCell>
+                          <TableCell>{t('storeProducts.syncOldValue')}</TableCell>
+                          <TableCell>{t('storeProducts.syncNewValue')}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {preview.toUpdate.map((item) => (
+                          item.changes.map((change, idx) => (
+                            <TableRow key={`${item.cmsProductId}-${idx}`}>
+                              {idx === 0 ? (
+                                <>
+                                  <TableCell rowSpan={item.changes.length} padding="checkbox">
+                                    <Checkbox
+                                      checked={selectedUpdate.has(item.cmsProductId)}
+                                      onChange={() => handleToggleUpdate(item.cmsProductId)}
+                                    />
+                                  </TableCell>
+                                  <TableCell rowSpan={item.changes.length}>{item.cmsProductId}</TableCell>
+                                  <TableCell rowSpan={item.changes.length}>{item.productCode}</TableCell>
+                                  <TableCell rowSpan={item.changes.length}>{item.name}</TableCell>
+                                </>
+                              ) : null}
+                              <TableCell>
+                                <Typography variant="caption" color="text.secondary">
+                                  {t(`storeProducts.${FIELD_LABELS[change.field] || change.field}`)}:
+                                </Typography>{' '}
+                                {String(change.oldValue || '-')}
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant="caption" color="text.secondary">
+                                  {t(`storeProducts.${FIELD_LABELS[change.field] || change.field}`)}:
+                                </Typography>{' '}
+                                {String(change.newValue || '-')}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </AccordionDetails>
               </Accordion>
             )}
@@ -188,26 +315,43 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <DeleteIcon color="error" />
-                    {t('storeProducts.syncDeleteItems')} ({preview.toDelete.length})
+                    {t('storeProducts.syncDeleteItems')} ({selectedDelete.size}/{preview.toDelete.length})
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>{t('storeProducts.productId')}</TableCell>
-                        <TableCell>{t('storeProducts.productName')}</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {preview.toDelete.map((item) => (
-                        <TableRow key={item.productCode}>
-                          <TableCell>{item.productCode}</TableCell>
-                          <TableCell>{item.name}</TableCell>
+                  <TableContainer sx={{ maxHeight: 440 }}>
+                    <Table size="small" stickyHeader>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={selectedDelete.size === preview.toDelete.length}
+                              indeterminate={selectedDelete.size > 0 && selectedDelete.size < preview.toDelete.length}
+                              onChange={(e) => handleSelectAllDelete(e.target.checked)}
+                            />
+                          </TableCell>
+                          <TableCell>{t('storeProducts.cmsProductId')}</TableCell>
+                          <TableCell>{t('storeProducts.productId')}</TableCell>
+                          <TableCell>{t('storeProducts.productName')}</TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHead>
+                      <TableBody>
+                        {preview.toDelete.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell padding="checkbox">
+                              <Checkbox
+                                checked={selectedDelete.has(item.id)}
+                                onChange={() => handleToggleDelete(item.id)}
+                              />
+                            </TableCell>
+                            <TableCell>{item.cmsProductId ?? '-'}</TableCell>
+                            <TableCell>{item.productCode}</TableCell>
+                            <TableCell>{item.name}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </AccordionDetails>
               </Accordion>
             )}
@@ -219,9 +363,9 @@ const SyncPreviewDialog: React.FC<SyncPreviewDialogProps> = ({
           {t('storeProducts.syncCancel')}
         </Button>
         <Button
-          onClick={onApply}
+          onClick={handleApply}
           variant="contained"
-          disabled={loading || !hasChanges}
+          disabled={loading || !hasSelectedItems}
           startIcon={loading ? <CircularProgress size={20} /> : null}
         >
           {t('storeProducts.syncApply')}

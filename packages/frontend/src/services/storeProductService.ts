@@ -6,6 +6,7 @@ export interface StoreProduct {
   environmentId: string;
   isActive: boolean;
   productId: string;
+  cmsProductId: number | null;
   productName: string;
   store: string;
   price: number;
@@ -169,12 +170,19 @@ class StoreProductService {
   }
 
   /**
-   * Apply sync with planning data
+   * Apply sync with planning data (selective)
    */
-  async applySync(): Promise<SyncApplyResult> {
-    const response = await api.post('/admin/store-products/sync/apply');
+  async applySync(selected?: SelectedSyncItems): Promise<SyncApplyResult> {
+    const response = await api.post('/admin/store-products/sync/apply', selected);
     return response.data;
   }
+}
+
+// Selected items for selective sync
+export interface SelectedSyncItems {
+  toAdd: number[];      // cmsProductId array
+  toUpdate: number[];   // cmsProductId array
+  toDelete: string[];   // id array
 }
 
 // Sync related interfaces
@@ -185,6 +193,7 @@ export interface SyncChange {
 }
 
 export interface SyncAddItem {
+  cmsProductId: number;
   productCode: string;
   name: string;
   price: number;
@@ -193,6 +202,7 @@ export interface SyncAddItem {
 
 export interface SyncUpdateItem {
   id: string;
+  cmsProductId: number;
   productCode: string;
   name: string;
   changes: SyncChange[];
@@ -200,6 +210,7 @@ export interface SyncUpdateItem {
 
 export interface SyncDeleteItem {
   id: string;
+  cmsProductId: number | null;
   productCode: string;
   name: string;
 }

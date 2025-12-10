@@ -21,6 +21,7 @@ import {
   CardContent,
   TableSortLabel,
   Switch,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -35,9 +36,9 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import storeProductService, { StoreProduct, SyncPreviewResult } from '../../services/storeProductService';
+import storeProductService, { StoreProduct, SyncPreviewResult, SelectedSyncItems } from '../../services/storeProductService';
 import { tagService } from '../../services/tagService';
-import SyncPreviewDialog from '../../components/game/SyncPreviewDialog';
+import SyncPreviewDialog, { SelectedSyncItems as DialogSelectedSyncItems } from '../../components/game/SyncPreviewDialog';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
@@ -112,6 +113,11 @@ const StoreProductsPage: React.FC = () => {
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
     {
+      key: 'cmsProductId',
+      label: t('storeProducts.cmsProductId'),
+      type: 'number',
+    },
+    {
       key: 'tags',
       label: t('storeProducts.tags'),
       type: 'tags',
@@ -142,11 +148,32 @@ const StoreProductsPage: React.FC = () => {
         { value: 'false', label: t('common.inactive') },
       ],
     },
+    {
+      key: 'currency',
+      label: t('storeProducts.currency'),
+      type: 'select',
+      options: [
+        { value: 'CNY', label: 'CNY' },
+        { value: 'KRW', label: 'KRW' },
+        { value: 'USD', label: 'USD' },
+      ],
+    },
+    {
+      key: 'priceMin',
+      label: t('storeProducts.priceMin'),
+      type: 'number',
+    },
+    {
+      key: 'priceMax',
+      label: t('storeProducts.priceMax'),
+      type: 'number',
+    },
   ], [t, allRegistryTags]);
 
   // Default columns
   const defaultColumns: ColumnConfig[] = [
     { id: 'checkbox', labelKey: '', visible: true },
+    { id: 'cmsProductId', labelKey: 'storeProducts.cmsProductId', visible: true },
     { id: 'isActive', labelKey: 'storeProducts.isActive', visible: true },
     { id: 'productId', labelKey: 'storeProducts.productId', visible: true },
     { id: 'productName', labelKey: 'storeProducts.productName', visible: true },
@@ -214,6 +241,32 @@ const StoreProductsPage: React.FC = () => {
           if (!filter.value) return true;
           return product.isActive === (filter.value === 'true');
         }
+        if (filter.key === 'cmsProductId') {
+          // Skip filter if value is empty
+          if (!filter.value) return true;
+          const searchId = Number(filter.value);
+          if (isNaN(searchId)) return true;
+          return product.cmsProductId === searchId;
+        }
+        if (filter.key === 'currency') {
+          // Skip filter if value is empty
+          if (!filter.value) return true;
+          return product.currency === filter.value;
+        }
+        if (filter.key === 'priceMin') {
+          // Skip filter if value is empty
+          if (!filter.value) return true;
+          const minPrice = Number(filter.value);
+          if (isNaN(minPrice)) return true;
+          return Number(product.price) >= minPrice;
+        }
+        if (filter.key === 'priceMax') {
+          // Skip filter if value is empty
+          if (!filter.value) return true;
+          const maxPrice = Number(filter.value);
+          if (isNaN(maxPrice)) return true;
+          return Number(product.price) <= maxPrice;
+        }
         return true;
       });
     });
@@ -258,6 +311,17 @@ const StoreProductsPage: React.FC = () => {
       setIsInitialLoad(false);
     }
   };
+
+  // Calculate statistics from filtered products
+  const productStats = useMemo(() => {
+    const activeCount = products.filter(p => p.isActive).length;
+    const inactiveCount = products.filter(p => !p.isActive).length;
+    return {
+      total: products.length,
+      active: activeCount,
+      inactive: inactiveCount,
+    };
+  }, [products]);
 
   // Save active filters to localStorage
   useEffect(() => {
@@ -393,10 +457,10 @@ const StoreProductsPage: React.FC = () => {
     }
   };
 
-  const handleSyncApply = async () => {
+  const handleSyncApply = async (selected: SelectedSyncItems) => {
     setSyncLoading(true);
     try {
-      const result = await storeProductService.applySync();
+      const result = await storeProductService.applySync(selected);
       setSyncDialogOpen(false);
       setSyncPreview(null);
       enqueueSnackbar(
@@ -528,6 +592,7 @@ const StoreProductsPage: React.FC = () => {
               variant="contained"
               startIcon={<AddIcon />}
               onClick={handleCreate}
+              disabled
             >
               {t('storeProducts.createProduct')}
             </Button>
@@ -596,21 +661,35 @@ const StoreProductsPage: React.FC = () => {
                 onFilterChange={handleDynamicFilterChange}
                 onOperatorChange={handleOperatorChange}
                 afterFilterAddActions={
-                  <Tooltip title={t('common.columnSettings')}>
-                    <IconButton
-                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                      sx={{
-                        bgcolor: 'background.paper',
-                        border: 1,
-                        borderColor: 'divider',
-                        '&:hover': {
-                          bgcolor: 'action.hover',
-                        },
-                      }}
-                    >
-                      <ViewColumnIcon />
-                    </IconButton>
-                  </Tooltip>
+                  <>
+                    <Tooltip title={t('common.columnSettings')}>
+                      <IconButton
+                        onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                        sx={{
+                          bgcolor: 'background.paper',
+                          border: 1,
+                          borderColor: 'divider',
+                          '&:hover': {
+                            bgcolor: 'action.hover',
+                          },
+                        }}
+                      >
+                        <ViewColumnIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {t('storeProducts.statsTotal')}: <strong>{total}</strong>
+                      </Typography>
+                      <Typography variant="body2" color="success.main">
+                        {t('storeProducts.statsActive')}: <strong>{productStats.active}</strong>
+                      </Typography>
+                      <Typography variant="body2" color="text.disabled">
+                        {t('storeProducts.statsInactive')}: <strong>{productStats.inactive}</strong>
+                      </Typography>
+                    </Box>
+                  </>
                 }
               />
             </Box>
@@ -678,7 +757,7 @@ const StoreProductsPage: React.FC = () => {
                         </TableCell>
                       );
                     }
-                    const isSortable = ['productId', 'productName', 'store', 'price', 'createdAt', 'updatedAt'].includes(column.id);
+                    const isSortable = ['cmsProductId', 'productId', 'productName', 'store', 'price', 'createdAt', 'updatedAt'].includes(column.id);
                     return (
                       <TableCell key={column.id}>
                         {isSortable ? (
@@ -731,6 +810,39 @@ const StoreProductsPage: React.FC = () => {
                             </TableCell>
                           );
                         }
+                        if (column.id === 'cmsProductId') {
+                          return (
+                            <TableCell key={column.id}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Box
+                                  component="span"
+                                  onClick={() => handleEdit(product)}
+                                  sx={{
+                                    cursor: 'pointer',
+                                    color: 'primary.main',
+                                    '&:hover': { textDecoration: 'underline' },
+                                  }}
+                                >
+                                  {product.cmsProductId ?? '-'}
+                                </Box>
+                                {product.cmsProductId && (
+                                  <Tooltip title={t('common.copy')}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(String(product.cmsProductId));
+                                        enqueueSnackbar(t('common.copied'), { variant: 'success' });
+                                      }}
+                                      sx={{ p: 0.25 }}
+                                    >
+                                      <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                              </Box>
+                            </TableCell>
+                          );
+                        }
                         if (column.id === 'isActive') {
                           return (
                             <TableCell key={column.id}>
@@ -746,30 +858,58 @@ const StoreProductsPage: React.FC = () => {
                         if (column.id === 'productId') {
                           return (
                             <TableCell key={column.id}>
-                              <Typography
-                                sx={{
-                                  cursor: 'pointer',
-                                  '&:hover': { textDecoration: 'underline' }
-                                }}
-                                onClick={() => handleEdit(product)}
-                              >
-                                {product.productId}
-                              </Typography>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Typography
+                                  sx={{
+                                    cursor: 'pointer',
+                                    '&:hover': { textDecoration: 'underline' }
+                                  }}
+                                  onClick={() => handleEdit(product)}
+                                >
+                                  {product.productId}
+                                </Typography>
+                                <Tooltip title={t('common.copy')}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(product.productId);
+                                      enqueueSnackbar(t('common.copied'), { variant: 'success' });
+                                    }}
+                                    sx={{ p: 0.25 }}
+                                  >
+                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                  </IconButton>
+                                </Tooltip>
+                              </Box>
                             </TableCell>
                           );
                         }
                         if (column.id === 'productName') {
                           return (
                             <TableCell key={column.id}>
-                              <Typography
-                                sx={{
-                                  cursor: 'pointer',
-                                  '&:hover': { textDecoration: 'underline' }
-                                }}
-                                onClick={() => handleEdit(product)}
-                              >
-                                {product.productName}
-                              </Typography>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Typography
+                                  sx={{
+                                    cursor: 'pointer',
+                                    '&:hover': { textDecoration: 'underline' }
+                                  }}
+                                  onClick={() => handleEdit(product)}
+                                >
+                                  {product.productName}
+                                </Typography>
+                                <Tooltip title={t('common.copy')}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(product.productName);
+                                      enqueueSnackbar(t('common.copied'), { variant: 'success' });
+                                    }}
+                                    sx={{ p: 0.25 }}
+                                  >
+                                    <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                  </IconButton>
+                                </Tooltip>
+                              </Box>
                             </TableCell>
                           );
                         }
@@ -921,7 +1061,31 @@ const StoreProductsPage: React.FC = () => {
         title={t('storeProducts.bulkDeleteConfirmTitle')}
         message={t('storeProducts.bulkDeleteConfirmMessage', { count: selectedIds.length })}
         warning={t('storeProducts.bulkDeleteWarning')}
-      />
+      >
+        {/* List of products to be deleted */}
+        <TableContainer sx={{ maxHeight: 300, mt: 2 }}>
+          <Table size="small" stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>{t('storeProducts.cmsProductId')}</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>{t('storeProducts.productId')}</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>{t('storeProducts.productName')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {products
+                .filter((p) => selectedIds.includes(p.id))
+                .map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>{product.cmsProductId || '-'}</TableCell>
+                    <TableCell>{product.productId}</TableCell>
+                    <TableCell>{product.productName}</TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </ConfirmDeleteDialog>
 
       {/* Sync Preview Dialog */}
       <SyncPreviewDialog

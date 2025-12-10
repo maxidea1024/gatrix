@@ -4115,7 +4115,13 @@
     "syncNewValue": "新值",
     "syncResultAdded": "已添加{{count}}个",
     "syncResultUpdated": "已更新{{count}}个",
-    "syncResultDeleted": "已删除{{count}}个"
+    "syncResultDeleted": "已删除{{count}}个",
+    "cmsProductId": "CMS ID",
+    "priceMin": "最低价格",
+    "priceMax": "最高价格",
+    "statsTotal": "总计",
+    "statsActive": "销售中",
+    "statsInactive": "停止销售"
   },
   "rewardTemplates": {
     "title": "奖励物品模板",

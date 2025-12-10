@@ -4067,7 +4067,13 @@
     "syncNewValue": "변경값",
     "syncResultAdded": "{{count}}개 추가",
     "syncResultUpdated": "{{count}}개 수정",
-    "syncResultDeleted": "{{count}}개 삭제"
+    "syncResultDeleted": "{{count}}개 삭제",
+    "cmsProductId": "CMS ID",
+    "priceMin": "최소 가격",
+    "priceMax": "최대 가격",
+    "statsTotal": "전체",
+    "statsActive": "판매중",
+    "statsInactive": "판매중지"
   },
   "rewardTemplates": {
     "title": "보상아이템 템플릿",

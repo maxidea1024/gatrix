@@ -12,6 +12,7 @@ export interface StoreProduct {
   environmentId: string;
   isActive: boolean;
   productId: string;
+  cmsProductId: number | null;
   productName: string;
   store: string;
   price: number;
@@ -94,9 +95,18 @@ class StoreProductService {
     const queryParams: any[] = [envId];
 
     if (search) {
-      conditions.push('(productId LIKE ? OR productName LIKE ? OR description LIKE ?)');
-      const searchPattern = `%${search}%`;
-      queryParams.push(searchPattern, searchPattern, searchPattern);
+      // Check if search is a number (for CMS ID search)
+      const searchNumber = Number(search);
+      if (!isNaN(searchNumber) && String(searchNumber) === search.trim()) {
+        // Search by CMS ID if input is a pure number
+        conditions.push('(productId LIKE ? OR productName LIKE ? OR description LIKE ? OR cmsProductId = ?)');
+        const searchPattern = `%${search}%`;
+        queryParams.push(searchPattern, searchPattern, searchPattern, searchNumber);
+      } else {
+        conditions.push('(productId LIKE ? OR productName LIKE ? OR description LIKE ?)');
+        const searchPattern = `%${search}%`;
+        queryParams.push(searchPattern, searchPattern, searchPattern);
+      }
     }
 
     if (params?.store) {
@@ -112,7 +122,7 @@ class StoreProductService {
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     // Validate sort column
-    const allowedSortColumns = ['productId', 'productName', 'store', 'price', 'isActive', 'saleStartAt', 'saleEndAt', 'createdAt', 'updatedAt'];
+    const allowedSortColumns = ['cmsProductId', 'productId', 'productName', 'store', 'price', 'isActive', 'saleStartAt', 'saleEndAt', 'createdAt', 'updatedAt'];
     const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : 'createdAt';
     const safeSortOrder = sortOrder === 'ASC' ? 'ASC' : 'DESC';
 
@@ -397,15 +407,17 @@ class StoreProductService {
       );
       const dbProducts = rows as StoreProduct[];
 
-      // Create maps for comparison
-      const planningMap = new Map<string, CmsCashShopProduct>();
+      // Create maps for comparison - use id as key (productCode can be duplicated)
+      const planningMap = new Map<number, CmsCashShopProduct>();
       for (const p of planningProducts) {
-        planningMap.set(p.productCode, p);
+        planningMap.set(p.id, p);
       }
 
-      const dbMap = new Map<string, StoreProduct>();
+      const dbMap = new Map<number, StoreProduct>();
       for (const p of dbProducts) {
-        dbMap.set(p.productId, p);
+        if (p.cmsProductId !== null) {
+          dbMap.set(p.cmsProductId, p);
+        }
       }
 
       const toAdd: SyncAddItem[] = [];
@@ -413,8 +425,8 @@ class StoreProductService {
       const toDelete: SyncDeleteItem[] = [];
 
       // Check for products to add or update
-      for (const [productCode, planningProduct] of planningMap) {
-        const dbProduct = dbMap.get(productCode);
+      for (const [cmsProductId, planningProduct] of planningMap) {
+        const dbProduct = dbMap.get(cmsProductId);
 
         if (!dbProduct) {
           // New product to add
@@ -423,6 +435,7 @@ class StoreProductService {
             name: planningProduct.name,
             price: planningProduct.price,
             description: planningProduct.productDesc || null,
+            cmsProductId: planningProduct.id,
           });
         } else {
           // Check for changes
@@ -457,7 +470,8 @@ class StoreProductService {
           if (changes.length > 0) {
             toUpdate.push({
               id: dbProduct.id,
-              productCode: productCode,
+              cmsProductId: planningProduct.id,
+              productCode: planningProduct.productCode,
               name: planningProduct.name,
               changes,
             });
@@ -466,11 +480,12 @@ class StoreProductService {
       }
 
       // Check for products to delete
-      for (const [productId, dbProduct] of dbMap) {
-        if (!planningMap.has(productId)) {
+      for (const [cmsProductId, dbProduct] of dbMap) {
+        if (!planningMap.has(cmsProductId)) {
           toDelete.push({
             id: dbProduct.id,
-            productCode: productId,
+            cmsProductId: dbProduct.cmsProductId,
+            productCode: dbProduct.productId,
             name: dbProduct.productName,
           });
         }
@@ -494,9 +509,14 @@ class StoreProductService {
   }
 
   /**
-   * Apply sync with planning data
+   * Apply sync with planning data (selective)
    */
-  static async applySync(environmentId?: string, lang: 'kr' | 'en' | 'zh' = 'kr', userId?: number): Promise<SyncApplyResult> {
+  static async applySync(
+    environmentId?: string,
+    lang: 'kr' | 'en' | 'zh' = 'kr',
+    userId?: number,
+    selected?: SelectedSyncItems
+  ): Promise<SyncApplyResult> {
     const envId = environmentId || getCurrentEnvironmentId();
     if (!envId) {
       throw new GatrixError('Environment ID is required', 400);
@@ -505,24 +525,36 @@ class StoreProductService {
     const pool = await database.getPool();
     const preview = await this.previewSync(envId, lang);
 
+    // Filter items based on selection if provided
+    const toAddFiltered = selected?.toAdd
+      ? preview.toAdd.filter(item => selected.toAdd.includes(item.cmsProductId))
+      : preview.toAdd;
+    const toUpdateFiltered = selected?.toUpdate
+      ? preview.toUpdate.filter(item => selected.toUpdate.includes(item.cmsProductId))
+      : preview.toUpdate;
+    const toDeleteFiltered = selected?.toDelete
+      ? preview.toDelete.filter(item => selected.toDelete.includes(item.id))
+      : preview.toDelete;
+
     let addedCount = 0;
     let updatedCount = 0;
     let deletedCount = 0;
 
     try {
       // Add new products
-      for (const item of preview.toAdd) {
+      for (const item of toAddFiltered) {
         const id = ulid();
         await pool.execute(
           `INSERT INTO g_store_products
-           (id, environmentId, isActive, productId, productName, store, price, currency,
+           (id, environmentId, isActive, productId, cmsProductId, productName, store, price, currency,
             saleStartAt, saleEndAt, description, metadata, createdBy, createdAt, updatedAt)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
           [
             id,
             envId,
             0, // isActive = false for new products
             item.productCode,
+            item.cmsProductId,
             item.name,
             'sdo', // Default store
             item.price,
@@ -538,7 +570,7 @@ class StoreProductService {
       }
 
       // Update existing products
-      for (const item of preview.toUpdate) {
+      for (const item of toUpdateFiltered) {
         const updates: string[] = [];
         const values: any[] = [];
 
@@ -570,7 +602,7 @@ class StoreProductService {
       }
 
       // Delete removed products
-      for (const item of preview.toDelete) {
+      for (const item of toDeleteFiltered) {
         // First delete associated tags by setting empty array
         await TagService.setTagsForEntity('store_product', item.id, []);
         // Then delete the product
@@ -613,10 +645,12 @@ export interface SyncAddItem {
   name: string;
   price: number;
   description: string | null;
+  cmsProductId: number;
 }
 
 export interface SyncUpdateItem {
   id: string;
+  cmsProductId: number;
   productCode: string;
   name: string;
   changes: SyncChange[];
@@ -624,6 +658,7 @@ export interface SyncUpdateItem {
 
 export interface SyncDeleteItem {
   id: string;
+  cmsProductId: number | null;
   productCode: string;
   name: string;
 }
@@ -645,6 +680,12 @@ export interface SyncApplyResult {
   addedCount: number;
   updatedCount: number;
   deletedCount: number;
+}
+
+export interface SelectedSyncItems {
+  toAdd: number[];      // cmsProductId array
+  toUpdate: number[];   // cmsProductId array
+  toDelete: string[];   // id array
 }
 
 export default StoreProductService;

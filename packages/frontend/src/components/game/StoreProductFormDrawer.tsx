@@ -265,21 +265,26 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                   fullWidth
                   size="small"
                   placeholder={t('storeProducts.productNameHelp')}
-                  disabled={!!selectedCmsProduct}
+                  disabled={isEditMode}
+                  InputProps={{
+                    readOnly: isEditMode,
+                  }}
                 />
               </Box>
 
-              {/* Store */}
+              {/* Store - Read-only in edit mode */}
               <Box>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
                   {t('storeProducts.store')}
-                  <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>
+                  {!isEditMode && <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>}
                 </Typography>
                 <FormControl fullWidth size="small">
                   <Select
                     value={store}
                     onChange={(e) => setStore(e.target.value)}
                     displayEmpty
+                    disabled={isEditMode}
+                    readOnly={isEditMode}
                   >
                     <MenuItem value="" disabled>
                       {t('storeProducts.selectStore')}
@@ -293,12 +298,12 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                 </FormControl>
               </Box>
 
-              {/* Price and Currency */}
+              {/* Price and Currency - Read-only in edit mode */}
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <Box sx={{ flex: 2 }}>
                   <Typography variant="subtitle2" sx={{ mb: 1 }}>
                     {t('storeProducts.price')}
-                    <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>
+                    {!isEditMode && <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>}
                   </Typography>
                   <TextField
                     type="number"
@@ -306,7 +311,8 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                     onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
                     fullWidth
                     size="small"
-                    inputProps={{ min: 0, step: 0.01 }}
+                    inputProps={{ min: 0, step: 0.01, readOnly: isEditMode }}
+                    disabled={isEditMode}
                   />
                 </Box>
                 <Box sx={{ flex: 1 }}>
@@ -317,6 +323,8 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                     <Select
                       value={currency}
                       onChange={(e) => setCurrency(e.target.value)}
+                      disabled={isEditMode}
+                      readOnly={isEditMode}
                     >
                       {CURRENCY_OPTIONS.map((curr) => (
                         <MenuItem key={curr} value={curr}>
@@ -337,8 +345,16 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                   <DateTimePicker
                     value={saleStartAt}
                     onChange={(value) => setSaleStartAt(value)}
+                    timeSteps={{ minutes: 1 }}
                     slotProps={{
-                      textField: { size: 'small', fullWidth: true },
+                      textField: {
+                        size: 'small',
+                        fullWidth: true,
+                        slotProps: { input: { readOnly: true } },
+                      },
+                      actionBar: {
+                        actions: ['clear', 'cancel', 'accept'],
+                      },
                     }}
                   />
                 </Box>
@@ -349,8 +365,17 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                   <DateTimePicker
                     value={saleEndAt}
                     onChange={(value) => setSaleEndAt(value)}
+                    minDateTime={saleStartAt || undefined}
+                    timeSteps={{ minutes: 1 }}
                     slotProps={{
-                      textField: { size: 'small', fullWidth: true },
+                      textField: {
+                        size: 'small',
+                        fullWidth: true,
+                        slotProps: { input: { readOnly: true } },
+                      },
+                      actionBar: {
+                        actions: ['clear', 'cancel', 'accept'],
+                      },
                     }}
                   />
                 </Box>
@@ -369,6 +394,11 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                   rows={3}
                   size="small"
                   placeholder={t('storeProducts.descriptionHelp')}
+                  slotProps={{
+                    input: {
+                      readOnly: isEditMode,
+                    },
+                  }}
                 />
               </Box>
 

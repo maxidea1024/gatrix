@@ -4067,7 +4067,13 @@
     "syncNewValue": "New Value",
     "syncResultAdded": "{{count}} added",
     "syncResultUpdated": "{{count}} updated",
-    "syncResultDeleted": "{{count}} deleted"
+    "syncResultDeleted": "{{count}} deleted",
+    "cmsProductId": "CMS ID",
+    "priceMin": "Min Price",
+    "priceMax": "Max Price",
+    "statsTotal": "Total",
+    "statsActive": "On Sale",
+    "statsInactive": "Not On Sale"
   },
   "rewardTemplates": {
     "title": "Reward Item Templates",
