@@ -654,7 +654,15 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
               }}
               onWheel={handleWheel}
             >
-              {/* CSS for rumble and heartbeat animations */}
+              {/* CSS keyframes for ball pulse animation */}
+              <style>
+                {`
+                  .cluster-ball-pulse circle:first-child {
+                    filter: brightness(1.3);
+                    transition: filter 0.3s ease-out;
+                  }
+                `}
+              </style>
               <defs>
                 {/* Gradient definitions for animated links */}
                 <linearGradient id="pulseGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -781,14 +789,37 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
 
               return (
                 <g
-                  key={`${node.id}-${currentRumbleCount}`}
+                  key={node.id}
                   transform={`translate(${node.x || 0}, ${node.y || 0})`}
-                  style={{
-                    cursor: 'grab',
-                    animation: shouldRumble ? 'clusterBallPulse 0.4s ease-out' : 'none',
-                  }}
+                  style={{ cursor: 'grab' }}
                   onMouseDown={(e) => handleMouseDown(node.id, e)}
                 >
+                  {/* Subtle ripple effect on heartbeat/status change */}
+                  {shouldRumble && (
+                    <circle
+                      key={`ripple-${currentRumbleCount}`}
+                      r={nodeRadius}
+                      fill="none"
+                      stroke="rgba(255,255,255,0.3)"
+                      strokeWidth="1"
+                    >
+                      <animate
+                        attributeName="r"
+                        from={`${nodeRadius}`}
+                        to={`${nodeRadius + 12}`}
+                        dur="0.5s"
+                        fill="freeze"
+                      />
+                      <animate
+                        attributeName="opacity"
+                        from="0.3"
+                        to="0"
+                        dur="0.5s"
+                        fill="freeze"
+                      />
+                    </circle>
+                  )}
+
                   {/* Outer glow for active services */}
                   {service.status === 'ready' && (
                     <circle
@@ -813,12 +844,16 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
                     </circle>
                   )}
 
-                  {/* Main circle */}
+                  {/* Main circle with subtle glow on pulse */}
                   <circle
                     r={nodeRadius}
                     fill={nodeColor}
-                    stroke={shouldRumble ? '#ffeb3b' : '#fff'}
-                    strokeWidth={shouldRumble ? 4 : 2}
+                    stroke="#fff"
+                    strokeWidth="2"
+                    style={{
+                      filter: shouldRumble ? 'drop-shadow(0 0 10px #e53935) drop-shadow(0 0 5px #ff6659)' : 'none',
+                      transition: 'filter 0.3s ease-out',
+                    }}
                   />
 
                   {/* Shine effect */}
