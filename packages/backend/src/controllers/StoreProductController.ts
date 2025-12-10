@@ -214,4 +214,39 @@ export class StoreProductController {
       message: `Store product ${isActive ? 'activated' : 'deactivated'} successfully`,
     });
   });
+
+  /**
+   * Preview sync with planning data
+   * GET /api/v1/admin/store-products/sync/preview
+   */
+  static previewSync = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const lang = (req.query.lang as 'kr' | 'en' | 'zh') || 'kr';
+    const environmentId = req.environmentId;
+
+    const result = await StoreProductService.previewSync(environmentId, lang);
+
+    res.json({
+      success: true,
+      data: result,
+      message: 'Sync preview generated successfully',
+    });
+  });
+
+  /**
+   * Apply sync with planning data
+   * POST /api/v1/admin/store-products/sync/apply
+   */
+  static applySync = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const lang = (req.query.lang as 'kr' | 'en' | 'zh') || 'kr';
+    const environmentId = req.environmentId;
+    const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+
+    const result = await StoreProductService.applySync(environmentId, lang, userId);
+
+    res.json({
+      success: true,
+      data: result,
+      message: 'Sync applied successfully',
+    });
+  });
 }

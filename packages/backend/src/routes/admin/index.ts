@@ -39,6 +39,7 @@ import serviceDiscoveryRoutes from './serviceDiscovery';
 import monitoringAlertRoutes from './monitoringAlerts';
 import dataManagementRoutes from './dataManagement';
 import bannerRoutes from './banners';
+import cmsCashShopRoutes from './cmsCashShop';
 
 const router = express.Router();
 
@@ -150,5 +151,8 @@ router.use('/data-management', requirePermission([PERMISSIONS.DATA_MANAGEMENT_VI
 
 // Banners - requires banners.view or banners.manage permission
 router.use('/banners', requirePermission([PERMISSIONS.BANNERS_VIEW, PERMISSIONS.BANNERS_MANAGE]) as any, bannerRoutes);
+
+// CMS CashShop - requires store-products.view or store-products.manage permission
+router.use('/cms/cash-shop', requirePermission([PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE]) as any, cmsCashShopRoutes);
 
 export default router;

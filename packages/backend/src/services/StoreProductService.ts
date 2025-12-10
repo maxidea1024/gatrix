@@ -4,6 +4,8 @@ import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { TagService } from './TagService';
 import { getCurrentEnvironmentId } from '../utils/environmentContext';
+import { PlanningDataService } from './PlanningDataService';
+import { CmsCashShopProduct } from './CmsCashShopService';
 
 export interface StoreProduct {
   id: string;
@@ -77,8 +79,9 @@ class StoreProductService {
    */
   static async getStoreProducts(params?: GetStoreProductsParams): Promise<GetStoreProductsResponse> {
     const pool = database.getPool();
-    const page = params?.page || 1;
-    const limit = params?.limit || 10;
+    // Ensure page and limit are numbers (query params come as strings)
+    const page = Number(params?.page) || 1;
+    const limit = Number(params?.limit) || 10;
     const search = params?.search || '';
     const sortBy = params?.sortBy || 'createdAt';
     const sortOrder = (params?.sortOrder || 'desc').toUpperCase();
@@ -121,10 +124,10 @@ class StoreProductService {
       );
       const total = countResult[0].total;
 
-      // Get products
+      // Get products (use template literal for LIMIT/OFFSET as they are already validated numbers)
       const [products] = await pool.execute<any[]>(
-        `SELECT * FROM g_store_products ${whereClause} ORDER BY ${safeSortBy} ${safeSortOrder} LIMIT ? OFFSET ?`,
-        [...queryParams, limit, offset]
+        `SELECT * FROM g_store_products ${whereClause} ORDER BY ${safeSortBy} ${safeSortOrder} LIMIT ${limit} OFFSET ${offset}`,
+        queryParams
       );
 
       // Load tags for each product
@@ -318,8 +321,8 @@ class StoreProductService {
     const envId = environmentId ?? getCurrentEnvironmentId();
 
     try {
-      // Delete associated tags first
-      await TagService.removeAllTagsFromEntity('store_product', id);
+      // Delete associated tags first (set to empty array)
+      await TagService.setTagsForEntity('store_product', id, []);
 
       const [result] = await pool.execute<any>(
         'DELETE FROM g_store_products WHERE id = ? AND environmentId = ?',
@@ -346,9 +349,9 @@ class StoreProductService {
     if (ids.length === 0) return 0;
 
     try {
-      // Delete associated tags first
+      // Delete associated tags first (set to empty array)
       for (const id of ids) {
-        await TagService.removeAllTagsFromEntity('store_product', id);
+        await TagService.setTagsForEntity('store_product', id, []);
       }
 
       const placeholders = ids.map(() => '?').join(',');
@@ -370,6 +373,278 @@ class StoreProductService {
   static async toggleActive(id: string, isActive: boolean, updatedBy?: number, environmentId?: string): Promise<StoreProduct> {
     return this.updateStoreProduct(id, { isActive, updatedBy }, environmentId);
   }
+
+  /**
+   * Preview sync with planning data
+   * Returns what changes would be made without applying them
+   */
+  static async previewSync(environmentId?: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<SyncPreviewResult> {
+    const envId = environmentId || getCurrentEnvironmentId();
+    if (!envId) {
+      throw new GatrixError('Environment ID is required', 400);
+    }
+
+    try {
+      // Get planning data products
+      const planningData = await PlanningDataService.getCashShopLookup(envId, lang);
+      const planningProducts: CmsCashShopProduct[] = planningData.items || [];
+
+      // Get current DB products
+      const pool = await database.getPool();
+      const [rows] = await pool.execute(
+        'SELECT * FROM g_store_products WHERE environmentId = ?',
+        [envId]
+      );
+      const dbProducts = rows as StoreProduct[];
+
+      // Create maps for comparison
+      const planningMap = new Map<string, CmsCashShopProduct>();
+      for (const p of planningProducts) {
+        planningMap.set(p.productCode, p);
+      }
+
+      const dbMap = new Map<string, StoreProduct>();
+      for (const p of dbProducts) {
+        dbMap.set(p.productId, p);
+      }
+
+      const toAdd: SyncAddItem[] = [];
+      const toUpdate: SyncUpdateItem[] = [];
+      const toDelete: SyncDeleteItem[] = [];
+
+      // Check for products to add or update
+      for (const [productCode, planningProduct] of planningMap) {
+        const dbProduct = dbMap.get(productCode);
+
+        if (!dbProduct) {
+          // New product to add
+          toAdd.push({
+            productCode: planningProduct.productCode,
+            name: planningProduct.name,
+            price: planningProduct.price,
+            description: planningProduct.productDesc || null,
+          });
+        } else {
+          // Check for changes
+          const changes: SyncChange[] = [];
+
+          if (dbProduct.productName !== planningProduct.name) {
+            changes.push({
+              field: 'productName',
+              oldValue: dbProduct.productName,
+              newValue: planningProduct.name,
+            });
+          }
+
+          if (Number(dbProduct.price) !== planningProduct.price) {
+            changes.push({
+              field: 'price',
+              oldValue: dbProduct.price,
+              newValue: planningProduct.price,
+            });
+          }
+
+          const dbDesc = dbProduct.description || '';
+          const planningDesc = planningProduct.productDesc || '';
+          if (dbDesc !== planningDesc) {
+            changes.push({
+              field: 'description',
+              oldValue: dbDesc,
+              newValue: planningDesc,
+            });
+          }
+
+          if (changes.length > 0) {
+            toUpdate.push({
+              id: dbProduct.id,
+              productCode: productCode,
+              name: planningProduct.name,
+              changes,
+            });
+          }
+        }
+      }
+
+      // Check for products to delete
+      for (const [productId, dbProduct] of dbMap) {
+        if (!planningMap.has(productId)) {
+          toDelete.push({
+            id: dbProduct.id,
+            productCode: productId,
+            name: dbProduct.productName,
+          });
+        }
+      }
+
+      return {
+        toAdd,
+        toUpdate,
+        toDelete,
+        summary: {
+          addCount: toAdd.length,
+          updateCount: toUpdate.length,
+          deleteCount: toDelete.length,
+          totalChanges: toAdd.length + toUpdate.length + toDelete.length,
+        },
+      };
+    } catch (error) {
+      logger.error('Failed to preview sync', { error, environmentId: envId });
+      throw new GatrixError('Failed to preview sync with planning data', 500);
+    }
+  }
+
+  /**
+   * Apply sync with planning data
+   */
+  static async applySync(environmentId?: string, lang: 'kr' | 'en' | 'zh' = 'kr', userId?: number): Promise<SyncApplyResult> {
+    const envId = environmentId || getCurrentEnvironmentId();
+    if (!envId) {
+      throw new GatrixError('Environment ID is required', 400);
+    }
+
+    const pool = await database.getPool();
+    const preview = await this.previewSync(envId, lang);
+
+    let addedCount = 0;
+    let updatedCount = 0;
+    let deletedCount = 0;
+
+    try {
+      // Add new products
+      for (const item of preview.toAdd) {
+        const id = ulid();
+        await pool.execute(
+          `INSERT INTO g_store_products
+           (id, environmentId, isActive, productId, productName, store, price, currency,
+            saleStartAt, saleEndAt, description, metadata, createdBy, createdAt, updatedAt)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+          [
+            id,
+            envId,
+            0, // isActive = false for new products
+            item.productCode,
+            item.name,
+            'sdo', // Default store
+            item.price,
+            'CNY', // Default currency
+            null, // saleStartAt
+            null, // saleEndAt
+            item.description,
+            null, // metadata
+            userId || null,
+          ]
+        );
+        addedCount++;
+      }
+
+      // Update existing products
+      for (const item of preview.toUpdate) {
+        const updates: string[] = [];
+        const values: any[] = [];
+
+        for (const change of item.changes) {
+          if (change.field === 'productName') {
+            updates.push('productName = ?');
+            values.push(change.newValue);
+          } else if (change.field === 'price') {
+            updates.push('price = ?');
+            values.push(change.newValue);
+          } else if (change.field === 'description') {
+            updates.push('description = ?');
+            values.push(change.newValue || null);
+          }
+        }
+
+        if (updates.length > 0) {
+          updates.push('updatedBy = ?');
+          values.push(userId || null);
+          updates.push('updatedAt = NOW()');
+          values.push(item.id);
+
+          await pool.execute(
+            `UPDATE g_store_products SET ${updates.join(', ')} WHERE id = ?`,
+            values
+          );
+          updatedCount++;
+        }
+      }
+
+      // Delete removed products
+      for (const item of preview.toDelete) {
+        // First delete associated tags by setting empty array
+        await TagService.setTagsForEntity('store_product', item.id, []);
+        // Then delete the product
+        await pool.execute(
+          'DELETE FROM g_store_products WHERE id = ?',
+          [item.id]
+        );
+        deletedCount++;
+      }
+
+      logger.info('Sync applied successfully', {
+        environmentId: envId,
+        addedCount,
+        updatedCount,
+        deletedCount,
+      });
+
+      return {
+        success: true,
+        addedCount,
+        updatedCount,
+        deletedCount,
+      };
+    } catch (error) {
+      logger.error('Failed to apply sync', { error, environmentId: envId });
+      throw new GatrixError('Failed to apply sync with planning data', 500);
+    }
+  }
+}
+
+// Sync related interfaces
+export interface SyncChange {
+  field: string;
+  oldValue: any;
+  newValue: any;
+}
+
+export interface SyncAddItem {
+  productCode: string;
+  name: string;
+  price: number;
+  description: string | null;
+}
+
+export interface SyncUpdateItem {
+  id: string;
+  productCode: string;
+  name: string;
+  changes: SyncChange[];
+}
+
+export interface SyncDeleteItem {
+  id: string;
+  productCode: string;
+  name: string;
+}
+
+export interface SyncPreviewResult {
+  toAdd: SyncAddItem[];
+  toUpdate: SyncUpdateItem[];
+  toDelete: SyncDeleteItem[];
+  summary: {
+    addCount: number;
+    updateCount: number;
+    deleteCount: number;
+    totalChanges: number;
+  };
+}
+
+export interface SyncApplyResult {
+  success: boolean;
+  addedCount: number;
+  updatedCount: number;
+  deletedCount: number;
 }
 
 export default StoreProductService;

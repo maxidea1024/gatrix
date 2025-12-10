@@ -343,6 +343,7 @@ export interface ServiceInstance {
  * - internalAddress is optional; if omitted, the first NIC address will be used
  */
 export interface RegisterServiceInput {
+  instanceId?: string; // Optional: Use existing instance ID for re-registration
   labels: ServiceLabels; // Service labels (required: labels.service)
   hostname?: string; // Optional: Auto-detected from os.hostname() if omitted
   internalAddress?: string; // Optional: Auto-detected from first NIC if omitted

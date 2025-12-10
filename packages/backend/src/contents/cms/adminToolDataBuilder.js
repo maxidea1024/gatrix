@@ -3329,6 +3329,152 @@ function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir, loctab = {}) {
   }
 }
 
+/**
+ * Build CashShop lookup from CashShop_BCCN.json
+ * Only includes valid products (with chinaPrice and productCodeSdo)
+ */
+function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
+  console.log('💰 Building CashShop lookup...');
+
+  try {
+    // Load CashShop_BCCN.json
+    const cashShopPath = path.join(cmsDir, 'CashShop_BCCN.json');
+    if (!fs.existsSync(cashShopPath)) {
+      console.log('   ⚠️  CashShop_BCCN.json not found, skipping...');
+      return null;
+    }
+
+    const cashShopData = loadJson5File(cashShopPath);
+    if (!cashShopData || !cashShopData.CashShop) {
+      console.log('   ⚠️  Invalid CashShop data');
+      return null;
+    }
+
+    // Format product name: replace {0} with formatText
+    const formatProductName = (productName, formatText, loctab) => {
+      const localizedTemplate = loctab[productName] || productName;
+      return localizedTemplate.replace('{0}', formatText || '');
+    };
+
+    // Extract valid products
+    const items = Object.entries(cashShopData.CashShop)
+      .filter(([key, item]) => {
+        if (!item || !item.id || key.startsWith(':')) return false;
+        // Only valid products with chinaPrice and productCodeSdo
+        return item.chinaPrice && item.productCodeSdo;
+      })
+      .map(([, item]) => {
+        const nameKr = formatProductName(
+          item.productName || '',
+          item.productNameFormatText || '',
+          {} // Korean: no translation
+        );
+        const nameCn = formatProductName(
+          item.productName || '',
+          item.productNameFormatText || '',
+          loctab
+        );
+        // Translate productDesc
+        const descKr = item.productDesc || '';
+        const descCn = loctab[descKr] || descKr;
+
+        return {
+          id: item.id,
+          name: nameKr,
+          nameKr,
+          nameEn: nameKr, // English: use Korean (no translation available)
+          nameCn,
+          productCode: item.productCodeSdo,
+          price: item.chinaPrice,
+          productCategory: item.productCategory || 0,
+          productType: item.productType || 0,
+          saleType: item.saleType || 0,
+          productDesc: descKr,
+          productDescKr: descKr,
+          productDescEn: descKr, // English: use Korean (no translation available)
+          productDescCn: descCn,
+        };
+      });
+
+    items.sort((a, b) => a.id - b.id);
+
+    const lookupData = { items };
+
+    // Convert to language-specific files
+    convertCashShopToLanguageSpecific(lookupData, 'cashshop', outputDir);
+
+    console.log(`   ✅ CashShop lookup built (${items.length} items)`);
+    return lookupData;
+  } catch (error) {
+    console.log(`   ⚠️  Error building CashShop lookup:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Convert CashShop data to language-specific files
+ * Handles both name and productDesc translations
+ */
+function convertCashShopToLanguageSpecific(data, eventType, outputDir) {
+  const languageData = {
+    kr: { totalCount: 0, items: [] },
+    en: { totalCount: 0, items: [] },
+    zh: { totalCount: 0, items: [] },
+  };
+
+  for (const item of data.items) {
+    // Korean
+    languageData.kr.items.push({
+      id: item.id,
+      name: item.nameKr,
+      productCode: item.productCode,
+      price: item.price,
+      productCategory: item.productCategory,
+      productType: item.productType,
+      saleType: item.saleType,
+      productDesc: item.productDescKr,
+    });
+
+    // English
+    languageData.en.items.push({
+      id: item.id,
+      name: item.nameEn,
+      productCode: item.productCode,
+      price: item.price,
+      productCategory: item.productCategory,
+      productType: item.productType,
+      saleType: item.saleType,
+      productDesc: item.productDescEn,
+    });
+
+    // Chinese
+    languageData.zh.items.push({
+      id: item.id,
+      name: item.nameCn,
+      productCode: item.productCode,
+      price: item.price,
+      productCategory: item.productCategory,
+      productType: item.productType,
+      saleType: item.saleType,
+      productDesc: item.productDescCn,
+    });
+  }
+
+  languageData.kr.totalCount = languageData.kr.items.length;
+  languageData.en.totalCount = languageData.en.items.length;
+  languageData.zh.totalCount = languageData.zh.items.length;
+
+  // Save language-specific files
+  const krFile = path.join(outputDir, `${eventType}-lookup-kr.json`);
+  fs.writeFileSync(krFile, JSON.stringify(languageData.kr, null, 2), 'utf8');
+
+  const enFile = path.join(outputDir, `${eventType}-lookup-en.json`);
+  fs.writeFileSync(enFile, JSON.stringify(languageData.en, null, 2), 'utf8');
+
+  const zhFile = path.join(outputDir, `${eventType}-lookup-zh.json`);
+  fs.writeFileSync(zhFile, JSON.stringify(languageData.zh, null, 2), 'utf8');
+}
+
 // ============================================================================
 // Main Function
 // ============================================================================
@@ -3469,6 +3615,13 @@ Examples:
       generatedFiles.push({ name: 'oceannpcarea-lookup-en.json', description: 'OceanNpcArea (English)' });
       generatedFiles.push({ name: 'oceannpcarea-lookup-zh.json', description: 'OceanNpcArea (Chinese)' });
     }
+
+    const cashShop = buildCashShopLookup(cmsDir, outputDir, loctab);
+    if (cashShop) {
+      generatedFiles.push({ name: 'cashshop-lookup-kr.json', description: 'CashShop (Korean)' });
+      generatedFiles.push({ name: 'cashshop-lookup-en.json', description: 'CashShop (English)' });
+      generatedFiles.push({ name: 'cashshop-lookup-zh.json', description: 'CashShop (Chinese)' });
+    }
   }
 
   const endTime = Date.now();
@@ -3504,6 +3657,7 @@ module.exports = {
   buildLiveEventLookup,
   buildMateRecruitingGroupLookup,
   buildOceanNpcAreaSpawnerLookup,
+  buildCashShopLookup,
 };
 
 // Run main function if this file is executed directly

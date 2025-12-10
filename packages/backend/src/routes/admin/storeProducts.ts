@@ -3,6 +3,10 @@ import { StoreProductController } from '../../controllers/StoreProductController
 
 const router = Router();
 
+// Sync routes (must be before /:id to avoid conflict)
+router.get('/sync/preview', StoreProductController.previewSync);
+router.post('/sync/apply', StoreProductController.applySync);
+
 // Store product CRUD routes
 router.get('/', StoreProductController.getStoreProducts);
 router.get('/:id', StoreProductController.getStoreProductById);
