@@ -4144,6 +4144,8 @@
     "bulkHealthCheck.latency": "응답시간",
     "bulkHealthCheck.result": "결과",
     "bulkHealthCheck.port": "포트",
+    "bulkHealthCheck.selected": "선택됨",
+    "bulkHealthCheck.subtitle": "선택한 서버들의 헬스체크를 수행하여 상태를 확인합니다.",
     "viewMode": {
       "list": "리스트 뷰",
       "grid": "그리드 뷰",

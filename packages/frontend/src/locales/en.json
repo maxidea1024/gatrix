@@ -4147,6 +4147,8 @@
     "bulkHealthCheck.latency": "Latency",
     "bulkHealthCheck.result": "Result",
     "bulkHealthCheck.port": "Port",
+    "bulkHealthCheck.selected": "Selected",
+    "bulkHealthCheck.subtitle": "Perform health checks on selected servers to verify their status.",
     "viewMode": {
       "list": "List View",
       "grid": "Grid View",

@@ -36,6 +36,9 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Menu,
+  MenuItem,
+  ListItemIcon,
 } from '@mui/material';
 import {
   Dns as DnsIcon,
@@ -60,6 +63,7 @@ import {
   Favorite as FavoriteIcon,
   Refresh as RefreshIcon,
   NetworkCheck as NetworkCheckIcon,
+  FileDownload as FileDownloadIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -1055,6 +1059,7 @@ const ServerListPage: React.FC = () => {
     error?: string;
   }[]>([]);
   const [bulkHealthCheckRunning, setBulkHealthCheckRunning] = useState(false);
+  const [bulkHealthCheckSelected, setBulkHealthCheckSelected] = useState<Set<string>>(new Set());
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -1402,7 +1407,7 @@ const ServerListPage: React.FC = () => {
       return hasApiPort && isActive;
     });
 
-    setBulkHealthCheckResults(checkableServices.map(s => {
+    const results = checkableServices.map(s => {
       const ports = s.ports;
       const healthPort = ports?.internalApi || ports?.externalApi || ports?.web || ports?.http || ports?.api;
       return {
@@ -1416,15 +1421,44 @@ const ServerListPage: React.FC = () => {
         healthPort: healthPort,
         status: 'pending' as const,
       };
-    }));
+    });
+
+    setBulkHealthCheckResults(results);
+    // Select all by default
+    setBulkHealthCheckSelected(new Set(results.map(r => r.serviceKey)));
     setBulkHealthCheckOpen(true);
+  };
+
+  const handleBulkHealthCheckToggle = (serviceKey: string) => {
+    setBulkHealthCheckSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(serviceKey)) {
+        next.delete(serviceKey);
+      } else {
+        next.add(serviceKey);
+      }
+      return next;
+    });
+  };
+
+  const handleBulkHealthCheckSelectAll = () => {
+    setBulkHealthCheckSelected(new Set(bulkHealthCheckResults.map(r => r.serviceKey)));
+  };
+
+  const handleBulkHealthCheckDeselectAll = () => {
+    setBulkHealthCheckSelected(new Set());
   };
 
   const handleBulkHealthCheckStart = async () => {
     setBulkHealthCheckRunning(true);
 
-    for (let i = 0; i < bulkHealthCheckResults.length; i++) {
-      const item = bulkHealthCheckResults[i];
+    // Get only selected items to check
+    const selectedItems = bulkHealthCheckResults
+      .map((item, idx) => ({ item, idx }))
+      .filter(({ item }) => bulkHealthCheckSelected.has(item.serviceKey));
+
+    for (let j = 0; j < selectedItems.length; j++) {
+      const { item, idx: i } = selectedItems[j];
 
       // Update status to 'checking'
       setBulkHealthCheckResults(prev => prev.map((r, idx) =>
@@ -1472,18 +1506,102 @@ const ServerListPage: React.FC = () => {
       }
 
       // Small delay between checks to avoid overwhelming the servers
-      if (i < bulkHealthCheckResults.length - 1) {
+      if (j < selectedItems.length - 1) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
     }
 
     setBulkHealthCheckRunning(false);
+    setHasCompletedHealthCheck(true);
   };
 
   const handleBulkHealthCheckClose = () => {
     if (!bulkHealthCheckRunning) {
       setBulkHealthCheckOpen(false);
       setBulkHealthCheckResults([]);
+      setBulkHealthCheckSelected(new Set());
+      setHasCompletedHealthCheck(false);
+    }
+  };
+
+  // State for tracking if health check has been completed at least once
+  const [hasCompletedHealthCheck, setHasCompletedHealthCheck] = useState(false);
+
+  // Export menu anchor
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+
+  const handleExportMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setExportMenuAnchor(event.currentTarget);
+  };
+
+  const handleExportMenuClose = () => {
+    setExportMenuAnchor(null);
+  };
+
+  const handleExportHealthCheck = (format: 'csv' | 'xlsx' | 'json') => {
+    handleExportMenuClose();
+
+    const exportData = bulkHealthCheckResults.map(item => ({
+      service: item.service,
+      group: item.group || '',
+      env: item.env || '',
+      hostname: item.hostname || '',
+      internalIp: item.internalIp || '',
+      port: item.healthPort || '',
+      status: item.status,
+      latency: item.latency || '',
+      error: item.error || '',
+    }));
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const filename = `health-check-${timestamp}`;
+
+    if (format === 'json') {
+      const jsonStr = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (format === 'csv') {
+      const headers = ['Service', 'Group', 'Environment', 'Hostname', 'Internal IP', 'Port', 'Status', 'Latency (ms)', 'Error'];
+      const csvRows = [
+        headers.join(','),
+        ...exportData.map(row =>
+          [row.service, row.group, row.env, row.hostname, row.internalIp, row.port, row.status, row.latency, `"${row.error}"`].join(',')
+        ),
+      ];
+      const csvStr = csvRows.join('\n');
+      const blob = new Blob(['\uFEFF' + csvStr], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (format === 'xlsx') {
+      // For xlsx, we'll use a simple approach with csv-like data
+      // In production, you might want to use a library like xlsx or exceljs
+      import('xlsx').then(XLSX => {
+        const ws = XLSX.utils.json_to_sheet(exportData.map(row => ({
+          Service: row.service,
+          Group: row.group,
+          Environment: row.env,
+          Hostname: row.hostname,
+          'Internal IP': row.internalIp,
+          Port: row.port,
+          Status: row.status,
+          'Latency (ms)': row.latency,
+          Error: row.error,
+        })));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Health Check Results');
+        XLSX.writeFile(wb, `${filename}.xlsx`);
+      }).catch(() => {
+        enqueueSnackbar(t('common.exportFailed'), { variant: 'error' });
+      });
     }
   };
 
@@ -3137,6 +3255,11 @@ const ServerListPage: React.FC = () => {
           {t('serverList.bulkHealthCheck')}
         </DialogTitle>
         <DialogContent>
+          {/* Subtitle */}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {t('serverList.bulkHealthCheck.subtitle')}
+          </Typography>
+
           {/* Statistics Summary */}
           <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
             <Chip
@@ -3201,7 +3324,7 @@ const ServerListPage: React.FC = () => {
           <Box
             id="bulk-health-check-scroll-container"
             sx={{
-              maxHeight: 400,
+              maxHeight: 600,
               overflow: 'auto',
               border: 1,
               borderColor: 'divider',
@@ -3211,6 +3334,17 @@ const ServerListPage: React.FC = () => {
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
+                  <TableCell sx={{ width: 50, bgcolor: 'background.paper', padding: '4px 8px' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Checkbox
+                        size="small"
+                        checked={bulkHealthCheckSelected.size === bulkHealthCheckResults.length && bulkHealthCheckResults.length > 0}
+                        indeterminate={bulkHealthCheckSelected.size > 0 && bulkHealthCheckSelected.size < bulkHealthCheckResults.length}
+                        onChange={(e) => e.target.checked ? handleBulkHealthCheckSelectAll() : handleBulkHealthCheckDeselectAll()}
+                        disabled={bulkHealthCheckRunning}
+                      />
+                    </Box>
+                  </TableCell>
                   <TableCell sx={{ width: 50, bgcolor: 'background.paper' }}>{t('serverList.bulkHealthCheck.status')}</TableCell>
                   <TableCell sx={{ bgcolor: 'background.paper' }}>{t('serverList.table.service')}</TableCell>
                   <TableCell sx={{ bgcolor: 'background.paper' }}>{t('serverList.table.group')}</TableCell>
@@ -3234,6 +3368,14 @@ const ServerListPage: React.FC = () => {
                       transition: 'background-color 0.3s ease',
                     }}
                   >
+                    <TableCell sx={{ padding: '4px 8px' }}>
+                      <Checkbox
+                        size="small"
+                        checked={bulkHealthCheckSelected.has(item.serviceKey)}
+                        onChange={() => handleBulkHealthCheckToggle(item.serviceKey)}
+                        disabled={bulkHealthCheckRunning || item.status !== 'pending'}
+                      />
+                    </TableCell>
                     <TableCell>
                       {item.status === 'pending' && (
                         <HourglassEmptyIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
@@ -3309,18 +3451,62 @@ const ServerListPage: React.FC = () => {
             </Table>
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleBulkHealthCheckClose} disabled={bulkHealthCheckRunning}>
-            {t('common.close')}
-          </Button>
+        <DialogActions sx={{ justifyContent: 'space-between' }}>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+            {t('serverList.bulkHealthCheck.selected')}: {bulkHealthCheckSelected.size} / {bulkHealthCheckResults.length}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Button onClick={handleBulkHealthCheckClose} disabled={bulkHealthCheckRunning}>
+              {t('common.close')}
+            </Button>
+            <Button
+              onClick={handleBulkHealthCheckStart}
+              variant="contained"
+              disabled={bulkHealthCheckRunning || bulkHealthCheckSelected.size === 0}
+              startIcon={bulkHealthCheckRunning ? <CircularProgress size={16} color="inherit" /> : <NetworkCheckIcon />}
+            >
+              {bulkHealthCheckRunning ? t('serverList.bulkHealthCheck.checking') : t('serverList.bulkHealthCheck.start')}
+            </Button>
+          <Box
+            sx={{
+              width: '1px',
+              height: '24px',
+              bgcolor: 'divider',
+              mx: 1,
+            }}
+          />
           <Button
-            onClick={handleBulkHealthCheckStart}
-            variant="contained"
-            disabled={bulkHealthCheckRunning || bulkHealthCheckStats.completed > 0}
-            startIcon={bulkHealthCheckRunning ? <CircularProgress size={16} color="inherit" /> : <NetworkCheckIcon />}
+            onClick={handleExportMenuOpen}
+            disabled={!hasCompletedHealthCheck || bulkHealthCheckRunning}
+            startIcon={<FileDownloadIcon />}
           >
-            {bulkHealthCheckRunning ? t('serverList.bulkHealthCheck.checking') : t('serverList.bulkHealthCheck.start')}
+            {t('common.export')}
           </Button>
+          <Menu
+            anchorEl={exportMenuAnchor}
+            open={Boolean(exportMenuAnchor)}
+            onClose={handleExportMenuClose}
+          >
+            <MenuItem onClick={() => handleExportHealthCheck('csv')}>
+              <ListItemIcon>
+                <FileDownloadIcon fontSize="small" />
+              </ListItemIcon>
+              CSV
+            </MenuItem>
+            <MenuItem onClick={() => handleExportHealthCheck('xlsx')}>
+              <ListItemIcon>
+                <FileDownloadIcon fontSize="small" />
+              </ListItemIcon>
+              Excel (XLSX)
+            </MenuItem>
+            <MenuItem onClick={() => handleExportHealthCheck('json')}>
+              <ListItemIcon>
+                <FileDownloadIcon fontSize="small" />
+              </ListItemIcon>
+              JSON
+            </MenuItem>
+          </Menu>
+          </Box>
         </DialogActions>
       </Dialog>
     </Box>

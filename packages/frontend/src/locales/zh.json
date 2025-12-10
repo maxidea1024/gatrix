@@ -4195,6 +4195,8 @@
     "bulkHealthCheck.latency": "延迟",
     "bulkHealthCheck.result": "结果",
     "bulkHealthCheck.port": "端口",
+    "bulkHealthCheck.selected": "已选择",
+    "bulkHealthCheck.subtitle": "对选定的服务器执行健康检查以验证其状态。",
     "viewMode": {
       "list": "列表视图",
       "grid": "网格视图",
