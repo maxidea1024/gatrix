@@ -59,6 +59,7 @@ import {
   TouchApp as TouchAppIcon,
   Favorite as FavoriteIcon,
   Refresh as RefreshIcon,
+  NetworkCheck as NetworkCheckIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -796,28 +797,52 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
                 >
                   {/* Subtle ripple effect on heartbeat/status change */}
                   {shouldRumble && (
-                    <circle
-                      key={`ripple-${currentRumbleCount}`}
-                      r={nodeRadius}
-                      fill="none"
-                      stroke="rgba(255,255,255,0.3)"
-                      strokeWidth="1"
-                    >
-                      <animate
-                        attributeName="r"
-                        from={`${nodeRadius}`}
-                        to={`${nodeRadius + 12}`}
-                        dur="0.5s"
-                        fill="freeze"
-                      />
-                      <animate
-                        attributeName="opacity"
-                        from="0.3"
-                        to="0"
-                        dur="0.5s"
-                        fill="freeze"
-                      />
-                    </circle>
+                    <>
+                      <circle
+                        key={`ripple1-${currentRumbleCount}`}
+                        r={nodeRadius}
+                        fill="none"
+                        stroke="rgba(255,255,255,0.6)"
+                        strokeWidth="2"
+                      >
+                        <animate
+                          attributeName="r"
+                          from={`${nodeRadius}`}
+                          to={`${nodeRadius + 15}`}
+                          dur="0.6s"
+                          fill="freeze"
+                        />
+                        <animate
+                          attributeName="opacity"
+                          from="0.6"
+                          to="0"
+                          dur="0.6s"
+                          fill="freeze"
+                        />
+                      </circle>
+                      <circle
+                        key={`ripple2-${currentRumbleCount}`}
+                        r={nodeRadius}
+                        fill="none"
+                        stroke="rgba(255,255,255,0.4)"
+                        strokeWidth="1"
+                      >
+                        <animate
+                          attributeName="r"
+                          from={`${nodeRadius}`}
+                          to={`${nodeRadius + 25}`}
+                          dur="0.8s"
+                          fill="freeze"
+                        />
+                        <animate
+                          attributeName="opacity"
+                          from="0.4"
+                          to="0"
+                          dur="0.8s"
+                          fill="freeze"
+                        />
+                      </circle>
+                    </>
                   )}
 
                   {/* Outer glow for active services */}
@@ -1013,6 +1038,23 @@ const ServerListPage: React.FC = () => {
     fading: boolean;
     result?: { healthy: boolean; latency: number; error?: string }
   }>>(new Map());
+
+  // Bulk health check dialog state
+  const [bulkHealthCheckOpen, setBulkHealthCheckOpen] = useState(false);
+  const [bulkHealthCheckResults, setBulkHealthCheckResults] = useState<{
+    serviceKey: string;
+    service: string;
+    instanceId: string;
+    group?: string;
+    env?: string;
+    hostname?: string;
+    internalIp?: string;
+    healthPort?: number;
+    status: 'pending' | 'checking' | 'success' | 'failed';
+    latency?: number;
+    error?: string;
+  }[]>([]);
+  const [bulkHealthCheckRunning, setBulkHealthCheckRunning] = useState(false);
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -1349,6 +1391,116 @@ const ServerListPage: React.FC = () => {
   const handleCleanupCancel = () => {
     setCleanupDialogOpen(false);
   };
+
+  // Bulk health check handlers
+  const handleBulkHealthCheckOpen = () => {
+    // Filter only checkable services (those with API ports and active status)
+    const checkableServices = services.filter(s => {
+      const ports = s.ports;
+      const hasApiPort = !!(ports?.internalApi || ports?.externalApi || ports?.web || ports?.http || ports?.api);
+      const isActive = s.status === 'ready' || s.status === 'initializing';
+      return hasApiPort && isActive;
+    });
+
+    setBulkHealthCheckResults(checkableServices.map(s => {
+      const ports = s.ports;
+      const healthPort = ports?.internalApi || ports?.externalApi || ports?.web || ports?.http || ports?.api;
+      return {
+        serviceKey: `${s.labels.service}-${s.instanceId}`,
+        service: s.labels.service,
+        instanceId: s.instanceId,
+        group: s.labels.group,
+        env: s.labels.env,
+        hostname: s.hostname,
+        internalIp: s.internalAddress,
+        healthPort: healthPort,
+        status: 'pending' as const,
+      };
+    }));
+    setBulkHealthCheckOpen(true);
+  };
+
+  const handleBulkHealthCheckStart = async () => {
+    setBulkHealthCheckRunning(true);
+
+    for (let i = 0; i < bulkHealthCheckResults.length; i++) {
+      const item = bulkHealthCheckResults[i];
+
+      // Update status to 'checking'
+      setBulkHealthCheckResults(prev => prev.map((r, idx) =>
+        idx === i ? { ...r, status: 'checking' as const } : r
+      ));
+
+      // Auto-scroll to current row (center it in the container)
+      setTimeout(() => {
+        const row = document.getElementById(`bulk-health-row-${i}`);
+        const container = document.getElementById('bulk-health-check-scroll-container');
+        if (row && container) {
+          const rowTop = row.offsetTop;
+          const rowHeight = row.offsetHeight;
+          const containerHeight = container.clientHeight;
+          const headerHeight = 40; // Approximate sticky header height
+          // Scroll so the row is centered in the visible area
+          const scrollTarget = rowTop - headerHeight - (containerHeight / 2) + (rowHeight / 2);
+          container.scrollTo({
+            top: Math.max(0, scrollTarget),
+            behavior: 'smooth',
+          });
+        }
+      }, 50);
+
+      try {
+        const result = await serviceDiscoveryService.healthCheck(item.service, item.instanceId);
+
+        // Update with result
+        setBulkHealthCheckResults(prev => prev.map((r, idx) =>
+          idx === i ? {
+            ...r,
+            status: result.healthy ? 'success' as const : 'failed' as const,
+            latency: result.latency,
+            error: result.error,
+          } : r
+        ));
+      } catch (error: any) {
+        setBulkHealthCheckResults(prev => prev.map((r, idx) =>
+          idx === i ? {
+            ...r,
+            status: 'failed' as const,
+            error: error.message || 'Unknown error',
+          } : r
+        ));
+      }
+
+      // Small delay between checks to avoid overwhelming the servers
+      if (i < bulkHealthCheckResults.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+
+    setBulkHealthCheckRunning(false);
+  };
+
+  const handleBulkHealthCheckClose = () => {
+    if (!bulkHealthCheckRunning) {
+      setBulkHealthCheckOpen(false);
+      setBulkHealthCheckResults([]);
+    }
+  };
+
+  // Bulk health check statistics
+  const bulkHealthCheckStats = useMemo(() => {
+    const total = bulkHealthCheckResults.length;
+    const success = bulkHealthCheckResults.filter(r => r.status === 'success').length;
+    const failed = bulkHealthCheckResults.filter(r => r.status === 'failed').length;
+    const pending = bulkHealthCheckResults.filter(r => r.status === 'pending').length;
+    const checking = bulkHealthCheckResults.filter(r => r.status === 'checking').length;
+    const completed = success + failed;
+    const avgLatency = bulkHealthCheckResults
+      .filter(r => r.status === 'success' && r.latency)
+      .reduce((acc, r) => acc + (r.latency || 0), 0) / (success || 1);
+
+    return { total, success, failed, pending, checking, completed, avgLatency };
+  }, [bulkHealthCheckResults]);
 
   // Extract unique values from current services for filter options
   const uniqueServices = useMemo(() =>
@@ -1994,6 +2146,37 @@ const ServerListPage: React.FC = () => {
                   }}
                 >
                   <CleaningServicesIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+
+            {/* Divider before Bulk Health Check */}
+            <Box
+              sx={{
+                width: '1px',
+                height: '24px',
+                bgcolor: (theme) => theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.2)'
+                  : 'rgba(0, 0, 0, 0.2)',
+              }}
+            />
+
+            {/* Bulk Health Check Button */}
+            <Tooltip title={t('serverList.bulkHealthCheck')}>
+              <span>
+                <IconButton
+                  onClick={handleBulkHealthCheckOpen}
+                  disabled={services.filter(s => s.status === 'ready' || s.status === 'initializing').length === 0}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <NetworkCheckIcon />
                 </IconButton>
               </span>
             </Tooltip>
@@ -2937,6 +3120,206 @@ const ServerListPage: React.FC = () => {
           </Button>
           <Button onClick={handleCleanupConfirm} color="error" variant="contained" autoFocus>
             {t('common.confirm')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Bulk Health Check Dialog */}
+      <Dialog
+        open={bulkHealthCheckOpen}
+        onClose={handleBulkHealthCheckClose}
+        maxWidth="xl"
+        fullWidth
+        aria-labelledby="bulk-health-check-dialog-title"
+      >
+        <DialogTitle id="bulk-health-check-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <NetworkCheckIcon color="primary" />
+          {t('serverList.bulkHealthCheck')}
+        </DialogTitle>
+        <DialogContent>
+          {/* Statistics Summary */}
+          <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+            <Chip
+              label={`${t('serverList.bulkHealthCheck.total')}: ${bulkHealthCheckStats.total}`}
+              color="default"
+              variant="outlined"
+            />
+            <Chip
+              icon={<CheckCircleIcon />}
+              label={`${t('serverList.bulkHealthCheck.success')}: ${bulkHealthCheckStats.success}`}
+              color="success"
+              variant={bulkHealthCheckStats.success > 0 ? 'filled' : 'outlined'}
+            />
+            <Chip
+              icon={<ErrorIcon />}
+              label={`${t('serverList.bulkHealthCheck.failed')}: ${bulkHealthCheckStats.failed}`}
+              color="error"
+              variant={bulkHealthCheckStats.failed > 0 ? 'filled' : 'outlined'}
+            />
+            {bulkHealthCheckStats.success > 0 && (
+              <Chip
+                label={`${t('serverList.bulkHealthCheck.avgLatency')}: ${Math.round(bulkHealthCheckStats.avgLatency)}ms`}
+                color="info"
+                variant="outlined"
+              />
+            )}
+          </Box>
+
+          {/* Progress Bar */}
+          {bulkHealthCheckRunning && (
+            <Box sx={{ mb: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                <Typography variant="body2" color="text.secondary">
+                  {t('serverList.bulkHealthCheck.checking')}...
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {bulkHealthCheckStats.completed}/{bulkHealthCheckStats.total}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  width: '100%',
+                  height: 8,
+                  bgcolor: 'grey.200',
+                  borderRadius: 1,
+                  overflow: 'hidden',
+                }}
+              >
+                <Box
+                  sx={{
+                    width: `${(bulkHealthCheckStats.completed / bulkHealthCheckStats.total) * 100}%`,
+                    height: '100%',
+                    bgcolor: 'primary.main',
+                    transition: 'width 0.3s ease',
+                  }}
+                />
+              </Box>
+            </Box>
+          )}
+
+          {/* Results List */}
+          <Box
+            id="bulk-health-check-scroll-container"
+            sx={{
+              maxHeight: 400,
+              overflow: 'auto',
+              border: 1,
+              borderColor: 'divider',
+              borderRadius: 1,
+            }}
+          >
+            <Table size="small" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ width: 50, bgcolor: 'background.paper' }}>{t('serverList.bulkHealthCheck.status')}</TableCell>
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>{t('serverList.table.service')}</TableCell>
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>{t('serverList.table.group')}</TableCell>
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>{t('serverList.filters.env')}</TableCell>
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>{t('serverList.table.hostname')}</TableCell>
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>{t('serverList.table.internalAddress')}</TableCell>
+                  <TableCell sx={{ width: 70, bgcolor: 'background.paper' }}>{t('serverList.bulkHealthCheck.port')}</TableCell>
+                  <TableCell sx={{ width: 80, bgcolor: 'background.paper' }}>{t('serverList.bulkHealthCheck.latency')}</TableCell>
+                  <TableCell sx={{ bgcolor: 'background.paper' }}>{t('serverList.bulkHealthCheck.result')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {bulkHealthCheckResults.map((item, index) => (
+                  <TableRow
+                    key={item.serviceKey}
+                    id={`bulk-health-row-${index}`}
+                    sx={{
+                      bgcolor: item.status === 'checking' ? alpha('#1976d2', 0.1) :
+                        item.status === 'success' ? alpha('#2e7d32', 0.05) :
+                          item.status === 'failed' ? alpha('#d32f2f', 0.05) : 'transparent',
+                      transition: 'background-color 0.3s ease',
+                    }}
+                  >
+                    <TableCell>
+                      {item.status === 'pending' && (
+                        <HourglassEmptyIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+                      )}
+                      {item.status === 'checking' && (
+                        <CircularProgress size={18} />
+                      )}
+                      {item.status === 'success' && (
+                        <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
+                      )}
+                      {item.status === 'failed' && (
+                        <ErrorIcon sx={{ color: 'error.main', fontSize: 20 }} />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight="medium">
+                        {item.service}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.group || '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.env || '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontFamily: 'D2Coding, monospace', fontSize: '0.75rem' }}>
+                        {item.hostname || '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontFamily: 'D2Coding, monospace', fontSize: '0.75rem' }}>
+                        {item.internalIp || '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontFamily: 'D2Coding, monospace', fontSize: '0.75rem' }}>
+                        {item.healthPort || '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      {item.latency !== undefined && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: item.latency < 100 ? 'success.main' :
+                              item.latency < 500 ? 'warning.main' : 'error.main',
+                          }}
+                        >
+                          {item.latency}ms
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {item.error && (
+                        <Typography variant="body2" color="error.main" sx={{ fontSize: '0.75rem' }}>
+                          {item.error}
+                        </Typography>
+                      )}
+                      {item.status === 'success' && !item.error && (
+                        <Typography variant="body2" color="success.main" sx={{ fontSize: '0.75rem' }}>
+                          OK
+                        </Typography>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleBulkHealthCheckClose} disabled={bulkHealthCheckRunning}>
+            {t('common.close')}
+          </Button>
+          <Button
+            onClick={handleBulkHealthCheckStart}
+            variant="contained"
+            disabled={bulkHealthCheckRunning || bulkHealthCheckStats.completed > 0}
+            startIcon={bulkHealthCheckRunning ? <CircularProgress size={16} color="inherit" /> : <NetworkCheckIcon />}
+          >
+            {bulkHealthCheckRunning ? t('serverList.bulkHealthCheck.checking') : t('serverList.bulkHealthCheck.start')}
           </Button>
         </DialogActions>
       </Dialog>
