@@ -39,6 +39,7 @@ import {
   Folder as FolderIcon,
   ViewCarousel as ViewCarouselIcon,
   Layers as LayersIcon,
+  Storefront as StorefrontIcon,
 } from '@mui/icons-material';
 import { Permission, PERMISSIONS } from '@/types/permissions';
 
@@ -127,6 +128,7 @@ export const gameMenuItems: MenuItem[] = [
       { text: 'sidebar.liveEvent', icon: <CelebrationIcon />, path: '/game/live-event', adminOnly: true, requiredPermission: [PERMISSIONS.OPERATION_EVENTS_VIEW, PERMISSIONS.OPERATION_EVENTS_MANAGE] },
     ]
   },
+  { text: 'sidebar.storeProducts', icon: <StorefrontIcon />, path: '/game/store-products', adminOnly: true, requiredPermission: [PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE] },
   { text: 'sidebar.rewardTemplates', icon: <CardGiftcardIcon />, path: '/game/reward-templates', adminOnly: true, requiredPermission: [PERMISSIONS.REWARD_TEMPLATES_VIEW, PERMISSIONS.REWARD_TEMPLATES_MANAGE] },
   { text: 'sidebar.banners', icon: <ViewCarouselIcon />, path: '/game/banners', adminOnly: true, requiredPermission: [PERMISSIONS.BANNERS_VIEW, PERMISSIONS.BANNERS_MANAGE] },
   { text: 'sidebar.planningData', icon: <StorageIcon />, path: '/game/planning-data', adminOnly: true, requiredPermission: [PERMISSIONS.PLANNING_DATA_VIEW, PERMISSIONS.PLANNING_DATA_MANAGE] },

@@ -807,6 +807,10 @@
     "operation-events_view_desc": "View the list of in-game operation events (attendance, missions, etc.).",
     "operation-events_manage": "Manage Operation Events",
     "operation-events_manage_desc": "Create, edit, delete operation events and set rewards and conditions.",
+    "store-products_view": "View Store Products",
+    "store-products_view_desc": "View the list of products available in the in-game store.",
+    "store-products_manage": "Manage Store Products",
+    "store-products_manage_desc": "Manage the sale status and settings of store products.",
     "reward-templates_view": "View Reward Templates",
     "reward-templates_view_desc": "View the list of frequently used reward configuration templates.",
     "reward-templates_manage": "Manage Reward Templates",
@@ -2704,6 +2708,7 @@
     "couponSettings": "Coupon Settings",
     "couponUsage": "Coupon Usage",
     "surveys": "Surveys",
+    "storeProducts": "Store Products",
     "rewardTemplates": "Reward Item Templates",
     "operationEvents": "Operation Events",
     "hotTimeButtonEvent": "Hot Time Button Event",
@@ -3989,6 +3994,10 @@
     "templateEmpty": "The selected template has no reward items.",
     "modeChangeWarning": "Change Mode",
     "modeChangeWarningMessage": "Changing the mode will delete all current rewards. Do you want to continue?"
+  },
+  "storeProducts": {
+    "title": "Store Products",
+    "subtitle": "Manage the sale status of products available in the in-game store"
   },
   "rewardTemplates": {
     "title": "Reward Item Templates",

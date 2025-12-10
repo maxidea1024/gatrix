@@ -862,6 +862,10 @@
     "operation-events_view_desc": "可以查看游戏内运营活动（签到、任务等）列表。",
     "operation-events_manage": "管理运营活动",
     "operation-events_manage_desc": "可以创建、修改、删除运营活动，并设置奖励和条件。",
+    "store-products_view": "查看商店商品",
+    "store-products_view_desc": "可以查看游戏内商店中销售的商品列表。",
+    "store-products_manage": "管理商店商品",
+    "store-products_manage_desc": "可以管理商店商品的销售状态和设置。",
     "reward-templates_view": "查看奖励模板",
     "reward-templates_view_desc": "可以查看常用的奖励配置模板列表。",
     "reward-templates_manage": "管理奖励模板",
@@ -2756,6 +2760,7 @@
     "couponSettings": "优惠券定义",
     "couponUsage": "优惠券使用记录",
     "surveys": "问卷调查",
+    "storeProducts": "商店商品管理",
     "rewardTemplates": "奖励物品模板",
     "operationEvents": "运营活动管理",
     "hotTimeButtonEvent": "热时按钮活动",
@@ -4037,6 +4042,10 @@
     "templateEmpty": "所选模板没有奖励物品。",
     "modeChangeWarning": "更改模式",
     "modeChangeWarningMessage": "更改模式将删除所有当前奖励。您要继续吗？"
+  },
+  "storeProducts": {
+    "title": "商店商品管理",
+    "subtitle": "管理游戏内商店中商品的销售状态"
   },
   "rewardTemplates": {
     "title": "奖励物品模板",

@@ -807,6 +807,10 @@
     "operation-events_view_desc": "게임 내 운영 이벤트(출석 체크, 미션 등) 목록을 조회할 수 있습니다.",
     "operation-events_manage": "운영 이벤트 관리",
     "operation-events_manage_desc": "운영 이벤트를 생성, 수정, 삭제하고 보상 및 조건을 설정할 수 있습니다.",
+    "store-products_view": "스토어 상품 조회",
+    "store-products_view_desc": "게임 내 스토어에서 판매되는 상품 목록을 조회할 수 있습니다.",
+    "store-products_manage": "스토어 상품 관리",
+    "store-products_manage_desc": "스토어 상품의 판매 여부 및 설정을 변경할 수 있습니다.",
     "reward-templates_view": "보상 템플릿 조회",
     "reward-templates_view_desc": "자주 사용하는 보상 구성 템플릿 목록을 조회할 수 있습니다.",
     "reward-templates_manage": "보상 템플릿 관리",
@@ -2704,6 +2708,7 @@
     "couponSettings": "쿠폰 정의",
     "couponUsage": "쿠폰 사용 기록",
     "surveys": "설문지",
+    "storeProducts": "스토어 상품관리",
     "rewardTemplates": "보상아이템 템플릿",
     "operationEvents": "운영이벤트 관리",
     "hotTimeButtonEvent": "핫타임버튼 이벤트",
@@ -3989,6 +3994,10 @@
     "templateEmpty": "선택한 템플릿에 보상 아이템이 없습니다.",
     "modeChangeWarning": "모드 변경",
     "modeChangeWarningMessage": "모드를 변경하면 현재 입력된 보상이 모두 삭제됩니다. 계속하시겠습니까?"
+  },
+  "storeProducts": {
+    "title": "스토어 상품관리",
+    "subtitle": "게임 내 스토어에서 판매되는 상품의 판매 여부를 설정합니다"
   },
   "rewardTemplates": {
     "title": "보상아이템 템플릿",

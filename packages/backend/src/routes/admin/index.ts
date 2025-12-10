@@ -30,6 +30,7 @@ import crashEventRoutes from './crashEvents';
 import consoleRoutes from './console';
 import surveyRoutes from './surveys';
 import rewardTemplateRoutes from './rewardTemplates';
+import storeProductRoutes from './storeProducts';
 import serviceNoticeRoutes from './serviceNotices';
 import ingamePopupNoticeRoutes from './ingamePopupNotices';
 import planningDataRoutes from './planningData';
@@ -125,6 +126,9 @@ router.use('/surveys', requirePermission([PERMISSIONS.SURVEYS_VIEW, PERMISSIONS.
 
 // Reward templates - requires reward-templates.view or reward-templates.manage permission
 router.use('/reward-templates', requirePermission([PERMISSIONS.REWARD_TEMPLATES_VIEW, PERMISSIONS.REWARD_TEMPLATES_MANAGE]) as any, rewardTemplateRoutes);
+
+// Store products - requires store-products.view or store-products.manage permission
+router.use('/store-products', requirePermission([PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE]) as any, storeProductRoutes);
 
 // Service notices - requires service-notices.view or service-notices.manage permission
 router.use('/service-notices', requirePermission([PERMISSIONS.SERVICE_NOTICES_VIEW, PERMISSIONS.SERVICE_NOTICES_MANAGE]) as any, serviceNoticeRoutes);

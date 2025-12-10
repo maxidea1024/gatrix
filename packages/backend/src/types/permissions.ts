@@ -81,6 +81,10 @@ export const PERMISSIONS = {
   OPERATION_EVENTS_VIEW: 'operation-events.view',
   OPERATION_EVENTS_MANAGE: 'operation-events.manage',
 
+  // Game Management - Store Products
+  STORE_PRODUCTS_VIEW: 'store-products.view',
+  STORE_PRODUCTS_MANAGE: 'store-products.manage',
+
   // Game Management - Reward Templates
   REWARD_TEMPLATES_VIEW: 'reward-templates.view',
   REWARD_TEMPLATES_MANAGE: 'reward-templates.manage',
@@ -166,6 +170,8 @@ export const PERMISSION_CATEGORIES = {
       PERMISSIONS.SURVEYS_MANAGE,
       PERMISSIONS.OPERATION_EVENTS_VIEW,
       PERMISSIONS.OPERATION_EVENTS_MANAGE,
+      PERMISSIONS.STORE_PRODUCTS_VIEW,
+      PERMISSIONS.STORE_PRODUCTS_MANAGE,
       PERMISSIONS.REWARD_TEMPLATES_VIEW,
       PERMISSIONS.REWARD_TEMPLATES_MANAGE,
       PERMISSIONS.BANNERS_VIEW,

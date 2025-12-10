@@ -1,0 +1,376 @@
+import { ulid } from 'ulid';
+import database from '../config/database';
+import { GatrixError } from '../middleware/errorHandler';
+import logger from '../config/logger';
+import { TagService } from './TagService';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
+
+export interface StoreProduct {
+  id: string;
+  environmentId: string;
+  isActive: boolean;
+  productId: string;
+  productName: string;
+  store: string;
+  price: number;
+  currency: string;
+  saleStartAt: Date | null;
+  saleEndAt: Date | null;
+  description: string | null;
+  metadata: Record<string, any> | null;
+  createdBy: number | null;
+  updatedBy: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  tags?: any[];
+}
+
+export interface CreateStoreProductInput {
+  productId: string;
+  productName: string;
+  store: string;
+  price: number;
+  currency?: string;
+  isActive?: boolean;
+  saleStartAt?: Date | null;
+  saleEndAt?: Date | null;
+  description?: string;
+  metadata?: Record<string, any>;
+  createdBy?: number;
+}
+
+export interface UpdateStoreProductInput {
+  productId?: string;
+  productName?: string;
+  store?: string;
+  price?: number;
+  currency?: string;
+  isActive?: boolean;
+  saleStartAt?: Date | null;
+  saleEndAt?: Date | null;
+  description?: string;
+  metadata?: Record<string, any>;
+  updatedBy?: number;
+}
+
+export interface GetStoreProductsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  store?: string;
+  isActive?: boolean;
+  environmentId?: string;
+}
+
+export interface GetStoreProductsResponse {
+  products: StoreProduct[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+class StoreProductService {
+  /**
+   * Get all store products with pagination
+   */
+  static async getStoreProducts(params?: GetStoreProductsParams): Promise<GetStoreProductsResponse> {
+    const pool = database.getPool();
+    const page = params?.page || 1;
+    const limit = params?.limit || 10;
+    const search = params?.search || '';
+    const sortBy = params?.sortBy || 'createdAt';
+    const sortOrder = (params?.sortOrder || 'desc').toUpperCase();
+    const envId = params?.environmentId ?? getCurrentEnvironmentId();
+
+    const offset = (page - 1) * limit;
+
+    // Build WHERE clause
+    const conditions: string[] = ['environmentId = ?'];
+    const queryParams: any[] = [envId];
+
+    if (search) {
+      conditions.push('(productId LIKE ? OR productName LIKE ? OR description LIKE ?)');
+      const searchPattern = `%${search}%`;
+      queryParams.push(searchPattern, searchPattern, searchPattern);
+    }
+
+    if (params?.store) {
+      conditions.push('store = ?');
+      queryParams.push(params.store);
+    }
+
+    if (params?.isActive !== undefined) {
+      conditions.push('isActive = ?');
+      queryParams.push(params.isActive ? 1 : 0);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    // Validate sort column
+    const allowedSortColumns = ['productId', 'productName', 'store', 'price', 'isActive', 'saleStartAt', 'saleEndAt', 'createdAt', 'updatedAt'];
+    const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : 'createdAt';
+    const safeSortOrder = sortOrder === 'ASC' ? 'ASC' : 'DESC';
+
+    try {
+      // Get total count
+      const [countResult] = await pool.execute<any[]>(
+        `SELECT COUNT(*) as total FROM g_store_products ${whereClause}`,
+        queryParams
+      );
+      const total = countResult[0].total;
+
+      // Get products
+      const [products] = await pool.execute<any[]>(
+        `SELECT * FROM g_store_products ${whereClause} ORDER BY ${safeSortBy} ${safeSortOrder} LIMIT ? OFFSET ?`,
+        [...queryParams, limit, offset]
+      );
+
+      // Load tags for each product
+      const productsWithTags = await Promise.all(
+        products.map(async (product) => {
+          const tags = await TagService.listTagsForEntity('store_product', product.id);
+          return {
+            ...product,
+            isActive: Boolean(product.isActive),
+            metadata: typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
+            tags,
+          };
+        })
+      );
+
+      return {
+        products: productsWithTags,
+        total,
+        page,
+        limit,
+      };
+    } catch (error) {
+      logger.error('Failed to get store products', { error, params });
+      throw new GatrixError('Failed to get store products', 500);
+    }
+  }
+
+  /**
+   * Get store product by ID
+   */
+  static async getStoreProductById(id: string, environmentId?: string): Promise<StoreProduct> {
+    const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
+
+    try {
+      const [products] = await pool.execute<any[]>(
+        'SELECT * FROM g_store_products WHERE id = ? AND environmentId = ?',
+        [id, envId]
+      );
+
+      if (products.length === 0) {
+        throw new GatrixError('Store product not found', 404);
+      }
+
+      const product = products[0];
+      const tags = await TagService.listTagsForEntity('store_product', id);
+
+      return {
+        ...product,
+        isActive: Boolean(product.isActive),
+        metadata: typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
+        tags,
+      };
+    } catch (error) {
+      if (error instanceof GatrixError) throw error;
+      logger.error('Failed to get store product by ID', { error, id });
+      throw new GatrixError('Failed to get store product', 500);
+    }
+  }
+
+  /**
+   * Create a new store product
+   */
+  static async createStoreProduct(input: CreateStoreProductInput, environmentId?: string): Promise<StoreProduct> {
+    const pool = database.getPool();
+    const id = ulid();
+    const envId = environmentId ?? getCurrentEnvironmentId();
+
+    try {
+      await pool.execute(
+        `INSERT INTO g_store_products
+         (id, environmentId, isActive, productId, productName, store, price, currency,
+          saleStartAt, saleEndAt, description, metadata, createdBy, createdAt, updatedAt)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+        [
+          id,
+          envId,
+          input.isActive !== undefined ? (input.isActive ? 1 : 0) : 1,
+          input.productId,
+          input.productName,
+          input.store,
+          input.price,
+          input.currency || 'USD',
+          input.saleStartAt || null,
+          input.saleEndAt || null,
+          input.description || null,
+          input.metadata ? JSON.stringify(input.metadata) : null,
+          input.createdBy || null,
+        ]
+      );
+
+      return this.getStoreProductById(id, envId);
+    } catch (error: any) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new GatrixError('A product with this ID and store already exists', 409);
+      }
+      logger.error('Failed to create store product', { error, input });
+      throw new GatrixError('Failed to create store product', 500);
+    }
+  }
+
+  /**
+   * Update an existing store product
+   */
+  static async updateStoreProduct(id: string, input: UpdateStoreProductInput, environmentId?: string): Promise<StoreProduct> {
+    const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
+
+    // Build dynamic update query
+    const updates: string[] = [];
+    const values: any[] = [];
+
+    if (input.productId !== undefined) {
+      updates.push('productId = ?');
+      values.push(input.productId);
+    }
+    if (input.productName !== undefined) {
+      updates.push('productName = ?');
+      values.push(input.productName);
+    }
+    if (input.store !== undefined) {
+      updates.push('store = ?');
+      values.push(input.store);
+    }
+    if (input.price !== undefined) {
+      updates.push('price = ?');
+      values.push(input.price);
+    }
+    if (input.currency !== undefined) {
+      updates.push('currency = ?');
+      values.push(input.currency);
+    }
+    if (input.isActive !== undefined) {
+      updates.push('isActive = ?');
+      values.push(input.isActive ? 1 : 0);
+    }
+    if (input.saleStartAt !== undefined) {
+      updates.push('saleStartAt = ?');
+      values.push(input.saleStartAt);
+    }
+    if (input.saleEndAt !== undefined) {
+      updates.push('saleEndAt = ?');
+      values.push(input.saleEndAt);
+    }
+    if (input.description !== undefined) {
+      updates.push('description = ?');
+      values.push(input.description);
+    }
+    if (input.metadata !== undefined) {
+      updates.push('metadata = ?');
+      values.push(JSON.stringify(input.metadata));
+    }
+    if (input.updatedBy !== undefined) {
+      updates.push('updatedBy = ?');
+      values.push(input.updatedBy);
+    }
+
+    if (updates.length === 0) {
+      return this.getStoreProductById(id, envId);
+    }
+
+    updates.push('updatedAt = NOW()');
+    values.push(id, envId);
+
+    try {
+      const [result] = await pool.execute<any>(
+        `UPDATE g_store_products SET ${updates.join(', ')} WHERE id = ? AND environmentId = ?`,
+        values
+      );
+
+      if (result.affectedRows === 0) {
+        throw new GatrixError('Store product not found', 404);
+      }
+
+      return this.getStoreProductById(id, envId);
+    } catch (error: any) {
+      if (error instanceof GatrixError) throw error;
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new GatrixError('A product with this ID and store already exists', 409);
+      }
+      logger.error('Failed to update store product', { error, id, input });
+      throw new GatrixError('Failed to update store product', 500);
+    }
+  }
+
+  /**
+   * Delete a store product
+   */
+  static async deleteStoreProduct(id: string, environmentId?: string): Promise<void> {
+    const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
+
+    try {
+      // Delete associated tags first
+      await TagService.removeAllTagsFromEntity('store_product', id);
+
+      const [result] = await pool.execute<any>(
+        'DELETE FROM g_store_products WHERE id = ? AND environmentId = ?',
+        [id, envId]
+      );
+
+      if (result.affectedRows === 0) {
+        throw new GatrixError('Store product not found', 404);
+      }
+    } catch (error) {
+      if (error instanceof GatrixError) throw error;
+      logger.error('Failed to delete store product', { error, id });
+      throw new GatrixError('Failed to delete store product', 500);
+    }
+  }
+
+  /**
+   * Delete multiple store products
+   */
+  static async deleteStoreProducts(ids: string[], environmentId?: string): Promise<number> {
+    const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
+
+    if (ids.length === 0) return 0;
+
+    try {
+      // Delete associated tags first
+      for (const id of ids) {
+        await TagService.removeAllTagsFromEntity('store_product', id);
+      }
+
+      const placeholders = ids.map(() => '?').join(',');
+      const [result] = await pool.execute<any>(
+        `DELETE FROM g_store_products WHERE id IN (${placeholders}) AND environmentId = ?`,
+        [...ids, envId]
+      );
+
+      return result.affectedRows;
+    } catch (error) {
+      logger.error('Failed to delete store products', { error, ids });
+      throw new GatrixError('Failed to delete store products', 500);
+    }
+  }
+
+  /**
+   * Toggle store product active status
+   */
+  static async toggleActive(id: string, isActive: boolean, updatedBy?: number, environmentId?: string): Promise<StoreProduct> {
+    return this.updateStoreProduct(id, { isActive, updatedBy }, environmentId);
+  }
+}
+
+export default StoreProductService;
+
