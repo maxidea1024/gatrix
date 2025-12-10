@@ -233,15 +233,16 @@ export class StoreProductController {
   });
 
   /**
-   * Apply sync with planning data
+   * Apply sync with planning data (selective)
    * POST /api/v1/admin/store-products/sync/apply
    */
   static applySync = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const lang = (req.query.lang as 'kr' | 'en' | 'zh') || 'kr';
     const environmentId = req.environmentId;
     const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+    const selected = req.body; // { toAdd: number[], toUpdate: number[], toDelete: string[] }
 
-    const result = await StoreProductService.applySync(environmentId, lang, userId);
+    const result = await StoreProductService.applySync(environmentId, lang, userId, selected);
 
     res.json({
       success: true,
