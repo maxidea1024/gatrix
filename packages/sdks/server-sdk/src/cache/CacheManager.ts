@@ -60,6 +60,7 @@ export class CacheManager {
       enabled: config.enabled !== false,
       ttl: config.ttl || 300,
       refreshMethod: config.refreshMethod ?? 'polling', // Default: polling
+      skipBackendReady: config.skipBackendReady ?? false, // Default: wait for backend
     };
     this.features = features || {};
     this.gameWorldService = gameWorldService;
@@ -131,8 +132,12 @@ export class CacheManager {
     }
 
     try {
-      // Wait for backend to be ready with retry logic
-      await this.waitForBackendReady();
+      // Wait for backend to be ready with retry logic (unless skipped)
+      if (!this.config.skipBackendReady) {
+        await this.waitForBackendReady();
+      } else {
+        this.logger.info('Skipping backend ready check (skipBackendReady: true)');
+      }
 
       // Build list of promises based on enabled features
       const promises: Promise<any>[] = [];

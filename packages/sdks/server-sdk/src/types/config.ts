@@ -13,6 +13,7 @@ export interface CacheConfig {
   enabled?: boolean; // Enable caching (default: true)
   ttl?: number; // Cache TTL in seconds (default: 300)
   refreshMethod?: 'polling' | 'event' | 'manual'; // Cache refresh method. 'polling': periodic refresh, 'event': real-time via Redis PubSub, 'manual': manual refresh only (default: 'polling')
+  skipBackendReady?: boolean; // Skip waiting for backend to be ready during initialization (default: false). Set to true for backend self-registration to avoid infinite wait.
 }
 
 export interface LoggerConfig {

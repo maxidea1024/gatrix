@@ -639,7 +639,8 @@ const { instanceId, externalAddress } = await sdk.registerService({
   internalAddress: '10.0.0.1', // Optional: auto-detected from first NIC if omitted
   ports: {
     game: 7777,             // Named port: { serviceName: port }
-    web: 8080,
+    internalApi: 8080,      // Internal API port (for internal services)
+    externalApi: 8081,      // External API port (for external access like edge servers)
     // metricsApi is automatically added from SDK config (default: 9337)
   },
   status: 'ready',

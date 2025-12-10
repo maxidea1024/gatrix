@@ -45,7 +45,8 @@ async function startServer() {
       },
       hostname: `${type}-test`,
       ports: {
-        http: [port],
+        internalApi: port,
+        externalApi: port,
       },
       meta: {
         version: '1.0.0',

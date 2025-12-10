@@ -450,8 +450,8 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-info}
-      EDGE_PORT: 1337
-      EDGE_METRICS_PORT: 9337
+      EDGE_PORT: 1400
+      EDGE_METRICS_PORT: 9400
       # Backend API configuration
       GATRIX_URL: http://backend:5000
       EDGE_API_TOKEN: ${EDGE_API_TOKEN:-gatrix-unsecured-server-api-token}
@@ -467,8 +467,8 @@ services:
       CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-polling}
       CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
     ports:
-      - "${EDGE_PORT:-51337}:1337"
-      # Note: Metrics port (9337) is NOT exposed externally for security
+      - "${EDGE_PORT:-1400}:1400"
+      # Note: Metrics port (9400) is NOT exposed externally for security
     depends_on:
       backend:
         condition: service_healthy
@@ -479,7 +479,7 @@ services:
     volumes:
       - ${DATA_ROOT:-./data}/edge/logs:/app/logs
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:1337/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:1400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
       timeout: 10s
       retries: 5
       interval: 30s

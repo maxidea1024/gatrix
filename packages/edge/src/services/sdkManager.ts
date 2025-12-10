@@ -73,6 +73,24 @@ class SDKManager {
         environments: config.environments,
         syncMethod: config.cache.syncMethod,
       });
+
+      // Register Edge service to Service Discovery
+      const result = await this.sdk.registerService({
+        labels: {
+          service: 'edge',
+          group: config.group,
+        },
+        ports: {
+          externalApi: config.port,
+        },
+        status: 'ready',
+        meta: {
+          instanceName: 'edge-1',
+        },
+      });
+      logger.info('Edge service registered to Service Discovery via SDK', {
+        instanceId: result.instanceId,
+      });
     } catch (error) {
       logger.error('Failed to initialize GatrixServerSDK:', error);
       throw error;
@@ -91,6 +109,12 @@ class SDKManager {
    */
   async shutdown(): Promise<void> {
     if (this.sdk) {
+      try {
+        await this.sdk.unregisterService();
+        logger.info('Edge service unregistered from Service Discovery');
+      } catch (error) {
+        logger.warn('Error unregistering Edge service:', error);
+      }
       await this.sdk.close();
       this.sdk = null;
       this.initPromise = null;

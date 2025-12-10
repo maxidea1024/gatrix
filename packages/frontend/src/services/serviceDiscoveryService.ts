@@ -9,7 +9,7 @@ import api from './api';
 /**
  * Service Ports - Named port mapping
  * Format: { serviceName: port }
- * Example: { game: 7777, web: 8080, metricsApi: 9337 }
+ * Example: { game: 7777, internalApi: 8080, externalApi: 8081, metricsApi: 9337 }
  */
 export interface ServicePorts {
   [serviceName: string]: number;
@@ -84,7 +84,7 @@ class ServiceDiscoveryService {
 
   /**
    * Health check a service instance
-   * Pings the service's web port /health endpoint
+   * Pings the service's API port (internalApi/externalApi) /health endpoint
    */
   async healthCheck(serviceType: string, instanceId: string): Promise<{
     healthy: boolean;

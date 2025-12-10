@@ -74,17 +74,17 @@ RUN mkdir -p logs && chown nodejs:nodejs logs
 USER nodejs
 
 # Main API port
-EXPOSE 1337
+EXPOSE 1400
 # Metrics port (internal only - should not be exposed externally)
-EXPOSE 9337
+EXPOSE 9400
 
 ENV NODE_ENV=production
-ENV EDGE_PORT=1337
-ENV EDGE_METRICS_PORT=9337
+ENV EDGE_PORT=1400
+ENV EDGE_METRICS_PORT=9400
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:1337/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+  CMD node -e "require('http').get('http://localhost:1400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 CMD ["node", "dist/index.js"]
 

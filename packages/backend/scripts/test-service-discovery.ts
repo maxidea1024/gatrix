@@ -44,7 +44,7 @@ const SERVER_TYPES = ['world', 'auth', 'channel', 'chat', 'lobby', 'match'];
 const STATUSES = ['initializing', 'ready', 'shutting_down', 'error', 'terminated'] as const;
 const DEFAULT_TTL = 30; // seconds
 const HEARTBEAT_INTERVAL = 15; // seconds
-const TERMINATED_TTL = 300; // 5 minutes for terminated/error servers (auto-cleanup)
+const INACTIVE_KEEP_TTL = 60; // How long to keep inactive services visible in UI
 
 // Custom state templates
 const CUSTOM_STATES = {
@@ -389,10 +389,10 @@ async function registerServer(permanent: boolean = false, internalAddress?: stri
             });
 
             if (MODE === 'etcd') {
-              const lease = etcdClient.lease(TERMINATED_TTL);
+              const lease = etcdClient.lease(INACTIVE_KEEP_TTL);
               await lease.put(key).value(value);
             } else if (redisClient) {
-              await redisClient.setex(key, TERMINATED_TTL, value);
+              await redisClient.setex(key, INACTIVE_KEEP_TTL, value);
             }
 
             // Stop heartbeat

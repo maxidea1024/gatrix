@@ -124,7 +124,7 @@ services:
       # Service Discovery
       SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-etcd}
       SERVICE_DISCOVERY_HEARTBEAT_TTL: ${SERVICE_DISCOVERY_HEARTBEAT_TTL:-30}
-      SERVICE_DISCOVERY_TERMINATED_TTL: ${SERVICE_DISCOVERY_TERMINATED_TTL:-15}
+      SERVICE_DISCOVERY_INACTIVE_KEEP_TTL: ${SERVICE_DISCOVERY_INACTIVE_KEEP_TTL:-60}
       SERVICE_DISCOVERY_TERMINATED_MARKER_TTL: ${SERVICE_DISCOVERY_TERMINATED_MARKER_TTL:-300}
       ETCD_HOSTS: http://etcd:2379
     ports:
@@ -278,6 +278,8 @@ services:
     ports:
       - "0.0.0.0:${EVENT_LENS_PORT:-55200}:5200"
     depends_on:
+      backend-dev:
+        condition: service_healthy
       mysql:
         condition: service_started
       redis:
@@ -428,8 +430,8 @@ services:
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-edge
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-debug}
-      EDGE_PORT: 1337
-      EDGE_METRICS_PORT: 9337
+      EDGE_PORT: 1400
+      EDGE_METRICS_PORT: 9400
       # Backend API configuration
       GATRIX_URL: http://backend-dev:5000
       EDGE_API_TOKEN: ${EDGE_API_TOKEN:-gatrix-unsecured-server-api-token}
@@ -445,8 +447,8 @@ services:
       CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-polling}
       CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
     ports:
-      - "0.0.0.0:${EDGE_PORT:-51337}:1337"
-      # Note: Metrics port (9337) is NOT exposed externally for security
+      - "0.0.0.0:${EDGE_PORT:-1400}:1400"
+      # Note: Metrics port (9400) is NOT exposed externally for security
     depends_on:
       backend-dev:
         condition: service_healthy
@@ -462,7 +464,7 @@ services:
       - ${DATA_ROOT:-./data}/edge/logs:/app/packages/edge/logs
     command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/edge dev"
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:1337/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:1400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
       timeout: 10s
       retries: 5
       interval: 30s

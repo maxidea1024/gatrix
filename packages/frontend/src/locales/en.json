@@ -2295,6 +2295,9 @@
     "deleting": "Deleting",
     "sdkGuide": {
       "headerEnvironmentId": "Target environment ID (Required)"
+    },
+    "relativeTime": {
+      "secondsAgo": "{{seconds}} seconds ago"
     }
   },
   "createdAt": "createdAt",
@@ -4136,7 +4139,8 @@
     "viewMode": {
       "list": "List View",
       "grid": "Grid View",
-      "card": "Card View"
+      "card": "Card View",
+      "cluster": "Cluster View"
     },
     "filters": {
       "service": "Service Type",

@@ -55,6 +55,20 @@ async function start() {
         group: process.env.SERVICE_GROUP || 'development',
         environment: process.env.ENVIRONMENT || 'env_default',
         logger: { level: 'info' },
+        cache: {
+          enabled: false, // Disable cache - not needed for service discovery only
+          skipBackendReady: true, // Don't wait for backend - event-lens may start before backend
+        },
+        features: {
+          gameWorld: false,
+          popupNotice: false,
+          survey: false,
+          whitelist: false,
+          serviceMaintenance: false,
+          clientVersion: false,
+          serviceNotice: false,
+          banner: false,
+        },
       });
 
       await gatrixSdk.initialize();
@@ -66,7 +80,7 @@ async function start() {
           group: process.env.SERVICE_GROUP || 'development',
         },
         ports: {
-          web: config.port,
+          internalApi: config.port,
         },
         status: 'ready',
         meta: {

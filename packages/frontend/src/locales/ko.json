@@ -2295,6 +2295,9 @@
     "deleting": "삭제 중",
     "sdkGuide": {
       "headerEnvironmentId": "요청 대상 환경 ID (필수)"
+    },
+    "relativeTime": {
+      "secondsAgo": "{{seconds}}초 전"
     }
   },
   "createdAt": "생성일",
@@ -4133,7 +4136,8 @@
     "viewMode": {
       "list": "리스트 뷰",
       "grid": "그리드 뷰",
-      "card": "카드 뷰"
+      "card": "카드 뷰",
+      "cluster": "클러스터 뷰"
     },
     "filters": {
       "service": "서비스 타입",

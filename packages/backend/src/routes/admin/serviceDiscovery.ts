@@ -208,7 +208,7 @@ router.put('/config', ServiceDiscoveryConfigController.updateConfig);
 /**
  * Health check a service instance
  * POST /api/v1/admin/services/:type/:instanceId/health
- * Pings the service's web port /health endpoint
+ * Pings the service's API port (internalApi/externalApi) /health endpoint
  */
 router.post('/:type/:instanceId/health', async (req: Request, res: Response) => {
   try {
@@ -232,12 +232,12 @@ router.post('/:type/:instanceId/health', async (req: Request, res: Response) => 
       });
     }
 
-    // Check if service has a web port
-    const webPort = service.ports?.web || service.ports?.http || service.ports?.api;
+    // Check if service has an API port (internalApi, externalApi, or legacy web/http/api)
+    const webPort = service.ports?.internalApi || service.ports?.externalApi || service.ports?.web || service.ports?.http || service.ports?.api;
     if (!webPort) {
       return res.status(400).json({
         success: false,
-        error: { message: 'Service does not have a web/http/api port' },
+        error: { message: 'Service does not have an internalApi/externalApi/web/http/api port' },
       });
     }
 

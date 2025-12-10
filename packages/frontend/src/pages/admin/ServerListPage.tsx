@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { forceSimulation, forceLink, forceManyBody, forceCollide, SimulationNodeDatum, SimulationLinkDatum } from 'd3-force';
 import { useAuth } from '../../hooks/useAuth';
 import { PERMISSIONS } from '../../types/permissions';
 import {
@@ -51,11 +52,13 @@ import {
   ViewList as ViewListIcon,
   ViewModule as ViewModuleIcon,
   ViewComfy as ViewComfyIcon,
+  BubbleChart as BubbleChartIcon,
   Pause as PauseIcon,
   PlayArrow as PlayArrowIcon,
   CleaningServices as CleaningServicesIcon,
-  NetworkCheck as NetworkCheckIcon,
+  TouchApp as TouchAppIcon,
   Favorite as FavoriteIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -85,7 +88,7 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { RelativeTime } from '../../components/common/RelativeTime';
 
 // View mode type
-type ViewMode = 'list' | 'grid' | 'card';
+type ViewMode = 'list' | 'grid' | 'card' | 'cluster';
 
 // Column definition interface
 interface ColumnConfig {
@@ -94,6 +97,731 @@ interface ColumnConfig {
   visible: boolean;
   width?: string;
 }
+
+// Force simulation node interface
+interface ClusterNode extends SimulationNodeDatum {
+  id: string;
+  service?: ServiceInstance;
+  isCenter?: boolean;
+  radius: number;
+  isNew?: boolean; // Track if node is newly added
+  prevStatus?: string; // Track previous status for change detection
+}
+
+// Force simulation link interface
+interface ClusterLink extends SimulationLinkDatum<ClusterNode> {
+  source: ClusterNode | string;
+  target: ClusterNode | string;
+}
+
+// ClusterView component with D3 force simulation
+interface ClusterViewProps {
+  services: ServiceInstance[];
+  heartbeatIds: Set<string>;
+  t: (key: string) => string;
+}
+
+const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [nodes, setNodes] = useState<ClusterNode[]>([]);
+  const [links, setLinks] = useState<ClusterLink[]>([]);
+  const [draggedNode, setDraggedNode] = useState<string | null>(null);
+  const simulationRef = useRef<ReturnType<typeof forceSimulation<ClusterNode>> | null>(null);
+  const nodesRef = useRef<ClusterNode[]>([]);
+  const linksRef = useRef<ClusterLink[]>([]);
+
+  // Track rumble and heartbeat animation states
+  const [rumbleNodes, setRumbleNodes] = useState<Set<string>>(new Set());
+  const [heartbeatAnimNodes, setHeartbeatAnimNodes] = useState<Set<string>>(new Set());
+  const prevStatusRef = useRef<Map<string, string>>(new Map());
+  const prevHeartbeatRef = useRef<Set<string>>(new Set());
+
+  // Pan and zoom state for infinite canvas
+  const [viewBox, setViewBox] = useState({ x: 0, y: 0, width: 1200, height: 800 });
+  const [isPanning, setIsPanning] = useState(false);
+  const panStartRef = useRef({ x: 0, y: 0, viewBoxX: 0, viewBoxY: 0 });
+
+  const nodeRadius = 32;
+  const centerRadius = 50;
+
+  // Get center position from current viewBox
+  const viewCenterX = viewBox.x + viewBox.width / 2;
+  const viewCenterY = viewBox.y + viewBox.height / 2;
+
+  // Get status color for node
+  const getNodeColor = (status: string) => {
+    switch (status) {
+      case 'ready': return '#4caf50';
+      case 'busy': return '#ff9800';
+      case 'full': return '#f44336';
+      case 'starting': return '#2196f3';
+      case 'terminated': return '#9e9e9e';
+      case 'error': return '#f44336';
+      case 'no-response': return '#795548';
+      default: return '#9e9e9e';
+    }
+  };
+
+  // Create a stable service ID list to detect actual structure changes
+  const serviceIds = useMemo(() => {
+    return services.map(s => `${s.labels.service}-${s.instanceId}`).sort().join(',');
+  }, [services]);
+
+  // Create a service map for quick lookup (for UI updates without simulation restart)
+  const serviceMap = useMemo(() => {
+    const map = new Map<string, ServiceInstance>();
+    services.forEach(s => {
+      map.set(`${s.labels.service}-${s.instanceId}`, s);
+    });
+    return map;
+  }, [services]);
+
+  // LocalStorage keys
+  const CLUSTER_CENTER_POS_KEY = 'clusterViewCenterPosition';
+  const CLUSTER_VIEWBOX_KEY = 'clusterViewViewBox';
+
+  // Get saved center position from localStorage
+  const getSavedCenterPosition = useCallback(() => {
+    try {
+      const saved = localStorage.getItem(CLUSTER_CENTER_POS_KEY);
+      if (saved) {
+        const pos = JSON.parse(saved);
+        if (typeof pos.x === 'number' && typeof pos.y === 'number') {
+          return pos;
+        }
+      }
+    } catch {
+      // Ignore parse errors
+    }
+    return { x: viewCenterX, y: viewCenterY };
+  }, [viewCenterX, viewCenterY]);
+
+  // Save center position to localStorage
+  const saveCenterPosition = useCallback((x: number, y: number) => {
+    try {
+      localStorage.setItem(CLUSTER_CENTER_POS_KEY, JSON.stringify({ x, y }));
+    } catch {
+      // Ignore storage errors
+    }
+  }, []);
+
+  // Reset view to default position
+  const handleResetView = useCallback(() => {
+    const defaultViewBox = { x: 0, y: 0, width: 1200, height: 800 };
+    setViewBox(defaultViewBox);
+    localStorage.removeItem(CLUSTER_VIEWBOX_KEY);
+    localStorage.removeItem(CLUSTER_CENTER_POS_KEY);
+
+    const newCenterX = defaultViewBox.width / 2;
+    const newCenterY = defaultViewBox.height / 2;
+
+    // Reset center node position
+    const centerNode = nodesRef.current.find(n => n.isCenter);
+    if (centerNode && simulationRef.current) {
+      centerNode.x = newCenterX;
+      centerNode.y = newCenterY;
+      centerNode.fx = newCenterX;
+      centerNode.fy = newCenterY;
+
+      // Reposition all service nodes around the new center
+      nodesRef.current.forEach(node => {
+        if (!node.isCenter) {
+          const angle = Math.random() * 2 * Math.PI;
+          const distance = 80 + Math.random() * 60;
+          node.x = newCenterX + Math.cos(angle) * distance;
+          node.y = newCenterY + Math.sin(angle) * distance;
+          node.fx = null;
+          node.fy = null;
+        }
+      });
+
+      simulationRef.current.alpha(0.8).restart();
+    }
+  }, []);
+
+  // Detect status changes and trigger rumble effect
+  useEffect(() => {
+    const newRumbleNodes = new Set<string>();
+
+    services.forEach(s => {
+      const nodeId = `${s.labels.service}-${s.instanceId}`;
+      const prevStatus = prevStatusRef.current.get(nodeId);
+
+      // If status changed (and not first render), trigger rumble
+      if (prevStatus !== undefined && prevStatus !== s.status) {
+        newRumbleNodes.add(nodeId);
+      }
+
+      prevStatusRef.current.set(nodeId, s.status);
+    });
+
+    if (newRumbleNodes.size > 0) {
+      setRumbleNodes(prev => new Set([...prev, ...newRumbleNodes]));
+
+      // Clear rumble after animation
+      setTimeout(() => {
+        setRumbleNodes(prev => {
+          const next = new Set(prev);
+          newRumbleNodes.forEach(id => next.delete(id));
+          return next;
+        });
+      }, 500);
+    }
+  }, [services]);
+
+  // Detect heartbeat and trigger border animation
+  useEffect(() => {
+    const newHeartbeatNodes = new Set<string>();
+
+    heartbeatIds.forEach(id => {
+      if (!prevHeartbeatRef.current.has(id)) {
+        newHeartbeatNodes.add(id);
+      }
+    });
+
+    if (newHeartbeatNodes.size > 0) {
+      setHeartbeatAnimNodes(prev => new Set([...prev, ...newHeartbeatNodes]));
+
+      // Clear animation after 600ms
+      setTimeout(() => {
+        setHeartbeatAnimNodes(prev => {
+          const next = new Set(prev);
+          newHeartbeatNodes.forEach(id => next.delete(id));
+          return next;
+        });
+      }, 600);
+    }
+
+    prevHeartbeatRef.current = new Set(heartbeatIds);
+  }, [heartbeatIds]);
+
+  // Initialize and update simulation only when service structure changes (add/remove)
+  useEffect(() => {
+    // Get saved center position
+    const savedPos = getSavedCenterPosition();
+
+    // Create center node
+    const centerNode: ClusterNode = {
+      id: 'center',
+      isCenter: true,
+      radius: centerRadius,
+      x: savedPos.x,
+      y: savedPos.y,
+      fx: savedPos.x, // Fixed position (but can be dragged)
+      fy: savedPos.y,
+    };
+
+    // Create service nodes - preserve existing positions if available
+    const existingNodeMap = new Map<string, ClusterNode>();
+    nodesRef.current.forEach(n => existingNodeMap.set(n.id, n));
+
+    // Track new nodes for rumble effect
+    const newNodeIds: string[] = [];
+
+    const serviceNodes: ClusterNode[] = services.map((service) => {
+      const nodeId = `${service.labels.service}-${service.instanceId}`;
+      const existing = existingNodeMap.get(nodeId);
+
+      if (existing) {
+        // Preserve position for existing nodes
+        return {
+          ...existing,
+          service, // Update service data
+          isNew: false,
+        };
+      }
+
+      // New node - random position around center node
+      const angle = Math.random() * 2 * Math.PI;
+      const distance = 80 + Math.random() * 60; // Random distance 80-140px from center
+      newNodeIds.push(nodeId);
+
+      return {
+        id: nodeId,
+        service,
+        isCenter: false,
+        radius: nodeRadius,
+        x: savedPos.x + Math.cos(angle) * distance,
+        y: savedPos.y + Math.sin(angle) * distance,
+        isNew: true,
+      };
+    });
+
+    // Trigger rumble for new nodes
+    if (newNodeIds.length > 0) {
+      setRumbleNodes(prev => new Set([...prev, ...newNodeIds]));
+      setTimeout(() => {
+        setRumbleNodes(prev => {
+          const next = new Set(prev);
+          newNodeIds.forEach(id => next.delete(id));
+          return next;
+        });
+      }, 500);
+    }
+
+    const allNodes = [centerNode, ...serviceNodes];
+    nodesRef.current = allNodes;
+
+    // Create links from each service node to center
+    const newLinks: ClusterLink[] = serviceNodes.map(node => ({
+      source: 'center',
+      target: node.id,
+    }));
+    linksRef.current = newLinks;
+
+    // Create or update simulation
+    if (simulationRef.current) {
+      simulationRef.current.stop();
+    }
+
+    // Note: No forceCenter - center node is fixed via fx/fy,
+    // and other nodes orbit around it via link force
+    const simulation = forceSimulation<ClusterNode>(allNodes)
+      .force('link', forceLink<ClusterNode, ClusterLink>(newLinks)
+        .id(d => d.id)
+        .distance(100)
+        .strength(0.5)) // Stronger link to keep nodes close to center
+      .force('charge', forceManyBody<ClusterNode>()
+        .strength(-100)) // Lighter repulsion between nodes
+      .force('collision', forceCollide<ClusterNode>()
+        .radius(d => d.radius + 8)
+        .strength(0.8))
+      .alphaDecay(0.05)
+      .velocityDecay(0.4)
+      .on('tick', () => {
+        setNodes([...allNodes]);
+        setLinks([...newLinks]);
+      });
+
+    simulationRef.current = simulation;
+
+    return () => {
+      simulation.stop();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serviceIds, getSavedCenterPosition]); // Only re-run when service IDs change
+
+  // Convert mouse position to SVG coordinates
+  const mouseToSvgCoords = useCallback((e: MouseEvent | React.MouseEvent) => {
+    if (!svgRef.current) return { x: 0, y: 0 };
+
+    const svg = svgRef.current;
+    const rect = svg.getBoundingClientRect();
+
+    // Scale mouse position to SVG viewBox coordinates
+    const scaleX = viewBox.width / rect.width;
+    const scaleY = viewBox.height / rect.height;
+    const x = viewBox.x + (e.clientX - rect.left) * scaleX;
+    const y = viewBox.y + (e.clientY - rect.top) * scaleY;
+
+    return { x, y };
+  }, [viewBox]);
+
+  // Handle drag start for nodes
+  const handleMouseDown = useCallback((nodeId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDraggedNode(nodeId);
+
+    const node = nodesRef.current.find(n => n.id === nodeId);
+    if (node && simulationRef.current) {
+      node.fx = node.x;
+      node.fy = node.y;
+      simulationRef.current.alphaTarget(0.3).restart();
+    }
+  }, []);
+
+  // Handle pan start (right-click or ctrl+click or empty space click)
+  const handlePanStart = useCallback((e: React.MouseEvent) => {
+    // Only start panning if not dragging a node
+    if (draggedNode) return;
+
+    setIsPanning(true);
+    panStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      viewBoxX: viewBox.x,
+      viewBoxY: viewBox.y,
+    };
+  }, [draggedNode, viewBox]);
+
+  // Handle mouse move for both dragging and panning
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!svgRef.current) return;
+
+    if (draggedNode) {
+      // Dragging a node
+      const { x, y } = mouseToSvgCoords(e);
+      const node = nodesRef.current.find(n => n.id === draggedNode);
+      if (node) {
+        node.fx = x;
+        node.fy = y;
+        // Force re-render
+        setNodes([...nodesRef.current]);
+      }
+    } else if (isPanning) {
+      // Panning the canvas
+      const svg = svgRef.current;
+      const rect = svg.getBoundingClientRect();
+      const scaleX = viewBox.width / rect.width;
+      const scaleY = viewBox.height / rect.height;
+
+      const dx = (e.clientX - panStartRef.current.x) * scaleX;
+      const dy = (e.clientY - panStartRef.current.y) * scaleY;
+
+      setViewBox(prev => ({
+        ...prev,
+        x: panStartRef.current.viewBoxX - dx,
+        y: panStartRef.current.viewBoxY - dy,
+      }));
+    }
+  }, [draggedNode, isPanning, mouseToSvgCoords, viewBox.width, viewBox.height]);
+
+  // Handle mouse up - global listener for proper capture
+  const handleMouseUp = useCallback(() => {
+    if (draggedNode && simulationRef.current) {
+      const node = nodesRef.current.find(n => n.id === draggedNode);
+      if (node) {
+        // For center node, keep it fixed at current position and save to localStorage
+        if (node.isCenter) {
+          const posX = node.x || viewCenterX;
+          const posY = node.y || viewCenterY;
+          node.fx = posX;
+          node.fy = posY;
+          saveCenterPosition(posX, posY);
+        } else {
+          // For service nodes, release to let physics take over
+          node.fx = null;
+          node.fy = null;
+        }
+      }
+      simulationRef.current.alphaTarget(0);
+    }
+    setDraggedNode(null);
+    setIsPanning(false);
+  }, [draggedNode, viewCenterX, viewCenterY, saveCenterPosition]);
+
+  // Global mouse event listeners for proper capture outside SVG
+  useEffect(() => {
+    if (draggedNode || isPanning) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [draggedNode, isPanning, handleMouseMove, handleMouseUp]);
+
+  // Handle wheel for zoom
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+
+    const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
+    const { x: mouseX, y: mouseY } = mouseToSvgCoords(e);
+
+    setViewBox(prev => {
+      const newWidth = Math.max(400, Math.min(4000, prev.width * zoomFactor));
+      const newHeight = Math.max(300, Math.min(3000, prev.height * zoomFactor));
+
+      // Zoom toward mouse position
+      const widthRatio = newWidth / prev.width;
+      const heightRatio = newHeight / prev.height;
+
+      const newX = mouseX - (mouseX - prev.x) * widthRatio;
+      const newY = mouseY - (mouseY - prev.y) * heightRatio;
+
+      return { x: newX, y: newY, width: newWidth, height: newHeight };
+    });
+  }, [mouseToSvgCoords]);
+
+  // Get link positions
+  const getNodeById = useCallback((id: string | ClusterNode): ClusterNode | undefined => {
+    if (typeof id === 'object') return id;
+    return nodes.find(n => n.id === id);
+  }, [nodes]);
+
+  return (
+    <Card
+      ref={containerRef}
+      sx={{
+        p: 2,
+        overflow: 'hidden',
+        width: '100%',
+        height: 'calc(100vh - 220px)', // Fill available height with margin for header/toolbar
+        minHeight: 400,
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+      }}
+    >
+      {services.length === 0 ? (
+        <Box sx={{ py: 4, textAlign: 'center', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            {t('serverList.noData')}
+          </Typography>
+        </Box>
+      ) : (
+        <>
+          {/* Reset view button - floating top right */}
+          <Tooltip title={t('common.reset')} placement="left">
+            <IconButton
+              onClick={handleResetView}
+              sx={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                zIndex: 10,
+                bgcolor: 'background.paper',
+                boxShadow: 2,
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                },
+              }}
+              size="small"
+            >
+              <RefreshIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+              height: '100%',
+              flex: 1,
+              cursor: isPanning ? 'grabbing' : (draggedNode ? 'grabbing' : 'grab'),
+            }}
+            onMouseDown={handlePanStart}
+          >
+            <svg
+              ref={svgRef}
+              width="100%"
+              height="100%"
+              viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+              preserveAspectRatio="xMidYMid meet"
+              style={{
+                cursor: draggedNode ? 'grabbing' : (isPanning ? 'grabbing' : 'grab'),
+                userSelect: 'none',
+              }}
+              onWheel={handleWheel}
+            >
+              {/* CSS for rumble and heartbeat animations */}
+              <defs>
+                {/* Gradient definitions for animated links */}
+                <linearGradient id="pulseGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#90a4ae">
+                    <animate attributeName="stop-color" values="#90a4ae;#ff9800;#90a4ae" dur="1s" repeatCount="indefinite" />
+                  </stop>
+                  <stop offset="50%" stopColor="#ff9800">
+                    <animate attributeName="stop-color" values="#ff9800;#ffb74d;#ff9800" dur="1s" repeatCount="indefinite" />
+                  </stop>
+                  <stop offset="100%" stopColor="#90a4ae">
+                    <animate attributeName="stop-color" values="#90a4ae;#ff9800;#90a4ae" dur="1s" repeatCount="indefinite" />
+                  </stop>
+                </linearGradient>
+
+                {/* Heartbeat border glow filter */}
+                <filter id="heartbeatGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
+              {/* Links */}
+              {links.map((link, idx) => {
+                const source = getNodeById(link.source);
+                const target = getNodeById(link.target);
+                if (!source || !target) return null;
+
+                // Check if this link's target node has heartbeat
+                const targetId = typeof link.target === 'string' ? link.target : link.target.id;
+                const hasHeartbeat = heartbeatIds.has(targetId);
+
+                return (
+                  <g key={`link-${idx}`}>
+                    {/* Base line */}
+                    <line
+                      x1={source.x || 0}
+                      y1={source.y || 0}
+                      x2={target.x || 0}
+                      y2={target.y || 0}
+                      stroke={hasHeartbeat ? 'url(#pulseGradient)' : '#90a4ae'}
+                      strokeWidth={hasHeartbeat ? 3 : 2}
+                      strokeDasharray={hasHeartbeat ? '8,4' : '4,4'}
+                      opacity={hasHeartbeat ? 0.8 : 0.5}
+                    >
+                      {hasHeartbeat && (
+                        <animate
+                          attributeName="stroke-dashoffset"
+                          values="0;24"
+                          dur="0.5s"
+                          repeatCount="indefinite"
+                        />
+                      )}
+                    </line>
+                  </g>
+                );
+              })}
+
+              {/* Nodes */}
+              {nodes.map(node => {
+                if (node.isCenter) {
+                  // Center cluster node - draggable
+                  return (
+                    <g
+                      key={node.id}
+                      transform={`translate(${node.x || 0}, ${node.y || 0})`}
+                      style={{ cursor: 'grab' }}
+                      onMouseDown={(e) => handleMouseDown(node.id, e)}
+                  >
+                    <circle
+                      r={centerRadius}
+                      fill="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                      stroke="#fff"
+                      strokeWidth="3"
+                    />
+                    <defs>
+                      <linearGradient id="centerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#667eea" />
+                        <stop offset="100%" stopColor="#764ba2" />
+                      </linearGradient>
+                    </defs>
+                    <circle
+                      r={centerRadius}
+                      fill="url(#centerGradient)"
+                      stroke="#fff"
+                      strokeWidth="3"
+                    />
+                    <text
+                      textAnchor="middle"
+                      fill="#fff"
+                      fontSize="24"
+                      fontWeight="bold"
+                      dy="-5"
+                    >
+                      {services.length}
+                    </text>
+                    <text
+                      textAnchor="middle"
+                      fill="rgba(255,255,255,0.8)"
+                      fontSize="11"
+                      dy="12"
+                    >
+                      INSTANCES
+                    </text>
+                  </g>
+                );
+              }
+
+              // Service node - use serviceMap to get latest service data
+              const serviceKey = node.id;
+              const service = serviceMap.get(serviceKey) || node.service!;
+              const hasHeartbeat = heartbeatIds.has(serviceKey);
+              const hasRumble = rumbleNodes.has(serviceKey);
+              const hasHeartbeatAnim = heartbeatAnimNodes.has(serviceKey);
+              const nodeColor = getNodeColor(service.status);
+
+              // Combine rumble triggers: status change OR heartbeat
+              const shouldRumble = hasRumble || hasHeartbeatAnim;
+
+              return (
+                <g
+                  key={node.id}
+                  transform={`translate(${node.x || 0}, ${node.y || 0})`}
+                  style={{ cursor: 'grab' }}
+                  onMouseDown={(e) => handleMouseDown(node.id, e)}
+                >
+                  {/* Outer glow for active services */}
+                  {service.status === 'ready' && (
+                    <circle
+                      r={nodeRadius + 5}
+                      fill="none"
+                      stroke={nodeColor}
+                      strokeWidth="2"
+                      opacity="0.4"
+                    >
+                      <animate
+                        attributeName="r"
+                        values={`${nodeRadius + 3};${nodeRadius + 8};${nodeRadius + 3}`}
+                        dur="2s"
+                        repeatCount="indefinite"
+                      />
+                      <animate
+                        attributeName="opacity"
+                        values="0.4;0.2;0.4"
+                        dur="2s"
+                        repeatCount="indefinite"
+                      />
+                    </circle>
+                  )}
+
+                  {/* Main circle with rumble animation - use key to force re-render on rumble */}
+                  <circle
+                    key={shouldRumble ? `rumble-${Date.now()}` : 'normal'}
+                    r={nodeRadius}
+                    fill={nodeColor}
+                    stroke="#fff"
+                    strokeWidth="2"
+                  >
+                    {shouldRumble && (
+                      <animate
+                        attributeName="r"
+                        values={`${nodeRadius};${nodeRadius + 3};${nodeRadius - 1};${nodeRadius + 1};${nodeRadius}`}
+                        dur="0.4s"
+                        fill="freeze"
+                      />
+                    )}
+                  </circle>
+
+                  {/* Shine effect */}
+                  <ellipse
+                    cx={-10}
+                    cy={-12}
+                    rx="10"
+                    ry="7"
+                    fill="rgba(255,255,255,0.25)"
+                  />
+
+                  {/* Service type label */}
+                  <text
+                    y={-6}
+                    textAnchor="middle"
+                    fill="#fff"
+                    fontSize="10"
+                    fontWeight="bold"
+                    fontFamily="D2Coding, monospace"
+                  >
+                    {(service.labels.service || '').substring(0, 7).toUpperCase()}
+                  </text>
+
+                  {/* Hostname */}
+                  <text
+                    y={10}
+                    textAnchor="middle"
+                    fill="rgba(255,255,255,0.9)"
+                    fontSize="9"
+                    fontFamily="D2Coding, monospace"
+                  >
+                    {(service.hostname || '').substring(0, 8)}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        </Box>
+        </>
+      )}
+    </Card>
+  );
+};
 
 // Sortable list item component for drag and drop
 interface SortableColumnItemProps {
@@ -203,9 +931,11 @@ const ServerListPage: React.FC = () => {
   // Cleanup confirmation dialog
   const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false);
 
-  // Health check state: Map<serviceKey, { loading: boolean, result?: { healthy: boolean, latency: number, error?: string } }>
+  // Health check state: Map<serviceKey, { loading: boolean, cooldown: boolean, fading: boolean, result?: { healthy: boolean, latency: number, error?: string } }>
   const [healthCheckStatus, setHealthCheckStatus] = useState<Map<string, {
     loading: boolean;
+    cooldown: boolean;
+    fading: boolean;
     result?: { healthy: boolean; latency: number; error?: string }
   }>>(new Map());
 
@@ -448,13 +1178,37 @@ const ServerListPage: React.FC = () => {
     const serviceKey = `${service.labels.service}-${service.instanceId}`;
 
     // Set loading state
-    setHealthCheckStatus(prev => new Map(prev).set(serviceKey, { loading: true }));
+    setHealthCheckStatus(prev => new Map(prev).set(serviceKey, { loading: true, cooldown: false, fading: false }));
+
+    const startFadeOut = () => {
+      // Start fading animation after 5 seconds
+      setTimeout(() => {
+        setHealthCheckStatus(prev => {
+          const current = prev.get(serviceKey);
+          if (current) {
+            return new Map(prev).set(serviceKey, { ...current, fading: true });
+          }
+          return prev;
+        });
+        // Clear result after fade animation (500ms)
+        setTimeout(() => {
+          setHealthCheckStatus(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(serviceKey);
+            return newMap;
+          });
+        }, 500);
+      }, 5000);
+    };
 
     try {
       const result = await serviceDiscoveryService.healthCheck(service.labels.service, service.instanceId);
 
+      // Set result and start cooldown
       setHealthCheckStatus(prev => new Map(prev).set(serviceKey, {
         loading: false,
+        cooldown: true,
+        fading: false,
         result: {
           healthy: result.healthy,
           latency: result.latency,
@@ -462,30 +1216,13 @@ const ServerListPage: React.FC = () => {
         }
       }));
 
-      // Show snackbar with result
-      if (result.healthy) {
-        enqueueSnackbar(
-          t('serverList.healthCheck.success', { latency: result.latency }),
-          { variant: 'success' }
-        );
-      } else {
-        enqueueSnackbar(
-          t('serverList.healthCheck.failed', { error: result.error || 'Unknown error' }),
-          { variant: 'error' }
-        );
-      }
-
-      // Clear result after 10 seconds
-      setTimeout(() => {
-        setHealthCheckStatus(prev => {
-          const newMap = new Map(prev);
-          newMap.delete(serviceKey);
-          return newMap;
-        });
-      }, 10000);
+      startFadeOut();
     } catch (error: any) {
+      // Set error result and start cooldown
       setHealthCheckStatus(prev => new Map(prev).set(serviceKey, {
         loading: false,
+        cooldown: true,
+        fading: false,
         result: {
           healthy: false,
           latency: 0,
@@ -493,17 +1230,14 @@ const ServerListPage: React.FC = () => {
         }
       }));
 
-      enqueueSnackbar(
-        t('serverList.healthCheck.error'),
-        { variant: 'error' }
-      );
+      startFadeOut();
     }
   };
 
   // Check if service has a web port for health check
   const hasWebPort = (service: ServiceInstance): boolean => {
     const ports = service.ports;
-    return !!(ports?.web || ports?.http || ports?.api);
+    return !!(ports?.internalApi || ports?.externalApi || ports?.web || ports?.http || ports?.api);
   };
 
   // Clean up terminated, error, and no-response servers
@@ -1083,6 +1817,22 @@ const ServerListPage: React.FC = () => {
                 <ViewComfyIcon />
               </IconButton>
             </Tooltip>
+            <Tooltip title={t('serverList.viewMode.cluster')}>
+              <IconButton
+                onClick={() => handleViewModeChange('cluster')}
+                sx={{
+                  bgcolor: viewMode === 'cluster' ? 'primary.main' : 'background.paper',
+                  color: viewMode === 'cluster' ? 'primary.contrastText' : 'text.primary',
+                  border: 1,
+                  borderColor: viewMode === 'cluster' ? 'primary.main' : 'divider',
+                  '&:hover': {
+                    bgcolor: viewMode === 'cluster' ? 'primary.dark' : 'action.hover',
+                  },
+                }}
+              >
+                <BubbleChartIcon />
+              </IconButton>
+            </Tooltip>
 
             {/* Divider */}
             <Box
@@ -1191,7 +1941,7 @@ const ServerListPage: React.FC = () => {
               <TableHead>
                 <TableRow>
                   {columns.filter(col => col.visible).map((column) => (
-                    <TableCell key={column.id}>
+                    <TableCell key={column.id} align={column.id === 'actions' ? 'center' : 'left'}>
                       {column.id !== 'ports' && column.id !== 'stats' && column.id !== 'meta' && column.id !== 'labels' && column.id !== 'actions' ? (
                         <TableSortLabel
                           active={sortBy === column.id}
@@ -1256,7 +2006,7 @@ const ServerListPage: React.FC = () => {
                           case 'instanceId':
                             return (
                               <TableCell key={column.id}>
-                                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                                <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
                                   {service.instanceId}
                                 </Typography>
                               </TableCell>
@@ -1304,7 +2054,7 @@ const ServerListPage: React.FC = () => {
                           case 'hostname':
                             return (
                               <TableCell key={column.id}>
-                                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                                <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
                                   {service.hostname}
                                 </Typography>
                               </TableCell>
@@ -1312,7 +2062,7 @@ const ServerListPage: React.FC = () => {
                           case 'externalAddress':
                             return (
                               <TableCell key={column.id}>
-                                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                                <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
                                   {service.externalAddress}
                                 </Typography>
                               </TableCell>
@@ -1320,7 +2070,7 @@ const ServerListPage: React.FC = () => {
                           case 'internalAddress':
                             return (
                               <TableCell key={column.id}>
-                                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                                <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
                                   {service.internalAddress}
                                 </Typography>
                               </TableCell>
@@ -1336,7 +2086,7 @@ const ServerListPage: React.FC = () => {
                                         key={`${service.instanceId}-${name}`}
                                         label={`${name}:${port}`}
                                         size="small"
-                                        sx={{ fontFamily: 'monospace', fontSize: '0.7rem', height: '20px' }}
+                                        sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.875rem', height: '24px' }}
                                       />
                                     ))}
                                   </Box>
@@ -1344,25 +2094,43 @@ const ServerListPage: React.FC = () => {
                               </TableCell>
                             );
                           case 'status':
+                            // Only show heartbeat icon for initializing/ready status
+                            const showHeartbeatIcon = service.status === 'initializing' || service.status === 'ready';
                             return (
                               <TableCell key={column.id}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                   {getStatusBadge(service.status)}
-                                  <FavoriteIcon
-                                    sx={{
-                                      fontSize: 14,
-                                      color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
-                                      opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
-                                      animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
-                                      '@keyframes heartbeat': {
-                                        '0%': { transform: 'scale(1)' },
-                                        '25%': { transform: 'scale(1.3)' },
-                                        '50%': { transform: 'scale(1)' },
-                                        '75%': { transform: 'scale(1.2)' },
-                                        '100%': { transform: 'scale(1)' },
-                                      },
-                                    }}
-                                  />
+                                  {showHeartbeatIcon && (
+                                    <Box
+                                      sx={{
+                                        width: 26,
+                                        height: 26,
+                                        borderRadius: '50%',
+                                        border: 1,
+                                        borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        bgcolor: 'background.paper',
+                                      }}
+                                    >
+                                      <FavoriteIcon
+                                        sx={{
+                                          fontSize: 14,
+                                          color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
+                                          opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
+                                          animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
+                                          '@keyframes heartbeat': {
+                                            '0%': { transform: 'scale(1)' },
+                                            '25%': { transform: 'scale(1.3)' },
+                                            '50%': { transform: 'scale(1)' },
+                                            '75%': { transform: 'scale(1.2)' },
+                                            '100%': { transform: 'scale(1)' },
+                                          },
+                                        }}
+                                      />
+                                    </Box>
+                                  )}
                                 </Box>
                               </TableCell>
                             );
@@ -1397,51 +2165,81 @@ const ServerListPage: React.FC = () => {
                           case 'createdAt':
                             return (
                               <TableCell key={column.id}>
-                                <RelativeTime date={service.createdAt} />
+                                <RelativeTime date={service.createdAt} showSeconds />
                               </TableCell>
                             );
                           case 'updatedAt':
                             return (
                               <TableCell key={column.id}>
-                                <RelativeTime date={service.updatedAt} />
+                                <RelativeTime date={service.updatedAt} showSeconds />
                               </TableCell>
                             );
                           case 'actions':
                             const actionsServiceKey = `${service.labels.service}-${service.instanceId}`;
                             const actionsHealthStatus = healthCheckStatus.get(actionsServiceKey);
                             return (
-                              <TableCell key={column.id}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <TableCell key={column.id} align="center">
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
                                   {hasWebPort(service) && (
-                                    <Tooltip title={
-                                      actionsHealthStatus?.result
-                                        ? (actionsHealthStatus.result.healthy
-                                            ? t('serverList.healthCheck.healthyTooltip', { latency: actionsHealthStatus.result.latency })
-                                            : t('serverList.healthCheck.unhealthyTooltip', { error: actionsHealthStatus.result.error }))
-                                        : t('serverList.healthCheck.tooltip')
-                                    } arrow>
-                                      <IconButton
-                                        size="small"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleHealthCheck(service);
-                                        }}
-                                        disabled={actionsHealthStatus?.loading}
+                                    actionsHealthStatus?.cooldown && actionsHealthStatus.result ? (
+                                      // Show result: ms or X
+                                      <Box
                                         sx={{
-                                          width: 28,
-                                          height: 28,
-                                          color: actionsHealthStatus?.result
-                                            ? (actionsHealthStatus.result.healthy ? 'success.main' : 'error.main')
-                                            : 'action.active',
+                                          minWidth: 44,
+                                          height: 24,
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          borderRadius: 1,
+                                          bgcolor: actionsHealthStatus.result.healthy ? 'success.main' : 'error.main',
+                                          color: 'white',
+                                          fontSize: '0.75rem',
+                                          fontWeight: 600,
+                                          px: 0.75,
+                                          animation: actionsHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
+                                          '@keyframes wiggleFade': {
+                                            '0%': { opacity: 1, transform: 'scale(1)' },
+                                            '20%': { transform: 'scale(1.1) rotate(-3deg)' },
+                                            '40%': { transform: 'scale(0.9) rotate(3deg)' },
+                                            '60%': { transform: 'scale(1.05) rotate(-2deg)' },
+                                            '80%': { opacity: 0.5, transform: 'scale(0.95) rotate(1deg)' },
+                                            '100%': { opacity: 0, transform: 'scale(0.8)' },
+                                          },
                                         }}
                                       >
-                                        {actionsHealthStatus?.loading ? (
-                                          <CircularProgress size={14} />
-                                        ) : (
-                                          <NetworkCheckIcon fontSize="small" />
-                                        )}
-                                      </IconButton>
-                                    </Tooltip>
+                                        {actionsHealthStatus.result.healthy
+                                          ? `${actionsHealthStatus.result.latency}ms`
+                                          : '✕'}
+                                      </Box>
+                                    ) : (
+                                      // Show button (rounded style like view mode buttons)
+                                      <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
+                                        <IconButton
+                                          size="small"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleHealthCheck(service);
+                                          }}
+                                          disabled={actionsHealthStatus?.loading}
+                                          sx={{
+                                            width: 28,
+                                            height: 28,
+                                            bgcolor: 'background.paper',
+                                            border: 1,
+                                            borderColor: 'divider',
+                                            '&:hover': {
+                                              bgcolor: 'action.hover',
+                                            },
+                                          }}
+                                        >
+                                          {actionsHealthStatus?.loading ? (
+                                            <CircularProgress size={14} />
+                                          ) : (
+                                            <TouchAppIcon fontSize="small" />
+                                          )}
+                                        </IconButton>
+                                      </Tooltip>
+                                    )
                                   )}
                                 </Box>
                               </TableCell>
@@ -1497,7 +2295,7 @@ const ServerListPage: React.FC = () => {
                     <Card
                       key={serviceKey}
                       sx={{
-                        height: 110,
+                        height: 130,
                         cursor: 'default',
                         transition: 'all 0.15s ease-in-out',
                         bgcolor: isUpdated
@@ -1525,32 +2323,45 @@ const ServerListPage: React.FC = () => {
                         {/* Header: Type + Status */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
                           {getTypeChip(service.labels.service)}
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                             {getStatusBadge(service.status)}
-                            <FavoriteIcon
+                            <Box
                               sx={{
-                                fontSize: 12,
-                                color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
-                                opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
-                                animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
-                                '@keyframes heartbeat': {
-                                  '0%': { transform: 'scale(1)' },
-                                  '25%': { transform: 'scale(1.3)' },
-                                  '50%': { transform: 'scale(1)' },
-                                  '75%': { transform: 'scale(1.2)' },
-                                  '100%': { transform: 'scale(1)' },
-                                },
+                                width: 20,
+                                height: 20,
+                                borderRadius: '50%',
+                                border: 1,
+                                borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                bgcolor: 'background.paper',
                               }}
-                            />
+                            >
+                              <FavoriteIcon
+                                sx={{
+                                  fontSize: 12,
+                                  color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
+                                  opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
+                                  animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
+                                  '@keyframes heartbeat': {
+                                    '0%': { transform: 'scale(1)' },
+                                    '25%': { transform: 'scale(1.3)' },
+                                    '50%': { transform: 'scale(1)' },
+                                    '75%': { transform: 'scale(1.2)' },
+                                    '100%': { transform: 'scale(1)' },
+                                  },
+                                }}
+                              />
+                            </Box>
                           </Box>
                         </Box>
                         {/* Hostname */}
                         <Typography
                           variant="body2"
                           sx={{
-                            fontFamily: 'monospace',
+                            fontFamily: '"D2Coding", monospace',
                             fontWeight: 600,
-                            fontSize: '0.75rem',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
@@ -1560,19 +2371,82 @@ const ServerListPage: React.FC = () => {
                         </Typography>
                         {/* Group label if exists */}
                         {service.labels.group && (
-                          <Typography variant="caption" color="primary.main" sx={{ fontSize: '0.65rem', fontWeight: 500 }}>
+                          <Typography variant="caption" color="primary.main" sx={{ fontWeight: 500 }}>
                             {service.labels.group}
                           </Typography>
                         )}
                         {/* Spacer */}
                         <Box sx={{ flex: 1 }} />
-                        {/* Footer: IP + Ports */}
+                        {/* Footer: IP + Ports + Health */}
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                          <Typography sx={{ fontFamily: 'monospace', fontSize: '0.75rem', color: 'text.secondary' }}>
-                            {service.externalAddress}
-                          </Typography>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace', color: 'text.secondary' }}>
+                              {service.externalAddress}
+                            </Typography>
+                            {hasWebPort(service) && (() => {
+                              const gridHealthStatus = healthCheckStatus.get(serviceKey);
+                              return gridHealthStatus?.cooldown && gridHealthStatus.result ? (
+                                <Box
+                                  sx={{
+                                    minWidth: 36,
+                                    height: 18,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderRadius: 0.5,
+                                    bgcolor: gridHealthStatus.result.healthy ? 'success.main' : 'error.main',
+                                    color: 'white',
+                                    fontSize: '0.65rem',
+                                    fontWeight: 600,
+                                    px: 0.5,
+                                    animation: gridHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
+                                    '@keyframes wiggleFade': {
+                                      '0%': { opacity: 1, transform: 'scale(1)' },
+                                      '20%': { transform: 'scale(1.1) rotate(-3deg)' },
+                                      '40%': { transform: 'scale(0.9) rotate(3deg)' },
+                                      '60%': { transform: 'scale(1.05) rotate(-2deg)' },
+                                      '80%': { opacity: 0.5, transform: 'scale(0.95) rotate(1deg)' },
+                                      '100%': { opacity: 0, transform: 'scale(0.8)' },
+                                    },
+                                  }}
+                                >
+                                  {gridHealthStatus.result.healthy
+                                    ? `${gridHealthStatus.result.latency}ms`
+                                    : '✕'}
+                                </Box>
+                              ) : (
+                                <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
+                                  <IconButton
+                                    size="small"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleHealthCheck(service);
+                                    }}
+                                    disabled={gridHealthStatus?.loading}
+                                    sx={{
+                                      width: 20,
+                                      height: 20,
+                                      p: 0,
+                                      bgcolor: 'background.paper',
+                                      border: 1,
+                                      borderColor: 'divider',
+                                      '&:hover': {
+                                        bgcolor: 'action.hover',
+                                      },
+                                    }}
+                                  >
+                                    {gridHealthStatus?.loading ? (
+                                      <CircularProgress size={12} />
+                                    ) : (
+                                      <TouchAppIcon sx={{ fontSize: 14 }} />
+                                    )}
+                                  </IconButton>
+                                </Tooltip>
+                              );
+                            })()}
+                          </Box>
                           {ports.length > 0 && (
-                            <Typography sx={{ fontFamily: 'monospace', fontSize: '0.7rem', color: 'text.disabled', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace', color: 'text.disabled', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {ports.map(([n, p]) => `${n}:${p}`).join(' ')}
                             </Typography>
                           )}
@@ -1587,7 +2461,7 @@ const ServerListPage: React.FC = () => {
                     key={`empty-${idx}`}
                     variant="outlined"
                     sx={{
-                      height: 110,
+                      height: 130,
                       borderStyle: 'dashed',
                       borderColor: 'divider',
                       bgcolor: (theme) => theme.palette.mode === 'dark'
@@ -1639,7 +2513,7 @@ const ServerListPage: React.FC = () => {
                     <Card
                       key={serviceKey}
                       sx={{
-                        height: 200,
+                        minHeight: 300,
                         display: 'flex',
                         flexDirection: 'column',
                         transition: 'all 0.15s ease-in-out',
@@ -1679,37 +2553,51 @@ const ServerListPage: React.FC = () => {
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             {getStatusBadge(service.status)}
-                            <FavoriteIcon
+                            <Box
                               sx={{
-                                fontSize: 14,
-                                color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
-                                opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
-                                animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
-                                '@keyframes heartbeat': {
-                                  '0%': { transform: 'scale(1)' },
-                                  '25%': { transform: 'scale(1.3)' },
-                                  '50%': { transform: 'scale(1)' },
-                                  '75%': { transform: 'scale(1.2)' },
-                                  '100%': { transform: 'scale(1)' },
-                                },
+                                width: 26,
+                                height: 26,
+                                borderRadius: '50%',
+                                border: 1,
+                                borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                bgcolor: 'background.paper',
                               }}
-                            />
+                            >
+                              <FavoriteIcon
+                                sx={{
+                                  fontSize: 14,
+                                  color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
+                                  opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
+                                  animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
+                                  '@keyframes heartbeat': {
+                                    '0%': { transform: 'scale(1)' },
+                                    '25%': { transform: 'scale(1.3)' },
+                                    '50%': { transform: 'scale(1)' },
+                                    '75%': { transform: 'scale(1.2)' },
+                                    '100%': { transform: 'scale(1)' },
+                                  },
+                                }}
+                              />
+                            </Box>
                           </Box>
                         </Box>
 
                         {/* Hostname */}
                         <Typography
                           variant="body2"
-                          sx={{ fontFamily: 'monospace', fontWeight: 600 }}
+                          sx={{ fontFamily: '"D2Coding", monospace', fontWeight: 600 }}
                         >
                           {service.hostname}
                         </Typography>
 
                         {/* Instance ID */}
                         <Typography
-                          variant="caption"
+                          variant="body2"
                           color="text.disabled"
-                          sx={{ fontFamily: 'monospace', fontSize: '0.65rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                          sx={{ fontFamily: '"D2Coding", monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                         >
                           {service.instanceId}
                         </Typography>
@@ -1720,20 +2608,39 @@ const ServerListPage: React.FC = () => {
                           display: 'grid',
                           gridTemplateColumns: 'auto 1fr',
                           gap: 0.25,
-                          '& .label': { color: 'text.secondary', fontSize: '0.8rem', minWidth: 55 },
-                          '& .value': { fontFamily: 'monospace', fontSize: '0.8rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+                          '& .label': { color: 'text.secondary', fontSize: '0.875rem', minWidth: 55 },
+                          '& .value': { fontFamily: '"D2Coding", monospace', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
                         }}>
                           <Typography className="label">External</Typography>
                           <Typography className="value">{service.externalAddress}</Typography>
                           <Typography className="label">Internal</Typography>
                           <Typography className="value">{service.internalAddress}</Typography>
-                          {ports.length > 0 && (
-                            <>
-                              <Typography className="label">Ports</Typography>
-                              <Typography className="value">{ports.map(([n, p]) => `${n}:${p}`).join(', ')}</Typography>
-                            </>
-                          )}
                         </Box>
+
+                        {/* Ports - Compact inline chips */}
+                        {ports.length > 0 && (
+                          <Box sx={{
+                            mt: 0.5,
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: 0.5,
+                          }}>
+                            {ports.map(([name, port]) => (
+                              <Chip
+                                key={`${service.instanceId}-port-${name}`}
+                                label={`${name}:${port}`}
+                                size="small"
+                                variant="outlined"
+                                sx={{
+                                  height: 24,
+                                  fontSize: '0.8rem',
+                                  fontFamily: '"D2Coding", monospace',
+                                  '& .MuiChip-label': { px: 1 },
+                                }}
+                              />
+                            ))}
+                          </Box>
+                        )}
 
                         {/* Custom labels */}
                         {customLabels.length > 0 && (
@@ -1744,7 +2651,7 @@ const ServerListPage: React.FC = () => {
                                 label={`${key}=${value}`}
                                 size="small"
                                 variant="outlined"
-                                sx={{ fontSize: '0.65rem', height: 18 }}
+                                sx={{ fontSize: '0.8rem', height: 24, fontFamily: '"D2Coding", monospace' }}
                               />
                             ))}
                           </Box>
@@ -1778,9 +2685,70 @@ const ServerListPage: React.FC = () => {
                           </Box>
                         )}
 
-                        {/* Footer: Updated time */}
-                        <Box sx={{ mt: 0.5, pt: 0.5, borderTop: 1, borderColor: 'divider', display: 'flex', justifyContent: 'flex-end' }}>
-                          <RelativeTime date={service.updatedAt} variant="caption" color="text.disabled" />
+                        {/* Footer: Health + Updated time */}
+                        <Box sx={{ mt: 0.5, pt: 0.5, borderTop: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          {hasWebPort(service) ? (() => {
+                            const cardHealthStatus = healthCheckStatus.get(serviceKey);
+                            return cardHealthStatus?.cooldown && cardHealthStatus.result ? (
+                              <Box
+                                sx={{
+                                  minWidth: 44,
+                                  height: 22,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  borderRadius: 1,
+                                  bgcolor: cardHealthStatus.result.healthy ? 'success.main' : 'error.main',
+                                  color: 'white',
+                                  fontSize: '0.7rem',
+                                  fontWeight: 600,
+                                  px: 0.75,
+                                  animation: cardHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
+                                  '@keyframes wiggleFade': {
+                                    '0%': { opacity: 1, transform: 'scale(1)' },
+                                    '20%': { transform: 'scale(1.1) rotate(-3deg)' },
+                                    '40%': { transform: 'scale(0.9) rotate(3deg)' },
+                                    '60%': { transform: 'scale(1.05) rotate(-2deg)' },
+                                    '80%': { opacity: 0.5, transform: 'scale(0.95) rotate(1deg)' },
+                                    '100%': { opacity: 0, transform: 'scale(0.8)' },
+                                  },
+                                }}
+                              >
+                                {cardHealthStatus.result.healthy
+                                  ? `${cardHealthStatus.result.latency}ms`
+                                  : '✕'}
+                              </Box>
+                            ) : (
+                              <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleHealthCheck(service);
+                                  }}
+                                  disabled={cardHealthStatus?.loading}
+                                  sx={{
+                                    width: 24,
+                                    height: 24,
+                                    p: 0,
+                                    bgcolor: 'background.paper',
+                                    border: 1,
+                                    borderColor: 'divider',
+                                    '&:hover': {
+                                      bgcolor: 'action.hover',
+                                    },
+                                  }}
+                                >
+                                  {cardHealthStatus?.loading ? (
+                                    <CircularProgress size={14} />
+                                  ) : (
+                                    <TouchAppIcon sx={{ fontSize: 16 }} />
+                                  )}
+                                </IconButton>
+                              </Tooltip>
+                            );
+                          })() : <Box />}
+                          <RelativeTime date={service.updatedAt} variant="caption" color="text.disabled" showSeconds />
                         </Box>
                       </CardContent>
                     </Card>
@@ -1792,7 +2760,7 @@ const ServerListPage: React.FC = () => {
                     key={`empty-card-${idx}`}
                     variant="outlined"
                     sx={{
-                      height: 200,
+                      minHeight: 300,
                       borderStyle: 'dashed',
                       borderColor: 'divider',
                       bgcolor: (theme) => theme.palette.mode === 'dark'
@@ -1806,6 +2774,15 @@ const ServerListPage: React.FC = () => {
           </Box>
         );
       })()}
+
+      {/* Cluster View - Force-directed grape cluster visualization */}
+      {!isLoading && viewMode === 'cluster' && (
+        <ClusterView
+          services={gridDisplayServices}
+          heartbeatIds={heartbeatIds}
+          t={t}
+        />
+      )}
 
       {/* Column Settings Popover */}
       <Popover

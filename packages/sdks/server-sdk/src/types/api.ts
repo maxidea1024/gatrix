@@ -296,11 +296,12 @@ export type ServiceStatus = 'initializing' | 'ready' | 'shutting_down' | 'error'
 /**
  * Service Ports - Named port mapping
  * Format: { serviceName: port }
- * Example: { game: 7777, web: 8080, metricsApi: 9337 }
+ * Example: { game: 7777, internalApi: 8080, externalApi: 8081, metricsApi: 9337 }
  *
  * Common port names:
  * - game: Main game server port
- * - web: HTTP/REST API port
+ * - internalApi: Internal HTTP/REST API port (for internal services)
+ * - externalApi: External HTTP/REST API port (for external access like edge servers)
  * - websocket: WebSocket server port
  * - grpc: gRPC server port
  * - metricsApi: Prometheus metrics port (default: 9337)

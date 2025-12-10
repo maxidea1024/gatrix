@@ -272,7 +272,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
       // For terminated/error servers, move to Redis and delete from Etcd
       if (instance.status === 'terminated' || instance.status === 'error') {
-        const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 300;
+        const inactiveKeepTTL = config?.serviceDiscovery?.inactiveKeepTTL || 60;
 
         // Save to Redis
         await this.saveInactiveToRedis(instance);
@@ -702,14 +702,12 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         logger.info('👑 Backend Elected as Service Discovery Monitor Leader');
 
         // Start monitoring loop
+        // Only detect no-response services - cleanup is done via TTL expiration or manual cleanup
         this.monitorInterval = setInterval(async () => {
           try {
             await this.detectNoResponseServices();
-
-            const inactiveServices = await this.getInactiveServices();
-            if (inactiveServices.length > 0) {
-              await this.cleanupInactiveServices([]);
-            }
+            // Note: Inactive services are cleaned up automatically via Redis TTL expiration
+            // Manual cleanup is available via the admin API endpoint
           } catch (error) {
             logger.error('Error in monitoring loop:', error);
           }
@@ -793,13 +791,13 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
   /**
    * Mirror active service data to Redis.
    * This is used as a fallback when etcd delete event doesn't have prevKv.
-   * Only mirrors when terminatedTTL > 0 (i.e., inactive services should be displayed).
+   * Only mirrors when inactiveKeepTTL > 0 (i.e., inactive services should be displayed).
    * TTL is set to heartbeatTTL * 3 to ensure data persists long enough for delete event handling.
    */
   private async saveMirrorToRedis(instance: ServiceInstance): Promise<void> {
-    // Only mirror if terminatedTTL > 0 (inactive services should be displayed)
-    const terminatedTTL = parseInt(process.env.SERVICE_DISCOVERY_TERMINATED_TTL || '60', 10);
-    if (terminatedTTL <= 0) return;
+    // Only mirror if inactiveKeepTTL > 0 (inactive services should be displayed)
+    const inactiveKeepTTL = parseInt(process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || '60', 10);
+    if (inactiveKeepTTL <= 0) return;
 
     const client = redisClient.getClient();
     if (!client) return;
@@ -852,7 +850,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     if (!client) return;
 
     // Read TTL directly from environment variable to avoid config initialization issues
-    const ttl = parseInt(process.env.SERVICE_DISCOVERY_TERMINATED_TTL || '60', 10);
+    const ttl = parseInt(process.env.SERVICE_DISCOVERY_INACTIVE_KEEP_TTL || '60', 10);
     const key = `service-discovery:inactive:${instance.labels.service}:${instance.instanceId}`;
 
     await client.set(key, JSON.stringify(instance), { EX: ttl });
@@ -899,7 +897,7 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
   }
 
   private broadcastEvent(event: any) {
-    logger.debug(`Broadcasting event to ${this.watchCallbacks.size} callbacks:`, {
+    logger.info(`📢 Broadcasting event to ${this.watchCallbacks.size} SSE clients:`, {
       type: event.type,
       instanceId: event.instance?.instanceId,
       status: event.instance?.status,

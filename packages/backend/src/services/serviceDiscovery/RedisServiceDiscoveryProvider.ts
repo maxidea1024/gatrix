@@ -199,16 +199,16 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
           logger.debug('Config check in unregister:', {
             hasConfig: !!config,
             hasServiceDiscovery: !!config?.serviceDiscovery,
-            terminatedTTL: config?.serviceDiscovery?.terminatedTTL
+            inactiveKeepTTL: config?.serviceDiscovery?.inactiveKeepTTL
           });
 
-          const ttl = config?.serviceDiscovery?.terminatedTTL || 15;
+          const ttl = config?.serviceDiscovery?.inactiveKeepTTL || 60;
           const terminatedMarkerTTL = config?.serviceDiscovery?.terminatedMarkerTTL || 300; // 5 minutes for audit trail
 
           // Validate that terminatedMarkerTTL is greater than stat TTL
           if (terminatedMarkerTTL <= ttl) {
             logger.warn(
-              `WARNING: terminatedMarkerTTL (${terminatedMarkerTTL}s) must be greater than terminatedTTL (${ttl}s). ` +
+              `WARNING: terminatedMarkerTTL (${terminatedMarkerTTL}s) must be greater than inactiveKeepTTL (${ttl}s). ` +
               `Otherwise, terminated marker will expire before stat key, causing terminated services to be marked as no-response. ` +
               `Please set terminatedMarkerTTL to at least ${ttl + 60}s (recommended: 300s for 5 minutes).`
             );
@@ -349,11 +349,11 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
 
       // Use configured TTL based on status
       const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
-      const terminatedTTL = config?.serviceDiscovery?.terminatedTTL || 15;
+      const inactiveKeepTTL = config?.serviceDiscovery?.inactiveKeepTTL || 60;
 
       let ttl: number;
       if (stat.status === 'terminated' || stat.status === 'error') {
-        ttl = terminatedTTL; // Configured TTL for auto-cleanup
+        ttl = inactiveKeepTTL; // How long to keep inactive services visible in UI
 
         // Set terminated marker so keyspace notification knows to delete this service
         const terminatedMarkerKey = `services:${serviceType}:terminated:${input.instanceId}`;

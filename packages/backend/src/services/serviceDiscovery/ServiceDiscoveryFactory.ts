@@ -28,19 +28,33 @@ export class ServiceDiscoveryFactory {
    */
   static create(): IServiceDiscoveryProvider {
     const mode = process.env.SERVICE_DISCOVERY_MODE || 'redis';
-    
+
     logger.info(`Creating ServiceDiscoveryProvider with mode: ${mode}`);
-    
+
     if (mode === 'etcd') {
       const hosts = process.env.ETCD_HOSTS || 'http://localhost:2379';
-      return new EtcdServiceDiscoveryProvider(hosts);
+      const provider = new EtcdServiceDiscoveryProvider(hosts);
+      // Start monitoring in background (fire-and-forget)
+      if (provider.startMonitoring) {
+        provider.startMonitoring().catch(err => {
+          logger.error('Failed to start service discovery monitoring:', err);
+        });
+      }
+      return provider;
     } else if (mode === 'redis') {
       const host = config.redis.host;
       const port = config.redis.port;
       const password = config.redis.password;
       const db = 0; // Use DB 0 for service discovery
-      
-      return new RedisServiceDiscoveryProvider(host, port, password, db);
+
+      const provider = new RedisServiceDiscoveryProvider(host, port, password, db);
+      // Redis provider might not implement startMonitoring, or handles it differently
+      if ('startMonitoring' in provider && typeof (provider as any).startMonitoring === 'function') {
+        (provider as any).startMonitoring().catch((err: Error) => {
+          logger.error('Failed to start service discovery monitoring:', err);
+        });
+      }
+      return provider;
     } else {
       throw new Error(`Unknown service discovery mode: ${mode}. Use 'etcd' or 'redis'`);
     }

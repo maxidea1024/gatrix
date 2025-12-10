@@ -167,14 +167,41 @@ export const formatTime = (date: string | Date | null | undefined): string => {
 };
 
 /**
- * 상대 시간 포맷 (예: "2 minutes ago", "Just now")
+ * 상대 시간 포맷 옵션
  */
-export const formatRelativeTime = (date: string | Date | null | undefined): string => {
+interface FormatRelativeTimeOptions {
+  /** 초단위 표시 여부 (기본: false, true이면 "5초 전" 형태로 표시) */
+  showSeconds?: boolean;
+}
+
+/**
+ * 상대 시간 포맷 (예: "2 minutes ago", "Just now")
+ * @param date 날짜/시간 값
+ * @param options 옵션 (showSeconds: 초단위 표시 여부)
+ */
+export const formatRelativeTime = (
+  date: string | Date | null | undefined,
+  options?: FormatRelativeTimeOptions
+): string => {
   if (!date) return '-';
 
   try {
     const d = toDayjs(date);
-    return d ? d.fromNow() : '-';
+    if (!d) return '-';
+
+    // If showSeconds option is enabled, calculate seconds for recent times
+    if (options?.showSeconds) {
+      const now = dayjs();
+      const diffSeconds = now.diff(d, 'second');
+
+      // Less than 60 seconds: show exact seconds
+      if (diffSeconds >= 0 && diffSeconds < 60) {
+        // Return a special format that will be handled by i18n
+        return `__SECONDS_AGO__${diffSeconds}`;
+      }
+    }
+
+    return d.fromNow();
   } catch (error) {
     return '-';
   }

@@ -301,6 +301,19 @@ class ChatServerApp {
               group: process.env.SERVICE_GROUP || 'development',
               environment: process.env.ENVIRONMENT || 'env_default',
               logger: { level: 'info' },
+              cache: {
+                enabled: false, // Chat server doesn't need caching for now
+              },
+              features: {
+                gameWorld: false,
+                popupNotice: false,
+                survey: false,
+                whitelist: false,
+                serviceMaintenance: false,
+                clientVersion: false,
+                serviceNotice: false,
+                banner: false,
+              },
             });
 
             await gatrixSdk.initialize();
@@ -312,7 +325,7 @@ class ChatServerApp {
                 group: process.env.SERVICE_GROUP || 'development',
               },
               ports: {
-                web: config.port,
+                internalApi: config.port,
               },
               status: 'ready',
               meta: {

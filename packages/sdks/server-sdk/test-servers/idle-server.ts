@@ -60,6 +60,21 @@ async function main() {
     logger,
   });
 
+  // Shutdown handler for graceful shutdown via HTTP
+  async function handleShutdown() {
+    try {
+      logger.info('Stopping metrics server...');
+      await metricsServer.stop();
+      logger.info('Unregistering service...');
+      await sdk.serviceDiscovery.unregister();
+      logger.info('Service unregistered');
+      process.exit(0);
+    } catch (error) {
+      logger.error('Error during shutdown', { error });
+      process.exit(1);
+    }
+  }
+
   try {
     logger.info('Initializing SDK...');
     await sdk.initialize();
@@ -67,6 +82,14 @@ async function main() {
 
     // Start metrics server
     metricsServer.start();
+
+    // Add shutdown endpoint to metrics server
+    metricsServer.app.post('/shutdown', async (_req, res) => {
+      logger.info('Received shutdown request via HTTP');
+      res.json({ success: true, message: 'Shutting down...' });
+      // Delay to allow response to be sent
+      setTimeout(() => handleShutdown(), 100);
+    });
 
     // Register service
     logger.info('Registering service...');
@@ -79,7 +102,8 @@ async function main() {
       // hostname: os.hostname(),
       // internalAddress: internalIp,
       ports: {
-        http: [metricsPort],
+        internalApi: metricsPort,
+        externalApi: metricsPort,
       },
       status: 'ready',
       meta: {
@@ -195,9 +219,9 @@ async function main() {
     }
 
     logger.info('Idle server is running and listening to events...');
-    logger.info('Press Ctrl+C to stop');
+    logger.info('Press Ctrl+C to stop or POST to /shutdown endpoint');
 
-    // Handle graceful shutdown
+    // Handle graceful shutdown via signals
     process.on('SIGTERM', async () => {
       logger.info('Received SIGTERM, shutting down gracefully...');
       await handleShutdown();
@@ -207,20 +231,6 @@ async function main() {
       logger.info('Received SIGINT, shutting down gracefully...');
       await handleShutdown();
     });
-
-    async function handleShutdown() {
-      try {
-        logger.info('Stopping metrics server...');
-        await metricsServer.stop();
-        logger.info('Unregistering service...');
-        await sdk.serviceDiscovery.unregister();
-        logger.info('Service unregistered');
-        process.exit(0);
-      } catch (error) {
-        logger.error('Error during shutdown', { error });
-        process.exit(1);
-      }
-    }
   } catch (error) {
     logger.error('Fatal error', { error });
     process.exit(1);

@@ -2349,6 +2349,9 @@
     "deleting": "删除中",
     "sdkGuide": {
       "headerEnvironmentId": "请求目标环境 ID (必填)"
+    },
+    "relativeTime": {
+      "secondsAgo": "{{seconds}}秒前"
     }
   },
   "createdAt": "createdAt",
@@ -4184,7 +4187,8 @@
     "viewMode": {
       "list": "列表视图",
       "grid": "网格视图",
-      "card": "卡片视图"
+      "card": "卡片视图",
+      "cluster": "集群视图"
     },
     "filters": {
       "service": "服务类型",

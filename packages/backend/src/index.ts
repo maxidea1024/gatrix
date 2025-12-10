@@ -1,6 +1,7 @@
 import { config } from './config';
 import { createServer } from 'http';
 import type { SSENotificationBusMessage } from './services/PubSubService';
+import type { GatrixServerSDK } from '@gatrix/server-sdk';
 
 // Lazy imports to avoid initialization at import time
 let app: any;
@@ -16,6 +17,8 @@ let SSENotificationService: any;
 
 // Backend service instance ID for service discovery
 let backendInstanceId: string | null = null;
+// GatrixServerSDK instance for service discovery
+let gatrixSdk: GatrixServerSDK | null = null;
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error: Error) => {
@@ -85,14 +88,14 @@ const gracefulShutdown = async (signal: string) => {
       if (logger) logger.info('etcd cleanup interval cleared');
     }
 
-    // Unregister backend service from service discovery
-    if (backendInstanceId) {
+    // Unregister backend service from service discovery via SDK
+    if (gatrixSdk && backendInstanceId) {
       try {
-        const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
-        await serviceDiscoveryService.unregister(backendInstanceId, 'backend', true);
-        if (logger) logger.info('Backend service unregistered from Service Discovery');
+        await gatrixSdk.unregisterService();
+        await gatrixSdk.close();
+        if (logger) logger.info('Backend service unregistered from Service Discovery via SDK');
       } catch (error) {
-        if (logger) logger.warn('Error unregistering backend service:', error);
+        if (logger) logger.warn('Error unregistering backend service via SDK:', error);
       }
     }
 
@@ -257,37 +260,6 @@ const startServer = async () => {
     }
 
 
-    // // Register Backend service to Service Discovery directly (no SDK needed for self-registration)
-    // try {
-    //   const serviceDiscoveryService = (await import('./services/serviceDiscoveryService')).default;
-    //   const { ulid } = await import('ulid');
-    //   const os = await import('os');
-
-    //   backendInstanceId = ulid();
-    //   const hostname = os.hostname();
-
-    //   await serviceDiscoveryService.register({
-    //     instanceId: backendInstanceId,
-    //     hostname,
-    //     internalAddress: hostname,
-    //     labels: {
-    //       service: 'backend',
-    //       group: process.env.SERVICE_GROUP || 'development',
-    //     },
-    //     ports: {
-    //       http: [config.port],
-    //     },
-    //     status: 'ready',
-    //     meta: {
-    //       instanceName: 'backend-1',
-    //     },
-    //   });
-
-    //   logger.info('Backend service registered to Service Discovery', { instanceId: backendInstanceId });
-    // } catch (error) {
-    //   logger.warn('Backend service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });
-    // }
-
     // Initialize Service Discovery watch (for Redis keyspace notifications)
     try {
       const serviceDiscoveryMode = process.env.SERVICE_DISCOVERY_MODE || 'redis';
@@ -319,13 +291,70 @@ const startServer = async () => {
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)
     const server = createServer(app);
 
-    server.listen(config.port, () => {
+    server.listen(config.port, async () => {
       logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`, appInstance.getLogInfo());
       logger.info(`Health check available at http://127.0.0.1:${config.port}/health`);
       logger.info(`API available at http://127.0.0.1:${config.port}/api/v1`);
       logger.info(`Chat API proxy available at http://127.0.0.1:${config.port}/api/v1/chat`);
       logger.info(`Queue service ready: ${queueService.isReady()}`);
       logger.info(`PubSub service ready: ${pubSubService.isReady()}`);
+
+      // Register Backend service to Service Discovery via SDK
+      // Must be done AFTER server starts listening
+      try {
+        const { GatrixServerSDK } = await import('@gatrix/server-sdk');
+
+        const backendUrl = `http://localhost:${config.port}`;
+        const apiToken = process.env.API_TOKEN || 'gatrix-unsecured-server-api-token';
+
+        gatrixSdk = new GatrixServerSDK({
+          gatrixUrl: backendUrl,
+          apiToken: apiToken,
+          applicationName: 'backend',
+          service: 'backend',
+          group: process.env.SERVICE_GROUP || 'development',
+          environment: process.env.ENVIRONMENT || 'env_default',
+          logger: { level: 'info' },
+          cache: {
+            enabled: false, // Backend doesn't need caching - it IS the data source
+            skipBackendReady: true, // Backend must skip waiting for itself
+          },
+          // Disable all features since backend doesn't need cached data from itself
+          features: {
+            gameWorld: false,
+            popupNotice: false,
+            survey: false,
+            whitelist: false,
+            serviceMaintenance: false,
+            clientVersion: false,
+            serviceNotice: false,
+            banner: false,
+          },
+        });
+
+        await gatrixSdk.initialize();
+
+        const result = await gatrixSdk.registerService({
+          labels: {
+            service: 'backend',
+            group: process.env.SERVICE_GROUP || 'development',
+          },
+          ports: {
+            internalApi: config.port,
+          },
+          status: 'ready',
+          meta: {
+            instanceName: 'backend-1',
+          },
+        });
+
+        backendInstanceId = result.instanceId;
+        logger.info('Backend service registered to Service Discovery via SDK', {
+          instanceId: backendInstanceId,
+        });
+      } catch (error) {
+        logger.warn('Backend service registration failed, continuing', { error: error instanceof Error ? error.message : String(error) });
+      }
     });
 
     // Handle server errors
