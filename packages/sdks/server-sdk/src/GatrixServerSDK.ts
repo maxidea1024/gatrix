@@ -94,6 +94,7 @@ export class GatrixServerSDK {
       baseURL: configWithDefaults.gatrixUrl,
       apiToken: configWithDefaults.apiToken,
       applicationName: configWithDefaults.applicationName,
+      environment: configWithDefaults.environment, // Pass environment for X-Environment header
       logger: this.logger,
       retry: configWithDefaults.retry,
       metrics: this.metrics,
@@ -111,6 +112,8 @@ export class GatrixServerSDK {
     this.logger.info('GatrixServerSDK created', {
       gatrixUrl: configWithDefaults.gatrixUrl,
       applicationName: configWithDefaults.applicationName,
+      environment: configWithDefaults.environment,
+      environments: configWithDefaults.environments,
       apiToken: configWithDefaults.apiToken === 'gatrix-unsecured-server-api-token' ? 'unsecured (testing)' : '***',
     });
   }

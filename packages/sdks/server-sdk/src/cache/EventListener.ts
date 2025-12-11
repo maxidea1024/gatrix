@@ -253,9 +253,13 @@ export class EventListener {
       'maintenance.settings.updated',
       'whitelist.updated',
       'client_version.updated',
+      'banner.created',
       'banner.updated',
+      'banner.deleted',
       'service_notice.updated',
+      'store_product.created',
       'store_product.updated',
+      'store_product.deleted',
       'environment.created',
       'environment.deleted',
     ].includes(type);
@@ -353,7 +357,12 @@ export class EventListener {
         }
         break;
 
-      case 'client_version.updated':
+      case 'client_version.updated': {
+        const features = this.cacheManager.getFeatures();
+        if (features.clientVersion !== true) {
+          this.logger.debug('Client version event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         this.logger.info('Client version updated event received, refreshing client version cache', {
           id: event.data.id,
           environment: event.data.environment
@@ -365,21 +374,43 @@ export class EventListener {
           this.logger.error('Failed to refresh client version cache', { error: error.message });
         }
         break;
+      }
 
-      case 'banner.updated':
-        this.logger.info('Banner updated event received, refreshing banner cache', {
-          id: event.data.id,
-          environment: event.data.environment
-        });
-        try {
-          await this.cacheManager.getBannerService()?.refresh();
-          this.logger.info('Banner cache refreshed successfully');
-        } catch (error: any) {
-          this.logger.error('Failed to refresh banner cache', { error: error.message });
+      case 'banner.created':
+      case 'banner.updated': {
+        const features = this.cacheManager.getFeatures();
+        if (features.banner !== true) {
+          this.logger.debug('Banner event ignored - feature is disabled', { event: event.type });
+          break;
         }
+        // Update only the affected banner (immutable)
+        // Pass status from event data to avoid unnecessary API calls
+        const bannerStatus = event.data.status as string | undefined;
+        await this.cacheManager.updateSingleBanner(
+          String(event.data.id),
+          event.data.environment,
+          bannerStatus
+        );
         break;
+      }
 
-      case 'service_notice.updated':
+      case 'banner.deleted': {
+        const features = this.cacheManager.getFeatures();
+        if (features.banner !== true) {
+          this.logger.debug('Banner event ignored - feature is disabled', { event: event.type });
+          break;
+        }
+        // Remove the deleted banner from cache (immutable)
+        this.cacheManager.removeBanner(String(event.data.id), event.data.environment);
+        break;
+      }
+
+      case 'service_notice.updated': {
+        const features = this.cacheManager.getFeatures();
+        if (features.serviceNotice !== true) {
+          this.logger.debug('Service notice event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         this.logger.info('Service notice updated event received, refreshing service notice cache', {
           id: event.data.id,
           environment: event.data.environment
@@ -391,19 +422,37 @@ export class EventListener {
           this.logger.error('Failed to refresh service notice cache', { error: error.message });
         }
         break;
+      }
 
-      case 'store_product.updated':
-        this.logger.info('Store product updated event received, refreshing store product cache', {
-          id: event.data.id,
-          environment: event.data.environment
-        });
-        try {
-          await this.cacheManager.getStoreProductService()?.refresh();
-          this.logger.info('Store product cache refreshed successfully');
-        } catch (error: any) {
-          this.logger.error('Failed to refresh store product cache', { error: error.message });
+      case 'store_product.created':
+      case 'store_product.updated': {
+        const features = this.cacheManager.getFeatures();
+        if (features.storeProduct !== true) {
+          this.logger.debug('Store product event ignored - feature is disabled', { event: event.type });
+          break;
         }
+        // Update only the affected store product (immutable)
+        // Pass isActive from event data to avoid unnecessary API calls
+        // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
+        const productIsActive = event.data.isActive === 0 ? false : (event.data.isActive === 1 ? true : event.data.isActive);
+        await this.cacheManager.updateSingleStoreProduct(
+          String(event.data.id),
+          event.data.environment,
+          productIsActive
+        );
         break;
+      }
+
+      case 'store_product.deleted': {
+        const features = this.cacheManager.getFeatures();
+        if (features.storeProduct !== true) {
+          this.logger.debug('Store product event ignored - feature is disabled', { event: event.type });
+          break;
+        }
+        // Remove the deleted store product from cache (immutable)
+        this.cacheManager.removeStoreProduct(String(event.data.id), event.data.environment);
+        break;
+      }
 
       case 'environment.created':
       case 'environment.deleted':

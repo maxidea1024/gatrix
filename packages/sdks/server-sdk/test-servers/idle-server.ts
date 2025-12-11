@@ -17,6 +17,9 @@ async function main() {
   const metricsPort = portArg ? parseInt(portArg) : parseInt(process.env.METRICS_PORT || '9999');
   const instanceName = process.env.INSTANCE_NAME || `idle-${metricsPort}`;
 
+  // Determine target environment from environment variable
+  const targetEnvironment = process.env.ENVIRONMENT || 'development';
+
   // SDK will provide its Registry for HTTP metrics to merge into
   const sdk = new GatrixServerSDK({
     gatrixUrl: process.env.GATRIX_URL || 'http://localhost:55000',
@@ -24,7 +27,9 @@ async function main() {
     applicationName: 'idle',
     service: 'idle', // Required: service name for identification
     group: process.env.SERVICE_GROUP || 'development', // Required: service group
-    environment: process.env.ENVIRONMENT || 'env_dev', // Required: environment
+    environment: targetEnvironment, // Required: environment
+    // Use multi-environment mode with specific environment for proper environment-based API calls
+    environments: [targetEnvironment],
 
     // Redis for events
     redis: {
@@ -37,6 +42,14 @@ async function main() {
       enabled: true,
       ttl: 100,
       refreshMethod: 'event', // Use event-based refresh (requires Redis)
+    },
+
+    // Enable all features for testing
+    features: {
+      clientVersion: true,
+      serviceNotice: true,
+      banner: true,
+      storeProduct: true,
     },
 
     // Logger configuration
@@ -205,6 +218,36 @@ async function main() {
       printCachedData();
     });
 
+    sdk.on('banner.updated', (event) => {
+      logger.info('BANNER UPDATED', event.data);
+      printCachedData();
+    });
+
+    sdk.on('client_version.updated', (event) => {
+      logger.info('CLIENT VERSION UPDATED', event.data);
+      printCachedData();
+    });
+
+    sdk.on('service_notice.updated', (event) => {
+      logger.info('SERVICE NOTICE UPDATED', event.data);
+      printCachedData();
+    });
+
+    sdk.on('store_product.updated', (event) => {
+      logger.info('STORE PRODUCT UPDATED', event.data);
+      printCachedData();
+    });
+
+    sdk.on('environment.created', (event) => {
+      logger.info('ENVIRONMENT CREATED', event.data);
+      printCachedData();
+    });
+
+    sdk.on('environment.deleted', (event) => {
+      logger.info('ENVIRONMENT DELETED', event.data);
+      printCachedData();
+    });
+
     // Helper function to print cached data
     function printCachedData() {
       const surveysData = sdk.getSurveys();
@@ -214,6 +257,10 @@ async function main() {
         surveys: surveysData,
         whitelists: sdk.whitelist.getCached(),
         maintenance: sdk.getServiceMaintenanceStatus(),
+        banners: sdk.getBanners(),
+        clientVersions: sdk.getClientVersions(),
+        serviceNotices: sdk.getServiceNotices(),
+        storeProducts: sdk.getStoreProducts(),
         timestamp: new Date().toISOString(),
       };
 

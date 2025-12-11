@@ -100,7 +100,35 @@ export class ServerStoreProductController {
             };
           } else {
             // Single-environment mode: return flat array
+            // Use X-Environment header to determine environment (required for Server SDK)
+            const envHeader = req.headers['x-environment'] as string | undefined;
+            if (!envHeader) {
+              return res.status(400).json({
+                success: false,
+                error: {
+                  code: 'MISSING_ENVIRONMENT',
+                  message: 'X-Environment header is required for single-environment mode',
+                },
+              });
+            }
+
+            // Resolve environment by name or ID
+            let targetEnv = await Environment.query().findById(envHeader);
+            if (!targetEnv) {
+              targetEnv = await Environment.getByName(envHeader);
+            }
+            if (!targetEnv) {
+              return res.status(400).json({
+                success: false,
+                error: {
+                  code: 'INVALID_ENVIRONMENT',
+                  message: `Environment '${envHeader}' not found`,
+                },
+              });
+            }
+
             const result = await StoreProductService.getStoreProducts({
+              environmentId: targetEnv.id,
               limit: 1000,
               page: 1,
               isActive: true,

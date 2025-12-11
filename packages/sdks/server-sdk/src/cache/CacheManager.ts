@@ -711,6 +711,41 @@ export class CacheManager {
     return this.storeProductService;
   }
 
+  /**
+   * Update a single store product in cache (immutable)
+   */
+  async updateSingleStoreProduct(id: string, environment?: string, isActive?: boolean | number): Promise<void> {
+    await this.storeProductService?.updateSingleProduct(id, environment, isActive);
+  }
+
+  /**
+   * Remove a store product from cache (immutable)
+   */
+  removeStoreProduct(id: string, environment?: string): void {
+    this.storeProductService?.removeProduct(id, environment);
+  }
+
+  /**
+   * Update a single banner in cache (immutable)
+   */
+  async updateSingleBanner(bannerId: string, environment?: string, status?: string): Promise<void> {
+    await this.bannerService?.updateSingleBanner(bannerId, environment, status);
+  }
+
+  /**
+   * Remove a banner from cache (immutable)
+   */
+  removeBanner(bannerId: string, environment?: string): void {
+    this.bannerService?.removeBanner(bannerId, environment);
+  }
+
+  /**
+   * Get features configuration
+   */
+  getFeatures(): FeaturesConfig {
+    return this.features;
+  }
+
   // ==================== CACHE MANAGEMENT ====================
 
   /**

@@ -102,7 +102,35 @@ export class ServerClientVersionController {
             };
           } else {
             // Single-environment mode: return flat array
+            // Use X-Environment header to determine environment (required for Server SDK)
+            const envHeader = req.headers['x-environment'] as string | undefined;
+            if (!envHeader) {
+              return res.status(400).json({
+                success: false,
+                error: {
+                  code: 'MISSING_ENVIRONMENT',
+                  message: 'X-Environment header is required for single-environment mode',
+                },
+              });
+            }
+
+            // Resolve environment by name or ID
+            let targetEnv = await Environment.query().findById(envHeader);
+            if (!targetEnv) {
+              targetEnv = await Environment.getByName(envHeader);
+            }
+            if (!targetEnv) {
+              return res.status(400).json({
+                success: false,
+                error: {
+                  code: 'INVALID_ENVIRONMENT',
+                  message: `Environment '${envHeader}' not found`,
+                },
+              });
+            }
+
             const result = await ClientVersionModel.findAll({
+              environmentId: targetEnv.id,
               limit: 1000,
               offset: 0,
               sortBy: 'clientVersion',
@@ -113,14 +141,17 @@ export class ServerClientVersionController {
             const versionsWithTags = await Promise.all(
               result.clientVersions.map(async (version: any) => {
                 const tags = await TagService.listTagsForEntity('client_version', version.id);
+                // Remove environmentId from response
+                const { environmentId: _envId, ...versionWithoutEnvId } = version;
+                void _envId;
                 return {
-                  ...version,
+                  ...versionWithoutEnvId,
                   tags: tags || [],
                 };
               }),
             );
 
-            logger.info(`Server SDK: Retrieved ${versionsWithTags.length} client versions`);
+            logger.info(`Server SDK: Retrieved ${versionsWithTags.length} client versions for environment ${targetEnv.environmentName}`);
 
             return {
               success: true,

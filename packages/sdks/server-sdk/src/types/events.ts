@@ -24,7 +24,10 @@ export type StandardEventType =
   | 'whitelist.updated'
   | 'client_version.updated'
   | 'banner.updated'
-  | 'service_notice.updated';
+  | 'service_notice.updated'
+  | 'store_product.updated'
+  | 'environment.created'
+  | 'environment.deleted';
 
 export interface StandardEventData {
   id: number | string;

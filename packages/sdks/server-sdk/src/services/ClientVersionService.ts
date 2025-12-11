@@ -100,12 +100,22 @@ export class ClientVersionService {
   /**
    * Get cached client versions
    * @param environment Environment name. Only used in multi-environment mode.
-   *                    For game servers, can be omitted to use default environment.
-   *                    For edge servers, must be provided from client request.
+   *                    If omitted in multi-environment mode, returns all versions as flat array.
    */
   getCached(environment?: string): ClientVersion[] {
-    const envKey = this.isMultiEnvironment() ? (environment || this.defaultEnvKey) : this.defaultEnvKey;
-    return this.cachedVersionsByEnv.get(envKey) || [];
+    if (!this.isMultiEnvironment()) {
+      // Single-environment mode: return default key
+      return this.cachedVersionsByEnv.get(this.defaultEnvKey) || [];
+    }
+
+    // Multi-environment mode
+    if (environment) {
+      // Specific environment requested
+      return this.cachedVersionsByEnv.get(environment) || [];
+    }
+
+    // No environment specified: return all versions as flat array
+    return Array.from(this.cachedVersionsByEnv.values()).flat();
   }
 
   /**
@@ -126,9 +136,12 @@ export class ClientVersionService {
 
   /**
    * Refresh cached client versions
+   * Invalidates ETag cache first to ensure fresh data is fetched
    */
   async refresh(): Promise<ClientVersion[]> {
     this.logger.info('Refreshing client versions cache');
+    // Invalidate ETag cache to force fresh data fetch
+    this.apiClient.invalidateEtagCache('/api/v1/server/client-versions');
     return await this.list();
   }
 

@@ -79,9 +79,36 @@ export class ServerBannerController {
             };
           } else {
             // Single-environment mode: return flat array
-            const banners = await BannerModel.findPublished();
+            // Use X-Environment header to determine environment (required for Server SDK)
+            const envHeader = req.headers['x-environment'] as string | undefined;
+            if (!envHeader) {
+              return res.status(400).json({
+                success: false,
+                error: {
+                  code: 'MISSING_ENVIRONMENT',
+                  message: 'X-Environment header is required for single-environment mode',
+                },
+              });
+            }
 
-            logger.info(`Server SDK: Retrieved ${banners.length} published banners`);
+            // Resolve environment by name or ID
+            let targetEnv = await Environment.query().findById(envHeader);
+            if (!targetEnv) {
+              targetEnv = await Environment.getByName(envHeader);
+            }
+            if (!targetEnv) {
+              return res.status(400).json({
+                success: false,
+                error: {
+                  code: 'INVALID_ENVIRONMENT',
+                  message: `Environment '${envHeader}' not found`,
+                },
+              });
+            }
+
+            const banners = await BannerModel.findPublished(targetEnv.id);
+
+            logger.info(`Server SDK: Retrieved ${banners.length} published banners for environment ${targetEnv.environmentName}`);
 
             return {
               success: true,

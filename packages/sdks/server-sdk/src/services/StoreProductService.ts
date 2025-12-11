@@ -100,10 +100,22 @@ export class StoreProductService {
   /**
    * Get cached store products
    * @param environment Environment name. Only used in multi-environment mode.
+   *                    If omitted in multi-environment mode, returns all products as flat array.
    */
   getCached(environment?: string): StoreProduct[] {
-    const envKey = this.isMultiEnvironment() ? (environment || this.defaultEnvKey) : this.defaultEnvKey;
-    return this.cachedProductsByEnv.get(envKey) || [];
+    if (!this.isMultiEnvironment()) {
+      // Single-environment mode: return default key
+      return this.cachedProductsByEnv.get(this.defaultEnvKey) || [];
+    }
+
+    // Multi-environment mode
+    if (environment) {
+      // Specific environment requested
+      return this.cachedProductsByEnv.get(environment) || [];
+    }
+
+    // No environment specified: return all products as flat array
+    return Array.from(this.cachedProductsByEnv.values()).flat();
   }
 
   /**
@@ -124,9 +136,12 @@ export class StoreProductService {
 
   /**
    * Refresh cached store products
+   * Invalidates ETag cache first to ensure fresh data is fetched
    */
   async refresh(): Promise<StoreProduct[]> {
     this.logger.info('Refreshing store products cache');
+    // Invalidate ETag cache to force fresh data fetch
+    this.apiClient.invalidateEtagCache('/api/v1/server/store-products');
     return await this.list();
   }
 
@@ -141,7 +156,90 @@ export class StoreProductService {
   }
 
   /**
-   * Get store product by productId
+   * Get a single store product by ID from API
+   * Used for updating cache with fresh data
+   */
+  async getById(id: string): Promise<StoreProduct> {
+    const response = await this.apiClient.get<{ product: StoreProduct }>(`/api/v1/server/store-products/${id}`);
+    if (!response.success || !response.data) {
+      throw new Error(response.error?.message || 'Failed to fetch store product');
+    }
+    return response.data.product;
+  }
+
+  /**
+   * Update a single store product in cache (immutable)
+   * If isActive is false, removes the product from cache (no API call needed)
+   * If isActive is true but not in cache, fetches and adds it to cache
+   * If isActive is true and in cache, fetches and updates it
+   */
+  async updateSingleProduct(id: string, environment?: string, isActive?: boolean | number): Promise<void> {
+    try {
+      this.logger.debug('Updating single store product in cache', { id, environment, isActive });
+
+      const envKey = this.isMultiEnvironment() ? (environment || this.defaultEnvKey) : this.defaultEnvKey;
+
+      // If isActive is explicitly false (0 or false), just remove from cache
+      if (isActive === false || isActive === 0) {
+        this.logger.info('Store product isActive=false, removing from cache', { id, environment: envKey });
+        this.removeProduct(id, environment);
+        return;
+      }
+
+      // Otherwise, fetch from API and add/update
+      // Add small delay to ensure backend transaction is committed
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Fetch the updated product from backend
+      const updatedProduct = await this.getById(id);
+
+      // Get current products for this environment
+      const currentProducts = this.cachedProductsByEnv.get(envKey) || [];
+
+      // Check if product already exists in cache
+      const existsInCache = currentProducts.some(p => p.id === id);
+
+      if (existsInCache) {
+        // Immutable update: update existing product
+        const newProducts = currentProducts.map(p => p.id === id ? updatedProduct : p);
+        this.cachedProductsByEnv.set(envKey, newProducts);
+        this.logger.debug('Single store product updated in cache', { id, environment: envKey });
+      } else {
+        // Product not in cache but found in backend (e.g., isActive changed from false to true)
+        // Add it to cache
+        const newProducts = [...currentProducts, updatedProduct];
+        this.cachedProductsByEnv.set(envKey, newProducts);
+        this.logger.debug('Single store product added to cache', { id, environment: envKey });
+      }
+    } catch (error: any) {
+      this.logger.error('Failed to update single store product in cache', {
+        id,
+        environment,
+        error: error.message,
+      });
+      // If update fails, fall back to full refresh
+      await this.refresh();
+    }
+  }
+
+  /**
+   * Remove a store product from cache (immutable)
+   */
+  removeProduct(id: string, environment?: string): void {
+    this.logger.debug('Removing store product from cache', { id, environment });
+
+    const envKey = this.isMultiEnvironment() ? (environment || this.defaultEnvKey) : this.defaultEnvKey;
+    const currentProducts = this.cachedProductsByEnv.get(envKey) || [];
+
+    // Immutable update: create new array without the deleted product
+    const newProducts = currentProducts.filter(p => p.id !== id);
+    this.cachedProductsByEnv.set(envKey, newProducts);
+
+    this.logger.debug('Store product removed from cache', { id, environment: envKey });
+  }
+
+  /**
+   * Get store product by productId from cache
    * @param environment Environment name. Only used in multi-environment mode.
    */
   getByProductId(productId: string, environment?: string): StoreProduct | null {

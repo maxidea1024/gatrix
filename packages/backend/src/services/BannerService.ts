@@ -152,10 +152,11 @@ class BannerService {
           environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
-          type: 'banner.updated',
+          type: 'banner.created',
           data: {
             id: banner.bannerId,
             environment,
+            status: banner.status,
             timestamp: Date.now()
           }
         });

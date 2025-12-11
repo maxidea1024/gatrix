@@ -107,12 +107,22 @@ export class ServiceNoticeService {
   /**
    * Get cached service notices
    * @param environment Environment name. Only used in multi-environment mode.
-   *                    For game servers, can be omitted to use default environment.
-   *                    For edge servers, must be provided from client request.
+   *                    If omitted in multi-environment mode, returns all notices as flat array.
    */
   getCached(environment?: string): ServiceNotice[] {
-    const envKey = this.isMultiEnvironment() ? (environment || this.defaultEnvKey) : this.defaultEnvKey;
-    return this.cachedNoticesByEnv.get(envKey) || [];
+    if (!this.isMultiEnvironment()) {
+      // Single-environment mode: return default key
+      return this.cachedNoticesByEnv.get(this.defaultEnvKey) || [];
+    }
+
+    // Multi-environment mode
+    if (environment) {
+      // Specific environment requested
+      return this.cachedNoticesByEnv.get(environment) || [];
+    }
+
+    // No environment specified: return all notices as flat array
+    return Array.from(this.cachedNoticesByEnv.values()).flat();
   }
 
   /**
@@ -133,9 +143,12 @@ export class ServiceNoticeService {
 
   /**
    * Refresh cached service notices
+   * Invalidates ETag cache first to ensure fresh data is fetched
    */
   async refresh(): Promise<ServiceNotice[]> {
     this.logger.info('Refreshing service notices cache');
+    // Invalidate ETag cache to force fresh data fetch
+    this.apiClient.invalidateEtagCache('/api/v1/server/service-notices');
     return await this.list();
   }
 

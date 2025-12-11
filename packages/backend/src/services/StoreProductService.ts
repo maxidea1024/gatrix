@@ -265,10 +265,11 @@ class StoreProductService {
       try {
         const env = await Environment.query().findById(envId);
         await pubSubService.publishSDKEvent({
-          type: 'store_product.updated',
+          type: 'store_product.created',
           data: {
             id,
             environment: env?.environmentName,
+            isActive: product?.isActive ? 1 : 0,
             timestamp: Date.now()
           }
         });
@@ -369,6 +370,7 @@ class StoreProductService {
           data: {
             id,
             environment: env?.environmentName,
+            isActive: product?.isActive ? 1 : 0,
             timestamp: Date.now()
           }
         });
@@ -411,7 +413,7 @@ class StoreProductService {
       try {
         const env = await Environment.query().findById(envId);
         await pubSubService.publishSDKEvent({
-          type: 'store_product.updated',
+          type: 'store_product.deleted',
           data: {
             id,
             environment: env?.environmentName,
@@ -449,18 +451,20 @@ class StoreProductService {
         [...ids, envId]
       );
 
-      // Publish SDK event
+      // Publish SDK events for each deleted product
       if (result.affectedRows > 0) {
         try {
           const env = await Environment.query().findById(envId);
-          await pubSubService.publishSDKEvent({
-            type: 'store_product.updated',
-            data: {
-              id: ids.join(','),
-              environment: env?.environmentName,
-              timestamp: Date.now()
-            }
-          });
+          for (const id of ids) {
+            await pubSubService.publishSDKEvent({
+              type: 'store_product.deleted',
+              data: {
+                id,
+                environment: env?.environmentName,
+                timestamp: Date.now()
+              }
+            });
+          }
         } catch (eventError) {
           logger.warn('Failed to publish store product SDK event', { eventError, ids });
         }
@@ -496,18 +500,21 @@ class StoreProductService {
         [isActive ? 1 : 0, updatedBy || null, ...ids, envId]
       );
 
-      // Publish SDK event
+      // Publish SDK events for each updated product
       if (result.affectedRows > 0) {
         try {
           const env = await Environment.query().findById(envId);
-          await pubSubService.publishSDKEvent({
-            type: 'store_product.updated',
-            data: {
-              id: ids.join(','),
-              environment: env?.environmentName,
-              timestamp: Date.now()
-            }
-          });
+          for (const id of ids) {
+            await pubSubService.publishSDKEvent({
+              type: 'store_product.updated',
+              data: {
+                id,
+                environment: env?.environmentName,
+                isActive: isActive ? 1 : 0,
+                timestamp: Date.now()
+              }
+            });
+          }
         } catch (eventError) {
           logger.warn('Failed to publish store product SDK event', { eventError, ids });
         }
