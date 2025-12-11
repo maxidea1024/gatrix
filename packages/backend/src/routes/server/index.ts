@@ -15,6 +15,7 @@ import serviceDiscoveryRoutes, { getWhitelistsHandler } from './serviceDiscovery
 import ServerClientVersionController from '../../controllers/ServerClientVersionController';
 import ServerServiceNoticeController from '../../controllers/ServerServiceNoticeController';
 import ServerBannerController from '../../controllers/ServerBannerController';
+import ServerStoreProductController from '../../controllers/ServerStoreProductController';
 
 const router = express.Router();
 
@@ -103,6 +104,9 @@ router.get('/service-notices/:id', serverSDKAuth, ServerServiceNoticeController.
 // Banner routes (Edge)
 router.get('/banners', serverSDKAuth, ServerBannerController.getBanners);
 router.get('/banners/:bannerId', serverSDKAuth, ServerBannerController.getBannerById);
+
+// Store product routes
+router.get('/store-products', serverSDKAuth, ServerStoreProductController.getStoreProducts);
 
 // Service discovery routes
 router.use('/services', serviceDiscoveryRoutes);

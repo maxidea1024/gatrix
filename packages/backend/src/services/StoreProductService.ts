@@ -6,6 +6,8 @@ import { TagService } from './TagService';
 import { getCurrentEnvironmentId } from '../utils/environmentContext';
 import { PlanningDataService } from './PlanningDataService';
 import { CmsCashShopProduct } from './CmsCashShopService';
+import { pubSubService } from './PubSubService';
+import { Environment } from '../models/Environment';
 
 export interface StoreProduct {
   id: string;
@@ -257,7 +259,24 @@ class StoreProductService {
         ]
       );
 
-      return this.getStoreProductById(id, envId);
+      const product = await this.getStoreProductById(id, envId);
+
+      // Publish SDK event
+      try {
+        const env = await Environment.query().findById(envId);
+        await pubSubService.publishSDKEvent({
+          type: 'store_product.updated',
+          data: {
+            id,
+            environment: env?.environmentName,
+            timestamp: Date.now()
+          }
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish store product SDK event', { eventError, id });
+      }
+
+      return product;
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
         throw new GatrixError('A product with this ID and store already exists', 409);
@@ -340,7 +359,24 @@ class StoreProductService {
         throw new GatrixError('Store product not found', 404);
       }
 
-      return this.getStoreProductById(id, envId);
+      const product = await this.getStoreProductById(id, envId);
+
+      // Publish SDK event
+      try {
+        const env = await Environment.query().findById(envId);
+        await pubSubService.publishSDKEvent({
+          type: 'store_product.updated',
+          data: {
+            id,
+            environment: env?.environmentName,
+            timestamp: Date.now()
+          }
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish store product SDK event', { eventError, id });
+      }
+
+      return product;
     } catch (error: any) {
       if (error instanceof GatrixError) throw error;
       if (error.code === 'ER_DUP_ENTRY') {
@@ -370,6 +406,21 @@ class StoreProductService {
       if (result.affectedRows === 0) {
         throw new GatrixError('Store product not found', 404);
       }
+
+      // Publish SDK event
+      try {
+        const env = await Environment.query().findById(envId);
+        await pubSubService.publishSDKEvent({
+          type: 'store_product.updated',
+          data: {
+            id,
+            environment: env?.environmentName,
+            timestamp: Date.now()
+          }
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish store product SDK event', { eventError, id });
+      }
     } catch (error) {
       if (error instanceof GatrixError) throw error;
       logger.error('Failed to delete store product', { error, id });
@@ -397,6 +448,23 @@ class StoreProductService {
         `DELETE FROM g_store_products WHERE id IN (${placeholders}) AND environmentId = ?`,
         [...ids, envId]
       );
+
+      // Publish SDK event
+      if (result.affectedRows > 0) {
+        try {
+          const env = await Environment.query().findById(envId);
+          await pubSubService.publishSDKEvent({
+            type: 'store_product.updated',
+            data: {
+              id: ids.join(','),
+              environment: env?.environmentName,
+              timestamp: Date.now()
+            }
+          });
+        } catch (eventError) {
+          logger.warn('Failed to publish store product SDK event', { eventError, ids });
+        }
+      }
 
       return result.affectedRows;
     } catch (error) {
@@ -427,6 +495,23 @@ class StoreProductService {
         `UPDATE g_store_products SET isActive = ?, updatedBy = ?, updatedAt = NOW() WHERE id IN (${placeholders}) AND environmentId = ?`,
         [isActive ? 1 : 0, updatedBy || null, ...ids, envId]
       );
+
+      // Publish SDK event
+      if (result.affectedRows > 0) {
+        try {
+          const env = await Environment.query().findById(envId);
+          await pubSubService.publishSDKEvent({
+            type: 'store_product.updated',
+            data: {
+              id: ids.join(','),
+              environment: env?.environmentName,
+              timestamp: Date.now()
+            }
+          });
+        } catch (eventError) {
+          logger.warn('Failed to publish store product SDK event', { eventError, ids });
+        }
+      }
 
       return result.affectedRows;
     } catch (error) {

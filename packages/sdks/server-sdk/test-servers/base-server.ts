@@ -359,16 +359,16 @@ export class BaseTestServer {
       this.log(`Service Discovery API: ${allServices.length} total services`);
 
       // Get services by service type
-      const authServices = await this.sdk.fetchServices({ serviceType: 'authd' });
+      const authServices = await this.sdk.fetchServices({ service: 'authd' });
       this.log(`  - authd: ${authServices.length} instances`);
 
-      const lobbydServices = await this.sdk.fetchServices({ serviceType: 'lobbyd' });
+      const lobbydServices = await this.sdk.fetchServices({ service: 'lobbyd' });
       this.log(`  - lobbyd: ${lobbydServices.length} instances`);
 
-      const chatdServices = await this.sdk.fetchServices({ serviceType: 'chatd' });
+      const chatdServices = await this.sdk.fetchServices({ service: 'chatd' });
       this.log(`  - chatd: ${chatdServices.length} instances`);
 
-      const worlddServices = await this.sdk.fetchServices({ serviceType: 'worldd' });
+      const worlddServices = await this.sdk.fetchServices({ service: 'worldd' });
       this.log(`  - worldd: ${worlddServices.length} instances`);
 
       // Get services by group

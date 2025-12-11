@@ -257,11 +257,12 @@ export class ServiceDiscoveryService {
 
   /**
    * Fetch services with filtering via Backend API
-   * GET /api/v1/server/services?serviceType=world&serviceGroup=kr&status=ready&env=prod
+   * GET /api/v1/server/services?serviceType=world&group=kr&environment=prod&status=ready
    *
    * Supports filtering by:
-   * - serviceType: labels.service
-   * - serviceGroup: labels.group
+   * - service: labels.service
+   * - group: labels.group
+   * - environment: labels.environment
    * - status: service status
    * - Any custom label key-value pairs
    */
@@ -270,12 +271,16 @@ export class ServiceDiscoveryService {
 
     const queryParams: any = {};
 
-    if (params?.serviceType) {
-      queryParams.serviceType = params.serviceType;
+    if (params?.service) {
+      queryParams.serviceType = params.service;
     }
 
-    if (params?.serviceGroup) {
-      queryParams.group = params.serviceGroup;
+    if (params?.group) {
+      queryParams.group = params.group;
+    }
+
+    if (params?.environment) {
+      queryParams.environment = params.environment;
     }
 
     if (params?.status) {

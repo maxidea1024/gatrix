@@ -311,6 +311,11 @@ export const SERVER_SDK_ETAG = {
    * Banners for server SDK (Edge)
    */
   BANNERS: 'server_sdk:etag:banners',
+
+  /**
+   * Store products for server SDK
+   */
+  STORE_PRODUCTS: 'server_sdk:etag:store_products',
 } as const;
 
 /**
@@ -570,4 +575,9 @@ export const DEFAULT_CONFIG = {
    * 배너 TTL (Server SDK용 - Edge)
    */
   BANNER_TTL: TTL.FIVE_MINUTES,
+
+  /**
+   * 스토어 상품 TTL (Server SDK용)
+   */
+  STORE_PRODUCT_TTL: TTL.FIVE_MINUTES,
 } as const;

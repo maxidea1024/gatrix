@@ -121,12 +121,13 @@ router.get('/client-version', async (req: Request, res: Response) => {
       });
     }
 
-    // Get environment ID from header (Edge-specific)
-    const environmentId = req.headers['x-environment-id'] as string;
-    if (!environmentId) {
+    // Get environment from header (Edge-specific)
+    // 'environment' is the standard external identifier (value is environmentName)
+    const environment = req.headers['x-environment'] as string;
+    if (!environment) {
       return res.status(400).json({
         success: false,
-        message: 'x-environment-id header is required',
+        message: 'x-environment header is required',
       });
     }
 
@@ -144,13 +145,8 @@ router.get('/client-version', async (req: Request, res: Response) => {
       statusFilter = upperStatus;
     }
 
-    // Get all client versions from cache
-    const allVersions = sdk.getClientVersions() as ClientVersion[];
-
-    // Filter by environment
-    const envVersions = allVersions.filter(
-      (v) => v.environmentId === environmentId
-    );
+    // Get client versions from cache for this environment
+    const envVersions = sdk.getClientVersions(environment) as ClientVersion[];
 
     // Filter by platform
     const platformVersions = envVersions.filter(
@@ -223,7 +219,7 @@ router.get('/client-version', async (req: Request, res: Response) => {
     }
 
     logger.debug('Client version retrieved', {
-      environmentId,
+      environment,
       platform,
       version: record.clientVersion,
     });
@@ -352,7 +348,7 @@ router.get('/cache-stats', async (_req: Request, res: Response) => {
  * GET /api/v1/client/test
  */
 router.get('/test', clientAuth, (req: ClientRequest, res: Response) => {
-  const { applicationName, environmentId } = req.clientContext!;
+  const { applicationName, environment } = req.clientContext!;
 
   res.json({
     success: true,
@@ -361,7 +357,7 @@ router.get('/test', clientAuth, (req: ClientRequest, res: Response) => {
       tokenId: 'edge-token', // Edge doesn't have token ID
       tokenName: applicationName,
       tokenType: 'client',
-      environmentId,
+      environment,
       timestamp: new Date().toISOString(),
     },
   });
@@ -376,15 +372,10 @@ router.get('/banners', clientAuth, async (req: ClientRequest, res: Response) => 
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const { environmentId } = req.clientContext!;
+    const { environment } = req.clientContext!;
 
-    // Get all banners from cache
-    const allBanners = sdk.getBanners() as Banner[];
-
-    // Filter by environment
-    const envBanners = allBanners.filter(
-      (b) => b.environmentId === environmentId
-    );
+    // Get banners from cache for this environment
+    const envBanners = sdk.getBanners(environment) as Banner[];
 
     // Record cache hit/miss
     if (envBanners.length > 0) {
@@ -406,7 +397,7 @@ router.get('/banners', clientAuth, async (req: ClientRequest, res: Response) => 
     }));
 
     logger.debug('Banners retrieved', {
-      environmentId,
+      environment,
       count: clientBanners.length,
     });
 
@@ -439,15 +430,13 @@ router.get('/banners/:bannerId', clientAuth, async (req: ClientRequest, res: Res
     if (!sdk) return;
 
     const { bannerId } = req.params;
-    const { environmentId } = req.clientContext!;
+    const { environment } = req.clientContext!;
 
-    // Get all banners from cache
-    const allBanners = sdk.getBanners() as Banner[];
+    // Get banners from cache for this environment
+    const envBanners = sdk.getBanners(environment) as Banner[];
 
     // Find the specific banner
-    const banner = allBanners.find(
-      (b) => b.bannerId === bannerId && b.environmentId === environmentId
-    );
+    const banner = envBanners.find((b) => b.bannerId === bannerId);
 
     if (!banner) {
       return res.status(404).json({
@@ -472,7 +461,7 @@ router.get('/banners/:bannerId', clientAuth, async (req: ClientRequest, res: Res
     };
 
     logger.debug('Banner retrieved', {
-      environmentId,
+      environment,
       bannerId,
     });
 
@@ -508,15 +497,10 @@ router.get('/versions', clientAuth, async (req: ClientRequest, res: Response) =>
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const { environmentId, platform } = req.clientContext!;
+    const { environment, platform } = req.clientContext!;
 
-    // Get all client versions from cache
-    const allVersions = sdk.getClientVersions() as ClientVersion[];
-
-    // Filter by environment
-    const envVersions = allVersions.filter(
-      (v) => v.environmentId === environmentId
-    );
+    // Get client versions from cache for this environment
+    const envVersions = sdk.getClientVersions(environment) as ClientVersion[];
 
     // Optionally filter by platform
     let filteredVersions = envVersions;
@@ -534,7 +518,7 @@ router.get('/versions', clientAuth, async (req: ClientRequest, res: Response) =>
     }
 
     logger.debug('Client versions retrieved', {
-      environmentId,
+      environment,
       platform,
       count: filteredVersions.length,
     });
@@ -567,15 +551,10 @@ router.get('/notices', clientAuth, async (req: ClientRequest, res: Response) => 
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const { environmentId, platform } = req.clientContext!;
+    const { environment, platform } = req.clientContext!;
 
-    // Get all service notices from cache
-    const allNotices = sdk.getServiceNotices();
-
-    // Filter by environment
-    const envNotices = allNotices.filter(
-      (n: { environmentId?: string }) => n.environmentId === environmentId
-    );
+    // Get service notices from cache for this environment
+    const envNotices = sdk.getServiceNotices(environment);
 
     // Optionally filter by platform
     let filteredNotices = envNotices;
@@ -593,7 +572,7 @@ router.get('/notices', clientAuth, async (req: ClientRequest, res: Response) => 
     }
 
     logger.debug('Service notices retrieved', {
-      environmentId,
+      environment,
       platform,
       count: filteredNotices.length,
     });

@@ -69,6 +69,7 @@ export interface FeaturesConfig {
   clientVersion?: boolean; // Client version caching (default: false)
   serviceNotice?: boolean; // Service notice caching (default: false)
   banner?: boolean; // Banner caching (default: false)
+  storeProduct?: boolean; // Store product caching (default: false)
 }
 
 /**

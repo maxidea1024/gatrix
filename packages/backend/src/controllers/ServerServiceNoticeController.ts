@@ -33,10 +33,27 @@ export class ServerServiceNoticeController {
         ttlMs: DEFAULT_CONFIG.SERVICE_NOTICE_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          let notices: any[] = [];
+          // Helper function to filter active notices by time window
+          const filterActiveNotices = (notices: any[]) => {
+            const now = new Date();
+            return notices.filter((notice: any) => {
+              if (notice.startDate) {
+                const startDate = new Date(notice.startDate);
+                if (now < startDate) return false;
+              }
+              if (notice.endDate) {
+                const endDate = new Date(notice.endDate);
+                if (now > endDate) return false;
+              }
+              return true;
+            });
+          };
 
           if (environments.length > 0) {
-            // Multi-environment mode: fetch from all specified environments
+            // Multi-environment mode: return data grouped by environment
+            const byEnvironment: Record<string, any[]> = {};
+            let totalCount = 0;
+
             for (const envParam of environments) {
               // Try to find environment by ID or Name
               let env = await Environment.query().findById(envParam);
@@ -51,55 +68,47 @@ export class ServerServiceNoticeController {
                   { environmentId: env.id, isActive: true }
                 );
 
-                // Add environmentId and environmentName to each notice for client grouping
-                const noticesWithEnv = result.notices.map((n: any) => ({
-                  ...n,
-                  environmentId: env!.id,
-                  environmentName: env!.environmentName,
-                }));
-                notices.push(...noticesWithEnv);
+                const activeNotices = filterActiveNotices(result.notices);
+                // Store by environmentName (the standard external identifier)
+                byEnvironment[env.environmentName] = activeNotices;
+                totalCount += activeNotices.length;
               } else {
                 logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
               }
             }
+
+            logger.info(
+              `Server SDK: Retrieved ${totalCount} active service notices across ${Object.keys(byEnvironment).length} environments`,
+              { environments }
+            );
+
+            return {
+              success: true,
+              data: {
+                byEnvironment,
+                total: totalCount,
+              },
+            };
           } else {
-            // Single-environment mode: use current environment (via context)
+            // Single-environment mode: return flat array
             const result = await ServiceNoticeService.getServiceNotices(
               1,
               1000,
               { isActive: true }
             );
-            notices = result.notices;
+
+            const activeNotices = filterActiveNotices(result.notices);
+
+            logger.info(`Server SDK: Retrieved ${activeNotices.length} active service notices`);
+
+            return {
+              success: true,
+              data: {
+                notices: activeNotices,
+                total: activeNotices.length,
+              },
+            };
           }
-
-          // Filter out expired notices
-          const now = new Date();
-          const activeNotices = notices.filter((notice: any) => {
-            // Check if not started yet
-            if (notice.startDate) {
-              const startDate = new Date(notice.startDate);
-              if (now < startDate) return false;
-            }
-            // Check if already ended
-            if (notice.endDate) {
-              const endDate = new Date(notice.endDate);
-              if (now > endDate) return false;
-            }
-            return true;
-          });
-
-          logger.info(
-            `Server SDK: Retrieved ${activeNotices.length} active service notices`,
-            { environments: environments.length > 0 ? environments : 'current' }
-          );
-
-          return {
-            success: true,
-            data: {
-              notices: activeNotices,
-              total: activeNotices.length,
-            },
-          };
         },
       });
     } catch (error) {

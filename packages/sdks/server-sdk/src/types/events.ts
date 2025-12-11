@@ -29,8 +29,11 @@ export type StandardEventType =
 export interface StandardEventData {
   id: number | string;
   timestamp: number;
-  environmentId?: string; // Optional environment ID
-  environmentName?: string; // Optional environment Name
+  /**
+   * Environment identifier (environmentName value).
+   * This is the standard external identifier for environments.
+   */
+  environment?: string;
   isVisible?: boolean | number; // For gameworld.updated, popup.updated events (MySQL returns 0/1)
   isActive?: boolean | number;  // For survey.updated events (MySQL returns 0/1)
   isMaintenance?: boolean; // For maintenance.settings.updated events

@@ -299,23 +299,29 @@ router.post('/status', serverSDKAuth, async (req: any, res: any) => {
 
 /**
  * Get services with filtering
- * GET /api/v1/server/services?serviceType=world&group=kr&status=ready&excludeSelf=true
+ * GET /api/v1/server/services?serviceType=world&group=kr&environment=prod&status=ready&excludeSelf=true
  *
  * Query parameters:
  * - serviceType: Filter by labels.service (e.g., 'world', 'auth', 'lobby')
  * - group: Filter by labels.group (e.g., 'kr', 'us', 'production')
+ * - environment: Filter by labels.environment (e.g., 'development', 'production')
  * - status: Filter by status (e.g., 'ready', 'terminated')
  * - excludeSelf: Exclude self instance (default: true)
- * - Any label key: Filter by label value (e.g., env=prod, region=ap-northeast-2)
+ * - Any label key: Filter by label value (e.g., region=ap-northeast-2)
  */
 router.get('/', serverSDKAuth, async (req: any, res: any) => {
   try {
-    const { serviceType, group, status, excludeSelf, ...otherLabels } = req.query;
+    const { serviceType, group, environment, status, excludeSelf, ...otherLabels } = req.query;
 
     // Get all services or services of a specific type and/or group
     let services = await serviceDiscoveryService.getServices(serviceType as string, group as string);
 
-    // Filter by other labels (e.g., env=prod, region=ap-northeast-2)
+    // Filter by environment
+    if (environment) {
+      services = services.filter((s: any) => s.labels.environment === environment);
+    }
+
+    // Filter by other labels (e.g., region=ap-northeast-2)
     for (const [key, value] of Object.entries(otherLabels)) {
       if (value) {
         services = services.filter((s: any) => s.labels[key] === value);

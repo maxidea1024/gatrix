@@ -146,17 +146,16 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (banner.environmentId) {
           const env = await Environment.query().findById(banner.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
           type: 'banner.updated',
           data: {
             id: banner.bannerId,
-            environmentId: banner.environmentId,
-            environmentName: envName,
+            environment,
             timestamp: Date.now()
           }
         });
@@ -205,17 +204,16 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (banner.environmentId) {
           const env = await Environment.query().findById(banner.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
           type: 'banner.updated',
           data: {
             id: banner.bannerId,
-            environmentId: banner.environmentId,
-            environmentName: envName,
+            environment,
             timestamp: Date.now()
           }
         });
@@ -253,17 +251,16 @@ class BannerService {
 
       // Publish SDK Event (Deletion)
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (banner.environmentId) {
           const env = await Environment.query().findById(banner.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
           type: 'banner.updated',
           data: {
             id: bannerId,
-            environmentId: banner.environmentId,
-            environmentName: envName,
+            environment,
             timestamp: Date.now()
           }
         });
@@ -296,17 +293,16 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (banner.environmentId) {
           const env = await Environment.query().findById(banner.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
           type: 'banner.updated',
           data: {
             id: banner.bannerId,
-            environmentId: banner.environmentId,
-            environmentName: envName,
+            environment,
             timestamp: Date.now()
           }
         });
@@ -340,17 +336,16 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (banner.environmentId) {
           const env = await Environment.query().findById(banner.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
           type: 'banner.updated',
           data: {
             id: banner.bannerId,
-            environmentId: banner.environmentId,
-            environmentName: envName,
+            environment,
             timestamp: Date.now()
           }
         });

@@ -5,7 +5,11 @@ export interface ClientRequest extends Request {
   clientContext?: {
     apiToken: string;
     applicationName: string;
-    environmentId: string;
+    /**
+     * Environment identifier (environmentName value).
+     * This is the standard external identifier for environments.
+     */
+    environment: string;
     clientVersion?: string;
     platform?: string;
   };
@@ -18,7 +22,7 @@ export interface ClientRequest extends Request {
 export function clientAuth(req: ClientRequest, res: Response, next: NextFunction): void {
   const apiToken = req.headers['x-api-token'] as string;
   const applicationName = req.headers['x-application-name'] as string;
-  const environmentId = req.headers['x-environment-id'] as string;
+  const environment = req.headers['x-environment'] as string;
   const clientVersion = req.headers['x-client-version'] as string | undefined;
   const platform = req.headers['x-platform'] as string | undefined;
 
@@ -45,12 +49,12 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     return;
   }
 
-  if (!environmentId) {
+  if (!environment) {
     res.status(401).json({
       success: false,
       error: {
-        code: 'MISSING_ENVIRONMENT_ID',
-        message: 'x-environment-id header is required',
+        code: 'MISSING_ENVIRONMENT',
+        message: 'x-environment header is required',
       },
     });
     return;
@@ -64,14 +68,14 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
   req.clientContext = {
     apiToken,
     applicationName,
-    environmentId,
+    environment,
     clientVersion,
     platform,
   };
 
   logger.debug('Client authenticated', {
     applicationName,
-    environmentId,
+    environment,
     clientVersion,
     platform,
   });

@@ -35,6 +35,7 @@ import {
   ClientVersion,
   ServiceNotice,
   Banner,
+  StoreProduct,
 } from './types/api';
 
 /**
@@ -991,14 +992,16 @@ export class GatrixServerSDK {
   /**
    * Get cached client versions
    * Only available when features.clientVersion is enabled
-   * @param environmentId Only used in multi-environment mode (Edge)
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getClientVersions(environmentId?: string): ClientVersion[] {
+  getClientVersions(environment?: string): ClientVersion[] {
     if (!this.cacheManager) {
       this.logger.warn('SDK not initialized');
       return [];
     }
-    return this.cacheManager.getClientVersions(environmentId);
+    return this.cacheManager.getClientVersions(environment);
   }
 
   /**
@@ -1016,14 +1019,16 @@ export class GatrixServerSDK {
   /**
    * Get cached service notices
    * Only available when features.serviceNotice is enabled
-   * @param environmentId Only used in multi-environment mode (Edge)
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getServiceNotices(environmentId?: string): ServiceNotice[] {
+  getServiceNotices(environment?: string): ServiceNotice[] {
     if (!this.cacheManager) {
       this.logger.warn('SDK not initialized');
       return [];
     }
-    return this.cacheManager.getServiceNotices(environmentId);
+    return this.cacheManager.getServiceNotices(environment);
   }
 
   /**
@@ -1041,14 +1046,16 @@ export class GatrixServerSDK {
   /**
    * Get cached banners
    * Only available when features.banner is enabled
-   * @param environmentId Only used in multi-environment mode (Edge)
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getBanners(environmentId?: string): Banner[] {
+  getBanners(environment?: string): Banner[] {
     if (!this.cacheManager) {
       this.logger.warn('SDK not initialized');
       return [];
     }
-    return this.cacheManager.getBanners(environmentId);
+    return this.cacheManager.getBanners(environment);
   }
 
   /**
@@ -1057,6 +1064,32 @@ export class GatrixServerSDK {
    */
   getBannerService() {
     return this.cacheManager?.getBannerService();
+  }
+
+  // ============================================================================
+  // Store Product Methods
+  // ============================================================================
+
+  /**
+   * Get cached store products
+   * Only available when features.storeProduct is enabled
+   * @param environment Environment name. Only used in multi-environment mode.
+   *                    For game servers, can be omitted to use default environment.
+   */
+  getStoreProducts(environment?: string): StoreProduct[] {
+    if (!this.cacheManager) {
+      this.logger.warn('SDK not initialized');
+      return [];
+    }
+    return this.cacheManager.getStoreProducts(environment);
+  }
+
+  /**
+   * Get StoreProductService for advanced operations
+   * Returns undefined if features.storeProduct is not enabled
+   */
+  getStoreProductService() {
+    return this.cacheManager?.getStoreProductService();
   }
 
   // ============================================================================

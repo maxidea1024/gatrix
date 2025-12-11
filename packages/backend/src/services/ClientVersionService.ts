@@ -297,19 +297,17 @@ export class ClientVersionService {
 
     // Publish event
     try {
-      let envName: string | undefined;
-      // result is ClientVersionAttributes, check environmentId
+      let environment: string | undefined;
       if (result.environmentId) {
         const env = await Environment.query().findById(result.environmentId);
-        envName = env?.environmentName;
+        environment = env?.environmentName;
       }
 
       await pubSubService.publishSDKEvent({
         type: 'client_version.updated',
         data: {
           id: result.id,
-          environmentId: result.environmentId,
-          environmentName: envName,
+          environment,
           timestamp: Date.now()
         }
       });
@@ -421,18 +419,17 @@ export class ClientVersionService {
     // Publish event
     if (updatedClientVersion) {
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (updatedClientVersion.environmentId) {
           const env = await Environment.query().findById(updatedClientVersion.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
 
         await pubSubService.publishSDKEvent({
           type: 'client_version.updated',
           data: {
             id: updatedClientVersion.id,
-            environmentId: updatedClientVersion.environmentId,
-            environmentName: envName,
+            environment,
             timestamp: Date.now()
           }
         });

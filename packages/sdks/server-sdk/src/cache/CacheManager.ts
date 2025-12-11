@@ -13,9 +13,10 @@ import { ServiceMaintenanceService } from '../services/ServiceMaintenanceService
 import { ClientVersionService } from '../services/ClientVersionService';
 import { ServiceNoticeService } from '../services/ServiceNoticeService';
 import { BannerService } from '../services/BannerService';
+import { StoreProductService } from '../services/StoreProductService';
 import { ApiClient } from '../client/ApiClient';
 import { SdkMetrics } from '../utils/sdkMetrics';
-import { MaintenanceStatus, ClientVersion, ServiceNotice, Banner } from '../types/api';
+import { MaintenanceStatus, ClientVersion, ServiceNotice, Banner, StoreProduct } from '../types/api';
 import { sleep } from '../utils/time';
 import { MaintenanceWatcher, MaintenanceEventCallback } from './MaintenanceWatcher';
 
@@ -32,6 +33,7 @@ export class CacheManager {
   private clientVersionService?: ClientVersionService;
   private serviceNoticeService?: ServiceNoticeService;
   private bannerService?: BannerService;
+  private storeProductService?: StoreProductService;
   private apiClient: ApiClient;
   private refreshInterval?: NodeJS.Timeout;
   private refreshCallbacks: Array<(type: string, data: any) => void> = [];
@@ -79,6 +81,9 @@ export class CacheManager {
     }
     if (this.features.banner === true) {
       this.bannerService = bannerService || new BannerService(apiClient, logger, targetEnvs);
+    }
+    if (this.features.storeProduct === true) {
+      this.storeProductService = new StoreProductService(apiClient, logger, targetEnvs);
     }
 
     this.apiClient = apiClient;
@@ -212,6 +217,16 @@ export class CacheManager {
           })
         );
         featureTypes.push('banner');
+      }
+
+      if (this.features.storeProduct === true && this.storeProductService) {
+        promises.push(
+          this.storeProductService.list().catch((error) => {
+            this.logger.warn('Failed to load store products', { error: error.message });
+            return [];
+          })
+        );
+        featureTypes.push('storeProduct');
       }
 
       // Load all enabled features in parallel
@@ -374,6 +389,15 @@ export class CacheManager {
         refreshedTypes.push('banner');
       }
 
+      if (this.features.storeProduct === true && this.storeProductService) {
+        promises.push(
+          this.storeProductService.refresh().catch((error) => {
+            this.logger.warn('Failed to refresh store products', { error: error.message });
+          })
+        );
+        refreshedTypes.push('storeProduct');
+      }
+
       await Promise.all(promises);
 
       try {
@@ -476,6 +500,10 @@ export class CacheManager {
       surveys: this.surveyService.getCached(),
       whitelists: this.whitelistService.getCached(),
       serviceMaintenance: this.serviceMaintenanceService.getCached(),
+      clientVersions: this.clientVersionService?.getAllCached() || {},
+      serviceNotices: this.serviceNoticeService?.getAllCached() || {},
+      banners: this.bannerService?.getAllCached() || {},
+      storeProducts: this.storeProductService?.getAllCached() || {},
     };
   }
 
@@ -617,26 +645,32 @@ export class CacheManager {
 
   /**
    * Get cached client versions
-   * @param environmentId Only used in multi-environment mode (Edge)
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getClientVersions(environmentId?: string): ClientVersion[] {
-    return this.clientVersionService?.getCached(environmentId) || [];
+  getClientVersions(environment?: string): ClientVersion[] {
+    return this.clientVersionService?.getCached(environment) || [];
   }
 
   /**
    * Get cached service notices
-   * @param environmentId Only used in multi-environment mode (Edge)
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getServiceNotices(environmentId?: string): ServiceNotice[] {
-    return this.serviceNoticeService?.getCached(environmentId) || [];
+  getServiceNotices(environment?: string): ServiceNotice[] {
+    return this.serviceNoticeService?.getCached(environment) || [];
   }
 
   /**
    * Get cached banners
-   * @param environmentId Only used in multi-environment mode (Edge)
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getBanners(environmentId?: string): Banner[] {
-    return this.bannerService?.getCached(environmentId) || [];
+  getBanners(environment?: string): Banner[] {
+    return this.bannerService?.getCached(environment) || [];
   }
 
   /**
@@ -660,6 +694,22 @@ export class CacheManager {
     return this.bannerService;
   }
 
+  /**
+   * Get cached store products
+   * @param environment Environment name. Only used in multi-environment mode.
+   *                    For game servers, can be omitted to use default environment.
+   */
+  getStoreProducts(environment?: string): StoreProduct[] {
+    return this.storeProductService?.getCached(environment) || [];
+  }
+
+  /**
+   * Get StoreProductService instance (for advanced usage)
+   */
+  getStoreProductService(): StoreProductService | undefined {
+    return this.storeProductService;
+  }
+
   // ==================== CACHE MANAGEMENT ====================
 
   /**
@@ -672,7 +722,12 @@ export class CacheManager {
     this.surveyService.updateCache([]);
     this.whitelistService.updateCache({ ipWhitelist: [], accountWhitelist: [] });
     this.serviceMaintenanceService.updateCache(null);
-    // Note: New services use Map internally, no need to clear explicitly
+
+    // Clear new multi-env services
+    this.clientVersionService?.clearCache();
+    this.serviceNoticeService?.clearCache();
+    this.bannerService?.clearCache();
+    this.storeProductService?.clearCache();
   }
 
   /**

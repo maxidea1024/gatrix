@@ -255,6 +255,7 @@ export class EventListener {
       'client_version.updated',
       'banner.updated',
       'service_notice.updated',
+      'store_product.updated',
     ].includes(type);
   }
 
@@ -353,7 +354,7 @@ export class EventListener {
       case 'client_version.updated':
         this.logger.info('Client version updated event received, refreshing client version cache', {
           id: event.data.id,
-          environment: event.data.environmentName || event.data.environmentId
+          environment: event.data.environment
         });
         try {
           await this.cacheManager.getClientVersionService()?.refresh();
@@ -366,7 +367,7 @@ export class EventListener {
       case 'banner.updated':
         this.logger.info('Banner updated event received, refreshing banner cache', {
           id: event.data.id,
-          environment: event.data.environmentName || event.data.environmentId
+          environment: event.data.environment
         });
         try {
           await this.cacheManager.getBannerService()?.refresh();
@@ -379,13 +380,26 @@ export class EventListener {
       case 'service_notice.updated':
         this.logger.info('Service notice updated event received, refreshing service notice cache', {
           id: event.data.id,
-          environment: event.data.environmentName || event.data.environmentId
+          environment: event.data.environment
         });
         try {
           await this.cacheManager.getServiceNoticeService()?.refresh();
           this.logger.info('Service notice cache refreshed successfully');
         } catch (error: any) {
           this.logger.error('Failed to refresh service notice cache', { error: error.message });
+        }
+        break;
+
+      case 'store_product.updated':
+        this.logger.info('Store product updated event received, refreshing store product cache', {
+          id: event.data.id,
+          environment: event.data.environment
+        });
+        try {
+          await this.cacheManager.getStoreProductService()?.refresh();
+          this.logger.info('Store product cache refreshed successfully');
+        } catch (error: any) {
+          this.logger.error('Failed to refresh store product cache', { error: error.message });
         }
         break;
 

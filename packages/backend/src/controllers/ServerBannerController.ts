@@ -33,10 +33,11 @@ export class ServerBannerController {
         ttlMs: DEFAULT_CONFIG.BANNER_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          let banners: any[] = [];
-
           if (environments.length > 0) {
-            // Multi-environment mode: fetch from all specified environments
+            // Multi-environment mode: return data grouped by environment
+            const byEnvironment: Record<string, any[]> = {};
+            let totalCount = 0;
+
             for (const envParam of environments) {
               // Try to find environment by ID or Name
               let env = await Environment.query().findById(envParam);
@@ -46,35 +47,40 @@ export class ServerBannerController {
 
               if (env) {
                 const envBanners = await BannerModel.findPublished(env.id);
-
-                // Add environmentId and environmentName to each banner for client grouping
-                const bannersWithEnv = envBanners.map((b: any) => ({
-                  ...b,
-                  environmentId: env!.id,
-                  environmentName: env!.environmentName,
-                }));
-                banners.push(...bannersWithEnv);
+                // Store by environmentName (the standard external identifier)
+                byEnvironment[env.environmentName] = envBanners;
+                totalCount += envBanners.length;
               } else {
                 logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
               }
             }
+
+            logger.info(
+              `Server SDK: Retrieved ${totalCount} published banners across ${Object.keys(byEnvironment).length} environments`,
+              { environments }
+            );
+
+            return {
+              success: true,
+              data: {
+                byEnvironment,
+                total: totalCount,
+              },
+            };
           } else {
-            // Single-environment mode: use current environment (via context)
-            banners = await BannerModel.findPublished();
+            // Single-environment mode: return flat array
+            const banners = await BannerModel.findPublished();
+
+            logger.info(`Server SDK: Retrieved ${banners.length} published banners`);
+
+            return {
+              success: true,
+              data: {
+                banners,
+                total: banners.length,
+              },
+            };
           }
-
-          logger.info(
-            `Server SDK: Retrieved ${banners.length} published banners`,
-            { environments: environments.length > 0 ? environments : 'current' }
-          );
-
-          return {
-            success: true,
-            data: {
-              banners: banners,
-              total: banners.length,
-            },
-          };
         },
       });
     } catch (error) {

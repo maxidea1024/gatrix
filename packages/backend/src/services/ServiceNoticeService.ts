@@ -278,14 +278,11 @@ class ServiceNoticeService {
     // Publish SDK Event
     try {
       const env = await Environment.query().findById(envId);
-      const envName = env?.environmentName;
-
       await pubSubService.publishSDKEvent({
         type: 'service_notice.updated',
         data: {
           id: notice.id,
-          environmentId: envId,
-          environmentName: envName,
+          environment: env?.environmentName,
           timestamp: Date.now()
         }
       });
@@ -376,14 +373,11 @@ class ServiceNoticeService {
     // Publish SDK Event
     try {
       const env = await Environment.query().findById(envId);
-      const envName = env?.environmentName;
-
       await pubSubService.publishSDKEvent({
         type: 'service_notice.updated',
         data: {
           id: notice.id,
-          environmentId: envId,
-          environmentName: envName,
+          environment: env?.environmentName,
           timestamp: Date.now()
         }
       });
@@ -405,14 +399,11 @@ class ServiceNoticeService {
     // Publish SDK Event (Deletion)
     try {
       const env = await Environment.query().findById(envId);
-      const envName = env?.environmentName;
-
       await pubSubService.publishSDKEvent({
         type: 'service_notice.updated',
         data: {
           id: id,
-          environmentId: envId,
-          environmentName: envName,
+          environment: env?.environmentName,
           timestamp: Date.now()
         }
       });
@@ -438,14 +429,11 @@ class ServiceNoticeService {
     // Publish SDK Event (Deletion)
     try {
       const env = await Environment.query().findById(envId);
-      const envName = env?.environmentName;
-
       await pubSubService.publishSDKEvent({
         type: 'service_notice.updated',
         data: {
-          timestamp: Date.now(),
-          environmentId: envId,
-          environmentName: envName
+          environment: env?.environmentName,
+          timestamp: Date.now()
         }
       });
     } catch (err) {
@@ -472,14 +460,11 @@ class ServiceNoticeService {
     // Publish SDK Event
     try {
       const env = await Environment.query().findById(envId);
-      const envName = env?.environmentName;
-
       await pubSubService.publishSDKEvent({
         type: 'service_notice.updated',
         data: {
           id: notice.id,
-          environmentId: envId,
-          environmentName: envName,
+          environment: env?.environmentName,
           timestamp: Date.now()
         }
       });

@@ -25,8 +25,10 @@ export class ServerClientVersionController {
   static async getClientVersions(req: SDKRequest, res: Response) {
     try {
       // Parse environments query parameter
+      // '*' means all environments
       const environmentsParam = req.query.environments as string | undefined;
-      const environments = environmentsParam
+      const isAllEnvironments = environmentsParam === '*';
+      const environments = environmentsParam && !isAllEnvironments
         ? environmentsParam.split(',').map(e => e.trim()).filter(Boolean)
         : [];
 
@@ -35,77 +37,99 @@ export class ServerClientVersionController {
         ttlMs: DEFAULT_CONFIG.CLIENT_VERSION_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          let clientVersions: any[] = [];
+          // All environments mode or specific environments mode
+          if (isAllEnvironments || environments.length > 0) {
+            const byEnvironment: Record<string, any[]> = {};
+            let totalCount = 0;
 
-          if (environments.length > 0) {
-            // Multi-environment mode: fetch from all specified environments
-            for (const envParam of environments) {
-              // Try to find environment by ID or Name
-              let env = await Environment.query().findById(envParam);
-              if (!env) {
-                env = await Environment.getByName(envParam);
-              }
-
-              if (env) {
-                const result = await ClientVersionModel.findAll({
-                  environmentId: env.id,
-                  limit: 1000,
-                  offset: 0,
-                  sortBy: 'clientVersion',
-                  sortOrder: 'DESC',
-                });
-
-                // Add environmentId and environmentName to each version for client grouping
-                const versionsWithEnv = result.clientVersions.map((v: any) => ({
-                  ...v,
-                  environmentId: env!.id,
-                  environmentName: env!.environmentName,
-                }));
-                clientVersions.push(...versionsWithEnv);
-              } else {
-                logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
+            // Get target environments
+            let targetEnvs: any[];
+            if (isAllEnvironments) {
+              // Fetch all environments
+              targetEnvs = await Environment.query().where('isActive', true);
+            } else {
+              // Fetch specific environments
+              targetEnvs = [];
+              for (const envParam of environments) {
+                let env = await Environment.query().findById(envParam);
+                if (!env) {
+                  env = await Environment.getByName(envParam);
+                }
+                if (env) {
+                  targetEnvs.push(env);
+                } else {
+                  logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
+                }
               }
             }
+
+            for (const env of targetEnvs) {
+              const result = await ClientVersionModel.findAll({
+                environmentId: env.id,
+                limit: 1000,
+                offset: 0,
+                sortBy: 'clientVersion',
+                sortOrder: 'DESC',
+              });
+
+              // Fetch tags for each client version
+              const versionsWithTags = await Promise.all(
+                result.clientVersions.map(async (version: any) => {
+                  const tags = await TagService.listTagsForEntity('client_version', version.id);
+                  return {
+                    ...version,
+                    tags: tags || [],
+                  };
+                }),
+              );
+
+              // Store by environmentName (the standard external identifier)
+              byEnvironment[env.environmentName] = versionsWithTags;
+              totalCount += versionsWithTags.length;
+            }
+
+            logger.info(
+              `Server SDK: Retrieved ${totalCount} client versions across ${Object.keys(byEnvironment).length} environments`,
+              { mode: isAllEnvironments ? 'all' : 'specific', environments: Object.keys(byEnvironment) }
+            );
+
+            return {
+              success: true,
+              data: {
+                byEnvironment,
+                total: totalCount,
+              },
+            };
           } else {
-            // Single-environment mode: use current environment (via context)
+            // Single-environment mode: return flat array
             const result = await ClientVersionModel.findAll({
               limit: 1000,
               offset: 0,
               sortBy: 'clientVersion',
               sortOrder: 'DESC',
             });
-            // Try to find environment info for current environment
-            // Since we don't have easy access to current env name here without extra query (it's in request context usually)
-            // We just return what we have. Most likely result.clientVersions items rely on their own fields.
-            // But ClientVersionModel.findAll usually filters by current env.
-            // We can try to attach environmentName if we can resolve it.
-            // But for single-env mode, SDK usually doesn't need to differentiate.
-            clientVersions = result.clientVersions;
+
+            // Fetch tags for each client version
+            const versionsWithTags = await Promise.all(
+              result.clientVersions.map(async (version: any) => {
+                const tags = await TagService.listTagsForEntity('client_version', version.id);
+                return {
+                  ...version,
+                  tags: tags || [],
+                };
+              }),
+            );
+
+            logger.info(`Server SDK: Retrieved ${versionsWithTags.length} client versions`);
+
+            return {
+              success: true,
+              data: {
+                clientVersions: versionsWithTags,
+                total: versionsWithTags.length,
+              },
+            };
           }
-
-          // Fetch tags for each client version
-          const versionsWithTags = await Promise.all(
-            clientVersions.map(async (version: any) => {
-              const tags = await TagService.listTagsForEntity('client_version', version.id);
-              return {
-                ...version,
-                tags: tags || [],
-              };
-            }),
-          );
-
-          logger.info(
-            `Server SDK: Retrieved ${versionsWithTags.length} client versions`,
-            { environments: environments.length > 0 ? environments : 'current' }
-          );
-
-          return {
-            success: true,
-            data: {
-              clientVersions: versionsWithTags,
-              total: versionsWithTags.length,
-            },
-          };
         },
       });
     } catch (error) {
