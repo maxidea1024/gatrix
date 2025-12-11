@@ -36,7 +36,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import storeProductService, { StoreProduct, SyncPreviewResult, SelectedSyncItems } from '../../services/storeProductService';
+import storeProductService, { StoreProduct, SyncPreviewResult, SelectedSyncItems, StoreProductStats } from '../../services/storeProductService';
 import { tagService } from '../../services/tagService';
 import SyncPreviewDialog, { SelectedSyncItems as DialogSelectedSyncItems } from '../../components/game/SyncPreviewDialog';
 import SimplePagination from '../../components/common/SimplePagination';
@@ -88,6 +88,9 @@ const StoreProductsPage: React.FC = () => {
   const [syncPreview, setSyncPreview] = useState<SyncPreviewResult | null>(null);
   const [syncLoading, setSyncLoading] = useState(false);
 
+  // Stats state
+  const [productStats, setProductStats] = useState<StoreProductStats>({ total: 0, active: 0, inactive: 0 });
+
   // Sorting state with localStorage persistence
   const [orderBy, setOrderBy] = useState<string>(() => {
     const saved = localStorage.getItem('storeProductsSortBy');
@@ -113,9 +116,13 @@ const StoreProductsPage: React.FC = () => {
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
     {
-      key: 'cmsProductId',
-      label: t('storeProducts.cmsProductId'),
-      type: 'number',
+      key: 'isActive',
+      label: t('storeProducts.isActive'),
+      type: 'select',
+      options: [
+        { value: 'true', label: t('common.active') },
+        { value: 'false', label: t('common.inactive') },
+      ],
     },
     {
       key: 'tags',
@@ -138,15 +145,6 @@ const StoreProductsPage: React.FC = () => {
         value,
         label,
       })),
-    },
-    {
-      key: 'isActive',
-      label: t('storeProducts.isActive'),
-      type: 'select',
-      options: [
-        { value: 'true', label: t('common.active') },
-        { value: 'false', label: t('common.inactive') },
-      ],
     },
     {
       key: 'currency',
@@ -173,8 +171,8 @@ const StoreProductsPage: React.FC = () => {
   // Default columns
   const defaultColumns: ColumnConfig[] = [
     { id: 'checkbox', labelKey: '', visible: true },
-    { id: 'cmsProductId', labelKey: 'storeProducts.cmsProductId', visible: true },
     { id: 'isActive', labelKey: 'storeProducts.isActive', visible: true },
+    { id: 'cmsProductId', labelKey: 'storeProducts.cmsProductId', visible: true },
     { id: 'productId', labelKey: 'storeProducts.productId', visible: true },
     { id: 'productName', labelKey: 'storeProducts.productName', visible: true },
     { id: 'store', labelKey: 'storeProducts.store', visible: true },
@@ -312,16 +310,15 @@ const StoreProductsPage: React.FC = () => {
     }
   };
 
-  // Calculate statistics from filtered products
-  const productStats = useMemo(() => {
-    const activeCount = products.filter(p => p.isActive).length;
-    const inactiveCount = products.filter(p => !p.isActive).length;
-    return {
-      total: products.length,
-      active: activeCount,
-      inactive: inactiveCount,
-    };
-  }, [products]);
+  // Load product statistics
+  const loadStats = async () => {
+    try {
+      const stats = await storeProductService.getStats();
+      setProductStats(stats);
+    } catch (error) {
+      console.error('Failed to load product stats:', error);
+    }
+  };
 
   // Save active filters to localStorage
   useEffect(() => {
@@ -339,10 +336,12 @@ const StoreProductsPage: React.FC = () => {
       }
     };
     loadTags();
+    loadStats();
   }, []);
 
   useEffect(() => {
     loadProducts();
+    loadStats();
   }, [page, rowsPerPage, debouncedSearchTerm, orderBy, order, activeFilters]);
 
   // Column handlers
@@ -440,6 +439,7 @@ const StoreProductsPage: React.FC = () => {
     setPage(0);
     setSelectedIds([]);
     await loadProducts();
+    loadStats();
   };
 
   // Sync handlers
@@ -470,6 +470,7 @@ const StoreProductsPage: React.FC = () => {
       setPage(0);
       setSelectedIds([]);
       await loadProducts();
+      loadStats();
     } catch (error: any) {
       console.error('Failed to apply sync:', error);
       enqueueSnackbar(error.message || t('storeProducts.syncApplyFailed'), { variant: 'error' });
@@ -496,6 +497,7 @@ const StoreProductsPage: React.FC = () => {
       enqueueSnackbar(t('storeProducts.deleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadProducts();
+      loadStats();
     } catch (error: any) {
       enqueueSnackbar(error.message || t('storeProducts.deleteFailed'), { variant: 'error' });
     } finally {
@@ -522,6 +524,7 @@ const StoreProductsPage: React.FC = () => {
       enqueueSnackbar(t('storeProducts.bulkDeleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadProducts();
+      loadStats();
     } catch (error: any) {
       enqueueSnackbar(error.message || t('storeProducts.bulkDeleteFailed'), { variant: 'error' });
     } finally {
@@ -533,6 +536,33 @@ const StoreProductsPage: React.FC = () => {
     setBulkDeleteConfirmOpen(false);
   };
 
+  // Bulk update active status
+  const handleBulkActivate = async () => {
+    if (selectedIds.length === 0) return;
+    try {
+      await storeProductService.bulkUpdateActiveStatus(selectedIds, true);
+      enqueueSnackbar(t('storeProducts.bulkActivateSuccess'), { variant: 'success' });
+      setSelectedIds([]);
+      loadProducts();
+      loadStats();
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('storeProducts.bulkActivateFailed'), { variant: 'error' });
+    }
+  };
+
+  const handleBulkDeactivate = async () => {
+    if (selectedIds.length === 0) return;
+    try {
+      await storeProductService.bulkUpdateActiveStatus(selectedIds, false);
+      enqueueSnackbar(t('storeProducts.bulkDeactivateSuccess'), { variant: 'success' });
+      setSelectedIds([]);
+      loadProducts();
+      loadStats();
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('storeProducts.bulkDeactivateFailed'), { variant: 'error' });
+    }
+  };
+
   // Toggle active status
   const handleToggleActive = async (product: StoreProduct) => {
     try {
@@ -542,6 +572,7 @@ const StoreProductsPage: React.FC = () => {
         { variant: 'success' }
       );
       loadProducts();
+      loadStats();
     } catch (error: any) {
       enqueueSnackbar(error.message || t('common.saveFailed'), { variant: 'error' });
     }
@@ -661,7 +692,7 @@ const StoreProductsPage: React.FC = () => {
                 onFilterChange={handleDynamicFilterChange}
                 onOperatorChange={handleOperatorChange}
                 afterFilterAddActions={
-                  <>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
                     <Tooltip title={t('common.columnSettings')}>
                       <IconButton
                         onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
@@ -677,19 +708,40 @@ const StoreProductsPage: React.FC = () => {
                         <ViewColumnIcon />
                       </IconButton>
                     </Tooltip>
-                    <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {t('storeProducts.statsTotal')}: <strong>{total}</strong>
-                      </Typography>
-                      <Typography variant="body2" color="success.main">
-                        {t('storeProducts.statsActive')}: <strong>{productStats.active}</strong>
-                      </Typography>
-                      <Typography variant="body2" color="text.disabled">
-                        {t('storeProducts.statsInactive')}: <strong>{productStats.inactive}</strong>
-                      </Typography>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        ml: 1,
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 1,
+                        bgcolor: 'background.paper',
+                        border: 1,
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'primary.main' }} />
+                        <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                          {t('storeProducts.statsTotal')} <strong style={{ color: 'inherit' }}>{productStats.total}</strong>
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
+                        <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                          {t('storeProducts.statsActive')} <strong style={{ color: 'inherit' }}>{productStats.active}</strong>
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'text.disabled' }} />
+                        <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                          {t('storeProducts.statsInactive')} <strong style={{ color: 'inherit' }}>{productStats.inactive}</strong>
+                        </Typography>
+                      </Box>
                     </Box>
-                  </>
+                  </Box>
                 }
               />
             </Box>
@@ -717,6 +769,22 @@ const StoreProductsPage: React.FC = () => {
           <Typography variant="body2" color="text.secondary">
             {t('common.selectedCount', { count: selectedIds.length })}
           </Typography>
+          <Button
+            variant="outlined"
+            color="success"
+            size="small"
+            onClick={handleBulkActivate}
+          >
+            {t('storeProducts.bulkActivate')}
+          </Button>
+          <Button
+            variant="outlined"
+            color="warning"
+            size="small"
+            onClick={handleBulkDeactivate}
+          >
+            {t('storeProducts.bulkDeactivate')}
+          </Button>
           <Button
             variant="outlined"
             color="error"
@@ -987,9 +1055,11 @@ const StoreProductsPage: React.FC = () => {
                                   </IconButton>
                                 </Tooltip>
                                 <Tooltip title={t('storeProducts.copyProduct')}>
-                                  <IconButton size="small" onClick={() => handleCopy(product)}>
-                                    <ContentCopyIcon fontSize="small" />
-                                  </IconButton>
+                                  <span>
+                                    <IconButton size="small" onClick={() => handleCopy(product)} disabled>
+                                      <ContentCopyIcon fontSize="small" />
+                                    </IconButton>
+                                  </span>
                                 </Tooltip>
                                 <Tooltip title={t('common.delete')}>
                                   <IconButton size="small" onClick={() => handleDelete(product)}>
@@ -1067,9 +1137,9 @@ const StoreProductsPage: React.FC = () => {
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>{t('storeProducts.cmsProductId')}</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>{t('storeProducts.productId')}</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>{t('storeProducts.productName')}</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>{t('storeProducts.cmsProductId')}</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>{t('storeProducts.productId')}</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', bgcolor: 'background.paper' }}>{t('storeProducts.productName')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

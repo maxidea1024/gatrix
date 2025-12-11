@@ -86,6 +86,12 @@ export interface GetCmsCashShopResponse {
   total: number;
 }
 
+export interface StoreProductStats {
+  total: number;
+  active: number;
+  inactive: number;
+}
+
 class StoreProductService {
   /**
    * Get all store products with pagination
@@ -94,6 +100,14 @@ class StoreProductService {
   async getStoreProducts(params?: GetStoreProductsParams): Promise<GetStoreProductsResponse> {
     const response = await api.get('/admin/store-products', { params });
     // response = { success, data: { products, total, page, limit }, message }
+    return response.data;
+  }
+
+  /**
+   * Get store product statistics
+   */
+  async getStats(): Promise<StoreProductStats> {
+    const response = await api.get('/admin/store-products/stats');
     return response.data;
   }
 
@@ -142,6 +156,14 @@ class StoreProductService {
   async toggleActive(id: string, isActive: boolean): Promise<StoreProduct> {
     const response = await api.patch(`/admin/store-products/${id}/toggle-active`, { isActive });
     return response.data.product;
+  }
+
+  /**
+   * Bulk update active status for multiple products
+   */
+  async bulkUpdateActiveStatus(ids: string[], isActive: boolean): Promise<number> {
+    const response = await api.patch('/admin/store-products/bulk-active', { ids, isActive });
+    return response.data.affectedCount;
   }
 
   /**

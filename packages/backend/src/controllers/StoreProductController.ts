@@ -30,6 +30,21 @@ export class StoreProductController {
   });
 
   /**
+   * Get store product statistics
+   * GET /api/v1/admin/store-products/stats
+   */
+  static getStats = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const environmentId = req.environmentId;
+    const stats = await StoreProductService.getStats(environmentId);
+
+    res.json({
+      success: true,
+      data: stats,
+      message: 'Store product stats retrieved successfully',
+    });
+  });
+
+  /**
    * Get a single store product by ID
    * GET /api/v1/admin/store-products/:id
    */
@@ -212,6 +227,30 @@ export class StoreProductController {
       success: true,
       data: { product },
       message: `Store product ${isActive ? 'activated' : 'deactivated'} successfully`,
+    });
+  });
+
+  /**
+   * Bulk update active status
+   * PATCH /api/v1/admin/store-products/bulk-active
+   */
+  static bulkUpdateActiveStatus = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { ids, isActive } = req.body;
+    const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      throw new GatrixError('Product IDs array is required', 400);
+    }
+    if (isActive === undefined) {
+      throw new GatrixError('isActive value is required', 400);
+    }
+
+    const affectedCount = await StoreProductService.bulkUpdateActiveStatus(ids, isActive, userId);
+
+    res.json({
+      success: true,
+      data: { affectedCount },
+      message: `${affectedCount} products ${isActive ? 'activated' : 'deactivated'} successfully`,
     });
   });
 

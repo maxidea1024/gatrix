@@ -166,6 +166,34 @@ class StoreProductService {
   }
 
   /**
+   * Get store product statistics
+   */
+  static async getStats(environmentId?: string): Promise<{ total: number; active: number; inactive: number }> {
+    const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
+
+    try {
+      const [result] = await pool.execute<any[]>(
+        `SELECT
+          COUNT(*) as total,
+          SUM(CASE WHEN isActive = 1 THEN 1 ELSE 0 END) as active,
+          SUM(CASE WHEN isActive = 0 THEN 1 ELSE 0 END) as inactive
+        FROM g_store_products WHERE environmentId = ?`,
+        [envId]
+      );
+
+      return {
+        total: result[0].total || 0,
+        active: result[0].active || 0,
+        inactive: result[0].inactive || 0,
+      };
+    } catch (error) {
+      logger.error('Failed to get store product stats', { error });
+      throw new GatrixError('Failed to get store product stats', 500);
+    }
+  }
+
+  /**
    * Get store product by ID
    */
   static async getStoreProductById(id: string, environmentId?: string): Promise<StoreProduct> {
@@ -382,6 +410,29 @@ class StoreProductService {
    */
   static async toggleActive(id: string, isActive: boolean, updatedBy?: number, environmentId?: string): Promise<StoreProduct> {
     return this.updateStoreProduct(id, { isActive, updatedBy }, environmentId);
+  }
+
+  /**
+   * Bulk update active status for multiple products
+   */
+  static async bulkUpdateActiveStatus(ids: string[], isActive: boolean, updatedBy?: number, environmentId?: string): Promise<number> {
+    const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
+
+    if (ids.length === 0) return 0;
+
+    try {
+      const placeholders = ids.map(() => '?').join(',');
+      const [result] = await pool.execute<any>(
+        `UPDATE g_store_products SET isActive = ?, updatedBy = ?, updatedAt = NOW() WHERE id IN (${placeholders}) AND environmentId = ?`,
+        [isActive ? 1 : 0, updatedBy || null, ...ids, envId]
+      );
+
+      return result.affectedRows;
+    } catch (error) {
+      logger.error('Failed to bulk update active status', { error, ids, isActive });
+      throw new GatrixError('Failed to bulk update active status', 500);
+    }
   }
 
   /**
