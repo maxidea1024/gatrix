@@ -383,13 +383,27 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
     }
   }, [groupingBy]);
 
+  // Track previous groupingBy to detect changes
+  const prevGroupingByRef = useRef<GroupingOption>(groupingBy);
+
   // Update nodes when services change (add/remove) or grouping changes
   useEffect(() => {
     if (!simulationRef.current) return;
 
     const savedPos = getSavedCenterPosition();
+
+    // Check if grouping mode changed
+    const groupingChanged = prevGroupingByRef.current !== groupingBy;
+    prevGroupingByRef.current = groupingBy;
+
+    // Only use existing nodes if grouping didn't change
     const existingNodeMap = new Map<string, ClusterNode>();
-    nodesRef.current.forEach(n => existingNodeMap.set(n.id, n));
+    if (!groupingChanged) {
+      nodesRef.current.forEach(n => existingNodeMap.set(n.id, n));
+    } else {
+      // Only keep service nodes when grouping changes, recreate center nodes
+      nodesRef.current.filter(n => !n.isCenter).forEach(n => existingNodeMap.set(n.id, n));
+    }
 
     // Track new nodes for rumble effect
     const newNodeIds: string[] = [];
@@ -398,19 +412,16 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
     const centerNodes: ClusterNode[] = [];
 
     if (groupingBy === 'none') {
-      // Single center node
-      let centerNode = existingNodeMap.get('center');
-      if (!centerNode) {
-        centerNode = {
-          id: 'center',
-          isCenter: true,
-          radius: centerRadius,
-          x: savedPos.x,
-          y: savedPos.y,
-          fx: savedPos.x,
-          fy: savedPos.y,
-        };
-      }
+      // Single center node - always create fresh when switching to 'none'
+      const centerNode: ClusterNode = {
+        id: 'center',
+        isCenter: true,
+        radius: centerRadius,
+        x: savedPos.x,
+        y: savedPos.y,
+        fx: savedPos.x,
+        fy: savedPos.y,
+      };
       centerNodes.push(centerNode);
     } else {
       // Multiple center nodes based on grouping
@@ -510,10 +521,14 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
     simulation.nodes(allNodes);
     (simulation.force('link') as ForceLink<ClusterNode, ClusterLink>)?.links(newLinks);
 
-    // Gently restart with low alpha for smooth transition
-    const hasChanges = newNodeIds.length > 0 || allNodes.length !== existingNodeMap.size;
+    // Force re-render to show new state immediately
+    setNodes([...allNodes]);
+    setLinks([...newLinks]);
+
+    // Restart simulation - stronger restart when grouping changes
+    const hasChanges = newNodeIds.length > 0 || allNodes.length !== existingNodeMap.size || groupingChanged;
     if (hasChanges) {
-      simulation.alpha(0.3).restart();
+      simulation.alpha(groupingChanged ? 0.8 : 0.3).restart();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serviceIds, getSavedCenterPosition, groupingBy, getGroupKey]);
