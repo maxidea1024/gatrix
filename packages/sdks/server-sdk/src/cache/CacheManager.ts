@@ -697,12 +697,22 @@ export class CacheManager {
       return obj;
     };
 
+    // Helper to convert Map<string, T> (non-array values like WhitelistData, MaintenanceStatus)
+    const mapToObjectSingle = <T>(map: Map<string, T> | undefined): Record<string, T> => {
+      if (!map) return {};
+      const obj: Record<string, T> = {};
+      for (const [key, value] of map.entries()) {
+        obj[key] = value;
+      }
+      return obj;
+    };
+
     return {
-      gameWorlds: this.gameWorldService.getCached(),
-      popupNotices: this.popupNoticeService.getCached(),
-      surveys: this.surveyService.getCached(),
-      whitelists: this.whitelistService.getCached(),
-      serviceMaintenance: this.serviceMaintenanceService.getCached(),
+      gameWorlds: mapToObject(this.gameWorldService.getAllCached()),
+      popupNotices: mapToObject(this.popupNoticeService.getAllCached()),
+      surveys: mapToObject(this.surveyService.getAllCached()),
+      whitelists: mapToObjectSingle(this.whitelistService.getAllCached()),
+      serviceMaintenance: mapToObjectSingle(this.serviceMaintenanceService.getAllCached()),
       clientVersions: mapToObject(this.clientVersionService?.getAllCached()),
       serviceNotices: mapToObject(this.serviceNoticeService?.getAllCached()),
       banners: mapToObject(this.bannerService?.getAllCached()),
