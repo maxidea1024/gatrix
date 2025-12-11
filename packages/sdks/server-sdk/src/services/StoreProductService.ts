@@ -11,33 +11,40 @@ import { StoreProduct, StoreProductListResponse, StoreProductByEnvResponse } fro
 export class StoreProductService {
   private apiClient: ApiClient;
   private logger: Logger;
-  // Target environments (empty = single environment mode)
+  // Target environments ('*' = all environments, string[] = specific, empty = single mode)
   // Note: environments are identified by environmentName
-  private environments: string[];
+  private environments: string[] | '*';
   // Multi-environment cache: Map<environment (environmentName), StoreProduct[]>
   private cachedProductsByEnv: Map<string, StoreProduct[]> = new Map();
   // Default environment key (for single-environment mode)
   private defaultEnvKey: string = 'default';
 
-  constructor(apiClient: ApiClient, logger: Logger, environments: string[] = []) {
+  constructor(apiClient: ApiClient, logger: Logger, environments: string[] | '*' = []) {
     this.apiClient = apiClient;
     this.logger = logger;
     this.environments = environments;
   }
 
   private isMultiEnvironment(): boolean {
-    return this.environments.length > 0;
+    return this.environments === '*' || (Array.isArray(this.environments) && this.environments.length > 0);
+  }
+
+  private isAllEnvironments(): boolean {
+    return this.environments === '*';
   }
 
   /**
    * Get all store products
    * Single-env mode: GET /api/v1/server/store-products -> { products: [...] }
    * Multi-env mode: GET /api/v1/server/store-products?environments=... -> { byEnvironment: { [env]: [...] } }
+   * All-env mode: GET /api/v1/server/store-products?environments=* -> { byEnvironment: { [env]: [...] } }
    */
   async list(): Promise<StoreProduct[]> {
     let endpoint = `/api/v1/server/store-products`;
-    if (this.isMultiEnvironment()) {
-      endpoint += `?environments=${this.environments.join(',')}`;
+    if (this.isAllEnvironments()) {
+      endpoint += `?environments=*`;
+    } else if (this.isMultiEnvironment()) {
+      endpoint += `?environments=${(this.environments as string[]).join(',')}`;
     }
 
     this.logger.debug('Fetching store products', { environments: this.environments });

@@ -23,8 +23,10 @@ export class ServerServiceNoticeController {
   static async getServiceNotices(req: SDKRequest, res: Response) {
     try {
       // Parse environments query parameter
+      // '*' means all environments
       const environmentsParam = req.query.environments as string | undefined;
-      const environments = environmentsParam
+      const isAllEnvironments = environmentsParam === '*';
+      const environments = environmentsParam && !isAllEnvironments
         ? environmentsParam.split(',').map(e => e.trim()).filter(Boolean)
         : [];
 
@@ -49,37 +51,45 @@ export class ServerServiceNoticeController {
             });
           };
 
-          if (environments.length > 0) {
-            // Multi-environment mode: return data grouped by environment
+          // All environments mode or specific environments mode
+          if (isAllEnvironments || environments.length > 0) {
             const byEnvironment: Record<string, any[]> = {};
             let totalCount = 0;
 
-            for (const envParam of environments) {
-              // Try to find environment by ID or Name
-              let env = await Environment.query().findById(envParam);
-              if (!env) {
-                env = await Environment.getByName(envParam);
+            // Get target environments
+            let targetEnvs: any[];
+            if (isAllEnvironments) {
+              targetEnvs = await Environment.query().where('isActive', true);
+            } else {
+              targetEnvs = [];
+              for (const envParam of environments) {
+                let env = await Environment.query().findById(envParam);
+                if (!env) {
+                  env = await Environment.getByName(envParam);
+                }
+                if (env) {
+                  targetEnvs.push(env);
+                } else {
+                  logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
+                }
               }
+            }
 
-              if (env) {
-                const result = await ServiceNoticeService.getServiceNotices(
-                  1,
-                  1000,
-                  { environmentId: env.id, isActive: true }
-                );
+            for (const env of targetEnvs) {
+              const result = await ServiceNoticeService.getServiceNotices(
+                1,
+                1000,
+                { environmentId: env.id, isActive: true }
+              );
 
-                const activeNotices = filterActiveNotices(result.notices);
-                // Store by environmentName (the standard external identifier)
-                byEnvironment[env.environmentName] = activeNotices;
-                totalCount += activeNotices.length;
-              } else {
-                logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
-              }
+              const activeNotices = filterActiveNotices(result.notices);
+              byEnvironment[env.environmentName] = activeNotices;
+              totalCount += activeNotices.length;
             }
 
             logger.info(
               `Server SDK: Retrieved ${totalCount} active service notices across ${Object.keys(byEnvironment).length} environments`,
-              { environments }
+              { mode: isAllEnvironments ? 'all' : 'specific', environments: Object.keys(byEnvironment) }
             );
 
             return {

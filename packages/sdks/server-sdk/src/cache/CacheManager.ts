@@ -52,7 +52,7 @@ export class CacheManager {
     metrics?: SdkMetrics,
     configWorldId?: string,
     features?: FeaturesConfig,
-    environments?: string[],
+    environments?: string[] | '*',
     // New services for Edge (created internally if enabled)
     clientVersionService?: ClientVersionService,
     serviceNoticeService?: ServiceNoticeService,
@@ -72,7 +72,8 @@ export class CacheManager {
     this.serviceMaintenanceService = serviceMaintenanceService;
 
     // Create new services if enabled (with environments support)
-    const targetEnvs = environments || [];
+    // '*' means all environments mode (dynamic)
+    const targetEnvs: string[] | '*' = environments ?? [];
     if (this.features.clientVersion === true) {
       this.clientVersionService = clientVersionService || new ClientVersionService(apiClient, logger, targetEnvs);
     }

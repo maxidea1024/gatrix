@@ -256,6 +256,8 @@ export class EventListener {
       'banner.updated',
       'service_notice.updated',
       'store_product.updated',
+      'environment.created',
+      'environment.deleted',
     ].includes(type);
   }
 
@@ -400,6 +402,22 @@ export class EventListener {
           this.logger.info('Store product cache refreshed successfully');
         } catch (error: any) {
           this.logger.error('Failed to refresh store product cache', { error: error.message });
+        }
+        break;
+
+      case 'environment.created':
+      case 'environment.deleted':
+        // When environments are added or removed, refresh all multi-environment caches
+        // This is essential for "all environments" mode (environments: '*')
+        this.logger.info('Environment change event received, refreshing all caches', {
+          type: event.type,
+          environment: event.data.environment
+        });
+        try {
+          await this.cacheManager.refreshAll();
+          this.logger.info('All caches refreshed successfully after environment change');
+        } catch (error: any) {
+          this.logger.error('Failed to refresh caches after environment change', { error: error.message });
         }
         break;
 

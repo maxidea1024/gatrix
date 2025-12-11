@@ -24,8 +24,10 @@ export class ServerStoreProductController {
   static async getStoreProducts(req: SDKRequest, res: Response) {
     try {
       // Parse environments query parameter
+      // '*' means all environments
       const environmentsParam = req.query.environments as string | undefined;
-      const environments = environmentsParam
+      const isAllEnvironments = environmentsParam === '*';
+      const environments = environmentsParam && !isAllEnvironments
         ? environmentsParam.split(',').map(e => e.trim()).filter(Boolean)
         : [];
 
@@ -34,50 +36,59 @@ export class ServerStoreProductController {
         ttlMs: DEFAULT_CONFIG.STORE_PRODUCT_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          if (environments.length > 0) {
-            // Multi-environment mode: return data grouped by environment
+          // All environments mode or specific environments mode
+          if (isAllEnvironments || environments.length > 0) {
             const byEnvironment: Record<string, any[]> = {};
             let totalCount = 0;
 
-            for (const envParam of environments) {
-              // Try to find environment by ID or Name
-              let env = await Environment.query().findById(envParam);
-              if (!env) {
-                env = await Environment.getByName(envParam);
+            // Get target environments
+            let targetEnvs: any[];
+            if (isAllEnvironments) {
+              targetEnvs = await Environment.query().where('isActive', true);
+            } else {
+              targetEnvs = [];
+              for (const envParam of environments) {
+                let env = await Environment.query().findById(envParam);
+                if (!env) {
+                  env = await Environment.getByName(envParam);
+                }
+                if (env) {
+                  targetEnvs.push(env);
+                } else {
+                  logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
+                }
               }
+            }
 
-              if (env) {
-                const result = await StoreProductService.getStoreProducts({
-                  environmentId: env.id,
-                  limit: 1000,
-                  page: 1,
-                  isActive: true,
-                });
+            for (const env of targetEnvs) {
+              const result = await StoreProductService.getStoreProducts({
+                environmentId: env.id,
+                limit: 1000,
+                page: 1,
+                isActive: true,
+              });
 
-                // Fetch tags for each product
-                const productsWithTags = await Promise.all(
-                  result.products.map(async (product: any) => {
-                    const tags = await TagService.listTagsForEntity('store_product', product.id);
-                    // Remove environmentId from response (external API uses environment name as key)
-                    const { environmentId, ...productWithoutEnvId } = product;
-                    return {
-                      ...productWithoutEnvId,
-                      tags: tags || [],
-                    };
-                  }),
-                );
+              // Fetch tags for each product
+              const productsWithTags = await Promise.all(
+                result.products.map(async (product: any) => {
+                  const tags = await TagService.listTagsForEntity('store_product', product.id);
+                  // Remove environmentId from response (external API uses environment name as key)
+                  const { environmentId: _envId, ...productWithoutEnvId } = product;
+                  void _envId; // Suppress unused variable warning
+                  return {
+                    ...productWithoutEnvId,
+                    tags: tags || [],
+                  };
+                }),
+              );
 
-                // Store by environmentName (the standard external identifier)
-                byEnvironment[env.environmentName] = productsWithTags;
-                totalCount += productsWithTags.length;
-              } else {
-                logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
-              }
+              byEnvironment[env.environmentName] = productsWithTags;
+              totalCount += productsWithTags.length;
             }
 
             logger.info(
               `Server SDK: Retrieved ${totalCount} store products across ${Object.keys(byEnvironment).length} environments`,
-              { environments }
+              { mode: isAllEnvironments ? 'all' : 'specific', environments: Object.keys(byEnvironment) }
             );
 
             return {
@@ -100,7 +111,8 @@ export class ServerStoreProductController {
               result.products.map(async (product: any) => {
                 const tags = await TagService.listTagsForEntity('store_product', product.id);
                 // Remove environmentId from response
-                const { environmentId, ...productWithoutEnvId } = product;
+                const { environmentId: _envId, ...productWithoutEnvId } = product;
+                void _envId; // Suppress unused variable warning
                 return {
                   ...productWithoutEnvId,
                   tags: tags || [],
