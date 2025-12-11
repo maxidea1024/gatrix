@@ -24,7 +24,91 @@ X-Application-Name: your-application-name
 
 ## API Endpoints
 
-### 1. Authentication Test
+### Environment-Specific Endpoints
+
+All environment-specific endpoints follow the pattern:
+
+```
+GET /api/v1/server/:env/resource
+```
+
+Where `:env` is the environment ID (e.g., `development`, `production`, `qa`).
+
+**Important:** Each endpoint returns data filtered by the specified environment. This ensures that:
+- Development data is only returned for development environment requests
+- Production data is only returned for production environment requests
+- No cross-environment data leakage occurs
+
+### 1. Game Worlds
+
+```
+GET /api/v1/server/:env/game-worlds
+```
+
+Get all visible game worlds for the specified environment.
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "worlds": [
+      {
+        "id": 1,
+        "worldId": "world-1",
+        "name": "Main Server",
+        "worldServerAddress": "world1.example.com:7777",
+        "status": "active",
+        "hasMaintenanceScheduled": false,
+        "isMaintenanceActive": false
+      }
+    ]
+  }
+}
+```
+
+### 2. Popup Notices
+
+```
+GET /api/v1/server/:env/ingame-popup-notices
+```
+
+Get active popup notices for the specified environment.
+
+### 3. Surveys
+
+```
+GET /api/v1/server/:env/surveys
+```
+
+Get active surveys for the specified environment.
+
+### 4. Service Discovery
+
+```
+GET /api/v1/server/:env/service-discovery
+```
+
+Get service discovery data including whitelists for the specified environment.
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "ipWhitelist": [
+      { "ip": "192.168.1.0/24", "description": "Office network" }
+    ],
+    "accountWhitelist": [
+      { "accountId": "admin123", "description": "Admin account" }
+    ]
+  }
+}
+```
+
+### 5. Authentication Test
 
 ```
 GET /api/v1/server/test
@@ -47,7 +131,7 @@ Test server SDK authentication.
 }
 ```
 
-### 2. Get Server Templates
+### 6. Get Server Templates
 
 ```
 GET /api/v1/server/templates

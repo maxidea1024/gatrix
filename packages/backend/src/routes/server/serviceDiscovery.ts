@@ -33,8 +33,11 @@ export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) =>
       ttlMs: DEFAULT_CONFIG.WHITELIST_TTL,
       requestEtag: req.headers?.['if-none-match'],
       buildPayload: async () => {
-        // Get all enabled IP whitelists
-        const ipWhitelistsResult = await IpWhitelistModel.findAll(1, 10000, { isEnabled: true });
+        // Get all enabled IP whitelists for this environment
+        const ipWhitelistsResult = await IpWhitelistModel.findAll(1, 10000, {
+          isEnabled: true,
+          environmentId: environment.id
+        });
         const now = new Date();
 
         // Filter by date range
@@ -44,8 +47,11 @@ export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) =>
           return true;
         });
 
-        // Get all enabled account whitelists
-        const accountWhitelistsResult = await WhitelistModel.findAll(1, 10000, { isEnabled: true });
+        // Get all enabled account whitelists for this environment
+        const accountWhitelistsResult = await WhitelistModel.findAll(1, 10000, {
+          isEnabled: true,
+          environmentId: environment.id
+        });
 
         // Filter by date range
         const activeAccountWhitelists = accountWhitelistsResult.whitelists.filter((account: any) => {

@@ -24,7 +24,91 @@ X-Application-Name: your-application-name
 
 ## API 엔드포인트
 
-### 1. 인증 테스트
+### 환경별 엔드포인트
+
+모든 환경별 엔드포인트는 다음 패턴을 따릅니다:
+
+```
+GET /api/v1/server/:env/resource
+```
+
+`:env`는 환경 ID입니다 (예: `development`, `production`, `qa`).
+
+**중요:** 각 엔드포인트는 지정된 환경으로 필터링된 데이터를 반환합니다:
+- 개발 환경 요청에는 개발 데이터만 반환됩니다
+- 프로덕션 환경 요청에는 프로덕션 데이터만 반환됩니다
+- 환경 간 데이터 누출이 발생하지 않습니다
+
+### 1. 게임 월드
+
+```
+GET /api/v1/server/:env/game-worlds
+```
+
+지정된 환경의 모든 표시 가능한 게임 월드를 조회합니다.
+
+#### 응답
+
+```json
+{
+  "success": true,
+  "data": {
+    "worlds": [
+      {
+        "id": 1,
+        "worldId": "world-1",
+        "name": "메인 서버",
+        "worldServerAddress": "world1.example.com:7777",
+        "status": "active",
+        "hasMaintenanceScheduled": false,
+        "isMaintenanceActive": false
+      }
+    ]
+  }
+}
+```
+
+### 2. 팝업 공지
+
+```
+GET /api/v1/server/:env/ingame-popup-notices
+```
+
+지정된 환경의 활성 팝업 공지를 조회합니다.
+
+### 3. 설문조사
+
+```
+GET /api/v1/server/:env/surveys
+```
+
+지정된 환경의 활성 설문조사를 조회합니다.
+
+### 4. 서비스 디스커버리
+
+```
+GET /api/v1/server/:env/service-discovery
+```
+
+지정된 환경의 화이트리스트를 포함한 서비스 디스커버리 데이터를 조회합니다.
+
+#### 응답
+
+```json
+{
+  "success": true,
+  "data": {
+    "ipWhitelist": [
+      { "ip": "192.168.1.0/24", "description": "사무실 네트워크" }
+    ],
+    "accountWhitelist": [
+      { "accountId": "admin123", "description": "관리자 계정" }
+    ]
+  }
+}
+```
+
+### 5. 인증 테스트
 
 ```
 GET /api/v1/server/test
@@ -47,7 +131,7 @@ GET /api/v1/server/test
 }
 ```
 
-### 2. 서버 템플릿 조회
+### 6. 서버 템플릿 조회
 
 ```
 GET /api/v1/server/templates

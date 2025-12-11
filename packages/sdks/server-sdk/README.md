@@ -173,11 +173,51 @@ const sdk = new GatrixServerSDK({
 | `applicationName` | string | Application name | `my-game-server` |
 | `service` | string | Service name for identification | `auth`, `lobby`, `world`, `chat` |
 | `group` | string | Service group for categorization | `kr`, `us`, `production` |
-| `environment` | string | Environment identifier | `env_prod`, `env_staging`, `env_dev` |
+| `environment` | string or `'*'` | Environment identifier or `'*'` for multi-env mode | `env_prod`, `env_staging`, `*` |
 
 These required fields (`service`, `group`, `environment`) are used consistently across:
 - **Metrics labels**: All SDK metrics include these as default labels for filtering in Grafana
 - **Service Discovery**: Automatically applied when registering services
+
+### Multi-Environment Mode
+
+For Edge servers or services that need to cache data for ALL environments, use the wildcard `'*'`:
+
+```typescript
+const sdk = new GatrixServerSDK({
+  gatrixUrl: 'https://api.gatrix.com',
+  apiToken: 'your-bypass-token', // Must have access to all environments
+  applicationName: 'edge-server',
+  service: 'edge',
+  group: 'default',
+  environment: '*', // Multi-environment mode
+  redis: {
+    host: 'localhost',
+    port: 6379,
+  },
+  cache: {
+    enabled: true,
+    refreshMethod: 'event', // Recommended for multi-env mode
+  },
+});
+
+await sdk.initialize();
+
+// Access cached data for specific environments
+const devWorlds = sdk.getCachedGameWorlds('development');
+const prodWorlds = sdk.getCachedGameWorlds('production');
+
+// Get all cached environments
+const environments = sdk.getCachedEnvironments();
+console.log('Cached environments:', environments.map(e => e.id));
+```
+
+**Multi-Environment Mode Features:**
+- Automatically fetches all environments from backend on initialization
+- Caches data for each environment separately
+- Listens for `environment.created` and `environment.deleted` events via Redis PubSub
+- Each getter method accepts an optional `environmentId` parameter to filter data
+- Ideal for Edge servers that serve multiple environments
 
 ## API Reference
 

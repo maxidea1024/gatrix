@@ -349,6 +349,7 @@ export class SurveyController {
           page: 1,
           limit: 1000,
           isActive: true,
+          environmentId: environment.id,
         });
 
         // Get survey configuration

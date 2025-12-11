@@ -454,17 +454,18 @@ services:
       EDGE_METRICS_PORT: 9400
       # Backend API configuration
       GATRIX_URL: http://backend:5000
-      EDGE_API_TOKEN: ${EDGE_API_TOKEN:-gatrix-unsecured-server-api-token}
+      # Edge bypass token - allows access to all environments and internal APIs
+      EDGE_BYPASS_TOKEN: ${EDGE_BYPASS_TOKEN:-gatrix-edge-internal-bypass-token}
       EDGE_APPLICATION_NAME: ${EDGE_APPLICATION_NAME:-edge-server}
-      # Target environments (comma-separated)
-      EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-}
+      # Target environments - use '*' for all environments (Edge mode)
+      EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-*}
       # Redis for PubSub
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       REDIS_DB: 0
-      # Cache configuration
-      CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-polling}
+      # Cache configuration (event mode uses Redis PubSub for real-time sync)
+      CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-event}
       CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
     ports:
       - "${EDGE_PORT:-1400}:1400"

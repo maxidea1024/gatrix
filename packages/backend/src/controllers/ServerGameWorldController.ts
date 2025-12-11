@@ -45,8 +45,9 @@ export class ServerGameWorldController {
         ttlMs: DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          // Fetch visible game worlds sorted by displayOrder ASC
+          // Fetch visible game worlds sorted by displayOrder ASC for this environment
           const allWorlds = await GameWorldService.getAllGameWorlds({
+            environmentId: environment.id,
             isVisible: true,
           });
 

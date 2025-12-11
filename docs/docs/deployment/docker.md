@@ -26,11 +26,36 @@ This page explains how to run Gatrix with Docker in both development and product
 
 ## Environment Variables (selected)
 
-- PROM_SCRAPE_INTERVAL (default: 15s)
-- PROM_RETENTION_TIME (default: 14d)
-- GRAFANA_ADMIN_USER (default: admin)
-- GRAFANA_ADMIN_PASSWORD (default: admin)
-- MONITORING_ENABLED (true/false)
+### Monitoring
+- `PROM_SCRAPE_INTERVAL` (default: 15s)
+- `PROM_RETENTION_TIME` (default: 14d)
+- `GRAFANA_ADMIN_USER` (default: admin)
+- `GRAFANA_ADMIN_PASSWORD` (default: admin)
+- `MONITORING_ENABLED` (true/false)
+
+### Edge Server
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `EDGE_PORT` | 1400 | Edge server port |
+| `EDGE_METRICS_PORT` | 9400 | Metrics endpoint port (internal only) |
+| `EDGE_BYPASS_TOKEN` | `gatrix-edge-internal-bypass-token` | Bypass token for all environments and internal APIs |
+| `EDGE_APPLICATION_NAME` | `edge-server` | Application name for SDK identification |
+| `EDGE_ENVIRONMENTS` | `*` | Target environments. Use `*` for all environments (multi-env mode) or comma-separated IDs |
+| `CACHE_SYNC_METHOD` | `event` | Cache sync method: `event` (Redis PubSub real-time), `polling`, or `manual` |
+| `CACHE_POLLING_INTERVAL_MS` | 60000 | Polling interval in ms (only used when `CACHE_SYNC_METHOD=polling`) |
+| `EDGE_LOG_LEVEL` | `info` (prod) / `debug` (dev) | Log level |
+
+**Multi-Environment Mode (`EDGE_ENVIRONMENTS=*`):**
+- Edge server caches data for ALL environments dynamically
+- Automatically syncs when new environments are created/deleted via Redis PubSub
+- Each API endpoint filters data by the requested environment
+
+**Event Mode (`CACHE_SYNC_METHOD=event`):**
+- Uses Redis PubSub for real-time cache synchronization
+- Cache is updated immediately when backend publishes events
+- Requires Redis connection
+- Recommended for production use
 
 ## Development
 

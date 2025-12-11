@@ -341,6 +341,7 @@ class IngamePopupNoticeController {
     try {
       const environment = req.environment!;
       const filters: IngamePopupNoticeFilters = {
+        environmentId: environment.id,
         isActive: true,
         currentlyVisible: true,
       };
