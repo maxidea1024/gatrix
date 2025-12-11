@@ -4297,6 +4297,20 @@
       "createdAt": "Created At",
       "updatedAt": "Updated At",
       "actions": "Actions"
+    },
+    "grouping": {
+      "label": "Grouping",
+      "none": "None",
+      "group": "Group",
+      "environment": "Environment",
+      "region": "Region"
+    },
+    "stats": {
+      "initializing": "Initializing",
+      "ready": "Online",
+      "shuttingDown": "Shutting Down",
+      "terminated": "Terminated",
+      "error": "Error"
     }
   },
   "REWARD_TYPE_POINT": "Point",

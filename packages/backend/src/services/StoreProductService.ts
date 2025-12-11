@@ -229,6 +229,38 @@ class StoreProductService {
   }
 
   /**
+   * Get store product by ID across all environments (for Server SDK)
+   * This is used when the SDK receives an event and needs to fetch a specific product
+   */
+  static async getStoreProductByIdAcrossEnvironments(id: string): Promise<StoreProduct | null> {
+    const pool = database.getPool();
+
+    try {
+      const [products] = await pool.execute<any[]>(
+        'SELECT * FROM g_store_products WHERE id = ?',
+        [id]
+      );
+
+      if (products.length === 0) {
+        return null;
+      }
+
+      const product = products[0];
+      const tags = await TagService.listTagsForEntity('store_product', id);
+
+      return {
+        ...product,
+        isActive: Boolean(product.isActive),
+        metadata: typeof product.metadata === 'string' ? JSON.parse(product.metadata) : product.metadata,
+        tags,
+      };
+    } catch (error) {
+      logger.error('Failed to get store product by ID across environments', { error, id });
+      return null;
+    }
+  }
+
+  /**
    * Create a new store product
    */
   static async createStoreProduct(input: CreateStoreProductInput, environmentId?: string): Promise<StoreProduct> {

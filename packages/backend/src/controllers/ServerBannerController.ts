@@ -178,7 +178,9 @@ export class ServerBannerController {
 
       res.json({
         success: true,
-        data: banner,
+        data: {
+          banner,
+        },
       });
     } catch (error) {
       logger.error('Error in ServerBannerController.getBannerById:', error);

@@ -108,6 +108,7 @@ interface ClusterNode extends SimulationNodeDatum {
   id: string;
   service?: ServiceInstance;
   isCenter?: boolean;
+  groupKey?: string; // For center nodes: the group key (e.g., 'development', 'production')
   radius: number;
   isNew?: boolean; // Track if node is newly added
   prevStatus?: string; // Track previous status for change detection
@@ -119,14 +120,18 @@ interface ClusterLink extends SimulationLinkDatum<ClusterNode> {
   target: ClusterNode | string;
 }
 
+// Grouping option type
+type GroupingOption = 'none' | 'group' | 'environment' | 'region';
+
 // ClusterView component with D3 force simulation
 interface ClusterViewProps {
   services: ServiceInstance[];
   heartbeatIds: Set<string>;
   t: (key: string) => string;
+  groupingBy?: GroupingOption;
 }
 
-const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) => {
+const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, groupingBy = 'none' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [nodes, setNodes] = useState<ClusterNode[]>([]);
@@ -1061,6 +1066,32 @@ const ServerListPage: React.FC = () => {
   const [bulkHealthCheckRunning, setBulkHealthCheckRunning] = useState(false);
   const [bulkHealthCheckSelected, setBulkHealthCheckSelected] = useState<Set<string>>(new Set());
 
+  // Grouping state (persisted in localStorage)
+  type GroupingOption = 'none' | 'group' | 'environment' | 'region';
+  const [groupingBy, setGroupingBy] = useState<GroupingOption>(() => {
+    return (localStorage.getItem('serverListGroupingBy') as GroupingOption) || 'none';
+  });
+  const [groupingMenuAnchor, setGroupingMenuAnchor] = useState<null | HTMLElement>(null);
+
+  // Status counters - computed from services
+  const statusCounts = useMemo(() => {
+    const counts = {
+      initializing: 0,
+      ready: 0,
+      shutting_down: 0,
+      terminated: 0,
+      error: 0,
+    };
+    services.forEach((s) => {
+      if (s.status === 'initializing') counts.initializing++;
+      else if (s.status === 'ready') counts.ready++;
+      else if (s.status === 'shutting_down') counts.shutting_down++;
+      else if (s.status === 'terminated') counts.terminated++;
+      else if (s.status === 'error' || s.status === 'no-response') counts.error++;
+    });
+    return counts;
+  }, [services]);
+
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
     { id: 'status', labelKey: 'serverList.table.status', visible: true },
@@ -1293,6 +1324,13 @@ const ServerListPage: React.FC = () => {
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
     localStorage.setItem('serverListViewMode', mode);
+  };
+
+  // Grouping change handler
+  const handleGroupingChange = (option: GroupingOption) => {
+    setGroupingBy(option);
+    localStorage.setItem('serverListGroupingBy', option);
+    setGroupingMenuAnchor(null);
   };
 
   // Health check a service
@@ -2099,6 +2137,58 @@ const ServerListPage: React.FC = () => {
               </Tooltip>
             )}
 
+            {/* Divider before status counters */}
+            <Box
+              sx={{
+                width: '1px',
+                height: '24px',
+                bgcolor: (theme) => theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.2)'
+                  : 'rgba(0, 0, 0, 0.2)',
+              }}
+            />
+
+            {/* Status Counters */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                px: 1,
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'info.main' }} />
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                  {t('serverList.stats.initializing')} <strong style={{ color: 'inherit' }}>{statusCounts.initializing}</strong>
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                  {t('serverList.stats.ready')} <strong style={{ color: 'inherit' }}>{statusCounts.ready}</strong>
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'warning.main' }} />
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                  {t('serverList.stats.shuttingDown')} <strong style={{ color: 'inherit' }}>{statusCounts.shutting_down}</strong>
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'grey.500' }} />
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                  {t('serverList.stats.terminated')} <strong style={{ color: 'inherit' }}>{statusCounts.terminated}</strong>
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'error.main' }} />
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                  {t('serverList.stats.error')} <strong style={{ color: 'inherit' }}>{statusCounts.error}</strong>
+                </Typography>
+              </Box>
+            </Box>
+
             {/* Spacer to push right-side buttons to the right */}
             <Box sx={{ flexGrow: 1 }} />
 
@@ -2189,6 +2279,76 @@ const ServerListPage: React.FC = () => {
                   : 'rgba(0, 0, 0, 0.2)',
               }}
             />
+
+            {/* Grouping Button - Only show in cluster view */}
+            {viewMode === 'cluster' && (
+              <>
+                <Tooltip title={t('serverList.grouping.label')}>
+                  <Button
+                    size="small"
+                    variant={groupingBy !== 'none' ? 'contained' : 'outlined'}
+                    onClick={(e) => setGroupingMenuAnchor(e.currentTarget)}
+                    sx={{
+                      minWidth: 'auto',
+                      px: 1.5,
+                      textTransform: 'none',
+                      ...(groupingBy === 'none' && {
+                        bgcolor: 'background.paper',
+                        borderColor: 'divider',
+                        color: 'text.primary',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
+                        },
+                      }),
+                    }}
+                  >
+                    {groupingBy === 'none'
+                      ? t('serverList.grouping.label')
+                      : t(`serverList.grouping.${groupingBy}`)}
+                  </Button>
+                </Tooltip>
+                <Menu
+                  anchorEl={groupingMenuAnchor}
+                  open={Boolean(groupingMenuAnchor)}
+                  onClose={() => setGroupingMenuAnchor(null)}
+                >
+                  <MenuItem
+                    selected={groupingBy === 'none'}
+                    onClick={() => handleGroupingChange('none')}
+                  >
+                    {t('serverList.grouping.none')}
+                  </MenuItem>
+                  <MenuItem
+                    selected={groupingBy === 'group'}
+                    onClick={() => handleGroupingChange('group')}
+                  >
+                    {t('serverList.grouping.group')}
+                  </MenuItem>
+                  <MenuItem
+                    selected={groupingBy === 'environment'}
+                    onClick={() => handleGroupingChange('environment')}
+                  >
+                    {t('serverList.grouping.environment')}
+                  </MenuItem>
+                  <MenuItem
+                    selected={groupingBy === 'region'}
+                    onClick={() => handleGroupingChange('region')}
+                  >
+                    {t('serverList.grouping.region')}
+                  </MenuItem>
+                </Menu>
+                {/* Divider */}
+                <Box
+                  sx={{
+                    width: '1px',
+                    height: '24px',
+                    bgcolor: (theme) => theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 0.2)',
+                  }}
+                />
+              </>
+            )}
 
             {/* Pause/Resume Button */}
             <Tooltip title={isPaused ? t('serverList.resumeUpdates') : t('serverList.pauseUpdates')}>

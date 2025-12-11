@@ -215,6 +215,7 @@ class BannerService {
           data: {
             id: banner.bannerId,
             environment,
+            status: banner.status,
             timestamp: Date.now()
           }
         });
@@ -258,7 +259,7 @@ class BannerService {
           environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
-          type: 'banner.updated',
+          type: 'banner.deleted',
           data: {
             id: bannerId,
             environment,
@@ -304,6 +305,7 @@ class BannerService {
           data: {
             id: banner.bannerId,
             environment,
+            status: banner.status,
             timestamp: Date.now()
           }
         });
@@ -347,6 +349,7 @@ class BannerService {
           data: {
             id: banner.bannerId,
             environment,
+            status: banner.status,
             timestamp: Date.now()
           }
         });

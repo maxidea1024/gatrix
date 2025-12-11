@@ -107,6 +107,7 @@ router.get('/banners/:bannerId', serverSDKAuth, ServerBannerController.getBanner
 
 // Store product routes
 router.get('/store-products', serverSDKAuth, ServerStoreProductController.getStoreProducts);
+router.get('/store-products/:id', serverSDKAuth, ServerStoreProductController.getStoreProductById);
 
 // Service discovery routes
 router.use('/services', serviceDiscoveryRoutes);

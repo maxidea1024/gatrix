@@ -4294,6 +4294,20 @@
       "createdAt": "생성 시간",
       "updatedAt": "업데이트 시간",
       "actions": "액션"
+    },
+    "grouping": {
+      "label": "그룹핑",
+      "none": "없음",
+      "group": "그룹",
+      "environment": "환경",
+      "region": "지역"
+    },
+    "stats": {
+      "initializing": "초기화",
+      "ready": "온라인",
+      "shuttingDown": "종료중",
+      "terminated": "종료됨",
+      "error": "오류"
     }
   },
   "REWARD_TYPE_POINT": "포인트",
