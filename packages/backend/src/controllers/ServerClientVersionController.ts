@@ -45,8 +45,8 @@ export class ServerClientVersionController {
             // Get target environments
             let targetEnvs: any[];
             if (isAllEnvironments) {
-              // Fetch all environments
-              targetEnvs = await Environment.query().where('isActive', true);
+              // Fetch all environments (Environment table doesn't have isActive column)
+              targetEnvs = await Environment.query();
             } else {
               // Fetch specific environments
               targetEnvs = [];

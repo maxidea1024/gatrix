@@ -19,11 +19,13 @@ export const config = {
   group: process.env.EDGE_GROUP || 'default',
   environment: process.env.EDGE_ENVIRONMENT || 'env_default',
 
-  // Target environments (comma-separated)
-  environments: (process.env.EDGE_ENVIRONMENTS || '')
-    .split(',')
-    .map(e => e.trim())
-    .filter(Boolean),
+  // Target environments (comma-separated, or '*' for all environments)
+  environments: process.env.EDGE_ENVIRONMENTS === '*'
+    ? '*' as const
+    : (process.env.EDGE_ENVIRONMENTS || '')
+        .split(',')
+        .map(e => e.trim())
+        .filter(Boolean),
 
   // Redis configuration (for PubSub only)
   redis: {
@@ -51,8 +53,8 @@ export function validateConfig(): void {
     errors.push('EDGE_API_TOKEN is required');
   }
 
-  if (config.environments.length === 0) {
-    errors.push('EDGE_ENVIRONMENTS is required (comma-separated environment IDs)');
+  if (config.environments !== '*' && config.environments.length === 0) {
+    errors.push('EDGE_ENVIRONMENTS is required (comma-separated environment IDs or "*" for all)');
   }
 
   if (errors.length > 0) {

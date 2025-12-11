@@ -109,10 +109,15 @@ async function main() {
     // Register service
     logger.info('Registering service...');
 
+    const serviceGroup = process.env.SERVICE_GROUP || 'development';
+    const serviceRegion = process.env.SERVICE_REGION || 'default';
+
     const { instanceId, hostname, internalAddress, externalAddress } = await sdk.registerService({
       labels: {
         service: 'idle',
-        group: 'development',
+        group: serviceGroup,
+        region: serviceRegion,
+        env: targetEnvironment,
       },
       // hostname: os.hostname(),
       // internalAddress: internalIp,

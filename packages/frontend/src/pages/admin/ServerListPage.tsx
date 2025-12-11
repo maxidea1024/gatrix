@@ -369,7 +369,21 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Update nodes when services change (add/remove)
+  // Helper function to get group key from service based on grouping option
+  const getGroupKey = useCallback((service: ServiceInstance): string => {
+    switch (groupingBy) {
+      case 'group':
+        return service.labels.group || 'unknown';
+      case 'environment':
+        return service.labels.env || 'unknown';
+      case 'region':
+        return service.labels.region || 'unknown';
+      default:
+        return 'center';
+    }
+  }, [groupingBy]);
+
+  // Update nodes when services change (add/remove) or grouping changes
   useEffect(() => {
     if (!simulationRef.current) return;
 
@@ -380,24 +394,68 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
     // Track new nodes for rumble effect
     const newNodeIds: string[] = [];
 
-    // Get or create center node
-    let centerNode = existingNodeMap.get('center');
-    if (!centerNode) {
-      centerNode = {
-        id: 'center',
-        isCenter: true,
-        radius: centerRadius,
-        x: savedPos.x,
-        y: savedPos.y,
-        fx: savedPos.x,
-        fy: savedPos.y,
-      };
+    // Determine center nodes based on grouping
+    const centerNodes: ClusterNode[] = [];
+
+    if (groupingBy === 'none') {
+      // Single center node
+      let centerNode = existingNodeMap.get('center');
+      if (!centerNode) {
+        centerNode = {
+          id: 'center',
+          isCenter: true,
+          radius: centerRadius,
+          x: savedPos.x,
+          y: savedPos.y,
+          fx: savedPos.x,
+          fy: savedPos.y,
+        };
+      }
+      centerNodes.push(centerNode);
+    } else {
+      // Multiple center nodes based on grouping
+      const groupKeys = new Set<string>();
+      services.forEach(s => groupKeys.add(getGroupKey(s)));
+
+      const groupArray = Array.from(groupKeys).sort();
+      const groupCount = groupArray.length;
+
+      groupArray.forEach((groupKey, index) => {
+        const centerId = `center-${groupKey}`;
+        let centerNode = existingNodeMap.get(centerId);
+
+        if (!centerNode) {
+          // Position group centers in a circle around the main center
+          const angle = (2 * Math.PI * index) / Math.max(groupCount, 1);
+          const distance = groupCount > 1 ? 200 : 0;
+          const x = savedPos.x + Math.cos(angle) * distance;
+          const y = savedPos.y + Math.sin(angle) * distance;
+
+          centerNode = {
+            id: centerId,
+            isCenter: true,
+            groupKey,
+            radius: centerRadius,
+            x,
+            y,
+            fx: x,
+            fy: y,
+          };
+        } else {
+          // Update groupKey in case it changed
+          centerNode.groupKey = groupKey;
+        }
+        centerNodes.push(centerNode);
+      });
     }
 
     // Create/update service nodes
     const serviceNodes: ClusterNode[] = services.map((service) => {
       const nodeId = `${service.labels.service}-${service.instanceId}`;
       const existing = existingNodeMap.get(nodeId);
+      const groupKey = getGroupKey(service);
+      const targetCenterId = groupingBy === 'none' ? 'center' : `center-${groupKey}`;
+      const targetCenter = centerNodes.find(c => c.id === targetCenterId);
 
       if (existing) {
         // Update service data but keep position
@@ -405,7 +463,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
         return existing;
       }
 
-      // New node - random position around center
+      // New node - random position around its center
       const angle = Math.random() * 2 * Math.PI;
       const distance = 80 + Math.random() * 60;
       newNodeIds.push(nodeId);
@@ -415,8 +473,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
         service,
         isCenter: false,
         radius: nodeRadius,
-        x: (centerNode?.x ?? savedPos.x) + Math.cos(angle) * distance,
-        y: (centerNode?.y ?? savedPos.y) + Math.sin(angle) * distance,
+        x: (targetCenter?.x ?? savedPos.x) + Math.cos(angle) * distance,
+        y: (targetCenter?.y ?? savedPos.y) + Math.sin(angle) * distance,
         isNew: true,
       };
     });
@@ -433,14 +491,18 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
       }, 500);
     }
 
-    const allNodes = [centerNode, ...serviceNodes];
+    const allNodes = [...centerNodes, ...serviceNodes];
     nodesRef.current = allNodes;
 
-    // Create links
-    const newLinks: ClusterLink[] = serviceNodes.map(node => ({
-      source: 'center',
-      target: node.id,
-    }));
+    // Create links - each service links to its group center
+    const newLinks: ClusterLink[] = serviceNodes.map(node => {
+      const groupKey = getGroupKey(node.service!);
+      const targetCenterId = groupingBy === 'none' ? 'center' : `center-${groupKey}`;
+      return {
+        source: targetCenterId,
+        target: node.id,
+      };
+    });
     linksRef.current = newLinks;
 
     // Update simulation with new nodes/links (don't recreate)
@@ -454,7 +516,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
       simulation.alpha(0.3).restart();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceIds, getSavedCenterPosition]);
+  }, [serviceIds, getSavedCenterPosition, groupingBy, getGroupKey]);
 
   // Convert mouse position to SVG coordinates
   const mouseToSvgCoords = useCallback((e: MouseEvent | React.MouseEvent) => {
@@ -737,6 +799,11 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
               {nodes.map(node => {
                 if (node.isCenter) {
                   // Center cluster node - draggable
+                  // Calculate count for this center node
+                  const centerCount = node.groupKey
+                    ? services.filter(s => getGroupKey(s) === node.groupKey).length
+                    : services.length;
+
                   return (
                     <g
                       key={node.id}
@@ -744,41 +811,70 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
                       style={{ cursor: 'grab' }}
                       onMouseDown={(e) => handleMouseDown(node.id, e)}
                   >
-                    <circle
-                      r={centerRadius}
-                      fill="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-                      stroke="#fff"
-                      strokeWidth="3"
-                    />
                     <defs>
-                      <linearGradient id="centerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <linearGradient id={`centerGradient-${node.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor="#667eea" />
                         <stop offset="100%" stopColor="#764ba2" />
                       </linearGradient>
                     </defs>
                     <circle
                       r={centerRadius}
-                      fill="url(#centerGradient)"
+                      fill={`url(#centerGradient-${node.id})`}
                       stroke="#fff"
                       strokeWidth="3"
                     />
-                    <text
-                      textAnchor="middle"
-                      fill="#fff"
-                      fontSize="24"
-                      fontWeight="bold"
-                      dy="-5"
-                    >
-                      {services.length}
-                    </text>
-                    <text
-                      textAnchor="middle"
-                      fill="rgba(255,255,255,0.8)"
-                      fontSize="11"
-                      dy="12"
-                    >
-                      INSTANCES
-                    </text>
+                    {node.groupKey ? (
+                      // Grouped center node - show group key and count
+                      <>
+                        <text
+                          textAnchor="middle"
+                          fill="#fff"
+                          fontSize="12"
+                          fontWeight="bold"
+                          dy="-12"
+                        >
+                          {node.groupKey === 'unknown' ? '---' : node.groupKey.toUpperCase()}
+                        </text>
+                        <text
+                          textAnchor="middle"
+                          fill="#fff"
+                          fontSize="20"
+                          fontWeight="bold"
+                          dy="8"
+                        >
+                          {centerCount}
+                        </text>
+                        <text
+                          textAnchor="middle"
+                          fill="rgba(255,255,255,0.8)"
+                          fontSize="9"
+                          dy="22"
+                        >
+                          INSTANCES
+                        </text>
+                      </>
+                    ) : (
+                      // Single center node - show total count
+                      <>
+                        <text
+                          textAnchor="middle"
+                          fill="#fff"
+                          fontSize="24"
+                          fontWeight="bold"
+                          dy="-5"
+                        >
+                          {centerCount}
+                        </text>
+                        <text
+                          textAnchor="middle"
+                          fill="rgba(255,255,255,0.8)"
+                          fontSize="11"
+                          dy="12"
+                        >
+                          INSTANCES
+                        </text>
+                      </>
+                    )}
                   </g>
                 );
               }
@@ -1067,7 +1163,6 @@ const ServerListPage: React.FC = () => {
   const [bulkHealthCheckSelected, setBulkHealthCheckSelected] = useState<Set<string>>(new Set());
 
   // Grouping state (persisted in localStorage)
-  type GroupingOption = 'none' | 'group' | 'environment' | 'region';
   const [groupingBy, setGroupingBy] = useState<GroupingOption>(() => {
     return (localStorage.getItem('serverListGroupingBy') as GroupingOption) || 'none';
   });
@@ -3323,6 +3418,7 @@ const ServerListPage: React.FC = () => {
           services={gridDisplayServices}
           heartbeatIds={heartbeatIds}
           t={t}
+          groupingBy={groupingBy}
         />
       )}
 

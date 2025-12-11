@@ -436,8 +436,8 @@ services:
       GATRIX_URL: http://backend-dev:5000
       EDGE_API_TOKEN: ${EDGE_API_TOKEN:-gatrix-unsecured-server-api-token}
       EDGE_APPLICATION_NAME: ${EDGE_APPLICATION_NAME:-edge-server}
-      # Target environments (comma-separated) - use all environments for dev
-      EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-01KBP3PMDF4MJPKYVX7ER1VMSH,01KBP3PMDFBWYEB9DGK7FS9KDT,01KBP3PMDFKP8MB9KPBY6EZZF2,01KBP3PPZSD79W1K2YXBYJ6E8G}
+      # Target environments - use '*' for all environments (Edge mode)
+      EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-*}
       # Redis for PubSub
       REDIS_HOST: redis
       REDIS_PORT: 6379

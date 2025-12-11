@@ -1095,6 +1095,18 @@ export class GatrixServerSDK {
     return this.cacheManager?.getStoreProductService();
   }
 
+  /**
+   * Get all cached data (for debugging/monitoring)
+   * Returns all cached data organized by type and environment
+   */
+  getAllCachedData(): any {
+    if (!this.cacheManager) {
+      this.logger.warn('SDK not initialized');
+      return {};
+    }
+    return this.cacheManager.getAllCachedData();
+  }
+
   // ============================================================================
   // Cleanup Methods
   // ============================================================================

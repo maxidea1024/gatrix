@@ -26,7 +26,7 @@ async function main(): Promise<void> {
     const server = app.listen(config.port, () => {
       logger.info(`Edge server listening on port ${config.port}`);
       logger.info(`Environment: ${config.nodeEnv}`);
-      logger.info(`Target environments: ${config.environments.join(', ')}`);
+      logger.info(`Target environments: ${config.environments === '*' ? '*' : config.environments.join(', ')}`);
     });
 
     // Graceful shutdown

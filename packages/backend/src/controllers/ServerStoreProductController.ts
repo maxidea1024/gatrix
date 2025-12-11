@@ -77,7 +77,8 @@ export class ServerStoreProductController {
             // Get target environments
             let targetEnvs: any[];
             if (isAllEnvironments) {
-              targetEnvs = await Environment.query().where('isActive', true);
+              // Environment table doesn't have isActive column - all environments are active
+              targetEnvs = await Environment.query();
             } else {
               targetEnvs = [];
               for (const envParam of environments) {

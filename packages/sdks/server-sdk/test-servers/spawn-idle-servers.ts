@@ -11,9 +11,13 @@ import path from 'path';
 
 const SERVER_COUNT = parseInt(process.argv[2] || '50');
 const ENVIRONMENT = process.argv[3] || 'development';
-const MIN_DELAY_MS = 2000; // 2 seconds
-const MAX_DELAY_MS = 10000; // 10 seconds
+const MIN_DELAY_MS = parseInt(process.argv[4] || '2000'); // default 2 seconds
+const MAX_DELAY_MS = parseInt(process.argv[5] || '10000'); // default 10 seconds
 const BASE_PORT = 11000;
+
+// Groups to distribute servers across
+const GROUPS = ['alpha', 'beta', 'gamma', 'delta'];
+const REGIONS = ['us-east', 'us-west', 'eu-west', 'ap-northeast'];
 
 const children: ChildProcess[] = [];
 
@@ -33,16 +37,24 @@ async function spawnServer(index: number): Promise<void> {
 
   const serverPath = path.join(__dirname, 'idle-server.ts');
 
+  // Distribute servers across groups and regions
+  const group = GROUPS[index % GROUPS.length];
+  const region = REGIONS[index % REGIONS.length];
+
   const child = spawn('npx', ['ts-node', serverPath, port.toString()], {
     env: {
       ...process.env,
       ENVIRONMENT: ENVIRONMENT,
       INSTANCE_NAME: instanceName,
       METRICS_PORT: port.toString(),
+      SERVICE_GROUP: group,
+      SERVICE_REGION: region,
     },
     stdio: ['ignore', 'pipe', 'pipe'],
     shell: true,
   });
+
+  console.log(`[${new Date().toISOString()}]   -> Group: ${group}, Region: ${region}`);
 
   children.push(child);
 
