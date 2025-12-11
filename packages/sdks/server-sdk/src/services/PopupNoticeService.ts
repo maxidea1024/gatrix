@@ -1,6 +1,7 @@
 /**
  * Popup Notice Service
  * Handles in-game popup notice retrieval
+ * Uses per-environment API pattern: GET /api/v1/server/:env/ingame-popup-notices
  */
 
 import { ApiClient } from '../client/ApiClient';
@@ -10,59 +11,126 @@ import { PopupNotice } from '../types/api';
 export class PopupNoticeService {
   private apiClient: ApiClient;
   private logger: Logger;
-  private cachedNotices: PopupNotice[] = [];
+  // Default environment for single-environment mode
+  private defaultEnvironment: string;
+  // Multi-environment cache: Map<environment (environmentName), PopupNotice[]>
+  private cachedNoticesByEnv: Map<string, PopupNotice[]> = new Map();
 
-  constructor(apiClient: ApiClient, logger: Logger) {
+  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
     this.apiClient = apiClient;
     this.logger = logger;
+    this.defaultEnvironment = defaultEnvironment;
   }
 
   /**
-   * Get active popup notices
-   * GET /api/v1/server/ingame-popup-notices
+   * Get popup notices for a specific environment
+   * GET /api/v1/server/:env/ingame-popup-notices
    */
-  async list(): Promise<PopupNotice[]> {
-    this.logger.debug('Fetching popup notices');
+  async listByEnvironment(environment: string): Promise<PopupNotice[]> {
+    const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/ingame-popup-notices`;
 
-    const response = await this.apiClient.get<PopupNotice[]>(
-      `/api/v1/server/ingame-popup-notices`
-    );
+    this.logger.debug('Fetching popup notices', { environment });
+
+    const response = await this.apiClient.get<PopupNotice[]>(endpoint);
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch popup notices');
     }
 
     const notices = response.data;
-    this.cachedNotices = notices;
+    this.cachedNoticesByEnv.set(environment, notices);
 
-    this.logger.info('Popup notices fetched', { count: notices.length });
+    this.logger.info('Popup notices fetched', { count: notices.length, environment });
 
     return notices;
   }
 
   /**
-   * Get cached popup notices (from memory)
+   * Get popup notices for multiple environments
+   * Fetches each environment separately and caches results
    */
-  getCached(): PopupNotice[] {
-    return this.cachedNotices;
+  async listByEnvironments(environments: string[]): Promise<PopupNotice[]> {
+    this.logger.debug('Fetching popup notices for multiple environments', { environments });
+
+    const results: PopupNotice[] = [];
+
+    for (const env of environments) {
+      try {
+        const notices = await this.listByEnvironment(env);
+        results.push(...notices);
+      } catch (error) {
+        this.logger.error(`Failed to fetch popup notices for environment ${env}`, { error });
+      }
+    }
+
+    this.logger.info('Popup notices fetched for all environments', {
+      count: results.length,
+      environmentCount: environments.length,
+    });
+
+    return results;
   }
 
   /**
-   * Refresh cached popup notices
+   * Get active popup notices (uses default environment for single-env mode)
+   * For backward compatibility
+   */
+  async list(): Promise<PopupNotice[]> {
+    return this.listByEnvironment(this.defaultEnvironment);
+  }
+
+  /**
+   * Get cached popup notices
+   * @param environment Environment name. If omitted, returns all notices as flat array.
+   */
+  getCached(environment?: string): PopupNotice[] {
+    if (environment) {
+      return this.cachedNoticesByEnv.get(environment) || [];
+    }
+    // No environment specified: return all notices as flat array
+    return Array.from(this.cachedNoticesByEnv.values()).flat();
+  }
+
+  /**
+   * Get all cached popup notices (all environments)
+   */
+  getAllCached(): Map<string, PopupNotice[]> {
+    return this.cachedNoticesByEnv;
+  }
+
+  /**
+   * Clear all cached data
+   */
+  clearCache(): void {
+    this.cachedNoticesByEnv.clear();
+    this.logger.debug('Popup notices cache cleared');
+  }
+
+  /**
+   * Refresh cached popup notices for a specific environment
+   */
+  async refreshByEnvironment(environment: string): Promise<PopupNotice[]> {
+    this.logger.info('Refreshing popup notices cache', { environment });
+    return await this.listByEnvironment(environment);
+  }
+
+  /**
+   * Refresh cached popup notices (uses default environment)
+   * For backward compatibility
    */
   async refresh(): Promise<PopupNotice[]> {
-    this.logger.info('Refreshing popup notices cache');
-    return await this.list();
+    return this.refreshByEnvironment(this.defaultEnvironment);
   }
 
   /**
    * Get popup notice by ID
-   * GET /api/v1/server/ingame-popup-notices/:id
+   * GET /api/v1/server/:env/ingame-popup-notices/:id
    */
-  async getById(id: number): Promise<PopupNotice> {
-    this.logger.debug('Fetching popup notice by ID', { id });
+  async getById(id: number, environment?: string): Promise<PopupNotice> {
+    const env = environment || this.defaultEnvironment;
+    this.logger.debug('Fetching popup notice by ID', { id, environment: env });
 
-    const response = await this.apiClient.get<{ notice: PopupNotice }>(`/api/v1/server/ingame-popup-notices/${id}`);
+    const response = await this.apiClient.get<{ notice: PopupNotice }>(`/api/v1/server/${encodeURIComponent(env)}/ingame-popup-notices/${id}`);
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch popup notice');
@@ -76,9 +144,10 @@ export class PopupNoticeService {
   /**
    * Update cache with new data
    */
-  updateCache(notices: PopupNotice[]): void {
-    this.cachedNotices = notices;
-    this.logger.debug('Popup notices cache updated', { count: notices.length });
+  updateCache(notices: PopupNotice[], environment?: string): void {
+    const envKey = environment || this.defaultEnvironment;
+    this.cachedNoticesByEnv.set(envKey, notices);
+    this.logger.debug('Popup notices cache updated', { environment: envKey, count: notices.length });
   }
 
   /**
@@ -87,14 +156,16 @@ export class PopupNoticeService {
    * If isVisible is true but not in cache, fetches and adds it to cache
    * If isVisible is true and in cache, fetches and updates it
    */
-  async updateSingleNotice(id: number, isVisible?: boolean | number): Promise<void> {
+  async updateSingleNotice(id: number, environment?: string, isVisible?: boolean | number): Promise<void> {
     try {
-      this.logger.debug('Updating single popup notice in cache', { id, isVisible });
+      this.logger.debug('Updating single popup notice in cache', { id, environment, isVisible });
+
+      const envKey = environment || this.defaultEnvironment;
 
       // If isVisible is explicitly false (0 or false), just remove from cache
       if (isVisible === false || isVisible === 0) {
-        this.logger.info('Popup notice isVisible=false, removing from cache', { id });
-        this.removeNotice(id);
+        this.logger.info('Popup notice isVisible=false, removing from cache', { id, environment: envKey });
+        this.removeNotice(id, environment);
         return;
       }
 
@@ -105,32 +176,36 @@ export class PopupNoticeService {
       // Fetch the single notice from backend using getById (instead of list)
       let updatedNotice: PopupNotice;
       try {
-        updatedNotice = await this.getById(id);
+        updatedNotice = await this.getById(id, environment);
       } catch (_error: any) {
         // If notice not found (404), it's no longer active or visible
-        this.logger.debug('Popup notice not found or not active, removing from cache', { id });
-        this.removeNotice(id);
+        this.logger.debug('Popup notice not found or not active, removing from cache', { id, environment: envKey });
+        this.removeNotice(id, environment);
         return;
       }
 
+      // Get current notices for this environment
+      const currentNotices = this.cachedNoticesByEnv.get(envKey) || [];
+
       // Check if notice already exists in cache
-      const existsInCache = this.cachedNotices.some(notice => notice.id === id);
+      const existsInCache = currentNotices.some(notice => notice.id === id);
 
       if (existsInCache) {
         // Immutable update: update existing notice
-        this.cachedNotices = this.cachedNotices.map(notice =>
-          notice.id === id ? updatedNotice : notice
-        );
-        this.logger.debug('Single popup notice updated in cache', { id });
+        const newNotices = currentNotices.map(notice => notice.id === id ? updatedNotice : notice);
+        this.cachedNoticesByEnv.set(envKey, newNotices);
+        this.logger.debug('Single popup notice updated in cache', { id, environment: envKey });
       } else {
         // Notice not in cache but found in backend (e.g., isActive changed from false to true)
         // Add it to cache
-        this.cachedNotices = [...this.cachedNotices, updatedNotice];
-        this.logger.debug('Single popup notice added to cache (was previously removed)', { id });
+        const newNotices = [...currentNotices, updatedNotice];
+        this.cachedNoticesByEnv.set(envKey, newNotices);
+        this.logger.debug('Single popup notice added to cache (was previously removed)', { id, environment: envKey });
       }
     } catch (error: any) {
       this.logger.error('Failed to update single popup notice in cache', {
         id,
+        environment,
         error: error.message,
       });
       // If update fails, fall back to full refresh
@@ -141,20 +216,25 @@ export class PopupNoticeService {
   /**
    * Remove a popup notice from cache (immutable)
    */
-  removeNotice(id: number): void {
-    this.logger.debug('Removing popup notice from cache', { id });
+  removeNotice(id: number, environment?: string): void {
+    this.logger.debug('Removing popup notice from cache', { id, environment });
+
+    const envKey = environment || this.defaultEnvironment;
+    const currentNotices = this.cachedNoticesByEnv.get(envKey) || [];
 
     // Immutable update: create new array without the deleted notice
-    this.cachedNotices = this.cachedNotices.filter(notice => notice.id !== id);
+    const newNotices = currentNotices.filter(notice => notice.id !== id);
+    this.cachedNoticesByEnv.set(envKey, newNotices);
 
-    this.logger.debug('Popup notice removed from cache', { id });
+    this.logger.debug('Popup notice removed from cache', { id, environment: envKey });
   }
 
   /**
    * Get active notices for a specific world
    */
-  getNoticesForWorld(worldId: string): PopupNotice[] {
-    return this.cachedNotices.filter((notice) => {
+  getNoticesForWorld(worldId: string, environment?: string): PopupNotice[] {
+    const notices = this.getCached(environment);
+    return notices.filter((notice) => {
       if (!notice.targetWorlds || notice.targetWorlds.length === 0) {
         return true; // No targeting = show to all
       }
@@ -174,11 +254,13 @@ export class PopupNoticeService {
     subChannel?: string;
     worldId?: string;
     userId?: string;
+    environment?: string;
   }): PopupNotice[] {
     const now = new Date();
-    const { platform, channel, subChannel, worldId, userId } = options ?? {};
+    const { platform, channel, subChannel, worldId, userId, environment } = options ?? {};
 
-    const filtered = this.cachedNotices.filter((notice) => {
+    const notices = this.getCached(environment);
+    const filtered = notices.filter((notice) => {
       // Check startDate: if set, current time must be after startDate
       if (notice.startDate) {
         const startDate = new Date(notice.startDate);

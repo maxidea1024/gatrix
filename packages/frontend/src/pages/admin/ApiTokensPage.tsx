@@ -1185,7 +1185,28 @@ const ApiTokensPage: React.FC = () => {
                     </Box>
                   }
                 />
+                <FormControlLabel
+                  value="all"
+                  control={<Radio size="small" />}
+                  label={
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: 'warning.main' }}>
+                        {t('apiTokens.allTokenType')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('apiTokens.allTokenDescription')}
+                      </Typography>
+                    </Box>
+                  }
+                />
               </RadioGroup>
+              {formData.tokenType === 'all' && (
+                <Alert severity="warning" sx={{ mt: 1, py: 0.5 }}>
+                  <Typography variant="caption">
+                    {t('apiTokens.allTokenWarning')}
+                  </Typography>
+                </Alert>
+              )}
             </FormControl>
 
             {/* Environment Access */}

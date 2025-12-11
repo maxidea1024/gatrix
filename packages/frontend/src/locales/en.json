@@ -1408,6 +1408,9 @@
     "clientTokenDescription": "Token for client SDK",
     "serverTokenType": "Server Token",
     "serverTokenDescription": "Token for server SDK",
+    "allTokenType": "All (Client + Server)",
+    "allTokenDescription": "Token that can access both client and server APIs",
+    "allTokenWarning": "Warning: This token can access both client and server APIs, which may pose a higher security risk. Use only in trusted environments such as internal system integrations.",
     "tokenTypeNotEditable": "Token type cannot be changed after creation",
     "tokenValue": "Token Value",
     "lastUsed": "Last Used",
@@ -1428,6 +1431,7 @@
     "types": {
       "client": "Client",
       "server": "Server",
+      "all": "All",
       "admin": "Admin"
     },
     "permissionTypes": {

@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { sdkManager } from '../services/sdkManager';
+import { tokenMirrorService } from '../services/tokenMirrorService';
 
 const router = Router();
 
@@ -9,12 +10,17 @@ const router = Router();
  */
 router.get('/', (req: Request, res: Response) => {
   const sdk = sdkManager.getSDK();
-  const isReady = sdk !== null;
+  const isSdkReady = sdk !== null;
+  const isTokenMirrorReady = tokenMirrorService.isInitialized();
+  const isReady = isSdkReady && isTokenMirrorReady;
 
   res.status(isReady ? 200 : 503).json({
     status: isReady ? 'healthy' : 'initializing',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
+    sdk: isSdkReady ? 'ready' : 'initializing',
+    tokenMirror: isTokenMirrorReady ? 'ready' : 'initializing',
+    tokenCount: tokenMirrorService.getTokenCount(),
   });
 });
 

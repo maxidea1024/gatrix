@@ -1,15 +1,9 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { RemoteConfigTemplate } from '../models/RemoteConfigTemplate';
-import { Environment } from '../models/Environment';
-import { ApiAccessToken } from '../models/ApiAccessToken';
 import { asyncHandler } from '../utils/asyncHandler';
 import { CacheService } from '../services/CacheService';
 import logger from '../config/logger';
-
-interface SDKRequest extends Request {
-  apiToken?: ApiAccessToken;
-  environment?: Environment;
-}
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 interface UserContext {
   userId?: string;
@@ -24,7 +18,7 @@ export class RemoteConfigSDKController {
   /**
    * Get client templates for SDK
    */
-  static getClientTemplates = asyncHandler(async (req: SDKRequest, res: Response) => {
+  static getClientTemplates = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
     const environment = req.environment;
     const etag = req.headers['if-none-match'];
 
@@ -116,8 +110,9 @@ export class RemoteConfigSDKController {
 
   /**
    * Get server templates for SDK
+   * GET /api/v1/server/:env/templates
    */
-  static getServerTemplates = asyncHandler(async (req: SDKRequest, res: Response) => {
+  static getServerTemplates = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
     const environment = req.environment;
     const etag = req.headers['if-none-match'];
 
@@ -210,7 +205,7 @@ export class RemoteConfigSDKController {
   /**
    * Evaluate config for client SDK
    */
-  static evaluateConfig = asyncHandler(async (req: SDKRequest, res: Response) => {
+  static evaluateConfig = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
     const { configKey, userContext } = req.body;
     const environment = req.environment;
 
@@ -277,8 +272,9 @@ export class RemoteConfigSDKController {
 
   /**
    * Submit metrics from SDK
+   * POST /api/v1/server/:env/metrics
    */
-  static submitMetrics = asyncHandler(async (req: SDKRequest, res: Response) => {
+  static submitMetrics = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
     const { metrics } = req.body;
     const environment = req.environment;
     const apiToken = req.apiToken;

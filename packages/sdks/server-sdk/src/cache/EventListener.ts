@@ -278,7 +278,7 @@ export class EventListener {
         // Pass isVisible from event data to avoid unnecessary API calls
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
         const gameWorldIsVisible = event.data.isVisible === 0 ? false : (event.data.isVisible === 1 ? true : event.data.isVisible);
-        await this.cacheManager.updateSingleGameWorld(Number(event.data.id), gameWorldIsVisible);
+        await this.cacheManager.updateSingleGameWorld(Number(event.data.id), event.data.environment, gameWorldIsVisible);
         break;
 
       case 'gameworld.deleted':
@@ -298,7 +298,7 @@ export class EventListener {
         // Pass isVisible from event data to avoid unnecessary API calls
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
         const popupIsVisible = event.data.isVisible === 0 ? false : (event.data.isVisible === 1 ? true : event.data.isVisible);
-        await this.cacheManager.updateSinglePopupNotice(Number(event.data.id), popupIsVisible);
+        await this.cacheManager.updateSinglePopupNotice(Number(event.data.id), event.data.environment, popupIsVisible);
         break;
 
       case 'popup.deleted':
@@ -312,7 +312,7 @@ export class EventListener {
         // Pass isActive from event data to avoid unnecessary API calls
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
         const surveyIsActive = event.data.isActive === 0 ? false : (event.data.isActive === 1 ? true : event.data.isActive);
-        await this.cacheManager.updateSingleSurvey(String(event.data.id), surveyIsActive);
+        await this.cacheManager.updateSingleSurvey(String(event.data.id), event.data.environment, surveyIsActive);
         break;
 
       case 'survey.deleted':

@@ -14,20 +14,22 @@ import { ulid } from 'ulid';
 import { pubSubService } from '../../services/PubSubService';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../../constants/cacheKeys';
 import { respondWithEtagCache } from '../../utils/serverSdkEtagCache';
+import { EnvironmentRequest } from '../../middleware/environmentResolver';
 
 const router = express.Router();
 
 /**
  * Get whitelists (IP and Account)
- * GET /api/v1/server/whitelists
+ * GET /api/v1/server/:env/whitelists
  *
  * Returns enabled whitelists for server-side validation
  * Exported as a separate handler for use in both /services/whitelists and /whitelists paths
  */
-export const getWhitelistsHandler = async (req: any, res: any) => {
+export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) => {
+  const environment = req.environment!;
   try {
     await respondWithEtagCache(res, {
-      cacheKey: SERVER_SDK_ETAG.WHITELISTS,
+      cacheKey: `${SERVER_SDK_ETAG.WHITELISTS}:${environment.id}`,
       ttlMs: DEFAULT_CONFIG.WHITELIST_TTL,
       requestEtag: req.headers?.['if-none-match'],
       buildPayload: async () => {

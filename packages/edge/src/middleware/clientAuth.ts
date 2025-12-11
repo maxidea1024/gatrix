@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import logger from '../config/logger';
+import { tokenMirrorService } from '../services/tokenMirrorService';
 
 export interface ClientRequest extends Request {
   clientContext?: {
@@ -12,12 +13,14 @@ export interface ClientRequest extends Request {
     environment: string;
     clientVersion?: string;
     platform?: string;
+    tokenName?: string;
   };
 }
 
 /**
  * Client authentication middleware
- * Validates required headers from client requests
+ * Validates required headers and API token from client requests
+ * Uses locally mirrored tokens for validation (no backend call needed)
  */
 export function clientAuth(req: ClientRequest, res: Response, next: NextFunction): void {
   const apiToken = req.headers['x-api-token'] as string;
@@ -60,9 +63,31 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     return;
   }
 
-  // TODO: Validate API token against cached tokens
-  // For now, we just pass through the headers
-  // In production, this should validate against ApiTokenCacheService
+  // Validate API token using mirrored tokens
+  const validation = tokenMirrorService.validateToken(apiToken, 'client', environment);
+
+  if (!validation.valid) {
+    const errorMessages: Record<string, { code: string; message: string }> = {
+      not_found: { code: 'INVALID_TOKEN', message: 'Invalid API token' },
+      expired: { code: 'TOKEN_EXPIRED', message: 'API token has expired' },
+      invalid_type: { code: 'INVALID_TOKEN_TYPE', message: 'Token is not authorized for client API access' },
+      invalid_environment: { code: 'INVALID_ENVIRONMENT', message: 'Token is not authorized for this environment' },
+    };
+
+    const error = errorMessages[validation.reason || 'not_found'];
+
+    logger.warn('Client authentication failed', {
+      reason: validation.reason,
+      environment,
+      applicationName,
+    });
+
+    res.status(401).json({
+      success: false,
+      error,
+    });
+    return;
+  }
 
   // Set client context
   req.clientContext = {
@@ -71,6 +96,7 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     environment,
     clientVersion,
     platform,
+    tokenName: validation.token?.tokenName,
   };
 
   logger.debug('Client authenticated', {
@@ -78,6 +104,7 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     environment,
     clientVersion,
     platform,
+    tokenName: validation.token?.tokenName,
   });
 
   next();

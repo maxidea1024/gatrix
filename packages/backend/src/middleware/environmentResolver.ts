@@ -6,7 +6,7 @@
 import { Response, NextFunction } from 'express';
 import { SDKRequest } from './apiTokenAuth';
 import { Environment } from '../models/Environment';
-import logger from '../utils/logger';
+import logger from '../config/logger';
 
 export interface EnvironmentRequest extends SDKRequest {
   environment?: Environment;

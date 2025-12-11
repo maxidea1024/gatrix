@@ -11,7 +11,9 @@ export const config = {
 
   // Backend API configuration
   gatrixUrl: process.env.GATRIX_URL || 'http://localhost:3000',
-  apiToken: process.env.EDGE_API_TOKEN || '',
+  // Edge bypass token - allows access to all environments and internal APIs
+  // Can be configured via EDGE_BYPASS_TOKEN or EDGE_API_TOKEN environment variable
+  apiToken: process.env.EDGE_BYPASS_TOKEN || process.env.EDGE_API_TOKEN || 'gatrix-edge-internal-bypass-token',
   applicationName: process.env.EDGE_APPLICATION_NAME || 'edge-server',
 
   // SDK required fields for metrics labels and service discovery

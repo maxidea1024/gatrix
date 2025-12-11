@@ -1408,6 +1408,9 @@
     "clientTokenDescription": "클라이언트 SDK를 위한 토큰입니다",
     "serverTokenType": "서버 토큰",
     "serverTokenDescription": "서버 SDK를 위한 토큰입니다",
+    "allTokenType": "전체 (Client + Server)",
+    "allTokenDescription": "클라이언트와 서버 API 모두에 접근할 수 있는 토큰입니다",
+    "allTokenWarning": "주의: 이 토큰은 클라이언트와 서버 API 모두에 접근할 수 있어 보안 위험이 높을 수 있습니다. 내부 시스템 연동 등 신뢰할 수 있는 환경에서만 사용하세요.",
     "tokenTypeNotEditable": "토큰 유형은 생성 후 변경할 수 없습니다",
     "tokenValue": "토큰 값",
     "lastUsed": "마지막 사용",
@@ -1428,6 +1431,7 @@
     "types": {
       "client": "클라이언트",
       "server": "서버",
+      "all": "전체",
       "admin": "관리자"
     },
     "permissionTypes": {

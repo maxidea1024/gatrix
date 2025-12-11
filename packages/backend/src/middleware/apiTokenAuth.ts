@@ -15,11 +15,19 @@ import {
 const UNSECURED_CLIENT_TOKEN = 'gatrix-unsecured-client-api-token';
 const UNSECURED_SERVER_TOKEN = 'gatrix-unsecured-server-api-token';
 
-interface SDKRequest extends Request {
+// Edge bypass token - allows access to all environments and internal APIs
+// This token is used by Edge servers that run in internal network
+// Can be configured via EDGE_BYPASS_TOKEN environment variable
+// TODO: In the future, this should be replaced with a generated/registered token
+export const EDGE_BYPASS_TOKEN = process.env.EDGE_BYPASS_TOKEN || 'gatrix-edge-internal-bypass-token';
+
+export interface SDKRequest extends Request {
   apiToken?: ApiAccessToken;
   environments?: Environment[];
   environment?: Environment;
+  environmentId?: string;
   isUnsecuredToken?: boolean; // Flag to indicate unsecured token usage
+  isEdgeBypassToken?: boolean; // Flag to indicate Edge bypass token usage
 }
 
 /**
@@ -81,7 +89,7 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       // Cache the token for 5 minutes
       await CacheService.set(cacheKey, apiToken, 300);
     } else {
-      // 캐시?�서 ?�큰??찾았?�도 ?�용??기록
+      // 캐시?�서 ?�큰??찾았?�도 ?�용??기록
       if (apiToken.id) {
         const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
         apiTokenUsageService.recordTokenUsage(apiToken.id).catch(error => {
@@ -167,6 +175,7 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
 
 /**
  * Middleware to check token type
+ * 'all' token type can access both client and server APIs
  */
 export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
   return (req: SDKRequest, res: Response, next: NextFunction) => {
@@ -177,6 +186,11 @@ export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
         success: false,
         message: 'API token not found'
       });
+    }
+
+    // 'all' token type can access any API
+    if (apiToken.tokenType === 'all') {
+      return next();
     }
 
     if (apiToken.tokenType !== tokenType) {
@@ -227,9 +241,9 @@ export const sdkRateLimit = (req: SDKRequest, res: Response, next: NextFunction)
 };
 
 /**
- * SDK ?�경 ?�정 미들?�어
- * X-Environment-Id ?�더 ?�는 기본 ?�경???�용?�여 req.environment�??�정?�니??
- * ?�큰???�경 ?�근 권한??검증합?�다.
+ * SDK ?�경 ?�정 미들?�어
+ * X-Environment-Id ?�더 ?�는 기본 ?�경???�용?�여 req.environment�??�정?�니??
+ * ?�큰???�경 ?�근 권한??검증합?�다.
  */
 export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
@@ -329,8 +343,8 @@ export const clientSDKAuth = [
 ];
 
 /**
- * Server API ?�큰 ?�증 미들?�어
- * X-API-Token ?�더�??�용?�여 ?�버 �??�신???�증?�니??
+ * Server API ?�큰 ?�증 미들?�어
+ * X-API-Token ?�더�??�용?�여 ?�버 �??�신???�증?�니??
  */
 export const authenticateServerApiToken = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
@@ -368,6 +382,24 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
       return next();
     }
 
+    // Check for Edge bypass token (internal network only)
+    if (apiToken === EDGE_BYPASS_TOKEN) {
+      req.isUnsecuredToken = true;
+      req.isEdgeBypassToken = true;
+      req.apiToken = {
+        id: 'edge-bypass',
+        tokenType: 'server',
+        tokenValue: EDGE_BYPASS_TOKEN,
+        tokenName: 'Edge Bypass Token (Internal)',
+        allowAllEnvironments: true,
+        isActive: true,
+        expiresAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any;
+      return next();
+    }
+
     // Try to get token from cache first
     const cacheKey = `server_api_token:${apiToken.substring(0, 16)}...`;
     let validatedToken = await CacheService.get<ApiAccessToken>(cacheKey);
@@ -383,8 +415,8 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
         });
       }
 
-      // ?�버 ?�큰?��? ?�인
-      if (validatedToken.tokenType !== 'server') {
+      // Check server token type - 'server' or 'all' are allowed
+      if (validatedToken.tokenType !== 'server' && validatedToken.tokenType !== 'all') {
         return res.status(403).json({
           success: false,
           message: 'Server API token required'
@@ -395,7 +427,7 @@ export const authenticateServerApiToken = async (req: SDKRequest, res: Response,
       await CacheService.set(cacheKey, validatedToken, 5 * 60 * 1000);
     }
 
-    // ?�청 객체???�큰 ?�보 추�?
+    // ?�청 객체???�큰 ?�보 추�?
     req.apiToken = validatedToken;
 
     next();

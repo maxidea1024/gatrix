@@ -1,126 +1,101 @@
 /**
  * Client Version Service
  * Handles client version list and retrieval
- * Supports both single-environment (default) and multi-environment (Edge) modes
+ * Uses per-environment API pattern: GET /api/v1/server/:env/client-versions
  */
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
-import { ClientVersion, ClientVersionListResponse, ClientVersionByEnvResponse } from '../types/api';
+import { ClientVersion, ClientVersionListResponse } from '../types/api';
 
 export class ClientVersionService {
   private apiClient: ApiClient;
   private logger: Logger;
-  // Target environments ('*' = all environments, string[] = specific, empty = single mode)
-  // Note: environments are identified by environmentName
-  private environments: string[] | '*';
+  // Default environment for single-environment mode
+  private defaultEnvironment: string;
   // Multi-environment cache: Map<environment (environmentName), ClientVersion[]>
   private cachedVersionsByEnv: Map<string, ClientVersion[]> = new Map();
-  // Default environment key (for single-environment mode)
-  private defaultEnvKey: string = 'default';
 
-  constructor(apiClient: ApiClient, logger: Logger, environments: string[] | '*' = []) {
+  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.environments = environments;
-  }
-
-  private isMultiEnvironment(): boolean {
-    return this.environments === '*' || (Array.isArray(this.environments) && this.environments.length > 0);
-  }
-
-  private isAllEnvironments(): boolean {
-    return this.environments === '*';
+    this.defaultEnvironment = defaultEnvironment;
   }
 
   /**
-   * Get all client versions
-   * Single-env mode: GET /api/v1/server/client-versions -> { clientVersions: [...] }
-   * Multi-env mode: GET /api/v1/server/client-versions?environments=... -> { byEnvironment: { [env]: [...] } }
-   * All-env mode: GET /api/v1/server/client-versions?environments=* -> { byEnvironment: { [env]: [...] } }
+   * Get client versions for a specific environment
+   * GET /api/v1/server/:env/client-versions -> { clientVersions: [...] }
+   */
+  async listByEnvironment(environment: string): Promise<ClientVersion[]> {
+    const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/client-versions`;
+
+    this.logger.debug('Fetching client versions', { environment });
+
+    const response = await this.apiClient.get<ClientVersionListResponse>(endpoint);
+
+    if (!response.success || !response.data) {
+      throw new Error(response.error?.message || 'Failed to fetch client versions');
+    }
+
+    const versions = response.data.clientVersions;
+    this.cachedVersionsByEnv.set(environment, versions);
+
+    this.logger.info('Client versions fetched', {
+      count: versions.length,
+      environment,
+    });
+
+    return versions;
+  }
+
+  /**
+   * Get client versions for multiple environments
+   * Fetches each environment separately and caches results
+   */
+  async listByEnvironments(environments: string[]): Promise<ClientVersion[]> {
+    this.logger.debug('Fetching client versions for multiple environments', { environments });
+
+    const results: ClientVersion[] = [];
+
+    for (const env of environments) {
+      try {
+        const versions = await this.listByEnvironment(env);
+        results.push(...versions);
+      } catch (error) {
+        this.logger.error(`Failed to fetch client versions for environment ${env}`, { error });
+      }
+    }
+
+    this.logger.info('Client versions fetched for all environments', {
+      count: results.length,
+      environmentCount: environments.length,
+    });
+
+    return results;
+  }
+
+  /**
+   * Get all client versions (uses default environment for single-env mode)
+   * For backward compatibility
    */
   async list(): Promise<ClientVersion[]> {
-    let endpoint = `/api/v1/server/client-versions`;
-    if (this.isAllEnvironments()) {
-      endpoint += `?environments=*`;
-    } else if (this.isMultiEnvironment()) {
-      endpoint += `?environments=${(this.environments as string[]).join(',')}`;
-    }
-
-    this.logger.debug('Fetching client versions', { environments: this.environments });
-
-    // Clear cache before fetching
-    this.cachedVersionsByEnv.clear();
-
-    if (this.isMultiEnvironment()) {
-      // Multi-environment mode: backend returns { byEnvironment: { [env]: data[] } }
-      const response = await this.apiClient.get<ClientVersionByEnvResponse>(endpoint);
-
-      if (!response.success || !response.data) {
-        throw new Error(response.error?.message || 'Failed to fetch client versions');
-      }
-
-      const byEnvironment = response.data.byEnvironment;
-      let totalCount = 0;
-
-      // Store directly by environment key (already separated by backend)
-      for (const [envName, versions] of Object.entries(byEnvironment)) {
-        this.cachedVersionsByEnv.set(envName, versions);
-        totalCount += versions.length;
-      }
-
-      this.logger.info('Client versions fetched', {
-        count: totalCount,
-        environmentCount: this.cachedVersionsByEnv.size,
-        environments: this.environments,
-      });
-
-      // Return all versions as flat array for backward compatibility
-      return Array.from(this.cachedVersionsByEnv.values()).flat();
-    } else {
-      // Single-environment mode: backend returns { clientVersions: [...] }
-      const response = await this.apiClient.get<ClientVersionListResponse>(endpoint);
-
-      if (!response.success || !response.data) {
-        throw new Error(response.error?.message || 'Failed to fetch client versions');
-      }
-
-      const versions = response.data.clientVersions;
-      this.cachedVersionsByEnv.set(this.defaultEnvKey, versions);
-
-      this.logger.info('Client versions fetched', {
-        count: versions.length,
-        environments: 'single',
-      });
-
-      return versions;
-    }
+    return this.listByEnvironment(this.defaultEnvironment);
   }
 
   /**
    * Get cached client versions
-   * @param environment Environment name. Only used in multi-environment mode.
-   *                    If omitted in multi-environment mode, returns all versions as flat array.
+   * @param environment Environment name. If omitted, returns all versions as flat array.
    */
   getCached(environment?: string): ClientVersion[] {
-    if (!this.isMultiEnvironment()) {
-      // Single-environment mode: return default key
-      return this.cachedVersionsByEnv.get(this.defaultEnvKey) || [];
-    }
-
-    // Multi-environment mode
     if (environment) {
-      // Specific environment requested
       return this.cachedVersionsByEnv.get(environment) || [];
     }
-
     // No environment specified: return all versions as flat array
     return Array.from(this.cachedVersionsByEnv.values()).flat();
   }
 
   /**
    * Get all cached client versions (all environments)
-   * Only meaningful in multi-environment mode
    */
   getAllCached(): Map<string, ClientVersion[]> {
     return this.cachedVersionsByEnv;
@@ -135,22 +110,28 @@ export class ClientVersionService {
   }
 
   /**
-   * Refresh cached client versions
-   * Invalidates ETag cache first to ensure fresh data is fetched
+   * Refresh cached client versions for a specific environment
+   */
+  async refreshByEnvironment(environment: string): Promise<ClientVersion[]> {
+    this.logger.info('Refreshing client versions cache', { environment });
+    // Invalidate ETag cache to force fresh data fetch
+    this.apiClient.invalidateEtagCache(`/api/v1/server/${encodeURIComponent(environment)}/client-versions`);
+    return await this.listByEnvironment(environment);
+  }
+
+  /**
+   * Refresh cached client versions (uses default environment)
+   * For backward compatibility
    */
   async refresh(): Promise<ClientVersion[]> {
-    this.logger.info('Refreshing client versions cache');
-    // Invalidate ETag cache to force fresh data fetch
-    this.apiClient.invalidateEtagCache('/api/v1/server/client-versions');
-    return await this.list();
+    return this.refreshByEnvironment(this.defaultEnvironment);
   }
 
   /**
    * Update cache with new data
-   * @param environment Environment name. Only used in multi-environment mode.
    */
   updateCache(versions: ClientVersion[], environment?: string): void {
-    const envKey = this.isMultiEnvironment() ? (environment || this.defaultEnvKey) : this.defaultEnvKey;
+    const envKey = environment || this.defaultEnvironment;
     this.cachedVersionsByEnv.set(envKey, versions);
     this.logger.debug('Client versions cache updated', { environment: envKey, count: versions.length });
   }

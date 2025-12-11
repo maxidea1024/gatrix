@@ -100,13 +100,14 @@ export class GatrixServerSDK {
       metrics: this.metrics,
     });
 
-    // Initialize services
-    this.coupon = new CouponService(this.apiClient, this.logger);
-    this.gameWorld = new GameWorldService(this.apiClient, this.logger);
-    this.popupNotice = new PopupNoticeService(this.apiClient, this.logger);
-    this.survey = new SurveyService(this.apiClient, this.logger);
-    this.whitelist = new WhitelistService(this.apiClient, this.logger);
-    this.serviceMaintenance = new ServiceMaintenanceService(this.apiClient, this.logger);
+    // Initialize services with default environment
+    const defaultEnv = configWithDefaults.environment || 'development';
+    this.coupon = new CouponService(this.apiClient, this.logger, defaultEnv);
+    this.gameWorld = new GameWorldService(this.apiClient, this.logger, defaultEnv);
+    this.popupNotice = new PopupNoticeService(this.apiClient, this.logger, defaultEnv);
+    this.survey = new SurveyService(this.apiClient, this.logger, defaultEnv);
+    this.whitelist = new WhitelistService(this.apiClient, this.logger, defaultEnv);
+    this.serviceMaintenance = new ServiceMaintenanceService(this.apiClient, this.logger, defaultEnv);
     this.serviceDiscovery = new ServiceDiscoveryService(this.apiClient, this.logger);
 
     this.logger.info('GatrixServerSDK created', {

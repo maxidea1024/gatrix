@@ -434,7 +434,8 @@ services:
       EDGE_METRICS_PORT: 9400
       # Backend API configuration
       GATRIX_URL: http://backend-dev:5000
-      EDGE_API_TOKEN: ${EDGE_API_TOKEN:-gatrix-unsecured-server-api-token}
+      # Edge bypass token - allows access to all environments and internal APIs
+      EDGE_BYPASS_TOKEN: ${EDGE_BYPASS_TOKEN:-gatrix-edge-internal-bypass-token}
       EDGE_APPLICATION_NAME: ${EDGE_APPLICATION_NAME:-edge-server}
       # Target environments - use '*' for all environments (Edge mode)
       EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-*}

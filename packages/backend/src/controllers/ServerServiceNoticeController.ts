@@ -1,13 +1,9 @@
-import { Request, Response } from 'express';
-import { Environment } from '../models/Environment';
+import { Response } from 'express';
 import ServiceNoticeService from '../services/ServiceNoticeService';
 import logger from '../config/logger';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
-
-export interface SDKRequest extends Request {
-  apiToken?: any;
-}
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 /**
  * Server SDK Service Notice Controller
@@ -15,23 +11,16 @@ export interface SDKRequest extends Request {
  */
 export class ServerServiceNoticeController {
   /**
-   * Get service notices list
-   * GET /api/v1/server/service-notices
-   * GET /api/v1/server/service-notices?environments=env1,env2,env3
-   * Returns all active service notices
+   * Get service notices for a specific environment
+   * GET /api/v1/server/:env/service-notices
+   * Returns all active service notices for the specified environment
    */
-  static async getServiceNotices(req: SDKRequest, res: Response) {
+  static async getServiceNotices(req: EnvironmentRequest, res: Response) {
     try {
-      // Parse environments query parameter
-      // '*' means all environments
-      const environmentsParam = req.query.environments as string | undefined;
-      const isAllEnvironments = environmentsParam === '*';
-      const environments = environmentsParam && !isAllEnvironments
-        ? environmentsParam.split(',').map(e => e.trim()).filter(Boolean)
-        : [];
+      const environment = req.environment!;
 
       await respondWithEtagCache(res, {
-        cacheKey: SERVER_SDK_ETAG.SERVICE_NOTICES,
+        cacheKey: `${SERVER_SDK_ETAG.SERVICE_NOTICES}:${environment.id}`,
         ttlMs: DEFAULT_CONFIG.SERVICE_NOTICE_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
@@ -51,102 +40,23 @@ export class ServerServiceNoticeController {
             });
           };
 
-          // All environments mode or specific environments mode
-          if (isAllEnvironments || environments.length > 0) {
-            const byEnvironment: Record<string, any[]> = {};
-            let totalCount = 0;
+          const result = await ServiceNoticeService.getServiceNotices(
+            1,
+            1000,
+            { isActive: true, environmentId: environment.id }
+          );
 
-            // Get target environments
-            let targetEnvs: any[];
-            if (isAllEnvironments) {
-              // Environment table doesn't have isActive column - all environments are active
-              targetEnvs = await Environment.query();
-            } else {
-              targetEnvs = [];
-              for (const envParam of environments) {
-                let env = await Environment.query().findById(envParam);
-                if (!env) {
-                  env = await Environment.getByName(envParam);
-                }
-                if (env) {
-                  targetEnvs.push(env);
-                } else {
-                  logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
-                }
-              }
-            }
+          const activeNotices = filterActiveNotices(result.notices);
 
-            for (const env of targetEnvs) {
-              const result = await ServiceNoticeService.getServiceNotices(
-                1,
-                1000,
-                { environmentId: env.id, isActive: true }
-              );
+          logger.info(`Server SDK: Retrieved ${activeNotices.length} active service notices for environment ${environment.environmentName}`);
 
-              const activeNotices = filterActiveNotices(result.notices);
-              byEnvironment[env.environmentName] = activeNotices;
-              totalCount += activeNotices.length;
-            }
-
-            logger.info(
-              `Server SDK: Retrieved ${totalCount} active service notices across ${Object.keys(byEnvironment).length} environments`,
-              { mode: isAllEnvironments ? 'all' : 'specific', environments: Object.keys(byEnvironment) }
-            );
-
-            return {
-              success: true,
-              data: {
-                byEnvironment,
-                total: totalCount,
-              },
-            };
-          } else {
-            // Single-environment mode: return flat array
-            // Use X-Environment header to determine environment (required for Server SDK)
-            const envHeader = req.headers['x-environment'] as string | undefined;
-            if (!envHeader) {
-              return res.status(400).json({
-                success: false,
-                error: {
-                  code: 'MISSING_ENVIRONMENT',
-                  message: 'X-Environment header is required for single-environment mode',
-                },
-              });
-            }
-
-            // Resolve environment by name or ID
-            let targetEnv = await Environment.query().findById(envHeader);
-            if (!targetEnv) {
-              targetEnv = await Environment.getByName(envHeader);
-            }
-            if (!targetEnv) {
-              return res.status(400).json({
-                success: false,
-                error: {
-                  code: 'INVALID_ENVIRONMENT',
-                  message: `Environment '${envHeader}' not found`,
-                },
-              });
-            }
-
-            const result = await ServiceNoticeService.getServiceNotices(
-              1,
-              1000,
-              { isActive: true, environmentId: targetEnv.id }
-            );
-
-            const activeNotices = filterActiveNotices(result.notices);
-
-            logger.info(`Server SDK: Retrieved ${activeNotices.length} active service notices for environment ${targetEnv.environmentName}`);
-
-            return {
-              success: true,
-              data: {
-                notices: activeNotices,
-                total: activeNotices.length,
-              },
-            };
-          }
+          return {
+            success: true,
+            data: {
+              notices: activeNotices,
+              total: activeNotices.length,
+            },
+          };
         },
       });
     } catch (error) {
@@ -163,9 +73,9 @@ export class ServerServiceNoticeController {
 
   /**
    * Get specific service notice by ID
-   * GET /api/v1/server/service-notices/:id
+   * GET /api/v1/server/:env/service-notices/:id
    */
-  static async getServiceNoticeById(req: SDKRequest, res: Response) {
+  static async getServiceNoticeById(req: EnvironmentRequest, res: Response) {
     try {
       const { id } = req.params;
       const noticeId = parseInt(id);

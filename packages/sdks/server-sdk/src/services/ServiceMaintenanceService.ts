@@ -1,6 +1,7 @@
 /**
  * Service Maintenance Service
  * Handles global service maintenance status retrieval and caching
+ * Uses per-environment API pattern: GET /api/v1/server/:env/maintenance
  */
 
 import { ApiClient } from '../client/ApiClient';
@@ -10,23 +11,27 @@ import { MaintenanceStatus } from '../types/api';
 export class ServiceMaintenanceService {
   private apiClient: ApiClient;
   private logger: Logger;
-  private cachedStatus: MaintenanceStatus | null = null;
+  // Default environment for single-environment mode
+  private defaultEnvironment: string;
+  // Multi-environment cache: Map<environment (environmentName), MaintenanceStatus>
+  private cachedStatusByEnv: Map<string, MaintenanceStatus> = new Map();
 
-  constructor(apiClient: ApiClient, logger: Logger) {
+  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
     this.apiClient = apiClient;
     this.logger = logger;
+    this.defaultEnvironment = defaultEnvironment;
   }
 
   /**
-   * Fetch service maintenance status from backend
-   * GET /api/v1/server/maintenance
+   * Fetch service maintenance status for a specific environment
+   * GET /api/v1/server/:env/maintenance
    */
-  async getStatus(): Promise<MaintenanceStatus> {
-    this.logger.debug('Fetching service maintenance status');
+  async getStatusByEnvironment(environment: string): Promise<MaintenanceStatus> {
+    const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/maintenance`;
 
-    const response = await this.apiClient.get<MaintenanceStatus>(
-      '/api/v1/server/maintenance'
-    );
+    this.logger.debug('Fetching service maintenance status', { environment });
+
+    const response = await this.apiClient.get<MaintenanceStatus>(endpoint);
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch service maintenance status');
@@ -38,9 +43,10 @@ export class ServiceMaintenanceService {
       isMaintenanceActive: response.data.isMaintenanceActive ?? false,
     };
 
-    this.cachedStatus = status;
+    this.cachedStatusByEnv.set(environment, status);
 
     this.logger.info('Service maintenance status fetched', {
+      environment,
       hasMaintenanceScheduled: status.hasMaintenanceScheduled,
       isMaintenanceActive: status.isMaintenanceActive,
     });
@@ -49,36 +55,95 @@ export class ServiceMaintenanceService {
   }
 
   /**
-   * Refresh service maintenance cache
+   * Fetch service maintenance status for multiple environments
+   */
+  async getStatusByEnvironments(environments: string[]): Promise<MaintenanceStatus[]> {
+    this.logger.debug('Fetching service maintenance status for multiple environments', { environments });
+
+    const results: MaintenanceStatus[] = [];
+
+    for (const env of environments) {
+      try {
+        const status = await this.getStatusByEnvironment(env);
+        results.push(status);
+      } catch (error) {
+        this.logger.error(`Failed to fetch maintenance status for environment ${env}`, { error });
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Fetch service maintenance status (uses default environment)
+   * For backward compatibility
+   */
+  async getStatus(): Promise<MaintenanceStatus> {
+    return this.getStatusByEnvironment(this.defaultEnvironment);
+  }
+
+  /**
+   * Refresh service maintenance cache for a specific environment
+   */
+  async refreshByEnvironment(environment: string): Promise<MaintenanceStatus> {
+    return await this.getStatusByEnvironment(environment);
+  }
+
+  /**
+   * Refresh service maintenance cache (uses default environment)
+   * For backward compatibility
    */
   async refresh(): Promise<MaintenanceStatus> {
-    return await this.getStatus();
+    return this.refreshByEnvironment(this.defaultEnvironment);
   }
 
   /**
    * Get cached service maintenance status
+   * @param environment Environment name. If omitted, returns default environment status.
    */
-  getCached(): MaintenanceStatus | null {
-    return this.cachedStatus;
+  getCached(environment?: string): MaintenanceStatus | null {
+    const envKey = environment || this.defaultEnvironment;
+    return this.cachedStatusByEnv.get(envKey) || null;
+  }
+
+  /**
+   * Get all cached maintenance statuses (all environments)
+   */
+  getAllCached(): Map<string, MaintenanceStatus> {
+    return this.cachedStatusByEnv;
+  }
+
+  /**
+   * Clear all cached data
+   */
+  clearCache(): void {
+    this.cachedStatusByEnv.clear();
+    this.logger.debug('Service maintenance cache cleared');
   }
 
   /**
    * Update cached service maintenance status
    * Used by cache manager or event listener when maintenance changes
    */
-  updateCache(status: MaintenanceStatus | null): void {
-    this.cachedStatus = status;
+  updateCache(status: MaintenanceStatus | null, environment?: string): void {
+    const envKey = environment || this.defaultEnvironment;
+    if (status) {
+      this.cachedStatusByEnv.set(envKey, status);
+    } else {
+      this.cachedStatusByEnv.delete(envKey);
+    }
   }
 
   /**
    * Check if service is currently in maintenance based on flag and time window
    */
-  isMaintenanceActive(): boolean {
-    if (!this.cachedStatus) {
+  isMaintenanceActive(environment?: string): boolean {
+    const cachedStatus = this.getCached(environment);
+    if (!cachedStatus) {
       return false;
     }
 
-    const { hasMaintenanceScheduled, detail } = this.cachedStatus;
+    const { hasMaintenanceScheduled, detail } = cachedStatus;
 
     if (!hasMaintenanceScheduled) {
       return false;
@@ -109,12 +174,13 @@ export class ServiceMaintenanceService {
    * Get localized maintenance message for the service
    * Returns null when maintenance is not active
    */
-  getMessage(lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
-    if (!this.isMaintenanceActive() || !this.cachedStatus?.detail) {
+  getMessage(lang: 'ko' | 'en' | 'zh' = 'en', environment?: string): string | null {
+    const cachedStatus = this.getCached(environment);
+    if (!this.isMaintenanceActive(environment) || !cachedStatus?.detail) {
       return null;
     }
 
-    const detail = this.cachedStatus.detail;
+    const detail = cachedStatus.detail;
 
     // Try localized message first
     const localized = detail.localeMessages?.[lang];

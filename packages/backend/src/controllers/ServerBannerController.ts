@@ -1,13 +1,9 @@
-import { Request, Response } from 'express';
-import { Environment } from '../models/Environment';
+import { Response } from 'express';
 import { BannerModel } from '../models/Banner';
 import logger from '../config/logger';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
-
-export interface SDKRequest extends Request {
-  apiToken?: any;
-}
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 /**
  * Server SDK Banner Controller
@@ -15,110 +11,30 @@ export interface SDKRequest extends Request {
  */
 export class ServerBannerController {
   /**
-   * Get banners list
-   * GET /api/v1/server/banners
-   * GET /api/v1/server/banners?environments=env1,env2,env3
-   * Returns only published banners
+   * Get banners for a specific environment
+   * GET /api/v1/server/:env/banners
+   * Returns only published banners for the specified environment
    */
-  static async getBanners(req: SDKRequest, res: Response) {
+  static async getBanners(req: EnvironmentRequest, res: Response) {
     try {
-      // Parse environments query parameter
-      // '*' means all environments
-      const environmentsParam = req.query.environments as string | undefined;
-      const isAllEnvironments = environmentsParam === '*';
-      const environments = environmentsParam && !isAllEnvironments
-        ? environmentsParam.split(',').map(e => e.trim()).filter(Boolean)
-        : [];
+      const environment = req.environment!;
 
       await respondWithEtagCache(res, {
-        cacheKey: SERVER_SDK_ETAG.BANNERS,
+        cacheKey: `${SERVER_SDK_ETAG.BANNERS}:${environment.id}`,
         ttlMs: DEFAULT_CONFIG.BANNER_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          // All environments mode or specific environments mode
-          if (isAllEnvironments || environments.length > 0) {
-            const byEnvironment: Record<string, any[]> = {};
-            let totalCount = 0;
+          const banners = await BannerModel.findPublished(environment.id);
 
-            // Get target environments
-            let targetEnvs: any[];
-            if (isAllEnvironments) {
-              // Environment table doesn't have isActive column - all environments are active
-              targetEnvs = await Environment.query();
-            } else {
-              targetEnvs = [];
-              for (const envParam of environments) {
-                let env = await Environment.query().findById(envParam);
-                if (!env) {
-                  env = await Environment.getByName(envParam);
-                }
-                if (env) {
-                  targetEnvs.push(env);
-                } else {
-                  logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
-                }
-              }
-            }
+          logger.info(`Server SDK: Retrieved ${banners.length} published banners for environment ${environment.environmentName}`);
 
-            for (const env of targetEnvs) {
-              const envBanners = await BannerModel.findPublished(env.id);
-              byEnvironment[env.environmentName] = envBanners;
-              totalCount += envBanners.length;
-            }
-
-            logger.info(
-              `Server SDK: Retrieved ${totalCount} published banners across ${Object.keys(byEnvironment).length} environments`,
-              { mode: isAllEnvironments ? 'all' : 'specific', environments: Object.keys(byEnvironment) }
-            );
-
-            return {
-              success: true,
-              data: {
-                byEnvironment,
-                total: totalCount,
-              },
-            };
-          } else {
-            // Single-environment mode: return flat array
-            // Use X-Environment header to determine environment (required for Server SDK)
-            const envHeader = req.headers['x-environment'] as string | undefined;
-            if (!envHeader) {
-              return res.status(400).json({
-                success: false,
-                error: {
-                  code: 'MISSING_ENVIRONMENT',
-                  message: 'X-Environment header is required for single-environment mode',
-                },
-              });
-            }
-
-            // Resolve environment by name or ID
-            let targetEnv = await Environment.query().findById(envHeader);
-            if (!targetEnv) {
-              targetEnv = await Environment.getByName(envHeader);
-            }
-            if (!targetEnv) {
-              return res.status(400).json({
-                success: false,
-                error: {
-                  code: 'INVALID_ENVIRONMENT',
-                  message: `Environment '${envHeader}' not found`,
-                },
-              });
-            }
-
-            const banners = await BannerModel.findPublished(targetEnv.id);
-
-            logger.info(`Server SDK: Retrieved ${banners.length} published banners for environment ${targetEnv.environmentName}`);
-
-            return {
-              success: true,
-              data: {
-                banners,
-                total: banners.length,
-              },
-            };
-          }
+          return {
+            success: true,
+            data: {
+              banners,
+              total: banners.length,
+            },
+          };
         },
       });
     } catch (error) {
@@ -135,9 +51,9 @@ export class ServerBannerController {
 
   /**
    * Get specific banner by ID
-   * GET /api/v1/server/banners/:bannerId
+   * GET /api/v1/server/:env/banners/:bannerId
    */
-  static async getBannerById(req: SDKRequest, res: Response) {
+  static async getBannerById(req: EnvironmentRequest, res: Response) {
     try {
       const { bannerId } = req.params;
 

@@ -39,6 +39,10 @@ export class CacheManager {
   private refreshCallbacks: Array<(type: string, data: any) => void> = [];
   private metrics?: SdkMetrics;
   private maintenanceWatcher: MaintenanceWatcher;
+  // Multi-environment mode: list of environments to cache
+  private environments?: string[] | '*';
+  // Cached environment list (for '*' mode)
+  private cachedEnvironmentList: string[] = [];
 
   constructor(
     config: CacheConfig,
@@ -71,21 +75,25 @@ export class CacheManager {
     this.whitelistService = whitelistService;
     this.serviceMaintenanceService = serviceMaintenanceService;
 
-    // Create new services if enabled (with environments support)
-    // '*' means all environments mode (dynamic)
-    const targetEnvs: string[] | '*' = environments ?? [];
+    // Create new services if enabled
+    // Services now use per-environment API pattern
+    // Default environment is 'development' for single-env mode
+    const defaultEnv = 'development';
     if (this.features.clientVersion === true) {
-      this.clientVersionService = clientVersionService || new ClientVersionService(apiClient, logger, targetEnvs);
+      this.clientVersionService = clientVersionService || new ClientVersionService(apiClient, logger, defaultEnv);
     }
     if (this.features.serviceNotice === true) {
-      this.serviceNoticeService = serviceNoticeService || new ServiceNoticeService(apiClient, logger, targetEnvs);
+      this.serviceNoticeService = serviceNoticeService || new ServiceNoticeService(apiClient, logger, defaultEnv);
     }
     if (this.features.banner === true) {
-      this.bannerService = bannerService || new BannerService(apiClient, logger, targetEnvs);
+      this.bannerService = bannerService || new BannerService(apiClient, logger, defaultEnv);
     }
     if (this.features.storeProduct === true) {
-      this.storeProductService = new StoreProductService(apiClient, logger, targetEnvs);
+      this.storeProductService = new StoreProductService(apiClient, logger, defaultEnv);
     }
+
+    // Store environments for multi-environment mode
+    this.environments = environments;
 
     this.apiClient = apiClient;
     this.logger = logger;
@@ -485,8 +493,8 @@ export class CacheManager {
    * Update a single game world in cache (immutable)
    * Also checks and emits maintenance state change events
    */
-  async updateSingleGameWorld(id: number, isVisible?: boolean | number): Promise<void> {
-    await this.gameWorldService.updateSingleWorld(id, isVisible);
+  async updateSingleGameWorld(id: number, environment?: string, isVisible?: boolean | number): Promise<void> {
+    await this.gameWorldService.updateSingleWorld(id, environment, isVisible);
     // Check maintenance state changes after update
     this.checkMaintenanceStateChanges();
   }
@@ -525,8 +533,8 @@ export class CacheManager {
   /**
    * Update a single popup notice in cache (immutable)
    */
-  async updateSinglePopupNotice(id: number, isVisible?: boolean | number): Promise<void> {
-    await this.popupNoticeService.updateSingleNotice(id, isVisible);
+  async updateSinglePopupNotice(id: number, environment?: string, isVisible?: boolean | number): Promise<void> {
+    await this.popupNoticeService.updateSingleNotice(id, environment, isVisible);
   }
 
   /**
@@ -539,8 +547,8 @@ export class CacheManager {
   /**
    * Update a single survey in cache (immutable)
    */
-  async updateSingleSurvey(id: string, isActive?: boolean | number): Promise<void> {
-    await this.surveyService.updateSingleSurvey(id, isActive);
+  async updateSingleSurvey(id: string, environment?: string, isActive?: boolean | number): Promise<void> {
+    await this.surveyService.updateSingleSurvey(id, environment, isActive);
   }
 
   /**
