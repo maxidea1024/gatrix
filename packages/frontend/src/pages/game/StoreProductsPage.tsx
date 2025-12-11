@@ -712,29 +712,30 @@ const StoreProductsPage: React.FC = () => {
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 2,
+                        gap: 0,
                         ml: 1,
-                        px: 1.5,
-                        py: 0.5,
                         borderRadius: 1,
                         bgcolor: 'background.paper',
                         border: 1,
                         borderColor: 'divider',
+                        overflow: 'hidden',
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.5 }}>
                         <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'primary.main' }} />
                         <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
                           {t('storeProducts.statsTotal')} <strong style={{ color: 'inherit' }}>{productStats.total}</strong>
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      <Box sx={{ width: '1px', height: 20, bgcolor: 'divider' }} />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.5 }}>
                         <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
                         <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
                           {t('storeProducts.statsActive')} <strong style={{ color: 'inherit' }}>{productStats.active}</strong>
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      <Box sx={{ width: '1px', height: 20, bgcolor: 'divider' }} />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.5 }}>
                         <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'text.disabled' }} />
                         <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
                           {t('storeProducts.statsInactive')} <strong style={{ color: 'inherit' }}>{productStats.inactive}</strong>
