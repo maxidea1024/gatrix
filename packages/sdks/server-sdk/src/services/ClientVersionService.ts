@@ -110,6 +110,14 @@ export class ClientVersionService {
   }
 
   /**
+   * Clear cached data for a specific environment
+   */
+  clearCacheForEnvironment(environment: string): void {
+    this.cachedVersionsByEnv.delete(environment);
+    this.logger.debug('Client versions cache cleared for environment', { environment });
+  }
+
+  /**
    * Refresh cached client versions for a specific environment
    */
   async refreshByEnvironment(environment: string): Promise<ClientVersion[]> {

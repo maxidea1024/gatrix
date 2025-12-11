@@ -110,6 +110,14 @@ export class StoreProductService {
   }
 
   /**
+   * Clear cached data for a specific environment
+   */
+  clearCacheForEnvironment(environment: string): void {
+    this.cachedProductsByEnv.delete(environment);
+    this.logger.debug('Store products cache cleared for environment', { environment });
+  }
+
+  /**
    * Refresh cached store products for a specific environment
    */
   async refreshByEnvironment(environment: string): Promise<StoreProduct[]> {

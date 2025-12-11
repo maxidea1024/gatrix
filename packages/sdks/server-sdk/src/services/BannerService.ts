@@ -110,6 +110,14 @@ export class BannerService {
   }
 
   /**
+   * Clear cached data for a specific environment
+   */
+  clearCacheForEnvironment(environment: string): void {
+    this.cachedBannersByEnv.delete(environment);
+    this.logger.debug('Banners cache cleared for environment', { environment });
+  }
+
+  /**
    * Refresh cached banners for a specific environment
    */
   async refreshByEnvironment(environment: string): Promise<Banner[]> {

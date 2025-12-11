@@ -344,6 +344,114 @@ export class CacheManager {
   }
 
   /**
+   * Get target environments for multi-environment mode
+   * Returns the cached environment list for '*' mode, or the explicit list
+   */
+  private getTargetEnvironments(): string[] {
+    if (this.environments === '*') {
+      return this.cachedEnvironmentList;
+    }
+    if (Array.isArray(this.environments)) {
+      return this.environments;
+    }
+    // Default: single environment mode
+    return ['development'];
+  }
+
+  /**
+   * Refresh environment list and load data for new environments
+   * Used when environment.created event is received
+   */
+  async refreshEnvironmentList(): Promise<{ added: string[]; removed: string[] }> {
+    if (this.environments !== '*' || !this.environmentService) {
+      return { added: [], removed: [] };
+    }
+
+    const oldEnvList = [...this.cachedEnvironmentList];
+    const environments = await this.environmentService.fetchEnvironments();
+    this.cachedEnvironmentList = environments.map(e => e.environmentName);
+
+    const added = this.cachedEnvironmentList.filter(e => !oldEnvList.includes(e));
+    const removed = oldEnvList.filter(e => !this.cachedEnvironmentList.includes(e));
+
+    this.logger.info('Environment list refreshed', {
+      total: this.cachedEnvironmentList.length,
+      added,
+      removed
+    });
+
+    // Load data for newly added environments
+    if (added.length > 0) {
+      await this.loadDataForEnvironments(added);
+    }
+
+    // Remove cached data for removed environments
+    if (removed.length > 0) {
+      this.clearDataForEnvironments(removed);
+    }
+
+    return { added, removed };
+  }
+
+  /**
+   * Load data for specific environments (multi-environment features only)
+   */
+  private async loadDataForEnvironments(environments: string[]): Promise<void> {
+    this.logger.info('Loading data for new environments', { environments });
+
+    const promises: Promise<any>[] = [];
+
+    if (this.features.clientVersion === true && this.clientVersionService) {
+      promises.push(
+        this.clientVersionService.listByEnvironments(environments).catch((error) => {
+          this.logger.warn('Failed to load client versions for new environments', { error: error.message });
+        })
+      );
+    }
+
+    if (this.features.serviceNotice === true && this.serviceNoticeService) {
+      promises.push(
+        this.serviceNoticeService.listByEnvironments(environments).catch((error) => {
+          this.logger.warn('Failed to load service notices for new environments', { error: error.message });
+        })
+      );
+    }
+
+    if (this.features.banner === true && this.bannerService) {
+      promises.push(
+        this.bannerService.listByEnvironments(environments).catch((error) => {
+          this.logger.warn('Failed to load banners for new environments', { error: error.message });
+        })
+      );
+    }
+
+    if (this.features.storeProduct === true && this.storeProductService) {
+      promises.push(
+        this.storeProductService.listByEnvironments(environments).catch((error) => {
+          this.logger.warn('Failed to load store products for new environments', { error: error.message });
+        })
+      );
+    }
+
+    await Promise.all(promises);
+    this.logger.info('Data loaded for new environments', { environments });
+  }
+
+  /**
+   * Clear cached data for removed environments
+   */
+  private clearDataForEnvironments(environments: string[]): void {
+    this.logger.info('Clearing data for removed environments', { environments });
+
+    for (const env of environments) {
+      this.clientVersionService?.clearCacheForEnvironment?.(env);
+      this.serviceNoticeService?.clearCacheForEnvironment?.(env);
+      this.bannerService?.clearCacheForEnvironment?.(env);
+      this.storeProductService?.clearCacheForEnvironment?.(env);
+    }
+  }
+
+  /**
    * Refresh all cached data based on enabled features
    */
   async refreshAll(): Promise<void> {
@@ -392,10 +500,18 @@ export class CacheManager {
         refreshedTypes.push('serviceMaintenance');
       }
 
-      // New features for Edge - default: false (explicit enable required)
+      // For wildcard mode, refresh environment list first
+      if (this.environments === '*' && this.environmentService) {
+        const environments = await this.environmentService.fetchEnvironments();
+        this.cachedEnvironmentList = environments.map(e => e.environmentName);
+      }
+
+      // Multi-environment features for Edge - use cachedEnvironmentList for '*' mode
+      const envList = this.getTargetEnvironments();
+
       if (this.features.clientVersion === true && this.clientVersionService) {
         promises.push(
-          this.clientVersionService.refresh().catch((error) => {
+          this.clientVersionService.listByEnvironments(envList).catch((error) => {
             this.logger.warn('Failed to refresh client versions', { error: error.message });
           })
         );
@@ -404,7 +520,7 @@ export class CacheManager {
 
       if (this.features.serviceNotice === true && this.serviceNoticeService) {
         promises.push(
-          this.serviceNoticeService.refresh().catch((error) => {
+          this.serviceNoticeService.listByEnvironments(envList).catch((error) => {
             this.logger.warn('Failed to refresh service notices', { error: error.message });
           })
         );
@@ -413,7 +529,7 @@ export class CacheManager {
 
       if (this.features.banner === true && this.bannerService) {
         promises.push(
-          this.bannerService.refresh().catch((error) => {
+          this.bannerService.listByEnvironments(envList).catch((error) => {
             this.logger.warn('Failed to refresh banners', { error: error.message });
           })
         );
@@ -422,7 +538,7 @@ export class CacheManager {
 
       if (this.features.storeProduct === true && this.storeProductService) {
         promises.push(
-          this.storeProductService.refresh().catch((error) => {
+          this.storeProductService.listByEnvironments(envList).catch((error) => {
             this.logger.warn('Failed to refresh store products', { error: error.message });
           })
         );
@@ -525,16 +641,26 @@ export class CacheManager {
    * Get all cached data (game worlds, popup notices, surveys)
    */
   getAllCachedData(): any {
+    // Convert Map to plain object for JSON serialization
+    const mapToObject = <T>(map: Map<string, T[]> | undefined): Record<string, T[]> => {
+      if (!map) return {};
+      const obj: Record<string, T[]> = {};
+      for (const [key, value] of map.entries()) {
+        obj[key] = value;
+      }
+      return obj;
+    };
+
     return {
       gameWorlds: this.gameWorldService.getCached(),
       popupNotices: this.popupNoticeService.getCached(),
       surveys: this.surveyService.getCached(),
       whitelists: this.whitelistService.getCached(),
       serviceMaintenance: this.serviceMaintenanceService.getCached(),
-      clientVersions: this.clientVersionService?.getAllCached() || {},
-      serviceNotices: this.serviceNoticeService?.getAllCached() || {},
-      banners: this.bannerService?.getAllCached() || {},
-      storeProducts: this.storeProductService?.getAllCached() || {},
+      clientVersions: mapToObject(this.clientVersionService?.getAllCached()),
+      serviceNotices: mapToObject(this.serviceNoticeService?.getAllCached()),
+      banners: mapToObject(this.bannerService?.getAllCached()),
+      storeProducts: mapToObject(this.storeProductService?.getAllCached()),
     };
   }
 

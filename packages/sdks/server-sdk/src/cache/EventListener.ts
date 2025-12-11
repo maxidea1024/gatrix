@@ -456,17 +456,20 @@ export class EventListener {
 
       case 'environment.created':
       case 'environment.deleted':
-        // When environments are added or removed, refresh all multi-environment caches
+        // When environments are added or removed, refresh environment list and load/clear data
         // This is essential for "all environments" mode (environments: '*')
-        this.logger.info('Environment change event received, refreshing all caches', {
+        this.logger.info('Environment change event received', {
           type: event.type,
           environment: event.data.environment
         });
         try {
-          await this.cacheManager.refreshAll();
-          this.logger.info('All caches refreshed successfully after environment change');
+          const result = await this.cacheManager.refreshEnvironmentList();
+          this.logger.info('Environment list refreshed after environment change', {
+            added: result.added,
+            removed: result.removed
+          });
         } catch (error: any) {
-          this.logger.error('Failed to refresh caches after environment change', { error: error.message });
+          this.logger.error('Failed to refresh environment list after environment change', { error: error.message });
         }
         break;
 

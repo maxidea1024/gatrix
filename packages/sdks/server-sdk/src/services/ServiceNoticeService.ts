@@ -118,6 +118,14 @@ export class ServiceNoticeService {
   }
 
   /**
+   * Clear cached data for a specific environment
+   */
+  clearCacheForEnvironment(environment: string): void {
+    this.cachedNoticesByEnv.delete(environment);
+    this.logger.debug('Service notices cache cleared for environment', { environment });
+  }
+
+  /**
    * Refresh cached service notices for a specific environment
    */
   async refreshByEnvironment(environment: string): Promise<ServiceNotice[]> {
