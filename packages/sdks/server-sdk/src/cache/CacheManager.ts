@@ -14,6 +14,7 @@ import { ClientVersionService } from '../services/ClientVersionService';
 import { ServiceNoticeService } from '../services/ServiceNoticeService';
 import { BannerService } from '../services/BannerService';
 import { StoreProductService } from '../services/StoreProductService';
+import { EnvironmentService } from '../services/EnvironmentService';
 import { ApiClient } from '../client/ApiClient';
 import { SdkMetrics } from '../utils/sdkMetrics';
 import { MaintenanceStatus, ClientVersion, ServiceNotice, Banner, StoreProduct } from '../types/api';
@@ -41,6 +42,8 @@ export class CacheManager {
   private maintenanceWatcher: MaintenanceWatcher;
   // Multi-environment mode: list of environments to cache
   private environments?: string[] | '*';
+  // Environment service for wildcard mode
+  private environmentService?: EnvironmentService;
   // Cached environment list (for '*' mode)
   private cachedEnvironmentList: string[] = [];
 
@@ -94,6 +97,11 @@ export class CacheManager {
 
     // Store environments for multi-environment mode
     this.environments = environments;
+
+    // Create environment service for wildcard mode
+    if (environments === '*') {
+      this.environmentService = new EnvironmentService(apiClient, logger);
+    }
 
     this.apiClient = apiClient;
     this.logger = logger;
@@ -153,6 +161,15 @@ export class CacheManager {
         this.logger.info('Skipping backend ready check (skipBackendReady: true)');
       }
 
+      // For wildcard mode, fetch environment list first
+      if (this.environments === '*' && this.environmentService) {
+        const environments = await this.environmentService.fetchEnvironments();
+        this.cachedEnvironmentList = environments.map(e => e.environmentName);
+        this.logger.info('Wildcard mode: fetched environment list', {
+          environments: this.cachedEnvironmentList
+        });
+      }
+
       // Build list of promises based on enabled features
       const promises: Promise<any>[] = [];
       const featureTypes: string[] = [];
@@ -197,10 +214,12 @@ export class CacheManager {
         featureTypes.push('serviceMaintenance');
       }
 
-      // New features for Edge - default: false (explicit enable required)
+      // Multi-environment features for Edge - use cachedEnvironmentList for '*' mode
+      const envList = this.getTargetEnvironments();
+
       if (this.features.clientVersion === true && this.clientVersionService) {
         promises.push(
-          this.clientVersionService.list().catch((error) => {
+          this.clientVersionService.listByEnvironments(envList).catch((error) => {
             this.logger.warn('Failed to load client versions', { error: error.message });
             return [];
           })
@@ -210,7 +229,7 @@ export class CacheManager {
 
       if (this.features.serviceNotice === true && this.serviceNoticeService) {
         promises.push(
-          this.serviceNoticeService.list().catch((error) => {
+          this.serviceNoticeService.listByEnvironments(envList).catch((error) => {
             this.logger.warn('Failed to load service notices', { error: error.message });
             return [];
           })
@@ -220,7 +239,7 @@ export class CacheManager {
 
       if (this.features.banner === true && this.bannerService) {
         promises.push(
-          this.bannerService.list().catch((error) => {
+          this.bannerService.listByEnvironments(envList).catch((error) => {
             this.logger.warn('Failed to load banners', { error: error.message });
             return [];
           })
@@ -230,7 +249,7 @@ export class CacheManager {
 
       if (this.features.storeProduct === true && this.storeProductService) {
         promises.push(
-          this.storeProductService.list().catch((error) => {
+          this.storeProductService.listByEnvironments(envList).catch((error) => {
             this.logger.warn('Failed to load store products', { error: error.message });
             return [];
           })
@@ -241,7 +260,10 @@ export class CacheManager {
       // Load all enabled features in parallel
       await Promise.all(promises);
 
-      this.logger.info('SDK cache initialized', { enabledFeatures: featureTypes });
+      this.logger.info('SDK cache initialized', {
+        enabledFeatures: featureTypes,
+        environments: this.environments === '*' ? `* (${this.cachedEnvironmentList.length} envs)` : this.environments
+      });
 
       // Initialize maintenance watcher with current state (no events emitted on first check)
       if (this.features.serviceMaintenance !== false || this.features.gameWorld !== false) {

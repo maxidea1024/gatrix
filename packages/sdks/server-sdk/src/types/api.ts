@@ -21,6 +21,23 @@ export interface ApiResponse<T = any> {
 }
 
 // ============================================================================
+// Environment Types
+// ============================================================================
+
+export interface EnvironmentInfo {
+  id: string;
+  environmentName: string;
+  displayName: string;
+  environmentType: string;
+  color?: string;
+}
+
+export interface EnvironmentListResponse {
+  environments: EnvironmentInfo[];
+  count: number;
+}
+
+// ============================================================================
 // Client Version Types
 // ============================================================================
 
