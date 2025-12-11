@@ -327,7 +327,7 @@ export class Environment extends Model implements EnvironmentData {
       const tokenIds = apiTokenEnvs.items.map((item) => item.tokenId);
       const tokens = await knex('g_api_access_tokens')
         .whereIn('id', tokenIds)
-        .select(['id', 'name'])
+        .select(['id', 'tokenName as name'])
         .limit(maxItems);
       apiTokens = { count: apiTokenEnvs.count, items: tokens };
     }
