@@ -174,48 +174,94 @@ export class CacheManager {
       const promises: Promise<any>[] = [];
       const featureTypes: string[] = [];
 
+      // Get target environments for multi-environment mode
+      const envList = this.getTargetEnvironments();
+      const isMultiEnvMode = this.environments === '*' || (Array.isArray(this.environments) && this.environments.length > 0);
+
       // Existing features - default: true (backward compatible)
       // Use !== false check to maintain backward compatibility
+      // In multi-environment mode, use listByEnvironments for environment-specific features
       if (this.features.gameWorld !== false) {
-        promises.push(this.gameWorldService.list());
+        if (isMultiEnvMode && envList.length > 0) {
+          promises.push(
+            this.gameWorldService.listByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to load game worlds', { error: error.message });
+              return [];
+            })
+          );
+        } else {
+          promises.push(this.gameWorldService.list());
+        }
         featureTypes.push('gameWorld');
       }
 
       if (this.features.popupNotice !== false) {
-        promises.push(this.popupNoticeService.list());
+        if (isMultiEnvMode && envList.length > 0) {
+          promises.push(
+            this.popupNoticeService.listByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to load popup notices', { error: error.message });
+              return [];
+            })
+          );
+        } else {
+          promises.push(this.popupNoticeService.list());
+        }
         featureTypes.push('popupNotice');
       }
 
       if (this.features.survey !== false) {
-        promises.push(
-          this.surveyService.list({ isActive: true }).catch((_error) => {
-            return { surveys: [], settings: null };
-          })
-        );
+        if (isMultiEnvMode && envList.length > 0) {
+          promises.push(
+            this.surveyService.listByEnvironments(envList, { isActive: true }).catch((_error) => {
+              return { surveys: [], settings: null };
+            })
+          );
+        } else {
+          promises.push(
+            this.surveyService.list({ isActive: true }).catch((_error) => {
+              return { surveys: [], settings: null };
+            })
+          );
+        }
         featureTypes.push('survey');
       }
 
       if (this.features.whitelist !== false) {
-        promises.push(
-          this.whitelistService.list().catch((error) => {
-            this.logger.warn('Failed to load whitelists', { error: error.message });
-            return { ipWhitelist: [], accountWhitelist: [] };
-          })
-        );
+        if (isMultiEnvMode && envList.length > 0) {
+          promises.push(
+            this.whitelistService.listByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to load whitelists', { error: error.message });
+              return [];
+            })
+          );
+        } else {
+          promises.push(
+            this.whitelistService.list().catch((error) => {
+              this.logger.warn('Failed to load whitelists', { error: error.message });
+              return { ipWhitelist: [], accountWhitelist: [] };
+            })
+          );
+        }
         featureTypes.push('whitelist');
       }
 
       if (this.features.serviceMaintenance !== false) {
-        promises.push(
-          this.refreshServiceMaintenanceInternal().catch((error) => {
-            this.logger.warn('Failed to load service maintenance status', { error: error.message });
-          })
-        );
+        if (isMultiEnvMode && envList.length > 0) {
+          promises.push(
+            this.serviceMaintenanceService.getStatusByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to load service maintenance status', { error: error.message });
+              return [];
+            })
+          );
+        } else {
+          promises.push(
+            this.refreshServiceMaintenanceInternal().catch((error) => {
+              this.logger.warn('Failed to load service maintenance status', { error: error.message });
+            })
+          );
+        }
         featureTypes.push('serviceMaintenance');
       }
-
-      // Multi-environment features for Edge - use cachedEnvironmentList for '*' mode
-      const envList = this.getTargetEnvironments();
 
       if (this.features.clientVersion === true && this.clientVersionService) {
         promises.push(
