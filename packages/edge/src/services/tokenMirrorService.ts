@@ -10,7 +10,7 @@ export interface MirroredToken {
   id: string;
   tokenName: string;
   tokenValue: string;
-  tokenType: 'client' | 'server' | 'all';
+  tokenType: 'client' | 'server' | 'edge' | 'all';
   allowAllEnvironments: boolean;
   environments: string[]; // ['*'] for all, or list of environment names
   expiresAt: string | null;

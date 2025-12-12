@@ -4,6 +4,7 @@ import app from './app';
 import { sdkManager } from './services/sdkManager';
 import { startMetricsServer, sdkInitialized } from './services/metricsServer';
 import { tokenMirrorService } from './services/tokenMirrorService';
+import { tokenUsageTracker } from './services/tokenUsageTracker';
 
 /**
  * Main entry point for Edge server
@@ -28,6 +29,9 @@ async function main(): Promise<void> {
     await tokenMirrorService.initialize();
     logger.info(`Token mirror initialized with ${tokenMirrorService.getTokenCount()} tokens`);
 
+    // Initialize token usage tracker (for reporting usage to backend)
+    await tokenUsageTracker.initialize();
+
     // Start main HTTP server
     const server = app.listen(config.port, () => {
       logger.info(`Edge server listening on port ${config.port}`);
@@ -43,6 +47,7 @@ async function main(): Promise<void> {
         logger.info('HTTP server closed');
 
         try {
+          await tokenUsageTracker.shutdown();
           await sdkManager.shutdown();
           await tokenMirrorService.shutdown();
           sdkInitialized.set(0);

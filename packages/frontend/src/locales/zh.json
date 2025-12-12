@@ -1463,6 +1463,12 @@
     "clientTokenDescription": "客户端 SDK 令牌",
     "serverTokenType": "服务器令牌",
     "serverTokenDescription": "服务器 SDK 令牌",
+    "edgeTokenType": "Edge 令牌",
+    "edgeTokenDescription": "用于客户端访问 Edge 服务器的令牌",
+    "edgeTokenNote": "注意：Edge 令牌只能在单一环境中使用。请在下方选择目标环境。",
+    "allTokenType": "全部 (客户端 + 服务器)",
+    "allTokenDescription": "可以访问客户端和服务器API的令牌",
+    "allTokenWarning": "警告：此令牌可以访问客户端和服务器API，这可能会带来更高的安全风险。仅在内部系统集成等受信任的环境中使用。",
     "tokenTypeNotEditable": "令牌类型在创建后无法更改",
     "tokenValue": "令牌值",
     "lastUsed": "最后使用",
@@ -1477,12 +1483,19 @@
     "neverUsed": "从未使用",
     "noExpiration": "无过期时间",
     "expiresAtHelp": "留空表示永不过期",
+    "expiresAtPastError": "过期时间不能是过去的时间。",
+    "expiresAtTooSoonError": "过期时间必须至少在当前时间5分钟之后。",
+    "basicInfoSection": "基本信息",
+    "tokenTypeSection": "令牌类型",
+    "expirationSection": "过期设置",
     "tokenWarning": "请立即复制此令牌。您将无法再次看到它！",
     "deleteConfirmation": "您确定要删除此 API 令牌吗？此操作无法撤销。",
     "copiedToClipboard": "已复制到剪贴板",
     "types": {
       "client": "客户端",
       "server": "服务器",
+      "edge": "Edge",
+      "all": "全部",
       "admin": "管理员"
     },
     "permissionTypes": {
@@ -1543,7 +1556,8 @@
     "allowAllEnvironments": "允许所有环境",
     "allowAllEnvironmentsDescription": "此令牌可以访问所有环境",
     "allowAllEnvironmentsWarning": "可访问所有环境的令牌可能会影响生产环境，存在风险。建议仅选择您需要的环境。",
-    "allEnvironments": "所有环境"
+    "allEnvironments": "所有环境",
+    "selectSingleEnvironment": "请选择此 Edge 令牌的目标环境："
   },
   "auditLogs": {
     "action": "操作",

@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { ulid } from 'ulid';
 
-export type TokenType = 'client' | 'server' | 'all';
+export type TokenType = 'client' | 'server' | 'edge' | 'all';
 
 export interface ApiAccessTokenData {
   id?: string; // ULID (26 characters)
@@ -52,7 +52,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
         id: { type: 'string', minLength: 26, maxLength: 26 },
         tokenName: { type: 'string', minLength: 1, maxLength: 200 },
         tokenValue: { type: 'string', minLength: 1, maxLength: 255 },
-        tokenType: { type: 'string', enum: ['client', 'server'] },
+        tokenType: { type: 'string', enum: ['client', 'server', 'edge', 'all'] },
         expiresAt: { type: ['string', 'object', 'null'], format: 'date-time' },
         lastUsedAt: { type: ['string', 'object', 'null'], format: 'date-time' },
         usageCount: { type: ['integer', 'null'], minimum: 0 },

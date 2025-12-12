@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import logger from '../config/logger';
 import { tokenMirrorService } from '../services/tokenMirrorService';
+import { tokenUsageTracker } from '../services/tokenUsageTracker';
 
 export interface ClientRequest extends Request {
   clientContext?: {
@@ -87,6 +88,11 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
       error,
     });
     return;
+  }
+
+  // Record token usage for tracking
+  if (validation.token?.id) {
+    tokenUsageTracker.recordUsage(validation.token.id);
   }
 
   // Set client context

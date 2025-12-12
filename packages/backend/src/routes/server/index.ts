@@ -29,6 +29,9 @@ const router = express.Router();
 // Get all valid API tokens for Edge mirroring
 router.get('/internal/tokens', serverSDKAuth, InternalApiTokensController.getAllTokens as any);
 
+// Receive token usage report from Edge servers
+router.post('/internal/token-usage-report', serverSDKAuth, InternalApiTokensController.receiveUsageReport as any);
+
 // ============================================================================
 // Global routes (environment-independent)
 // ============================================================================

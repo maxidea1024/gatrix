@@ -87,6 +87,7 @@ import { apiTokenService } from '@/services/apiTokenService';
 import { environmentService, Environment } from '@/services/environmentService';
 import SimplePagination from '@/components/common/SimplePagination';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
+import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import { useI18n } from '@/contexts/I18nContext';
@@ -174,6 +175,7 @@ const defaultColumns: ColumnConfig[] = [
   { id: 'tokenType', labelKey: 'apiTokens.tokenType', visible: true },
   { id: 'environments', labelKey: 'apiTokens.environments', visible: true },
   { id: 'description', labelKey: 'apiTokens.description', visible: true },
+  { id: 'usageCount', labelKey: 'apiTokens.usageCount', visible: true },
   { id: 'lastUsedAt', labelKey: 'apiTokens.lastUsedAt', visible: true },
   { id: 'expiresAt', labelKey: 'apiTokens.expiresAt', visible: true },
   { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
@@ -479,6 +481,12 @@ const ApiTokensPage: React.FC = () => {
             {token.description || '-'}
           </Typography>
         );
+      case 'usageCount':
+        return (
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+            {token.usageCount?.toLocaleString() || '0'}
+          </Typography>
+        );
       case 'lastUsedAt':
         return (
           <Typography variant="body2">
@@ -512,6 +520,29 @@ const ApiTokensPage: React.FC = () => {
   const isValidTokenName = (name: string): boolean => {
     return name.trim().length >= 3; // 최소 3자 이상
   };
+
+  // 유효기간 검증 함수
+  const validateExpiresAt = (expiresAt: string | undefined): { isValid: boolean; warning: string | null } => {
+    if (!expiresAt) {
+      return { isValid: true, warning: null }; // No expiration is valid
+    }
+
+    const expiresDate = dayjs(expiresAt);
+    const now = dayjs();
+    const fiveMinutesFromNow = now.add(5, 'minute');
+
+    if (expiresDate.isBefore(now)) {
+      return { isValid: false, warning: t('apiTokens.expiresAtPastError') };
+    }
+
+    if (expiresDate.isBefore(fiveMinutesFromNow)) {
+      return { isValid: false, warning: t('apiTokens.expiresAtTooSoonError') };
+    }
+
+    return { isValid: true, warning: null };
+  };
+
+  const expiresAtValidation = validateExpiresAt(formData.expiresAt);
 
   const handleCreate = async () => {
     try {
@@ -1067,52 +1098,16 @@ const ApiTokensPage: React.FC = () => {
     </Box>
 
       {/* Create Token Side Panel */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 500 },
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
-        ModalProps={{
-          keepMounted: false
-        }}
+        title={t('apiTokens.createToken')}
+        storageKey="apiTokenCreateDrawerWidth"
+        defaultWidth={550}
+        minWidth={450}
+        zIndex={1301}
+        onEntered={() => tokenNameRef.current?.focus()}
       >
-        {/* Header */}
-        <Box sx={{
-          p: 3,
-          borderBottom: 1,
-          borderColor: 'divider',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: 'background.paper',
-          position: 'sticky',
-          top: 0,
-          zIndex: 1
-        }}>
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('apiTokens.createToken')}
-          </Typography>
-          <IconButton
-            onClick={() => setCreateDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
         {/* Content */}
         <Box sx={{
           flex: 1,
@@ -1120,34 +1115,48 @@ const ApiTokensPage: React.FC = () => {
           overflow: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: 2
+          gap: 3
         }}>
-          <TextField
-              inputRef={tokenNameRef}
-              label={t('apiTokens.tokenName')}
-              value={formData.tokenName}
-              onChange={(e) => setFormData(prev => ({ ...prev, tokenName: e.target.value }))}
-              fullWidth
-              required
-              size="small"
-              error={formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)}
-              helperText={
-                formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)
-                  ? t('apiTokens.tokenNameMinLength')
-                  : t('apiTokens.tokenNameHelp')
-              }
-            />
+          {/* Basic Information Section */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+              {t('apiTokens.basicInfoSection')}
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <TextField
+                inputRef={tokenNameRef}
+                label={t('apiTokens.tokenName')}
+                value={formData.tokenName}
+                onChange={(e) => setFormData(prev => ({ ...prev, tokenName: e.target.value }))}
+                fullWidth
+                required
+                size="small"
+                error={formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)}
+                helperText={
+                  formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)
+                    ? t('apiTokens.tokenNameMinLength')
+                    : t('apiTokens.tokenNameHelp')
+                }
+              />
 
-            <TextField
-              label={t('apiTokens.description')}
-              value={formData.description || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              fullWidth
-              multiline
-              rows={2}
-              size="small"
-              placeholder={t('apiTokens.descriptionPlaceholder')}
-            />
+              <TextField
+                label={t('apiTokens.description')}
+                value={formData.description || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                fullWidth
+                multiline
+                rows={2}
+                size="small"
+                placeholder={t('apiTokens.descriptionPlaceholder')}
+              />
+            </Box>
+          </Paper>
+
+          {/* Token Type Section */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+              {t('apiTokens.tokenTypeSection')}
+            </Typography>
 
             <FormControl component="fieldset" fullWidth>
               <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
@@ -1186,6 +1195,20 @@ const ApiTokensPage: React.FC = () => {
                   }
                 />
                 <FormControlLabel
+                  value="edge"
+                  control={<Radio size="small" />}
+                  label={
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: 'info.main' }}>
+                        {t('apiTokens.edgeTokenType')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('apiTokens.edgeTokenDescription')}
+                      </Typography>
+                    </Box>
+                  }
+                />
+                <FormControlLabel
                   value="all"
                   control={<Radio size="small" />}
                   label={
@@ -1200,6 +1223,13 @@ const ApiTokensPage: React.FC = () => {
                   }
                 />
               </RadioGroup>
+              {formData.tokenType === 'edge' && (
+                <Alert severity="info" sx={{ mt: 1, py: 0.5 }}>
+                  <Typography variant="caption">
+                    {t('apiTokens.edgeTokenNote')}
+                  </Typography>
+                </Alert>
+              )}
               {formData.tokenType === 'all' && (
                 <Alert severity="warning" sx={{ mt: 1, py: 0.5 }}>
                   <Typography variant="caption">
@@ -1214,65 +1244,99 @@ const ApiTokensPage: React.FC = () => {
               <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
                 {t('apiTokens.environmentAccess')}
               </FormLabel>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formData.allowAllEnvironments}
+              {/* Edge tokens can only use single environment */}
+              {formData.tokenType === 'edge' ? (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    {t('apiTokens.selectSingleEnvironment')}
+                  </Typography>
+                  <RadioGroup
+                    value={formData.environmentIds[0] || ''}
                     onChange={(e) => setFormData(prev => ({
                       ...prev,
-                      allowAllEnvironments: e.target.checked,
-                      environmentIds: e.target.checked ? [] : prev.environmentIds,
+                      allowAllEnvironments: false,
+                      environmentIds: [e.target.value],
                     }))}
-                    size="small"
-                  />
-                }
-                label={
-                  <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      {t('apiTokens.allowAllEnvironments')}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {t('apiTokens.allowAllEnvironmentsDescription')}
-                    </Typography>
-                  </Box>
-                }
-              />
-              {formData.allowAllEnvironments && (
-                <Alert severity="warning" sx={{ mt: 1, py: 0.5 }}>
-                  {t('apiTokens.allowAllEnvironmentsWarning')}
-                </Alert>
-              )}
-              {!formData.allowAllEnvironments && (
-                <Box sx={{ mt: 1, pl: 4 }}>
-                  {environments.map((env) => (
-                    <FormControlLabel
-                      key={env.id}
-                      control={
-                        <Checkbox
-                          checked={formData.environmentIds.includes(env.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setFormData(prev => ({
-                                ...prev,
-                                environmentIds: [...prev.environmentIds, env.id],
-                              }));
-                            } else {
-                              setFormData(prev => ({
-                                ...prev,
-                                environmentIds: prev.environmentIds.filter(id => id !== env.id),
-                              }));
-                            }
-                          }}
-                          size="small"
-                        />
-                      }
-                      label={env.displayName || env.environmentName}
-                    />
-                  ))}
+                  >
+                    {environments.map((env) => (
+                      <FormControlLabel
+                        key={env.id}
+                        value={env.id}
+                        control={<Radio size="small" />}
+                        label={env.displayName || env.environmentName}
+                      />
+                    ))}
+                  </RadioGroup>
                 </Box>
+              ) : (
+                <>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.allowAllEnvironments}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          allowAllEnvironments: e.target.checked,
+                          environmentIds: e.target.checked ? [] : prev.environmentIds,
+                        }))}
+                        size="small"
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {t('apiTokens.allowAllEnvironments')}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('apiTokens.allowAllEnvironmentsDescription')}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                  {formData.allowAllEnvironments && (
+                    <Alert severity="warning" sx={{ mt: 1, py: 0.5 }}>
+                      {t('apiTokens.allowAllEnvironmentsWarning')}
+                    </Alert>
+                  )}
+                  {!formData.allowAllEnvironments && (
+                    <Box sx={{ mt: 1, pl: 4 }}>
+                      {environments.map((env) => (
+                        <FormControlLabel
+                          key={env.id}
+                          control={
+                            <Checkbox
+                              checked={formData.environmentIds.includes(env.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    environmentIds: [...prev.environmentIds, env.id],
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    environmentIds: prev.environmentIds.filter(id => id !== env.id),
+                                  }));
+                                }
+                              }}
+                              size="small"
+                            />
+                          }
+                          label={env.displayName || env.environmentName}
+                        />
+                      ))}
+                    </Box>
+                  )}
+                </>
               )}
             </FormControl>
+          </Paper>
 
+          {/* Expiration Section */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+              {t('apiTokens.expirationSection')}
+            </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
               <DateTimePicker
                 label={t('apiTokens.expiresAt')}
@@ -1283,12 +1347,21 @@ const ApiTokensPage: React.FC = () => {
                   textField: {
                     fullWidth: true,
                     size: 'small',
-                    helperText: t('apiTokens.expiresAtHelp'),
+                    helperText: expiresAtValidation.warning || t('apiTokens.expiresAtHelp'),
+                    error: !expiresAtValidation.isValid,
                     slotProps: { input: { readOnly: true } },
                   },
                 }}
               />
             </LocalizationProvider>
+            {!expiresAtValidation.isValid && (
+              <Alert severity="error" sx={{ mt: 1, py: 0.5 }}>
+                <Typography variant="caption">
+                  {expiresAtValidation.warning}
+                </Typography>
+              </Alert>
+            )}
+          </Paper>
         </Box>
 
         {/* Actions */}
@@ -1311,60 +1384,24 @@ const ApiTokensPage: React.FC = () => {
             onClick={handleCreate}
             variant="contained"
             startIcon={<VpnKeyIcon />}
-            disabled={!isValidTokenName(formData.tokenName)}
+            disabled={!isValidTokenName(formData.tokenName) || !expiresAtValidation.isValid}
           >
             {t('apiTokens.createToken')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* Edit Token Side Panel */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 500 },
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
-        ModalProps={{
-          keepMounted: false
-        }}
+        title={t('apiTokens.editToken')}
+        storageKey="apiTokenEditDrawerWidth"
+        defaultWidth={550}
+        minWidth={450}
+        zIndex={1301}
+        onEntered={() => editTokenNameRef.current?.focus()}
       >
-        {/* Header */}
-        <Box sx={{
-          p: 3,
-          borderBottom: 1,
-          borderColor: 'divider',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: 'background.paper',
-          position: 'sticky',
-          top: 0,
-          zIndex: 1
-        }}>
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('apiTokens.editToken')}
-          </Typography>
-          <IconButton
-            onClick={() => setEditDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
         {/* Content */}
         <Box sx={{
           flex: 1,
@@ -1372,35 +1409,48 @@ const ApiTokensPage: React.FC = () => {
           overflow: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: 2
+          gap: 3
         }}>
-            <TextField
-              inputRef={editTokenNameRef}
-              label={t('apiTokens.tokenName')}
-              value={formData.tokenName}
-              onChange={(e) => setFormData(prev => ({ ...prev, tokenName: e.target.value }))}
-              fullWidth
-              required
-              size="small"
-              error={formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)}
-              helperText={
-                formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)
-                  ? t('apiTokens.tokenNameMinLength')
-                  : t('apiTokens.tokenNameHelp')
-              }
-            />
+          {/* Basic Information Section */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+              {t('apiTokens.basicInfoSection')}
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <TextField
+                inputRef={editTokenNameRef}
+                label={t('apiTokens.tokenName')}
+                value={formData.tokenName}
+                onChange={(e) => setFormData(prev => ({ ...prev, tokenName: e.target.value }))}
+                fullWidth
+                required
+                size="small"
+                error={formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)}
+                helperText={
+                  formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)
+                    ? t('apiTokens.tokenNameMinLength')
+                    : t('apiTokens.tokenNameHelp')
+                }
+              />
 
-            <TextField
-              label={t('apiTokens.description')}
-              value={formData.description || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              fullWidth
-              multiline
-              rows={2}
-              size="small"
-              placeholder={t('apiTokens.descriptionPlaceholder')}
-            />
+              <TextField
+                label={t('apiTokens.description')}
+                value={formData.description || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                fullWidth
+                multiline
+                rows={2}
+                size="small"
+                placeholder={t('apiTokens.descriptionPlaceholder')}
+              />
+            </Box>
+          </Paper>
 
+          {/* Token Type Section (Read-only) */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+              {t('apiTokens.tokenTypeSection')}
+            </Typography>
             <TextField
               label={t('apiTokens.tokenType')}
               value={t(`apiTokens.${formData.tokenType}TokenType`, formData.tokenType)}
@@ -1411,69 +1461,103 @@ const ApiTokensPage: React.FC = () => {
             />
 
             {/* Environment Access */}
-            <FormControl component="fieldset" fullWidth>
+            <FormControl component="fieldset" fullWidth sx={{ mt: 2 }}>
               <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
                 {t('apiTokens.environmentAccess')}
               </FormLabel>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formData.allowAllEnvironments}
+              {/* Edge tokens can only use single environment */}
+              {selectedToken?.tokenType === 'edge' ? (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    {t('apiTokens.selectSingleEnvironment')}
+                  </Typography>
+                  <RadioGroup
+                    value={formData.environmentIds[0] || ''}
                     onChange={(e) => setFormData(prev => ({
                       ...prev,
-                      allowAllEnvironments: e.target.checked,
-                      environmentIds: e.target.checked ? [] : prev.environmentIds,
+                      allowAllEnvironments: false,
+                      environmentIds: [e.target.value],
                     }))}
-                    size="small"
-                  />
-                }
-                label={
-                  <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      {t('apiTokens.allowAllEnvironments')}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {t('apiTokens.allowAllEnvironmentsDescription')}
-                    </Typography>
-                  </Box>
-                }
-              />
-              {formData.allowAllEnvironments && (
-                <Alert severity="warning" sx={{ mt: 1, py: 0.5 }}>
-                  {t('apiTokens.allowAllEnvironmentsWarning')}
-                </Alert>
-              )}
-              {!formData.allowAllEnvironments && (
-                <Box sx={{ mt: 1, pl: 4 }}>
-                  {environments.map((env) => (
-                    <FormControlLabel
-                      key={env.id}
-                      control={
-                        <Checkbox
-                          checked={formData.environmentIds.includes(env.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setFormData(prev => ({
-                                ...prev,
-                                environmentIds: [...prev.environmentIds, env.id],
-                              }));
-                            } else {
-                              setFormData(prev => ({
-                                ...prev,
-                                environmentIds: prev.environmentIds.filter(id => id !== env.id),
-                              }));
-                            }
-                          }}
-                          size="small"
-                        />
-                      }
-                      label={env.displayName || env.environmentName}
-                    />
-                  ))}
+                  >
+                    {environments.map((env) => (
+                      <FormControlLabel
+                        key={env.id}
+                        value={env.id}
+                        control={<Radio size="small" />}
+                        label={env.displayName || env.environmentName}
+                      />
+                    ))}
+                  </RadioGroup>
                 </Box>
+              ) : (
+                <>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.allowAllEnvironments}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          allowAllEnvironments: e.target.checked,
+                          environmentIds: e.target.checked ? [] : prev.environmentIds,
+                        }))}
+                        size="small"
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {t('apiTokens.allowAllEnvironments')}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('apiTokens.allowAllEnvironmentsDescription')}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                  {formData.allowAllEnvironments && (
+                    <Alert severity="warning" sx={{ mt: 1, py: 0.5 }}>
+                      {t('apiTokens.allowAllEnvironmentsWarning')}
+                    </Alert>
+                  )}
+                  {!formData.allowAllEnvironments && (
+                    <Box sx={{ mt: 1, pl: 4 }}>
+                      {environments.map((env) => (
+                        <FormControlLabel
+                          key={env.id}
+                          control={
+                            <Checkbox
+                              checked={formData.environmentIds.includes(env.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    environmentIds: [...prev.environmentIds, env.id],
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    environmentIds: prev.environmentIds.filter(id => id !== env.id),
+                                  }));
+                                }
+                              }}
+                              size="small"
+                            />
+                          }
+                          label={env.displayName || env.environmentName}
+                        />
+                      ))}
+                    </Box>
+                  )}
+                </>
               )}
             </FormControl>
+          </Paper>
 
+          {/* Expiration Section */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+              {t('apiTokens.expirationSection')}
+            </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
               <DateTimePicker
                 label={t('apiTokens.expiresAt')}
@@ -1484,12 +1568,21 @@ const ApiTokensPage: React.FC = () => {
                   textField: {
                     fullWidth: true,
                     size: "small",
-                    helperText: t('apiTokens.expiresAtHelp'),
+                    helperText: expiresAtValidation.warning || t('apiTokens.expiresAtHelp'),
+                    error: !expiresAtValidation.isValid,
                     slotProps: { input: { readOnly: true } },
                   },
                 }}
               />
             </LocalizationProvider>
+            {!expiresAtValidation.isValid && (
+              <Alert severity="error" sx={{ mt: 1, py: 0.5 }}>
+                <Typography variant="caption">
+                  {expiresAtValidation.warning}
+                </Typography>
+              </Alert>
+            )}
+          </Paper>
         </Box>
 
         {/* Actions */}
@@ -1512,12 +1605,12 @@ const ApiTokensPage: React.FC = () => {
             onClick={handleEdit}
             variant="contained"
             startIcon={<SaveIcon />}
-            disabled={!isValidTokenName(formData.tokenName)}
+            disabled={!isValidTokenName(formData.tokenName) || !expiresAtValidation.isValid}
           >
             {t('common.save')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* Delete Confirmation Drawer */}
       <Drawer

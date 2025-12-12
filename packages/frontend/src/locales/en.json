@@ -1408,6 +1408,9 @@
     "clientTokenDescription": "Token for client SDK",
     "serverTokenType": "Server Token",
     "serverTokenDescription": "Token for server SDK",
+    "edgeTokenType": "Edge Token",
+    "edgeTokenDescription": "Token for client to edge server access",
+    "edgeTokenNote": "Note: Edge tokens can only be used with a single environment. Select the target environment below.",
     "allTokenType": "All (Client + Server)",
     "allTokenDescription": "Token that can access both client and server APIs",
     "allTokenWarning": "Warning: This token can access both client and server APIs, which may pose a higher security risk. Use only in trusted environments such as internal system integrations.",
@@ -1425,12 +1428,18 @@
     "neverUsed": "Never",
     "noExpiration": "No Expiration",
     "expiresAtHelp": "Leave empty for no expiration",
+    "expiresAtPastError": "Expiration date cannot be in the past.",
+    "expiresAtTooSoonError": "Expiration date must be at least 5 minutes from now.",
+    "basicInfoSection": "Basic Information",
+    "tokenTypeSection": "Token Type",
+    "expirationSection": "Expiration",
     "tokenWarning": "Please copy this token now. You won't be able to see it again!",
     "deleteConfirmation": "Are you sure you want to delete this API token? This action cannot be undone.",
     "copiedToClipboard": "Copied to clipboard",
     "types": {
       "client": "Client",
       "server": "Server",
+      "edge": "Edge",
       "all": "All",
       "admin": "Admin"
     },
@@ -1492,7 +1501,8 @@
     "allowAllEnvironments": "Allow All Environments",
     "allowAllEnvironmentsDescription": "This token can access all environments",
     "allowAllEnvironmentsWarning": "A token with access to all environments can affect production environments. It is recommended to select only the environments you need.",
-    "allEnvironments": "All Environments"
+    "allEnvironments": "All Environments",
+    "selectSingleEnvironment": "Select the target environment for this Edge token:"
   },
   "auditLogs": {
     "action": "Action",
