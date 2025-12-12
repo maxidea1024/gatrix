@@ -422,6 +422,7 @@ services:
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
       VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:54000}
       VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:53000/bull-board}
+      VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:1400}
 
     ports:
       - "${FRONTEND_PORT:-53000}:80"

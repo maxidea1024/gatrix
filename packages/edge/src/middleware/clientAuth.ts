@@ -22,11 +22,15 @@ export interface ClientRequest extends Request {
  * Client authentication middleware
  * Validates required headers and API token from client requests
  * Uses locally mirrored tokens for validation (no backend call needed)
+ *
+ * Environment is extracted from URL path parameter (:environment)
+ * instead of x-environment header for cleaner API design.
  */
 export function clientAuth(req: ClientRequest, res: Response, next: NextFunction): void {
   const apiToken = req.headers['x-api-token'] as string;
   const applicationName = req.headers['x-application-name'] as string;
-  const environment = req.headers['x-environment'] as string;
+  // Get environment from URL path parameter instead of header
+  const environment = req.params.environment as string;
   const clientVersion = req.headers['x-client-version'] as string | undefined;
   const platform = req.headers['x-platform'] as string | undefined;
 
@@ -53,12 +57,13 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     return;
   }
 
+  // Validate environment from path parameter
   if (!environment) {
-    res.status(401).json({
+    res.status(400).json({
       success: false,
       error: {
         code: 'MISSING_ENVIRONMENT',
-        message: 'x-environment header is required',
+        message: 'Environment is required in URL path (e.g., /api/v1/client/{environment}/...)',
       },
     });
     return;
@@ -90,8 +95,8 @@ export function clientAuth(req: ClientRequest, res: Response, next: NextFunction
     return;
   }
 
-  // Record token usage for tracking
-  if (validation.token?.id) {
+  // Record token usage for tracking (skip unsecured tokens with id=0)
+  if (validation.token?.id && validation.token.id > 0) {
     tokenUsageTracker.recordUsage(validation.token.id);
   }
 

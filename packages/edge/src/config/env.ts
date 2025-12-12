@@ -45,6 +45,11 @@ export const config = {
 
   // Logging
   logLevel: process.env.LOG_LEVEL || 'info',
+
+  // Unsecured client token for testing purposes (client -> edge)
+  // This token bypasses normal token validation and allows access to all environments
+  // WARNING: Only use in development/testing environments
+  unsecuredClientToken: process.env.EDGE_CLIENT_UNSECURED_TOKEN || 'gatrix-unsecured-edge-api-token',
 };
 
 // Validate required configuration

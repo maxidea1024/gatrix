@@ -411,12 +411,18 @@ export class EventListener {
           this.logger.debug('Service notice event ignored - feature is disabled', { event: event.type });
           break;
         }
+        const noticeEnvironment = event.data.environment as string;
         this.logger.info('Service notice updated event received, refreshing service notice cache', {
           id: event.data.id,
-          environment: event.data.environment
+          environment: noticeEnvironment
         });
         try {
-          await this.cacheManager.getServiceNoticeService()?.refresh();
+          // Use refreshByEnvironment to refresh the specific environment's cache
+          if (noticeEnvironment) {
+            await this.cacheManager.getServiceNoticeService()?.refreshByEnvironment(noticeEnvironment);
+          } else {
+            await this.cacheManager.getServiceNoticeService()?.refresh();
+          }
           this.logger.info('Service notice cache refreshed successfully');
         } catch (error: any) {
           this.logger.error('Failed to refresh service notice cache', { error: error.message });

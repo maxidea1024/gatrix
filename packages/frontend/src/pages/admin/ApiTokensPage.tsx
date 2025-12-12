@@ -35,6 +35,7 @@ import {
   ListItemButton,
   ListItemText,
   ClickAwayListener,
+  Divider,
   InputAdornment,
 } from '@mui/material';
 import {
@@ -88,7 +89,7 @@ import { environmentService, Environment } from '@/services/environmentService';
 import SimplePagination from '@/components/common/SimplePagination';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
-import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { formatRelativeTime } from '@/utils/dateFormat';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import { useI18n } from '@/contexts/I18nContext';
 import { copyToClipboardWithNotification } from '@/utils/clipboard';
@@ -265,7 +266,7 @@ const ApiTokensPage: React.FC = () => {
     description: '',
     tokenType: 'client',
     environmentId: 1,
-    allowAllEnvironments: true,
+    allowAllEnvironments: false,
     environmentIds: [],
   });
 
@@ -483,24 +484,24 @@ const ApiTokensPage: React.FC = () => {
         );
       case 'usageCount':
         return (
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-            {token.usageCount?.toLocaleString() || '0'}
+          <Typography variant="body2" sx={{ fontWeight: 500 }} color={!token.usageCount ? 'text.secondary' : 'text.primary'}>
+            {token.usageCount ? token.usageCount.toLocaleString() : t('apiTokens.neverUsed')}
           </Typography>
         );
       case 'lastUsedAt':
         return (
           <Typography variant="body2">
-            {token.lastUsedAt ? formatDateTimeDetailed(token.lastUsedAt) : t('apiTokens.neverUsed')}
+            {token.lastUsedAt ? formatRelativeTime(token.lastUsedAt) : t('apiTokens.neverUsed')}
           </Typography>
         );
       case 'expiresAt':
         return (
           <Typography variant="body2">
-            {token.expiresAt ? formatDateTimeDetailed(token.expiresAt) : t('apiTokens.noExpiration')}
+            {token.expiresAt ? formatRelativeTime(token.expiresAt) : t('apiTokens.noExpiration')}
           </Typography>
         );
       case 'createdAt':
-        return <Typography variant="body2">{formatDateTimeDetailed(token.createdAt)}</Typography>;
+        return <Typography variant="body2">{formatRelativeTime(token.createdAt)}</Typography>;
       default:
         return null;
     }
@@ -555,6 +556,8 @@ const ApiTokensPage: React.FC = () => {
         description: formData.description,
         tokenType: formData.tokenType,
         expiresAt: formData.expiresAt,
+        allowAllEnvironments: formData.allowAllEnvironments,
+        environmentIds: formData.environmentIds,
         isNew: true
       };
 
@@ -675,7 +678,7 @@ const ApiTokensPage: React.FC = () => {
       description: '',
       tokenType: 'client',
       environmentId: 1,
-      allowAllEnvironments: true,
+      allowAllEnvironments: false,
       environmentIds: [],
     });
   };
@@ -696,7 +699,7 @@ const ApiTokensPage: React.FC = () => {
       description: token.description || '',
       tokenType: token.tokenType,
       environmentId: token.environmentId,
-      allowAllEnvironments: token.allowAllEnvironments ?? true,
+      allowAllEnvironments: token.allowAllEnvironments ?? false,
       environmentIds: token.environmentIds || [],
       expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString().slice(0, 16) : undefined,
     });
@@ -1102,6 +1105,7 @@ const ApiTokensPage: React.FC = () => {
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
         title={t('apiTokens.createToken')}
+        subtitle={t('apiTokens.createTokenSubtitle')}
         storageKey="apiTokenCreateDrawerWidth"
         defaultWidth={550}
         minWidth={450}
@@ -1195,20 +1199,6 @@ const ApiTokensPage: React.FC = () => {
                   }
                 />
                 <FormControlLabel
-                  value="edge"
-                  control={<Radio size="small" />}
-                  label={
-                    <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 500, color: 'info.main' }}>
-                        {t('apiTokens.edgeTokenType')}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('apiTokens.edgeTokenDescription')}
-                      </Typography>
-                    </Box>
-                  }
-                />
-                <FormControlLabel
                   value="all"
                   control={<Radio size="small" />}
                   label={
@@ -1222,14 +1212,8 @@ const ApiTokensPage: React.FC = () => {
                     </Box>
                   }
                 />
+
               </RadioGroup>
-              {formData.tokenType === 'edge' && (
-                <Alert severity="info" sx={{ mt: 1, py: 0.5 }}>
-                  <Typography variant="caption">
-                    {t('apiTokens.edgeTokenNote')}
-                  </Typography>
-                </Alert>
-              )}
               {formData.tokenType === 'all' && (
                 <Alert severity="warning" sx={{ mt: 1, py: 0.5 }}>
                   <Typography variant="caption">
@@ -1239,14 +1223,112 @@ const ApiTokensPage: React.FC = () => {
               )}
             </FormControl>
 
-            {/* Environment Access */}
+            {/* Environment Access - Only for non-edge tokens */}
+            {formData.tokenType !== 'edge' && (
+              <FormControl component="fieldset" fullWidth sx={{ mt: 2 }}>
+                <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
+                  {t('apiTokens.environmentAccess')}
+                </FormLabel>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={formData.allowAllEnvironments}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        allowAllEnvironments: e.target.checked,
+                        environmentIds: e.target.checked ? [] : prev.environmentIds,
+                      }))}
+                      size="small"
+                    />
+                  }
+                  label={
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {t('apiTokens.allowAllEnvironments')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('apiTokens.allowAllEnvironmentsDescription')}
+                      </Typography>
+                    </Box>
+                  }
+                />
+                {formData.allowAllEnvironments && (
+                  <Alert severity="warning" sx={{ mt: 1, py: 0.5 }}>
+                    {t('apiTokens.allowAllEnvironmentsWarning')}
+                  </Alert>
+                )}
+                {!formData.allowAllEnvironments && (
+                  <Box sx={{ mt: 1, pl: 4 }}>
+                    {environments.map((env) => (
+                      <FormControlLabel
+                        key={env.id}
+                        control={
+                          <Checkbox
+                            checked={formData.environmentIds.includes(env.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  environmentIds: [...prev.environmentIds, env.id],
+                                }));
+                              } else {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  environmentIds: prev.environmentIds.filter(id => id !== env.id),
+                                }));
+                              }
+                            }}
+                            size="small"
+                          />
+                        }
+                        label={env.displayName || env.environmentName}
+                      />
+                    ))}
+                  </Box>
+                )}
+              </FormControl>
+            )}
+
+            {/* Special Purpose Tokens Section */}
+            <Divider sx={{ my: 2 }}>
+              <Typography variant="caption" color="text.secondary">
+                {t('apiTokens.specialPurposeTokens')}
+              </Typography>
+            </Divider>
+
             <FormControl component="fieldset" fullWidth>
-              <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
-                {t('apiTokens.environmentAccess')}
-              </FormLabel>
-              {/* Edge tokens can only use single environment */}
-              {formData.tokenType === 'edge' ? (
-                <Box sx={{ mt: 1 }}>
+              <RadioGroup
+                value={formData.tokenType === 'edge' ? 'edge' : ''}
+                onChange={(e) => {
+                  if (e.target.value === 'edge') {
+                    setFormData(prev => ({
+                      ...prev,
+                      tokenType: 'edge',
+                      allowAllEnvironments: false,
+                      environmentIds: prev.environmentIds.length > 0 ? [prev.environmentIds[0]] : [],
+                    }));
+                  }
+                }}
+              >
+                <FormControlLabel
+                  value="edge"
+                  control={<Radio size="small" />}
+                  label={
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: 'info.main' }}>
+                        {t('apiTokens.edgeTokenType')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('apiTokens.edgeTokenDescription')}
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </RadioGroup>
+
+              {/* Edge token environment selection - inline */}
+              {formData.tokenType === 'edge' && (
+                <Box sx={{ mt: 1, ml: 4, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     {t('apiTokens.selectSingleEnvironment')}
                   </Typography>
@@ -1268,66 +1350,6 @@ const ApiTokensPage: React.FC = () => {
                     ))}
                   </RadioGroup>
                 </Box>
-              ) : (
-                <>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={formData.allowAllEnvironments}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          allowAllEnvironments: e.target.checked,
-                          environmentIds: e.target.checked ? [] : prev.environmentIds,
-                        }))}
-                        size="small"
-                      />
-                    }
-                    label={
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {t('apiTokens.allowAllEnvironments')}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {t('apiTokens.allowAllEnvironmentsDescription')}
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                  {formData.allowAllEnvironments && (
-                    <Alert severity="warning" sx={{ mt: 1, py: 0.5 }}>
-                      {t('apiTokens.allowAllEnvironmentsWarning')}
-                    </Alert>
-                  )}
-                  {!formData.allowAllEnvironments && (
-                    <Box sx={{ mt: 1, pl: 4 }}>
-                      {environments.map((env) => (
-                        <FormControlLabel
-                          key={env.id}
-                          control={
-                            <Checkbox
-                              checked={formData.environmentIds.includes(env.id)}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    environmentIds: [...prev.environmentIds, env.id],
-                                  }));
-                                } else {
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    environmentIds: prev.environmentIds.filter(id => id !== env.id),
-                                  }));
-                                }
-                              }}
-                              size="small"
-                            />
-                          }
-                          label={env.displayName || env.environmentName}
-                        />
-                      ))}
-                    </Box>
-                  )}
-                </>
               )}
             </FormControl>
           </Paper>
@@ -1350,6 +1372,9 @@ const ApiTokensPage: React.FC = () => {
                     helperText: expiresAtValidation.warning || t('apiTokens.expiresAtHelp'),
                     error: !expiresAtValidation.isValid,
                     slotProps: { input: { readOnly: true } },
+                  },
+                  actionBar: {
+                    actions: ['clear', 'cancel', 'accept'],
                   },
                 }}
               />
@@ -1384,7 +1409,12 @@ const ApiTokensPage: React.FC = () => {
             onClick={handleCreate}
             variant="contained"
             startIcon={<VpnKeyIcon />}
-            disabled={!isValidTokenName(formData.tokenName) || !expiresAtValidation.isValid}
+            disabled={
+              !isValidTokenName(formData.tokenName) ||
+              !expiresAtValidation.isValid ||
+              // Edge token requires exactly one environment to be selected
+              (formData.tokenType === 'edge' && formData.environmentIds.length === 0)
+            }
           >
             {t('apiTokens.createToken')}
           </Button>
@@ -1396,6 +1426,7 @@ const ApiTokensPage: React.FC = () => {
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
         title={t('apiTokens.editToken')}
+        subtitle={t('apiTokens.editTokenSubtitle')}
         storageKey="apiTokenEditDrawerWidth"
         defaultWidth={550}
         minWidth={450}
@@ -1571,6 +1602,9 @@ const ApiTokensPage: React.FC = () => {
                     helperText: expiresAtValidation.warning || t('apiTokens.expiresAtHelp'),
                     error: !expiresAtValidation.isValid,
                     slotProps: { input: { readOnly: true } },
+                  },
+                  actionBar: {
+                    actions: ['clear', 'cancel', 'accept'],
                   },
                 }}
               />
@@ -2085,10 +2119,42 @@ const ApiTokensPage: React.FC = () => {
                     </Typography>
                     <Typography variant="body2" fontWeight={500}>
                       {newTokenInfo.expiresAt
-                        ? formatDateTimeDetailed(newTokenInfo.expiresAt)
+                        ? formatRelativeTime(newTokenInfo.expiresAt)
                         : t('apiTokens.noExpiration')
                       }
                     </Typography>
+                  </Box>
+
+                  {/* Environment Access */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      {t('apiTokens.environments')}
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'flex-end', maxWidth: '60%' }}>
+                      {newTokenInfo.allowAllEnvironments ? (
+                        <Chip
+                          label={t('apiTokens.allEnvironments')}
+                          size="small"
+                          color="success"
+                        />
+                      ) : newTokenInfo.environmentIds && newTokenInfo.environmentIds.length > 0 ? (
+                        newTokenInfo.environmentIds.map((envId: number) => {
+                          const env = environments.find(e => e.id === envId);
+                          return env ? (
+                            <Chip
+                              key={envId}
+                              label={env.environmentName}
+                              size="small"
+                              variant="outlined"
+                            />
+                          ) : null;
+                        })
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          {t('apiTokens.noEnvironmentSelected')}
+                        </Typography>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
               </Box>

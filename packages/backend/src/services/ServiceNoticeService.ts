@@ -5,6 +5,7 @@ import { getCurrentEnvironmentId } from '../utils/environmentContext';
 import { pubSubService } from './PubSubService';
 import { Environment } from '../models/Environment';
 import logger from '../config/logger';
+import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 export interface ServiceNotice {
   id: number;
@@ -275,9 +276,13 @@ class ServiceNoticeService {
       throw new Error('Failed to retrieve created service notice');
     }
 
-    // Publish SDK Event
+    // Invalidate ETag cache and publish SDK Event
     try {
       const env = await Environment.query().findById(envId);
+
+      // Invalidate ETag cache so SDK fetches fresh data
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${envId}`);
+
       await pubSubService.publishSDKEvent({
         type: 'service_notice.updated',
         data: {
@@ -370,9 +375,13 @@ class ServiceNoticeService {
       throw new Error('Service notice not found');
     }
 
-    // Publish SDK Event
+    // Invalidate ETag cache and publish SDK Event
     try {
       const env = await Environment.query().findById(envId);
+
+      // Invalidate ETag cache so SDK fetches fresh data
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${envId}`);
+
       await pubSubService.publishSDKEvent({
         type: 'service_notice.updated',
         data: {
@@ -396,9 +405,13 @@ class ServiceNoticeService {
     const envId = environmentId ?? getCurrentEnvironmentId();
     await pool.execute('DELETE FROM g_service_notices WHERE id = ? AND environmentId = ?', [id, envId]);
 
-    // Publish SDK Event (Deletion)
+    // Invalidate ETag cache and publish SDK Event (Deletion)
     try {
       const env = await Environment.query().findById(envId);
+
+      // Invalidate ETag cache so SDK fetches fresh data
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${envId}`);
+
       await pubSubService.publishSDKEvent({
         type: 'service_notice.updated',
         data: {

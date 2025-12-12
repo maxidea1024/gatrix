@@ -5,9 +5,10 @@ import logger from '../config/logger';
 
 /**
  * Token structure mirrored from backend
+ * Note: id is number to match backend database ID for usage tracking
  */
 export interface MirroredToken {
-  id: string;
+  id: number;
   tokenName: string;
   tokenValue: string;
   tokenType: 'client' | 'server' | 'edge' | 'all';
@@ -33,7 +34,7 @@ export interface TokenValidationResult {
  */
 class TokenMirrorService {
   private tokens: Map<string, MirroredToken> = new Map(); // tokenValue -> token
-  private tokenById: Map<string, MirroredToken> = new Map(); // id -> token
+  private tokenById: Map<number, MirroredToken> = new Map(); // id -> token
   private subscriber: Redis | null = null;
   private initialized = false;
   private readonly CHANNEL_NAME = 'gatrix-sdk-events';
@@ -177,6 +178,24 @@ class TokenMirrorService {
     requiredType: 'client' | 'server' | 'all',
     environment?: string
   ): TokenValidationResult {
+    // Check for unsecured client token (for testing purposes, client -> edge)
+    // Note: id=0 is used for unsecured tokens to skip usage tracking
+    if (tokenValue === config.unsecuredClientToken) {
+      logger.debug('Unsecured client token used for testing');
+      const unsecuredToken: MirroredToken = {
+        id: 0, // 0 indicates unsecured token, usage tracking will be skipped
+        tokenName: 'Unsecured Client Token (Testing)',
+        tokenValue: config.unsecuredClientToken,
+        tokenType: 'all',
+        allowAllEnvironments: true,
+        environments: ['*'],
+        expiresAt: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      return { valid: true, token: unsecuredToken };
+    }
+
     const token = this.tokens.get(tokenValue);
 
     if (!token) {
@@ -217,7 +236,7 @@ class TokenMirrorService {
   /**
    * Get token by ID
    */
-  getTokenById(id: string): MirroredToken | undefined {
+  getTokenById(id: number): MirroredToken | undefined {
     return this.tokenById.get(id);
   }
 

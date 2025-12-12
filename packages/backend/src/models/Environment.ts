@@ -259,7 +259,7 @@ export class Environment extends Model implements EnvironmentData {
           return { count: 0, items: [] };
         }
 
-        let query = knex(tableName).where('environmentId', this.id);
+        const query = knex(tableName).where('environmentId', this.id);
         if (modifyQuery) {
           modifyQuery(query);
         }

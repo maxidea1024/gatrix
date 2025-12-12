@@ -378,15 +378,21 @@ const ServiceNoticesPage: React.FC = () => {
     setWebviewMenuAnchorEl(null);
   };
 
+  // Get Edge server URL for webview pages
+  const getEdgeWebviewUrl = () => {
+    const edgeUrl = import.meta.env.VITE_EDGE_URL || 'http://localhost:1400';
+    return `${edgeUrl}/game-service-notices.html`;
+  };
+
   const handleOpenWebviewPreview = () => {
-    // Open the actual game webview HTML page in a new window (same size as preview dialog)
-    window.open('/game-service-notices.html', '_blank', 'width=1536,height=928');
+    // Open the actual game webview HTML page served from Edge server
+    window.open(getEdgeWebviewUrl(), '_blank', 'width=1536,height=928');
     handleWebviewMenuClose();
   };
 
-  // Copy notice URL to clipboard
+  // Copy notice URL to clipboard (Edge server URL)
   const handleCopyNoticeUrl = async () => {
-    const noticeUrl = `${window.location.origin}/game-service-notices.html`;
+    const noticeUrl = getEdgeWebviewUrl();
     copyToClipboardWithNotification(
       noticeUrl,
       () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),

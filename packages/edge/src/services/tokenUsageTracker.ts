@@ -12,7 +12,7 @@ interface TokenUsageStats {
  * Periodically reports usage statistics to backend for aggregation
  */
 class TokenUsageTracker {
-  private usageMap: Map<string, TokenUsageStats> = new Map(); // tokenId -> stats
+  private usageMap: Map<number, TokenUsageStats> = new Map(); // tokenId (number) -> stats
   private reportIntervalMs: number;
   private reportTimer: NodeJS.Timeout | null = null;
   private initialized = false;
@@ -76,8 +76,9 @@ class TokenUsageTracker {
   /**
    * Record token usage
    * Called when a token is successfully validated and used
+   * @param tokenId - The numeric token ID from the database
    */
-  recordUsage(tokenId: string): void {
+  recordUsage(tokenId: number): void {
     const existing = this.usageMap.get(tokenId);
     const now = new Date();
 
@@ -103,7 +104,7 @@ class TokenUsageTracker {
 
     // Collect and clear usage data atomically
     const usageData: Array<{
-      tokenId: string;
+      tokenId: number;
       usageCount: number;
       lastUsedAt: string;
     }> = [];

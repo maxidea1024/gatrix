@@ -222,7 +222,7 @@ export class AdminController {
       // If it's super admin modifying their own account, only allow name changes
       if (isTargetSuperAdmin && isOwnAccount) {
         const allowedUpdates = { name: updates.name };
-        let user = await UserService.updateUser(userId, allowedUpdates);
+        const user = await UserService.updateUser(userId, allowedUpdates);
         res.json({
           success: true,
           data: user,

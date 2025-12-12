@@ -135,7 +135,7 @@ class InternalApiTokensController {
       // Process each token's usage
       let processedCount = 0;
       for (const usage of usageData) {
-        const { tokenId, usageCount, lastUsedAt } = usage;
+        const { tokenId, usageCount } = usage;
 
         if (!tokenId || typeof usageCount !== 'number') {
           logger.warn('[InternalApiTokens] Invalid usage entry:', usage);

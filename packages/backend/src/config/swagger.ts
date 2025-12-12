@@ -26,6 +26,10 @@ const options: swaggerJSDoc.Options = {
         url: 'https://api.gatrix.motifgames.com/api/v1',
         description: 'Production server',
       },
+      {
+        url: 'http://localhost:1400/api/v1',
+        description: 'Edge server (Local)',
+      },
     ],
     components: {
       securitySchemes: {
@@ -233,6 +237,87 @@ const options: swaggerJSDoc.Options = {
             tags: { type: 'array', description: 'Associated tags', items: { $ref: '#/components/schemas/Tag' } },
           },
         },
+        ClientVersion: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer', example: 101 },
+            platform: { type: 'string', example: 'android' },
+            clientVersion: { type: 'string', example: '1.2.3' },
+            clientStatus: {
+              type: 'string',
+              enum: ['ONLINE', 'OFFLINE', 'RECOMMENDED_UPDATE', 'FORCED_UPDATE', 'UNDER_REVIEW', 'BLOCKED_PATCH_ALLOWED', 'MAINTENANCE'],
+              example: 'ONLINE'
+            },
+            gameServerAddress: { type: 'string', example: 'https://game.gatrix.io' },
+            patchAddress: { type: 'string', example: 'https://patch.gatrix.io' },
+            guestModeAllowed: { type: 'boolean', example: true },
+            externalClickLink: { type: 'string', nullable: true, example: 'https://gatrix.io/news/123' },
+            maintenanceMessage: { type: 'string', nullable: true, example: 'Server check in progress.' },
+            maintenanceLocales: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  lang: { type: 'string', example: 'ko' },
+                  message: { type: 'string', example: '서버 점검 중입니다.' },
+                },
+              },
+            },
+            customPayload: { type: 'object', example: { featureFlag: true, bannerId: "abc" } },
+            createdAt: { type: 'string', format: 'date-time', example: '2025-12-01T10:00:00Z' },
+            updatedAt: { type: 'string', format: 'date-time', example: '2025-12-05T15:30:00Z' },
+          },
+        },
+        Banner: {
+          type: 'object',
+          properties: {
+            bannerId: { type: 'string', example: 'banner_xmas_2025' },
+            name: { type: 'string', example: 'Christmas Event Banner' },
+            description: { type: 'string', example: 'Main lobby banner for Christmas' },
+            width: { type: 'integer', example: 1024 },
+            height: { type: 'integer', example: 512 },
+            playbackSpeed: { type: 'number', example: 1.0 },
+            sequences: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  sequenceId: { type: 'string', example: 'seq_1' },
+                  frames: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        frameId: { type: 'string', example: 'frame_1_1' },
+                        imageUrl: { type: 'string', example: 'https://cdn.gatrix.io/frames/1.jpg' },
+                        type: { type: 'string', example: 'jpg' },
+                        delay: { type: 'integer', example: 200 },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            status: { type: 'string', enum: ['draft', 'published', 'archived'], example: 'published' },
+            version: { type: 'integer', example: 5 },
+            metadata: { type: 'object', example: { deepLink: "app://event/xmas" } },
+          },
+        },
+        ServiceNotice: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer', example: 42 },
+            isActive: { type: 'boolean', example: true },
+            category: { type: 'string', enum: ['maintenance', 'event', 'notice', 'promotion', 'other'], example: 'notice' },
+            platforms: { type: 'array', items: { type: 'string' }, example: ['android', 'ios'] },
+            title: { type: 'string', example: 'Emergency Maintenance' },
+            content: { type: 'string', example: 'We will be performing emergency maintenance tonight.' },
+            startDate: { type: 'string', format: 'date-time', nullable: true, example: '2025-12-12T12:00:00Z' },
+            endDate: { type: 'string', format: 'date-time', nullable: true, example: '2025-12-12T14:00:00Z' },
+            createdAt: { type: 'string', format: 'date-time', example: '2025-12-12T09:00:00Z' },
+            updatedAt: { type: 'string', format: 'date-time', example: '2025-12-12T09:30:00Z' },
+          },
+        },
       },
       responses: {
         UnauthorizedError: {
@@ -364,6 +449,7 @@ const options: swaggerJSDoc.Options = {
     './src/routes/**/*.ts',
     './src/controllers/**/*.ts',
     './src/models/**/*.ts',
+    '../edge/src/routes/**/*.ts',
   ],
 };
 

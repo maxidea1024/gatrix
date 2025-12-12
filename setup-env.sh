@@ -219,6 +219,8 @@ create_env_file() {
     sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://$HOST:53000/bull-board|" "$ENV_FILE"
   fi
 
+  # Set Edge server URL (for game client webview pages)
+  sed -i.bak "s|^VITE_EDGE_URL=.*|VITE_EDGE_URL=$PROTOCOL://$HOST:1400|" "$ENV_FILE"
 
   # Replace admin password
   sed -i.bak "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=$ADMIN_PASSWORD|" "$ENV_FILE"
@@ -266,6 +268,7 @@ print_summary() {
   echo "  - DB_NAME: gatrix"
   echo "  - DB_USER: gatrix_user"
   echo "  - REDIS_HOST: redis"
+  echo "  - EDGE_URL: $PROTOCOL://$HOST:1400"
   echo ""
   echo -e "${BLUE}[FILE LOCATIONS]${NC}"
   echo "  - .env: $ENV_FILE"

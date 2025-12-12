@@ -3,6 +3,7 @@ import { pubSubService } from './PubSubService';
 import { Environment } from '../models/Environment';
 import logger from '../config/logger';
 import { applyMaintenanceStatusCalculationToArray, applyMaintenanceStatusCalculation } from '../utils/maintenanceUtils';
+import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 /**
  * Parse semver string to numeric array [major, minor, patch]
@@ -292,8 +293,11 @@ export class ClientVersionService {
 
     const result = await ClientVersionModel.create(data);
 
-    // Invalidate client version cache
+    // Invalidate client version cache (including ETag cache for SDK)
     await pubSubService.invalidateByPattern('client_version:.*');
+    if (result.environmentId) {
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${result.environmentId}`);
+    }
 
     // Publish event
     try {
@@ -389,8 +393,9 @@ export class ClientVersionService {
       }
     }
 
-    // Invalidate client version cache
+    // Invalidate client version cache (including ETag cache for SDK - all environments for bulk op)
     await pubSubService.invalidateByPattern('client_version:.*');
+    await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
 
     // Publish generic update event (bulk op)
     await pubSubService.publishSDKEvent({
