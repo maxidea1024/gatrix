@@ -29,6 +29,9 @@ export { Logger, LogLevel, LogFormat, getLogger } from './utils/logger';
 // Export environment service for wildcard mode
 export { EnvironmentService } from './services/EnvironmentService';
 
+// Export base service for custom extensions
+export { BaseEnvironmentService } from './services/BaseEnvironmentService';
+
 // Export metrics helpers
 export { SdkMetrics } from './utils/sdkMetrics';
 export { createMetricsServer, MetricsServerConfig, MetricsServerInstance } from './services/MetricsServer';

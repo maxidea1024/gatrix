@@ -2,125 +2,41 @@
  * Popup Notice Service
  * Handles in-game popup notice retrieval
  * Uses per-environment API pattern: GET /api/v1/server/:env/ingame-popup-notices
+ * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
 import { PopupNotice } from '../types/api';
+import { BaseEnvironmentService } from './BaseEnvironmentService';
 
-export class PopupNoticeService {
-  private apiClient: ApiClient;
-  private logger: Logger;
-  // Default environment for single-environment mode
-  private defaultEnvironment: string;
-  // Multi-environment cache: Map<environment (environmentName), PopupNotice[]>
-  private cachedNoticesByEnv: Map<string, PopupNotice[]> = new Map();
+// Response type is directly PopupNotice[] (not wrapped in object)
+type PopupNoticeListResponse = PopupNotice[];
 
+export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, PopupNoticeListResponse, number> {
   constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
-    this.apiClient = apiClient;
-    this.logger = logger;
-    this.defaultEnvironment = defaultEnvironment;
+    super(apiClient, logger, defaultEnvironment);
   }
 
-  /**
-   * Get popup notices for a specific environment
-   * GET /api/v1/server/:env/ingame-popup-notices
-   */
-  async listByEnvironment(environment: string): Promise<PopupNotice[]> {
-    const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/ingame-popup-notices`;
+  // ==================== Abstract Method Implementations ====================
 
-    this.logger.debug('Fetching popup notices', { environment });
-
-    const response = await this.apiClient.get<PopupNotice[]>(endpoint);
-
-    if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch popup notices');
-    }
-
-    const notices = response.data;
-    this.cachedNoticesByEnv.set(environment, notices);
-
-    this.logger.info('Popup notices fetched', { count: notices.length, environment });
-
-    return notices;
+  protected getEndpoint(environment: string): string {
+    return `/api/v1/server/${encodeURIComponent(environment)}/ingame-popup-notices`;
   }
 
-  /**
-   * Get popup notices for multiple environments
-   * Fetches each environment separately and caches results
-   */
-  async listByEnvironments(environments: string[]): Promise<PopupNotice[]> {
-    this.logger.debug('Fetching popup notices for multiple environments', { environments });
-
-    const results: PopupNotice[] = [];
-
-    for (const env of environments) {
-      try {
-        const notices = await this.listByEnvironment(env);
-        results.push(...notices);
-      } catch (error) {
-        this.logger.error(`Failed to fetch popup notices for environment ${env}`, { error });
-      }
-    }
-
-    this.logger.info('Popup notices fetched for all environments', {
-      count: results.length,
-      environmentCount: environments.length,
-    });
-
-    return results;
+  protected extractItems(response: PopupNoticeListResponse): PopupNotice[] {
+    return response; // Response is directly an array
   }
 
-  /**
-   * Get active popup notices (uses default environment for single-env mode)
-   * For backward compatibility
-   */
-  async list(): Promise<PopupNotice[]> {
-    return this.listByEnvironment(this.defaultEnvironment);
+  protected getServiceName(): string {
+    return 'popup notices';
   }
 
-  /**
-   * Get cached popup notices
-   * @param environment Environment name. If omitted, returns all notices as flat array.
-   */
-  getCached(environment?: string): PopupNotice[] {
-    if (environment) {
-      return this.cachedNoticesByEnv.get(environment) || [];
-    }
-    // No environment specified: return all notices as flat array
-    return Array.from(this.cachedNoticesByEnv.values()).flat();
+  protected getItemId(item: PopupNotice): number {
+    return item.id;
   }
 
-  /**
-   * Get all cached popup notices (all environments)
-   */
-  getAllCached(): Map<string, PopupNotice[]> {
-    return this.cachedNoticesByEnv;
-  }
-
-  /**
-   * Clear all cached data
-   */
-  clearCache(): void {
-    this.cachedNoticesByEnv.clear();
-    this.logger.debug('Popup notices cache cleared');
-  }
-
-  /**
-   * Refresh cached popup notices for a specific environment
-   */
-  async refreshByEnvironment(environment: string): Promise<PopupNotice[]> {
-    this.logger.info('Refreshing popup notices cache', { environment });
-    return await this.listByEnvironment(environment);
-  }
-
-  /**
-   * Refresh cached popup notices (uses default environment)
-   * For backward compatibility
-   */
-  async refresh(): Promise<PopupNotice[]> {
-    return this.refreshByEnvironment(this.defaultEnvironment);
-  }
+  // ==================== Domain-specific Methods ====================
 
   /**
    * Get popup notice by ID
@@ -142,15 +58,6 @@ export class PopupNoticeService {
   }
 
   /**
-   * Update cache with new data
-   */
-  updateCache(notices: PopupNotice[], environment?: string): void {
-    const envKey = environment || this.defaultEnvironment;
-    this.cachedNoticesByEnv.set(envKey, notices);
-    this.logger.debug('Popup notices cache updated', { environment: envKey, count: notices.length });
-  }
-
-  /**
    * Update a single popup notice in cache (immutable)
    * If isVisible is false, removes the notice from cache (no API call needed)
    * If isVisible is true but not in cache, fetches and adds it to cache
@@ -165,7 +72,7 @@ export class PopupNoticeService {
       // If isVisible is explicitly false (0 or false), just remove from cache
       if (isVisible === false || isVisible === 0) {
         this.logger.info('Popup notice isVisible=false, removing from cache', { id, environment: envKey });
-        this.removeNotice(id, environment);
+        this.removeFromCache(id, environment);
         return;
       }
 
@@ -173,35 +80,18 @@ export class PopupNoticeService {
       // Add small delay to ensure backend transaction is committed
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      // Fetch the single notice from backend using getById (instead of list)
+      // Fetch the single notice from backend using getById
       let updatedNotice: PopupNotice;
       try {
         updatedNotice = await this.getById(id, environment);
       } catch (_error: any) {
         // If notice not found (404), it's no longer active or visible
         this.logger.debug('Popup notice not found or not active, removing from cache', { id, environment: envKey });
-        this.removeNotice(id, environment);
+        this.removeFromCache(id, environment);
         return;
       }
 
-      // Get current notices for this environment
-      const currentNotices = this.cachedNoticesByEnv.get(envKey) || [];
-
-      // Check if notice already exists in cache
-      const existsInCache = currentNotices.some(notice => notice.id === id);
-
-      if (existsInCache) {
-        // Immutable update: update existing notice
-        const newNotices = currentNotices.map(notice => notice.id === id ? updatedNotice : notice);
-        this.cachedNoticesByEnv.set(envKey, newNotices);
-        this.logger.debug('Single popup notice updated in cache', { id, environment: envKey });
-      } else {
-        // Notice not in cache but found in backend (e.g., isActive changed from false to true)
-        // Add it to cache
-        const newNotices = [...currentNotices, updatedNotice];
-        this.cachedNoticesByEnv.set(envKey, newNotices);
-        this.logger.debug('Single popup notice added to cache (was previously removed)', { id, environment: envKey });
-      }
+      this.updateItemInCache(updatedNotice, environment);
     } catch (error: any) {
       this.logger.error('Failed to update single popup notice in cache', {
         id,
@@ -215,18 +105,10 @@ export class PopupNoticeService {
 
   /**
    * Remove a popup notice from cache (immutable)
+   * @deprecated Use removeFromCache instead
    */
   removeNotice(id: number, environment?: string): void {
-    this.logger.debug('Removing popup notice from cache', { id, environment });
-
-    const envKey = environment || this.defaultEnvironment;
-    const currentNotices = this.cachedNoticesByEnv.get(envKey) || [];
-
-    // Immutable update: create new array without the deleted notice
-    const newNotices = currentNotices.filter(notice => notice.id !== id);
-    this.cachedNoticesByEnv.set(envKey, newNotices);
-
-    this.logger.debug('Popup notice removed from cache', { id, environment: envKey });
+    this.removeFromCache(id, environment);
   }
 
   /**

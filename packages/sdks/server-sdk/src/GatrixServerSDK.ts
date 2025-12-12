@@ -304,23 +304,28 @@ export class GatrixServerSDK {
 
   /**
    * Get cached game worlds
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getGameWorlds(): GameWorld[] {
-    return this.gameWorld.getCached();
+  getGameWorlds(environment?: string): GameWorld[] {
+    return this.gameWorld.getCached(environment);
   }
 
   /**
    * Check if a world is in maintenance (time-based check)
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  isWorldMaintenanceActive(worldId: string): boolean {
-    return this.gameWorld.isWorldMaintenanceActive(worldId);
+  isWorldMaintenanceActive(worldId: string, environment?: string): boolean {
+    return this.gameWorld.isWorldMaintenanceActive(worldId, environment);
   }
 
   /**
    * Get maintenance message for a world
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getWorldMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
-    return this.gameWorld.getWorldMaintenanceMessage(worldId, lang);
+  getWorldMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en', environment?: string): string | null {
+    return this.gameWorld.getWorldMaintenanceMessage(worldId, lang, environment);
   }
 
   /**
@@ -547,23 +552,31 @@ export class GatrixServerSDK {
 
   /**
    * Fetch active popup notices
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  async fetchPopupNotices(): Promise<PopupNotice[]> {
+  async fetchPopupNotices(environment?: string): Promise<PopupNotice[]> {
+    if (environment) {
+      return await this.popupNotice.listByEnvironment(environment);
+    }
     return await this.popupNotice.list();
   }
 
   /**
    * Get cached popup notices
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getPopupNotices(): PopupNotice[] {
-    return this.popupNotice.getCached();
+  getPopupNotices(environment?: string): PopupNotice[] {
+    return this.popupNotice.getCached(environment);
   }
 
   /**
    * Get popup notices for a specific world
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getPopupNoticesForWorld(worldId: string): PopupNotice[] {
-    return this.popupNotice.getNoticesForWorld(worldId);
+  getPopupNoticesForWorld(worldId: string, environment?: string): PopupNotice[] {
+    return this.popupNotice.getNoticesForWorld(worldId, environment);
   }
 
   /**
@@ -578,6 +591,7 @@ export class GatrixServerSDK {
     subChannel?: string;
     worldId?: string;
     userId?: string;
+    environment?: string;
   }): PopupNotice[] {
     return this.popupNotice.getActivePopupNotices(options);
   }
@@ -588,34 +602,43 @@ export class GatrixServerSDK {
 
   /**
    * Fetch surveys with settings
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  async fetchSurveys(): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
+  async fetchSurveys(environment?: string): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
+    if (environment) {
+      return await this.survey.listByEnvironment(environment, { isActive: true });
+    }
     return await this.survey.list({ isActive: true });
   }
 
   /**
    * Get cached surveys with settings
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getSurveys(): { surveys: Survey[]; settings: SurveySettings | null } {
+  getSurveys(environment?: string): { surveys: Survey[]; settings: SurveySettings | null } {
     return {
-      surveys: this.survey.getCached(),
-      settings: this.survey.getCachedSettings(),
+      surveys: this.survey.getCached(environment),
+      settings: this.survey.getCachedSettings(environment),
     };
   }
 
   /**
    * Get surveys for a specific world
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getSurveysForWorld(worldId: string): Survey[] {
-    return this.survey.getSurveysForWorld(worldId);
+  getSurveysForWorld(worldId: string, environment?: string): Survey[] {
+    return this.survey.getSurveysForWorld(worldId, environment);
   }
 
   /**
    * Update survey settings only
    * Called when survey settings change (e.g., survey configuration updates)
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  updateSurveySettings(newSettings: SurveySettings): void {
-    this.survey.updateSettings(newSettings);
+  updateSurveySettings(newSettings: SurveySettings, environment?: string): void {
+    this.survey.updateSettings(newSettings, environment);
   }
 
   /**
@@ -627,6 +650,7 @@ export class GatrixServerSDK {
    * @param worldId User's world ID
    * @param userLevel User's level
    * @param joinDays User's join days
+   * @param environment Environment name. Only used in multi-environment mode.
    * @returns Array of appropriate surveys, empty array if none match
    */
   getActiveSurveys(
@@ -635,9 +659,10 @@ export class GatrixServerSDK {
     subChannel: string,
     worldId: string,
     userLevel: number,
-    joinDays: number
+    joinDays: number,
+    environment?: string
   ): Survey[] {
-    return this.survey.getActiveSurveys(platform, channel, subChannel, worldId, userLevel, joinDays);
+    return this.survey.getActiveSurveys(platform, channel, subChannel, worldId, userLevel, joinDays, environment);
   }
 
   // ============================================================================
