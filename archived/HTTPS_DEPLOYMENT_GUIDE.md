@@ -29,7 +29,7 @@ Gatrix는 클라우드 환경에서 HTTPS를 통해 안전하게 배포할 수 �
 - ✅ `FRONTEND_URL=https://uwocngatrixcbt.dorado.zjshulong.com` (표준 포트 443)
 - ✅ `VITE_GRAFANA_URL=https://uwocngatrixcbt.dorado.zjshulong.com/grafana` (서브패스)
 - ✅ `VITE_BULL_BOARD_URL=https://uwocngatrixcbt.dorado.zjshulong.com/bull-board` (서브패스)
-- ✅ 모든 호스트 포트 매핑 (50000번대)
+- ✅ 모든 호스트 포트 매핑 (40000번대)
 
 **중요:** Production 환경에서는 표준 HTTPS 포트(443)를 사용하므로 URL에 포트 번호가 포함되지 않습니다.
 
@@ -48,14 +48,14 @@ docker-compose up -d
 
 | 외부 접근 | 내부 포트 | 용도 | 비고 |
 |----------|----------|------|------|
-| `https://domain.com/` | 53000 | 웹 애플리케이션 (Frontend) | 기본 경로 |
-| `https://domain.com/grafana` | 54000 | 모니터링 대시보드 (Grafana) | 별도 포트 포워딩 필요 |
-| `https://domain.com/bull-board` | 53000 | 큐 모니터링 (Bull Board) | Frontend와 동일 포트 사용 |
+| `https://domain.com/` | 43000 | 웹 애플리케이션 (Frontend) | 기본 경로 |
+| `https://domain.com/grafana` | 44000 | 모니터링 대시보드 (Grafana) | 별도 포트 포워딩 필요 |
+| `https://domain.com/bull-board` | 43000 | 큐 모니터링 (Bull Board) | Frontend와 동일 포트 사용 |
 
 **중요:**
 - 외부에서는 표준 HTTPS 포트(443)로 접근
-- **Grafana만 별도 포트(54000) 포워딩 필요** - `/grafana` 경로로 접근 시 54000 포트로 전달
-- **Bull Board는 별도 포워딩 불필요** - Frontend(53000)에서 `/bull-board` 경로로 서비스됨
+- **Grafana만 별도 포트(44000) 포워딩 필요** - `/grafana` 경로로 접근 시 44000 포트로 전달
+- **Bull Board는 별도 포워딩 불필요** - Frontend(43000)에서 `/bull-board` 경로로 서비스됨
 - 로드 밸런서에서 경로 기반 라우팅 설정 필요
 
 ### 로드 밸런서 설정 예시
@@ -64,10 +64,10 @@ docker-compose up -d
 ```
 리스너: HTTPS:443 (SSL 인증서 연결)
   - 전달 규칙 1: 도메인 = uwocngatrixcbt.dorado.zjshulong.com, URL = /grafana*
-    → 백엔드 서버: CVM:54000 (Grafana 전용)
+    → 백엔드 서버: CVM:44000 (Grafana 전용)
     → 상태 확인: HTTP GET /grafana/api/health
   - 전달 규칙 2: 도메인 = uwocngatrixcbt.dorado.zjshulong.com, URL = /*
-    → 백엔드 서버: CVM:53000 (Frontend + Bull Board)
+    → 백엔드 서버: CVM:43000 (Frontend + Bull Board)
     → 상태 확인: HTTP GET /api/health
     → 참고: /bull-board 경로도 이 규칙으로 처리됨
 
@@ -81,10 +81,10 @@ X-Forwarded-For: 활성화
 ```
 Listener: HTTPS:443 (SSL Certificate attached)
   - Rule 1: Path = /grafana*
-    → Target Group: EC2:54000 (Grafana only)
+    → Target Group: EC2:44000 (Grafana only)
     → Path Pattern: /grafana* → /
   - Rule 2: Path = /*
-    → Target Group: EC2:53000 (Frontend + Bull Board)
+    → Target Group: EC2:43000 (Frontend + Bull Board)
     → Default action
     → Note: /bull-board path is handled by this rule
 ```
@@ -102,7 +102,7 @@ server {
 
     # Grafana (별도 포트 포워딩)
     location /grafana/ {
-        proxy_pass http://localhost:54000/;
+        proxy_pass http://localhost:44000/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -112,7 +112,7 @@ server {
     # Frontend + Bull Board (동일 포트)
     # /bull-board 경로는 Frontend Nginx에서 처리됨
     location / {
-        proxy_pass http://localhost:53000;
+        proxy_pass http://localhost:43000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -170,8 +170,8 @@ GF_SECURITY_COOKIE_SAMESITE=Lax
 - **Bull Board**: https://uwocngatrixcbt.dorado.zjshulong.com/bull-board
 
 **내부 포트 매핑:**
-- Frontend: 443 → 53000
-- Grafana: 443/grafana → 54000
+- Frontend: 443 → 43000
+- Grafana: 443/grafana → 44000
 
 ## 문제 해결
 

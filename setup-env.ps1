@@ -244,20 +244,20 @@ function Create-EnvFile {
             # In production with standard ports (80/443), omit port number
             # In development, include port number and use HOST address (not localhost)
             if ($Environment -eq "development") {
-                $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress`:53000"
+                $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress`:43000"
             }
             else {
-                $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress`:53000"
+                $newLines += "CORS_ORIGIN=$($script:ProtocolToUse)://$HostAddress`:43000"
             }
         }
         elseif ($line -match "^FRONTEND_URL=") {
             # In production with standard ports (80/443), omit port number
             # In development, include port number and use HOST address (not localhost)
             if ($Environment -eq "development") {
-                $newLines += "FRONTEND_URL=$($script:ProtocolToUse)://$HostAddress`:53000"
+                $newLines += "FRONTEND_URL=$($script:ProtocolToUse)://$HostAddress`:43000"
             }
             else {
-                $newLines += "FRONTEND_URL=$($script:ProtocolToUse)://$HostAddress`:53000"
+                $newLines += "FRONTEND_URL=$($script:ProtocolToUse)://$HostAddress`:43000"
             }
         }
         elseif ($line -match "^CHAT_SERVER_URL=") {
@@ -289,21 +289,21 @@ function Create-EnvFile {
         elseif ($line -match "^VITE_GRAFANA_URL=") {
             if ($Environment -eq "development") {
                 # Development: include port number, use HOST address (not localhost)
-                $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:54000"
+                $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:44000"
             }
             else {
                 # Production: Grafana accessed via /grafana subpath (handled by load balancer)
-                $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:54000"
+                $newLines += "VITE_GRAFANA_URL=$($script:ProtocolToUse)://$HostAddress`:44000"
             }
         }
         elseif ($line -match "^VITE_BULL_BOARD_URL=") {
             if ($Environment -eq "development") {
                 # Development: include port number, use HOST address (not localhost)
-                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress`:53000/bull-board"
+                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress`:43000/bull-board"
             }
             else {
                 # Production: Bull Board accessed via /bull-board subpath
-                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress`:53000/bull-board"
+                $newLines += "VITE_BULL_BOARD_URL=$($script:ProtocolToUse)://$HostAddress`:43000/bull-board"
             }
         }
         elseif ($line -match "^VITE_EDGE_URL=") {
@@ -374,14 +374,14 @@ function Print-Summary {
 
     if ($Environment -eq "development") {
         Write-Host "  2. Start Docker services: docker-compose -f docker-compose.dev.yml up -d"
-        Write-Host "  3. Access the application: $($script:ProtocolToUse)://$HostAddress`:53000"
+        Write-Host "  3. Access the application: $($script:ProtocolToUse)://$HostAddress`:43000"
     }
     else {
         Write-Host "  2. Start Docker services: docker-compose -f docker-compose.yml up -d"
         Write-Host "  3. Access the application: $($script:ProtocolToUse)://$HostAddress"
         Write-Host "  4. Configure your load balancer to forward:"
-        Write-Host "     - HTTPS 443 → 53000 (Frontend)"
-        Write-Host "     - HTTPS 443/grafana → 54000 (Grafana, optional)"
+        Write-Host "     - HTTPS 443 → 43000 (Frontend)"
+        Write-Host "     - HTTPS 443/grafana → 44000 (Grafana, optional)"
     }
     Write-Host ""
 }

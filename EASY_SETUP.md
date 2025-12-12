@@ -219,7 +219,7 @@ Open your browser and navigate to:
 
 **Development:**
 ```
-http://localhost:53000
+http://localhost:43000
 ```
 
 **Production (HTTPS - default):**
@@ -234,7 +234,7 @@ http://example.com
 
 (Replace `example.com` with your actual domain)
 
-**Important:** In production, standard ports (HTTP: 80, HTTPS: 443) are used, so port numbers are not included in URLs. Your cloud load balancer forwards 443 → 53000.
+**Important:** In production, standard ports (HTTP: 80, HTTPS: 443) are used, so port numbers are not included in URLs. Your cloud load balancer forwards 443 → 43000.
 
 ## Default Credentials
 
@@ -249,25 +249,25 @@ http://example.com
 
    **Port Forwarding Setup:**
    ```
-   External HTTPS 443 → Internal 53000 (Frontend + Bull Board)
-   External HTTPS 443/grafana → Internal 54000 (Grafana)
+   External HTTPS 443 → Internal 43000 (Frontend + Bull Board)
+   External HTTPS 443/grafana → Internal 44000 (Grafana)
    ```
 
    **Important:**
-   - Only Grafana requires separate port (54000) forwarding
-   - Bull Board uses the same port as Frontend (53000) - no separate forwarding needed
+   - Only Grafana requires separate port (44000) forwarding
+   - Bull Board uses the same port as Frontend (43000) - no separate forwarding needed
 
    **Tencent Cloud CLB Example:**
    - Listener: HTTPS:443 (with SSL certificate)
-   - Forwarding Rule 1: URL = `/grafana*` → Backend Server: CVM:54000 (Grafana only)
-   - Forwarding Rule 2: URL = `/*` → Backend Server: CVM:53000 (Frontend + Bull Board)
+   - Forwarding Rule 1: URL = `/grafana*` → Backend Server: CVM:44000 (Grafana only)
+   - Forwarding Rule 2: URL = `/*` → Backend Server: CVM:43000 (Frontend + Bull Board)
    - X-Forwarded-For: Enabled
    - Note: `/bull-board` path is handled by Rule 2 (no separate rule needed)
 
    **AWS Application Load Balancer Example:**
    - Listener: HTTPS:443 (with SSL certificate)
-   - Rule 1: Path = `/grafana*` → Target Group: EC2:54000 (Grafana only)
-   - Rule 2: Path = `/*` → Target Group: EC2:53000 (Frontend + Bull Board)
+   - Rule 1: Path = `/grafana*` → Target Group: EC2:44000 (Grafana only)
+   - Rule 2: Path = `/*` → Target Group: EC2:43000 (Frontend + Bull Board)
    - Note: `/bull-board` path is handled by Rule 2 (no separate rule needed)
 
    **Nginx Reverse Proxy Example:**
@@ -281,14 +281,14 @@ http://example.com
 
        # Grafana (separate port forwarding)
        location /grafana/ {
-           proxy_pass http://localhost:54000/;
+           proxy_pass http://localhost:44000/;
            proxy_set_header X-Forwarded-Proto https;
        }
 
        # Frontend + Bull Board (same port)
        # /bull-board path is handled by Frontend Nginx
        location / {
-           proxy_pass http://localhost:53000;
+           proxy_pass http://localhost:43000;
            proxy_set_header X-Forwarded-Proto https;
        }
    }
@@ -297,7 +297,7 @@ http://example.com
 2. **Configure Grafana URL** (Development):
    - Edit `.env` file
    - Update `VITE_GRAFANA_URL` to match your Grafana server address
-   - Development default: `http://localhost:54000`
+   - Development default: `http://localhost:44000`
    - Production: `https://example.com/grafana` (auto-configured)
    - Restart services:
 
@@ -405,7 +405,7 @@ sudo systemctl start docker
 
 ### Grafana Dashboard iframe Embedding Issue
 
-If you see the error: `Refused to display 'http://localhost:54000/' in a frame because it set 'X-Frame-Options' to 'deny'`
+If you see the error: `Refused to display 'http://localhost:44000/' in a frame because it set 'X-Frame-Options' to 'deny'`
 
 This occurs when Grafana's security settings prevent iframe embedding. To fix this:
 

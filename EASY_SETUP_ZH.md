@@ -219,7 +219,7 @@ docker-compose -f docker-compose.yml ps
 
 **开发环境：**
 ```
-http://localhost:53000
+http://localhost:43000
 ```
 
 **生产环境（HTTPS - 默认）：**
@@ -234,7 +234,7 @@ http://example.com
 
 （将 `example.com` 替换为您的实际域名）
 
-**重要：** 在生产环境中，使用标准端口（HTTP: 80，HTTPS: 443），因此 URL 中不包含端口号。云负载均衡器将 443 转发到 53000。
+**重要：** 在生产环境中，使用标准端口（HTTP: 80，HTTPS: 443），因此 URL 中不包含端口号。云负载均衡器将 443 转发到 43000。
 
 ## 默认凭据
 
@@ -249,25 +249,25 @@ http://example.com
 
    **端口转发设置：**
    ```
-   外部 HTTPS 443 → 内部 53000（前端 + Bull Board）
-   外部 HTTPS 443/grafana → 内部 54000（Grafana）
+   外部 HTTPS 443 → 内部 43000（前端 + Bull Board）
+   外部 HTTPS 443/grafana → 内部 44000（Grafana）
    ```
 
    **重要：**
-   - 仅 Grafana 需要单独的端口（54000）转发
-   - Bull Board 使用与前端相同的端口（53000）- 无需单独转发
+   - 仅 Grafana 需要单独的端口（44000）转发
+   - Bull Board 使用与前端相同的端口（43000）- 无需单独转发
 
    **腾讯云 CLB 示例：**
    - 监听器：HTTPS:443（附加 SSL 证书）
-   - 转发规则 1：URL = `/grafana*` → 后端服务器：CVM:54000（仅 Grafana）
-   - 转发规则 2：URL = `/*` → 后端服务器：CVM:53000（前端 + Bull Board）
+   - 转发规则 1：URL = `/grafana*` → 后端服务器：CVM:44000（仅 Grafana）
+   - 转发规则 2：URL = `/*` → 后端服务器：CVM:43000（前端 + Bull Board）
    - X-Forwarded-For：启用
    - 注意：`/bull-board` 路径由规则 2 处理（无需单独规则）
 
    **AWS Application Load Balancer 示例：**
    - 监听器：HTTPS:443（附加 SSL 证书）
-   - 规则 1：路径 = `/grafana*` → 目标组：EC2:54000（仅 Grafana）
-   - 规则 2：路径 = `/*` → 目标组：EC2:53000（前端 + Bull Board）
+   - 规则 1：路径 = `/grafana*` → 目标组：EC2:44000（仅 Grafana）
+   - 规则 2：路径 = `/*` → 目标组：EC2:43000（前端 + Bull Board）
    - 注意：`/bull-board` 路径由规则 2 处理（无需单独规则）
 
    **Nginx 反向代理示例：**
@@ -281,14 +281,14 @@ http://example.com
 
        # Grafana（单独端口转发）
        location /grafana/ {
-           proxy_pass http://localhost:54000/;
+           proxy_pass http://localhost:44000/;
            proxy_set_header X-Forwarded-Proto https;
        }
 
        # 前端 + Bull Board（相同端口）
        # /bull-board 路径由前端 Nginx 处理
        location / {
-           proxy_pass http://localhost:53000;
+           proxy_pass http://localhost:43000;
            proxy_set_header X-Forwarded-Proto https;
        }
    }
@@ -297,7 +297,7 @@ http://example.com
 2. **配置 Grafana URL**（开发环境）：
    - 编辑 `.env` 文件
    - 更新 `VITE_GRAFANA_URL` 以匹配您的 Grafana 服务器地址
-   - 开发环境默认值：`http://localhost:54000`
+   - 开发环境默认值：`http://localhost:44000`
    - 生产环境：`https://example.com/grafana`（自动配置）
    - 重启服务：
 
@@ -406,7 +406,7 @@ sudo systemctl start docker
 
 ### Grafana 仪表板 iframe 嵌入问题
 
-如果看到错误：`Refused to display 'http://localhost:54000/' in a frame because it set 'X-Frame-Options' to 'deny'`
+如果看到错误：`Refused to display 'http://localhost:44000/' in a frame because it set 'X-Frame-Options' to 'deny'`
 
 这是因为 Grafana 的安全设置阻止了 iframe 嵌入。解决方法：
 

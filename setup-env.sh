@@ -14,7 +14,7 @@
 #   --nobackup                 Do not create backup file when overwriting
 #   --admin-password           Set custom admin password
 #   --protocol                 Set protocol (http or https, default: http for dev, https for prod)
-#   --service-discovery-mode   Set service discovery mode (etcd or redis, default: etcd)
+#   --service-discovery-mode   Set service discovery mode (etcd or redis, default: redis)
 #   --data-root                Set root path for Docker volume data (default: ./data/gatrix-storage-root for non-Linux, /data/gatrix-storage-root for Linux)
 #
 # Examples:
@@ -179,12 +179,12 @@ create_env_file() {
   if [ "$ENVIRONMENT" = "development" ]; then
     # Development: include port number, use HOST address (not localhost)
     # This allows access from other machines in the development team
-    sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=$PROTOCOL://$HOST:53000|" "$ENV_FILE"
-    sed -i.bak "s|^FRONTEND_URL=.*|FRONTEND_URL=$PROTOCOL://$HOST:53000|" "$ENV_FILE"
+    sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=$PROTOCOL://$HOST:43000|" "$ENV_FILE"
+    sed -i.bak "s|^FRONTEND_URL=.*|FRONTEND_URL=$PROTOCOL://$HOST:43000|" "$ENV_FILE"
   else
     # Production: use standard HTTPS port (443), no port number in URL
-    sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=$PROTOCOL://$HOST:53000|" "$ENV_FILE"
-    sed -i.bak "s|^FRONTEND_URL=.*|FRONTEND_URL=$PROTOCOL://$HOST:53000|" "$ENV_FILE"
+    sed -i.bak "s|^CORS_ORIGIN=.*|CORS_ORIGIN=$PROTOCOL://$HOST:43000|" "$ENV_FILE"
+    sed -i.bak "s|^FRONTEND_URL=.*|FRONTEND_URL=$PROTOCOL://$HOST:43000|" "$ENV_FILE"
   fi
 
   # Set LOG_LEVEL based on environment
@@ -194,7 +194,7 @@ create_env_file() {
     sed -i.bak "s|^LOG_LEVEL=.*|LOG_LEVEL=info|" "$ENV_FILE"
   fi
 
-  sed -i.bak "s|^CHAT_SERVER_URL=.*|CHAT_SERVER_URL=http://chat-server:53001|" "$ENV_FILE"
+  sed -i.bak "s|^CHAT_SERVER_URL=.*|CHAT_SERVER_URL=http://chat-server:5100|" "$ENV_FILE"
 
   # Replace language settings
   sed -i.bak "s|^VITE_DEFAULT_LANGUAGE=.*|VITE_DEFAULT_LANGUAGE=$DEFAULT_LANGUAGE|" "$ENV_FILE"
@@ -204,19 +204,19 @@ create_env_file() {
   # In production, Grafana is typically accessed through a subpath or subdomain
   if [ "$ENVIRONMENT" = "development" ]; then
     # Development: include port number, use HOST address (not localhost)
-    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST:54000|" "$ENV_FILE"
+    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST:44000|" "$ENV_FILE"
   else
     # Production: Grafana accessed via /grafana subpath (handled by load balancer)
-    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST:54000|" "$ENV_FILE"
+    sed -i.bak "s|^VITE_GRAFANA_URL=.*|VITE_GRAFANA_URL=$PROTOCOL://$HOST:44000|" "$ENV_FILE"
   fi
 
   # Set Bull Board URL based on environment
   if [ "$ENVIRONMENT" = "development" ]; then
     # Development: include port number, use HOST address (not localhost)
-    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://$HOST:53000/bull-board|" "$ENV_FILE"
+    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://$HOST:43000/bull-board|" "$ENV_FILE"
   else
     # Production: Bull Board accessed via /bull-board subpath
-    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://$HOST:53000/bull-board|" "$ENV_FILE"
+    sed -i.bak "s|^VITE_BULL_BOARD_URL=.*|VITE_BULL_BOARD_URL=$PROTOCOL://$HOST:43000/bull-board|" "$ENV_FILE"
   fi
 
   # Set Edge server URL (for game client webview pages)
@@ -287,13 +287,13 @@ print_summary() {
 
   if [ "$ENVIRONMENT" = "development" ]; then
     echo "  2. Start Docker services: docker-compose -f docker-compose.dev.yml up -d"
-    echo "  3. Access the application: $PROTOCOL://$HOST:53000"
+    echo "  3. Access the application: $PROTOCOL://$HOST:43000"
   else
     echo "  2. Start Docker services: docker-compose -f docker-compose.yml up -d"
     echo "  3. Access the application: $PROTOCOL://$HOST"
     echo "  4. Configure your load balancer to forward:"
-    echo "     - HTTPS 443 → 53000 (Frontend)"
-    echo "     - HTTPS 443/grafana → 54000 (Grafana, optional)"
+    echo "     - HTTPS 443 → 43000 (Frontend)"
+    echo "     - HTTPS 443/grafana → 44000 (Grafana, optional)"
   fi
   echo ""
 }

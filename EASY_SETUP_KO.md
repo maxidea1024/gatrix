@@ -238,7 +238,7 @@ docker-compose -f docker-compose.yml ps
 
 **개발 환경:**
 ```
-http://localhost:53000
+http://localhost:43000
 ```
 
 **프로덕션 (HTTPS - 기본값):**
@@ -253,7 +253,7 @@ http://example.com
 
 (`example.com`을 실제 도메인으로 변경하세요)
 
-**중요:** 프로덕션 환경에서는 표준 포트(HTTP: 80, HTTPS: 443)를 사용하므로 URL에 포트 번호가 포함되지 않습니다. 클라우드 로드 밸런서가 443 → 53000으로 포워딩합니다.
+**중요:** 프로덕션 환경에서는 표준 포트(HTTP: 80, HTTPS: 443)를 사용하므로 URL에 포트 번호가 포함되지 않습니다. 클라우드 로드 밸런서가 443 → 43000으로 포워딩합니다.
 
 ## 기본 인증 정보
 
@@ -268,25 +268,25 @@ http://example.com
 
    **포트 포워딩 설정:**
    ```
-   외부 HTTPS 443 → 내부 53000 (Frontend + Bull Board)
-   외부 HTTPS 443/grafana → 내부 54000 (Grafana)
+   외부 HTTPS 443 → 내부 43000 (Frontend + Bull Board)
+   외부 HTTPS 443/grafana → 내부 44000 (Grafana)
    ```
 
    **중요:**
-   - Grafana만 별도 포트(54000) 포워딩 필요
-   - Bull Board는 Frontend(53000)와 동일 포트 사용 - 별도 포워딩 불필요
+   - Grafana만 별도 포트(44000) 포워딩 필요
+   - Bull Board는 Frontend(43000)와 동일 포트 사용 - 별도 포워딩 불필요
 
    **텐센트 클라우드 CLB 예시:**
    - 리스너: HTTPS:443 (SSL 인증서 연결)
-   - 전달 규칙 1: URL = `/grafana*` → 백엔드 서버: CVM:54000 (Grafana 전용)
-   - 전달 규칙 2: URL = `/*` → 백엔드 서버: CVM:53000 (Frontend + Bull Board)
+   - 전달 규칙 1: URL = `/grafana*` → 백엔드 서버: CVM:44000 (Grafana 전용)
+   - 전달 규칙 2: URL = `/*` → 백엔드 서버: CVM:43000 (Frontend + Bull Board)
    - X-Forwarded-For: 활성화
    - 참고: `/bull-board` 경로는 규칙 2로 처리됨 (별도 규칙 불필요)
 
    **AWS Application Load Balancer 예시:**
    - Listener: HTTPS:443 (SSL 인증서 연결)
-   - Rule 1: Path = `/grafana*` → Target Group: EC2:54000 (Grafana 전용)
-   - Rule 2: Path = `/*` → Target Group: EC2:53000 (Frontend + Bull Board)
+   - Rule 1: Path = `/grafana*` → Target Group: EC2:44000 (Grafana 전용)
+   - Rule 2: Path = `/*` → Target Group: EC2:43000 (Frontend + Bull Board)
    - 참고: `/bull-board` 경로는 Rule 2로 처리됨 (별도 규칙 불필요)
 
    **Nginx Reverse Proxy 예시:**
@@ -300,14 +300,14 @@ http://example.com
 
        # Grafana (별도 포트 포워딩)
        location /grafana/ {
-           proxy_pass http://localhost:54000/;
+           proxy_pass http://localhost:44000/;
            proxy_set_header X-Forwarded-Proto https;
        }
 
        # Frontend + Bull Board (동일 포트)
        # /bull-board 경로는 Frontend Nginx에서 처리됨
        location / {
-           proxy_pass http://localhost:53000;
+           proxy_pass http://localhost:43000;
            proxy_set_header X-Forwarded-Proto https;
        }
    }
@@ -316,7 +316,7 @@ http://example.com
 2. **Grafana URL 설정** (개발 환경):
    - `.env` 파일 편집
    - `VITE_GRAFANA_URL`을 Grafana 서버 주소에 맞게 업데이트
-   - 개발 환경 기본값: `http://localhost:54000`
+   - 개발 환경 기본값: `http://localhost:44000`
    - 프로덕션 환경: `https://example.com/grafana` (자동 설정됨)
    - 서비스 재시작:
 
@@ -425,7 +425,7 @@ sudo systemctl start docker
 
 ### Grafana 대시보드 iframe 임베딩 문제
 
-다음 오류가 표시되는 경우: `Refused to display 'http://localhost:54000/' in a frame because it set 'X-Frame-Options' to 'deny'`
+다음 오류가 표시되는 경우: `Refused to display 'http://localhost:44000/' in a frame because it set 'X-Frame-Options' to 'deny'`
 
 이는 Grafana의 보안 설정이 iframe 임베딩을 방지할 때 발생합니다. 해결 방법:
 

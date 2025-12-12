@@ -160,11 +160,11 @@ services:
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
       VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:44000}
-      VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:43500/bull-board}
+      VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:43000/bull-board}
       VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:1400}
 
     ports:
-      - "0.0.0.0:${FRONTEND_PORT:-43500}:3000"
+      - "0.0.0.0:${FRONTEND_PORT:-43000}:3000"
     depends_on:
       backend-dev:
         condition: service_healthy

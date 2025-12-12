@@ -347,9 +347,9 @@ yarn build
 
 Access the Bull Board queue monitoring interface at:
 ```
-http://localhost:55000/admin/queues
+http://localhost:45000/admin/queues
 ```
-(Backend internal port 5000 + 50000 offset = 55000)
+(Backend internal port 5000 + 40000 offset = 45000)
 
 This provides real-time monitoring of:
 - Job queues status and statistics
@@ -361,14 +361,14 @@ This provides real-time monitoring of:
 
 When running with `yarn docker:dev`, additional tools are available:
 
-- **Frontend**: http://localhost:53000
-- **Backend API**: http://localhost:55000
-- **Chat Server**: http://localhost:55100
-- **Event Lens**: http://localhost:55200
-- **Prometheus** (Metrics Collection): http://localhost:59090
-- **Grafana** (Monitoring Dashboard): http://localhost:54000
+- **Frontend**: http://localhost:43000
+- **Backend API**: http://localhost:45000
+- **Chat Server**: http://localhost:45100
+- **Event Lens**: http://localhost:45200
+- **Prometheus** (Metrics Collection): http://localhost:49090
+- **Grafana** (Monitoring Dashboard): http://localhost:44000
 
-(All ports use internal port + 50000 offset)
+(All ports use internal port + 40000 offset)
 
 ## Key Features
 
@@ -660,31 +660,32 @@ The Docker setup includes:
 
 ### Service Ports
 
-**Port Offset Strategy**: To avoid port conflicts, the application uses a +50000 offset for all external ports (both development and production environments).
+**Port Offset Strategy**: To avoid port conflicts, the application uses a +40000 offset for all external ports (both development and production environments).
 
 | Service | Internal Port | External Port | Description | Environment |
 |---------|---------------|---------------|-------------|-------------|
-| MySQL | 3306 | 53306 | Database | Both |
-| Redis | 6379 | 56379 | Cache & Queue | Both |
-| Backend | 5000 | 55000 | API Server | Both |
-| Frontend | 3000 | 53000 | Web UI | Both |
-| Chat Server | 5100 | 55100 | WebSocket Server | Both |
-| Event Lens | 5200 | 55200 | Analytics API | Both |
-| ClickHouse | 8123, 9000 | 58123, 59000 | Analytics DB | Both |
-| etcd | 2379, 2380 | 52879, 52880 | Service Discovery | Both |
-| Prometheus | 9090 | 59090 | Metrics Collection | Both |
-| Grafana | 3000 | 54000 | Monitoring Dashboard | Both |
-| Debug (Backend) | 9229 | 59229 | Node.js Debugger | Dev only |
+| MySQL | 3306 | 43306 | Database | Both |
+| Redis | 6379 | 46379 | Cache & Queue | Both |
+| Backend | 5000 | 45000 | API Server | Both |
+| Frontend | 80/3000 | 43000 | Web UI | Both |
+| Chat Server | 5100 | 45100 | WebSocket Server | Both |
+| Event Lens | 5200 | 45200 | Analytics API | Both |
+| ClickHouse | 8123, 9000 | 48123, 49000 | Analytics DB | Both |
+| etcd | 2379, 2380 | 42379, 42380 | Service Discovery | Both |
+| Prometheus | 9090 | 49090 | Metrics Collection | Both |
+| Grafana | 3000 | 44000 | Monitoring Dashboard | Both |
+| Loki | 3100 | 43100 | Log Aggregation | Both |
+| Debug (Backend) | 9229 | 49229 | Node.js Debugger | Dev only |
 
 **Notes:**
 - **Internal Port**: Port used inside Docker containers (always the same)
-- **External Port**: Port exposed on your local machine or server (internal port + 50000)
-- **Formula**: External Port = Internal Port + 50000
+- **External Port**: Port exposed on your local machine or server (internal port + 40000)
+- **Formula**: External Port = Internal Port + 40000
 - **Examples**:
-  - Frontend: `http://localhost:53000` (internal 3000 + 50000)
-  - Backend API: `http://localhost:55000` (internal 5000 + 50000)
-  - MySQL: `localhost:53306` (internal 3306 + 50000)
-  - Redis: `localhost:56379` (internal 6379 + 50000)
+  - Frontend: `http://localhost:43000` (internal 3000 + 40000)
+  - Backend API: `http://localhost:45000` (internal 5000 + 40000)
+  - MySQL: `localhost:43306` (internal 3306 + 40000)
+  - Redis: `localhost:46379` (internal 6379 + 40000)
 
 ## Documentation
 
@@ -692,9 +693,9 @@ The Docker setup includes:
 
 Once the backend is running, you can access the Swagger API documentation at:
 ```
-http://localhost:55000/api-docs
+http://localhost:45000/api-docs
 ```
-(Backend internal port 5000 + 50000 offset = 55000)
+(Backend internal port 5000 + 40000 offset = 45000)
 
 The API includes endpoints for:
 - User authentication and management
