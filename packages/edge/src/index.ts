@@ -3,6 +3,8 @@ import logger from './config/logger';
 import app from './app';
 import { sdkManager } from './services/sdkManager';
 import { startMetricsServer, sdkInitialized } from './services/metricsServer';
+import { tokenMirrorService } from './services/tokenMirrorService';
+import { tokenUsageTracker } from './services/tokenUsageTracker';
 
 /**
  * Main entry point for Edge server
@@ -18,15 +20,23 @@ async function main(): Promise<void> {
     // Start metrics server (internal only)
     startMetricsServer();
 
-    // Initialize SDK
+    // Initialize SDK first (waits for backend to be ready)
     await sdkManager.initialize();
     sdkInitialized.set(1);
+
+    // Initialize token mirror service (for local token validation)
+    // This comes after SDK initialization since backend should be ready at this point
+    await tokenMirrorService.initialize();
+    logger.info(`Token mirror initialized with ${tokenMirrorService.getTokenCount()} tokens`);
+
+    // Initialize token usage tracker (for reporting usage to backend)
+    await tokenUsageTracker.initialize();
 
     // Start main HTTP server
     const server = app.listen(config.port, () => {
       logger.info(`Edge server listening on port ${config.port}`);
       logger.info(`Environment: ${config.nodeEnv}`);
-      logger.info(`Target environments: ${config.environments.join(', ')}`);
+      logger.info(`Target environments: ${config.environments === '*' ? '*' : config.environments.join(', ')}`);
     });
 
     // Graceful shutdown
@@ -37,7 +47,9 @@ async function main(): Promise<void> {
         logger.info('HTTP server closed');
 
         try {
+          await tokenUsageTracker.shutdown();
           await sdkManager.shutdown();
+          await tokenMirrorService.shutdown();
           sdkInitialized.set(0);
           logger.info('Shutdown complete');
           process.exit(0);

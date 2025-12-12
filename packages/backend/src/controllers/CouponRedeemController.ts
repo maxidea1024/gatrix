@@ -1,8 +1,8 @@
 import { Response } from 'express';
 import Joi from 'joi';
 import { asyncHandler, GatrixError } from '../middleware/errorHandler';
-import { AuthenticatedRequest } from '../types/auth';
 import { CouponRedeemService } from '../services/CouponRedeemService';
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 // Validation schema for redeem request
 const redeemSchema = Joi.object({
@@ -18,10 +18,10 @@ const redeemSchema = Joi.object({
 export class CouponRedeemController {
   /**
    * Redeem a coupon code
-   * POST /api/v1/server/coupons/:code/redeem
+   * POST /api/v1/server/:env/coupons/:code/redeem
    * Requires: X-API-Token header (server SDK token)
    */
-  static redeem = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  static redeem = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
     const { code } = req.params;
 
     if (!code) {

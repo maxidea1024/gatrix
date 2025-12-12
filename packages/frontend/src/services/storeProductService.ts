@@ -1,0 +1,261 @@
+import api from './api';
+import { Tag } from './tagService';
+
+export interface StoreProduct {
+  id: string;
+  environmentId: string;
+  isActive: boolean;
+  productId: string;
+  cmsProductId: number | null;
+  productName: string;
+  store: string;
+  price: number;
+  currency: string;
+  saleStartAt: string | null;
+  saleEndAt: string | null;
+  description: string | null;
+  metadata: Record<string, any> | null;
+  createdBy: number | null;
+  updatedBy: number | null;
+  createdAt: string;
+  updatedAt: string;
+  tags?: Tag[];
+}
+
+export interface CreateStoreProductInput {
+  productId: string;
+  productName: string;
+  store: string;
+  price: number;
+  currency?: string;
+  isActive?: boolean;
+  saleStartAt?: string | null;
+  saleEndAt?: string | null;
+  description?: string;
+  metadata?: Record<string, any>;
+  tagIds?: number[];
+}
+
+export interface UpdateStoreProductInput {
+  productId?: string;
+  productName?: string;
+  store?: string;
+  price?: number;
+  currency?: string;
+  isActive?: boolean;
+  saleStartAt?: string | null;
+  saleEndAt?: string | null;
+  description?: string;
+  metadata?: Record<string, any>;
+  tagIds?: number[];
+}
+
+export interface GetStoreProductsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  store?: string;
+  isActive?: boolean;
+}
+
+export interface GetStoreProductsResponse {
+  products: StoreProduct[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+/**
+ * CMS CashShop product from cashshop-lookup-*.json (planning data)
+ */
+export interface CmsCashShopProduct {
+  id: number;
+  name: string;           // Formatted and localized name (e.g., "레드젬 600")
+  productCode: string;    // SDO product code
+  price: number;          // China price (CNY)
+  productCategory: number;
+  productType: number;
+  saleType: number;
+  productDesc?: string;   // Product description (localized)
+}
+
+export interface GetCmsCashShopResponse {
+  products: CmsCashShopProduct[];
+  total: number;
+}
+
+export interface StoreProductStats {
+  total: number;
+  active: number;
+  inactive: number;
+}
+
+class StoreProductService {
+  /**
+   * Get all store products with pagination
+   * api.get() returns { success, data, message } - already unwrapped from axios response
+   */
+  async getStoreProducts(params?: GetStoreProductsParams): Promise<GetStoreProductsResponse> {
+    const response = await api.get('/admin/store-products', { params });
+    // response = { success, data: { products, total, page, limit }, message }
+    return response.data;
+  }
+
+  /**
+   * Get store product statistics
+   */
+  async getStats(): Promise<StoreProductStats> {
+    const response = await api.get('/admin/store-products/stats');
+    return response.data;
+  }
+
+  /**
+   * Get store product by ID
+   */
+  async getStoreProductById(id: string): Promise<StoreProduct> {
+    const response = await api.get(`/admin/store-products/${id}`);
+    return response.data.product;
+  }
+
+  /**
+   * Create a new store product
+   */
+  async createStoreProduct(input: CreateStoreProductInput): Promise<StoreProduct> {
+    const response = await api.post('/admin/store-products', input);
+    return response.data.product;
+  }
+
+  /**
+   * Update a store product
+   */
+  async updateStoreProduct(id: string, input: UpdateStoreProductInput): Promise<StoreProduct> {
+    const response = await api.put(`/admin/store-products/${id}`, input);
+    return response.data.product;
+  }
+
+  /**
+   * Delete a store product
+   */
+  async deleteStoreProduct(id: string): Promise<void> {
+    await api.delete(`/admin/store-products/${id}`);
+  }
+
+  /**
+   * Delete multiple store products
+   */
+  async deleteStoreProducts(ids: string[]): Promise<number> {
+    const response = await api.delete('/admin/store-products', { data: { ids } });
+    return response.data.deletedCount;
+  }
+
+  /**
+   * Toggle store product active status
+   */
+  async toggleActive(id: string, isActive: boolean): Promise<StoreProduct> {
+    const response = await api.patch(`/admin/store-products/${id}/toggle-active`, { isActive });
+    return response.data.product;
+  }
+
+  /**
+   * Bulk update active status for multiple products
+   */
+  async bulkUpdateActiveStatus(ids: string[], isActive: boolean): Promise<number> {
+    const response = await api.patch('/admin/store-products/bulk-active', { ids, isActive });
+    return response.data.affectedCount;
+  }
+
+  /**
+   * Get CMS CashShop products from CashShop_BCCN.json
+   * Returns only valid products (with chinaPrice and productCodeSdo)
+   */
+  async getCmsCashShopProducts(): Promise<GetCmsCashShopResponse> {
+    const response = await api.get('/admin/cms/cash-shop');
+    return response.data;
+  }
+
+  /**
+   * Refresh CMS CashShop cache and get products
+   */
+  async refreshCmsCashShopProducts(): Promise<GetCmsCashShopResponse> {
+    const response = await api.post('/admin/cms/cash-shop/refresh');
+    return response.data;
+  }
+
+  /**
+   * Preview sync with planning data
+   */
+  async previewSync(): Promise<SyncPreviewResult> {
+    const response = await api.get('/admin/store-products/sync/preview');
+    return response.data;
+  }
+
+  /**
+   * Apply sync with planning data (selective)
+   */
+  async applySync(selected?: SelectedSyncItems): Promise<SyncApplyResult> {
+    const response = await api.post('/admin/store-products/sync/apply', selected);
+    return response.data;
+  }
+}
+
+// Selected items for selective sync
+export interface SelectedSyncItems {
+  toAdd: number[];      // cmsProductId array
+  toUpdate: number[];   // cmsProductId array
+  toDelete: string[];   // id array
+}
+
+// Sync related interfaces
+export interface SyncChange {
+  field: string;
+  oldValue: any;
+  newValue: any;
+}
+
+export interface SyncAddItem {
+  cmsProductId: number;
+  productCode: string;
+  name: string;
+  price: number;
+  description: string | null;
+}
+
+export interface SyncUpdateItem {
+  id: string;
+  cmsProductId: number;
+  productCode: string;
+  name: string;
+  changes: SyncChange[];
+}
+
+export interface SyncDeleteItem {
+  id: string;
+  cmsProductId: number | null;
+  productCode: string;
+  name: string;
+}
+
+export interface SyncPreviewResult {
+  toAdd: SyncAddItem[];
+  toUpdate: SyncUpdateItem[];
+  toDelete: SyncDeleteItem[];
+  summary: {
+    addCount: number;
+    updateCount: number;
+    deleteCount: number;
+    totalChanges: number;
+  };
+}
+
+export interface SyncApplyResult {
+  success: boolean;
+  addedCount: number;
+  updatedCount: number;
+  deletedCount: number;
+}
+
+const storeProductService = new StoreProductService();
+export default storeProductService;
+

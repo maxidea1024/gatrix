@@ -3,6 +3,8 @@ import crypto from 'crypto';
 import { validationResult } from 'express-validator';
 import { Request, Response } from 'express';
 import { ulid } from 'ulid';
+import { pubSubService } from '../services/PubSubService';
+import logger from '../config/logger';
 
 class ApiTokensController {
   /**
@@ -160,6 +162,7 @@ class ApiTokensController {
         // If not allowing all environments, insert environment assignments
         if (!allowAllEnvironments && environmentIds.length > 0) {
           const envInserts = environmentIds.map((envId: string) => ({
+            id: ulid(), // Generate ULID for each record
             tokenId: tokenId,
             environmentId: envId,
           }));
@@ -168,6 +171,21 @@ class ApiTokensController {
 
         return { id: tokenId };
       });
+
+      // Publish token created event for Edge mirroring
+      try {
+        await pubSubService.publishSDKEvent({
+          type: 'api_token.created',
+          data: {
+            id: result.id,
+            tokenType,
+            allowAllEnvironments,
+            timestamp: Date.now()
+          }
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish api_token.created event', { eventError });
+      }
 
       // Return the new token with the actual token value (only shown once)
       res.status(201).json({
@@ -238,7 +256,8 @@ class ApiTokensController {
           // Insert new assignments
           if (!allowAllEnvironments && environmentIds.length > 0) {
             const envInserts = environmentIds.map((envId: string) => ({
-              tokenId: Number(id),
+              id: ulid(), // Generate ULID for each record
+              tokenId: id,
               environmentId: envId,
             }));
             await trx('g_api_access_token_environments').insert(envInserts);
@@ -273,6 +292,21 @@ class ApiTokensController {
           email: updatedToken.creatorEmail || ''
         }
       };
+
+      // Publish token updated event for Edge mirroring
+      try {
+        await pubSubService.publishSDKEvent({
+          type: 'api_token.updated',
+          data: {
+            id,
+            tokenType: updatedToken.tokenType,
+            allowAllEnvironments: Boolean(updatedToken.allowAllEnvironments),
+            timestamp: Date.now()
+          }
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish api_token.updated event', { eventError });
+      }
 
       res.json({
         success: true,
@@ -313,10 +347,25 @@ class ApiTokensController {
       await knex('g_api_access_tokens')
         .where('id', id)
         .update({
-          tokenHash: tokenValue, // Store plain token value
+          tokenValue: tokenValue, // Store plain token value
           updatedBy: userId,
           updatedAt: knex.fn.now()
         });
+
+      // Publish token updated event for Edge mirroring (regenerate = token value changed)
+      try {
+        await pubSubService.publishSDKEvent({
+          type: 'api_token.updated',
+          data: {
+            id,
+            tokenType: existingToken.tokenType,
+            regenerated: true,
+            timestamp: Date.now()
+          }
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish api_token.updated event for regenerate', { eventError });
+      }
 
       // Return the new token with the actual token value (only shown once)
       res.json({
@@ -365,6 +414,20 @@ class ApiTokensController {
         // Delete token
         await trx('g_api_access_tokens').where('id', id).delete();
       });
+
+      // Publish token deleted event for Edge mirroring
+      try {
+        await pubSubService.publishSDKEvent({
+          type: 'api_token.deleted',
+          data: {
+            id,
+            tokenType: existingToken.tokenType,
+            timestamp: Date.now()
+          }
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish api_token.deleted event', { eventError });
+      }
 
       res.json({
         success: true,

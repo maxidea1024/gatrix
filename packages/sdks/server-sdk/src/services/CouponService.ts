@@ -1,6 +1,7 @@
 /**
  * Coupon Service
  * Handles coupon redemption
+ * Uses per-environment API pattern: POST /api/v1/server/:env/coupons/:code/redeem
  */
 
 import { ApiClient } from '../client/ApiClient';
@@ -11,15 +12,18 @@ import { CouponRedeemError, CouponRedeemErrorCode, isGatrixSDKError } from '../u
 export class CouponService {
   private apiClient: ApiClient;
   private logger: Logger;
+  // Default environment for single-environment mode
+  private defaultEnvironment: string;
 
-  constructor(apiClient: ApiClient, logger: Logger) {
+  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
     this.apiClient = apiClient;
     this.logger = logger;
+    this.defaultEnvironment = defaultEnvironment;
   }
 
   /**
    * Redeem a coupon code
-   * POST /api/v1/server/coupons/:code/redeem
+   * POST /api/v1/server/:env/coupons/:code/redeem
    *
    * @throws {CouponRedeemError} When coupon redemption fails with specific error code
    *
@@ -37,14 +41,15 @@ export class CouponService {
    * - COUPON_INVALID_SUBCHANNEL: Coupon not available for this subchannel
    * - COUPON_INVALID_USER: Coupon not available for this user
    */
-  async redeem(request: RedeemCouponRequest): Promise<RedeemCouponResponse> {
-    this.logger.info('Redeeming coupon', { code: request.code, userId: request.userId });
+  async redeem(request: RedeemCouponRequest, environment?: string): Promise<RedeemCouponResponse> {
+    const env = environment || this.defaultEnvironment;
+    this.logger.info('Redeeming coupon', { code: request.code, userId: request.userId, environment: env });
 
     const { code, ...body } = request;
 
     try {
       const response = await this.apiClient.post<RedeemCouponResponse>(
-        `/api/v1/server/coupons/${encodeURIComponent(code)}/redeem`,
+        `/api/v1/server/${encodeURIComponent(env)}/coupons/${encodeURIComponent(code)}/redeem`,
         body
       );
 
@@ -62,6 +67,7 @@ export class CouponService {
         code,
         userId: request.userId,
         sequence: response.data.sequence,
+        environment: env,
       });
 
       return response.data;

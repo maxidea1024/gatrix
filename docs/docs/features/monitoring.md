@@ -27,13 +27,12 @@ This guide explains how Gatrix integrates Prometheus and Grafana for monitoring 
 
 ## Ports
 
-- Prometheus: host 59091 -> container 9090
-- Grafana: host 54000 -> container 3000
-- Chat server metrics (existing): host 59090 -> container 9090
+- Prometheus: host 49090 -> container 9090
+- Grafana: host 44000 -> container 3000
 
 You can override host ports via environment variables:
-- `PROMETHEUS_PORT` (default 59091)
-- `GRAFANA_PORT` (default 54000)
+- `PROMETHEUS_PORT` (default 49090)
+- `GRAFANA_PORT` (default 44000)
 
 ## Environment Variables
 
@@ -47,7 +46,7 @@ Grafana (both dev/prod):
 - `GF_USERS_ALLOW_SIGN_UP`: defaults to `false`
 
 Frontend:
-- `VITE_GRAFANA_URL`: Optional. If set, the Admin Panel shortcut uses this URL; otherwise it defaults to `http(s)://<host>:54000`.
+- `VITE_GRAFANA_URL`: Optional. If set, the Admin Panel shortcut uses this URL; otherwise it defaults to `http(s)://<host>:44000`.
 
 ## Docker Compose
 
@@ -98,7 +97,7 @@ const logger = getLogger('MY-SERVER');
 
 // Create SDK with required identification fields
 const sdk = new GatrixServerSDK({
-  gatrixUrl: 'http://localhost:55000',
+  gatrixUrl: 'http://localhost:45000',
   apiToken: 'your-api-token',
   applicationName: 'my-game-server',
   service: 'worldd',       // Required: service name
@@ -181,14 +180,14 @@ playersOnline.labels('world-1').set(150);
 2) Development stack
 
 - `yarn docker:dev` to start all dev services (including Prometheus and Grafana)
-- Access Grafana: http://localhost:54000
-- Access Prometheus: http://localhost:59091
+- Access Grafana: http://localhost:44000
+- Access Prometheus: http://localhost:49090
 
 3) Production-like stack
 
 - `yarn docker:up` to start services with production compose
-- Access Grafana: http://localhost:54000
-- Access Prometheus: http://localhost:59091
+- Access Grafana: http://localhost:44000
+- Access Prometheus: http://localhost:49090
 
 4) Restart policy
 
@@ -218,7 +217,7 @@ Implementation pattern (Node.js/Express):
 
 - Prometheus has a `Targets` page to verify discovered endpoints.
 - If targets are missing, check the Backend HTTP-SD endpoint and service discovery configuration.
-- Ensure ports do not conflict (chat metrics use 59090/9090; Prometheus uses 59091/9090).
+- Ensure ports do not conflict (Prometheus uses 49090/9090).
 
 ## Internationalization
 

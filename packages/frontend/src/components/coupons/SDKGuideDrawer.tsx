@@ -162,8 +162,8 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
     "userUsedCount": 1,
     "sequence": 1,
     "usedAt": "2025-10-28T04:17:05.123Z",
-    "rewardEmailTitle": "Congratulations! You received a coupon reward.",
-    "rewardEmailBody": "Congratulations! You received a reward by using the coupon. Please check it in the game."
+    "rewardMailTitle": "Congratulations! You received a coupon reward.",
+    "rewardMailContent": "Congratulations! You received a reward by using the coupon. Please check it in the game."
   }
 }`;
 

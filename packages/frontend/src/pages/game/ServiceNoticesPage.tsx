@@ -56,11 +56,13 @@ import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/Colu
 import { formatDateTime } from '../../utils/dateFormat';
 import { useDebounce } from '../../hooks/useDebounce';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
+  const { currentEnvironment } = useEnvironment();
   const canManage = hasPermission([PERMISSIONS.SERVICE_NOTICES_MANAGE]);
 
   // State
@@ -378,15 +380,22 @@ const ServiceNoticesPage: React.FC = () => {
     setWebviewMenuAnchorEl(null);
   };
 
+  // Get Edge server URL for webview pages
+  const getEdgeWebviewUrl = () => {
+    const edgeUrl = import.meta.env.VITE_EDGE_URL || 'http://localhost:1400';
+    const envName = currentEnvironment?.environmentName || 'development';
+    return `${edgeUrl}/game-service-notices.html?environment=${encodeURIComponent(envName)}`;
+  };
+
   const handleOpenWebviewPreview = () => {
-    // Open the actual game webview HTML page in a new window (same size as preview dialog)
-    window.open('/game-service-notices.html', '_blank', 'width=1536,height=928');
+    // Open the actual game webview HTML page served from Edge server
+    window.open(getEdgeWebviewUrl(), '_blank', 'width=1536,height=928');
     handleWebviewMenuClose();
   };
 
-  // Copy notice URL to clipboard
+  // Copy notice URL to clipboard (Edge server URL)
   const handleCopyNoticeUrl = async () => {
-    const noticeUrl = `${window.location.origin}/game-service-notices.html`;
+    const noticeUrl = getEdgeWebviewUrl();
     copyToClipboardWithNotification(
       noticeUrl,
       () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),

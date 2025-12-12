@@ -108,6 +108,7 @@ interface ClusterNode extends SimulationNodeDatum {
   id: string;
   service?: ServiceInstance;
   isCenter?: boolean;
+  groupKey?: string; // For center nodes: the group key (e.g., 'development', 'production')
   radius: number;
   isNew?: boolean; // Track if node is newly added
   prevStatus?: string; // Track previous status for change detection
@@ -119,14 +120,18 @@ interface ClusterLink extends SimulationLinkDatum<ClusterNode> {
   target: ClusterNode | string;
 }
 
+// Grouping option type
+type GroupingOption = 'none' | 'group' | 'environment' | 'region';
+
 // ClusterView component with D3 force simulation
 interface ClusterViewProps {
   services: ServiceInstance[];
   heartbeatIds: Set<string>;
   t: (key: string) => string;
+  groupingBy?: GroupingOption;
 }
 
-const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) => {
+const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, groupingBy = 'none' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [nodes, setNodes] = useState<ClusterNode[]>([]);
@@ -160,6 +165,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
   const getNodeColor = (status: string) => {
     switch (status) {
       case 'ready': return '#4caf50';
+      case 'initializing': return '#ffc107'; // Yellow for initializing
       case 'busy': return '#ff9800';
       case 'full': return '#f44336';
       case 'starting': return '#2196f3';
@@ -393,21 +399,51 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Update nodes when services change (add/remove)
+  // Helper function to get group key from service based on grouping option
+  const getGroupKey = useCallback((service: ServiceInstance): string => {
+    switch (groupingBy) {
+      case 'group':
+        return service.labels.group || 'unknown';
+      case 'environment':
+        return service.labels.env || 'unknown';
+      case 'region':
+        return service.labels.region || 'unknown';
+      default:
+        return 'center';
+    }
+  }, [groupingBy]);
+
+  // Track previous groupingBy to detect changes
+  const prevGroupingByRef = useRef<GroupingOption>(groupingBy);
+
+  // Update nodes when services change (add/remove) or grouping changes
   useEffect(() => {
     if (!simulationRef.current) return;
 
     const savedPos = getSavedCenterPosition();
+
+    // Check if grouping mode changed
+    const groupingChanged = prevGroupingByRef.current !== groupingBy;
+    prevGroupingByRef.current = groupingBy;
+
+    // Only use existing nodes if grouping didn't change
     const existingNodeMap = new Map<string, ClusterNode>();
-    nodesRef.current.forEach(n => existingNodeMap.set(n.id, n));
+    if (!groupingChanged) {
+      nodesRef.current.forEach(n => existingNodeMap.set(n.id, n));
+    } else {
+      // Only keep service nodes when grouping changes, recreate center nodes
+      nodesRef.current.filter(n => !n.isCenter).forEach(n => existingNodeMap.set(n.id, n));
+    }
 
     // Track new nodes for rumble effect
     const newNodeIds: string[] = [];
 
-    // Get or create center node
-    let centerNode = existingNodeMap.get('center');
-    if (!centerNode) {
-      centerNode = {
+    // Determine center nodes based on grouping
+    const centerNodes: ClusterNode[] = [];
+
+    if (groupingBy === 'none') {
+      // Single center node - always create fresh when switching to 'none'
+      const centerNode: ClusterNode = {
         id: 'center',
         isCenter: true,
         radius: centerRadius,
@@ -416,12 +452,51 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
         fx: savedPos.x,
         fy: savedPos.y,
       };
+      centerNodes.push(centerNode);
+    } else {
+      // Multiple center nodes based on grouping
+      const groupKeys = new Set<string>();
+      services.forEach(s => groupKeys.add(getGroupKey(s)));
+
+      const groupArray = Array.from(groupKeys).sort();
+      const groupCount = groupArray.length;
+
+      groupArray.forEach((groupKey, index) => {
+        const centerId = `center-${groupKey}`;
+        let centerNode = existingNodeMap.get(centerId);
+
+        if (!centerNode) {
+          // Position group centers in a circle around the main center
+          const angle = (2 * Math.PI * index) / Math.max(groupCount, 1);
+          const distance = groupCount > 1 ? 200 : 0;
+          const x = savedPos.x + Math.cos(angle) * distance;
+          const y = savedPos.y + Math.sin(angle) * distance;
+
+          centerNode = {
+            id: centerId,
+            isCenter: true,
+            groupKey,
+            radius: centerRadius,
+            x,
+            y,
+            fx: x,
+            fy: y,
+          };
+        } else {
+          // Update groupKey in case it changed
+          centerNode.groupKey = groupKey;
+        }
+        centerNodes.push(centerNode);
+      });
     }
 
     // Create/update service nodes
     const serviceNodes: ClusterNode[] = services.map((service) => {
       const nodeId = `${service.labels.service}-${service.instanceId}`;
       const existing = existingNodeMap.get(nodeId);
+      const groupKey = getGroupKey(service);
+      const targetCenterId = groupingBy === 'none' ? 'center' : `center-${groupKey}`;
+      const targetCenter = centerNodes.find(c => c.id === targetCenterId);
 
       if (existing) {
         // Update service data but keep position
@@ -429,7 +504,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
         return existing;
       }
 
-      // New node - random position around center
+      // New node - random position around its center
       const angle = Math.random() * 2 * Math.PI;
       const distance = 80 + Math.random() * 60;
       newNodeIds.push(nodeId);
@@ -439,8 +514,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
         service,
         isCenter: false,
         radius: nodeRadius,
-        x: (centerNode?.x ?? savedPos.x) + Math.cos(angle) * distance,
-        y: (centerNode?.y ?? savedPos.y) + Math.sin(angle) * distance,
+        x: (targetCenter?.x ?? savedPos.x) + Math.cos(angle) * distance,
+        y: (targetCenter?.y ?? savedPos.y) + Math.sin(angle) * distance,
         isNew: true,
       };
     });
@@ -457,14 +532,18 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
       }, 500);
     }
 
-    const allNodes = [centerNode, ...serviceNodes];
+    const allNodes = [...centerNodes, ...serviceNodes];
     nodesRef.current = allNodes;
 
-    // Create links
-    const newLinks: ClusterLink[] = serviceNodes.map(node => ({
-      source: 'center',
-      target: node.id,
-    }));
+    // Create links - each service links to its group center
+    const newLinks: ClusterLink[] = serviceNodes.map(node => {
+      const groupKey = getGroupKey(node.service!);
+      const targetCenterId = groupingBy === 'none' ? 'center' : `center-${groupKey}`;
+      return {
+        source: targetCenterId,
+        target: node.id,
+      };
+    });
     linksRef.current = newLinks;
 
     // Update simulation with new nodes/links (don't recreate)
@@ -472,13 +551,17 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
     simulation.nodes(allNodes);
     (simulation.force('link') as ForceLink<ClusterNode, ClusterLink>)?.links(newLinks);
 
-    // Gently restart with low alpha for smooth transition
-    const hasChanges = newNodeIds.length > 0 || allNodes.length !== existingNodeMap.size;
+    // Force re-render to show new state immediately
+    setNodes([...allNodes]);
+    setLinks([...newLinks]);
+
+    // Restart simulation - stronger restart when grouping changes
+    const hasChanges = newNodeIds.length > 0 || allNodes.length !== existingNodeMap.size || groupingChanged;
     if (hasChanges) {
-      simulation.alpha(0.3).restart();
+      simulation.alpha(groupingChanged ? 0.8 : 0.3).restart();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceIds, getSavedCenterPosition]);
+  }, [serviceIds, getSavedCenterPosition, groupingBy, getGroupKey]);
 
   // Convert mouse position to SVG coordinates
   const mouseToSvgCoords = useCallback((e: MouseEvent | React.MouseEvent) => {
@@ -761,6 +844,11 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
               {nodes.map(node => {
                 if (node.isCenter) {
                   // Center cluster node - draggable
+                  // Calculate count for this center node
+                  const centerCount = node.groupKey
+                    ? services.filter(s => getGroupKey(s) === node.groupKey).length
+                    : services.length;
+
                   return (
                     <g
                       key={node.id}
@@ -768,41 +856,70 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
                       style={{ cursor: 'grab' }}
                       onMouseDown={(e) => handleMouseDown(node.id, e)}
                   >
-                    <circle
-                      r={centerRadius}
-                      fill="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-                      stroke="#fff"
-                      strokeWidth="3"
-                    />
                     <defs>
-                      <linearGradient id="centerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <linearGradient id={`centerGradient-${node.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor="#667eea" />
                         <stop offset="100%" stopColor="#764ba2" />
                       </linearGradient>
                     </defs>
                     <circle
                       r={centerRadius}
-                      fill="url(#centerGradient)"
+                      fill={`url(#centerGradient-${node.id})`}
                       stroke="#fff"
                       strokeWidth="3"
                     />
-                    <text
-                      textAnchor="middle"
-                      fill="#fff"
-                      fontSize="24"
-                      fontWeight="bold"
-                      dy="-5"
-                    >
-                      {services.length}
-                    </text>
-                    <text
-                      textAnchor="middle"
-                      fill="rgba(255,255,255,0.8)"
-                      fontSize="11"
-                      dy="12"
-                    >
-                      INSTANCES
-                    </text>
+                    {node.groupKey ? (
+                      // Grouped center node - show group key and count
+                      <>
+                        <text
+                          textAnchor="middle"
+                          fill="#fff"
+                          fontSize="12"
+                          fontWeight="bold"
+                          dy="-12"
+                        >
+                          {node.groupKey === 'unknown' ? '---' : node.groupKey.toUpperCase()}
+                        </text>
+                        <text
+                          textAnchor="middle"
+                          fill="#fff"
+                          fontSize="20"
+                          fontWeight="bold"
+                          dy="8"
+                        >
+                          {centerCount}
+                        </text>
+                        <text
+                          textAnchor="middle"
+                          fill="rgba(255,255,255,0.8)"
+                          fontSize="9"
+                          dy="22"
+                        >
+                          INSTANCES
+                        </text>
+                      </>
+                    ) : (
+                      // Single center node - show total count
+                      <>
+                        <text
+                          textAnchor="middle"
+                          fill="#fff"
+                          fontSize="24"
+                          fontWeight="bold"
+                          dy="-5"
+                        >
+                          {centerCount}
+                        </text>
+                        <text
+                          textAnchor="middle"
+                          fill="rgba(255,255,255,0.8)"
+                          fontSize="11"
+                          dy="12"
+                        >
+                          INSTANCES
+                        </text>
+                      </>
+                    )}
                   </g>
                 );
               }
@@ -1090,6 +1207,31 @@ const ServerListPage: React.FC = () => {
   const [bulkHealthCheckRunning, setBulkHealthCheckRunning] = useState(false);
   const [bulkHealthCheckSelected, setBulkHealthCheckSelected] = useState<Set<string>>(new Set());
 
+  // Grouping state (persisted in localStorage)
+  const [groupingBy, setGroupingBy] = useState<GroupingOption>(() => {
+    return (localStorage.getItem('serverListGroupingBy') as GroupingOption) || 'none';
+  });
+  const [groupingMenuAnchor, setGroupingMenuAnchor] = useState<null | HTMLElement>(null);
+
+  // Status counters - computed from services
+  const statusCounts = useMemo(() => {
+    const counts = {
+      initializing: 0,
+      ready: 0,
+      shutting_down: 0,
+      terminated: 0,
+      error: 0,
+    };
+    services.forEach((s) => {
+      if (s.status === 'initializing') counts.initializing++;
+      else if (s.status === 'ready') counts.ready++;
+      else if (s.status === 'shutting_down') counts.shutting_down++;
+      else if (s.status === 'terminated') counts.terminated++;
+      else if (s.status === 'error' || s.status === 'no-response') counts.error++;
+    });
+    return counts;
+  }, [services]);
+
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
     { id: 'status', labelKey: 'serverList.table.status', visible: true },
@@ -1322,6 +1464,13 @@ const ServerListPage: React.FC = () => {
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
     localStorage.setItem('serverListViewMode', mode);
+  };
+
+  // Grouping change handler
+  const handleGroupingChange = (option: GroupingOption) => {
+    setGroupingBy(option);
+    localStorage.setItem('serverListGroupingBy', option);
+    setGroupingMenuAnchor(null);
   };
 
   // Health check a service
@@ -2059,9 +2208,9 @@ const ServerListPage: React.FC = () => {
               placeholder={t('serverList.searchPlaceholder')}
               size="small"
               sx={{
-                minWidth: 450,
+                minWidth: 280,
                 flexGrow: 1,
-                maxWidth: 450,
+                maxWidth: 320,
                 '& .MuiOutlinedInput-root': {
                   height: '40px',
                   borderRadius: '20px',
@@ -2127,6 +2276,56 @@ const ServerListPage: React.FC = () => {
                 </IconButton>
               </Tooltip>
             )}
+
+            {/* Status Counters - wrapped in a box like StoreProducts */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0,
+                ml: 1,
+                borderRadius: 1,
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                overflow: 'hidden',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.5 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'info.main' }} />
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                  {t('serverList.stats.initializing')} <strong style={{ color: 'inherit' }}>{statusCounts.initializing}</strong>
+                </Typography>
+              </Box>
+              <Box sx={{ width: '1px', height: 20, bgcolor: 'divider' }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.5 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                  {t('serverList.stats.ready')} <strong style={{ color: 'inherit' }}>{statusCounts.ready}</strong>
+                </Typography>
+              </Box>
+              <Box sx={{ width: '1px', height: 20, bgcolor: 'divider' }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.5 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'warning.main' }} />
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                  {t('serverList.stats.shuttingDown')} <strong style={{ color: 'inherit' }}>{statusCounts.shutting_down}</strong>
+                </Typography>
+              </Box>
+              <Box sx={{ width: '1px', height: 20, bgcolor: 'divider' }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.5 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'grey.500' }} />
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                  {t('serverList.stats.terminated')} <strong style={{ color: 'inherit' }}>{statusCounts.terminated}</strong>
+                </Typography>
+              </Box>
+              <Box sx={{ width: '1px', height: 20, bgcolor: 'divider' }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 1.5, py: 0.5 }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'error.main' }} />
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                  {t('serverList.stats.error')} <strong style={{ color: 'inherit' }}>{statusCounts.error}</strong>
+                </Typography>
+              </Box>
+            </Box>
 
             {/* Spacer to push right-side buttons to the right */}
             <Box sx={{ flexGrow: 1 }} />
@@ -2218,6 +2417,76 @@ const ServerListPage: React.FC = () => {
                   : 'rgba(0, 0, 0, 0.2)',
               }}
             />
+
+            {/* Grouping Button - Only show in cluster view */}
+            {viewMode === 'cluster' && (
+              <>
+                <Tooltip title={t('serverList.grouping.label')}>
+                  <Button
+                    size="small"
+                    variant={groupingBy !== 'none' ? 'contained' : 'outlined'}
+                    onClick={(e) => setGroupingMenuAnchor(e.currentTarget)}
+                    sx={{
+                      minWidth: 'auto',
+                      px: 1.5,
+                      textTransform: 'none',
+                      ...(groupingBy === 'none' && {
+                        bgcolor: 'background.paper',
+                        borderColor: 'divider',
+                        color: 'text.primary',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
+                        },
+                      }),
+                    }}
+                  >
+                    {groupingBy === 'none'
+                      ? t('serverList.grouping.label')
+                      : t(`serverList.grouping.${groupingBy}`)}
+                  </Button>
+                </Tooltip>
+                <Menu
+                  anchorEl={groupingMenuAnchor}
+                  open={Boolean(groupingMenuAnchor)}
+                  onClose={() => setGroupingMenuAnchor(null)}
+                >
+                  <MenuItem
+                    selected={groupingBy === 'none'}
+                    onClick={() => handleGroupingChange('none')}
+                  >
+                    {t('serverList.grouping.none')}
+                  </MenuItem>
+                  <MenuItem
+                    selected={groupingBy === 'group'}
+                    onClick={() => handleGroupingChange('group')}
+                  >
+                    {t('serverList.grouping.group')}
+                  </MenuItem>
+                  <MenuItem
+                    selected={groupingBy === 'environment'}
+                    onClick={() => handleGroupingChange('environment')}
+                  >
+                    {t('serverList.grouping.environment')}
+                  </MenuItem>
+                  <MenuItem
+                    selected={groupingBy === 'region'}
+                    onClick={() => handleGroupingChange('region')}
+                  >
+                    {t('serverList.grouping.region')}
+                  </MenuItem>
+                </Menu>
+                {/* Divider */}
+                <Box
+                  sx={{
+                    width: '1px',
+                    height: '24px',
+                    bgcolor: (theme) => theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.2)'
+                      : 'rgba(0, 0, 0, 0.2)',
+                  }}
+                />
+              </>
+            )}
 
             {/* Pause/Resume Button */}
             <Tooltip title={isPaused ? t('serverList.resumeUpdates') : t('serverList.pauseUpdates')}>
@@ -3192,6 +3461,7 @@ const ServerListPage: React.FC = () => {
           services={gridDisplayServices}
           heartbeatIds={heartbeatIds}
           t={t}
+          groupingBy={groupingBy}
         />
       )}
 

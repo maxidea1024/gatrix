@@ -23,16 +23,27 @@ export type StandardEventType =
   | 'maintenance.ended'
   | 'whitelist.updated'
   | 'client_version.updated'
+  | 'banner.created'
   | 'banner.updated'
-  | 'service_notice.updated';
+  | 'banner.deleted'
+  | 'service_notice.updated'
+  | 'store_product.created'
+  | 'store_product.updated'
+  | 'store_product.deleted'
+  | 'environment.created'
+  | 'environment.deleted';
 
 export interface StandardEventData {
   id: number | string;
   timestamp: number;
-  environmentId?: string; // Optional environment ID
-  environmentName?: string; // Optional environment Name
+  /**
+   * Environment identifier (environmentName value).
+   * This is the standard external identifier for environments.
+   */
+  environment?: string;
   isVisible?: boolean | number; // For gameworld.updated, popup.updated events (MySQL returns 0/1)
-  isActive?: boolean | number;  // For survey.updated events (MySQL returns 0/1)
+  isActive?: boolean | number;  // For survey.updated, store_product.updated events (MySQL returns 0/1)
+  status?: string; // For banner.created, banner.updated events (draft, published, archived)
   isMaintenance?: boolean; // For maintenance.settings.updated events
   maintenanceStartDate?: string; // For maintenance.settings.updated events
   maintenanceEndDate?: string; // For maintenance.settings.updated events

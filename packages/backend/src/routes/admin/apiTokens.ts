@@ -15,8 +15,8 @@ const createTokenValidation = [
     .withMessage('Token name must be between 3 and 200 characters'),
   
   body('tokenType')
-    .isIn(['client', 'server'])
-    .withMessage('Token type must be client or server'),
+    .isIn(['client', 'server', 'edge', 'all'])
+    .withMessage('Token type must be client, server, edge, or all'),
   
   body('expiresAt')
     .optional()

@@ -14,25 +14,30 @@ import { ulid } from 'ulid';
 import { pubSubService } from '../../services/PubSubService';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../../constants/cacheKeys';
 import { respondWithEtagCache } from '../../utils/serverSdkEtagCache';
+import { EnvironmentRequest } from '../../middleware/environmentResolver';
 
 const router = express.Router();
 
 /**
  * Get whitelists (IP and Account)
- * GET /api/v1/server/whitelists
+ * GET /api/v1/server/:env/whitelists
  *
  * Returns enabled whitelists for server-side validation
  * Exported as a separate handler for use in both /services/whitelists and /whitelists paths
  */
-export const getWhitelistsHandler = async (req: any, res: any) => {
+export const getWhitelistsHandler = async (req: EnvironmentRequest, res: any) => {
+  const environment = req.environment!;
   try {
     await respondWithEtagCache(res, {
-      cacheKey: SERVER_SDK_ETAG.WHITELISTS,
+      cacheKey: `${SERVER_SDK_ETAG.WHITELISTS}:${environment.id}`,
       ttlMs: DEFAULT_CONFIG.WHITELIST_TTL,
       requestEtag: req.headers?.['if-none-match'],
       buildPayload: async () => {
-        // Get all enabled IP whitelists
-        const ipWhitelistsResult = await IpWhitelistModel.findAll(1, 10000, { isEnabled: true });
+        // Get all enabled IP whitelists for this environment
+        const ipWhitelistsResult = await IpWhitelistModel.findAll(1, 10000, {
+          isEnabled: true,
+          environmentId: environment.id
+        });
         const now = new Date();
 
         // Filter by date range
@@ -42,8 +47,11 @@ export const getWhitelistsHandler = async (req: any, res: any) => {
           return true;
         });
 
-        // Get all enabled account whitelists
-        const accountWhitelistsResult = await WhitelistModel.findAll(1, 10000, { isEnabled: true });
+        // Get all enabled account whitelists for this environment
+        const accountWhitelistsResult = await WhitelistModel.findAll(1, 10000, {
+          isEnabled: true,
+          environmentId: environment.id
+        });
 
         // Filter by date range
         const activeAccountWhitelists = accountWhitelistsResult.whitelists.filter((account: any) => {
@@ -299,23 +307,29 @@ router.post('/status', serverSDKAuth, async (req: any, res: any) => {
 
 /**
  * Get services with filtering
- * GET /api/v1/server/services?serviceType=world&group=kr&status=ready&excludeSelf=true
+ * GET /api/v1/server/services?serviceType=world&group=kr&environment=prod&status=ready&excludeSelf=true
  *
  * Query parameters:
  * - serviceType: Filter by labels.service (e.g., 'world', 'auth', 'lobby')
  * - group: Filter by labels.group (e.g., 'kr', 'us', 'production')
+ * - environment: Filter by labels.environment (e.g., 'development', 'production')
  * - status: Filter by status (e.g., 'ready', 'terminated')
  * - excludeSelf: Exclude self instance (default: true)
- * - Any label key: Filter by label value (e.g., env=prod, region=ap-northeast-2)
+ * - Any label key: Filter by label value (e.g., region=ap-northeast-2)
  */
 router.get('/', serverSDKAuth, async (req: any, res: any) => {
   try {
-    const { serviceType, group, status, excludeSelf, ...otherLabels } = req.query;
+    const { serviceType, group, environment, status, excludeSelf, ...otherLabels } = req.query;
 
     // Get all services or services of a specific type and/or group
     let services = await serviceDiscoveryService.getServices(serviceType as string, group as string);
 
-    // Filter by other labels (e.g., env=prod, region=ap-northeast-2)
+    // Filter by environment
+    if (environment) {
+      services = services.filter((s: any) => s.labels.environment === environment);
+    }
+
+    // Filter by other labels (e.g., region=ap-northeast-2)
     for (const [key, value] of Object.entries(otherLabels)) {
       if (value) {
         services = services.filter((s: any) => s.labels[key] === value);

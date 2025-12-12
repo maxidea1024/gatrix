@@ -1,150 +1,146 @@
 /**
  * Banner Service
  * Handles banner list and retrieval
- * Supports both single-environment (default) and multi-environment (Edge) modes
+ * Uses per-environment API pattern: GET /api/v1/server/:env/banners
+ * Extends BaseEnvironmentService for common fetch/caching logic
  */
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
 import { Banner, BannerListResponse } from '../types/api';
+import { BaseEnvironmentService } from './BaseEnvironmentService';
 
-export class BannerService {
-  private apiClient: ApiClient;
-  private logger: Logger;
-  // Target environments (empty = single environment mode)
-  private environments: string[];
-  // Multi-environment cache: Map<environmentId, Banner[]>
-  private cachedBannersByEnv: Map<string, Banner[]> = new Map();
-  private defaultEnvId: string = 'default';
-
-  constructor(apiClient: ApiClient, logger: Logger, environments: string[] = []) {
-    this.apiClient = apiClient;
-    this.logger = logger;
-    this.environments = environments;
+export class BannerService extends BaseEnvironmentService<Banner, BannerListResponse, string> {
+  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
+    super(apiClient, logger, defaultEnvironment);
   }
 
-  private isMultiEnvironment(): boolean {
-    return this.environments.length > 0;
+  // ==================== Abstract Method Implementations ====================
+
+  protected getEndpoint(environment: string): string {
+    return `/api/v1/server/${encodeURIComponent(environment)}/banners`;
   }
+
+  protected extractItems(response: BannerListResponse): Banner[] {
+    return response.banners;
+  }
+
+  protected getServiceName(): string {
+    return 'banners';
+  }
+
+  protected getItemId(item: Banner): string {
+    return item.bannerId;
+  }
+
+  // ==================== Override for ETag Invalidation ====================
 
   /**
-   * Get all banners
-   * Single-env mode: GET /api/v1/server/banners
-   * Multi-env mode: GET /api/v1/server/banners?environments=env1,env2,env3
+   * Refresh cached banners for a specific environment
    */
-  async list(): Promise<Banner[]> {
-    let endpoint = `/api/v1/server/banners`;
-    if (this.isMultiEnvironment()) {
-      endpoint += `?environments=${this.environments.join(',')}`;
-    }
+  async refreshByEnvironment(environment: string): Promise<Banner[]> {
+    this.logger.info('Refreshing banners cache', { environment });
+    // Invalidate ETag cache to force fresh data fetch
+    this.apiClient.invalidateEtagCache(this.getEndpoint(environment));
+    return await this.listByEnvironment(environment);
+  }
 
-    this.logger.debug('Fetching banners', { environments: this.environments });
+  // ==================== Domain-specific Methods ====================
 
-    const response = await this.apiClient.get<BannerListResponse>(endpoint);
-
+  /**
+   * Get a single banner by ID from API
+   * Used for updating cache with fresh data
+   */
+  async fetchById(bannerId: string, environment?: string): Promise<Banner> {
+    const env = environment || this.defaultEnvironment;
+    const response = await this.apiClient.get<{ banner: Banner }>(`/api/v1/server/${encodeURIComponent(env)}/banners/${bannerId}`);
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch banners');
+      throw new Error(response.error?.message || 'Failed to fetch banner');
     }
+    return response.data.banner;
+  }
 
-    const banners = response.data.banners;
+  /**
+   * Update a single banner in cache (immutable)
+   * If status is not 'published', removes the banner from cache (no API call needed)
+   * If status is 'published' but not in cache, fetches and adds it to cache
+   * If status is 'published' and in cache, fetches and updates it
+   */
+  async updateSingleBanner(bannerId: string, environment?: string, status?: string): Promise<void> {
+    try {
+      this.logger.debug('Updating single banner in cache', { bannerId, environment, status });
 
-    // Group by environment
-    this.cachedBannersByEnv.clear();
-    for (const banner of banners) {
-      // In single-env mode, all data goes to 'default'
-      let envKey = this.defaultEnvId;
-      if (this.isMultiEnvironment()) {
-        // Use environmentName if available (user preference), fallback to environmentId
-        // Also check if the configured environments contain the name or ID to ensure consistency
-        if (banner.environmentName && this.environments.includes(banner.environmentName)) {
-          envKey = banner.environmentName;
-        } else if (banner.environmentId && this.environments.includes(banner.environmentId)) {
-          envKey = banner.environmentId;
-        } else {
-          // Fallback: prefer name if available
-          envKey = banner.environmentName || banner.environmentId || this.defaultEnvId;
-        }
+      const envKey = environment || this.defaultEnvironment;
+
+      // If status is not 'published', just remove from cache
+      if (status && status !== 'published') {
+        this.logger.info('Banner is not published, removing from cache', { bannerId, environment: envKey, status });
+        this.removeFromCache(bannerId, environment);
+        return;
       }
 
-      if (!this.cachedBannersByEnv.has(envKey)) {
-        this.cachedBannersByEnv.set(envKey, []);
-      }
-      this.cachedBannersByEnv.get(envKey)!.push(banner);
+      // Otherwise, fetch from API and add/update
+      // Add small delay to ensure backend transaction is committed
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Invalidate ETag cache before fetching to ensure fresh data
+      this.apiClient.invalidateEtagCache(`/banners/${bannerId}`);
+
+      // Fetch the updated banner from backend
+      const updatedBanner = await this.fetchById(bannerId, environment);
+      this.updateItemInCache(updatedBanner, environment);
+    } catch (error: any) {
+      this.logger.error('Failed to update single banner in cache', {
+        bannerId,
+        environment,
+        error: error.message,
+      });
+      // If update fails, fall back to full refresh
+      await this.refresh();
     }
-
-    this.logger.info('Banners fetched', {
-      count: banners.length,
-      environmentCount: this.cachedBannersByEnv.size,
-      environments: this.environments,
-    });
-
-    return banners;
   }
 
   /**
-   * Get cached banners
-   * @param environmentId Only used in multi-environment mode
+   * Remove a banner from cache (immutable)
+   * @deprecated Use removeFromCache instead
    */
-  getCached(environmentId?: string): Banner[] {
-    const envId = this.isMultiEnvironment() ? (environmentId || this.defaultEnvId) : this.defaultEnvId;
-    return this.cachedBannersByEnv.get(envId) || [];
+  removeBanner(bannerId: string, environment?: string): void {
+    this.removeFromCache(bannerId, environment);
   }
 
   /**
-   * Get all cached banners (all environments)
-   * Only meaningful in multi-environment mode
+   * Get banner by ID from cache
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getAllCached(): Map<string, Banner[]> {
-    return this.cachedBannersByEnv;
-  }
-
-  /**
-   * Refresh cached banners
-   */
-  async refresh(): Promise<Banner[]> {
-    this.logger.info('Refreshing banners cache');
-    return await this.list();
-  }
-
-  /**
-   * Update cache with new data
-   * @param environmentId Only used in multi-environment mode
-   */
-  updateCache(banners: Banner[], environmentId?: string): void {
-    const envId = this.isMultiEnvironment() ? (environmentId || this.defaultEnvId) : this.defaultEnvId;
-    this.cachedBannersByEnv.set(envId, banners);
-    this.logger.debug('Banners cache updated', { environmentId: envId, count: banners.length });
-  }
-
-  /**
-   * Get banner by ID
-   */
-  getById(bannerId: string, environmentId?: string): Banner | null {
-    const banners = this.getCached(environmentId);
+  getById(bannerId: string, environment?: string): Banner | null {
+    const banners = this.getCached(environment);
     return banners.find((b) => b.bannerId === bannerId) || null;
   }
 
   /**
    * Get banner by name
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getByName(name: string, environmentId?: string): Banner | null {
-    const banners = this.getCached(environmentId);
+  getByName(name: string, environment?: string): Banner | null {
+    const banners = this.getCached(environment);
     return banners.find((b) => b.name === name) || null;
   }
 
   /**
    * Get published banners only
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getPublished(environmentId?: string): Banner[] {
-    const banners = this.getCached(environmentId);
+  getPublished(environment?: string): Banner[] {
+    const banners = this.getCached(environment);
     return banners.filter((b) => b.status === 'published');
   }
 
   /**
    * Get banners by status
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getByStatus(status: 'draft' | 'published' | 'archived', environmentId?: string): Banner[] {
-    const banners = this.getCached(environmentId);
+  getByStatus(status: 'draft' | 'published' | 'archived', environment?: string): Banner[] {
+    const banners = this.getCached(environment);
     return banners.filter((b) => b.status === status);
   }
 }

@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
+import axios from 'axios';
 import { clientAuth, ClientRequest } from '../middleware/clientAuth';
 import { sdkManager } from '../services/sdkManager';
+import { config } from '../config/env';
 import logger from '../config/logger';
 import { ClientVersion, Banner, GameWorld } from '@gatrix/server-sdk';
 import { cacheHitsTotal, cacheMissesTotal, cacheSize } from '../services/metricsServer';
@@ -77,24 +79,74 @@ setTimeout(() => {
 // ============================================================================
 
 /**
- * Get client version information
- * GET /api/v1/client/client-version
- *
- * Query params:
- * - platform (required): Platform identifier (e.g., 'android', 'ios', 'windows')
- * - version (optional): Client version string. If omitted or 'latest', returns the latest version
- * - status (optional): Filter by status (e.g., 'ONLINE', 'MAINTENANCE')
- * - lang (optional): Language code for localized maintenance messages
- *
- * Headers:
- * - x-application-name (required)
- * - x-api-token (required)
+ * @openapi
+ * /client/{environment}/client-version:
+ *   get:
+ *     tags: [EdgeClient]
+ *     summary: Get client version information (Cached)
+ *     description: Returns the latest client version info for the given platform. Filterable by status. Serves from edge cache.
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string, example: 'production' }
+ *         description: Environment name (e.g., 'staging', 'production')
+ *       - in: query
+ *         name: platform
+ *         required: true
+ *         schema: { type: string, example: 'android' }
+ *         description: Platform identifier (e.g., 'android', 'ios', 'windows')
+ *       - in: query
+ *         name: version
+ *         schema: { type: string, example: 'latest' }
+ *         description: Client version string. If omitted or 'latest', returns the latest version.
+ *       - in: query
+ *         name: status
+ *         schema: { type: string, enum: [ONLINE, OFFLINE, MAINTENANCE, UPDATE_REQUIRED], example: 'ONLINE' }
+ *         description: Filter by status
+ *       - in: query
+ *         name: lang
+ *         schema: { type: string, enum: [ko, en, zh], example: 'ko' }
+ *         description: Language code for localized maintenance messages
+ *       - in: header
+ *         name: x-application-name
+ *         required: true
+ *         schema: { type: string, example: 'gatrix-app' }
+ *       - in: header
+ *         name: x-api-token
+ *         required: true
+ *         schema: { type: string, example: 'test-token-123' }
+ *     responses:
+ *       200:
+ *         description: Client version information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   $ref: '#/components/schemas/ClientVersion'
+ *                 cached: { type: boolean, example: true }
+ *       400:
+ *         description: Bad Request (Missing parameters or invalid status)
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
+ *             example: { success: false, message: "platform is a required query parameter", error: "VALIDATION_ERROR" }
+ *       404:
+ *         description: Not Found (No client version matches)
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
+ *             example: { success: false, message: "Client version not found", error: "NOT_FOUND" }
  */
-router.get('/client-version', async (req: Request, res: Response) => {
+router.get('/:environment/client-version', async (req: Request, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
+    const environment = req.params.environment;
     const { platform, version, status, lang } = req.query as {
       platform?: string;
       version?: string;
@@ -121,15 +173,6 @@ router.get('/client-version', async (req: Request, res: Response) => {
       });
     }
 
-    // Get environment ID from header (Edge-specific)
-    const environmentId = req.headers['x-environment-id'] as string;
-    if (!environmentId) {
-      return res.status(400).json({
-        success: false,
-        message: 'x-environment-id header is required',
-      });
-    }
-
     // Validate status parameter if provided
     const validStatuses = ['ONLINE', 'OFFLINE', 'MAINTENANCE', 'UPDATE_REQUIRED'];
     let statusFilter: string | undefined;
@@ -144,13 +187,8 @@ router.get('/client-version', async (req: Request, res: Response) => {
       statusFilter = upperStatus;
     }
 
-    // Get all client versions from cache
-    const allVersions = sdk.getClientVersions() as ClientVersion[];
-
-    // Filter by environment
-    const envVersions = allVersions.filter(
-      (v) => v.environmentId === environmentId
-    );
+    // Get client versions from cache for this environment
+    const envVersions = sdk.getClientVersions(environment) as ClientVersion[];
 
     // Filter by platform
     const platformVersions = envVersions.filter(
@@ -223,7 +261,7 @@ router.get('/client-version', async (req: Request, res: Response) => {
     }
 
     logger.debug('Client version retrieved', {
-      environmentId,
+      environment,
       platform,
       version: record.clientVersion,
     });
@@ -246,8 +284,30 @@ router.get('/client-version', async (req: Request, res: Response) => {
 });
 
 /**
- * Get all game worlds
- * GET /api/v1/client/game-worlds
+ * @openapi
+ * /client/game-worlds:
+ *   get:
+ *     tags: [EdgeClient]
+ *     summary: Get all game worlds (Cached)
+ *     description: Returns list of visible game worlds served from edge cache.
+ *     responses:
+ *       200:
+ *         description: List of game worlds
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     worlds:
+ *                       type: array
+ *                       items: { $ref: '#/components/schemas/GameWorld' }
+ *                     total: { type: integer, example: 1 }
+ *                     timestamp: { type: string, format: date-time, example: '2025-12-12T12:00:00Z' }
+ *                 cached: { type: boolean, example: true }
  */
 router.get('/game-worlds', async (_req: Request, res: Response) => {
   try {
@@ -307,8 +367,27 @@ router.get('/game-worlds', async (_req: Request, res: Response) => {
 });
 
 /**
- * Get cache statistics (Edge-specific)
- * GET /api/v1/client/cache-stats
+ * @openapi
+ * /client/cache-stats:
+ *   get:
+ *     tags: [EdgeClient]
+ *     summary: Get cache statistics
+ *     description: Returns metrics about the edge cache status.
+ *     responses:
+ *       200:
+ *         description: Cache statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     cache: { type: object, example: { initialized: true, type: 'edge-sdk-cache' } }
+ *                     queue: { type: object, example: { pending: 0 } }
+ *                     pubsub: { type: object, example: { connected: true, timestamp: '2025-12-12T12:00:00Z' } }
  */
 router.get('/cache-stats', async (_req: Request, res: Response) => {
   try {
@@ -348,11 +427,36 @@ router.get('/cache-stats', async (_req: Request, res: Response) => {
 // ============================================================================
 
 /**
- * Test client SDK authentication
- * GET /api/v1/client/test
+ * @openapi
+ * /client/{environment}/test:
+ *   get:
+ *     tags: [EdgeClient]
+ *     summary: Test client authentication
+ *     description: Verifies client authentication and returns context.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string }
+ *         description: Environment name (e.g., 'staging', 'production')
+ *     responses:
+ *       200:
+ *         description: Authentication successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: 'Client SDK authentication successful' }
+ *                 data:
+ *                   type: object
+ *                   example: { tokenId: 'edge-token', tokenName: 'app-1', tokenType: 'client', environment: 'production', timestamp: '2025-12-12T12:00:00Z' }
  */
-router.get('/test', clientAuth, (req: ClientRequest, res: Response) => {
-  const { applicationName, environmentId } = req.clientContext!;
+router.get('/:environment/test', clientAuth, (req: ClientRequest, res: Response) => {
+  const { applicationName, environment } = req.clientContext!;
 
   res.json({
     success: true,
@@ -361,30 +465,53 @@ router.get('/test', clientAuth, (req: ClientRequest, res: Response) => {
       tokenId: 'edge-token', // Edge doesn't have token ID
       tokenName: applicationName,
       tokenType: 'client',
-      environmentId,
+      environment,
       timestamp: new Date().toISOString(),
     },
   });
 });
 
 /**
- * Get all published banners for client
- * GET /api/v1/client/banners
+ * @openapi
+ * /client/{environment}/banners:
+ *   get:
+ *     tags: [EdgeClient]
+ *     summary: Get all published banners
+ *     description: Returns all published banners for the client's environment (Cached).
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string }
+ *         description: Environment name (e.g., 'staging', 'production')
+ *     responses:
+ *       200:
+ *         description: List of banners
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     banners:
+ *                       type: array
+ *                       items: { $ref: '#/components/schemas/Banner' }
+ *                     timestamp: { type: string, format: date-time, example: '2025-12-12T12:00:00Z' }
  */
-router.get('/banners', clientAuth, async (req: ClientRequest, res: Response) => {
+router.get('/:environment/banners', clientAuth, async (req: ClientRequest, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const { environmentId } = req.clientContext!;
+    const { environment } = req.clientContext!;
 
-    // Get all banners from cache
-    const allBanners = sdk.getBanners() as Banner[];
-
-    // Filter by environment
-    const envBanners = allBanners.filter(
-      (b) => b.environmentId === environmentId
-    );
+    // Get banners from cache for this environment
+    const envBanners = sdk.getBanners(environment) as Banner[];
 
     // Record cache hit/miss
     if (envBanners.length > 0) {
@@ -406,7 +533,7 @@ router.get('/banners', clientAuth, async (req: ClientRequest, res: Response) => 
     }));
 
     logger.debug('Banners retrieved', {
-      environmentId,
+      environment,
       count: clientBanners.length,
     });
 
@@ -430,24 +557,53 @@ router.get('/banners', clientAuth, async (req: ClientRequest, res: Response) => 
 });
 
 /**
- * Get published banner by ID for client
- * GET /api/v1/client/banners/:bannerId
+ * @openapi
+ * /client/{environment}/banners/{bannerId}:
+ *   get:
+ *     tags: [EdgeClient]
+ *     summary: Get specific banner
+ *     description: Returns a single banner by ID (Cached).
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string }
+ *         description: Environment name (e.g., 'staging', 'production')
+ *       - in: path
+ *         name: bannerId
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Banner details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     banner: { $ref: '#/components/schemas/Banner' }
+ *                     timestamp: { type: string, format: date-time }
+ *       404: { $ref: '#/components/responses/NotFoundError' }
  */
-router.get('/banners/:bannerId', clientAuth, async (req: ClientRequest, res: Response) => {
+router.get('/:environment/banners/:bannerId', clientAuth, async (req: ClientRequest, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
     const { bannerId } = req.params;
-    const { environmentId } = req.clientContext!;
+    const { environment } = req.clientContext!;
 
-    // Get all banners from cache
-    const allBanners = sdk.getBanners() as Banner[];
+    // Get banners from cache for this environment
+    const envBanners = sdk.getBanners(environment) as Banner[];
 
     // Find the specific banner
-    const banner = allBanners.find(
-      (b) => b.bannerId === bannerId && b.environmentId === environmentId
-    );
+    const banner = envBanners.find((b) => b.bannerId === bannerId);
 
     if (!banner) {
       return res.status(404).json({
@@ -472,7 +628,7 @@ router.get('/banners/:bannerId', clientAuth, async (req: ClientRequest, res: Res
     };
 
     logger.debug('Banner retrieved', {
-      environmentId,
+      environment,
       bannerId,
     });
 
@@ -500,23 +656,46 @@ router.get('/banners/:bannerId', clientAuth, async (req: ClientRequest, res: Res
 // ============================================================================
 
 /**
- * Get client versions (Edge-specific list endpoint)
- * GET /api/v1/client/versions
+ * @openapi
+ * /client/{environment}/client-versions:
+ *   get:
+ *     tags: [EdgeClient]
+ *     summary: Get all client versions (List)
+ *     description: Returns list of all client versions for the environment. Useful for patchers.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string }
+ *         description: Environment name (e.g., 'staging', 'production')
+ *     responses:
+ *       200:
+ *         description: List of client versions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     versions:
+ *                       type: array
+ *                       items: { $ref: '#/components/schemas/ClientVersion' }
+ *                     total: { type: integer, example: 5 }
  */
-router.get('/versions', clientAuth, async (req: ClientRequest, res: Response) => {
+router.get('/:environment/client-versions', clientAuth, async (req: ClientRequest, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const { environmentId, platform } = req.clientContext!;
+    const { environment, platform } = req.clientContext!;
 
-    // Get all client versions from cache
-    const allVersions = sdk.getClientVersions() as ClientVersion[];
-
-    // Filter by environment
-    const envVersions = allVersions.filter(
-      (v) => v.environmentId === environmentId
-    );
+    // Get client versions from cache for this environment
+    const envVersions = sdk.getClientVersions(environment) as ClientVersion[];
 
     // Optionally filter by platform
     let filteredVersions = envVersions;
@@ -534,7 +713,7 @@ router.get('/versions', clientAuth, async (req: ClientRequest, res: Response) =>
     }
 
     logger.debug('Client versions retrieved', {
-      environmentId,
+      environment,
       platform,
       count: filteredVersions.length,
     });
@@ -559,23 +738,46 @@ router.get('/versions', clientAuth, async (req: ClientRequest, res: Response) =>
 });
 
 /**
- * Get service notices (Edge-specific list endpoint)
- * GET /api/v1/client/notices
+ * @openapi
+ * /client/{environment}/service-notices:
+ *   get:
+ *     tags: [EdgeClient]
+ *     summary: Get service notices
+ *     description: Returns list of active service notices.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string }
+ *         description: Environment name (e.g., 'staging', 'production')
+ *     responses:
+ *       200:
+ *         description: List of notices
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     notices:
+ *                       type: array
+ *                       items: { $ref: '#/components/schemas/ServiceNotice' }
+ *                     total: { type: integer, example: 3 }
  */
-router.get('/notices', clientAuth, async (req: ClientRequest, res: Response) => {
+router.get('/:environment/service-notices', clientAuth, async (req: ClientRequest, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    const { environmentId, platform } = req.clientContext!;
+    const { environment, platform } = req.clientContext!;
 
-    // Get all service notices from cache
-    const allNotices = sdk.getServiceNotices();
-
-    // Filter by environment
-    const envNotices = allNotices.filter(
-      (n: { environmentId?: string }) => n.environmentId === environmentId
-    );
+    // Get service notices from cache for this environment
+    const envNotices = sdk.getServiceNotices(environment);
 
     // Optionally filter by platform
     let filteredNotices = envNotices;
@@ -593,7 +795,7 @@ router.get('/notices', clientAuth, async (req: ClientRequest, res: Response) => 
     }
 
     logger.debug('Service notices retrieved', {
-      environmentId,
+      environment,
       platform,
       count: filteredNotices.length,
     });
@@ -617,5 +819,136 @@ router.get('/notices', clientAuth, async (req: ClientRequest, res: Response) => 
   }
 });
 
-export default router;
+// ============================================================================
+// Crash Upload Proxy (Forward to Backend)
+// ============================================================================
 
+/**
+ * @openapi
+ * /client/{environment}/crashes/upload:
+ *   post:
+ *     tags: [EdgeClient]
+ *     summary: Upload crash report (Proxy)
+ *     description: Proxies crash report to backend.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string }
+ *         description: Environment name (e.g., 'staging', 'production')
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [platform, branch, stack]
+ *             properties:
+ *               platform: { type: string, example: 'android' }
+ *               branch: { type: string, example: 'main' }
+ *               stack: { type: string, example: 'Error at MainActivity.java:10' }
+ *               marketType: { type: string, example: 'google' }
+ *               isEditor: { type: boolean, example: false }
+ *               appVersion: { type: string, example: '1.2.3' }
+ *               resVersion: { type: string, example: '1.2.3.456' }
+ *               accountId: { type: string, example: 'acc_123' }
+ *               characterId: { type: string, example: 'char_456' }
+ *               gameUserId: { type: string, example: 'user_789' }
+ *               userName: { type: string, example: 'PlayerOne' }
+ *               gameServerId: { type: string, example: 'S1' }
+ *               userMessage: { type: string, example: 'Game crashed when opening inventory' }
+ *               log: { type: string, example: 'System log content...' }
+ *     responses:
+ *       200:
+ *         description: Crash reported successfully
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/SuccessResponse' }
+ *             example: { success: true, message: "Crash uploaded successfully", data: { crashId: "crash_123" } }
+ *       503:
+ *         description: Service Unavailable (Backend unreachable)
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
+ *             example: { success: false, error: "SERVICE_UNAVAILABLE", message: "Failed to connect to backend server" }
+ */
+router.post('/:environment/crashes/upload', clientAuth, async (req: ClientRequest, res: Response) => {
+  try {
+    const { environment } = req.clientContext!;
+
+    // Get client IP and user agent to forward to backend
+    const clientIp = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || 'unknown';
+    const userAgent = req.headers['user-agent'] || 'unknown';
+
+    logger.debug('Proxying crash upload to backend', {
+      environment,
+      platform: req.body.platform,
+      branch: req.body.branch,
+      clientIp,
+    });
+
+    // Forward the request to backend
+    const backendUrl = `${config.gatrixUrl}/api/v1/client/crashes/upload`;
+
+    const response = await axios.post(backendUrl, req.body, {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-token': config.apiToken,
+        'x-application-name': config.applicationName,
+        'x-environment': environment,
+        'x-forwarded-for': clientIp,
+        'user-agent': userAgent,
+      },
+      timeout: 30000, // 30 second timeout for crash uploads
+    });
+
+    logger.info('Crash upload proxied successfully', {
+      environment,
+      platform: req.body.platform,
+      branch: req.body.branch,
+      crashId: response.data?.data?.crashId,
+      eventId: response.data?.data?.eventId,
+      isNewCrash: response.data?.data?.isNewCrash,
+    });
+
+    // Return the backend response to the client
+    res.status(response.status).json(response.data);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      logger.error('Error proxying crash upload to backend:', {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        environment: req.clientContext?.environment,
+        platform: req.body?.platform,
+        branch: req.body?.branch,
+      });
+
+      // Forward backend error response if available
+      if (error.response) {
+        return res.status(error.response.status).json(error.response.data);
+      }
+
+      // Network or timeout error
+      return res.status(503).json({
+        success: false,
+        error: {
+          code: 'SERVICE_UNAVAILABLE',
+          message: 'Failed to connect to backend server',
+        },
+      });
+    }
+
+    logger.error('Unexpected error in crash upload proxy:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to process crash upload',
+      },
+    });
+  }
+});
+
+export default router;

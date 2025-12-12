@@ -1,16 +1,36 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'path';
 import logger from './config/logger';
 import clientRoutes from './routes/client';
 import healthRoutes from './routes/health';
+import publicRoutes from './routes/public';
 import { httpRequestsTotal, httpRequestDuration } from './services/metricsServer';
 
 // Create Express application
 const app: Application = express();
 
+// Disable ETag for API responses to prevent browser caching issues
+// SDK cache is the source of truth, so we don't want browsers to use stale cached responses
+app.set('etag', false);
+
 // Security middleware
-app.use(helmet());
+// Configure helmet with relaxed CSP for static HTML pages that use inline scripts
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for game webview pages
+        styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
+        imgSrc: ["'self'", 'data:', 'https:'],
+        fontSrc: ["'self'", 'https:', 'data:'],
+        connectSrc: ["'self'"],
+      },
+    },
+  })
+);
 
 // CORS configuration
 app.use(cors({
@@ -77,8 +97,14 @@ function normalizePath(url: string): string {
 // Health check routes (no auth required)
 app.use('/health', healthRoutes);
 
+// Public API routes (no auth required - for game webview pages)
+app.use('/public', publicRoutes);
+
 // Client API routes
 app.use('/api/v1/client', clientRoutes);
+
+// Static files for game webview pages (served from public folder)
+app.use(express.static(path.join(__dirname, '../public')));
 
 // 404 handler
 app.use((req: Request, res: Response) => {

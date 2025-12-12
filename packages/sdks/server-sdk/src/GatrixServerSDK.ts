@@ -5,7 +5,7 @@
 
 import { Logger } from './utils/logger';
 import { ErrorCode, createError } from './utils/errors';
-import { GatrixSDKConfig } from './types/config';
+import { GatrixSDKConfig, GatrixSDKInitOptions } from './types/config';
 import { ApiClient } from './client/ApiClient';
 import { CouponService } from './services/CouponService';
 import { GameWorldService } from './services/GameWorldService';
@@ -14,6 +14,7 @@ import { SurveyService } from './services/SurveyService';
 import { WhitelistService } from './services/WhitelistService';
 import { ServiceMaintenanceService } from './services/ServiceMaintenanceService';
 import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
+import { StoreProductService } from './services/StoreProductService';
 import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
 import { EventCallback, SdkEvent } from './types/events';
@@ -35,6 +36,7 @@ import {
   ClientVersion,
   ServiceNotice,
   Banner,
+  StoreProduct,
 } from './types/api';
 
 /**
@@ -55,6 +57,7 @@ export class GatrixServerSDK {
   public readonly whitelist: WhitelistService;
   public readonly serviceMaintenance: ServiceMaintenanceService;
   public readonly serviceDiscovery: ServiceDiscoveryService;
+  public readonly storeProduct: StoreProductService;
 
   // Cache and Events
   private cacheManager?: CacheManager;
@@ -62,6 +65,89 @@ export class GatrixServerSDK {
   private metrics?: SdkMetrics;
   // Maintenance event listeners (separate from standard event listeners)
   private maintenanceEventListeners: Map<string, EventCallback[]> = new Map();
+
+  /**
+   * Create SDK instance with optional overrides
+   * Merges override options with base config, allowing per-program customization.
+   *
+   * @param baseConfig - Base SDK configuration (shared across programs)
+   * @param overrides - Optional overrides for specific program/service
+   * @returns New GatrixServerSDK instance with merged configuration
+   *
+   * @example
+   * ```typescript
+   * // Base config from config file
+   * const baseConfig: GatrixSDKConfig = {
+   *   gatrixUrl: 'https://api.gatrix.com',
+   *   apiToken: 'my-token',
+   *   applicationName: 'my-game',
+   *   service: 'default-service',
+   *   group: 'default-group',
+   *   environment: 'production',
+   * };
+   *
+   * // Create instance with overrides for billing worker
+   * const sdk = GatrixServerSDK.createInstance(baseConfig, {
+   *   service: 'billing-worker',
+   *   group: 'payment',
+   *   region: 'kr',
+   *   logger: { level: 'debug' },
+   * });
+   * ```
+   */
+  static createInstance(baseConfig: GatrixSDKConfig, overrides?: GatrixSDKInitOptions): GatrixServerSDK {
+    const mergedConfig = GatrixServerSDK.mergeConfig(baseConfig, overrides);
+    return new GatrixServerSDK(mergedConfig);
+  }
+
+  /**
+   * Merge base config with override options
+   * Deep merges nested objects (redis, cache, logger, retry, metrics, features).
+   *
+   * @param baseConfig - Base SDK configuration
+   * @param overrides - Optional overrides
+   * @returns Merged configuration
+   */
+  static mergeConfig(baseConfig: GatrixSDKConfig, overrides?: GatrixSDKInitOptions): GatrixSDKConfig {
+    if (!overrides) {
+      return { ...baseConfig };
+    }
+
+    const merged: GatrixSDKConfig = { ...baseConfig };
+
+    // Override simple fields if provided
+    if (overrides.service !== undefined) merged.service = overrides.service;
+    if (overrides.group !== undefined) merged.group = overrides.group;
+    if (overrides.environment !== undefined) merged.environment = overrides.environment;
+    if (overrides.region !== undefined) merged.region = overrides.region;
+    if (overrides.gatrixUrl !== undefined) merged.gatrixUrl = overrides.gatrixUrl;
+    if (overrides.apiToken !== undefined) merged.apiToken = overrides.apiToken;
+    if (overrides.applicationName !== undefined) merged.applicationName = overrides.applicationName;
+    if (overrides.worldId !== undefined) merged.worldId = overrides.worldId;
+    if (overrides.environments !== undefined) merged.environments = overrides.environments;
+
+    // Deep merge nested objects
+    if (overrides.redis) {
+      merged.redis = { ...baseConfig.redis, ...overrides.redis } as typeof baseConfig.redis;
+    }
+    if (overrides.cache) {
+      merged.cache = { ...baseConfig.cache, ...overrides.cache };
+    }
+    if (overrides.logger) {
+      merged.logger = { ...baseConfig.logger, ...overrides.logger };
+    }
+    if (overrides.retry) {
+      merged.retry = { ...baseConfig.retry, ...overrides.retry };
+    }
+    if (overrides.metrics) {
+      merged.metrics = { ...baseConfig.metrics, ...overrides.metrics };
+    }
+    if (overrides.features) {
+      merged.features = { ...baseConfig.features, ...overrides.features };
+    }
+
+    return merged;
+  }
 
   constructor(config: GatrixSDKConfig) {
     // Set default API token if not provided (for testing)
@@ -93,23 +179,28 @@ export class GatrixServerSDK {
       baseURL: configWithDefaults.gatrixUrl,
       apiToken: configWithDefaults.apiToken,
       applicationName: configWithDefaults.applicationName,
+      environment: configWithDefaults.environment, // Pass environment for X-Environment header
       logger: this.logger,
       retry: configWithDefaults.retry,
       metrics: this.metrics,
     });
 
-    // Initialize services
-    this.coupon = new CouponService(this.apiClient, this.logger);
-    this.gameWorld = new GameWorldService(this.apiClient, this.logger);
-    this.popupNotice = new PopupNoticeService(this.apiClient, this.logger);
-    this.survey = new SurveyService(this.apiClient, this.logger);
-    this.whitelist = new WhitelistService(this.apiClient, this.logger);
-    this.serviceMaintenance = new ServiceMaintenanceService(this.apiClient, this.logger);
+    // Initialize services with default environment
+    const defaultEnv = configWithDefaults.environment || 'development';
+    this.coupon = new CouponService(this.apiClient, this.logger, defaultEnv);
+    this.gameWorld = new GameWorldService(this.apiClient, this.logger, defaultEnv);
+    this.popupNotice = new PopupNoticeService(this.apiClient, this.logger, defaultEnv);
+    this.survey = new SurveyService(this.apiClient, this.logger, defaultEnv);
+    this.whitelist = new WhitelistService(this.apiClient, this.logger, defaultEnv);
+    this.serviceMaintenance = new ServiceMaintenanceService(this.apiClient, this.logger, defaultEnv);
     this.serviceDiscovery = new ServiceDiscoveryService(this.apiClient, this.logger);
+    this.storeProduct = new StoreProductService(this.apiClient, this.logger, defaultEnv);
 
     this.logger.info('GatrixServerSDK created', {
       gatrixUrl: configWithDefaults.gatrixUrl,
       applicationName: configWithDefaults.applicationName,
+      environment: configWithDefaults.environment,
+      environments: configWithDefaults.environments,
       apiToken: configWithDefaults.apiToken === 'gatrix-unsecured-server-api-token' ? 'unsecured (testing)' : '***',
     });
   }
@@ -228,7 +319,11 @@ export class GatrixServerSDK {
         this.metrics,
         this.config.worldId, // Pass worldId for maintenance watcher
         this.config.features, // Pass features config for conditional loading
-        this.config.environments // Pass target environments for Edge mode
+        this.config.environments, // Pass target environments for Edge mode
+        undefined, // clientVersionService
+        undefined, // serviceNoticeService
+        undefined, // bannerService
+        this.storeProduct // storeProductService
       );
 
       // Register maintenance state change listener to emit SDK events
@@ -299,23 +394,28 @@ export class GatrixServerSDK {
 
   /**
    * Get cached game worlds
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getGameWorlds(): GameWorld[] {
-    return this.gameWorld.getCached();
+  getGameWorlds(environment?: string): GameWorld[] {
+    return this.gameWorld.getCached(environment);
   }
 
   /**
    * Check if a world is in maintenance (time-based check)
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  isWorldMaintenanceActive(worldId: string): boolean {
-    return this.gameWorld.isWorldMaintenanceActive(worldId);
+  isWorldMaintenanceActive(worldId: string, environment?: string): boolean {
+    return this.gameWorld.isWorldMaintenanceActive(worldId, environment);
   }
 
   /**
    * Get maintenance message for a world
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getWorldMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
-    return this.gameWorld.getWorldMaintenanceMessage(worldId, lang);
+  getWorldMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en', environment?: string): string | null {
+    return this.gameWorld.getWorldMaintenanceMessage(worldId, lang, environment);
   }
 
   /**
@@ -542,23 +642,31 @@ export class GatrixServerSDK {
 
   /**
    * Fetch active popup notices
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  async fetchPopupNotices(): Promise<PopupNotice[]> {
+  async fetchPopupNotices(environment?: string): Promise<PopupNotice[]> {
+    if (environment) {
+      return await this.popupNotice.listByEnvironment(environment);
+    }
     return await this.popupNotice.list();
   }
 
   /**
    * Get cached popup notices
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getPopupNotices(): PopupNotice[] {
-    return this.popupNotice.getCached();
+  getPopupNotices(environment?: string): PopupNotice[] {
+    return this.popupNotice.getCached(environment);
   }
 
   /**
    * Get popup notices for a specific world
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getPopupNoticesForWorld(worldId: string): PopupNotice[] {
-    return this.popupNotice.getNoticesForWorld(worldId);
+  getPopupNoticesForWorld(worldId: string, environment?: string): PopupNotice[] {
+    return this.popupNotice.getNoticesForWorld(worldId, environment);
   }
 
   /**
@@ -573,8 +681,46 @@ export class GatrixServerSDK {
     subChannel?: string;
     worldId?: string;
     userId?: string;
+    environment?: string;
   }): PopupNotice[] {
     return this.popupNotice.getActivePopupNotices(options);
+  }
+
+  // ============================================================================
+  // Store Product Methods
+  // ============================================================================
+
+  /**
+   * Fetch all store products
+   * @param environment Environment name
+   */
+  async fetchStoreProducts(environment?: string): Promise<StoreProduct[]> {
+    if (environment) {
+      return await this.storeProduct.listByEnvironment(environment);
+    }
+    return await this.storeProduct.list();
+  }
+
+  /**
+   * Get cached store products
+   * @param environment Environment name
+   */
+  getStoreProducts(environment?: string): StoreProduct[] {
+    return this.storeProduct.getCached(environment);
+  }
+
+  /**
+   * Get active store products (filtered by time and status)
+   */
+  getActiveStoreProducts(environment?: string): StoreProduct[] {
+    return this.storeProduct.getActive(environment);
+  }
+
+  /**
+   * Get store product by ID
+   */
+  async getStoreProductById(id: string, environment?: string): Promise<StoreProduct> {
+    return await this.storeProduct.getById(id, environment);
   }
 
   // ============================================================================
@@ -583,34 +729,43 @@ export class GatrixServerSDK {
 
   /**
    * Fetch surveys with settings
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  async fetchSurveys(): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
+  async fetchSurveys(environment?: string): Promise<{ surveys: Survey[]; settings: SurveySettings }> {
+    if (environment) {
+      return await this.survey.listByEnvironment(environment, { isActive: true });
+    }
     return await this.survey.list({ isActive: true });
   }
 
   /**
    * Get cached surveys with settings
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getSurveys(): { surveys: Survey[]; settings: SurveySettings | null } {
+  getSurveys(environment?: string): { surveys: Survey[]; settings: SurveySettings | null } {
     return {
-      surveys: this.survey.getCached(),
-      settings: this.survey.getCachedSettings(),
+      surveys: this.survey.getCached(environment),
+      settings: this.survey.getCachedSettings(environment),
     };
   }
 
   /**
    * Get surveys for a specific world
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getSurveysForWorld(worldId: string): Survey[] {
-    return this.survey.getSurveysForWorld(worldId);
+  getSurveysForWorld(worldId: string, environment?: string): Survey[] {
+    return this.survey.getSurveysForWorld(worldId, environment);
   }
 
   /**
    * Update survey settings only
    * Called when survey settings change (e.g., survey configuration updates)
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  updateSurveySettings(newSettings: SurveySettings): void {
-    this.survey.updateSettings(newSettings);
+  updateSurveySettings(newSettings: SurveySettings, environment?: string): void {
+    this.survey.updateSettings(newSettings, environment);
   }
 
   /**
@@ -622,6 +777,7 @@ export class GatrixServerSDK {
    * @param worldId User's world ID
    * @param userLevel User's level
    * @param joinDays User's join days
+   * @param environment Environment name. Only used in multi-environment mode.
    * @returns Array of appropriate surveys, empty array if none match
    */
   getActiveSurveys(
@@ -630,9 +786,10 @@ export class GatrixServerSDK {
     subChannel: string,
     worldId: string,
     userLevel: number,
-    joinDays: number
+    joinDays: number,
+    environment?: string
   ): Survey[] {
-    return this.survey.getActiveSurveys(platform, channel, subChannel, worldId, userLevel, joinDays);
+    return this.survey.getActiveSurveys(platform, channel, subChannel, worldId, userLevel, joinDays, environment);
   }
 
   // ============================================================================
@@ -991,14 +1148,16 @@ export class GatrixServerSDK {
   /**
    * Get cached client versions
    * Only available when features.clientVersion is enabled
-   * @param environmentId Only used in multi-environment mode (Edge)
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getClientVersions(environmentId?: string): ClientVersion[] {
+  getClientVersions(environment?: string): ClientVersion[] {
     if (!this.cacheManager) {
       this.logger.warn('SDK not initialized');
       return [];
     }
-    return this.cacheManager.getClientVersions(environmentId);
+    return this.cacheManager.getClientVersions(environment);
   }
 
   /**
@@ -1016,14 +1175,16 @@ export class GatrixServerSDK {
   /**
    * Get cached service notices
    * Only available when features.serviceNotice is enabled
-   * @param environmentId Only used in multi-environment mode (Edge)
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getServiceNotices(environmentId?: string): ServiceNotice[] {
+  getServiceNotices(environment?: string): ServiceNotice[] {
     if (!this.cacheManager) {
       this.logger.warn('SDK not initialized');
       return [];
     }
-    return this.cacheManager.getServiceNotices(environmentId);
+    return this.cacheManager.getServiceNotices(environment);
   }
 
   /**
@@ -1041,14 +1202,16 @@ export class GatrixServerSDK {
   /**
    * Get cached banners
    * Only available when features.banner is enabled
-   * @param environmentId Only used in multi-environment mode (Edge)
+   * @param environment Environment name. Only used in multi-environment mode (Edge).
+   *                    For game servers, can be omitted to use default environment.
+   *                    For edge servers, must be provided from client request.
    */
-  getBanners(environmentId?: string): Banner[] {
+  getBanners(environment?: string): Banner[] {
     if (!this.cacheManager) {
       this.logger.warn('SDK not initialized');
       return [];
     }
-    return this.cacheManager.getBanners(environmentId);
+    return this.cacheManager.getBanners(environment);
   }
 
   /**
@@ -1057,6 +1220,20 @@ export class GatrixServerSDK {
    */
   getBannerService() {
     return this.cacheManager?.getBannerService();
+  }
+
+
+
+  /**
+   * Get all cached data (for debugging/monitoring)
+   * Returns all cached data organized by type and environment
+   */
+  getAllCachedData(): any {
+    if (!this.cacheManager) {
+      this.logger.warn('SDK not initialized');
+      return {};
+    }
+    return this.cacheManager.getAllCachedData();
   }
 
   // ============================================================================

@@ -1,12 +1,9 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { GameWorldService } from '../services/GameWorldService';
 import logger from '../config/logger';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
-
-export interface SDKRequest extends Request {
-  apiToken?: any;
-}
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 /**
  * Server SDK Game World Controller
@@ -14,11 +11,12 @@ export interface SDKRequest extends Request {
  */
 export class ServerGameWorldController {
   /**
-   * Get game worlds list
-   * GET /api/v1/server/game-worlds
+   * Get game worlds for a specific environment
+   * GET /api/v1/server/:env/game-worlds
    * Returns all visible game worlds sorted by displayOrder with tags and all maintenance messages
    */
-  static async getGameWorlds(req: SDKRequest, res: Response) {
+  static async getGameWorlds(req: EnvironmentRequest, res: Response) {
+    const environment = req.environment!;
     try {
       // Helper function to convert MySQL BOOLEAN (0/1) to boolean
       const toBoolean = (value: any): boolean => {
@@ -43,12 +41,13 @@ export class ServerGameWorldController {
       };
 
       await respondWithEtagCache(res, {
-        cacheKey: SERVER_SDK_ETAG.GAME_WORLDS,
+        cacheKey: `${SERVER_SDK_ETAG.GAME_WORLDS}:${environment.id}`,
         ttlMs: DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          // Fetch visible game worlds sorted by displayOrder ASC
+          // Fetch visible game worlds sorted by displayOrder ASC for this environment
           const allWorlds = await GameWorldService.getAllGameWorlds({
+            environmentId: environment.id,
             isVisible: true,
           });
 
@@ -125,9 +124,9 @@ export class ServerGameWorldController {
 
   /**
    * Get specific game world by ID
-   * GET /api/v1/server/game-worlds/:id
+   * GET /api/v1/server/:env/game-worlds/:id
    */
-  static async getGameWorldById(req: SDKRequest, res: Response) {
+  static async getGameWorldById(req: EnvironmentRequest, res: Response) {
     try {
       const { id } = req.params;
       const worldId = parseInt(id);
@@ -229,9 +228,9 @@ export class ServerGameWorldController {
 
   /**
    * Get specific game world by worldId
-   * GET /api/v1/server/game-worlds/world/:worldId
+   * GET /api/v1/server/:env/game-worlds/world/:worldId
    */
-  static async getGameWorldByWorldId(req: SDKRequest, res: Response) {
+  static async getGameWorldByWorldId(req: EnvironmentRequest, res: Response) {
     try {
       const { worldId } = req.params;
 

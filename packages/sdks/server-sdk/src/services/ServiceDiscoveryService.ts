@@ -17,6 +17,15 @@ export class ServiceDiscoveryService {
   private heartbeatInterval?: NodeJS.Timeout;
   private heartbeatIntervalMs: number = 15000; // 15 seconds (half of default 30s TTL)
 
+  // Backup registration data for auto-recovery
+  private registrationBackup?: {
+    hostname: string;
+    internalAddress: string;
+    ports: any;
+    meta?: any;
+    status?: string;
+  };
+
   constructor(apiClient: ApiClient, logger: Logger) {
     this.apiClient = apiClient;
     this.logger = logger;
@@ -85,6 +94,15 @@ export class ServiceDiscoveryService {
     this.instanceId = instanceId;
     this.labels = input.labels;
 
+    // Backup registration data for auto-recovery
+    this.registrationBackup = {
+      hostname,
+      internalAddress,
+      ports: input.ports,
+      meta: input.meta,
+      status: input.status,
+    };
+
     this.logger.info('Service registered via API', {
       instanceId,
       labels: input.labels,
@@ -141,9 +159,10 @@ export class ServiceDiscoveryService {
         error: error instanceof Error ? error.message : String(error),
       });
     } finally {
-      // Always clear instance ID and labels, even if unregister fails
+      // Always clear instance ID, labels, and backup, even if unregister fails
       this.instanceId = undefined;
       this.labels = undefined;
+      this.registrationBackup = undefined;
     }
   }
 
@@ -188,10 +207,48 @@ export class ServiceDiscoveryService {
     const response = await this.apiClient.post('/api/v1/server/services/status', payload);
 
     if (!response.success) {
-      throw new Error(response.error?.message || 'Failed to update service status');
+      const errorMessage = response.error?.message || 'Failed to update service status';
+
+      // Check if error is "Service not found" and we have backup data
+      if (errorMessage.includes('not found') && this.registrationBackup) {
+        this.logger.warn('Service not found in registry, attempting auto-registration', {
+          instanceId: this.instanceId,
+          service: this.labels?.service,
+        });
+
+        try {
+          // Re-register using backup data
+          await this.register({
+            instanceId: this.instanceId,
+            labels: this.labels!,
+            hostname: this.registrationBackup.hostname,
+            internalAddress: this.registrationBackup.internalAddress,
+            ports: this.registrationBackup.ports,
+            meta: this.registrationBackup.meta,
+            status: (input.status || this.registrationBackup.status || 'ready') as any,
+            stats: input.stats,
+          });
+
+          this.logger.info('Service auto-registered successfully', {
+            instanceId: this.instanceId,
+            service: this.labels?.service,
+          });
+
+          // Successfully re-registered, return without error
+          return;
+        } catch (reregisterError: any) {
+          this.logger.error('Failed to auto-register service', {
+            instanceId: this.instanceId,
+            error: reregisterError.message || String(reregisterError),
+          });
+          // Fall through to throw original error
+        }
+      }
+
+      throw new Error(errorMessage);
     }
 
-    this.logger.info('Service status updated via API', {
+    this.logger.debug('Service status updated via API', {
       instanceId: this.instanceId,
       labels: this.labels,
       status: input.status,
@@ -200,11 +257,12 @@ export class ServiceDiscoveryService {
 
   /**
    * Fetch services with filtering via Backend API
-   * GET /api/v1/server/services?serviceType=world&serviceGroup=kr&status=ready&env=prod
+   * GET /api/v1/server/services?serviceType=world&group=kr&environment=prod&status=ready
    *
    * Supports filtering by:
-   * - serviceType: labels.service
-   * - serviceGroup: labels.group
+   * - service: labels.service
+   * - group: labels.group
+   * - environment: labels.environment
    * - status: service status
    * - Any custom label key-value pairs
    */
@@ -213,12 +271,16 @@ export class ServiceDiscoveryService {
 
     const queryParams: any = {};
 
-    if (params?.serviceType) {
-      queryParams.serviceType = params.serviceType;
+    if (params?.service) {
+      queryParams.serviceType = params.service;
     }
 
-    if (params?.serviceGroup) {
-      queryParams.group = params.serviceGroup;
+    if (params?.group) {
+      queryParams.group = params.group;
+    }
+
+    if (params?.environment) {
+      queryParams.environment = params.environment;
     }
 
     if (params?.status) {

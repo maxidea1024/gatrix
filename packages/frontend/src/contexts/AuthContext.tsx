@@ -175,37 +175,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Check if user has a specific permission or any of the permissions
   const hasPermission = useCallback((permission: Permission | Permission[]): boolean => {
-    console.log(`[hasPermission] Checking: ${JSON.stringify(permission)}`);
-    console.log(`[hasPermission] isAuthenticated: ${isAuthenticated}, user: ${user?.email}, role: ${user?.role}`);
-    console.log(`[hasPermission] permissionsLoading: ${permissionsLoading}, permissions: ${JSON.stringify(permissions)}`);
-
     if (!isAuthenticated || !user) {
-      console.log(`[hasPermission] Return false - not authenticated or no user`);
       return false;
     }
 
     // Admin users with role 'admin' need to have permissions assigned
     if (user.role !== 'admin') {
-      console.log(`[hasPermission] Return false - not admin role`);
       return false;
     }
 
     // While permissions are loading, return false to prevent showing menus prematurely
     if (permissionsLoading) {
-      console.log(`[hasPermission] Return false - permissions loading`);
       return false;
     }
 
     // Check for wildcard permission '*' that grants all permissions
     if (permissions.includes('*')) {
-      console.log(`[hasPermission] Return true - has wildcard permission`);
       return true;
     }
 
     const requiredPermissions = Array.isArray(permission) ? permission : [permission];
-    const result = requiredPermissions.some(p => permissions.includes(p));
-    console.log(`[hasPermission] Result: ${result}`);
-    return result;
+    return requiredPermissions.some(p => permissions.includes(p));
   }, [isAuthenticated, user, permissions, permissionsLoading]);
 
   // Fetch permissions when user changes

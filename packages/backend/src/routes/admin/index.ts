@@ -30,6 +30,7 @@ import crashEventRoutes from './crashEvents';
 import consoleRoutes from './console';
 import surveyRoutes from './surveys';
 import rewardTemplateRoutes from './rewardTemplates';
+import storeProductRoutes from './storeProducts';
 import serviceNoticeRoutes from './serviceNotices';
 import ingamePopupNoticeRoutes from './ingamePopupNotices';
 import planningDataRoutes from './planningData';
@@ -38,6 +39,7 @@ import serviceDiscoveryRoutes from './serviceDiscovery';
 import monitoringAlertRoutes from './monitoringAlerts';
 import dataManagementRoutes from './dataManagement';
 import bannerRoutes from './banners';
+import cmsCashShopRoutes from './cmsCashShop';
 
 const router = express.Router();
 
@@ -126,6 +128,9 @@ router.use('/surveys', requirePermission([PERMISSIONS.SURVEYS_VIEW, PERMISSIONS.
 // Reward templates - requires reward-templates.view or reward-templates.manage permission
 router.use('/reward-templates', requirePermission([PERMISSIONS.REWARD_TEMPLATES_VIEW, PERMISSIONS.REWARD_TEMPLATES_MANAGE]) as any, rewardTemplateRoutes);
 
+// Store products - requires store-products.view or store-products.manage permission
+router.use('/store-products', requirePermission([PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE]) as any, storeProductRoutes);
+
 // Service notices - requires service-notices.view or service-notices.manage permission
 router.use('/service-notices', requirePermission([PERMISSIONS.SERVICE_NOTICES_VIEW, PERMISSIONS.SERVICE_NOTICES_MANAGE]) as any, serviceNoticeRoutes);
 
@@ -146,5 +151,8 @@ router.use('/data-management', requirePermission([PERMISSIONS.DATA_MANAGEMENT_VI
 
 // Banners - requires banners.view or banners.manage permission
 router.use('/banners', requirePermission([PERMISSIONS.BANNERS_VIEW, PERMISSIONS.BANNERS_MANAGE]) as any, bannerRoutes);
+
+// CMS CashShop - requires store-products.view or store-products.manage permission
+router.use('/cms/cash-shop', requirePermission([PERMISSIONS.STORE_PRODUCTS_VIEW, PERMISSIONS.STORE_PRODUCTS_MANAGE]) as any, cmsCashShopRoutes);
 
 export default router;

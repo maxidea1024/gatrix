@@ -200,20 +200,12 @@ const router = Router();
  *         description: Client version info
  *         content:
  *           application/json:
- *             examples:
- *               default:
- *                 value:
- *                   success: true
- *                   data:
- *                     platform: android
- *                     clientVersion: 1.2.3
- *                     status: ACTIVE
- *                     gameServerAddress: https://game.example.com
- *                     patchAddress: https://patch.example.com
- *                     guestModeAllowed: true
- *                     externalClickLink: "https://example.com/news"
- *                     meta: { featureFlag: true }
- *                   cached: false
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data: { $ref: '#/components/schemas/ClientVersion' }
+ *                 cached: { type: boolean, example: false }
  *       400: { $ref: '#/components/responses/BadRequestError' }
  *       404: { description: Client version not found }
  *
@@ -226,22 +218,19 @@ const router = Router();
  *         description: Public game worlds
  *         content:
  *           application/json:
- *             examples:
- *               default:
- *                 value:
- *                   success: true
- *                   data:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
  *                     worlds:
- *                       - id: 1
- *                         worldId: "NA-1"
- *                         name: "North America 1"
- *                         description: "Primary world"
- *                         displayOrder: 1
- *                         createdAt: "2025-01-01T00:00:00.000Z"
- *                         updatedAt: "2025-01-01T00:00:00.000Z"
- *                     total: 1
- *                     timestamp: "2025-01-01T00:00:00.000Z"
- *                   cached: false
+ *                       type: array
+ *                       items: { $ref: '#/components/schemas/GameWorld' }
+ *                     total: { type: integer, example: 1 }
+ *                     timestamp: { type: string, format: date-time }
+ *                 cached: { type: boolean, example: false }
  *
  * /client/cache-stats:
  *   get:
@@ -252,14 +241,16 @@ const router = Router();
  *         description: Cache, queue and pub/sub stats
  *         content:
  *           application/json:
- *             examples:
- *               default:
- *                 value:
- *                   success: true
- *                   data:
- *                     cache: { hits: 10, misses: 2 }
- *                     queue: { pending: 0 }
- *                     pubsub: { connected: true, timestamp: "2025-01-01T00:00:00.000Z" }
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     cache: { type: object, example: { hits: 10, misses: 2 } }
+ *                     queue: { type: object, example: { pending: 0 } }
+ *                     pubsub: { type: object, example: { connected: true, timestamp: "2025-01-01T00:00:00.000Z" } }
  *
  * /client/invalidate-cache:
  *   post:

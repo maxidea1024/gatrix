@@ -253,8 +253,15 @@ export class EventListener {
       'maintenance.settings.updated',
       'whitelist.updated',
       'client_version.updated',
+      'banner.created',
       'banner.updated',
+      'banner.deleted',
       'service_notice.updated',
+      'store_product.created',
+      'store_product.updated',
+      'store_product.deleted',
+      'environment.created',
+      'environment.deleted',
     ].includes(type);
   }
 
@@ -271,7 +278,7 @@ export class EventListener {
         // Pass isVisible from event data to avoid unnecessary API calls
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
         const gameWorldIsVisible = event.data.isVisible === 0 ? false : (event.data.isVisible === 1 ? true : event.data.isVisible);
-        await this.cacheManager.updateSingleGameWorld(Number(event.data.id), gameWorldIsVisible);
+        await this.cacheManager.updateSingleGameWorld(Number(event.data.id), event.data.environment, gameWorldIsVisible);
         break;
 
       case 'gameworld.deleted':
@@ -291,7 +298,7 @@ export class EventListener {
         // Pass isVisible from event data to avoid unnecessary API calls
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
         const popupIsVisible = event.data.isVisible === 0 ? false : (event.data.isVisible === 1 ? true : event.data.isVisible);
-        await this.cacheManager.updateSinglePopupNotice(Number(event.data.id), popupIsVisible);
+        await this.cacheManager.updateSinglePopupNotice(Number(event.data.id), event.data.environment, popupIsVisible);
         break;
 
       case 'popup.deleted':
@@ -305,7 +312,7 @@ export class EventListener {
         // Pass isActive from event data to avoid unnecessary API calls
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
         const surveyIsActive = event.data.isActive === 0 ? false : (event.data.isActive === 1 ? true : event.data.isActive);
-        await this.cacheManager.updateSingleSurvey(String(event.data.id), surveyIsActive);
+        await this.cacheManager.updateSingleSurvey(String(event.data.id), event.data.environment, surveyIsActive);
         break;
 
       case 'survey.deleted':
@@ -350,42 +357,131 @@ export class EventListener {
         }
         break;
 
-      case 'client_version.updated':
+      case 'client_version.updated': {
+        const features = this.cacheManager.getFeatures();
+        if (features.clientVersion !== true) {
+          this.logger.debug('Client version event ignored - feature is disabled', { event: event.type });
+          break;
+        }
+        const cvEnvironment = event.data.environment as string;
         this.logger.info('Client version updated event received, refreshing client version cache', {
           id: event.data.id,
-          environment: event.data.environmentName || event.data.environmentId
+          environment: cvEnvironment
         });
         try {
-          await this.cacheManager.getClientVersionService()?.refresh();
+          // Use refreshByEnvironment to refresh the specific environment's cache
+          if (cvEnvironment) {
+            await this.cacheManager.getClientVersionService()?.refreshByEnvironment(cvEnvironment);
+          } else {
+            await this.cacheManager.getClientVersionService()?.refresh();
+          }
           this.logger.info('Client version cache refreshed successfully');
         } catch (error: any) {
           this.logger.error('Failed to refresh client version cache', { error: error.message });
         }
         break;
+      }
 
-      case 'banner.updated':
-        this.logger.info('Banner updated event received, refreshing banner cache', {
-          id: event.data.id,
-          environment: event.data.environmentName || event.data.environmentId
-        });
-        try {
-          await this.cacheManager.getBannerService()?.refresh();
-          this.logger.info('Banner cache refreshed successfully');
-        } catch (error: any) {
-          this.logger.error('Failed to refresh banner cache', { error: error.message });
+      case 'banner.created':
+      case 'banner.updated': {
+        const features = this.cacheManager.getFeatures();
+        if (features.banner !== true) {
+          this.logger.debug('Banner event ignored - feature is disabled', { event: event.type });
+          break;
         }
+        // Update only the affected banner (immutable)
+        // Pass status from event data to avoid unnecessary API calls
+        const bannerStatus = event.data.status as string | undefined;
+        await this.cacheManager.updateSingleBanner(
+          String(event.data.id),
+          event.data.environment,
+          bannerStatus
+        );
         break;
+      }
 
-      case 'service_notice.updated':
+      case 'banner.deleted': {
+        const features = this.cacheManager.getFeatures();
+        if (features.banner !== true) {
+          this.logger.debug('Banner event ignored - feature is disabled', { event: event.type });
+          break;
+        }
+        // Remove the deleted banner from cache (immutable)
+        this.cacheManager.removeBanner(String(event.data.id), event.data.environment);
+        break;
+      }
+
+      case 'service_notice.updated': {
+        const features = this.cacheManager.getFeatures();
+        if (features.serviceNotice !== true) {
+          this.logger.debug('Service notice event ignored - feature is disabled', { event: event.type });
+          break;
+        }
+        const noticeEnvironment = event.data.environment as string;
         this.logger.info('Service notice updated event received, refreshing service notice cache', {
           id: event.data.id,
-          environment: event.data.environmentName || event.data.environmentId
+          environment: noticeEnvironment
         });
         try {
-          await this.cacheManager.getServiceNoticeService()?.refresh();
+          // Use refreshByEnvironment to refresh the specific environment's cache
+          if (noticeEnvironment) {
+            await this.cacheManager.getServiceNoticeService()?.refreshByEnvironment(noticeEnvironment);
+          } else {
+            await this.cacheManager.getServiceNoticeService()?.refresh();
+          }
           this.logger.info('Service notice cache refreshed successfully');
         } catch (error: any) {
           this.logger.error('Failed to refresh service notice cache', { error: error.message });
+        }
+        break;
+      }
+
+      case 'store_product.created':
+      case 'store_product.updated': {
+        const features = this.cacheManager.getFeatures();
+        if (features.storeProduct !== true) {
+          this.logger.debug('Store product event ignored - feature is disabled', { event: event.type });
+          break;
+        }
+        // Update only the affected store product (immutable)
+        // Pass isActive from event data to avoid unnecessary API calls
+        // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
+        const productIsActive = event.data.isActive === 0 ? false : (event.data.isActive === 1 ? true : event.data.isActive);
+        await this.cacheManager.updateSingleStoreProduct(
+          String(event.data.id),
+          event.data.environment,
+          productIsActive
+        );
+        break;
+      }
+
+      case 'store_product.deleted': {
+        const features = this.cacheManager.getFeatures();
+        if (features.storeProduct !== true) {
+          this.logger.debug('Store product event ignored - feature is disabled', { event: event.type });
+          break;
+        }
+        // Remove the deleted store product from cache (immutable)
+        this.cacheManager.removeStoreProduct(String(event.data.id), event.data.environment);
+        break;
+      }
+
+      case 'environment.created':
+      case 'environment.deleted':
+        // When environments are added or removed, refresh environment list and load/clear data
+        // This is essential for "all environments" mode (environments: '*')
+        this.logger.info('Environment change event received', {
+          type: event.type,
+          environment: event.data.environment
+        });
+        try {
+          const result = await this.cacheManager.refreshEnvironmentList();
+          this.logger.info('Environment list refreshed after environment change', {
+            added: result.added,
+            removed: result.removed
+          });
+        } catch (error: any) {
+          this.logger.error('Failed to refresh environment list after environment change', { error: error.message });
         }
         break;
 
