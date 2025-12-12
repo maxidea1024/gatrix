@@ -16,8 +16,8 @@ export const config = {
 
   // SDK required fields for metrics labels and service discovery
   service: process.env.EDGE_SERVICE || 'edge',
-  group: process.env.EDGE_GROUP || 'default',
-  environment: process.env.EDGE_ENVIRONMENT || 'env_default',
+  group: process.env.EDGE_GROUP || 'gatrix',
+  environment: process.env.EDGE_ENVIRONMENT || 'gatrix-env',
 
   // Target environments (comma-separated)
   environments: (process.env.EDGE_ENVIRONMENTS || '')

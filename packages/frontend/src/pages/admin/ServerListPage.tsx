@@ -213,35 +213,64 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t }) 
     }
   }, []);
 
-  // Reset view to default position
+  // Reset view to default position and center all nodes
   const handleResetView = useCallback(() => {
     const defaultViewBox = { x: 0, y: 0, width: 1200, height: 800 };
     setViewBox(defaultViewBox);
     localStorage.removeItem(CLUSTER_VIEWBOX_KEY);
     localStorage.removeItem(CLUSTER_CENTER_POS_KEY);
 
-    const newCenterX = defaultViewBox.width / 2;
-    const newCenterY = defaultViewBox.height / 2;
+    const centerX = defaultViewBox.width / 2;
+    const centerY = defaultViewBox.height / 2;
 
-    // Reset center node position
-    const centerNode = nodesRef.current.find(n => n.isCenter);
-    if (centerNode && simulationRef.current) {
-      centerNode.x = newCenterX;
-      centerNode.y = newCenterY;
-      centerNode.fx = newCenterX;
-      centerNode.fy = newCenterY;
+    if (simulationRef.current && nodesRef.current.length > 0) {
+      // Find all center nodes (could be multiple when grouping is enabled)
+      const centerNodes = nodesRef.current.filter(n => n.isCenter);
+      const serviceNodes = nodesRef.current.filter(n => !n.isCenter);
 
-      // Reposition all service nodes around the new center
-      nodesRef.current.forEach(node => {
-        if (!node.isCenter) {
+      if (centerNodes.length === 1) {
+        // Single center node - place at screen center
+        const centerNode = centerNodes[0];
+        centerNode.x = centerX;
+        centerNode.y = centerY;
+        centerNode.fx = centerX;
+        centerNode.fy = centerY;
+
+        // Reposition all service nodes around the center
+        serviceNodes.forEach(node => {
           const angle = Math.random() * 2 * Math.PI;
           const distance = 80 + Math.random() * 60;
-          node.x = newCenterX + Math.cos(angle) * distance;
-          node.y = newCenterY + Math.sin(angle) * distance;
+          node.x = centerX + Math.cos(angle) * distance;
+          node.y = centerY + Math.sin(angle) * distance;
           node.fx = null;
           node.fy = null;
-        }
-      });
+        });
+      } else if (centerNodes.length > 1) {
+        // Multiple center nodes (grouping mode) - arrange in a circle around screen center
+        const groupRadius = Math.min(centerNodes.length * 60, 250);
+        centerNodes.forEach((node, index) => {
+          const angle = (2 * Math.PI * index) / centerNodes.length - Math.PI / 2;
+          const x = centerX + Math.cos(angle) * groupRadius;
+          const y = centerY + Math.sin(angle) * groupRadius;
+          node.x = x;
+          node.y = y;
+          node.fx = x;
+          node.fy = y;
+        });
+
+        // Reposition service nodes around their respective center nodes
+        serviceNodes.forEach(node => {
+          // Find the linked center node
+          const linkedCenter = centerNodes.find(c => c.groupKey === node.groupKey);
+          const targetCenter = linkedCenter || { x: centerX, y: centerY };
+          const angle = Math.random() * 2 * Math.PI;
+          const distance = 80 + Math.random() * 60;
+          node.x = (targetCenter.x || centerX) + Math.cos(angle) * distance;
+          node.y = (targetCenter.y || centerY) + Math.sin(angle) * distance;
+          node.fx = null;
+          node.fy = null;
+        });
+      }
 
       simulationRef.current.alpha(0.8).restart();
     }

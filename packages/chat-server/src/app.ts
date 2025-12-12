@@ -298,8 +298,8 @@ class ChatServerApp {
               apiToken: apiToken,
               applicationName: 'chat-server',
               service: 'chat',
-              group: process.env.SERVICE_GROUP || 'development',
-              environment: process.env.ENVIRONMENT || 'env_default',
+              group: process.env.SERVICE_GROUP || 'gatrix',
+              environment: process.env.ENVIRONMENT || 'gatrix-env',
               logger: { level: 'info' },
               cache: {
                 enabled: false, // Chat server doesn't need caching for now
@@ -322,7 +322,7 @@ class ChatServerApp {
             const result = await gatrixSdk.registerService({
               labels: {
                 service: 'chat',
-                group: process.env.SERVICE_GROUP || 'development',
+                group: process.env.SERVICE_GROUP || 'gatrix',
               },
               ports: {
                 internalApi: config.port,

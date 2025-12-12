@@ -312,8 +312,8 @@ const startServer = async () => {
           apiToken: apiToken,
           applicationName: 'backend',
           service: 'backend',
-          group: process.env.SERVICE_GROUP || 'development',
-          environment: process.env.ENVIRONMENT || 'env_default',
+          group: process.env.SERVICE_GROUP || 'gatrix',
+          environment: process.env.ENVIRONMENT || 'gatrix-env',
           logger: { level: 'info' },
           cache: {
             enabled: false, // Backend doesn't need caching - it IS the data source
@@ -337,7 +337,7 @@ const startServer = async () => {
         const result = await gatrixSdk.registerService({
           labels: {
             service: 'backend',
-            group: process.env.SERVICE_GROUP || 'development',
+            group: process.env.SERVICE_GROUP || 'gatrix',
           },
           ports: {
             internalApi: config.port,

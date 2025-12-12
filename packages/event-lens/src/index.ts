@@ -52,8 +52,8 @@ async function start() {
         apiToken: apiToken,
         applicationName: 'event-lens',
         service: 'event-lens',
-        group: process.env.SERVICE_GROUP || 'development',
-        environment: process.env.ENVIRONMENT || 'env_default',
+        group: process.env.SERVICE_GROUP || 'gatrix',
+        environment: process.env.ENVIRONMENT || 'gatrix-env',
         logger: { level: 'info' },
         cache: {
           enabled: false, // Disable cache - not needed for service discovery only
@@ -77,7 +77,7 @@ async function start() {
       const result = await gatrixSdk.registerService({
         labels: {
           service: 'event-lens',
-          group: process.env.SERVICE_GROUP || 'development',
+          group: process.env.SERVICE_GROUP || 'gatrix',
         },
         ports: {
           internalApi: config.port,
