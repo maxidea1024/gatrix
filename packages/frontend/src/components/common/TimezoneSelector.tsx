@@ -74,8 +74,8 @@ const TimezoneSelector: React.FC = () => {
     if (newTimezone) {
       setTimezone(newTimezone);
       setStoredTimezone(newTimezone);
-      // 페이지 새로고침 없이 즉시 적용되도록 이벤트 발생
-      window.dispatchEvent(new Event('timezoneChanged'));
+      // Reload page to apply timezone change across all components
+      window.location.reload();
     }
   };
 

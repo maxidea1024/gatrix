@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { ulid } from 'ulid';
 
-export type TokenType = 'client' | 'server';
+export type TokenType = 'client' | 'server' | 'edge' | 'all';
 
 export interface ApiAccessTokenData {
   id?: string; // ULID (26 characters)
@@ -52,7 +52,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
         id: { type: 'string', minLength: 26, maxLength: 26 },
         tokenName: { type: 'string', minLength: 1, maxLength: 200 },
         tokenValue: { type: 'string', minLength: 1, maxLength: 255 },
-        tokenType: { type: 'string', enum: ['client', 'server'] },
+        tokenType: { type: 'string', enum: ['client', 'server', 'edge', 'all'] },
         expiresAt: { type: ['string', 'object', 'null'], format: 'date-time' },
         lastUsedAt: { type: ['string', 'object', 'null'], format: 'date-time' },
         usageCount: { type: ['integer', 'null'], minimum: 0 },
@@ -208,12 +208,12 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       return null;
     }
 
-    // 캐시 기반 ?�용??추적 (비동기로 처리?�여 API ?�답 ?�도???�향 ?�음)
+    // 캐시 기반 ?�용??추적 (비동기로 처리?�여 API ?�답 ?�도???�향 ?�음)
     if (tokenRecord.id) {
-      // ?�적 import�??�환 참조 방�?
+      // ?�적 import�??�환 참조 방�?
       const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
       apiTokenUsageService.recordTokenUsage(tokenRecord.id).catch(error => {
-        // ?�용??추적 ?�패가 API ?�청??방해?��? ?�도�?로그�??��?
+        // ?�용??추적 ?�패가 API ?�청??방해?��? ?�도�?로그�??��?
         const logger = require('../config/logger').default;
         logger.error('Failed to record token usage:', error);
       });
@@ -398,6 +398,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       // Insert new environment assignments
       if (environmentIds.length > 0) {
         const insertData = environmentIds.map(envId => ({
+          id: ulid(), // Generate ULID for each record
           tokenId: this.id,
           environmentId: envId,
         }));

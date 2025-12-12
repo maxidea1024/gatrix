@@ -21,10 +21,34 @@ export interface ApiResponse<T = any> {
 }
 
 // ============================================================================
+// Environment Types
+// ============================================================================
+
+export interface EnvironmentInfo {
+  id: string;
+  environmentName: string;
+  displayName: string;
+  environmentType: string;
+  color?: string;
+}
+
+export interface EnvironmentListResponse {
+  environments: EnvironmentInfo[];
+  count: number;
+}
+
+// ============================================================================
 // Client Version Types
 // ============================================================================
 
-export type ClientStatus = 'ONLINE' | 'OFFLINE' | 'MAINTENANCE' | 'UPDATE_REQUIRED';
+export type ClientStatus =
+  | 'ONLINE'
+  | 'OFFLINE'
+  | 'RECOMMENDED_UPDATE'
+  | 'FORCED_UPDATE'
+  | 'UNDER_REVIEW'
+  | 'BLOCKED_PATCH_ALLOWED'
+  | 'MAINTENANCE';
 
 export interface ClientVersionMaintenanceLocale {
   lang: string;
@@ -33,8 +57,6 @@ export interface ClientVersionMaintenanceLocale {
 
 export interface ClientVersion {
   id: number;
-  environmentId?: string; // Environment ID for multi-environment support
-  environmentName?: string; // Environment Name (if available)
   platform: string;
   clientVersion: string;
   clientStatus: ClientStatus;
@@ -56,8 +78,15 @@ export interface ClientVersion {
   updatedAt?: string;
 }
 
+// Single-environment mode response
 export interface ClientVersionListResponse {
   clientVersions: ClientVersion[];
+  total: number;
+}
+
+// Multi-environment mode response (byEnvironment is keyed by environmentName)
+export interface ClientVersionByEnvResponse {
+  byEnvironment: Record<string, ClientVersion[]>;
   total: number;
 }
 
@@ -69,8 +98,6 @@ export type ServiceNoticeCategory = 'maintenance' | 'event' | 'notice' | 'promot
 
 export interface ServiceNotice {
   id: number;
-  environmentId?: string;
-  environmentName?: string;
   isActive: boolean;
   category: ServiceNoticeCategory;
   platforms: string[];
@@ -86,8 +113,15 @@ export interface ServiceNotice {
   updatedAt: string;
 }
 
+// Single-environment mode response
 export interface ServiceNoticeListResponse {
   notices: ServiceNotice[];
+  total: number;
+}
+
+// Multi-environment mode response (byEnvironment is keyed by environmentName)
+export interface ServiceNoticeByEnvResponse {
+  byEnvironment: Record<string, ServiceNotice[]>;
   total: number;
 }
 
@@ -140,8 +174,6 @@ export interface Sequence {
 
 export interface Banner {
   bannerId: string;
-  environmentId?: string; // Environment ID for multi-environment support
-  environmentName?: string; // Environment Name (if available)
   name: string;
   description?: string;
   width: number;
@@ -156,8 +188,48 @@ export interface Banner {
   updatedAt?: string;
 }
 
+// Single-environment mode response
 export interface BannerListResponse {
   banners: Banner[];
+  total: number;
+}
+
+// Multi-environment mode response (byEnvironment is keyed by environmentName)
+export interface BannerByEnvResponse {
+  byEnvironment: Record<string, Banner[]>;
+  total: number;
+}
+
+// ============================================================================
+// Store Product Types
+// ============================================================================
+
+export interface StoreProduct {
+  id: string;
+  isActive: boolean;
+  productId: string;
+  productName: string;
+  store: string;
+  price: number;
+  currency: string;
+  saleStartAt: string | null;
+  saleEndAt: string | null;
+  description: string | null;
+  metadata: Record<string, any> | null;
+  tags?: { id: number; name: string; color: string }[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Single-environment mode response
+export interface StoreProductListResponse {
+  products: StoreProduct[];
+  total: number;
+}
+
+// Multi-environment mode response (byEnvironment is keyed by environmentName)
+export interface StoreProductByEnvResponse {
+  byEnvironment: Record<string, StoreProduct[]>;
   total: number;
 }
 
@@ -343,6 +415,7 @@ export interface ServiceInstance {
  * - internalAddress is optional; if omitted, the first NIC address will be used
  */
 export interface RegisterServiceInput {
+  instanceId?: string; // Optional: Use existing instance ID for re-registration
   labels: ServiceLabels; // Service labels (required: labels.service)
   hostname?: string; // Optional: Auto-detected from os.hostname() if omitted
   internalAddress?: string; // Optional: Auto-detected from first NIC if omitted
@@ -363,7 +436,7 @@ export interface RegisterServiceInput {
 export interface UpdateServiceStatusInput {
   status?: ServiceStatus; // Optional: Update status
   stats?: Record<string, any>; // Optional: Merge stats
-  autoRegisterIfMissing?: boolean; // Optional: Auto-register if not found (default: false)
+  autoRegisterIfMissing?: boolean; // Optional: Auto-register if not found (default: true)
 
   // Auto-register fields (only used when autoRegisterIfMissing=true)
   hostname?: string; // Required for auto-register
@@ -377,8 +450,9 @@ export interface UpdateServiceStatusInput {
  * Supports filtering by labels and status
  */
 export interface GetServicesParams {
-  serviceType?: string; // Filter by labels.service
-  serviceGroup?: string; // Filter by labels.group
+  service?: string; // Filter by labels.service
+  group?: string; // Filter by labels.group
+  environment?: string; // Filter by labels.environment
   status?: ServiceStatus; // Filter by status
   excludeSelf?: boolean; // Exclude current instance (default: true)
   labels?: Record<string, string>; // Additional label filters (e.g., { env: 'prod', region: 'ap-northeast-2' })

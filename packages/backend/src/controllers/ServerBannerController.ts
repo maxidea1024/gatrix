@@ -1,13 +1,9 @@
-import { Request, Response } from 'express';
-import { Environment } from '../models/Environment';
+import { Response } from 'express';
 import { BannerModel } from '../models/Banner';
 import logger from '../config/logger';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
-
-export interface SDKRequest extends Request {
-  apiToken?: any;
-}
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 /**
  * Server SDK Banner Controller
@@ -15,63 +11,27 @@ export interface SDKRequest extends Request {
  */
 export class ServerBannerController {
   /**
-   * Get banners list
-   * GET /api/v1/server/banners
-   * GET /api/v1/server/banners?environments=env1,env2,env3
-   * Returns only published banners
+   * Get banners for a specific environment
+   * GET /api/v1/server/:env/banners
+   * Returns only published banners for the specified environment
    */
-  static async getBanners(req: SDKRequest, res: Response) {
+  static async getBanners(req: EnvironmentRequest, res: Response) {
     try {
-      // Parse environments query parameter
-      const environmentsParam = req.query.environments as string | undefined;
-      const environments = environmentsParam
-        ? environmentsParam.split(',').map(e => e.trim()).filter(Boolean)
-        : [];
+      const environment = req.environment!;
 
       await respondWithEtagCache(res, {
-        cacheKey: SERVER_SDK_ETAG.BANNERS,
+        cacheKey: `${SERVER_SDK_ETAG.BANNERS}:${environment.id}`,
         ttlMs: DEFAULT_CONFIG.BANNER_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          let banners: any[] = [];
+          const banners = await BannerModel.findPublished(environment.id);
 
-          if (environments.length > 0) {
-            // Multi-environment mode: fetch from all specified environments
-            for (const envParam of environments) {
-              // Try to find environment by ID or Name
-              let env = await Environment.query().findById(envParam);
-              if (!env) {
-                env = await Environment.getByName(envParam);
-              }
-
-              if (env) {
-                const envBanners = await BannerModel.findPublished(env.id);
-
-                // Add environmentId and environmentName to each banner for client grouping
-                const bannersWithEnv = envBanners.map((b: any) => ({
-                  ...b,
-                  environmentId: env!.id,
-                  environmentName: env!.environmentName,
-                }));
-                banners.push(...bannersWithEnv);
-              } else {
-                logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
-              }
-            }
-          } else {
-            // Single-environment mode: use current environment (via context)
-            banners = await BannerModel.findPublished();
-          }
-
-          logger.info(
-            `Server SDK: Retrieved ${banners.length} published banners`,
-            { environments: environments.length > 0 ? environments : 'current' }
-          );
+          logger.info(`Server SDK: Retrieved ${banners.length} published banners for environment ${environment.environmentName}`);
 
           return {
             success: true,
             data: {
-              banners: banners,
+              banners,
               total: banners.length,
             },
           };
@@ -91,9 +51,9 @@ export class ServerBannerController {
 
   /**
    * Get specific banner by ID
-   * GET /api/v1/server/banners/:bannerId
+   * GET /api/v1/server/:env/banners/:bannerId
    */
-  static async getBannerById(req: SDKRequest, res: Response) {
+  static async getBannerById(req: EnvironmentRequest, res: Response) {
     try {
       const { bannerId } = req.params;
 
@@ -135,7 +95,9 @@ export class ServerBannerController {
 
       res.json({
         success: true,
-        data: banner,
+        data: {
+          banner,
+        },
       });
     } catch (error) {
       logger.error('Error in ServerBannerController.getBannerById:', error);

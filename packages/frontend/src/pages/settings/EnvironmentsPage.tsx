@@ -370,9 +370,23 @@ const EnvironmentsPage: React.FC = () => {
               {environments.map((env) => (
                 <TableRow key={env.id}>
                   <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                      {env.environmentName}
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                        {env.environmentName}
+                      </Typography>
+                      <Tooltip title={t('common.copy')}>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            navigator.clipboard.writeText(env.environmentName);
+                            enqueueSnackbar(t('common.copied'), { variant: 'success' });
+                          }}
+                          sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                        >
+                          <CopyIcon fontSize="small" sx={{ fontSize: 14 }} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

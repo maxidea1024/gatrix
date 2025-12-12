@@ -16,21 +16,50 @@ This page explains how to run Gatrix with Docker in both development and product
 
 ## Ports
 
-- Prometheus: host 59091 -> container 9090
-- Grafana: host 54000 -> container 3000
-- Chat Server metrics: host 59090 -> container 9090 (existing)
-- Backend API: host 55000 -> container 5000
-- Event Lens: host 53002 -> container 3002
-- Chat Server: host 53001 -> container 3001
-- etcd: host 52879 -> container 2379, host 52880 -> container 2380
+- Prometheus: host 49090 -> container 9090
+- Grafana: host 44000 -> container 3000
+- Backend API: host 45000 -> container 5000
+- Event Lens: host 45200 -> container 5200
+- Chat Server: host 45100 -> container 5100
+- Frontend: host 43000 (prod) / 43500 (dev) -> container 80 / 3000
+- Loki: host 43100 -> container 3100
+- ClickHouse: host 48123 -> container 8123, host 49000 -> container 9000
+- Redis: host 46379 -> container 6379
+- MySQL: host 43306 -> container 3306
+- etcd: host 42379 -> container 2379, host 42380 -> container 2380
 
 ## Environment Variables (selected)
 
-- PROM_SCRAPE_INTERVAL (default: 15s)
-- PROM_RETENTION_TIME (default: 14d)
-- GRAFANA_ADMIN_USER (default: admin)
-- GRAFANA_ADMIN_PASSWORD (default: admin)
-- MONITORING_ENABLED (true/false)
+### Monitoring
+- `PROM_SCRAPE_INTERVAL` (default: 15s)
+- `PROM_RETENTION_TIME` (default: 14d)
+- `GRAFANA_ADMIN_USER` (default: admin)
+- `GRAFANA_ADMIN_PASSWORD` (default: admin)
+- `MONITORING_ENABLED` (true/false)
+
+### Edge Server
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `EDGE_PORT` | 1400 | Edge server port |
+| `EDGE_METRICS_PORT` | 9400 | Metrics endpoint port (internal only) |
+| `EDGE_BYPASS_TOKEN` | `gatrix-edge-internal-bypass-token` | Bypass token for all environments and internal APIs |
+| `EDGE_APPLICATION_NAME` | `edge-server` | Application name for SDK identification |
+| `EDGE_ENVIRONMENTS` | `*` | Target environments. Use `*` for all environments (multi-env mode) or comma-separated IDs |
+| `CACHE_SYNC_METHOD` | `event` | Cache sync method: `event` (Redis PubSub real-time), `polling`, or `manual` |
+| `CACHE_POLLING_INTERVAL_MS` | 60000 | Polling interval in ms (only used when `CACHE_SYNC_METHOD=polling`) |
+| `EDGE_LOG_LEVEL` | `info` (prod) / `debug` (dev) | Log level |
+
+**Multi-Environment Mode (`EDGE_ENVIRONMENTS=*`):**
+- Edge server caches data for ALL environments dynamically
+- Automatically syncs when new environments are created/deleted via Redis PubSub
+- Each API endpoint filters data by the requested environment
+
+**Event Mode (`CACHE_SYNC_METHOD=event`):**
+- Uses Redis PubSub for real-time cache synchronization
+- Cache is updated immediately when backend publishes events
+- Requires Redis connection
+- Recommended for production use
 
 ## Development
 
@@ -43,9 +72,9 @@ docker compose -f docker-compose.dev.yml down --remove-orphans
 ```
 
 Access:
-- Grafana: http://localhost:54000
-- Prometheus: http://localhost:59091
-- Backend: http://localhost:55000
+- Grafana: http://localhost:44000
+- Prometheus: http://localhost:49090
+- Backend: http://localhost:45000
 
 ## Production-like (Local Build)
 
@@ -58,8 +87,8 @@ docker compose down --remove-orphans
 ```
 
 Access:
-- Grafana: http://localhost:54000
-- Prometheus: http://localhost:59091
+- Grafana: http://localhost:44000
+- Prometheus: http://localhost:49090
 
 ## Production Deployment (Pre-built Images)
 

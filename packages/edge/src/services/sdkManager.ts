@@ -50,19 +50,17 @@ class SDKManager {
         refreshMethod: config.cache.syncMethod,
       },
 
-      // Enable Edge-specific features
+      // Enable all features for Edge (cache everything)
       features: {
-        // Disable features not needed for Edge
-        gameWorld: false,
-        popupNotice: false,
-        survey: false,
-        whitelist: false,
-        serviceMaintenance: false,
-
-        // Enable Edge-specific features
+        gameWorld: true,
+        popupNotice: true,
+        survey: true,
+        whitelist: true,
+        serviceMaintenance: true,
         clientVersion: true,
         serviceNotice: true,
         banner: true,
+        storeProduct: true,
       },
     };
 

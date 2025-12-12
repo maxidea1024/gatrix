@@ -15,6 +15,7 @@ export interface ApiClientConfig {
   baseURL: string;
   apiToken: string;
   applicationName: string;
+  environment?: string; // Default environment for single-environment mode
   timeout?: number;
   logger?: Logger;
   retry?: RetryConfig;
@@ -45,15 +46,23 @@ export class ApiClient {
     this.etagStore = new Map();
     this.bodyCache = new Map();
 
+    // Build headers with optional environment
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-API-Token': config.apiToken,
+      'X-Application-Name': config.applicationName,
+    };
+
+    // Add environment header for single-environment mode
+    if (config.environment) {
+      headers['X-Environment'] = config.environment;
+    }
+
     // Create axios instance
     this.client = axios.create({
       baseURL: config.baseURL,
       timeout: config.timeout || 30000,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Token': config.apiToken,
-        'X-Application-Name': config.applicationName,
-      },
+      headers,
       // Treat 304 Not Modified as a successful response so we can handle ETag logic
       validateStatus: (status) => (status >= 200 && status < 300) || status === 304,
     });
@@ -463,6 +472,37 @@ export class ApiClient {
    */
   getAxiosInstance(): AxiosInstance {
     return this.client;
+  }
+
+  /**
+   * Invalidate ETag cache for a specific URL pattern
+   * This forces the next request to fetch fresh data instead of returning cached 304 response
+   * @param urlPattern URL or URL pattern (partial match) to invalidate
+   */
+  invalidateEtagCache(urlPattern: string): void {
+    const keysToDelete: string[] = [];
+    for (const key of this.etagStore.keys()) {
+      if (key.includes(urlPattern)) {
+        keysToDelete.push(key);
+      }
+    }
+    for (const key of keysToDelete) {
+      this.etagStore.delete(key);
+      this.bodyCache.delete(key);
+    }
+    if (keysToDelete.length > 0) {
+      this.logger.debug('Invalidated ETag cache', { urlPattern, count: keysToDelete.length });
+    }
+  }
+
+  /**
+   * Clear all ETag caches
+   */
+  clearAllEtagCache(): void {
+    const count = this.etagStore.size;
+    this.etagStore.clear();
+    this.bodyCache.clear();
+    this.logger.debug('Cleared all ETag cache', { count });
   }
 }
 

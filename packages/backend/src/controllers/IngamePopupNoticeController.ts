@@ -8,6 +8,7 @@ import IngamePopupNoticeService, {
 import { pubSubService } from '../services/PubSubService';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 // Validation schemas
 const createIngamePopupNoticeSchema = Joi.object({
@@ -333,18 +334,20 @@ class IngamePopupNoticeController {
 
   /**
    * Get active ingame popup notices for Server SDK
-   * GET /api/v1/server/ingame-popup-notices
+   * GET /api/v1/server/:env/ingame-popup-notices
    * Returns only active notices that are currently visible and not expired
    */
-  async getServerIngamePopupNotices(req: Request, res: Response, next: NextFunction) {
+  async getServerIngamePopupNotices(req: EnvironmentRequest, res: Response, next: NextFunction) {
     try {
+      const environment = req.environment!;
       const filters: IngamePopupNoticeFilters = {
+        environmentId: environment.id,
         isActive: true,
         currentlyVisible: true,
       };
 
       await respondWithEtagCache(res, {
-        cacheKey: SERVER_SDK_ETAG.POPUP_NOTICES,
+        cacheKey: `${SERVER_SDK_ETAG.POPUP_NOTICES}:${environment.id}`,
         ttlMs: DEFAULT_CONFIG.POPUP_NOTICE_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
@@ -376,10 +379,10 @@ class IngamePopupNoticeController {
 
   /**
    * Get ingame popup notice by ID for Server SDK
-   * GET /api/v1/server/ingame-popup-notices/:id
+   * GET /api/v1/server/:env/ingame-popup-notices/:id
    * Returns notice formatted for Server SDK
    */
-  async getServerIngamePopupNoticeById(req: Request, res: Response, next: NextFunction) {
+  async getServerIngamePopupNoticeById(req: EnvironmentRequest, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id);
       const notice = await IngamePopupNoticeService.getIngamePopupNoticeById(id);

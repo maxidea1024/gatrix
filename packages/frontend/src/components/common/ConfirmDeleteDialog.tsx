@@ -25,6 +25,7 @@ interface ConfirmDeleteDialogProps {
   confirmButtonText?: string;
   cancelButtonText?: string;
   loading?: boolean;
+  children?: React.ReactNode;
 }
 
 const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
@@ -36,7 +37,8 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
   warning,
   confirmButtonText,
   cancelButtonText,
-  loading = false
+  loading = false,
+  children,
 }) => {
   const { t } = useTranslation();
 
@@ -71,10 +73,12 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
           {message}
         </Typography>
 
+        {children}
+
         {warning && (
-          <Alert 
-            severity="warning" 
-            sx={{ 
+          <Alert
+            severity="warning"
+            sx={{
               mt: 2,
               '& .MuiAlert-message': {
                 fontSize: '0.875rem'

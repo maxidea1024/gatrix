@@ -1,14 +1,12 @@
 import { Request, Response } from 'express';
 import { Environment } from '../models/Environment';
 import { RemoteConfigSegment } from '../models/RemoteConfigSegment';
-import { RemoteConfigTemplate } from '../models/RemoteConfigTemplate';
-import { GameWorldModel } from '../models/GameWorld';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import logger from '../config/logger';
-import knex from '../config/knex';
 import { EnvironmentCopyService, CopyOptions } from '../services/EnvironmentCopyService';
 import { initializeSystemKVForEnvironment } from '../utils/systemKV';
+import { pubSubService } from '../services/PubSubService';
 
 export class EnvironmentController {
   /**
@@ -165,6 +163,20 @@ export class EnvironmentController {
 
       logger.info(`Environment created: ${environmentName} by user ${userId}`);
 
+      // Publish SDK event for dynamic environment detection
+      try {
+        await pubSubService.publishSDKEvent({
+          type: 'environment.created',
+          data: {
+            id: environment.id,
+            environment: environment.environmentName,
+            timestamp: Date.now()
+          }
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish environment created SDK event', { eventError });
+      }
+
       res.status(201).json({
         success: true,
         data: environment,
@@ -287,12 +299,27 @@ export class EnvironmentController {
     }
 
     try {
+      const environmentName = environment.environmentName;
       await environment.deleteEnvironment(force === true);
 
-      logger.info(`Environment deleted: ${environment.environmentName} by user ${userId}`, {
+      logger.info(`Environment deleted: ${environmentName} by user ${userId}`, {
         force,
         environmentId: id
       });
+
+      // Publish SDK event for dynamic environment detection
+      try {
+        await pubSubService.publishSDKEvent({
+          type: 'environment.deleted',
+          data: {
+            id,
+            environment: environmentName,
+            timestamp: Date.now()
+          }
+        });
+      } catch (eventError) {
+        logger.warn('Failed to publish environment deleted SDK event', { eventError });
+      }
 
       res.json({
         success: true,

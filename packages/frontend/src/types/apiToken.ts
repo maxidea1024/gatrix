@@ -1,4 +1,4 @@
-export type TokenType = 'client' | 'server';
+export type TokenType = 'client' | 'server' | 'edge' | 'all';
 
 export interface ApiAccessToken {
   id: string; // ULID (26 characters)

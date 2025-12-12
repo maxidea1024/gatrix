@@ -3,6 +3,7 @@ import { pubSubService } from './PubSubService';
 import { Environment } from '../models/Environment';
 import logger from '../config/logger';
 import { applyMaintenanceStatusCalculationToArray, applyMaintenanceStatusCalculation } from '../utils/maintenanceUtils';
+import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 /**
  * Parse semver string to numeric array [major, minor, patch]
@@ -282,34 +283,35 @@ export class ClientVersionService {
   static async createClientVersion(
     data: ClientVersionCreationAttributes
   ): Promise<ClientVersionAttributes> {
-    // Validate that the new version is greater than the latest version for this platform
-    const latestVersion = await this.findLatestByPlatform(data.platform);
-    if (latestVersion && compareSemver(data.clientVersion, latestVersion.clientVersion) <= 0) {
-      throw new Error(
-        `VERSION_TOO_OLD:${latestVersion.clientVersion}` // Error code format for i18n
-      );
-    }
+    // [DISABLED] Validate that the new version is greater than the latest version for this platform
+    // const latestVersion = await this.findLatestByPlatform(data.platform);
+    // if (latestVersion && compareSemver(data.clientVersion, latestVersion.clientVersion) <= 0) {
+    //   throw new Error(
+    //     `VERSION_TOO_OLD:${latestVersion.clientVersion}` // Error code format for i18n
+    //   );
+    // }
 
     const result = await ClientVersionModel.create(data);
 
-    // Invalidate client version cache
+    // Invalidate client version cache (including ETag cache for SDK)
     await pubSubService.invalidateByPattern('client_version:.*');
+    if (result.environmentId) {
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${result.environmentId}`);
+    }
 
     // Publish event
     try {
-      let envName: string | undefined;
-      // result is ClientVersionAttributes, check environmentId
+      let environment: string | undefined;
       if (result.environmentId) {
         const env = await Environment.query().findById(result.environmentId);
-        envName = env?.environmentName;
+        environment = env?.environmentName;
       }
 
       await pubSubService.publishSDKEvent({
         type: 'client_version.updated',
         data: {
           id: result.id,
-          environmentId: result.environmentId,
-          environmentName: envName,
+          environment,
           timestamp: Date.now()
         }
       });
@@ -323,20 +325,20 @@ export class ClientVersionService {
   static async bulkCreateClientVersions(
     data: any
   ): Promise<ClientVersionAttributes[]> {
-    // Version validation for each platform
-    const versionErrors: string[] = [];
-    for (const platform of data.platforms) {
-      const latestVersion = await this.findLatestByPlatform(platform.platform);
-      if (latestVersion && compareSemver(data.clientVersion, latestVersion.clientVersion) <= 0) {
-        versionErrors.push(`${platform.platform}: ${latestVersion.clientVersion}`);
-      }
-    }
-
-    if (versionErrors.length > 0) {
-      throw new Error(
-        `VERSION_TOO_OLD_BULK:${versionErrors.join(', ')}` // Error code format for i18n
-      );
-    }
+    // [DISABLED] Version validation for each platform
+    // const versionErrors: string[] = [];
+    // for (const platform of data.platforms) {
+    //   const latestVersion = await this.findLatestByPlatform(platform.platform);
+    //   if (latestVersion && compareSemver(data.clientVersion, latestVersion.clientVersion) <= 0) {
+    //     versionErrors.push(`${platform.platform}: ${latestVersion.clientVersion}`);
+    //   }
+    // }
+    //
+    // if (versionErrors.length > 0) {
+    //   throw new Error(
+    //     `VERSION_TOO_OLD_BULK:${versionErrors.join(', ')}` // Error code format for i18n
+    //   );
+    // }
 
     // 중복 체크
     const duplicates = [];
@@ -391,8 +393,9 @@ export class ClientVersionService {
       }
     }
 
-    // Invalidate client version cache
+    // Invalidate client version cache (including ETag cache for SDK - all environments for bulk op)
     await pubSubService.invalidateByPattern('client_version:.*');
+    await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
 
     // Publish generic update event (bulk op)
     await pubSubService.publishSDKEvent({
@@ -418,21 +421,25 @@ export class ClientVersionService {
 
     const updatedClientVersion = await this.getClientVersionById(id);
 
+    // Invalidate ETag cache for SDK
+    if (updatedClientVersion?.environmentId) {
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${updatedClientVersion.environmentId}`);
+    }
+
     // Publish event
     if (updatedClientVersion) {
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (updatedClientVersion.environmentId) {
           const env = await Environment.query().findById(updatedClientVersion.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
 
         await pubSubService.publishSDKEvent({
           type: 'client_version.updated',
           data: {
             id: updatedClientVersion.id,
-            environmentId: updatedClientVersion.environmentId,
-            environmentName: envName,
+            environment,
             timestamp: Date.now()
           }
         });
@@ -455,8 +462,9 @@ export class ClientVersionService {
         data: { id, timestamp: Date.now() }
       });
 
-      // Invalidate client version cache
+      // Invalidate client version cache (including ETag cache - all environments for deletion)
       await pubSubService.invalidateByPattern('client_version:.*');
+      await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
     }
 
     return deletedRowsCount > 0;
@@ -472,8 +480,9 @@ export class ClientVersionService {
         data: { timestamp: Date.now() }
       });
 
-      // Invalidate client version cache
+      // Invalidate client version cache (including ETag cache - all environments for bulk op)
       await pubSubService.invalidateByPattern('client_version:.*');
+      await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
     }
 
     return result;

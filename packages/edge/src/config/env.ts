@@ -11,7 +11,9 @@ export const config = {
 
   // Backend API configuration
   gatrixUrl: process.env.GATRIX_URL || 'http://localhost:3000',
-  apiToken: process.env.EDGE_API_TOKEN || '',
+  // Edge bypass token - allows access to all environments and internal APIs
+  // Can be configured via EDGE_BYPASS_TOKEN or EDGE_API_TOKEN environment variable
+  apiToken: process.env.EDGE_BYPASS_TOKEN || process.env.EDGE_API_TOKEN || 'gatrix-edge-internal-bypass-token',
   applicationName: process.env.EDGE_APPLICATION_NAME || 'edge-server',
 
   // SDK required fields for metrics labels and service discovery
@@ -19,11 +21,13 @@ export const config = {
   group: process.env.EDGE_GROUP || 'default',
   environment: process.env.EDGE_ENVIRONMENT || 'env_default',
 
-  // Target environments (comma-separated)
-  environments: (process.env.EDGE_ENVIRONMENTS || '')
-    .split(',')
-    .map(e => e.trim())
-    .filter(Boolean),
+  // Target environments (comma-separated, or '*' for all environments)
+  environments: process.env.EDGE_ENVIRONMENTS === '*'
+    ? '*' as const
+    : (process.env.EDGE_ENVIRONMENTS || '')
+        .split(',')
+        .map(e => e.trim())
+        .filter(Boolean),
 
   // Redis configuration (for PubSub only)
   redis: {
@@ -41,6 +45,11 @@ export const config = {
 
   // Logging
   logLevel: process.env.LOG_LEVEL || 'info',
+
+  // Unsecured client token for testing purposes (client -> edge)
+  // This token bypasses normal token validation and allows access to all environments
+  // WARNING: Only use in development/testing environments
+  unsecuredClientToken: process.env.EDGE_CLIENT_UNSECURED_TOKEN || 'gatrix-unsecured-edge-api-token',
 };
 
 // Validate required configuration
@@ -51,8 +60,8 @@ export function validateConfig(): void {
     errors.push('EDGE_API_TOKEN is required');
   }
 
-  if (config.environments.length === 0) {
-    errors.push('EDGE_ENVIRONMENTS is required (comma-separated environment IDs)');
+  if (config.environments !== '*' && config.environments.length === 0) {
+    errors.push('EDGE_ENVIRONMENTS is required (comma-separated environment IDs or "*" for all)');
   }
 
   if (errors.length > 0) {

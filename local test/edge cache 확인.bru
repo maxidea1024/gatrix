@@ -1,0 +1,15 @@
+meta {
+  name: edge cache 확인
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:1400/health/cache
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

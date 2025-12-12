@@ -48,8 +48,8 @@ export interface RedeemResponse {
   userUsedCount: number;
   sequence: number;
   usedAt: string;
-  rewardEmailTitle?: string | null;
-  rewardEmailBody?: string | null;
+  rewardMailTitle?: string | null;
+  rewardMailContent?: string | null;
 }
 
 /**
@@ -227,8 +227,8 @@ export class CouponRedeemService {
         userUsedCount: sequence,
         sequence,
         usedAt: usedAtISO,
-        rewardEmailTitle: setting.rewardEmailTitle || null,
-        rewardEmailBody: setting.rewardEmailBody || null,
+        rewardMailTitle: setting.rewardEmailTitle || null,
+        rewardMailContent: setting.rewardEmailBody || null,
       };
     });
   }

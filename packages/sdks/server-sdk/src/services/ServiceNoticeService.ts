@@ -1,7 +1,7 @@
 /**
  * Service Notice Service
  * Handles service notice list and retrieval
- * Supports both single-environment (default) and multi-environment (Edge) modes
+ * Uses per-environment API pattern: GET /api/v1/server/:env/service-notices
  */
 
 import { ApiClient } from '../client/ApiClient';
@@ -19,34 +19,25 @@ export interface ServiceNoticeFilters {
 export class ServiceNoticeService {
   private apiClient: ApiClient;
   private logger: Logger;
-  // Target environments (empty = single environment mode)
-  private environments: string[];
-  // Multi-environment cache: Map<environmentId, ServiceNotice[]>
+  // Default environment for single-environment mode
+  private defaultEnvironment: string;
+  // Multi-environment cache: Map<environment (environmentName), ServiceNotice[]>
   private cachedNoticesByEnv: Map<string, ServiceNotice[]> = new Map();
-  private defaultEnvId: string = 'default';
 
-  constructor(apiClient: ApiClient, logger: Logger, environments: string[] = []) {
+  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.environments = environments;
-  }
-
-  private isMultiEnvironment(): boolean {
-    return this.environments.length > 0;
+    this.defaultEnvironment = defaultEnvironment;
   }
 
   /**
-   * Get all service notices
-   * Single-env mode: GET /api/v1/server/service-notices
-   * Multi-env mode: GET /api/v1/server/service-notices?environments=env1,env2,env3
+   * Get service notices for a specific environment
+   * GET /api/v1/server/:env/service-notices -> { notices: [...] }
    */
-  async list(): Promise<ServiceNotice[]> {
-    let endpoint = `/api/v1/server/service-notices`;
-    if (this.isMultiEnvironment()) {
-      endpoint += `?environments=${this.environments.join(',')}`;
-    }
+  async listByEnvironment(environment: string): Promise<ServiceNotice[]> {
+    const endpoint = `/api/v1/server/${encodeURIComponent(environment)}/service-notices`;
 
-    this.logger.debug('Fetching service notices', { environments: this.environments });
+    this.logger.debug('Fetching service notices', { environment });
 
     const response = await this.apiClient.get<ServiceNoticeListResponse>(endpoint);
 
@@ -55,88 +46,127 @@ export class ServiceNoticeService {
     }
 
     const notices = response.data.notices;
-
-    // Group by environment
-    this.cachedNoticesByEnv.clear();
-    for (const notice of notices) {
-      // In single-env mode, all data goes to 'default'
-      let envKey = this.defaultEnvId;
-      if (this.isMultiEnvironment()) {
-        // Use environmentName if available (user preference), fallback to environmentId
-        // Also check if the configured environments contain the name or ID to ensure consistency
-        if (notice.environmentName && this.environments.includes(notice.environmentName)) {
-          envKey = notice.environmentName;
-        } else if (notice.environmentId && this.environments.includes(notice.environmentId)) {
-          envKey = notice.environmentId;
-        } else {
-          // Fallback: prefer name if available
-          envKey = notice.environmentName || notice.environmentId || this.defaultEnvId;
-        }
-      }
-
-      if (!this.cachedNoticesByEnv.has(envKey)) {
-        this.cachedNoticesByEnv.set(envKey, []);
-      }
-      this.cachedNoticesByEnv.get(envKey)!.push(notice);
-    }
+    this.cachedNoticesByEnv.set(environment, notices);
 
     this.logger.info('Service notices fetched', {
       count: notices.length,
-      environmentCount: this.cachedNoticesByEnv.size,
-      environments: this.environments,
+      environment,
     });
 
     return notices;
   }
 
   /**
-   * Get cached service notices
-   * @param environmentId Only used in multi-environment mode
+   * Get service notices for multiple environments
+   * Fetches each environment separately and caches results
    */
-  getCached(environmentId?: string): ServiceNotice[] {
-    const envId = this.isMultiEnvironment() ? (environmentId || this.defaultEnvId) : this.defaultEnvId;
-    return this.cachedNoticesByEnv.get(envId) || [];
+  async listByEnvironments(environments: string[]): Promise<ServiceNotice[]> {
+    this.logger.debug('Fetching service notices for multiple environments', { environments });
+
+    const results: ServiceNotice[] = [];
+
+    for (const env of environments) {
+      try {
+        const notices = await this.listByEnvironment(env);
+        results.push(...notices);
+      } catch (error) {
+        this.logger.error(`Failed to fetch service notices for environment ${env}`, { error });
+      }
+    }
+
+    this.logger.info('Service notices fetched for all environments', {
+      count: results.length,
+      environmentCount: environments.length,
+    });
+
+    return results;
+  }
+
+  /**
+   * Get all service notices (uses default environment for single-env mode)
+   * For backward compatibility
+   */
+  async list(): Promise<ServiceNotice[]> {
+    return this.listByEnvironment(this.defaultEnvironment);
+  }
+
+  /**
+   * Get cached service notices
+   * @param environment Environment name. If omitted, returns all notices as flat array.
+   */
+  getCached(environment?: string): ServiceNotice[] {
+    if (environment) {
+      return this.cachedNoticesByEnv.get(environment) || [];
+    }
+    // No environment specified: return all notices as flat array
+    return Array.from(this.cachedNoticesByEnv.values()).flat();
   }
 
   /**
    * Get all cached service notices (all environments)
-   * Only meaningful in multi-environment mode
    */
   getAllCached(): Map<string, ServiceNotice[]> {
     return this.cachedNoticesByEnv;
   }
 
   /**
-   * Refresh cached service notices
+   * Clear all cached data
+   */
+  clearCache(): void {
+    this.cachedNoticesByEnv.clear();
+    this.logger.debug('Service notices cache cleared');
+  }
+
+  /**
+   * Clear cached data for a specific environment
+   */
+  clearCacheForEnvironment(environment: string): void {
+    this.cachedNoticesByEnv.delete(environment);
+    this.logger.debug('Service notices cache cleared for environment', { environment });
+  }
+
+  /**
+   * Refresh cached service notices for a specific environment
+   */
+  async refreshByEnvironment(environment: string): Promise<ServiceNotice[]> {
+    this.logger.info('Refreshing service notices cache', { environment });
+    // Invalidate ETag cache to force fresh data fetch
+    this.apiClient.invalidateEtagCache(`/api/v1/server/${encodeURIComponent(environment)}/service-notices`);
+    return await this.listByEnvironment(environment);
+  }
+
+  /**
+   * Refresh cached service notices (uses default environment)
+   * For backward compatibility
    */
   async refresh(): Promise<ServiceNotice[]> {
-    this.logger.info('Refreshing service notices cache');
-    return await this.list();
+    return this.refreshByEnvironment(this.defaultEnvironment);
   }
 
   /**
    * Update cache with new data
-   * @param environmentId Only used in multi-environment mode
    */
-  updateCache(notices: ServiceNotice[], environmentId?: string): void {
-    const envId = this.isMultiEnvironment() ? (environmentId || this.defaultEnvId) : this.defaultEnvId;
-    this.cachedNoticesByEnv.set(envId, notices);
-    this.logger.debug('Service notices cache updated', { environmentId: envId, count: notices.length });
+  updateCache(notices: ServiceNotice[], environment?: string): void {
+    const envKey = environment || this.defaultEnvironment;
+    this.cachedNoticesByEnv.set(envKey, notices);
+    this.logger.debug('Service notices cache updated', { environment: envKey, count: notices.length });
   }
 
   /**
    * Get service notice by ID
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getById(id: number, environmentId?: string): ServiceNotice | null {
-    const notices = this.getCached(environmentId);
+  getById(id: number, environment?: string): ServiceNotice | null {
+    const notices = this.getCached(environment);
     return notices.find((n) => n.id === id) || null;
   }
 
   /**
    * Get active service notices with optional filters
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getActive(environmentId?: string, filters?: ServiceNoticeFilters): ServiceNotice[] {
-    const notices = this.getCached(environmentId);
+  getActive(environment?: string, filters?: ServiceNoticeFilters): ServiceNotice[] {
+    const notices = this.getCached(environment);
     const now = new Date();
 
     return notices.filter((notice) => {
@@ -181,9 +211,10 @@ export class ServiceNoticeService {
 
   /**
    * Get notices by category
+   * @param environment Environment name. Only used in multi-environment mode.
    */
-  getByCategory(category: ServiceNoticeCategory, environmentId?: string): ServiceNotice[] {
-    return this.getActive(environmentId, { category });
+  getByCategory(category: ServiceNoticeCategory, environment?: string): ServiceNotice[] {
+    return this.getActive(environment, { category });
   }
 
   /**

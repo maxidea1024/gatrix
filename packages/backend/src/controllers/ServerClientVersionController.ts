@@ -1,15 +1,11 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import ClientVersionService from '../services/ClientVersionService';
 import { ClientVersionModel } from '../models/ClientVersion';
-import { Environment } from '../models/Environment';
 import { TagService } from '../services/TagService';
 import logger from '../config/logger';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
-
-export interface SDKRequest extends Request {
-  apiToken?: any;
-}
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 /**
  * Server SDK Client Version Controller
@@ -17,87 +13,42 @@ export interface SDKRequest extends Request {
  */
 export class ServerClientVersionController {
   /**
-   * Get client versions list
-   * GET /api/v1/server/client-versions
-   * GET /api/v1/server/client-versions?environments=env1,env2,env3
-   * Returns all active client versions with tags
+   * Get client versions for a specific environment
+   * GET /api/v1/server/:env/client-versions
+   * Returns all active client versions with tags for the specified environment
    */
-  static async getClientVersions(req: SDKRequest, res: Response) {
+  static async getClientVersions(req: EnvironmentRequest, res: Response) {
     try {
-      // Parse environments query parameter
-      const environmentsParam = req.query.environments as string | undefined;
-      const environments = environmentsParam
-        ? environmentsParam.split(',').map(e => e.trim()).filter(Boolean)
-        : [];
+      const environment = req.environment!;
 
       await respondWithEtagCache(res, {
-        cacheKey: SERVER_SDK_ETAG.CLIENT_VERSIONS,
+        cacheKey: `${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${environment.id}`,
         ttlMs: DEFAULT_CONFIG.CLIENT_VERSION_TTL,
         requestEtag: req.headers['if-none-match'],
         buildPayload: async () => {
-          let clientVersions: any[] = [];
-
-          if (environments.length > 0) {
-            // Multi-environment mode: fetch from all specified environments
-            for (const envParam of environments) {
-              // Try to find environment by ID or Name
-              let env = await Environment.query().findById(envParam);
-              if (!env) {
-                env = await Environment.getByName(envParam);
-              }
-
-              if (env) {
-                const result = await ClientVersionModel.findAll({
-                  environmentId: env.id,
-                  limit: 1000,
-                  offset: 0,
-                  sortBy: 'clientVersion',
-                  sortOrder: 'DESC',
-                });
-
-                // Add environmentId and environmentName to each version for client grouping
-                const versionsWithEnv = result.clientVersions.map((v: any) => ({
-                  ...v,
-                  environmentId: env!.id,
-                  environmentName: env!.environmentName,
-                }));
-                clientVersions.push(...versionsWithEnv);
-              } else {
-                logger.warn(`Server SDK: Environment not found for param '${envParam}'`);
-              }
-            }
-          } else {
-            // Single-environment mode: use current environment (via context)
-            const result = await ClientVersionModel.findAll({
-              limit: 1000,
-              offset: 0,
-              sortBy: 'clientVersion',
-              sortOrder: 'DESC',
-            });
-            // Try to find environment info for current environment
-            // Since we don't have easy access to current env name here without extra query (it's in request context usually)
-            // We just return what we have. Most likely result.clientVersions items rely on their own fields.
-            // But ClientVersionModel.findAll usually filters by current env.
-            // We can try to attach environmentName if we can resolve it.
-            // But for single-env mode, SDK usually doesn't need to differentiate.
-            clientVersions = result.clientVersions;
-          }
+          const result = await ClientVersionModel.findAll({
+            environmentId: environment.id,
+            limit: 1000,
+            offset: 0,
+            sortBy: 'clientVersion',
+            sortOrder: 'DESC',
+          });
 
           // Fetch tags for each client version
           const versionsWithTags = await Promise.all(
-            clientVersions.map(async (version: any) => {
+            result.clientVersions.map(async (version: any) => {
               const tags = await TagService.listTagsForEntity('client_version', version.id);
+              // Remove internal fields from response
+              const { environmentId: _envId, ...versionWithoutEnvId } = version;
+              void _envId;
               return {
-                ...version,
+                ...versionWithoutEnvId,
                 tags: tags || [],
               };
             }),
           );
 
-          logger.info(
-            `Server SDK: Retrieved ${versionsWithTags.length} client versions`,
-            { environments: environments.length > 0 ? environments : 'current' }
-          );
+          logger.info(`Server SDK: Retrieved ${versionsWithTags.length} client versions for environment ${environment.environmentName}`);
 
           return {
             success: true,
@@ -122,9 +73,9 @@ export class ServerClientVersionController {
 
   /**
    * Get specific client version by ID
-   * GET /api/v1/server/client-versions/:id
+   * GET /api/v1/server/:env/client-versions/:id
    */
-  static async getClientVersionById(req: SDKRequest, res: Response) {
+  static async getClientVersionById(req: EnvironmentRequest, res: Response) {
     try {
       const { id } = req.params;
       const versionId = parseInt(id);

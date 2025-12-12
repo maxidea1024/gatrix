@@ -1,0 +1,32 @@
+import { Router, Response } from 'express';
+import { CmsCashShopService } from '../../services/CmsCashShopService';
+import { AuthenticatedRequest } from '../../middleware/auth';
+import { asyncHandler, GatrixError } from '../../middleware/errorHandler';
+
+const router = Router() as any;
+
+/**
+ * GET /api/v1/admin/cms/cash-shop
+ * Get all valid CMS CashShop products for the current environment
+ */
+router.get('/', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const environmentId = req.environmentId;
+  if (!environmentId) {
+    throw new GatrixError('Environment ID is required', 400);
+  }
+
+  // Get language from query param or default to 'kr'
+  const lang = (req.query.lang as 'kr' | 'en' | 'zh') || 'kr';
+  const products = await CmsCashShopService.getProducts(environmentId, lang);
+
+  res.json({
+    success: true,
+    data: {
+      products,
+      total: products.length,
+    },
+  });
+}));
+
+export default router;
+

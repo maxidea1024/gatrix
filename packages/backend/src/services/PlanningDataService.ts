@@ -59,6 +59,7 @@ export class PlanningDataService {
     LIVE_EVENT: 'planning:liveevent-lookup',
     MATE_RECRUITING: 'planning:materecruiting-lookup',
     OCEAN_NPC_AREA: 'planning:oceannpcarea-lookup',
+    CASH_SHOP: 'planning:cashshop-lookup',
   };
 
   /**
@@ -505,6 +506,40 @@ export class PlanningDataService {
   }
 
   /**
+   * Get CashShop lookup data
+   * @param environmentId Environment ULID
+   * @param lang Language code (kr, en, zh)
+   */
+  static async getCashShopLookup(environmentId: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
+    try {
+      const cacheKey = this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.CASH_SHOP}:${lang}`);
+      const filePath = this.getFilePath(environmentId, `cashshop-lookup-${lang}.json`);
+
+      // Try to get from Redis cache first
+      const cached = await cacheService.get<Record<string, any>>(cacheKey);
+      if (cached) {
+        await cacheService.setWithoutTTL(cacheKey, cached);
+        logger.debug(`CashShop lookup data (${lang}) retrieved from cache`, { environmentId });
+        return cached;
+      }
+
+      const exists = await fs.access(filePath).then(() => true).catch(() => false);
+      if (!exists) return { totalCount: 0, items: [] };
+
+      const data = await fs.readFile(filePath, 'utf-8');
+      const parsed = JSON.parse(data);
+
+      // Store in Redis cache for other instances
+      await cacheService.setWithoutTTL(cacheKey, parsed);
+
+      return parsed;
+    } catch (error) {
+      logger.error('Failed to read CashShop lookup data', { error, environmentId });
+      throw new GatrixError('Failed to load CashShop lookup data', 500);
+    }
+  }
+
+  /**
    * Upload planning data files (drag & drop)
    * Saves files to data/planning/{environmentId}/ and caches them in Redis
    * @param environmentId Environment ULID
@@ -549,6 +584,10 @@ export class PlanningDataService {
         'oceannpcarea-lookup-kr.json',
         'oceannpcarea-lookup-en.json',
         'oceannpcarea-lookup-zh.json',
+        // CashShop data
+        'cashshop-lookup-kr.json',
+        'cashshop-lookup-en.json',
+        'cashshop-lookup-zh.json',
       ];
 
       // Validate uploaded files

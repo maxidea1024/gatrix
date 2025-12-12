@@ -4,6 +4,7 @@ import { pubSubService } from '../services/PubSubService';
 import logger from '../config/logger';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 export interface MaintenancePayload {
   isMaintenance: boolean;
@@ -20,9 +21,9 @@ const KEY = 'isMaintenance';
 const KEY_DETAIL = 'maintenanceDetail';
 
 export class MaintenanceController {
-  static async getStatus(req: Request, res: Response, next: NextFunction) {
+  static async getStatus(req: EnvironmentRequest, res: Response, next: NextFunction) {
     try {
-      // Get environment ID from request (set by environmentContextMiddleware)
+      // Get environment ID from request (set by resolveEnvironment middleware)
       const environmentId = req.environmentId;
 
       await respondWithEtagCache(res, {

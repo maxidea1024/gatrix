@@ -19,8 +19,8 @@ docker compose -f docker-compose.dev.yml up -d
 ```
 
 2) Access UIs
-- Grafana: http://localhost:54000
-- Prometheus: http://localhost:59091
+- Grafana: http://localhost:44000
+- Prometheus: http://localhost:49090
 
 3) Enable metrics per service
 - Set `MONITORING_ENABLED=true`

@@ -153,6 +153,15 @@ function convertLoctab(inputPath, outputPath) {
       loctab[key] = chinese || key;
       keyLowerCaseMap.set(keyLower, key);
 
+      // Also add a version with literal \n if key contains actual newlines
+      // This allows matching when DB stores '\n' as literal string
+      if (key.includes('\n')) {
+        const keyWithLiteralNewline = key.replace(/\n/g, '\\n');
+        if (!loctab.hasOwnProperty(keyWithLiteralNewline)) {
+          loctab[keyWithLiteralNewline] = chinese || key;
+        }
+      }
+
       processedCount++;
 
       // Progress indicator (every 10000 lines)

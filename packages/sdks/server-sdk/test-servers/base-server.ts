@@ -310,6 +310,53 @@ export class BaseTestServer {
       this.log(`[EVENT] Survey updated: ${JSON.stringify(data)}`);
     });
 
+    // Maintenance events
+    this.sdk.on('maintenance.settings.updated', (data) => {
+      this.log(`[EVENT] Maintenance settings updated: ${JSON.stringify(data)}`);
+    });
+
+    this.sdk.on('maintenance.started', (data) => {
+      this.log(`[EVENT] Maintenance started: ${JSON.stringify(data)}`);
+    });
+
+    this.sdk.on('maintenance.ended', (data) => {
+      this.log(`[EVENT] Maintenance ended: ${JSON.stringify(data)}`);
+    });
+
+    // Whitelist events
+    this.sdk.on('whitelist.updated', (data) => {
+      this.log(`[EVENT] Whitelist updated: ${JSON.stringify(data)}`);
+    });
+
+    // Banner events
+    this.sdk.on('banner.updated', (data) => {
+      this.log(`[EVENT] Banner updated: ${JSON.stringify(data)}`);
+    });
+
+    // Client version events
+    this.sdk.on('client_version.updated', (data) => {
+      this.log(`[EVENT] Client version updated: ${JSON.stringify(data)}`);
+    });
+
+    // Service notice events
+    this.sdk.on('service_notice.updated', (data) => {
+      this.log(`[EVENT] Service notice updated: ${JSON.stringify(data)}`);
+    });
+
+    // Store product events
+    this.sdk.on('store_product.updated', (data) => {
+      this.log(`[EVENT] Store product updated: ${JSON.stringify(data)}`);
+    });
+
+    // Environment events
+    this.sdk.on('environment.created', (data) => {
+      this.log(`[EVENT] Environment created: ${JSON.stringify(data)}`);
+    });
+
+    this.sdk.on('environment.deleted', (data) => {
+      this.log(`[EVENT] Environment deleted: ${JSON.stringify(data)}`);
+    });
+
     // Custom events
     this.sdk.on('custom.event', (data) => {
       this.log(`[EVENT] Custom event: ${JSON.stringify(data)}`);
@@ -359,16 +406,16 @@ export class BaseTestServer {
       this.log(`Service Discovery API: ${allServices.length} total services`);
 
       // Get services by service type
-      const authServices = await this.sdk.fetchServices({ serviceType: 'authd' });
+      const authServices = await this.sdk.fetchServices({ service: 'authd' });
       this.log(`  - authd: ${authServices.length} instances`);
 
-      const lobbydServices = await this.sdk.fetchServices({ serviceType: 'lobbyd' });
+      const lobbydServices = await this.sdk.fetchServices({ service: 'lobbyd' });
       this.log(`  - lobbyd: ${lobbydServices.length} instances`);
 
-      const chatdServices = await this.sdk.fetchServices({ serviceType: 'chatd' });
+      const chatdServices = await this.sdk.fetchServices({ service: 'chatd' });
       this.log(`  - chatd: ${chatdServices.length} instances`);
 
-      const worlddServices = await this.sdk.fetchServices({ serviceType: 'worldd' });
+      const worlddServices = await this.sdk.fetchServices({ service: 'worldd' });
       this.log(`  - worldd: ${worlddServices.length} instances`);
 
       // Get services by group

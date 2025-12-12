@@ -7,6 +7,7 @@ import { pubSubService } from '../services/PubSubService';
 import { DEFAULT_CONFIG, SERVER_SDK_ETAG } from '../constants/cacheKeys';
 import { respondWithEtagCache } from '../utils/serverSdkEtagCache';
 import RewardTemplateService from '../services/RewardTemplateService';
+import { EnvironmentRequest } from '../middleware/environmentResolver';
 
 interface ServerReward {
   type: number;
@@ -305,12 +306,13 @@ export class SurveyController {
 
   /**
    * Get survey settings for Server SDK
-   * GET /api/v1/server/surveys/settings
+   * GET /api/v1/server/:env/surveys/settings
    * Returns only the survey configuration settings
    */
-  static getServerSurveySettings = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  static getServerSurveySettings = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
+    const environment = req.environment!;
     await respondWithEtagCache(res, {
-      cacheKey: SERVER_SDK_ETAG.SURVEY_SETTINGS,
+      cacheKey: `${SERVER_SDK_ETAG.SURVEY_SETTINGS}:${environment.id}`,
       ttlMs: DEFAULT_CONFIG.SURVEY_SETTINGS_TTL,
       requestEtag: req.headers['if-none-match'],
       buildPayload: async () => {
@@ -333,12 +335,13 @@ export class SurveyController {
 
   /**
    * Get active surveys for Server SDK
-   * GET /api/v1/server/surveys
+   * GET /api/v1/server/:env/surveys
    * Returns surveys with common settings
    */
-  static getServerSurveys = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  static getServerSurveys = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
+    const environment = req.environment!;
     await respondWithEtagCache(res, {
-      cacheKey: SERVER_SDK_ETAG.SURVEYS,
+      cacheKey: `${SERVER_SDK_ETAG.SURVEYS}:${environment.id}`,
       ttlMs: DEFAULT_CONFIG.SURVEYS_TTL,
       requestEtag: req.headers['if-none-match'],
       buildPayload: async () => {
@@ -346,6 +349,7 @@ export class SurveyController {
           page: 1,
           limit: 1000,
           isActive: true,
+          environmentId: environment.id,
         });
 
         // Get survey configuration
@@ -395,10 +399,10 @@ export class SurveyController {
 
   /**
    * Get survey by ID for Server SDK
-   * GET /api/v1/server/surveys/:id
+   * GET /api/v1/server/:env/surveys/:id
    * Returns survey formatted for Server SDK
    */
-  static getServerSurveyById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  static getServerSurveyById = asyncHandler(async (req: EnvironmentRequest, res: Response) => {
     const { id } = req.params;
 
     if (!id) {

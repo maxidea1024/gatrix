@@ -12,7 +12,7 @@ services:
       MYSQL_USER: ${DB_USER:-gatrix_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
     ports:
-      - "${MYSQL_HOST_PORT:-53306}:3306"
+      - "${MYSQL_HOST_PORT:-43306}:3306"
     volumes:
       - ${DATA_ROOT:-./data}/mysql:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
@@ -33,7 +33,7 @@ services:
     restart: unless-stopped
     command: redis-server /usr/local/etc/redis/redis.conf --appendonly yes
     ports:
-      - "${REDIS_HOST_PORT:-56379}:6379"
+      - "${REDIS_HOST_PORT:-46379}:6379"
     volumes:
       - ${DATA_ROOT:-./data}/redis:/data
       - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
@@ -55,7 +55,7 @@ services:
       - "--mysqld.username=root:${DB_ROOT_PASSWORD:-gatrix_rootpassword}"
       - "--mysqld.address=mysql:3306"
     ports:
-      - "59104:9104"
+      - "49104:9104"
     depends_on:
       mysql:
         condition: service_healthy
@@ -76,7 +76,7 @@ services:
     environment:
       REDIS_ADDR: "redis:6379"
     ports:
-      - "59121:9121"
+      - "49121:9121"
     networks:
       - gatrix-network
 
@@ -119,7 +119,7 @@ services:
       SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-redis}
       ETCD_HOSTS: ${ETCD_HOSTS:-http://etcd:2379}
     ports:
-      - "${BACKEND_PORT:-55000}:5000"
+      - "${BACKEND_PORT:-45000}:5000"
     depends_on:
       mysql:
         condition: service_healthy
@@ -147,8 +147,8 @@ services:
     restart: unless-stopped
     user: "0"  # Run as root to avoid volume permission issues
     ports:
-      - "${CLICKHOUSE_HTTP_PORT:-58123}:8123"
-      - "${CLICKHOUSE_NATIVE_PORT:-59000}:9000"
+      - "${CLICKHOUSE_HTTP_PORT:-48123}:8123"
+      - "${CLICKHOUSE_NATIVE_PORT:-49000}:9000"
     volumes:
       - clickhouse-data:/var/lib/clickhouse
     networks:
@@ -188,7 +188,7 @@ services:
       MONITORING_ENABLED: ${MONITORING_ENABLED:-true}
 
     ports:
-      - "${EVENT_LENS_PORT:-55200}:5200"
+      - "${EVENT_LENS_PORT:-45200}:5200"
     depends_on:
       mysql:
         condition: service_healthy
@@ -196,6 +196,8 @@ services:
         condition: service_healthy
       clickhouse:
         condition: service_healthy
+      chat-server:
+        condition: service_started
     networks:
       - gatrix-network
     volumes:
@@ -293,19 +295,19 @@ services:
       MONITORING_ENABLED: ${CHAT_MONITORING_ENABLED:-true}
       METRICS_PORT: 9090
       # Gatrix Integration
-      GATRIX_API_URL: ${GATRIX_API_URL:-http://backend:55000}
+      GATRIX_API_URL: ${GATRIX_API_URL:-http://backend:45000}
       GATRIX_API_SECRET: ${GATRIX_API_SECRET:-shared-secret-between-servers}
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-info}
     ports:
-      - "${CHAT_PORT:-55100}:5100"
+      - "${CHAT_PORT:-45100}:5100"
     depends_on:
       mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
-      backend:
-        condition: service_healthy
+      frontend:
+        condition: service_started
     networks:
       - gatrix-network
     volumes:
@@ -325,7 +327,7 @@ services:
     restart: unless-stopped
     user: "0"
     ports:
-      - "${LOKI_PORT:-53100}:3100"
+      - "${LOKI_PORT:-43100}:3100"
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
@@ -364,7 +366,7 @@ services:
       PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
       PROM_RETENTION_TIME: ${PROM_RETENTION_TIME:-14d}
     ports:
-      - "${PROMETHEUS_PORT:-59090}:9090"
+      - "${PROMETHEUS_PORT:-49090}:9090"
     volumes:
       - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
       - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro
@@ -397,7 +399,7 @@ services:
       GF_SECURITY_ALLOW_EMBEDDING: "true"
       GF_SECURITY_COOKIE_SAMESITE: "Lax"
     ports:
-      - "${GRAFANA_PORT:-54000}:3000"
+      - "${GRAFANA_PORT:-44000}:3000"
     volumes:
       - ${DATA_ROOT:-./data}/grafana:/var/lib/grafana
       - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
@@ -420,11 +422,12 @@ services:
       VITE_API_URL: /api/v1
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
-      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:54000}
-      VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:53000/bull-board}
+      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:44000}
+      VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:43000/bull-board}
+      VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:1400}
 
     ports:
-      - "${FRONTEND_PORT:-53000}:80"
+      - "${FRONTEND_PORT:-43000}:80"
     depends_on:
       backend:
         condition: service_healthy
@@ -454,17 +457,18 @@ services:
       EDGE_METRICS_PORT: 9400
       # Backend API configuration
       GATRIX_URL: http://backend:5000
-      EDGE_API_TOKEN: ${EDGE_API_TOKEN:-gatrix-unsecured-server-api-token}
+      # Edge bypass token - allows access to all environments and internal APIs
+      EDGE_BYPASS_TOKEN: ${EDGE_BYPASS_TOKEN:-gatrix-edge-internal-bypass-token}
       EDGE_APPLICATION_NAME: ${EDGE_APPLICATION_NAME:-edge-server}
-      # Target environments (comma-separated)
-      EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-}
+      # Target environments - use '*' for all environments (Edge mode)
+      EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-*}
       # Redis for PubSub
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       REDIS_DB: 0
-      # Cache configuration
-      CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-polling}
+      # Cache configuration (event mode uses Redis PubSub for real-time sync)
+      CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-event}
       CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
     ports:
       - "${EDGE_PORT:-1400}:1400"
@@ -474,6 +478,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      event-lens:
+        condition: service_started
     networks:
       - gatrix-network
     volumes:
@@ -505,8 +511,8 @@ services:
       - --initial-cluster-state=new
       - --log-level=info
     ports:
-      - "${ETCD_PORT:-52379}:2379"
-      - "52380:2380"
+      - "${ETCD_PORT:-42379}:2379"
+      - "42380:2380"
     volumes:
       - ${DATA_ROOT:-./data}/etcd:/etcd-data
     networks:

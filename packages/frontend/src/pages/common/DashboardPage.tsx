@@ -1347,6 +1347,7 @@ const DashboardPage: React.FC = () => {
                               </Typography>
                             </Box>
                           }
+                          secondaryTypographyProps={{ component: 'div' }}
                         />
                       </ListItem>
                       {index < recentActivities.length - 1 && <Divider />}
@@ -1431,6 +1432,7 @@ const DashboardPage: React.FC = () => {
                               </Typography>
                             </Box>
                           }
+                          secondaryTypographyProps={{ component: 'div' }}
                         />
                       </ListItem>
                       {index < Math.min(recentCrashEvents.length, 10) - 1 && <Divider />}

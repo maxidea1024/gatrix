@@ -5,6 +5,7 @@ import { GatrixError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { cacheService } from './CacheService';
 import { pubSubService } from './PubSubService';
+import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 const CACHE_PREFIX = 'banners';
 const CACHE_TTL = 300; // 5 minutes
@@ -146,17 +147,17 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (banner.environmentId) {
           const env = await Environment.query().findById(banner.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
-          type: 'banner.updated',
+          type: 'banner.created',
           data: {
             id: banner.bannerId,
-            environmentId: banner.environmentId,
-            environmentName: envName,
+            environment,
+            status: banner.status,
             timestamp: Date.now()
           }
         });
@@ -193,8 +194,8 @@ class BannerService {
 
       const banner = await BannerModel.update(bannerId, input);
 
-      // Invalidate cache
-      await this.invalidateCache();
+      // Invalidate cache (including ETag cache for SDK)
+      await this.invalidateCache(banner.environmentId);
 
       // Notify via PubSub
       await pubSubService.publishNotification({
@@ -205,17 +206,17 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (banner.environmentId) {
           const env = await Environment.query().findById(banner.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
           type: 'banner.updated',
           data: {
             id: banner.bannerId,
-            environmentId: banner.environmentId,
-            environmentName: envName,
+            environment,
+            status: banner.status,
             timestamp: Date.now()
           }
         });
@@ -241,8 +242,8 @@ class BannerService {
 
       await BannerModel.delete(bannerId);
 
-      // Invalidate cache
-      await this.invalidateCache();
+      // Invalidate cache (including ETag cache for SDK)
+      await this.invalidateCache(banner.environmentId);
 
       // Notify via PubSub
       await pubSubService.publishNotification({
@@ -253,17 +254,16 @@ class BannerService {
 
       // Publish SDK Event (Deletion)
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (banner.environmentId) {
           const env = await Environment.query().findById(banner.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
-          type: 'banner.updated',
+          type: 'banner.deleted',
           data: {
             id: bannerId,
-            environmentId: banner.environmentId,
-            environmentName: envName,
+            environment,
             timestamp: Date.now()
           }
         });
@@ -284,8 +284,8 @@ class BannerService {
     try {
       const banner = await BannerModel.updateStatus(bannerId, 'published', updatedBy);
 
-      // Invalidate cache
-      await this.invalidateCache();
+      // Invalidate cache (including ETag cache for SDK)
+      await this.invalidateCache(banner.environmentId);
 
       // Notify via PubSub
       await pubSubService.publishNotification({
@@ -296,17 +296,17 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (banner.environmentId) {
           const env = await Environment.query().findById(banner.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
           type: 'banner.updated',
           data: {
             id: banner.bannerId,
-            environmentId: banner.environmentId,
-            environmentName: envName,
+            environment,
+            status: banner.status,
             timestamp: Date.now()
           }
         });
@@ -328,8 +328,8 @@ class BannerService {
     try {
       const banner = await BannerModel.updateStatus(bannerId, 'archived', updatedBy);
 
-      // Invalidate cache
-      await this.invalidateCache();
+      // Invalidate cache (including ETag cache for SDK)
+      await this.invalidateCache(banner.environmentId);
 
       // Notify via PubSub
       await pubSubService.publishNotification({
@@ -340,17 +340,17 @@ class BannerService {
 
       // Publish SDK Event
       try {
-        let envName: string | undefined;
+        let environment: string | undefined;
         if (banner.environmentId) {
           const env = await Environment.query().findById(banner.environmentId);
-          envName = env?.environmentName;
+          environment = env?.environmentName;
         }
         await pubSubService.publishSDKEvent({
           type: 'banner.updated',
           data: {
             id: banner.bannerId,
-            environmentId: banner.environmentId,
-            environmentName: envName,
+            environment,
+            status: banner.status,
             timestamp: Date.now()
           }
         });
@@ -439,10 +439,19 @@ class BannerService {
   /**
    * Invalidate banner cache
    */
-  static async invalidateCache(): Promise<void> {
+  static async invalidateCache(environmentId?: string): Promise<void> {
     try {
       await cacheService.deleteByPattern(`${CACHE_PREFIX}:*`);
-      logger.info('Banner cache invalidated');
+
+      // Also invalidate ETag cache for SDK
+      if (environmentId) {
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.BANNERS}:${environmentId}`);
+      } else {
+        // Invalidate all banner ETag caches
+        await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.BANNERS}:*`);
+      }
+
+      logger.info('Banner cache invalidated', { environmentId });
     } catch (error) {
       logger.error('Failed to invalidate banner cache', { error });
     }
