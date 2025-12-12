@@ -324,8 +324,8 @@ Response 예시
     "userUsedCount": 2,
     "sequence": 2,
     "usedAt": "2025-10-27T12:34:56.000Z",
-    "rewardEmailTitle": "축하합니다! 쿠폰 보상을 받으셨습니다.",
-    "rewardEmailBody": "축하합니다! 쿠폰을 사용하여 보상을 받으셨습니다. 게임에서 확인해주세요."
+    "rewardMailTitle": "축하합니다! 쿠폰 보상을 받으셨습니다.",
+    "rewardMailContent": "축하합니다! 쿠폰을 사용하여 보상을 받으셨습니다. 게임에서 확인해주세요."
   }
 }
 ```

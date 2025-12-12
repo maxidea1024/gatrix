@@ -8,6 +8,7 @@ import { PlanningDataService } from './PlanningDataService';
 import { CmsCashShopProduct } from './CmsCashShopService';
 import { pubSubService } from './PubSubService';
 import { Environment } from '../models/Environment';
+import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 export interface StoreProduct {
   id: string;
@@ -293,9 +294,13 @@ class StoreProductService {
 
       const product = await this.getStoreProductById(id, envId);
 
-      // Publish SDK event
+      // Invalidate ETag cache and publish SDK event
       try {
         const env = await Environment.query().findById(envId);
+
+        // Invalidate ETag cache so SDK fetches fresh data
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${envId}`);
+
         await pubSubService.publishSDKEvent({
           type: 'store_product.created',
           data: {
@@ -394,9 +399,13 @@ class StoreProductService {
 
       const product = await this.getStoreProductById(id, envId);
 
-      // Publish SDK event
+      // Invalidate ETag cache and publish SDK event
       try {
         const env = await Environment.query().findById(envId);
+
+        // Invalidate ETag cache so SDK fetches fresh data
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${envId}`);
+
         await pubSubService.publishSDKEvent({
           type: 'store_product.updated',
           data: {
@@ -441,9 +450,13 @@ class StoreProductService {
         throw new GatrixError('Store product not found', 404);
       }
 
-      // Publish SDK event
+      // Invalidate ETag cache and publish SDK event
       try {
         const env = await Environment.query().findById(envId);
+
+        // Invalidate ETag cache so SDK fetches fresh data
+        await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${envId}`);
+
         await pubSubService.publishSDKEvent({
           type: 'store_product.deleted',
           data: {
@@ -483,10 +496,14 @@ class StoreProductService {
         [...ids, envId]
       );
 
-      // Publish SDK events for each deleted product
+      // Invalidate ETag cache and publish SDK events for each deleted product
       if (result.affectedRows > 0) {
         try {
           const env = await Environment.query().findById(envId);
+
+          // Invalidate ETag cache so SDK fetches fresh data
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${envId}`);
+
           for (const id of ids) {
             await pubSubService.publishSDKEvent({
               type: 'store_product.deleted',
@@ -532,10 +549,14 @@ class StoreProductService {
         [isActive ? 1 : 0, updatedBy || null, ...ids, envId]
       );
 
-      // Publish SDK events for each updated product
+      // Invalidate ETag cache and publish SDK events for each updated product
       if (result.affectedRows > 0) {
         try {
           const env = await Environment.query().findById(envId);
+
+          // Invalidate ETag cache so SDK fetches fresh data
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${envId}`);
+
           for (const id of ids) {
             await pubSubService.publishSDKEvent({
               type: 'store_product.updated',

@@ -5,7 +5,7 @@
 
 import { Logger } from './utils/logger';
 import { ErrorCode, createError } from './utils/errors';
-import { GatrixSDKConfig } from './types/config';
+import { GatrixSDKConfig, GatrixSDKInitOptions } from './types/config';
 import { ApiClient } from './client/ApiClient';
 import { CouponService } from './services/CouponService';
 import { GameWorldService } from './services/GameWorldService';
@@ -14,6 +14,7 @@ import { SurveyService } from './services/SurveyService';
 import { WhitelistService } from './services/WhitelistService';
 import { ServiceMaintenanceService } from './services/ServiceMaintenanceService';
 import { ServiceDiscoveryService } from './services/ServiceDiscoveryService';
+import { StoreProductService } from './services/StoreProductService';
 import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
 import { EventCallback, SdkEvent } from './types/events';
@@ -56,6 +57,7 @@ export class GatrixServerSDK {
   public readonly whitelist: WhitelistService;
   public readonly serviceMaintenance: ServiceMaintenanceService;
   public readonly serviceDiscovery: ServiceDiscoveryService;
+  public readonly storeProduct: StoreProductService;
 
   // Cache and Events
   private cacheManager?: CacheManager;
@@ -63,6 +65,89 @@ export class GatrixServerSDK {
   private metrics?: SdkMetrics;
   // Maintenance event listeners (separate from standard event listeners)
   private maintenanceEventListeners: Map<string, EventCallback[]> = new Map();
+
+  /**
+   * Create SDK instance with optional overrides
+   * Merges override options with base config, allowing per-program customization.
+   *
+   * @param baseConfig - Base SDK configuration (shared across programs)
+   * @param overrides - Optional overrides for specific program/service
+   * @returns New GatrixServerSDK instance with merged configuration
+   *
+   * @example
+   * ```typescript
+   * // Base config from config file
+   * const baseConfig: GatrixSDKConfig = {
+   *   gatrixUrl: 'https://api.gatrix.com',
+   *   apiToken: 'my-token',
+   *   applicationName: 'my-game',
+   *   service: 'default-service',
+   *   group: 'default-group',
+   *   environment: 'production',
+   * };
+   *
+   * // Create instance with overrides for billing worker
+   * const sdk = GatrixServerSDK.createInstance(baseConfig, {
+   *   service: 'billing-worker',
+   *   group: 'payment',
+   *   region: 'kr',
+   *   logger: { level: 'debug' },
+   * });
+   * ```
+   */
+  static createInstance(baseConfig: GatrixSDKConfig, overrides?: GatrixSDKInitOptions): GatrixServerSDK {
+    const mergedConfig = GatrixServerSDK.mergeConfig(baseConfig, overrides);
+    return new GatrixServerSDK(mergedConfig);
+  }
+
+  /**
+   * Merge base config with override options
+   * Deep merges nested objects (redis, cache, logger, retry, metrics, features).
+   *
+   * @param baseConfig - Base SDK configuration
+   * @param overrides - Optional overrides
+   * @returns Merged configuration
+   */
+  static mergeConfig(baseConfig: GatrixSDKConfig, overrides?: GatrixSDKInitOptions): GatrixSDKConfig {
+    if (!overrides) {
+      return { ...baseConfig };
+    }
+
+    const merged: GatrixSDKConfig = { ...baseConfig };
+
+    // Override simple fields if provided
+    if (overrides.service !== undefined) merged.service = overrides.service;
+    if (overrides.group !== undefined) merged.group = overrides.group;
+    if (overrides.environment !== undefined) merged.environment = overrides.environment;
+    if (overrides.region !== undefined) merged.region = overrides.region;
+    if (overrides.gatrixUrl !== undefined) merged.gatrixUrl = overrides.gatrixUrl;
+    if (overrides.apiToken !== undefined) merged.apiToken = overrides.apiToken;
+    if (overrides.applicationName !== undefined) merged.applicationName = overrides.applicationName;
+    if (overrides.worldId !== undefined) merged.worldId = overrides.worldId;
+    if (overrides.environments !== undefined) merged.environments = overrides.environments;
+
+    // Deep merge nested objects
+    if (overrides.redis) {
+      merged.redis = { ...baseConfig.redis, ...overrides.redis } as typeof baseConfig.redis;
+    }
+    if (overrides.cache) {
+      merged.cache = { ...baseConfig.cache, ...overrides.cache };
+    }
+    if (overrides.logger) {
+      merged.logger = { ...baseConfig.logger, ...overrides.logger };
+    }
+    if (overrides.retry) {
+      merged.retry = { ...baseConfig.retry, ...overrides.retry };
+    }
+    if (overrides.metrics) {
+      merged.metrics = { ...baseConfig.metrics, ...overrides.metrics };
+    }
+    if (overrides.features) {
+      merged.features = { ...baseConfig.features, ...overrides.features };
+    }
+
+    return merged;
+  }
 
   constructor(config: GatrixSDKConfig) {
     // Set default API token if not provided (for testing)
@@ -109,6 +194,7 @@ export class GatrixServerSDK {
     this.whitelist = new WhitelistService(this.apiClient, this.logger, defaultEnv);
     this.serviceMaintenance = new ServiceMaintenanceService(this.apiClient, this.logger, defaultEnv);
     this.serviceDiscovery = new ServiceDiscoveryService(this.apiClient, this.logger);
+    this.storeProduct = new StoreProductService(this.apiClient, this.logger, defaultEnv);
 
     this.logger.info('GatrixServerSDK created', {
       gatrixUrl: configWithDefaults.gatrixUrl,
@@ -233,7 +319,11 @@ export class GatrixServerSDK {
         this.metrics,
         this.config.worldId, // Pass worldId for maintenance watcher
         this.config.features, // Pass features config for conditional loading
-        this.config.environments // Pass target environments for Edge mode
+        this.config.environments, // Pass target environments for Edge mode
+        undefined, // clientVersionService
+        undefined, // serviceNoticeService
+        undefined, // bannerService
+        this.storeProduct // storeProductService
       );
 
       // Register maintenance state change listener to emit SDK events
@@ -594,6 +684,43 @@ export class GatrixServerSDK {
     environment?: string;
   }): PopupNotice[] {
     return this.popupNotice.getActivePopupNotices(options);
+  }
+
+  // ============================================================================
+  // Store Product Methods
+  // ============================================================================
+
+  /**
+   * Fetch all store products
+   * @param environment Environment name
+   */
+  async fetchStoreProducts(environment?: string): Promise<StoreProduct[]> {
+    if (environment) {
+      return await this.storeProduct.listByEnvironment(environment);
+    }
+    return await this.storeProduct.list();
+  }
+
+  /**
+   * Get cached store products
+   * @param environment Environment name
+   */
+  getStoreProducts(environment?: string): StoreProduct[] {
+    return this.storeProduct.getCached(environment);
+  }
+
+  /**
+   * Get active store products (filtered by time and status)
+   */
+  getActiveStoreProducts(environment?: string): StoreProduct[] {
+    return this.storeProduct.getActive(environment);
+  }
+
+  /**
+   * Get store product by ID
+   */
+  async getStoreProductById(id: string, environment?: string): Promise<StoreProduct> {
+    return await this.storeProduct.getById(id, environment);
   }
 
   // ============================================================================
@@ -1095,31 +1222,7 @@ export class GatrixServerSDK {
     return this.cacheManager?.getBannerService();
   }
 
-  // ============================================================================
-  // Store Product Methods
-  // ============================================================================
 
-  /**
-   * Get cached store products
-   * Only available when features.storeProduct is enabled
-   * @param environment Environment name. Only used in multi-environment mode.
-   *                    For game servers, can be omitted to use default environment.
-   */
-  getStoreProducts(environment?: string): StoreProduct[] {
-    if (!this.cacheManager) {
-      this.logger.warn('SDK not initialized');
-      return [];
-    }
-    return this.cacheManager.getStoreProducts(environment);
-  }
-
-  /**
-   * Get StoreProductService for advanced operations
-   * Returns undefined if features.storeProduct is not enabled
-   */
-  getStoreProductService() {
-    return this.cacheManager?.getStoreProductService();
-  }
 
   /**
    * Get all cached data (for debugging/monitoring)

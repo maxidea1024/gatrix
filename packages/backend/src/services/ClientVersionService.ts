@@ -283,13 +283,13 @@ export class ClientVersionService {
   static async createClientVersion(
     data: ClientVersionCreationAttributes
   ): Promise<ClientVersionAttributes> {
-    // Validate that the new version is greater than the latest version for this platform
-    const latestVersion = await this.findLatestByPlatform(data.platform);
-    if (latestVersion && compareSemver(data.clientVersion, latestVersion.clientVersion) <= 0) {
-      throw new Error(
-        `VERSION_TOO_OLD:${latestVersion.clientVersion}` // Error code format for i18n
-      );
-    }
+    // [DISABLED] Validate that the new version is greater than the latest version for this platform
+    // const latestVersion = await this.findLatestByPlatform(data.platform);
+    // if (latestVersion && compareSemver(data.clientVersion, latestVersion.clientVersion) <= 0) {
+    //   throw new Error(
+    //     `VERSION_TOO_OLD:${latestVersion.clientVersion}` // Error code format for i18n
+    //   );
+    // }
 
     const result = await ClientVersionModel.create(data);
 
@@ -325,20 +325,20 @@ export class ClientVersionService {
   static async bulkCreateClientVersions(
     data: any
   ): Promise<ClientVersionAttributes[]> {
-    // Version validation for each platform
-    const versionErrors: string[] = [];
-    for (const platform of data.platforms) {
-      const latestVersion = await this.findLatestByPlatform(platform.platform);
-      if (latestVersion && compareSemver(data.clientVersion, latestVersion.clientVersion) <= 0) {
-        versionErrors.push(`${platform.platform}: ${latestVersion.clientVersion}`);
-      }
-    }
-
-    if (versionErrors.length > 0) {
-      throw new Error(
-        `VERSION_TOO_OLD_BULK:${versionErrors.join(', ')}` // Error code format for i18n
-      );
-    }
+    // [DISABLED] Version validation for each platform
+    // const versionErrors: string[] = [];
+    // for (const platform of data.platforms) {
+    //   const latestVersion = await this.findLatestByPlatform(platform.platform);
+    //   if (latestVersion && compareSemver(data.clientVersion, latestVersion.clientVersion) <= 0) {
+    //     versionErrors.push(`${platform.platform}: ${latestVersion.clientVersion}`);
+    //   }
+    // }
+    //
+    // if (versionErrors.length > 0) {
+    //   throw new Error(
+    //     `VERSION_TOO_OLD_BULK:${versionErrors.join(', ')}` // Error code format for i18n
+    //   );
+    // }
 
     // 중복 체크
     const duplicates = [];
@@ -421,6 +421,11 @@ export class ClientVersionService {
 
     const updatedClientVersion = await this.getClientVersionById(id);
 
+    // Invalidate ETag cache for SDK
+    if (updatedClientVersion?.environmentId) {
+      await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${updatedClientVersion.environmentId}`);
+    }
+
     // Publish event
     if (updatedClientVersion) {
       try {
@@ -457,8 +462,9 @@ export class ClientVersionService {
         data: { id, timestamp: Date.now() }
       });
 
-      // Invalidate client version cache
+      // Invalidate client version cache (including ETag cache - all environments for deletion)
       await pubSubService.invalidateByPattern('client_version:.*');
+      await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
     }
 
     return deletedRowsCount > 0;
@@ -474,8 +480,9 @@ export class ClientVersionService {
         data: { timestamp: Date.now() }
       });
 
-      // Invalidate client version cache
+      // Invalidate client version cache (including ETag cache - all environments for bulk op)
       await pubSubService.invalidateByPattern('client_version:.*');
+      await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
     }
 
     return result;

@@ -56,11 +56,13 @@ import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/Colu
 import { formatDateTime } from '../../utils/dateFormat';
 import { useDebounce } from '../../hooks/useDebounce';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 
 const ServiceNoticesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
+  const { currentEnvironment } = useEnvironment();
   const canManage = hasPermission([PERMISSIONS.SERVICE_NOTICES_MANAGE]);
 
   // State
@@ -381,7 +383,8 @@ const ServiceNoticesPage: React.FC = () => {
   // Get Edge server URL for webview pages
   const getEdgeWebviewUrl = () => {
     const edgeUrl = import.meta.env.VITE_EDGE_URL || 'http://localhost:1400';
-    return `${edgeUrl}/game-service-notices.html`;
+    const envName = currentEnvironment?.environmentName || 'development';
+    return `${edgeUrl}/game-service-notices.html?environment=${encodeURIComponent(envName)}`;
   };
 
   const handleOpenWebviewPreview = () => {

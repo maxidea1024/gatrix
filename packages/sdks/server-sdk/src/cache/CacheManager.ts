@@ -63,7 +63,8 @@ export class CacheManager {
     // New services for Edge (created internally if enabled)
     clientVersionService?: ClientVersionService,
     serviceNoticeService?: ServiceNoticeService,
-    bannerService?: BannerService
+    bannerService?: BannerService,
+    storeProductService?: StoreProductService
   ) {
     this.config = {
       enabled: config.enabled !== false,
@@ -92,7 +93,7 @@ export class CacheManager {
       this.bannerService = bannerService || new BannerService(apiClient, logger, defaultEnv);
     }
     if (this.features.storeProduct === true) {
-      this.storeProductService = new StoreProductService(apiClient, logger, defaultEnv);
+      this.storeProductService = storeProductService || new StoreProductService(apiClient, logger, defaultEnv);
     }
 
     // Store environments for multi-environment mode
@@ -598,7 +599,7 @@ export class CacheManager {
         this.metrics?.incRefresh('all');
         this.metrics?.observeRefresh('all', duration);
         this.metrics?.setLastRefresh('all');
-      } catch (_) {}
+      } catch (_) { }
 
       this.logger.info('All caches refreshed successfully', { types: refreshedTypes });
 
@@ -616,7 +617,7 @@ export class CacheManager {
       }
     } catch (error: any) {
       this.logger.error('Failed to refresh caches', { error: error.message });
-      try { this.metrics?.incError('cache', 'refreshAll'); } catch (_) {}
+      try { this.metrics?.incError('cache', 'refreshAll'); } catch (_) { }
       throw error;
     }
   }
@@ -633,7 +634,7 @@ export class CacheManager {
       this.metrics?.incRefresh('gameworlds');
       this.metrics?.observeRefresh('gameworlds', duration);
       this.metrics?.setLastRefresh('gameworlds');
-    } catch (_) {}
+    } catch (_) { }
     // Check maintenance state changes after refresh
     this.checkMaintenanceStateChanges();
   }
@@ -649,7 +650,7 @@ export class CacheManager {
       this.metrics?.incRefresh('popups');
       this.metrics?.observeRefresh('popups', duration);
       this.metrics?.setLastRefresh('popups');
-    } catch (_) {}
+    } catch (_) { }
   }
 
   /**
@@ -663,7 +664,7 @@ export class CacheManager {
       this.metrics?.incRefresh('surveys');
       this.metrics?.observeRefresh('surveys', duration);
       this.metrics?.setLastRefresh('surveys');
-    } catch (_) {}
+    } catch (_) { }
   }
 
   /**
@@ -774,7 +775,7 @@ export class CacheManager {
       this.metrics?.incRefresh('whitelists');
       this.metrics?.observeRefresh('whitelists', duration);
       this.metrics?.setLastRefresh('whitelists');
-    } catch (_) {}
+    } catch (_) { }
   }
 
   /**
@@ -799,7 +800,7 @@ export class CacheManager {
         this.metrics?.incRefresh('serviceMaintenance');
         this.metrics?.observeRefresh('serviceMaintenance', duration);
         this.metrics?.setLastRefresh('serviceMaintenance');
-      } catch (_) {}
+      } catch (_) { }
     } catch (error: any) {
       this.logger.warn('Failed to refresh service maintenance status', { error: error.message });
     }

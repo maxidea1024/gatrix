@@ -83,6 +83,9 @@ export class BannerService extends BaseEnvironmentService<Banner, BannerListResp
       // Add small delay to ensure backend transaction is committed
       await new Promise(resolve => setTimeout(resolve, 100));
 
+      // Invalidate ETag cache before fetching to ensure fresh data
+      this.apiClient.invalidateEtagCache(`/banners/${bannerId}`);
+
       // Fetch the updated banner from backend
       const updatedBanner = await this.fetchById(bannerId, environment);
       this.updateItemInCache(updatedBanner, environment);

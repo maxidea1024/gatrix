@@ -83,6 +83,9 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
       // Add small delay to ensure backend transaction is committed
       await new Promise(resolve => setTimeout(resolve, 100));
 
+      // Invalidate ETag cache before fetching to ensure fresh data
+      this.apiClient.invalidateEtagCache(`/store-products/${id}`);
+
       // Fetch the updated product from backend
       const updatedProduct = await this.getById(id, environment);
       this.updateItemInCache(updatedProduct, environment);

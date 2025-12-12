@@ -35,7 +35,7 @@ services:
     # Used for detecting TTL expiration of service stat keys
     command: redis-server --appendonly yes --notify-keyspace-events Ex
     ports:
-      - "0.0.0.0:${REDIS_HOST_PORT:-56379}:6379"
+      - "0.0.0.0:${REDIS_HOST_PORT:-46379}:6379"
     volumes:
       - ${DATA_ROOT:-./data}/redis:/data
     networks:
@@ -56,7 +56,7 @@ services:
       - "--mysqld.username=root:${DB_ROOT_PASSWORD:-gatrix_rootpassword}"
       - "--mysqld.address=mysql:3306"
     ports:
-      - "0.0.0.0:59104:9104"
+      - "0.0.0.0:49104:9104"
     depends_on:
       mysql:
         condition: service_healthy
@@ -77,7 +77,7 @@ services:
     environment:
       REDIS_ADDR: "redis:6379"
     ports:
-      - "0.0.0.0:59121:9121"
+      - "0.0.0.0:49121:9121"
     networks:
       - gatrix-dev-network
 
@@ -128,8 +128,8 @@ services:
       SERVICE_DISCOVERY_TERMINATED_MARKER_TTL: ${SERVICE_DISCOVERY_TERMINATED_MARKER_TTL:-300}
       ETCD_HOSTS: http://etcd:2379
     ports:
-      - "0.0.0.0:${BACKEND_PORT:-55000}:5000"
-      - "0.0.0.0:59229:9229" # Debug port
+      - "0.0.0.0:${BACKEND_PORT:-45000}:5000"
+      - "0.0.0.0:49229:9229" # Debug port
     depends_on:
       mysql:
         condition: service_healthy
@@ -159,14 +159,15 @@ services:
       VITE_API_URL: ${VITE_API_URL:-/api/v1}
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
-      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:54000}
-      VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:53000/bull-board}
+      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:44000}
+      VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:43500/bull-board}
       VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:1400}
 
     ports:
-      - "0.0.0.0:${FRONTEND_PORT:-53000}:3000"
+      - "0.0.0.0:${FRONTEND_PORT:-43500}:3000"
     depends_on:
-      - backend-dev
+      backend-dev:
+        condition: service_healthy
     networks:
       - gatrix-dev-network
     volumes:
@@ -198,8 +199,8 @@ services:
     # Ports removed - etcd only needs to be accessible within Docker network
     # If you need external access, uncomment and use non-conflicting ports:
     # ports:
-    #   - "127.0.0.1:${ETCD_CLIENT_PORT:-52379}:2379"
-    #   - "127.0.0.1:${ETCD_PEER_PORT:-52380}:2380"
+    #   - "127.0.0.1:${ETCD_CLIENT_PORT:-42379}:2379"
+    #   - "127.0.0.1:${ETCD_PEER_PORT:-42380}:2380"
     volumes:
       - ${DATA_ROOT:-./data}/etcd:/etcd-data
     networks:
@@ -219,8 +220,8 @@ services:
     container_name: gatrix-clickhouse-dev
     restart: unless-stopped
     ports:
-      - "0.0.0.0:${CLICKHOUSE_HTTP_PORT:-58123}:8123"
-      - "0.0.0.0:${CLICKHOUSE_NATIVE_PORT:-59000}:9000"
+      - "0.0.0.0:${CLICKHOUSE_HTTP_PORT:-48123}:8123"
+      - "0.0.0.0:${CLICKHOUSE_NATIVE_PORT:-49000}:9000"
     volumes:
       - clickhouse-data:/var/lib/clickhouse
     networks:
@@ -277,7 +278,7 @@ services:
       WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-10}
 
     ports:
-      - "0.0.0.0:${EVENT_LENS_PORT:-55200}:5200"
+      - "0.0.0.0:${EVENT_LENS_PORT:-45200}:5200"
     depends_on:
       backend-dev:
         condition: service_healthy
@@ -286,6 +287,8 @@ services:
       redis:
         condition: service_started
       clickhouse:
+        condition: service_started
+      chat-server-dev:
         condition: service_started
     networks:
       gatrix-dev-network:
@@ -400,13 +403,13 @@ services:
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-debug}
     ports:
-      - "0.0.0.0:${CHAT_PORT:-55100}:5100"
+      - "0.0.0.0:${CHAT_PORT:-45100}:5100"
     depends_on:
       mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
-      backend-dev:
+      frontend-dev:
         condition: service_started
     networks:
       gatrix-dev-network:
@@ -456,6 +459,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      event-lens-dev:
+        condition: service_started
     networks:
       gatrix-dev-network:
         aliases:
@@ -479,7 +484,7 @@ services:
     restart: unless-stopped
     user: "0"
     ports:
-      - "0.0.0.0:${LOKI_PORT:-53100}:3100"
+      - "0.0.0.0:${LOKI_PORT:-43100}:3100"
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
@@ -517,7 +522,7 @@ services:
       PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
       PROM_RETENTION_TIME: ${PROM_RETENTION_TIME:-14d}
     ports:
-      - "0.0.0.0:${PROMETHEUS_PORT:-59090}:9090"
+      - "0.0.0.0:${PROMETHEUS_PORT:-49090}:9090"
     volumes:
       - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
       - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro
@@ -549,7 +554,7 @@ services:
       GF_SECURITY_ALLOW_EMBEDDING: "true"
       GF_SECURITY_COOKIE_SAMESITE: "Lax"
     ports:
-      - "0.0.0.0:${GRAFANA_PORT:-54000}:3000"
+      - "0.0.0.0:${GRAFANA_PORT:-44000}:3000"
     volumes:
       - ${DATA_ROOT:-./data}/grafana:/var/lib/grafana
       - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro

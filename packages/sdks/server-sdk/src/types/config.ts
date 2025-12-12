@@ -84,6 +84,9 @@ export interface GatrixSDKConfig {
   group: string; // Service group for categorization (e.g., 'kr', 'us', 'production'). Used in metrics labels and service discovery.
   environment: string; // Environment identifier (e.g., 'env_prod', 'env_staging'). Used in metrics labels and service discovery.
 
+  // Optional - Region for geographic identification
+  region?: string; // Region identifier (e.g., 'kr', 'us', 'eu', 'asia'). Used in metrics labels and service discovery.
+
   // Optional - World ID for world-specific maintenance checks
   worldId?: string; // Game world ID (e.g., 'world-1', 'asia-1'). Required for isMaintenance() to check world-level maintenance.
 
@@ -114,5 +117,48 @@ export interface GatrixSDKConfig {
   //   - undefined or []: Single-environment mode - use current environment only
   // Example: '*' or ['development', 'production'] or ['env_prod', 'env_staging']
   environments?: string[] | '*';
+}
+
+/**
+ * SDK Initialization Override Options
+ * Use this to override config values when creating SDK instances per-program/service.
+ * All fields are optional - unspecified fields use values from the base GatrixSDKConfig.
+ *
+ * @example
+ * ```typescript
+ * // Base config (shared across programs)
+ * const baseConfig: GatrixSDKConfig = { ... };
+ *
+ * // Create instance with overrides for specific program
+ * const sdk = GatrixServerSDK.createInstance(baseConfig, {
+ *   service: 'billing-worker',
+ *   group: 'payment',
+ *   region: 'kr',
+ *   worldId: 'world-1',
+ *   logger: { level: 'debug' },
+ * });
+ * ```
+ */
+export interface GatrixSDKInitOptions {
+  // Core identification overrides
+  service?: string; // Override service name
+  group?: string; // Override service group
+  environment?: string; // Override environment identifier
+  region?: string; // Override region identifier
+
+  // Optional overrides
+  gatrixUrl?: string; // Override Gatrix backend URL
+  apiToken?: string; // Override API token
+  applicationName?: string; // Override application name
+  worldId?: string; // Override world ID
+
+  // Configuration overrides (deep merged)
+  redis?: Partial<RedisConfig>; // Override Redis config
+  cache?: Partial<CacheConfig>; // Override cache settings
+  logger?: Partial<LoggerConfig>; // Override logger settings
+  retry?: Partial<RetryConfig>; // Override retry settings
+  metrics?: Partial<MetricsConfig>; // Override metrics settings
+  features?: Partial<FeaturesConfig>; // Override feature toggles
+  environments?: string[] | '*'; // Override target environments
 }
 

@@ -164,6 +164,93 @@ const sdk = new GatrixServerSDK({
 });
 ```
 
+### Creating Instance with Overrides
+
+When you have a shared base configuration but need to customize certain fields per program/service, use `createInstance`:
+
+```typescript
+import { GatrixServerSDK, GatrixSDKConfig, GatrixSDKInitOptions } from '@gatrix/server-sdk';
+
+// Base config (shared across programs, typically from config file)
+const baseConfig: GatrixSDKConfig = {
+  gatrixUrl: 'https://api.gatrix.com',
+  apiToken: 'your-server-api-token',
+  applicationName: 'my-game',
+  service: 'default-service',
+  group: 'default-group',
+  environment: 'production',
+  redis: {
+    host: 'localhost',
+    port: 6379,
+  },
+  cache: {
+    enabled: true,
+    refreshMethod: 'event',
+  },
+};
+
+// Create instance with overrides for billing worker
+const billingSDK = GatrixServerSDK.createInstance(baseConfig, {
+  service: 'billing-worker',
+  group: 'payment',
+  region: 'kr',
+  logger: { level: 'debug' },
+});
+
+// Create instance with overrides for world server
+const worldSDK = GatrixServerSDK.createInstance(baseConfig, {
+  service: 'worldd',
+  group: 'kr-1',
+  worldId: 'world-1',
+  metrics: { enabled: true, port: 9338 },
+});
+
+// Create instance with overrides for auth server
+const authSDK = GatrixServerSDK.createInstance(baseConfig, {
+  service: 'authd',
+  group: 'global',
+  environment: 'staging', // Override environment
+  cache: { ttl: 60 }, // Override cache TTL
+});
+```
+
+#### Override Options
+
+All fields in `GatrixSDKInitOptions` are optional. Unspecified fields use values from the base config.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `service` | string | Override service name |
+| `group` | string | Override service group |
+| `environment` | string | Override environment identifier |
+| `region` | string | Override region identifier |
+| `gatrixUrl` | string | Override Gatrix backend URL |
+| `apiToken` | string | Override API token |
+| `applicationName` | string | Override application name |
+| `worldId` | string | Override world ID |
+| `redis` | Partial\<RedisConfig\> | Override Redis config (deep merged) |
+| `cache` | Partial\<CacheConfig\> | Override cache settings (deep merged) |
+| `logger` | Partial\<LoggerConfig\> | Override logger settings (deep merged) |
+| `retry` | Partial\<RetryConfig\> | Override retry settings (deep merged) |
+| `metrics` | Partial\<MetricsConfig\> | Override metrics settings (deep merged) |
+| `features` | Partial\<FeaturesConfig\> | Override feature toggles (deep merged) |
+| `environments` | string[] \| '*' | Override target environments |
+
+#### Using mergeConfig Directly
+
+You can also use `mergeConfig` to create a merged configuration without instantiating:
+
+```typescript
+// Merge configs without creating instance
+const mergedConfig = GatrixServerSDK.mergeConfig(baseConfig, {
+  service: 'custom-service',
+  logger: { level: 'warn' },
+});
+
+// Use merged config later
+const sdk = new GatrixServerSDK(mergedConfig);
+```
+
 ### Required Configuration Fields
 
 | Field | Type | Description | Example |
@@ -174,6 +261,7 @@ const sdk = new GatrixServerSDK({
 | `service` | string | Service name for identification | `auth`, `lobby`, `world`, `chat` |
 | `group` | string | Service group for categorization | `kr`, `us`, `production` |
 | `environment` | string or `'*'` | Environment identifier or `'*'` for multi-env mode | `env_prod`, `env_staging`, `*` |
+| `region` | string | (Optional) Region identifier for geographic identification | `kr`, `us`, `eu`, `asia` |
 
 These required fields (`service`, `group`, `environment`) are used consistently across:
 - **Metrics labels**: All SDK metrics include these as default labels for filtering in Grafana

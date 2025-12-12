@@ -248,7 +248,7 @@ export class ServiceDiscoveryService {
       throw new Error(errorMessage);
     }
 
-    this.logger.info('Service status updated via API', {
+    this.logger.debug('Service status updated via API', {
       instanceId: this.instanceId,
       labels: this.labels,
       status: input.status,

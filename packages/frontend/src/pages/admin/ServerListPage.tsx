@@ -165,6 +165,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
   const getNodeColor = (status: string) => {
     switch (status) {
       case 'ready': return '#4caf50';
+      case 'initializing': return '#ffc107'; // Yellow for initializing
       case 'busy': return '#ff9800';
       case 'full': return '#f44336';
       case 'starting': return '#2196f3';

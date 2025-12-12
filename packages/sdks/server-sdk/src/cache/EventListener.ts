@@ -363,12 +363,18 @@ export class EventListener {
           this.logger.debug('Client version event ignored - feature is disabled', { event: event.type });
           break;
         }
+        const cvEnvironment = event.data.environment as string;
         this.logger.info('Client version updated event received, refreshing client version cache', {
           id: event.data.id,
-          environment: event.data.environment
+          environment: cvEnvironment
         });
         try {
-          await this.cacheManager.getClientVersionService()?.refresh();
+          // Use refreshByEnvironment to refresh the specific environment's cache
+          if (cvEnvironment) {
+            await this.cacheManager.getClientVersionService()?.refreshByEnvironment(cvEnvironment);
+          } else {
+            await this.cacheManager.getClientVersionService()?.refresh();
+          }
           this.logger.info('Client version cache refreshed successfully');
         } catch (error: any) {
           this.logger.error('Failed to refresh client version cache', { error: error.message });
