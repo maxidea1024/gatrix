@@ -1666,6 +1666,13 @@ const ServerListPage: React.FC = () => {
   const handleBulkHealthCheckStart = async () => {
     setBulkHealthCheckRunning(true);
 
+    // Reset selected items to 'pending' status first (for re-checking)
+    setBulkHealthCheckResults(prev => prev.map(item =>
+      bulkHealthCheckSelected.has(item.serviceKey)
+        ? { ...item, status: 'pending' as const, latency: undefined, error: undefined }
+        : item
+    ));
+
     // Get only selected items to check
     const selectedItems = bulkHealthCheckResults
       .map((item, idx) => ({ item, idx }))

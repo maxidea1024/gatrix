@@ -379,7 +379,7 @@ const EnvironmentsPage: React.FC = () => {
                           size="small"
                           onClick={() => {
                             navigator.clipboard.writeText(env.environmentName);
-                            enqueueSnackbar(t('common.copied'), { variant: 'success' });
+                            enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
                           }}
                           sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
                         >
