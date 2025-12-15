@@ -12,7 +12,7 @@ async function main() {
   logger.info('Starting Maintenance Watcher Test...');
 
   const sdk = new GatrixServerSDK({
-    gatrixUrl: process.env.GATRIX_URL || 'http://localhost:55000',
+    gatrixUrl: process.env.GATRIX_URL || 'http://localhost:45000',
     apiToken: process.env.API_TOKEN || 'gatrix-unsecured-server-api-token',
     applicationName: 'maintenance-test',
 
@@ -21,7 +21,7 @@ async function main() {
     // Redis for events
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '56379'),
+      port: parseInt(process.env.REDIS_PORT || '46379'),
     },
 
     // Cache configuration - event method for real-time updates

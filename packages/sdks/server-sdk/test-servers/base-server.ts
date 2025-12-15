@@ -34,7 +34,7 @@ export class BaseTestServer {
 
     // Create SDK instance
     this.sdk = new GatrixServerSDK({
-      gatrixUrl: process.env.GATRIX_URL || 'http://localhost:55000',
+      gatrixUrl: process.env.GATRIX_URL || 'http://localhost:45000',
       apiToken: process.env.API_TOKEN || 'gatrix-unsecured-server-api-token',
       applicationName: config.serviceType,
 

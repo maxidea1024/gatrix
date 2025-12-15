@@ -19,22 +19,24 @@ async function main() {
 
   // Determine target environment from environment variable
   const targetEnvironment = process.env.ENVIRONMENT || 'development';
+  // Use '*' for wildcard mode (all environments) or specific environment
+  const environments = process.env.ENVIRONMENTS || '*';
 
   // SDK will provide its Registry for HTTP metrics to merge into
   const sdk = new GatrixServerSDK({
-    gatrixUrl: process.env.GATRIX_URL || 'http://localhost:55000',
+    gatrixUrl: process.env.GATRIX_URL || 'http://localhost:45000',
     apiToken: process.env.API_TOKEN || 'gatrix-unsecured-server-api-token',
     applicationName: 'idle',
     service: 'idle', // Required: service name for identification
     group: process.env.SERVICE_GROUP || 'development', // Required: service group
-    environment: targetEnvironment, // Required: environment
-    // Use multi-environment mode with specific environment for proper environment-based API calls
-    environments: [targetEnvironment],
+    environment: targetEnvironment, // Required: environment (for metrics/service discovery)
+    // Use multi-environment mode: '*' for all environments, or array for specific ones
+    environments: environments === '*' ? '*' : environments.split(','),
 
     // Redis for events
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '56379'),
+      port: parseInt(process.env.REDIS_PORT || '46379'),
     },
 
     // Cache configuration

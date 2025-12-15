@@ -277,6 +277,28 @@ export class GatrixServerSDK {
         'redis config is required when cache.refreshMethod is "event"'
       );
     }
+
+    // Validate environments config
+    // - '*' means wildcard mode (fetch all environments from backend)
+    // - Array of strings means explicit mode (use only specified environments)
+    // - Cannot mix '*' with specific environments
+    if (config.environments !== undefined) {
+      if (Array.isArray(config.environments)) {
+        if (config.environments.includes('*')) {
+          if (config.environments.length > 1) {
+            throw createError(
+              ErrorCode.INVALID_CONFIG,
+              'environments cannot mix "*" with specific environment names. Use either "*" for all environments or an array of specific environment names.'
+            );
+          }
+        }
+      } else if (config.environments !== '*') {
+        throw createError(
+          ErrorCode.INVALID_CONFIG,
+          'environments must be "*" or an array of environment names'
+        );
+      }
+    }
   }
 
   /**

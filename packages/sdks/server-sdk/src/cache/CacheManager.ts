@@ -166,8 +166,14 @@ export class CacheManager {
       if (this.environments === '*' && this.environmentService) {
         const environments = await this.environmentService.fetchEnvironments();
         this.cachedEnvironmentList = environments.map(e => e.environmentName);
-        this.logger.info('Wildcard mode: fetched environment list', {
-          environments: this.cachedEnvironmentList
+        this.logger.info('Multi-environment mode (*): fetched environment list from backend', {
+          count: this.cachedEnvironmentList.length,
+          environments: this.cachedEnvironmentList,
+        });
+      } else if (Array.isArray(this.environments) && this.environments.length > 0) {
+        this.logger.info('Multi-environment mode (explicit): using configured environments', {
+          count: this.environments.length,
+          environments: this.environments,
         });
       }
 
@@ -179,62 +185,88 @@ export class CacheManager {
       const envList = this.getTargetEnvironments();
       const isMultiEnvMode = this.environments === '*' || (Array.isArray(this.environments) && this.environments.length > 0);
 
+      // In multi-environment mode (environments='*' or explicit list), if envList is empty,
+      // we should skip loading data rather than falling back to default environment
+      // This prevents calling APIs with invalid environment names like 'gatrix-env'
+      if (isMultiEnvMode && envList.length === 0) {
+        this.logger.warn('Multi-environment mode enabled but no environments available. Skipping initial data load.', {
+          mode: this.environments === '*' ? 'wildcard' : 'explicit',
+          configuredEnvironments: this.environments,
+        });
+      }
+
       // Existing features - default: true (backward compatible)
       // Use !== false check to maintain backward compatibility
       // In multi-environment mode, use listByEnvironments for environment-specific features
       if (this.features.gameWorld !== false) {
-        if (isMultiEnvMode && envList.length > 0) {
-          promises.push(
-            this.gameWorldService.listByEnvironments(envList).catch((error) => {
-              this.logger.warn('Failed to load game worlds', { error: error.message });
-              return [];
-            })
-          );
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.gameWorldService.listByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to load game worlds', { error: error.message });
+                return [];
+              })
+            );
+            featureTypes.push('gameWorld');
+          }
+          // Skip if multi-env mode but no environments available
         } else {
           promises.push(this.gameWorldService.list());
+          featureTypes.push('gameWorld');
         }
-        featureTypes.push('gameWorld');
       }
 
       if (this.features.popupNotice !== false) {
-        if (isMultiEnvMode && envList.length > 0) {
-          promises.push(
-            this.popupNoticeService.listByEnvironments(envList).catch((error) => {
-              this.logger.warn('Failed to load popup notices', { error: error.message });
-              return [];
-            })
-          );
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.popupNoticeService.listByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to load popup notices', { error: error.message });
+                return [];
+              })
+            );
+            featureTypes.push('popupNotice');
+          }
+          // Skip if multi-env mode but no environments available
         } else {
           promises.push(this.popupNoticeService.list());
+          featureTypes.push('popupNotice');
         }
-        featureTypes.push('popupNotice');
       }
 
       if (this.features.survey !== false) {
-        if (isMultiEnvMode && envList.length > 0) {
-          promises.push(
-            this.surveyService.listByEnvironments(envList, { isActive: true }).catch((_error) => {
-              return { surveys: [], settings: null };
-            })
-          );
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.surveyService.listByEnvironments(envList, { isActive: true }).catch((_error) => {
+                return { surveys: [], settings: null };
+              })
+            );
+            featureTypes.push('survey');
+          }
+          // Skip if multi-env mode but no environments available
         } else {
           promises.push(
             this.surveyService.list({ isActive: true }).catch((_error) => {
               return { surveys: [], settings: null };
             })
           );
+          featureTypes.push('survey');
         }
-        featureTypes.push('survey');
       }
 
       if (this.features.whitelist !== false) {
-        if (isMultiEnvMode && envList.length > 0) {
-          promises.push(
-            this.whitelistService.listByEnvironments(envList).catch((error) => {
-              this.logger.warn('Failed to load whitelists', { error: error.message });
-              return [];
-            })
-          );
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.whitelistService.listByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to load whitelists', { error: error.message });
+                return [];
+              })
+            );
+            featureTypes.push('whitelist');
+          }
+          // Skip if multi-env mode but no environments available
         } else {
           promises.push(
             this.whitelistService.list().catch((error) => {
@@ -242,66 +274,84 @@ export class CacheManager {
               return { ipWhitelist: [], accountWhitelist: [] };
             })
           );
+          featureTypes.push('whitelist');
         }
-        featureTypes.push('whitelist');
       }
 
       if (this.features.serviceMaintenance !== false) {
-        if (isMultiEnvMode && envList.length > 0) {
-          promises.push(
-            this.serviceMaintenanceService.getStatusByEnvironments(envList).catch((error) => {
-              this.logger.warn('Failed to load service maintenance status', { error: error.message });
-              return [];
-            })
-          );
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.serviceMaintenanceService.getStatusByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to load service maintenance status', { error: error.message });
+                return [];
+              })
+            );
+            featureTypes.push('serviceMaintenance');
+          }
+          // Skip if multi-env mode but no environments available
         } else {
           promises.push(
             this.refreshServiceMaintenanceInternal().catch((error) => {
               this.logger.warn('Failed to load service maintenance status', { error: error.message });
             })
           );
+          featureTypes.push('serviceMaintenance');
         }
-        featureTypes.push('serviceMaintenance');
       }
 
+      // Edge-specific features: these always use multi-environment APIs
+      // Only load if we have environments available
       if (this.features.clientVersion === true && this.clientVersionService) {
-        promises.push(
-          this.clientVersionService.listByEnvironments(envList).catch((error) => {
-            this.logger.warn('Failed to load client versions', { error: error.message });
-            return [];
-          })
-        );
-        featureTypes.push('clientVersion');
+        if (envList.length > 0) {
+          promises.push(
+            this.clientVersionService.listByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to load client versions', { error: error.message });
+              return [];
+            })
+          );
+          featureTypes.push('clientVersion');
+        }
+        // Skip if no environments available
       }
 
       if (this.features.serviceNotice === true && this.serviceNoticeService) {
-        promises.push(
-          this.serviceNoticeService.listByEnvironments(envList).catch((error) => {
-            this.logger.warn('Failed to load service notices', { error: error.message });
-            return [];
-          })
-        );
-        featureTypes.push('serviceNotice');
+        if (envList.length > 0) {
+          promises.push(
+            this.serviceNoticeService.listByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to load service notices', { error: error.message });
+              return [];
+            })
+          );
+          featureTypes.push('serviceNotice');
+        }
+        // Skip if no environments available
       }
 
       if (this.features.banner === true && this.bannerService) {
-        promises.push(
-          this.bannerService.listByEnvironments(envList).catch((error) => {
-            this.logger.warn('Failed to load banners', { error: error.message });
-            return [];
-          })
-        );
-        featureTypes.push('banner');
+        if (envList.length > 0) {
+          promises.push(
+            this.bannerService.listByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to load banners', { error: error.message });
+              return [];
+            })
+          );
+          featureTypes.push('banner');
+        }
+        // Skip if no environments available
       }
 
       if (this.features.storeProduct === true && this.storeProductService) {
-        promises.push(
-          this.storeProductService.listByEnvironments(envList).catch((error) => {
-            this.logger.warn('Failed to load store products', { error: error.message });
-            return [];
-          })
-        );
-        featureTypes.push('storeProduct');
+        if (envList.length > 0) {
+          promises.push(
+            this.storeProductService.listByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to load store products', { error: error.message });
+              return [];
+            })
+          );
+          featureTypes.push('storeProduct');
+        }
+        // Skip if no environments available
       }
 
       // Load all enabled features in parallel
@@ -509,87 +559,168 @@ export class CacheManager {
       const promises: Promise<any>[] = [];
       const refreshedTypes: string[] = [];
 
-      // Existing features - default: true (backward compatible)
-      if (this.features.gameWorld !== false) {
-        promises.push(this.gameWorldService.refresh());
-        refreshedTypes.push('gameWorld');
-      }
-
-      if (this.features.popupNotice !== false) {
-        promises.push(this.popupNoticeService.refresh());
-        refreshedTypes.push('popupNotice');
-      }
-
-      if (this.features.survey !== false) {
-        promises.push(
-          this.surveyService.refresh({ isActive: true }).catch((error) => {
-            this.logger.warn('Failed to refresh surveys', { error: error.message });
-          })
-        );
-        refreshedTypes.push('survey');
-      }
-
-      if (this.features.whitelist !== false) {
-        promises.push(
-          this.whitelistService.refresh().catch((error) => {
-            this.logger.warn('Failed to refresh whitelists', { error: error.message });
-          })
-        );
-        refreshedTypes.push('whitelist');
-      }
-
-      if (this.features.serviceMaintenance !== false) {
-        promises.push(
-          this.refreshServiceMaintenanceInternal().catch((error) => {
-            this.logger.warn('Failed to refresh service maintenance', { error: error.message });
-          })
-        );
-        refreshedTypes.push('serviceMaintenance');
-      }
-
       // For wildcard mode, refresh environment list first
       if (this.environments === '*' && this.environmentService) {
         const environments = await this.environmentService.fetchEnvironments();
         this.cachedEnvironmentList = environments.map(e => e.environmentName);
       }
 
-      // Multi-environment features for Edge - use cachedEnvironmentList for '*' mode
+      // Get target environments for multi-environment mode
       const envList = this.getTargetEnvironments();
+      const isMultiEnvMode = this.environments === '*' || (Array.isArray(this.environments) && this.environments.length > 0);
 
+      // In multi-environment mode, if envList is empty, we should skip refresh
+      // rather than falling back to default environment
+      if (isMultiEnvMode && envList.length === 0) {
+        this.logger.warn('Multi-environment mode enabled but no environments available. Skipping refresh.', {
+          mode: this.environments === '*' ? 'wildcard' : 'explicit',
+          configuredEnvironments: this.environments,
+        });
+      }
+
+      // Existing features - default: true (backward compatible)
+      // In multi-environment mode, use listByEnvironments for environment-specific features
+      if (this.features.gameWorld !== false) {
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.gameWorldService.listByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to refresh game worlds', { error: error.message });
+                return [];
+              })
+            );
+            refreshedTypes.push('gameWorld');
+          }
+        } else {
+          promises.push(this.gameWorldService.refresh());
+          refreshedTypes.push('gameWorld');
+        }
+      }
+
+      if (this.features.popupNotice !== false) {
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.popupNoticeService.listByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to refresh popup notices', { error: error.message });
+                return [];
+              })
+            );
+            refreshedTypes.push('popupNotice');
+          }
+        } else {
+          promises.push(this.popupNoticeService.refresh());
+          refreshedTypes.push('popupNotice');
+        }
+      }
+
+      if (this.features.survey !== false) {
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.surveyService.listByEnvironments(envList, { isActive: true }).catch((error) => {
+                this.logger.warn('Failed to refresh surveys', { error: error.message });
+                return { surveys: [], settings: null };
+              })
+            );
+            refreshedTypes.push('survey');
+          }
+        } else {
+          promises.push(
+            this.surveyService.refresh({ isActive: true }).catch((error) => {
+              this.logger.warn('Failed to refresh surveys', { error: error.message });
+            })
+          );
+          refreshedTypes.push('survey');
+        }
+      }
+
+      if (this.features.whitelist !== false) {
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.whitelistService.listByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to refresh whitelists', { error: error.message });
+                return [];
+              })
+            );
+            refreshedTypes.push('whitelist');
+          }
+        } else {
+          promises.push(
+            this.whitelistService.refresh().catch((error) => {
+              this.logger.warn('Failed to refresh whitelists', { error: error.message });
+            })
+          );
+          refreshedTypes.push('whitelist');
+        }
+      }
+
+      if (this.features.serviceMaintenance !== false) {
+        if (isMultiEnvMode) {
+          if (envList.length > 0) {
+            promises.push(
+              this.serviceMaintenanceService.getStatusByEnvironments(envList).catch((error) => {
+                this.logger.warn('Failed to refresh service maintenance', { error: error.message });
+                return [];
+              })
+            );
+            refreshedTypes.push('serviceMaintenance');
+          }
+        } else {
+          promises.push(
+            this.refreshServiceMaintenanceInternal().catch((error) => {
+              this.logger.warn('Failed to refresh service maintenance', { error: error.message });
+            })
+          );
+          refreshedTypes.push('serviceMaintenance');
+        }
+      }
+
+      // Edge-specific features: these always use multi-environment APIs
+      // Only refresh if we have environments available
       if (this.features.clientVersion === true && this.clientVersionService) {
-        promises.push(
-          this.clientVersionService.listByEnvironments(envList).catch((error) => {
-            this.logger.warn('Failed to refresh client versions', { error: error.message });
-          })
-        );
-        refreshedTypes.push('clientVersion');
+        if (envList.length > 0) {
+          promises.push(
+            this.clientVersionService.listByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to refresh client versions', { error: error.message });
+            })
+          );
+          refreshedTypes.push('clientVersion');
+        }
       }
 
       if (this.features.serviceNotice === true && this.serviceNoticeService) {
-        promises.push(
-          this.serviceNoticeService.listByEnvironments(envList).catch((error) => {
-            this.logger.warn('Failed to refresh service notices', { error: error.message });
-          })
-        );
-        refreshedTypes.push('serviceNotice');
+        if (envList.length > 0) {
+          promises.push(
+            this.serviceNoticeService.listByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to refresh service notices', { error: error.message });
+            })
+          );
+          refreshedTypes.push('serviceNotice');
+        }
       }
 
       if (this.features.banner === true && this.bannerService) {
-        promises.push(
-          this.bannerService.listByEnvironments(envList).catch((error) => {
-            this.logger.warn('Failed to refresh banners', { error: error.message });
-          })
-        );
-        refreshedTypes.push('banner');
+        if (envList.length > 0) {
+          promises.push(
+            this.bannerService.listByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to refresh banners', { error: error.message });
+            })
+          );
+          refreshedTypes.push('banner');
+        }
       }
 
       if (this.features.storeProduct === true && this.storeProductService) {
-        promises.push(
-          this.storeProductService.listByEnvironments(envList).catch((error) => {
-            this.logger.warn('Failed to refresh store products', { error: error.message });
-          })
-        );
-        refreshedTypes.push('storeProduct');
+        if (envList.length > 0) {
+          promises.push(
+            this.storeProductService.listByEnvironments(envList).catch((error) => {
+              this.logger.warn('Failed to refresh store products', { error: error.message });
+            })
+          );
+          refreshedTypes.push('storeProduct');
+        }
       }
 
       await Promise.all(promises);
