@@ -1,6 +1,6 @@
 {
   "name": "@gatrix/server-sdk",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "Gatrix Server-side SDK for Node.js - Provides easy access to Gatrix backend APIs with caching, Redis PubSub event handling, and service discovery",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

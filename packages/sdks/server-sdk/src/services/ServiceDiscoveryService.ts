@@ -357,7 +357,7 @@ export class ServiceDiscoveryService {
 
         await this.updateStatus({
           status: 'ready',
-          autoRegisterIfMissing: false,
+          autoRegisterIfMissing: true,
         });
 
         this.logger.debug('Heartbeat sent', {
