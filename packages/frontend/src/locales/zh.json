@@ -4352,6 +4352,7 @@
       "instanceId": "实例ID",
       "service": "服务",
       "group": "组",
+      "environment": "环境",
       "labels": "标签",
       "hostname": "主机名",
       "externalAddress": "外部IP",

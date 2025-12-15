@@ -409,7 +409,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
       case 'group':
         return service.labels.group || 'unknown';
       case 'environment':
-        return service.labels.env || 'unknown';
+        return service.labels.environment || 'unknown';
       case 'region':
         return service.labels.region || 'unknown';
       default:
@@ -1261,6 +1261,7 @@ const ServerListPage: React.FC = () => {
     { id: 'status', labelKey: 'serverList.table.status', visible: true },
     { id: 'service', labelKey: 'serverList.table.service', visible: true },
     { id: 'group', labelKey: 'serverList.table.group', visible: true },
+    { id: 'environment', labelKey: 'serverList.table.environment', visible: true },
     { id: 'labels', labelKey: 'serverList.table.labels', visible: true },
     { id: 'instanceId', labelKey: 'serverList.table.instanceId', visible: true },
     { id: 'hostname', labelKey: 'serverList.table.hostname', visible: true },
@@ -1617,7 +1618,7 @@ const ServerListPage: React.FC = () => {
         service: s.labels.service,
         instanceId: s.instanceId,
         group: s.labels.group,
-        env: s.labels.env,
+        env: s.labels.environment,
         hostname: s.hostname,
         internalIp: s.internalAddress,
         healthPort: healthPort,
@@ -1844,7 +1845,7 @@ const ServerListPage: React.FC = () => {
     [services]
   );
   const uniqueEnvs = useMemo(() =>
-    [...new Set(services.map(s => s.labels.env).filter(Boolean))].sort() as string[],
+    [...new Set(services.map(s => s.labels.environment).filter(Boolean))].sort() as string[],
     [services]
   );
   const uniqueRoles = useMemo(() =>
@@ -2040,7 +2041,7 @@ const ServerListPage: React.FC = () => {
       if (filter.key === 'region' && filter.value && service.labels.region !== filter.value) {
         return false;
       }
-      if (filter.key === 'env' && filter.value && service.labels.env !== filter.value) {
+      if (filter.key === 'env' && filter.value && service.labels.environment !== filter.value) {
         return false;
       }
       if (filter.key === 'role' && filter.value && service.labels.role !== filter.value) {
@@ -2730,6 +2731,22 @@ const ServerListPage: React.FC = () => {
                                     size="small"
                                     variant="outlined"
                                     color="primary"
+                                    sx={{ fontWeight: 600 }}
+                                  />
+                                ) : (
+                                  <Typography variant="caption" color="text.disabled">-</Typography>
+                                )}
+                              </TableCell>
+                            );
+                          case 'environment':
+                            return (
+                              <TableCell key={column.id}>
+                                {service.labels.environment ? (
+                                  <Chip
+                                    label={service.labels.environment}
+                                    size="small"
+                                    variant="outlined"
+                                    color="secondary"
                                     sx={{ fontWeight: 600 }}
                                   />
                                 ) : (

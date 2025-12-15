@@ -4304,6 +4304,7 @@
       "instanceId": "Instance ID",
       "service": "Service",
       "group": "Group",
+      "environment": "Environment",
       "labels": "Labels",
       "hostname": "Hostname",
       "externalAddress": "External IP",
