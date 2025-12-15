@@ -420,6 +420,17 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
   // Track previous groupingBy to detect changes
   const prevGroupingByRef = useRef<GroupingOption>(groupingBy);
 
+  // Auto-reset view when grouping changes
+  useEffect(() => {
+    if (prevGroupingByRef.current !== groupingBy) {
+      // Reset viewBox and clear saved positions when grouping changes
+      const defaultViewBox = { x: 0, y: 0, width: 1200, height: 800 };
+      setViewBox(defaultViewBox);
+      localStorage.removeItem(CLUSTER_VIEWBOX_KEY);
+      localStorage.removeItem(CLUSTER_CENTER_POS_KEY);
+    }
+  }, [groupingBy]);
+
   // Update nodes when services change (add/remove) or grouping changes
   useEffect(() => {
     if (!simulationRef.current) return;

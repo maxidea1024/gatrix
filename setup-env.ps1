@@ -380,8 +380,8 @@ function Print-Summary {
         Write-Host "  2. Start Docker services: docker-compose -f docker-compose.yml up -d"
         Write-Host "  3. Access the application: $($script:ProtocolToUse)://$HostAddress"
         Write-Host "  4. Configure your load balancer to forward:"
-        Write-Host "     - HTTPS 443 → 43000 (Frontend)"
-        Write-Host "     - HTTPS 443/grafana → 44000 (Grafana, optional)"
+        Write-Host "     - HTTPS 443 -> 43000 (Frontend)"
+        Write-Host "     - HTTPS 443/grafana -> 44000 (Grafana, optional)"
     }
     Write-Host ""
 }
