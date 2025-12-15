@@ -49,6 +49,7 @@ const MaintenancePage: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
 
   // Status
+  const [isLoading, setIsLoading] = useState(true); // Initial loading state to prevent flicker
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [maintenanceStatus, setMaintenanceStatus] = useState<MaintenanceStatusType>('inactive');
   const [currentMaintenanceDetail, setCurrentMaintenanceDetail] = useState<any>(null);
@@ -149,7 +150,11 @@ const MaintenancePage: React.FC = () => {
           messageInputRef.current?.focus();
         }, 100);
       }
-    }).catch(() => {});
+    }).catch(() => {
+      // On error, still mark as loaded
+    }).finally(() => {
+      setIsLoading(false);
+    });
 
     messageTemplateService.list({ isEnabled: true }).then(response => {
 
@@ -373,6 +378,27 @@ const MaintenancePage: React.FC = () => {
     setEditMode(false);
     enqueueSnackbar(t('maintenance.updateSuccess'), { variant: 'success' });
   };
+
+  // Don't render content until initial status is loaded to prevent flicker
+  if (isLoading) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <BuildIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                {t('maintenance.title')}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('maintenance.description')}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 3 }}>
