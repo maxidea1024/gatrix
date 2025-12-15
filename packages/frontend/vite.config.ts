@@ -96,7 +96,6 @@ export default defineConfig({
     },
     // Let Vite infer the HMR host from the page URL so LAN clients use the correct IP
     hmr: {
-      port: 53000,
       overlay: false, // Disable error overlay on connection loss
       timeout: 30000, // Increase timeout before giving up on reconnection
     },
@@ -134,6 +133,18 @@ export default defineConfig({
         // Ensure all Bull Board paths are proxied, including static resources
         rewrite: undefined, // Don't rewrite the path
         bypass: undefined, // Don't bypass any requests
+      },
+      '/grafana': {
+        target: isDocker ? 'http://grafana:3000' : 'http://localhost:44000',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        // Remove Gatrix cookies to prevent Grafana from misinterpreting them
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('cookie');
+          });
+        },
       },
     },
   },

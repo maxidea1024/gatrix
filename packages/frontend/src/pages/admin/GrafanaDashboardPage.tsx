@@ -99,7 +99,6 @@ export const GrafanaDashboardPage: React.FC = () => {
           }}
           title={t('sidebar.grafana')}
           allowFullScreen
-          sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
         />
       </Box>
     </Box>

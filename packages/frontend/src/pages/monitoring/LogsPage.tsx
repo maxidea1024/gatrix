@@ -51,7 +51,6 @@ const LogsPage: React.FC = () => {
           style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
           title={t('monitoring.logs.title')}
           allowFullScreen
-          sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
         />
       </Box>
     </Box>

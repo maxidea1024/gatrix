@@ -547,12 +547,23 @@ services:
     image: grafana/grafana:latest
     container_name: gatrix-grafana-dev
     restart: unless-stopped
+    user: "0"  # Run as root to avoid volume permission issues
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_SECURITY_ALLOW_EMBEDDING: "true"
       GF_SECURITY_COOKIE_SAMESITE: "Lax"
+      # Anonymous access for embedding
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_NAME: "Main Org."
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
+      # Disable basic auth to prevent login prompt
+      GF_AUTH_BASIC_ENABLED: "false"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      # Subpath support for nginx proxy
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:43000/grafana/}
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
     ports:
       - "0.0.0.0:${GRAFANA_PORT:-44000}:3000"
     volumes:
