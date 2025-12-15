@@ -31,9 +31,9 @@ const QueueMonitorPage: React.FC = () => {
 
   // BullMQ Dashboard URL
   const bullboardUrl = useMemo(() => {
-    const isDevelopment = import.meta.env.DEV || window.location.port === '53000';
+    const isDevelopment = import.meta.env.DEV || window.location.port === '43000';
     if (isDevelopment) {
-      return `${window.location.protocol}//${window.location.hostname}:55000/bull-board`;
+      return `${window.location.protocol}//${window.location.hostname}:45000/bull-board`;
     }
     return `${window.location.protocol}//${window.location.host}/bull-board`;
   }, []);

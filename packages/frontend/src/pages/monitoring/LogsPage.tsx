@@ -8,11 +8,11 @@ const LogsPage: React.FC = () => {
   const { t } = useTranslation();
 
   const grafanaUrl = useMemo(() => {
-    // In development, Grafana runs on port 54000
-    // In production, Grafana is accessed via /grafana subpath
-    const isDevelopment = import.meta.env.DEV || window.location.port === '53000';
-    if (isDevelopment) {
-      return `${window.location.protocol}//${window.location.hostname}:54000`;
+    // In vite dev mode (port 5173), access Grafana directly on port 44000
+    // In docker-compose or production, use /grafana subpath proxy
+    const isViteDev = import.meta.env.DEV && window.location.port === '5173';
+    if (isViteDev) {
+      return `${window.location.protocol}//${window.location.hostname}:44000`;
     } else {
       return `${window.location.protocol}//${window.location.host}/grafana`;
     }

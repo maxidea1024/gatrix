@@ -36,7 +36,7 @@ The Edge server is a high-availability client-facing API gateway that caches Gat
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `EDGE_PORT` | `1400` | Edge server port |
+| `EDGE_PORT` | `3400` | Edge server port |
 | `EDGE_METRICS_PORT` | `9400` | Prometheus metrics port (internal) |
 | `EDGE_BYPASS_TOKEN` | `gatrix-edge-internal-bypass-token` | Bypass token for internal APIs |
 | `EDGE_APPLICATION_NAME` | `edge-server` | Application name |

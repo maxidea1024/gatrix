@@ -5,7 +5,7 @@ dotenv.config();
 
 export const config = {
   // Server configuration
-  port: parseInt(process.env.EDGE_PORT || '1400', 10),
+  port: parseInt(process.env.EDGE_PORT || '3400', 10),
   metricsPort: parseInt(process.env.EDGE_METRICS_PORT || '9400', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
 

@@ -339,10 +339,11 @@ export class ChatWebSocketService {
     // Runtime-injected config (for production docker/nginx)
     const runtimeUrl = (window as any)?.ENV?.VITE_CHAT_SERVER_URL as string | undefined;
     const runtimePort = (window as any)?.ENV?.VITE_CHAT_SERVER_PORT as string | undefined;
-    const defaultPort = runtimePort || env.VITE_CHAT_SERVER_PORT || '55100';
+    // Default port: 45100 (docker-compose mapped port for chat-server)
+    const defaultPort = runtimePort || env.VITE_CHAT_SERVER_PORT || '45100';
 
     if (env.PROD) {
-      // Keep existing production fallback (5100) to match original docker-compose.prod mapping
+      // Production: use runtime config or build-time env, fallback to 45100
       return runtimeUrl || (env.VITE_CHAT_SERVER_URL as string) || `${location.protocol === 'https:' ? 'https' : 'http'}://${location.hostname}:${defaultPort}`;
     }
 
@@ -353,7 +354,7 @@ export class ChatWebSocketService {
     }
 
     const protocol = location.protocol === 'https:' ? 'https' : 'http';
-    const port = env.VITE_CHAT_SERVER_PORT || '55100';
+    const port = env.VITE_CHAT_SERVER_PORT || '45100';
     return `${protocol}://${location.hostname}:${port}`;
   }
 

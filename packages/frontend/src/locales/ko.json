@@ -4316,6 +4316,7 @@
     "grouping": {
       "label": "그룹핑",
       "none": "없음",
+      "service": "서비스",
       "group": "그룹",
       "environment": "환경",
       "region": "지역"

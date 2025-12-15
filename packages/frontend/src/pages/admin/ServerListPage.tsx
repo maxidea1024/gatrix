@@ -121,7 +121,7 @@ interface ClusterLink extends SimulationLinkDatum<ClusterNode> {
 }
 
 // Grouping option type
-type GroupingOption = 'none' | 'group' | 'environment' | 'region';
+type GroupingOption = 'none' | 'service' | 'group' | 'environment' | 'region';
 
 // ClusterView component with D3 force simulation
 interface ClusterViewProps {
@@ -153,6 +153,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
   const [viewBox, setViewBox] = useState({ x: 0, y: 0, width: 1200, height: 800 });
   const [isPanning, setIsPanning] = useState(false);
   const panStartRef = useRef({ x: 0, y: 0, viewBoxX: 0, viewBoxY: 0 });
+  // Store drag offset to prevent jumping when drag starts
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
 
   const nodeRadius = 32;
   const centerRadius = 50;
@@ -402,6 +404,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
   // Helper function to get group key from service based on grouping option
   const getGroupKey = useCallback((service: ServiceInstance): string => {
     switch (groupingBy) {
+      case 'service':
+        return service.labels.service || 'unknown';
       case 'group':
         return service.labels.group || 'unknown';
       case 'environment':
@@ -587,11 +591,17 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
 
     const node = nodesRef.current.find(n => n.id === nodeId);
     if (node && simulationRef.current) {
+      // Calculate offset between mouse position and node center
+      const mousePos = mouseToSvgCoords(e.nativeEvent);
+      dragOffsetRef.current = {
+        x: (node.x || 0) - mousePos.x,
+        y: (node.y || 0) - mousePos.y,
+      };
       node.fx = node.x;
       node.fy = node.y;
       simulationRef.current.alphaTarget(0.3).restart();
     }
-  }, []);
+  }, [mouseToSvgCoords]);
 
   // Handle pan start (right-click or ctrl+click or empty space click)
   const handlePanStart = useCallback((e: React.MouseEvent) => {
@@ -612,12 +622,12 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
     if (!svgRef.current) return;
 
     if (draggedNode) {
-      // Dragging a node
+      // Dragging a node - apply offset to keep node at same relative position to cursor
       const { x, y } = mouseToSvgCoords(e);
       const node = nodesRef.current.find(n => n.id === draggedNode);
       if (node) {
-        node.fx = x;
-        node.fy = y;
+        node.fx = x + dragOffsetRef.current.x;
+        node.fy = y + dragOffsetRef.current.y;
         // Force re-render
         setNodes([...nodesRef.current]);
       }
@@ -1019,17 +1029,31 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
                     </circle>
                   )}
 
-                  {/* Main circle with subtle glow on pulse */}
+                  {/* Main circle with glow effects */}
                   <circle
                     r={nodeRadius}
                     fill={nodeColor}
                     stroke="#fff"
                     strokeWidth="2"
                     style={{
-                      filter: shouldRumble ? 'drop-shadow(0 0 10px #e53935) drop-shadow(0 0 5px #ff6659)' : 'none',
+                      filter: shouldRumble
+                        ? 'drop-shadow(0 0 10px #e53935) drop-shadow(0 0 5px #ff6659)'
+                        : 'none',
                       transition: 'filter 0.3s ease-out',
                     }}
-                  />
+                  >
+                    {/* Soft breathing opacity animation for initializing services */}
+                    {service.status === 'initializing' && (
+                      <animate
+                        attributeName="opacity"
+                        values="1;0.5;1"
+                        dur="2s"
+                        repeatCount="indefinite"
+                        calcMode="spline"
+                        keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"
+                      />
+                    )}
+                  </circle>
 
                   {/* Shine effect */}
                   <ellipse
@@ -2455,6 +2479,12 @@ const ServerListPage: React.FC = () => {
                     onClick={() => handleGroupingChange('none')}
                   >
                     {t('serverList.grouping.none')}
+                  </MenuItem>
+                  <MenuItem
+                    selected={groupingBy === 'service'}
+                    onClick={() => handleGroupingChange('service')}
+                  >
+                    {t('serverList.grouping.service')}
                   </MenuItem>
                   <MenuItem
                     selected={groupingBy === 'group'}

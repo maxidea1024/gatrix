@@ -27,7 +27,7 @@ const options: swaggerJSDoc.Options = {
         description: 'Production server',
       },
       {
-        url: 'http://localhost:1400/api/v1',
+        url: 'http://localhost:3400/api/v1',
         description: 'Edge server (Local)',
       },
     ],

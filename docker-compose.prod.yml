@@ -278,11 +278,11 @@ services:
       WS_MAX_CONNECTIONS: ${CHAT_WS_MAX_CONNECTIONS:-10000}
       MONITORING_ENABLED: ${CHAT_MONITORING_ENABLED:-true}
       METRICS_PORT: 9090
-      GATRIX_API_URL: ${GATRIX_API_URL:-http://backend:55000}
+      GATRIX_API_URL: ${GATRIX_API_URL:-http://backend:5000}
       GATRIX_API_SECRET: ${GATRIX_API_SECRET:-shared-secret-between-servers}
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-info}
     ports:
-      - "${CHAT_PORT:-55100}:5100"
+      - "${CHAT_PORT:-45100}:5100"
     depends_on:
       mysql:
         condition: service_healthy

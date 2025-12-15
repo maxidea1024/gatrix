@@ -161,7 +161,7 @@ services:
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
       VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:44000}
       VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:43000/bull-board}
-      VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:1400}
+      VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:3400}
 
     ports:
       - "0.0.0.0:${FRONTEND_PORT:-43000}:3000"
@@ -434,7 +434,7 @@ services:
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-edge
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-debug}
-      EDGE_PORT: 1400
+      EDGE_PORT: 3400
       EDGE_METRICS_PORT: 9400
       # Backend API configuration
       GATRIX_URL: http://backend-dev:5000
@@ -452,7 +452,7 @@ services:
       CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-event}
       CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
     ports:
-      - "0.0.0.0:${EDGE_PORT:-1400}:1400"
+      - "0.0.0.0:${EDGE_PORT:-3400}:3400"
       # Note: Metrics port (9400) is NOT exposed externally for security
     depends_on:
       backend-dev:
@@ -471,7 +471,7 @@ services:
       - ${DATA_ROOT:-./data}/edge/logs:/app/packages/edge/logs
     command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/edge dev"
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:1400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
       timeout: 10s
       retries: 5
       interval: 30s

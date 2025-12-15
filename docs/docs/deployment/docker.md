@@ -41,7 +41,7 @@ This page explains how to run Gatrix with Docker in both development and product
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `EDGE_PORT` | 1400 | Edge server port |
+| `EDGE_PORT` | 3400 | Edge server port |
 | `EDGE_METRICS_PORT` | 9400 | Metrics endpoint port (internal only) |
 | `EDGE_BYPASS_TOKEN` | `gatrix-edge-internal-bypass-token` | Bypass token for all environments and internal APIs |
 | `EDGE_APPLICATION_NAME` | `edge-server` | Application name for SDK identification |

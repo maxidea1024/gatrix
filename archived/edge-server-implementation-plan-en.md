@@ -40,7 +40,7 @@ The current architecture where game clients directly request the Backend API has
 | Item | Value |
 |------|-------|
 | Server Name | `edge` |
-| Main Port | 1400 (external) - Client API only |
+| Main Port | 3400 (external) - Client API only |
 | Metrics Port | 9400 (internal only) - Prometheus metrics |
 | Tech Stack | Node.js + Express + TypeScript |
 | Cache Method | Server SDK based memory cache |
@@ -70,7 +70,7 @@ The current architecture where game clients directly request the Backend API has
 ```
 ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
 │ Game Client  │────────▶│    Edge      │◀───────▶│   Backend    │
-│              │         │  (Port 1400) │  SDK    │  (Port 5000) │
+│              │         │  (Port 3400) │  SDK    │  (Port 5000) │
 └──────────────┘         └──────────────┘         └──────────────┘
                                 │                        │
                                 │    ┌──────────────┐    │
@@ -302,7 +302,7 @@ const gameServerSDK = new GatrixServerSDK({
 ## 5. Security Considerations
 
 ### 5.1 Network
-- Only Edge main port exposed externally (port 1400)
+- Only Edge main port exposed externally (port 3400)
 - Backend isolated to internal network
 - TLS applied (at Reverse Proxy)
 
@@ -325,7 +325,7 @@ const gameServerSDK = new GatrixServerSDK({
 services:
   edge:
     ports:
-      - "1400:1400"        # Main API port (external)
+      - "3400:3400"        # Main API port (external)
       # - "9400:9400"      # ⛔ NEVER expose externally!
     networks:
       - public             # For external access

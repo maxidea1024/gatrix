@@ -75,6 +75,9 @@ COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 && \
   yarn cache clean
 
+# Copy built server-sdk dist to node_modules (required because main points to dist/index.js)
+COPY --from=builder /app/packages/sdks/server-sdk/dist ./node_modules/@gatrix/server-sdk/dist
+
 # Create logs, uploads, and data directories
 RUN mkdir -p logs uploads data && chown nodejs:nodejs logs uploads data
 

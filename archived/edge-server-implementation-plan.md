@@ -40,7 +40,7 @@
 | 항목 | 값 |
 |------|-----|
 | 서버명 | `edge` |
-| 메인 포트 | 1400 (외부 노출) - Client API 전용 |
+| 메인 포트 | 3400 (외부 노출) - Client API 전용 |
 | 메트릭 포트 | 9400 (내부 전용) - Prometheus 메트릭 |
 | 기술 스택 | Node.js + Express + TypeScript |
 | 캐시 방식 | Server SDK 기반 메모리 캐시 |
@@ -70,7 +70,7 @@
 ```
 ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
 │ Game Client  │────────▶│    Edge      │◀───────▶│   Backend    │
-│              │         │  (Port 1400) │  SDK    │  (Port 5000) │
+│              │         │  (Port 3400) │  SDK    │  (Port 5000) │
 └──────────────┘         └──────────────┘         └──────────────┘
                                 │                        │
                                 │    ┌──────────────┐    │
@@ -586,7 +586,7 @@ COPY --from=builder /app/packages/edge/dist ./dist
 COPY --from=builder /app/packages/edge/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 
-EXPOSE 1400
+EXPOSE 3400
 CMD ["node", "dist/index.js"]
 ```
 
@@ -599,10 +599,10 @@ services:
       context: .
       dockerfile: packages/edge/Dockerfile
     ports:
-      - "1400:1400"
+      - "3400:3400"
     environment:
       - NODE_ENV=production
-      - PORT=1400
+      - PORT=3400
       - GATRIX_URL=http://backend:5000
       - GATRIX_API_TOKEN=${GATRIX_SERVER_API_TOKEN:-gatrix-unsecured-server-api-token}
       - REDIS_HOST=redis
@@ -614,7 +614,7 @@ services:
       redis:
         condition: service_started
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:1400/health"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3400/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -712,7 +712,7 @@ edge_sdk_sync_duration_seconds
 ## 9. 보안 고려사항
 
 ### 9.1 네트워크
-- Edge 메인 포트만 외부 노출 (1400 포트)
+- Edge 메인 포트만 외부 노출 (3400 포트)
 - Backend는 내부 네트워크로 격리
 - TLS 적용 (Reverse Proxy에서)
 
@@ -735,7 +735,7 @@ edge_sdk_sync_duration_seconds
 services:
   edge:
     ports:
-      - "1400:1400"        # 메인 API 포트 (외부 노출)
+      - "3400:3400"        # 메인 API 포트 (외부 노출)
       # - "9400:9400"      # ⛔ 절대 외부 노출 금지!
     networks:
       - public             # 외부 접근용

@@ -382,7 +382,7 @@ const ServiceNoticesPage: React.FC = () => {
 
   // Get Edge server URL for webview pages
   const getEdgeWebviewUrl = () => {
-    const edgeUrl = import.meta.env.VITE_EDGE_URL || 'http://localhost:1400';
+    const edgeUrl = import.meta.env.VITE_EDGE_URL || 'http://localhost:3400';
     const envName = currentEnvironment?.environmentName || 'development';
     return `${edgeUrl}/game-service-notices.html?environment=${encodeURIComponent(envName)}`;
   };

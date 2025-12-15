@@ -4319,6 +4319,7 @@
     "grouping": {
       "label": "Grouping",
       "none": "None",
+      "service": "Service",
       "group": "Group",
       "environment": "Environment",
       "region": "Region"

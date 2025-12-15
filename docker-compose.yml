@@ -116,7 +116,10 @@ services:
       # Chat Server Integration
       CHAT_SERVER_URL: http://chat-server:5100
       # Service Discovery
-      SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-redis}
+      SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-etcd}
+      SERVICE_DISCOVERY_HEARTBEAT_TTL: ${SERVICE_DISCOVERY_HEARTBEAT_TTL:-30}
+      SERVICE_DISCOVERY_INACTIVE_KEEP_TTL: ${SERVICE_DISCOVERY_INACTIVE_KEEP_TTL:-60}
+      SERVICE_DISCOVERY_TERMINATED_MARKER_TTL: ${SERVICE_DISCOVERY_TERMINATED_MARKER_TTL:-300}
       ETCD_HOSTS: ${ETCD_HOSTS:-http://etcd:2379}
     ports:
       - "${BACKEND_PORT:-45000}:5000"
@@ -186,6 +189,9 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
       LOG_LEVEL: ${EVENT_LENS_LOG_LEVEL:-info}
       MONITORING_ENABLED: ${MONITORING_ENABLED:-true}
+      # Service Discovery
+      GATRIX_URL: http://backend:5000
+      API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
 
     ports:
       - "${EVENT_LENS_PORT:-45200}:5200"
@@ -295,8 +301,12 @@ services:
       MONITORING_ENABLED: ${CHAT_MONITORING_ENABLED:-true}
       METRICS_PORT: 9090
       # Gatrix Integration
-      GATRIX_API_URL: ${GATRIX_API_URL:-http://backend:45000}
+      GATRIX_API_URL: ${GATRIX_API_URL:-http://backend:5000}
       GATRIX_API_SECRET: ${GATRIX_API_SECRET:-shared-secret-between-servers}
+      # Service Discovery
+      GATRIX_URL: http://backend:5000
+      API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
+      BACKEND_SERVICE_TOKEN: ${BACKEND_SERVICE_TOKEN:-gatrix-backend-service-token-default-key-change-in-production}
       # Logging
       LOG_LEVEL: ${CHAT_LOG_LEVEL:-info}
     ports:
@@ -398,6 +408,10 @@ services:
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_SECURITY_ALLOW_EMBEDDING: "true"
       GF_SECURITY_COOKIE_SAMESITE: "Lax"
+      # Subpath support for nginx proxy
+      # Use explicit URL since template variables may not work in env vars
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:43000/grafana/}
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
     ports:
       - "${GRAFANA_PORT:-44000}:3000"
     volumes:
@@ -424,7 +438,7 @@ services:
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
       VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:44000}
       VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:43000/bull-board}
-      VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:1400}
+      VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:3400}
 
     ports:
       - "${FRONTEND_PORT:-43000}:80"
@@ -453,7 +467,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-info}
-      EDGE_PORT: 1400
+      EDGE_PORT: 3400
       EDGE_METRICS_PORT: 9400
       # Backend API configuration
       GATRIX_URL: http://backend:5000
@@ -471,7 +485,7 @@ services:
       CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-event}
       CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
     ports:
-      - "${EDGE_PORT:-1400}:1400"
+      - "${EDGE_PORT:-3400}:3400"
       # Note: Metrics port (9400) is NOT exposed externally for security
     depends_on:
       backend:
@@ -485,7 +499,7 @@ services:
     volumes:
       - ${DATA_ROOT:-./data}/edge/logs:/app/logs
     healthcheck:
-      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:1400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
       timeout: 10s
       retries: 5
       interval: 30s

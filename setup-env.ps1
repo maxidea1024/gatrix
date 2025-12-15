@@ -308,7 +308,7 @@ function Create-EnvFile {
         }
         elseif ($line -match "^VITE_EDGE_URL=") {
             # Edge server URL (for game client webview pages)
-            $newLines += "VITE_EDGE_URL=$($script:ProtocolToUse)://$HostAddress`:1400"
+            $newLines += "VITE_EDGE_URL=$($script:ProtocolToUse)://$HostAddress`:3400"
         }
         elseif ($line -match "^ADMIN_PASSWORD=") {
             $newLines += "ADMIN_PASSWORD=$AdminPassword"
@@ -355,7 +355,7 @@ function Print-Summary {
     Write-Host "  - DB_NAME: gatrix"
     Write-Host "  - DB_USER: gatrix_user"
     Write-Host "  - REDIS_HOST: redis"
-    Write-Host "  - EDGE_URL: $($script:ProtocolToUse)://$HostAddress`:1400"
+    Write-Host "  - EDGE_URL: $($script:ProtocolToUse)://$HostAddress`:3400"
     Write-Host ""
     Write-Host "[FILE LOCATIONS]" -ForegroundColor Cyan
     Write-Host "  - .env: $EnvFile"
