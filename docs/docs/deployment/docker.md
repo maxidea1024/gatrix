@@ -21,7 +21,7 @@ This page explains how to run Gatrix with Docker in both development and product
 - Backend API: host 45000 -> container 5000
 - Event Lens: host 45200 -> container 5200
 - Chat Server: host 45100 -> container 5100
-- Frontend: host 43000 (prod) / 43500 (dev) -> container 80 / 3000
+- Frontend: host 43000 -> container 80 / 3000
 - Loki: host 43100 -> container 3100
 - ClickHouse: host 48123 -> container 8123, host 49000 -> container 9000
 - Redis: host 46379 -> container 6379
