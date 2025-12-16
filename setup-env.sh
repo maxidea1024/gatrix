@@ -222,6 +222,13 @@ create_env_file() {
   # Set Edge server URL (for game client webview pages)
   sed -i.bak "s|^VITE_EDGE_URL=.*|VITE_EDGE_URL=$PROTOCOL://$HOST:3400|" "$ENV_FILE"
 
+  # Set Edge HTTPS enforcement based on protocol
+  if [ "$PROTOCOL" = "https" ]; then
+    sed -i.bak "s|^EDGE_FORCE_HTTPS=.*|EDGE_FORCE_HTTPS=true|" "$ENV_FILE"
+  else
+    sed -i.bak "s|^EDGE_FORCE_HTTPS=.*|EDGE_FORCE_HTTPS=false|" "$ENV_FILE"
+  fi
+
   # Replace admin password
   sed -i.bak "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=$ADMIN_PASSWORD|" "$ENV_FILE"
 

@@ -310,6 +310,14 @@ function Create-EnvFile {
             # Edge server URL (for game client webview pages)
             $newLines += "VITE_EDGE_URL=$($script:ProtocolToUse)://$HostAddress`:3400"
         }
+        elseif ($line -match "^EDGE_FORCE_HTTPS=") {
+            # Set Edge HTTPS enforcement based on protocol
+            if ($script:ProtocolToUse -eq "https") {
+                $newLines += "EDGE_FORCE_HTTPS=true"
+            } else {
+                $newLines += "EDGE_FORCE_HTTPS=false"
+            }
+        }
         elseif ($line -match "^ADMIN_PASSWORD=") {
             $newLines += "ADMIN_PASSWORD=$AdminPassword"
         }

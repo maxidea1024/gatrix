@@ -15,6 +15,9 @@ const app: Application = express();
 // SDK cache is the source of truth, so we don't want browsers to use stale cached responses
 app.set('etag', false);
 
+// Check if HTTPS is enforced (for HTTP environments, disable HSTS and related headers)
+const forceHttps = process.env.EDGE_FORCE_HTTPS !== 'false';
+
 // Security middleware
 // Configure helmet with relaxed CSP for static HTML pages that use inline scripts
 app.use(
@@ -24,11 +27,16 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for game webview pages
         styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
-        imgSrc: ["'self'", 'data:', 'https:'],
-        fontSrc: ["'self'", 'https:', 'data:'],
+        imgSrc: ["'self'", 'data:', 'https:', 'http:'],
+        fontSrc: ["'self'", 'https:', 'http:', 'data:'],
         connectSrc: ["'self'"],
       },
     },
+    // Disable HTTPS-related headers for HTTP environments
+    hsts: forceHttps, // HTTP Strict Transport Security
+    crossOriginOpenerPolicy: forceHttps ? { policy: 'same-origin' } : false,
+    crossOriginEmbedderPolicy: false, // Disable to allow loading external resources
+    originAgentCluster: false, // Disable to avoid origin-keying issues in HTTP
   })
 );
 
