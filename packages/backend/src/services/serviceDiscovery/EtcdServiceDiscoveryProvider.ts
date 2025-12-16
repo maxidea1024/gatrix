@@ -220,20 +220,39 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
       if (!value) {
         if (autoRegisterIfMissing) {
-          // Auto-register: create new instance
+          // Auto-register: try to restore from Redis mirror first to preserve externalAddress, hostname, ports, etc.
+          const mirrorData = await this.getMirrorFromRedis(serviceType, input.instanceId);
           const now = new Date().toISOString();
-          const newInstance: ServiceInstance = {
-            instanceId: input.instanceId,
-            labels: input.labels,
-            hostname: '',
-            externalAddress: '',
-            internalAddress: '',
-            ports: {}, // Empty ports for auto-registered instance
-            status: input.status || 'ready',
-            createdAt: now,
-            updatedAt: now,
-            stats: input.stats || {},
-          };
+
+          let newInstance: ServiceInstance;
+          if (mirrorData) {
+            // Restore from mirror with updated status
+            newInstance = {
+              ...mirrorData,
+              status: input.status || 'ready',
+              updatedAt: now,
+              stats: input.stats || mirrorData.stats || {},
+            };
+            logger.info(`Service auto-registered from mirror: ${serviceType}:${input.instanceId}`, {
+              externalAddress: newInstance.externalAddress,
+              hostname: newInstance.hostname,
+            });
+          } else {
+            // Create minimal instance (no mirror available)
+            newInstance = {
+              instanceId: input.instanceId,
+              labels: input.labels,
+              hostname: '',
+              externalAddress: '',
+              internalAddress: '',
+              ports: {},
+              status: input.status || 'ready',
+              createdAt: now,
+              updatedAt: now,
+              stats: input.stats || {},
+            };
+            logger.info(`Service auto-registered (no mirror): ${serviceType}:${input.instanceId}`);
+          }
 
           // Create new lease with configured TTL
           const heartbeatTTL = config?.serviceDiscovery?.heartbeatTTL || 30;
@@ -241,7 +260,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           await lease.put(key).value(JSON.stringify(newInstance));
           this.leases.set(leaseKey, lease);
 
-          logger.info(`Service auto-registered: ${serviceType}:${input.instanceId}`);
+          // Mirror to Redis for future recovery
+          await this.saveMirrorToRedis(newInstance);
+
           return;
         } else {
           throw new Error(`Service ${serviceType}:${input.instanceId} not found`);

@@ -12,13 +12,10 @@ import { CouponRedeemError, CouponRedeemErrorCode, isGatrixSDKError } from '../u
 export class CouponService {
   private apiClient: ApiClient;
   private logger: Logger;
-  // Default environment for single-environment mode
-  private defaultEnvironment: string;
 
-  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
+  constructor(apiClient: ApiClient, logger: Logger) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.defaultEnvironment = defaultEnvironment;
   }
 
   /**
@@ -40,16 +37,17 @@ export class CouponService {
    * - COUPON_INVALID_CHANNEL: Coupon not available for this channel
    * - COUPON_INVALID_SUBCHANNEL: Coupon not available for this subchannel
    * - COUPON_INVALID_USER: Coupon not available for this user
+   * @param request Coupon redemption request
+   * @param environment Environment name (required)
    */
-  async redeem(request: RedeemCouponRequest, environment?: string): Promise<RedeemCouponResponse> {
-    const env = environment || this.defaultEnvironment;
-    this.logger.info('Redeeming coupon', { code: request.code, userId: request.userId, environment: env });
+  async redeem(request: RedeemCouponRequest, environment: string): Promise<RedeemCouponResponse> {
+    this.logger.info('Redeeming coupon', { code: request.code, userId: request.userId, environment });
 
     const { code, ...body } = request;
 
     try {
       const response = await this.apiClient.post<RedeemCouponResponse>(
-        `/api/v1/server/${encodeURIComponent(env)}/coupons/${encodeURIComponent(code)}/redeem`,
+        `/api/v1/server/${encodeURIComponent(environment)}/coupons/${encodeURIComponent(code)}/redeem`,
         body
       );
 
@@ -67,7 +65,7 @@ export class CouponService {
         code,
         userId: request.userId,
         sequence: response.data.sequence,
-        environment: env,
+        environment,
       });
 
       return response.data;

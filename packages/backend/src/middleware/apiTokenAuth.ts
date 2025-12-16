@@ -71,6 +71,25 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       return next();
     }
 
+    // Check for Edge bypass token (internal network only)
+    // Edge server uses this token when proxying client requests to backend
+    if (token === EDGE_BYPASS_TOKEN) {
+      req.isUnsecuredToken = true;
+      req.isEdgeBypassToken = true;
+      req.apiToken = {
+        id: 0,
+        tokenType: 'client', // Treat as client for client SDK endpoints
+        tokenValue: EDGE_BYPASS_TOKEN,
+        name: 'Edge Bypass Token (Internal)',
+        allowAllEnvironments: true,
+        isActive: true,
+        expiresAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any;
+      return next();
+    }
+
     // Try to get token from cache first
     const cacheKey = `api_token:${token.substring(0, 16)}...`; // Use partial token for cache key
     let apiToken = await CacheService.get<ApiAccessToken>(cacheKey);

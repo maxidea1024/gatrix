@@ -195,12 +195,8 @@ export class EventListener {
    */
   private async reinitializeCache(): Promise<void> {
     try {
-      // Refresh all cache data
-      await this.cacheManager.refreshGameWorlds();
-      await this.cacheManager.refreshPopupNotices();
-      await this.cacheManager.refreshSurveys();
-      await this.cacheManager.refreshWhitelists();
-      await this.cacheManager.refreshServiceMaintenance();
+      // Refresh all cache data using refreshAll which handles all environments
+      await this.cacheManager.refreshAll();
 
       this.logger.info('Cache reinitialized after reconnection');
     } catch (error: any) {
@@ -268,98 +264,201 @@ export class EventListener {
 
   /**
    * Handle standard cache invalidation events
+   * All event handlers check feature flags before processing
    */
   private async handleStandardEvent(event: StandardEvent): Promise<void> {
     this.logger.info('Handling standard event', { type: event.type, id: event.data.id });
 
+    const features = this.cacheManager.getFeatures();
+
     switch (event.type) {
       case 'gameworld.created':
-      case 'gameworld.updated':
+      case 'gameworld.updated': {
+        if (features.gameWorld === false) {
+          this.logger.debug('Game world event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         // Update only the affected game world (immutable)
         // Pass isVisible from event data to avoid unnecessary API calls
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
+        const gwEnv = event.data.environment as string;
+        if (!gwEnv) {
+          this.logger.warn('Game world event missing environment', { event: event.type });
+          break;
+        }
         const gameWorldIsVisible = event.data.isVisible === 0 ? false : (event.data.isVisible === 1 ? true : event.data.isVisible);
-        await this.cacheManager.updateSingleGameWorld(Number(event.data.id), event.data.environment, gameWorldIsVisible);
+        await this.cacheManager.updateSingleGameWorld(Number(event.data.id), gwEnv, gameWorldIsVisible);
         break;
+      }
 
-      case 'gameworld.deleted':
+      case 'gameworld.deleted': {
+        if (features.gameWorld === false) {
+          this.logger.debug('Game world event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         // Remove the deleted game world from cache (immutable)
-        this.cacheManager.removeGameWorld(Number(event.data.id));
+        const gwDeleteEnv = event.data.environment as string;
+        if (!gwDeleteEnv) {
+          this.logger.warn('Game world deleted event missing environment', { event: event.type });
+          break;
+        }
+        this.cacheManager.removeGameWorld(Number(event.data.id), gwDeleteEnv);
         break;
+      }
 
-      case 'gameworld.order_changed':
+      case 'gameworld.order_changed': {
+        if (features.gameWorld === false) {
+          this.logger.debug('Game world event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         // Clear entire game worlds cache when order changes
-        this.logger.info('Game world order changed, clearing entire cache');
-        await this.cacheManager.refreshGameWorlds();
+        const gwOrderEnv = event.data.environment as string;
+        if (!gwOrderEnv) {
+          this.logger.warn('Game world order changed event missing environment', { event: event.type });
+          break;
+        }
+        this.logger.info('Game world order changed, refreshing cache', { environment: gwOrderEnv });
+        await this.cacheManager.refreshGameWorlds(gwOrderEnv);
         break;
+      }
 
       case 'popup.created':
-      case 'popup.updated':
+      case 'popup.updated': {
+        if (features.popupNotice === false) {
+          this.logger.debug('Popup notice event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         // Update only the affected popup notice (immutable)
         // Pass isVisible from event data to avoid unnecessary API calls
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
+        const popupEnv = event.data.environment as string;
+        if (!popupEnv) {
+          this.logger.warn('Popup notice event missing environment', { event: event.type });
+          break;
+        }
         const popupIsVisible = event.data.isVisible === 0 ? false : (event.data.isVisible === 1 ? true : event.data.isVisible);
-        await this.cacheManager.updateSinglePopupNotice(Number(event.data.id), event.data.environment, popupIsVisible);
+        await this.cacheManager.updateSinglePopupNotice(Number(event.data.id), popupEnv, popupIsVisible);
         break;
+      }
 
-      case 'popup.deleted':
+      case 'popup.deleted': {
+        if (features.popupNotice === false) {
+          this.logger.debug('Popup notice event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         // Remove the deleted popup notice from cache (immutable)
-        this.cacheManager.removePopupNotice(Number(event.data.id));
+        const popupDeleteEnv = event.data.environment as string;
+        if (!popupDeleteEnv) {
+          this.logger.warn('Popup notice deleted event missing environment', { event: event.type });
+          break;
+        }
+        this.cacheManager.removePopupNotice(Number(event.data.id), popupDeleteEnv);
         break;
+      }
 
       case 'survey.created':
-      case 'survey.updated':
+      case 'survey.updated': {
+        if (features.survey === false) {
+          this.logger.debug('Survey event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         // Update only the affected survey (immutable)
         // Pass isActive from event data to avoid unnecessary API calls
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
+        const surveyEnv = event.data.environment as string;
+        if (!surveyEnv) {
+          this.logger.warn('Survey event missing environment', { event: event.type });
+          break;
+        }
         const surveyIsActive = event.data.isActive === 0 ? false : (event.data.isActive === 1 ? true : event.data.isActive);
-        await this.cacheManager.updateSingleSurvey(String(event.data.id), event.data.environment, surveyIsActive);
+        await this.cacheManager.updateSingleSurvey(String(event.data.id), surveyEnv, surveyIsActive);
         break;
+      }
 
-      case 'survey.deleted':
+      case 'survey.deleted': {
+        if (features.survey === false) {
+          this.logger.debug('Survey event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         // Remove the deleted survey from cache (immutable)
-        this.cacheManager.removeSurvey(String(event.data.id));
+        const surveyDeleteEnv = event.data.environment as string;
+        if (!surveyDeleteEnv) {
+          this.logger.warn('Survey deleted event missing environment', { event: event.type });
+          break;
+        }
+        this.cacheManager.removeSurvey(String(event.data.id), surveyDeleteEnv);
         break;
+      }
 
-      case 'survey.settings.updated':
+      case 'survey.settings.updated': {
+        if (features.survey === false) {
+          this.logger.debug('Survey event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         // Refresh survey settings only when configuration changes
+        const surveySettingsEnv = event.data.environment as string;
+        if (!surveySettingsEnv) {
+          this.logger.warn('Survey settings updated event missing environment', { event: event.type });
+          break;
+        }
         this.logger.info('Survey settings updated event received, refreshing settings', {
           eventData: event.data,
+          environment: surveySettingsEnv,
         });
         try {
-          await this.cacheManager.refreshSurveySettings();
+          await this.cacheManager.refreshSurveySettings(surveySettingsEnv);
           this.logger.info('Survey settings refreshed successfully');
         } catch (error) {
           this.logger.error('Failed to refresh survey settings', { error });
         }
         break;
+      }
 
-      case 'whitelist.updated':
+      case 'whitelist.updated': {
+        if (features.whitelist === false) {
+          this.logger.debug('Whitelist event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         // Refresh whitelist cache when whitelist is updated
-        this.logger.info('Whitelist updated event received, refreshing whitelist cache');
+        const whitelistEnv = event.data.environment as string;
+        if (!whitelistEnv) {
+          this.logger.warn('Whitelist updated event missing environment', { event: event.type });
+          break;
+        }
+        this.logger.info('Whitelist updated event received, refreshing whitelist cache', { environment: whitelistEnv });
         try {
-          await this.cacheManager.refreshWhitelists();
+          await this.cacheManager.refreshWhitelists(whitelistEnv);
           this.logger.info('Whitelist cache refreshed successfully');
         } catch (error) {
           this.logger.error('Failed to refresh whitelist cache', { error });
         }
         break;
+      }
 
-      case 'maintenance.settings.updated':
+      case 'maintenance.settings.updated': {
+        if (features.serviceMaintenance === false) {
+          this.logger.debug('Maintenance event ignored - feature is disabled', { event: event.type });
+          break;
+        }
         // Refresh service maintenance cache when maintenance settings are updated
         // Note: This will also trigger MaintenanceWatcher to check state changes
         // and emit maintenance.started/maintenance.ended events if needed
-        this.logger.info('Service maintenance settings updated event received, refreshing service maintenance cache');
+        const maintenanceEnv = event.data.environment as string;
+        if (!maintenanceEnv) {
+          this.logger.warn('Maintenance settings updated event missing environment', { event: event.type });
+          break;
+        }
+        this.logger.info('Service maintenance settings updated event received, refreshing service maintenance cache', { environment: maintenanceEnv });
         try {
-          await this.cacheManager.refreshServiceMaintenance();
+          await this.cacheManager.refreshServiceMaintenance(maintenanceEnv);
           this.logger.info('Service maintenance cache refreshed successfully');
         } catch (error) {
           this.logger.error('Failed to refresh service maintenance cache', { error });
         }
         break;
+      }
 
       case 'client_version.updated': {
-        const features = this.cacheManager.getFeatures();
         if (features.clientVersion !== true) {
           this.logger.debug('Client version event ignored - feature is disabled', { event: event.type });
           break;
@@ -369,13 +468,13 @@ export class EventListener {
           id: event.data.id,
           environment: cvEnvironment
         });
+        if (!cvEnvironment) {
+          this.logger.warn('Client version updated event missing environment', { event: event.type });
+          break;
+        }
         try {
           // Use refreshByEnvironment to refresh the specific environment's cache
-          if (cvEnvironment) {
-            await this.cacheManager.getClientVersionService()?.refreshByEnvironment(cvEnvironment);
-          } else {
-            await this.cacheManager.getClientVersionService()?.refresh();
-          }
+          await this.cacheManager.getClientVersionService()?.refreshByEnvironment(cvEnvironment);
           this.logger.info('Client version cache refreshed successfully');
         } catch (error: any) {
           this.logger.error('Failed to refresh client version cache', { error: error.message });
@@ -385,51 +484,58 @@ export class EventListener {
 
       case 'banner.created':
       case 'banner.updated': {
-        const features = this.cacheManager.getFeatures();
         if (features.banner !== true) {
           this.logger.debug('Banner event ignored - feature is disabled', { event: event.type });
           break;
         }
         // Update only the affected banner (immutable)
         // Pass status from event data to avoid unnecessary API calls
+        const bannerEnv = event.data.environment as string;
+        if (!bannerEnv) {
+          this.logger.warn('Banner event missing environment', { event: event.type });
+          break;
+        }
         const bannerStatus = event.data.status as string | undefined;
         await this.cacheManager.updateSingleBanner(
           String(event.data.id),
-          event.data.environment,
+          bannerEnv,
           bannerStatus
         );
         break;
       }
 
       case 'banner.deleted': {
-        const features = this.cacheManager.getFeatures();
         if (features.banner !== true) {
           this.logger.debug('Banner event ignored - feature is disabled', { event: event.type });
           break;
         }
         // Remove the deleted banner from cache (immutable)
-        this.cacheManager.removeBanner(String(event.data.id), event.data.environment);
+        const bannerDeleteEnv = event.data.environment as string;
+        if (!bannerDeleteEnv) {
+          this.logger.warn('Banner deleted event missing environment', { event: event.type });
+          break;
+        }
+        this.cacheManager.removeBanner(String(event.data.id), bannerDeleteEnv);
         break;
       }
 
       case 'service_notice.updated': {
-        const features = this.cacheManager.getFeatures();
         if (features.serviceNotice !== true) {
           this.logger.debug('Service notice event ignored - feature is disabled', { event: event.type });
           break;
         }
         const noticeEnvironment = event.data.environment as string;
+        if (!noticeEnvironment) {
+          this.logger.warn('Service notice updated event missing environment', { event: event.type });
+          break;
+        }
         this.logger.info('Service notice updated event received, refreshing service notice cache', {
           id: event.data.id,
           environment: noticeEnvironment
         });
         try {
           // Use refreshByEnvironment to refresh the specific environment's cache
-          if (noticeEnvironment) {
-            await this.cacheManager.getServiceNoticeService()?.refreshByEnvironment(noticeEnvironment);
-          } else {
-            await this.cacheManager.getServiceNoticeService()?.refresh();
-          }
+          await this.cacheManager.getServiceNoticeService()?.refreshByEnvironment(noticeEnvironment);
           this.logger.info('Service notice cache refreshed successfully');
         } catch (error: any) {
           this.logger.error('Failed to refresh service notice cache', { error: error.message });
@@ -439,7 +545,6 @@ export class EventListener {
 
       case 'store_product.created':
       case 'store_product.updated': {
-        const features = this.cacheManager.getFeatures();
         if (features.storeProduct !== true) {
           this.logger.debug('Store product event ignored - feature is disabled', { event: event.type });
           break;
@@ -447,39 +552,52 @@ export class EventListener {
         // Update only the affected store product (immutable)
         // Pass isActive from event data to avoid unnecessary API calls
         // Convert 0/1 to false/true (MySQL returns TINYINT as 0 or 1)
+        const productEnv = event.data.environment as string;
+        if (!productEnv) {
+          this.logger.warn('Store product event missing environment', { event: event.type });
+          break;
+        }
         const productIsActive = event.data.isActive === 0 ? false : (event.data.isActive === 1 ? true : event.data.isActive);
         await this.cacheManager.updateSingleStoreProduct(
           String(event.data.id),
-          event.data.environment,
+          productEnv,
           productIsActive
         );
         break;
       }
 
       case 'store_product.deleted': {
-        const features = this.cacheManager.getFeatures();
         if (features.storeProduct !== true) {
           this.logger.debug('Store product event ignored - feature is disabled', { event: event.type });
           break;
         }
         // Remove the deleted store product from cache (immutable)
-        this.cacheManager.removeStoreProduct(String(event.data.id), event.data.environment);
+        const productDeleteEnv = event.data.environment as string;
+        if (!productDeleteEnv) {
+          this.logger.warn('Store product deleted event missing environment', { event: event.type });
+          break;
+        }
+        this.cacheManager.removeStoreProduct(String(event.data.id), productDeleteEnv);
         break;
       }
 
       case 'store_product.bulk_updated': {
-        const features = this.cacheManager.getFeatures();
         if (features.storeProduct !== true) {
           this.logger.debug('Store product bulk update event ignored - feature is disabled', { event: event.type });
           break;
         }
         // For bulk updates, refresh all store products for the environment
+        const bulkEnv = event.data.environment as string;
+        if (!bulkEnv) {
+          this.logger.warn('Store product bulk update event missing environment', { event: event.type });
+          break;
+        }
         this.logger.info('Store product bulk update event received, refreshing cache', {
           count: event.data.count,
-          environment: event.data.environment,
+          environment: bulkEnv,
           isActive: event.data.isActive,
         });
-        await this.cacheManager.refreshStoreProducts(event.data.environment);
+        await this.cacheManager.refreshStoreProducts(bulkEnv);
         break;
       }
 

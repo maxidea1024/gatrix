@@ -15,6 +15,7 @@ import { ServiceNoticeService } from '../services/ServiceNoticeService';
 import { BannerService } from '../services/BannerService';
 import { StoreProductService } from '../services/StoreProductService';
 import { EnvironmentService } from '../services/EnvironmentService';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 import { ApiClient } from '../client/ApiClient';
 import { SdkMetrics } from '../utils/sdkMetrics';
 import { MaintenanceStatus, ClientVersion, ServiceNotice, Banner, StoreProduct } from '../types/api';
@@ -25,12 +26,14 @@ export class CacheManager {
   private logger: Logger;
   private config: CacheConfig;
   private features: FeaturesConfig;
-  private gameWorldService: GameWorldService;
-  private popupNoticeService: PopupNoticeService;
-  private surveyService: SurveyService;
-  private whitelistService: WhitelistService;
-  private serviceMaintenanceService: ServiceMaintenanceService;
-  // New services for Edge
+  // Environment resolver for all services
+  private envResolver: EnvironmentResolver;
+  // All services are optional - controlled by feature flags
+  private gameWorldService?: GameWorldService;
+  private popupNoticeService?: PopupNoticeService;
+  private surveyService?: SurveyService;
+  private whitelistService?: WhitelistService;
+  private serviceMaintenanceService?: ServiceMaintenanceService;
   private clientVersionService?: ClientVersionService;
   private serviceNoticeService?: ServiceNoticeService;
   private bannerService?: BannerService;
@@ -49,22 +52,13 @@ export class CacheManager {
 
   constructor(
     config: CacheConfig,
-    gameWorldService: GameWorldService,
-    popupNoticeService: PopupNoticeService,
-    surveyService: SurveyService,
-    whitelistService: WhitelistService,
-    serviceMaintenanceService: ServiceMaintenanceService,
     apiClient: ApiClient,
     logger: Logger,
+    defaultEnvironment: string = 'development',
     metrics?: SdkMetrics,
     configWorldId?: string,
     features?: FeaturesConfig,
-    environments?: string[] | '*',
-    // New services for Edge (created internally if enabled)
-    clientVersionService?: ClientVersionService,
-    serviceNoticeService?: ServiceNoticeService,
-    bannerService?: BannerService,
-    storeProductService?: StoreProductService
+    environments?: string[] | '*'
   ) {
     this.config = {
       enabled: config.enabled !== false,
@@ -73,28 +67,10 @@ export class CacheManager {
       skipBackendReady: config.skipBackendReady ?? false, // Default: wait for backend
     };
     this.features = features || {};
-    this.gameWorldService = gameWorldService;
-    this.popupNoticeService = popupNoticeService;
-    this.surveyService = surveyService;
-    this.whitelistService = whitelistService;
-    this.serviceMaintenanceService = serviceMaintenanceService;
-
-    // Create new services if enabled
-    // Services now use per-environment API pattern
-    // Default environment is 'development' for single-env mode
-    const defaultEnv = 'development';
-    if (this.features.clientVersion === true) {
-      this.clientVersionService = clientVersionService || new ClientVersionService(apiClient, logger, defaultEnv);
-    }
-    if (this.features.serviceNotice === true) {
-      this.serviceNoticeService = serviceNoticeService || new ServiceNoticeService(apiClient, logger, defaultEnv);
-    }
-    if (this.features.banner === true) {
-      this.bannerService = bannerService || new BannerService(apiClient, logger, defaultEnv);
-    }
-    if (this.features.storeProduct === true) {
-      this.storeProductService = storeProductService || new StoreProductService(apiClient, logger, defaultEnv);
-    }
+    this.apiClient = apiClient;
+    this.logger = logger;
+    this.metrics = metrics;
+    this.maintenanceWatcher = new MaintenanceWatcher(logger, configWorldId);
 
     // Store environments for multi-environment mode
     this.environments = environments;
@@ -104,10 +80,55 @@ export class CacheManager {
       this.environmentService = new EnvironmentService(apiClient, logger);
     }
 
-    this.apiClient = apiClient;
-    this.logger = logger;
-    this.metrics = metrics;
-    this.maintenanceWatcher = new MaintenanceWatcher(logger, configWorldId);
+    // Determine if we're in multi-environment mode
+    const isMultiEnvMode = environments === '*' || (Array.isArray(environments) && environments.length > 0);
+
+    // Create EnvironmentResolver for all services
+    this.envResolver = new EnvironmentResolver(defaultEnvironment);
+    if (isMultiEnvMode) {
+      this.envResolver.setMultiEnvironmentMode(true);
+    }
+
+    // Initialize ALL services internally based on feature flags
+    // All services are optional and controlled by feature flags
+    // Default features (gameWorld, popupNotice, survey, whitelist, serviceMaintenance) use !== false for backward compatibility
+    // New features (clientVersion, serviceNotice, banner, storeProduct) require explicit === true
+    if (this.features.gameWorld !== false) {
+      this.gameWorldService = new GameWorldService(apiClient, logger, this.envResolver);
+      this.gameWorldService.setFeatureEnabled(true);
+    }
+    if (this.features.popupNotice !== false) {
+      this.popupNoticeService = new PopupNoticeService(apiClient, logger, this.envResolver);
+      this.popupNoticeService.setFeatureEnabled(true);
+    }
+    if (this.features.survey !== false) {
+      this.surveyService = new SurveyService(apiClient, logger, this.envResolver);
+      this.surveyService.setFeatureEnabled(true);
+    }
+    if (this.features.whitelist !== false) {
+      this.whitelistService = new WhitelistService(apiClient, logger, this.envResolver);
+      this.whitelistService.setFeatureEnabled(true);
+    }
+    if (this.features.serviceMaintenance !== false) {
+      this.serviceMaintenanceService = new ServiceMaintenanceService(apiClient, logger, this.envResolver);
+      this.serviceMaintenanceService.setFeatureEnabled(true);
+    }
+    if (this.features.clientVersion === true) {
+      this.clientVersionService = new ClientVersionService(apiClient, logger, this.envResolver);
+      this.clientVersionService.setFeatureEnabled(true);
+    }
+    if (this.features.serviceNotice === true) {
+      this.serviceNoticeService = new ServiceNoticeService(apiClient, logger, this.envResolver);
+      this.serviceNoticeService.setFeatureEnabled(true);
+    }
+    if (this.features.banner === true) {
+      this.bannerService = new BannerService(apiClient, logger, this.envResolver);
+      this.bannerService.setFeatureEnabled(true);
+    }
+    if (this.features.storeProduct === true) {
+      this.storeProductService = new StoreProductService(apiClient, logger, this.envResolver);
+      this.storeProductService.setFeatureEnabled(true);
+    }
   }
 
   /**
@@ -195,10 +216,10 @@ export class CacheManager {
         });
       }
 
-      // Existing features - default: true (backward compatible)
+      // All services use optional chaining since they are controlled by feature flags
       // Use !== false check to maintain backward compatibility
       // In multi-environment mode, use listByEnvironments for environment-specific features
-      if (this.features.gameWorld !== false) {
+      if (this.features.gameWorld !== false && this.gameWorldService) {
         if (isMultiEnvMode) {
           if (envList.length > 0) {
             promises.push(
@@ -211,12 +232,13 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          promises.push(this.gameWorldService.list());
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          promises.push(this.gameWorldService.listByEnvironment(defaultEnv));
           featureTypes.push('gameWorld');
         }
       }
 
-      if (this.features.popupNotice !== false) {
+      if (this.features.popupNotice !== false && this.popupNoticeService) {
         if (isMultiEnvMode) {
           if (envList.length > 0) {
             promises.push(
@@ -229,12 +251,13 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
-          promises.push(this.popupNoticeService.list());
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          promises.push(this.popupNoticeService.listByEnvironment(defaultEnv));
           featureTypes.push('popupNotice');
         }
       }
 
-      if (this.features.survey !== false) {
+      if (this.features.survey !== false && this.surveyService) {
         if (isMultiEnvMode) {
           if (envList.length > 0) {
             promises.push(
@@ -246,8 +269,9 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
           promises.push(
-            this.surveyService.list({ isActive: true }).catch((_error) => {
+            this.surveyService.listByEnvironment(defaultEnv, { isActive: true }).catch((_error) => {
               return { surveys: [], settings: null };
             })
           );
@@ -255,7 +279,7 @@ export class CacheManager {
         }
       }
 
-      if (this.features.whitelist !== false) {
+      if (this.features.whitelist !== false && this.whitelistService) {
         if (isMultiEnvMode) {
           if (envList.length > 0) {
             promises.push(
@@ -268,8 +292,9 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
           promises.push(
-            this.whitelistService.list().catch((error) => {
+            this.whitelistService.listByEnvironment(defaultEnv).catch((error) => {
               this.logger.warn('Failed to load whitelists', { error: error.message });
               return { ipWhitelist: [], accountWhitelist: [] };
             })
@@ -278,7 +303,7 @@ export class CacheManager {
         }
       }
 
-      if (this.features.serviceMaintenance !== false) {
+      if (this.features.serviceMaintenance !== false && this.serviceMaintenanceService) {
         if (isMultiEnvMode) {
           if (envList.length > 0) {
             promises.push(
@@ -291,8 +316,9 @@ export class CacheManager {
           }
           // Skip if multi-env mode but no environments available
         } else {
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
           promises.push(
-            this.refreshServiceMaintenanceInternal().catch((error) => {
+            this.refreshServiceMaintenanceInternal(defaultEnv).catch((error) => {
               this.logger.warn('Failed to load service maintenance status', { error: error.message });
             })
           );
@@ -491,13 +517,61 @@ export class CacheManager {
   }
 
   /**
-   * Load data for specific environments (multi-environment features only)
+   * Load data for specific environments (ALL features, not just Edge-specific ones)
+   * This ensures full data synchronization when new environments are added
    */
   private async loadDataForEnvironments(environments: string[]): Promise<void> {
     this.logger.info('Loading data for new environments', { environments });
 
     const promises: Promise<any>[] = [];
 
+    // All services use optional chaining since they are controlled by feature flags
+    // gameWorld - uses !== false check for backward compatibility
+    if (this.features.gameWorld !== false && this.gameWorldService) {
+      promises.push(
+        this.gameWorldService.listByEnvironments(environments).catch((error) => {
+          this.logger.warn('Failed to load game worlds for new environments', { error: error.message });
+        })
+      );
+    }
+
+    // popupNotice - uses !== false check for backward compatibility
+    if (this.features.popupNotice !== false && this.popupNoticeService) {
+      promises.push(
+        this.popupNoticeService.listByEnvironments(environments).catch((error) => {
+          this.logger.warn('Failed to load popup notices for new environments', { error: error.message });
+        })
+      );
+    }
+
+    // survey - uses !== false check for backward compatibility
+    if (this.features.survey !== false && this.surveyService) {
+      promises.push(
+        this.surveyService.listByEnvironments(environments).catch((error) => {
+          this.logger.warn('Failed to load surveys for new environments', { error: error.message });
+        })
+      );
+    }
+
+    // whitelist - uses !== false check for backward compatibility
+    if (this.features.whitelist !== false && this.whitelistService) {
+      promises.push(
+        this.whitelistService.listByEnvironments(environments).catch((error) => {
+          this.logger.warn('Failed to load whitelists for new environments', { error: error.message });
+        })
+      );
+    }
+
+    // serviceMaintenance - uses !== false check for backward compatibility
+    if (this.features.serviceMaintenance !== false && this.serviceMaintenanceService) {
+      promises.push(
+        this.serviceMaintenanceService.listByEnvironments(environments).catch((error) => {
+          this.logger.warn('Failed to load service maintenance for new environments', { error: error.message });
+        })
+      );
+    }
+
+    // Edge-specific features (default: false, must be explicitly enabled)
     if (this.features.clientVersion === true && this.clientVersionService) {
       promises.push(
         this.clientVersionService.listByEnvironments(environments).catch((error) => {
@@ -535,16 +609,22 @@ export class CacheManager {
   }
 
   /**
-   * Clear cached data for removed environments
+   * Clear cached data for removed environments (ALL services)
    */
   private clearDataForEnvironments(environments: string[]): void {
     this.logger.info('Clearing data for removed environments', { environments });
 
     for (const env of environments) {
-      this.clientVersionService?.clearCacheForEnvironment?.(env);
-      this.serviceNoticeService?.clearCacheForEnvironment?.(env);
-      this.bannerService?.clearCacheForEnvironment?.(env);
-      this.storeProductService?.clearCacheForEnvironment?.(env);
+      // All services use optional chaining since they are controlled by feature flags
+      this.gameWorldService?.clearCacheForEnvironment(env);
+      this.popupNoticeService?.clearCacheForEnvironment(env);
+      this.surveyService?.clearCacheForEnvironment(env);
+      this.whitelistService?.clearCacheForEnvironment(env);
+      this.serviceMaintenanceService?.clearCacheForEnvironment(env);
+      this.clientVersionService?.clearCacheForEnvironment(env);
+      this.serviceNoticeService?.clearCacheForEnvironment(env);
+      this.bannerService?.clearCacheForEnvironment(env);
+      this.storeProductService?.clearCacheForEnvironment(env);
     }
   }
 
@@ -578,9 +658,9 @@ export class CacheManager {
         });
       }
 
-      // Existing features - default: true (backward compatible)
+      // All services use optional chaining since they are controlled by feature flags
       // In multi-environment mode, use listByEnvironments for environment-specific features
-      if (this.features.gameWorld !== false) {
+      if (this.features.gameWorld !== false && this.gameWorldService) {
         if (isMultiEnvMode) {
           if (envList.length > 0) {
             promises.push(
@@ -592,12 +672,13 @@ export class CacheManager {
             refreshedTypes.push('gameWorld');
           }
         } else {
-          promises.push(this.gameWorldService.refresh());
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          promises.push(this.gameWorldService.refreshByEnvironment(defaultEnv, true)); // suppressWarnings=true for refreshAll
           refreshedTypes.push('gameWorld');
         }
       }
 
-      if (this.features.popupNotice !== false) {
+      if (this.features.popupNotice !== false && this.popupNoticeService) {
         if (isMultiEnvMode) {
           if (envList.length > 0) {
             promises.push(
@@ -609,12 +690,13 @@ export class CacheManager {
             refreshedTypes.push('popupNotice');
           }
         } else {
-          promises.push(this.popupNoticeService.refresh());
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
+          promises.push(this.popupNoticeService.refreshByEnvironment(defaultEnv, true)); // suppressWarnings=true for refreshAll
           refreshedTypes.push('popupNotice');
         }
       }
 
-      if (this.features.survey !== false) {
+      if (this.features.survey !== false && this.surveyService) {
         if (isMultiEnvMode) {
           if (envList.length > 0) {
             promises.push(
@@ -626,8 +708,9 @@ export class CacheManager {
             refreshedTypes.push('survey');
           }
         } else {
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
           promises.push(
-            this.surveyService.refresh({ isActive: true }).catch((error) => {
+            this.surveyService.refreshByEnvironment(defaultEnv, { isActive: true }, true).catch((error) => { // suppressWarnings=true for refreshAll
               this.logger.warn('Failed to refresh surveys', { error: error.message });
             })
           );
@@ -635,7 +718,7 @@ export class CacheManager {
         }
       }
 
-      if (this.features.whitelist !== false) {
+      if (this.features.whitelist !== false && this.whitelistService) {
         if (isMultiEnvMode) {
           if (envList.length > 0) {
             promises.push(
@@ -647,8 +730,9 @@ export class CacheManager {
             refreshedTypes.push('whitelist');
           }
         } else {
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
           promises.push(
-            this.whitelistService.refresh().catch((error) => {
+            this.whitelistService.refreshByEnvironment(defaultEnv, true).catch((error) => { // suppressWarnings=true for refreshAll
               this.logger.warn('Failed to refresh whitelists', { error: error.message });
             })
           );
@@ -656,7 +740,7 @@ export class CacheManager {
         }
       }
 
-      if (this.features.serviceMaintenance !== false) {
+      if (this.features.serviceMaintenance !== false && this.serviceMaintenanceService) {
         if (isMultiEnvMode) {
           if (envList.length > 0) {
             promises.push(
@@ -668,8 +752,9 @@ export class CacheManager {
             refreshedTypes.push('serviceMaintenance');
           }
         } else {
+          const defaultEnv = this.envResolver.getDefaultEnvironment();
           promises.push(
-            this.refreshServiceMaintenanceInternal().catch((error) => {
+            this.refreshServiceMaintenanceInternal(defaultEnv).catch((error) => {
               this.logger.warn('Failed to refresh service maintenance', { error: error.message });
             })
           );
@@ -756,10 +841,12 @@ export class CacheManager {
   /**
    * Refresh game worlds cache
    * Also checks and emits maintenance state change events
+   * @param environment Environment name (required)
    */
-  async refreshGameWorlds(): Promise<void> {
+  async refreshGameWorlds(environment: string): Promise<void> {
+    if (!this.gameWorldService) return;
     const start = process.hrtime.bigint();
-    await this.gameWorldService.refresh();
+    await this.gameWorldService.refreshByEnvironment(environment);
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('gameworlds');
@@ -772,10 +859,12 @@ export class CacheManager {
 
   /**
    * Refresh popup notices cache
+   * @param environment Environment name (required)
    */
-  async refreshPopupNotices(): Promise<void> {
+  async refreshPopupNotices(environment: string): Promise<void> {
+    if (!this.popupNoticeService) return;
     const start = process.hrtime.bigint();
-    await this.popupNoticeService.refresh();
+    await this.popupNoticeService.refreshByEnvironment(environment);
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('popups');
@@ -786,10 +875,12 @@ export class CacheManager {
 
   /**
    * Refresh surveys cache
+   * @param environment Environment name (required)
    */
-  async refreshSurveys(): Promise<void> {
+  async refreshSurveys(environment: string): Promise<void> {
+    if (!this.surveyService) return;
     const start = process.hrtime.bigint();
-    await this.surveyService.refresh({ isActive: true });
+    await this.surveyService.refreshByEnvironment(environment, { isActive: true });
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('surveys');
@@ -800,17 +891,21 @@ export class CacheManager {
 
   /**
    * Refresh survey settings only
+   * @param environment Environment name (required)
    */
-  async refreshSurveySettings(): Promise<void> {
-    await this.surveyService.refreshSettings();
+  async refreshSurveySettings(environment: string): Promise<void> {
+    await this.surveyService?.refreshSettings(environment);
   }
 
   /**
    * Update a single game world in cache (immutable)
    * Also checks and emits maintenance state change events
+   * @param id Game world ID
+   * @param environment Environment name (required)
+   * @param isVisible Optional visibility flag
    */
-  async updateSingleGameWorld(id: number, environment?: string, isVisible?: boolean | number): Promise<void> {
-    await this.gameWorldService.updateSingleWorld(id, environment, isVisible);
+  async updateSingleGameWorld(id: number, environment: string, isVisible?: boolean | number): Promise<void> {
+    await this.gameWorldService?.updateSingleWorld(id, environment, isVisible);
     // Check maintenance state changes after update
     this.checkMaintenanceStateChanges();
   }
@@ -840,11 +935,11 @@ export class CacheManager {
     };
 
     return {
-      gameWorlds: mapToObject(this.gameWorldService.getAllCached()),
-      popupNotices: mapToObject(this.popupNoticeService.getAllCached()),
-      surveys: mapToObject(this.surveyService.getAllCached()),
-      whitelists: mapToObjectSingle(this.whitelistService.getAllCached()),
-      serviceMaintenance: mapToObjectSingle(this.serviceMaintenanceService.getAllCached()),
+      gameWorlds: mapToObject(this.gameWorldService?.getAllCached()),
+      popupNotices: mapToObject(this.popupNoticeService?.getAllCached()),
+      surveys: mapToObject(this.surveyService?.getAllCached()),
+      whitelists: mapToObjectSingle(this.whitelistService?.getAllCached()),
+      serviceMaintenance: mapToObjectSingle(this.serviceMaintenanceService?.getAllCached()),
       clientVersions: mapToObject(this.clientVersionService?.getAllCached()),
       serviceNotices: mapToObject(this.serviceNoticeService?.getAllCached()),
       banners: mapToObject(this.bannerService?.getAllCached()),
@@ -854,53 +949,68 @@ export class CacheManager {
 
   /**
    * Get cached game worlds
+   * @param environment Environment name (required)
    */
-  getGameWorlds(): any[] {
-    return this.gameWorldService.getCached();
+  getGameWorlds(environment: string): any[] {
+    return this.gameWorldService?.getCached(environment) || [];
   }
 
   /**
    * Remove a game world from cache (immutable)
+   * @param id Game world ID
+   * @param environment Environment name (required)
    */
-  removeGameWorld(id: number): void {
-    this.gameWorldService.removeWorld(id);
+  removeGameWorld(id: number, environment: string): void {
+    this.gameWorldService?.removeFromCache(id, environment);
   }
 
   /**
    * Update a single popup notice in cache (immutable)
+   * @param id Popup notice ID
+   * @param environment Environment name (required)
+   * @param isVisible Optional visibility status
    */
-  async updateSinglePopupNotice(id: number, environment?: string, isVisible?: boolean | number): Promise<void> {
-    await this.popupNoticeService.updateSingleNotice(id, environment, isVisible);
+  async updateSinglePopupNotice(id: number, environment: string, isVisible?: boolean | number): Promise<void> {
+    await this.popupNoticeService?.updateSingleNotice(id, environment, isVisible);
   }
 
   /**
    * Remove a popup notice from cache (immutable)
+   * @param id Popup notice ID
+   * @param environment Environment name (required)
    */
-  removePopupNotice(id: number): void {
-    this.popupNoticeService.removeNotice(id);
+  removePopupNotice(id: number, environment: string): void {
+    this.popupNoticeService?.removeFromCache(id, environment);
   }
 
   /**
    * Update a single survey in cache (immutable)
+   * @param id Survey ID
+   * @param environment Environment name (required)
+   * @param isActive Optional active status
    */
-  async updateSingleSurvey(id: string, environment?: string, isActive?: boolean | number): Promise<void> {
-    await this.surveyService.updateSingleSurvey(id, environment, isActive);
+  async updateSingleSurvey(id: string, environment: string, isActive?: boolean | number): Promise<void> {
+    await this.surveyService?.updateSingleSurvey(id, environment, isActive);
   }
 
   /**
    * Remove a survey from cache (immutable)
+   * @param id Survey ID
+   * @param environment Environment name (required)
    */
-  removeSurvey(id: string): void {
-    this.surveyService.removeSurvey(id);
+  removeSurvey(id: string, environment: string): void {
+    this.surveyService?.removeSurvey(id, environment);
   }
 
   /**
    * Refresh whitelist cache only
+   * @param environment Environment name (required)
    */
-  async refreshWhitelists(): Promise<void> {
+  async refreshWhitelists(environment: string): Promise<void> {
+    if (!this.whitelistService) return;
     this.logger.info('Refreshing whitelist cache...');
     const start = process.hrtime.bigint();
-    await this.whitelistService.refresh();
+    await this.whitelistService.refreshByEnvironment(environment);
     try {
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       this.metrics?.incRefresh('whitelists');
@@ -911,20 +1021,23 @@ export class CacheManager {
 
   /**
    * Get cached whitelists
+   * @param environment Environment name (required)
    */
-  getWhitelists() {
-    return this.whitelistService.getCached();
+  getWhitelists(environment: string) {
+    return this.whitelistService?.getCached(environment);
   }
 
   /**
    * Internal service maintenance refresh (without maintenance state check)
    * Used by refreshAll() to avoid duplicate state checks
+   * @param environment Environment name (required)
    */
-  private async refreshServiceMaintenanceInternal(): Promise<void> {
+  private async refreshServiceMaintenanceInternal(environment: string): Promise<void> {
+    if (!this.serviceMaintenanceService) return;
     this.logger.info('Refreshing service maintenance cache...');
     const start = process.hrtime.bigint();
     try {
-      const status = await this.serviceMaintenanceService.refresh();
+      const status = await this.serviceMaintenanceService.refreshByEnvironment(environment, true); // suppressWarnings=true for refreshAll
       this.emitRefreshEvent('serviceMaintenance', status);
       const duration = Number(process.hrtime.bigint() - start) / 1e9;
       try {
@@ -940,22 +1053,40 @@ export class CacheManager {
   /**
    * Refresh service maintenance status
    * Also checks and emits maintenance state change events
+   * @param environment Environment name (required)
    */
-  async refreshServiceMaintenance(): Promise<void> {
-    await this.refreshServiceMaintenanceInternal();
+  async refreshServiceMaintenance(environment: string): Promise<void> {
+    await this.refreshServiceMaintenanceInternal(environment);
     // Check maintenance state changes after refresh
-    this.checkMaintenanceStateChanges();
+    this.checkMaintenanceStateChanges(environment);
   }
 
   /**
    * Check and emit maintenance state change events
    * Compares current state with previous state and emits events if changed
+   * @param environment Optional environment name. If not provided, checks all cached environments.
    */
-  private checkMaintenanceStateChanges(): void {
+  private checkMaintenanceStateChanges(environment?: string): void {
     try {
-      const serviceStatus = this.serviceMaintenanceService.getCached();
-      const gameWorlds = this.gameWorldService.getCached();
-      this.maintenanceWatcher.checkAndEmitChanges(serviceStatus, gameWorlds);
+      if (environment) {
+        // Check specific environment
+        const serviceStatus = this.serviceMaintenanceService?.getCached(environment) || null;
+        const gameWorlds = this.gameWorldService?.getCached(environment) || [];
+        this.maintenanceWatcher.checkAndEmitChanges(serviceStatus, gameWorlds);
+      } else {
+        // Check all cached environments (for multi-env mode or when environment is not specified)
+        const allGameWorlds = this.gameWorldService?.getAllCached() || new Map();
+        const allServiceStatus = this.serviceMaintenanceService?.getAllCached() || new Map();
+
+        // Collect all environments from both services
+        const allEnvs = new Set([...allGameWorlds.keys(), ...allServiceStatus.keys()]);
+
+        for (const env of allEnvs) {
+          const serviceStatus = allServiceStatus.get(env) || null;
+          const gameWorlds = allGameWorlds.get(env) || [];
+          this.maintenanceWatcher.checkAndEmitChanges(serviceStatus, gameWorlds);
+        }
+      }
     } catch (error: any) {
       this.logger.error('Error checking maintenance state changes', { error: error.message });
     }
@@ -963,9 +1094,10 @@ export class CacheManager {
 
   /**
    * Get cached service maintenance status
+   * @param environment Environment name (required)
    */
-  getServiceMaintenanceStatus(): MaintenanceStatus | null {
-    return this.serviceMaintenanceService.getCached();
+  getServiceMaintenanceStatus(environment: string): MaintenanceStatus | null {
+    return this.serviceMaintenanceService?.getCached(environment) || null;
   }
 
   /**
@@ -990,50 +1122,81 @@ export class CacheManager {
 
   /**
    * Get cached client versions
-   * @param environment Environment name. Only used in multi-environment mode (Edge).
-   *                    For game servers, can be omitted to use default environment.
-   *                    For edge servers, must be provided from client request.
+   * @param environment Environment name (required)
    */
-  getClientVersions(environment?: string): ClientVersion[] {
+  getClientVersions(environment: string): ClientVersion[] {
     return this.clientVersionService?.getCached(environment) || [];
   }
 
   /**
    * Get cached service notices
-   * @param environment Environment name. Only used in multi-environment mode (Edge).
-   *                    For game servers, can be omitted to use default environment.
-   *                    For edge servers, must be provided from client request.
+   * @param environment Environment name (required)
    */
-  getServiceNotices(environment?: string): ServiceNotice[] {
+  getServiceNotices(environment: string): ServiceNotice[] {
     return this.serviceNoticeService?.getCached(environment) || [];
   }
 
   /**
    * Get cached banners
-   * @param environment Environment name. Only used in multi-environment mode (Edge).
-   *                    For game servers, can be omitted to use default environment.
-   *                    For edge servers, must be provided from client request.
+   * @param environment Environment name (required)
    */
-  getBanners(environment?: string): Banner[] {
+  getBanners(environment: string): Banner[] {
     return this.bannerService?.getCached(environment) || [];
   }
 
+  // ==================== SERVICE GETTERS ====================
+
   /**
-   * Get ClientVersionService instance (for advanced usage)
+   * Get GameWorldService instance
+   */
+  getGameWorldService(): GameWorldService | undefined {
+    return this.gameWorldService;
+  }
+
+  /**
+   * Get PopupNoticeService instance
+   */
+  getPopupNoticeService(): PopupNoticeService | undefined {
+    return this.popupNoticeService;
+  }
+
+  /**
+   * Get SurveyService instance
+   */
+  getSurveyService(): SurveyService | undefined {
+    return this.surveyService;
+  }
+
+  /**
+   * Get WhitelistService instance
+   */
+  getWhitelistService(): WhitelistService | undefined {
+    return this.whitelistService;
+  }
+
+  /**
+   * Get ServiceMaintenanceService instance
+   */
+  getServiceMaintenanceService(): ServiceMaintenanceService | undefined {
+    return this.serviceMaintenanceService;
+  }
+
+  /**
+   * Get ClientVersionService instance
    */
   getClientVersionService(): ClientVersionService | undefined {
     return this.clientVersionService;
   }
 
   /**
-   * Get ServiceNoticeService instance (for advanced usage)
+   * Get ServiceNoticeService instance
    */
   getServiceNoticeService(): ServiceNoticeService | undefined {
     return this.serviceNoticeService;
   }
 
   /**
-   * Get BannerService instance (for advanced usage)
+   * Get BannerService instance
    */
   getBannerService(): BannerService | undefined {
     return this.bannerService;
@@ -1041,15 +1204,14 @@ export class CacheManager {
 
   /**
    * Get cached store products
-   * @param environment Environment name. Only used in multi-environment mode.
-   *                    For game servers, can be omitted to use default environment.
+   * @param environment Environment name (required)
    */
-  getStoreProducts(environment?: string): StoreProduct[] {
+  getStoreProducts(environment: string): StoreProduct[] {
     return this.storeProductService?.getCached(environment) || [];
   }
 
   /**
-   * Get StoreProductService instance (for advanced usage)
+   * Get StoreProductService instance
    */
   getStoreProductService(): StoreProductService | undefined {
     return this.storeProductService;
@@ -1057,42 +1219,48 @@ export class CacheManager {
 
   /**
    * Update a single store product in cache (immutable)
+   * @param id Store product ID
+   * @param environment Environment name (required)
+   * @param isActive Optional active status
    */
-  async updateSingleStoreProduct(id: string, environment?: string, isActive?: boolean | number): Promise<void> {
+  async updateSingleStoreProduct(id: string, environment: string, isActive?: boolean | number): Promise<void> {
     await this.storeProductService?.updateSingleProduct(id, environment, isActive);
   }
 
   /**
    * Remove a store product from cache (immutable)
+   * @param id Store product ID
+   * @param environment Environment name (required)
    */
-  removeStoreProduct(id: string, environment?: string): void {
-    this.storeProductService?.removeProduct(id, environment);
+  removeStoreProduct(id: string, environment: string): void {
+    this.storeProductService?.removeFromCache(id, environment);
   }
 
   /**
    * Refresh store products cache for an environment
+   * @param environment Environment name (required)
    */
-  async refreshStoreProducts(environment?: string): Promise<void> {
-    if (environment) {
-      await this.storeProductService?.refreshByEnvironment(environment);
-    } else {
-      // If no environment specified, refresh all cached environments
-      await this.storeProductService?.refresh();
-    }
+  async refreshStoreProducts(environment: string): Promise<void> {
+    await this.storeProductService?.refreshByEnvironment(environment);
   }
 
   /**
    * Update a single banner in cache (immutable)
+   * @param bannerId Banner ID
+   * @param environment Environment name (required)
+   * @param status Optional status
    */
-  async updateSingleBanner(bannerId: string, environment?: string, status?: string): Promise<void> {
+  async updateSingleBanner(bannerId: string, environment: string, status?: string): Promise<void> {
     await this.bannerService?.updateSingleBanner(bannerId, environment, status);
   }
 
   /**
    * Remove a banner from cache (immutable)
+   * @param bannerId Banner ID
+   * @param environment Environment name (required)
    */
-  removeBanner(bannerId: string, environment?: string): void {
-    this.bannerService?.removeBanner(bannerId, environment);
+  removeBanner(bannerId: string, environment: string): void {
+    this.bannerService?.removeFromCache(bannerId, environment);
   }
 
   /**
@@ -1109,13 +1277,12 @@ export class CacheManager {
    */
   clear(): void {
     this.logger.info('Clearing all caches');
-    this.gameWorldService.updateCache([]);
-    this.popupNoticeService.updateCache([]);
-    this.surveyService.updateCache([]);
-    this.whitelistService.updateCache({ ipWhitelist: [], accountWhitelist: [] });
-    this.serviceMaintenanceService.updateCache(null);
-
-    // Clear new multi-env services
+    // All services use optional chaining since they are controlled by feature flags
+    this.gameWorldService?.clearCache();
+    this.popupNoticeService?.clearCache();
+    this.surveyService?.clearCache();
+    this.whitelistService?.clearCache();
+    this.serviceMaintenanceService?.clearCache();
     this.clientVersionService?.clearCache();
     this.serviceNoticeService?.clearCache();
     this.bannerService?.clearCache();

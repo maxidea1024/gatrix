@@ -4379,6 +4379,7 @@
       "service": "服务",
       "group": "组",
       "environment": "环境",
+      "region": "地区",
       "labels": "标签",
       "hostname": "主机名",
       "externalAddress": "外部IP",
@@ -4390,6 +4391,21 @@
       "createdAt": "创建时间",
       "updatedAt": "更新时间",
       "actions": "操作"
+    },
+    "grouping": {
+      "label": "分组",
+      "none": "无",
+      "service": "服务",
+      "group": "组",
+      "environment": "环境",
+      "region": "地区"
+    },
+    "stats": {
+      "initializing": "初始化中",
+      "ready": "在线",
+      "shuttingDown": "关闭中",
+      "terminated": "已终止",
+      "error": "错误"
     }
   },
   "REWARD_TYPE_POINT": "点数",

@@ -7,12 +7,13 @@
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 import { GameWorld, GameWorldListResponse } from '../types/api';
 import { BaseEnvironmentService } from './BaseEnvironmentService';
 
 export class GameWorldService extends BaseEnvironmentService<GameWorld, GameWorldListResponse, number> {
-  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
-    super(apiClient, logger, defaultEnvironment);
+  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+    super(apiClient, logger, envResolver);
   }
 
   // ==================== Abstract Method Implementations ====================
@@ -65,12 +66,13 @@ export class GameWorldService extends BaseEnvironmentService<GameWorld, GameWorl
   /**
    * Get game world by ID
    * GET /api/v1/server/:env/game-worlds/:id
+   * @param id Game world ID
+   * @param environment Environment name (required)
    */
-  async getById(id: number, environment?: string): Promise<GameWorld> {
-    const env = environment || this.defaultEnvironment;
-    this.logger.debug('Fetching game world by ID', { id, environment: env });
+  async getById(id: number, environment: string): Promise<GameWorld> {
+    this.logger.debug('Fetching game world by ID', { id, environment });
 
-    const response = await this.apiClient.get<GameWorld>(`/api/v1/server/${encodeURIComponent(env)}/game-worlds/${id}`);
+    const response = await this.apiClient.get<GameWorld>(`/api/v1/server/${encodeURIComponent(environment)}/game-worlds/${id}`);
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch game world');
@@ -84,13 +86,14 @@ export class GameWorldService extends BaseEnvironmentService<GameWorld, GameWorl
   /**
    * Get game world by worldId
    * GET /api/v1/server/:env/game-worlds/world/:worldId
+   * @param worldId World ID
+   * @param environment Environment name (required)
    */
-  async getByWorldId(worldId: string, environment?: string): Promise<GameWorld> {
-    const env = environment || this.defaultEnvironment;
-    this.logger.debug('Fetching game world by worldId', { worldId, environment: env });
+  async getByWorldId(worldId: string, environment: string): Promise<GameWorld> {
+    this.logger.debug('Fetching game world by worldId', { worldId, environment });
 
     const response = await this.apiClient.get<GameWorld>(
-      `/api/v1/server/${encodeURIComponent(env)}/game-worlds/world/${encodeURIComponent(worldId)}`
+      `/api/v1/server/${encodeURIComponent(environment)}/game-worlds/world/${encodeURIComponent(worldId)}`
     );
 
     if (!response.success || !response.data) {
@@ -107,16 +110,17 @@ export class GameWorldService extends BaseEnvironmentService<GameWorld, GameWorl
    * If isVisible is false, removes the world from cache (no API call needed)
    * If isVisible is true but not in cache, fetches and adds it to cache
    * If isVisible is true and in cache, fetches and updates it
+   * @param id Game world ID
+   * @param environment Environment name (required)
+   * @param isVisible Optional visibility status
    */
-  async updateSingleWorld(id: number, environment?: string, isVisible?: boolean | number): Promise<void> {
+  async updateSingleWorld(id: number, environment: string, isVisible?: boolean | number): Promise<void> {
     try {
       this.logger.debug('Updating single game world in cache', { id, environment, isVisible });
 
-      const envKey = environment || this.defaultEnvironment;
-
       // If isVisible is explicitly false (0 or false), just remove from cache
       if (isVisible === false || isVisible === 0) {
-        this.logger.info('Game world isVisible=false, removing from cache', { id, environment: envKey });
+        this.logger.info('Game world isVisible=false, removing from cache', { id, environment });
         this.removeFromCache(id, environment);
         return;
       }
@@ -129,21 +133,21 @@ export class GameWorldService extends BaseEnvironmentService<GameWorld, GameWorl
       const updatedWorld = await this.getById(id, environment);
 
       // Get current worlds for this environment
-      const currentWorlds = this.cachedByEnv.get(envKey) || [];
+      const currentWorlds = this.cachedByEnv.get(environment) || [];
       const existsInCache = currentWorlds.some(world => world.id === id);
 
       if (existsInCache) {
         // Immutable update: update existing world
         const newWorlds = currentWorlds.map(world => world.id === id ? updatedWorld : world);
-        this.cachedByEnv.set(envKey, newWorlds);
-        this.logger.debug('Single game world updated in cache', { id, environment: envKey });
+        this.cachedByEnv.set(environment, newWorlds);
+        this.logger.debug('Single game world updated in cache', { id, environment });
       } else {
         // World not in cache but found in backend
         // Add it to cache and re-sort by displayOrder
         const newWorlds = [...currentWorlds, updatedWorld];
         newWorlds.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-        this.cachedByEnv.set(envKey, newWorlds);
-        this.logger.debug('Single game world added to cache', { id, environment: envKey });
+        this.cachedByEnv.set(environment, newWorlds);
+        this.logger.debug('Single game world added to cache', { id, environment });
       }
     } catch (error: any) {
       this.logger.error('Failed to update single game world in cache', {
@@ -152,22 +156,16 @@ export class GameWorldService extends BaseEnvironmentService<GameWorld, GameWorl
         error: error.message,
       });
       // If update fails, fall back to full refresh
-      await this.refresh();
+      await this.refreshByEnvironment(environment);
     }
   }
 
   /**
-   * Remove a game world from cache (immutable)
-   * @deprecated Use removeFromCache instead
-   */
-  removeWorld(id: number, environment?: string): void {
-    this.removeFromCache(id, environment);
-  }
-
-  /**
    * Check if a world is in maintenance based on flag and time window
+   * @param worldId World ID
+   * @param environment Environment name (required)
    */
-  isWorldMaintenanceActive(worldId: string, environment?: string): boolean {
+  isWorldMaintenanceActive(worldId: string, environment: string): boolean {
     const worlds = this.getCached(environment);
     const world = worlds.find((w) => w.worldId === worldId);
     if (!world || !world.isMaintenance) {
@@ -197,8 +195,10 @@ export class GameWorldService extends BaseEnvironmentService<GameWorld, GameWorl
 
   /**
    * Get world by worldId from cache
+   * @param worldId World ID
+   * @param environment Environment name (required)
    */
-  getWorldByWorldId(worldId: string, environment?: string): GameWorld | null {
+  getWorldByWorldId(worldId: string, environment: string): GameWorld | null {
     const worlds = this.getCached(environment);
     return worlds.find((w) => w.worldId === worldId) || null;
   }
@@ -206,8 +206,11 @@ export class GameWorldService extends BaseEnvironmentService<GameWorld, GameWorl
   /**
    * Get maintenance message for a world with language support
    * Falls back to default message if language not found
+   * @param worldId World ID
+   * @param environment Environment name (required)
+   * @param lang Language code (default: 'en')
    */
-  getWorldMaintenanceMessage(worldId: string, lang: 'ko' | 'en' | 'zh' = 'en', environment?: string): string | null {
+  getWorldMaintenanceMessage(worldId: string, environment: string, lang: 'ko' | 'en' | 'zh' = 'en'): string | null {
     const worlds = this.getCached(environment);
     const world = worlds.find((w) => w.worldId === worldId);
     if (!world || !this.isWorldMaintenanceActive(worldId, environment)) {

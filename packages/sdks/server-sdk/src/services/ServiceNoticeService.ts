@@ -2,10 +2,16 @@
  * Service Notice Service
  * Handles service notice list and retrieval
  * Uses per-environment API pattern: GET /api/v1/server/:env/service-notices
+ *
+ * DESIGN PRINCIPLES:
+ * - All methods that access cached data MUST receive environment explicitly in multi-env mode
+ * - Environment resolution is delegated to EnvironmentResolver
+ * - In multi-environment mode (edge), environment MUST always be provided
  */
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 import { ServiceNotice, ServiceNoticeListResponse, ServiceNoticeCategory } from '../types/api';
 
 export interface ServiceNoticeFilters {
@@ -19,15 +25,31 @@ export interface ServiceNoticeFilters {
 export class ServiceNoticeService {
   private apiClient: ApiClient;
   private logger: Logger;
-  // Default environment for single-environment mode
-  private defaultEnvironment: string;
+  private envResolver: EnvironmentResolver;
   // Multi-environment cache: Map<environment (environmentName), ServiceNotice[]>
   private cachedNoticesByEnv: Map<string, ServiceNotice[]> = new Map();
+  // Whether this feature is enabled
+  private featureEnabled: boolean = true;
 
-  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
+  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.defaultEnvironment = defaultEnvironment;
+    this.envResolver = envResolver;
+  }
+
+  /**
+   * Set feature enabled flag
+   * When false, refresh methods will log a warning
+   */
+  setFeatureEnabled(enabled: boolean): void {
+    this.featureEnabled = enabled;
+  }
+
+  /**
+   * Check if feature is enabled
+   */
+  isFeatureEnabled(): boolean {
+    return this.featureEnabled;
   }
 
   /**
@@ -83,23 +105,11 @@ export class ServiceNoticeService {
   }
 
   /**
-   * Get all service notices (uses default environment for single-env mode)
-   * For backward compatibility
-   */
-  async list(): Promise<ServiceNotice[]> {
-    return this.listByEnvironment(this.defaultEnvironment);
-  }
-
-  /**
    * Get cached service notices
-   * @param environment Environment name. If omitted, returns all notices as flat array.
+   * @param environment Environment name (required)
    */
-  getCached(environment?: string): ServiceNotice[] {
-    if (environment) {
-      return this.cachedNoticesByEnv.get(environment) || [];
-    }
-    // No environment specified: return all notices as flat array
-    return Array.from(this.cachedNoticesByEnv.values()).flat();
+  getCached(environment: string): ServiceNotice[] {
+    return this.cachedNoticesByEnv.get(environment) || [];
   }
 
   /**
@@ -107,6 +117,13 @@ export class ServiceNoticeService {
    */
   getAllCached(): Map<string, ServiceNotice[]> {
     return this.cachedNoticesByEnv;
+  }
+
+  /**
+   * Get all cached service notices as flat array (for internal use)
+   */
+  getAllCachedFlat(): ServiceNotice[] {
+    return Array.from(this.cachedNoticesByEnv.values()).flat();
   }
 
   /**
@@ -127,45 +144,44 @@ export class ServiceNoticeService {
 
   /**
    * Refresh cached service notices for a specific environment
+   * @param environment Environment name
+   * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
-  async refreshByEnvironment(environment: string): Promise<ServiceNotice[]> {
+  async refreshByEnvironment(environment: string, suppressWarnings?: boolean): Promise<ServiceNotice[]> {
+    if (!this.featureEnabled && !suppressWarnings) {
+      this.logger.warn('ServiceNoticeService.refreshByEnvironment() called but feature is disabled', { environment });
+    }
     this.logger.info('Refreshing service notices cache', { environment });
     // Invalidate ETag cache to force fresh data fetch
     this.apiClient.invalidateEtagCache(`/api/v1/server/${encodeURIComponent(environment)}/service-notices`);
     return await this.listByEnvironment(environment);
   }
 
-  /**
-   * Refresh cached service notices (uses default environment)
-   * For backward compatibility
-   */
-  async refresh(): Promise<ServiceNotice[]> {
-    return this.refreshByEnvironment(this.defaultEnvironment);
-  }
 
   /**
    * Update cache with new data
+   * @param notices Service notices to cache
+   * @param environment Environment name (required)
    */
-  updateCache(notices: ServiceNotice[], environment?: string): void {
-    const envKey = environment || this.defaultEnvironment;
-    this.cachedNoticesByEnv.set(envKey, notices);
-    this.logger.debug('Service notices cache updated', { environment: envKey, count: notices.length });
+  updateCache(notices: ServiceNotice[], environment: string): void {
+    this.cachedNoticesByEnv.set(environment, notices);
+    this.logger.debug('Service notices cache updated', { environment, count: notices.length });
   }
 
   /**
    * Get service notice by ID
-   * @param environment Environment name. Only used in multi-environment mode.
+   * @param environment Environment name (required)
    */
-  getById(id: number, environment?: string): ServiceNotice | null {
+  getById(id: number, environment: string): ServiceNotice | null {
     const notices = this.getCached(environment);
     return notices.find((n) => n.id === id) || null;
   }
 
   /**
    * Get active service notices with optional filters
-   * @param environment Environment name. Only used in multi-environment mode.
+   * @param environment Environment name (required)
    */
-  getActive(environment?: string, filters?: ServiceNoticeFilters): ServiceNotice[] {
+  getActive(environment: string, filters?: ServiceNoticeFilters): ServiceNotice[] {
     const notices = this.getCached(environment);
     const now = new Date();
 
@@ -211,9 +227,10 @@ export class ServiceNoticeService {
 
   /**
    * Get notices by category
-   * @param environment Environment name. Only used in multi-environment mode.
+   * @param category Notice category
+   * @param environment Environment name (required)
    */
-  getByCategory(category: ServiceNoticeCategory, environment?: string): ServiceNotice[] {
+  getByCategory(category: ServiceNoticeCategory, environment: string): ServiceNotice[] {
     return this.getActive(environment, { category });
   }
 

@@ -21,6 +21,7 @@ export class ServiceDiscoveryService {
   private registrationBackup?: {
     hostname: string;
     internalAddress: string;
+    externalAddress: string;
     ports: any;
     meta?: any;
     status?: string;
@@ -94,10 +95,11 @@ export class ServiceDiscoveryService {
     this.instanceId = instanceId;
     this.labels = input.labels;
 
-    // Backup registration data for auto-recovery
+    // Backup registration data for auto-recovery (includes externalAddress for re-registration)
     this.registrationBackup = {
       hostname,
       internalAddress,
+      externalAddress,
       ports: input.ports,
       meta: input.meta,
       status: input.status,
@@ -281,6 +283,10 @@ export class ServiceDiscoveryService {
 
     if (params?.environment) {
       queryParams.environment = params.environment;
+    }
+
+    if (params?.region) {
+      queryParams.region = params.region;
     }
 
     if (params?.status) {

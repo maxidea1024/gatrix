@@ -2,10 +2,16 @@
  * Whitelist Service
  * Handles IP and Account whitelist retrieval and caching
  * Uses per-environment API pattern: GET /api/v1/server/:env/whitelists
+ *
+ * DESIGN PRINCIPLES:
+ * - All methods that access cached data MUST receive environment explicitly in multi-env mode
+ * - Environment resolution is delegated to EnvironmentResolver
+ * - In multi-environment mode (edge), environment MUST always be provided
  */
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 
 export interface IpWhitelistEntry {
   id: number;
@@ -33,15 +39,31 @@ export interface WhitelistResponse {
 export class WhitelistService {
   private apiClient: ApiClient;
   private logger: Logger;
-  // Default environment for single-environment mode
-  private defaultEnvironment: string;
+  private envResolver: EnvironmentResolver;
   // Multi-environment cache: Map<environment (environmentName), WhitelistData>
   private cachedWhitelistByEnv: Map<string, WhitelistData> = new Map();
+  // Whether this feature is enabled
+  private featureEnabled: boolean = true;
 
-  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
+  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.defaultEnvironment = defaultEnvironment;
+    this.envResolver = envResolver;
+  }
+
+  /**
+   * Set feature enabled flag
+   * When false, refresh methods will log a warning
+   */
+  setFeatureEnabled(enabled: boolean): void {
+    this.featureEnabled = enabled;
+  }
+
+  /**
+   * Check if feature is enabled
+   */
+  isFeatureEnabled(): boolean {
+    return this.featureEnabled;
   }
 
   /**
@@ -90,36 +112,25 @@ export class WhitelistService {
   }
 
   /**
-   * Get all whitelists (uses default environment)
-   * For backward compatibility
-   */
-  async list(): Promise<WhitelistData> {
-    return this.listByEnvironment(this.defaultEnvironment);
-  }
-
-  /**
    * Refresh whitelist cache for a specific environment
+   * @param environment Environment name
+   * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
-  async refreshByEnvironment(environment: string): Promise<WhitelistData> {
+  async refreshByEnvironment(environment: string, suppressWarnings?: boolean): Promise<WhitelistData> {
+    if (!this.featureEnabled && !suppressWarnings) {
+      this.logger.warn('WhitelistService.refreshByEnvironment() called but feature is disabled', { environment });
+    }
     this.logger.debug('Refreshing whitelist cache', { environment });
     return await this.listByEnvironment(environment);
   }
 
-  /**
-   * Refresh whitelist cache (uses default environment)
-   * For backward compatibility
-   */
-  async refresh(): Promise<WhitelistData> {
-    return this.refreshByEnvironment(this.defaultEnvironment);
-  }
 
   /**
    * Get cached whitelists
-   * @param environment Environment name. If omitted, returns default environment data.
+   * @param environment Environment name (required)
    */
-  getCached(environment?: string): WhitelistData {
-    const envKey = environment || this.defaultEnvironment;
-    return this.cachedWhitelistByEnv.get(envKey) || { ipWhitelist: [], accountWhitelist: [] };
+  getCached(environment: string): WhitelistData {
+    return this.cachedWhitelistByEnv.get(environment) || { ipWhitelist: [], accountWhitelist: [] };
   }
 
   /**
@@ -138,24 +149,36 @@ export class WhitelistService {
   }
 
   /**
-   * Get cached IP whitelist
+   * Clear cached data for a specific environment
    */
-  getCachedIpWhitelist(environment?: string): IpWhitelistEntry[] {
+  clearCacheForEnvironment(environment: string): void {
+    this.cachedWhitelistByEnv.delete(environment);
+    this.logger.debug('Whitelist cache cleared for environment', { environment });
+  }
+
+  /**
+   * Get cached IP whitelist
+   * @param environment Environment name (required)
+   */
+  getCachedIpWhitelist(environment: string): IpWhitelistEntry[] {
     return this.getCached(environment).ipWhitelist;
   }
 
   /**
    * Get cached Account whitelist
+   * @param environment Environment name (required)
    */
-  getCachedAccountWhitelist(environment?: string): AccountWhitelistEntry[] {
+  getCachedAccountWhitelist(environment: string): AccountWhitelistEntry[] {
     return this.getCached(environment).accountWhitelist;
   }
 
   /**
    * Check if IP is whitelisted (supports CIDR notation)
    * Note: Backend already filters for enabled and valid entries
+   * @param ip IP address to check
+   * @param environment Environment name (required)
    */
-  isIpWhitelisted(ip: string, environment?: string): boolean {
+  isIpWhitelisted(ip: string, environment: string): boolean {
     const whitelist = this.getCached(environment);
     return whitelist.ipWhitelist.some((entry) => {
       // Check exact IP match
@@ -229,8 +252,10 @@ export class WhitelistService {
   /**
    * Check if account is whitelisted
    * Note: Backend already filters for enabled and valid entries
+   * @param accountId Account ID to check
+   * @param environment Environment name (required)
    */
-  isAccountWhitelisted(accountId: string, environment?: string): boolean {
+  isAccountWhitelisted(accountId: string, environment: string): boolean {
     const whitelist = this.getCached(environment);
     return whitelist.accountWhitelist.some((entry) => {
       return entry.accountId === accountId;
@@ -240,14 +265,15 @@ export class WhitelistService {
   /**
    * Update cached whitelist data
    * Called when whitelist.updated event is received
+   * @param whitelist Whitelist data to cache
+   * @param environment Environment name (required)
    */
-  updateCache(whitelist: WhitelistData, environment?: string): void {
-    const envKey = environment || this.defaultEnvironment;
+  updateCache(whitelist: WhitelistData, environment: string): void {
     this.logger.debug('Updating whitelist cache', {
-      environment: envKey,
+      environment,
       ipCount: whitelist.ipWhitelist.length,
       accountCount: whitelist.accountWhitelist.length,
     });
-    this.cachedWhitelistByEnv.set(envKey, whitelist);
+    this.cachedWhitelistByEnv.set(environment, whitelist);
   }
 }

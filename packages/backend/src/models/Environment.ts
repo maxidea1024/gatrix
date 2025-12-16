@@ -239,7 +239,7 @@ export class Environment extends Model implements EnvironmentData {
     coupons: { count: number; items: Array<{ id: string; name: string }> };
     banners: { count: number; items: Array<{ bannerId: string; name: string }> };
     jobs: { count: number; items: Array<{ id: string; name: string }> };
-    clientVersions: { count: number; items: Array<{ id: string; version: string; platform: string }> };
+    clientVersions: { count: number; items: Array<{ id: string; clientVersion: string; platform: string }> };
     apiTokens: { count: number; items: Array<{ id: string; name: string }> };
     total: number;
   }> {
@@ -317,7 +317,7 @@ export class Environment extends Model implements EnvironmentData {
       safeQuery<{ id: string; name: string }>('g_coupon_settings', ['id', 'name']),
       safeQuery<{ bannerId: string; name: string }>('g_banners', ['bannerId', 'name']),
       safeQuery<{ id: string; name: string }>('g_jobs', ['id', 'name']),
-      safeQuery<{ id: string; version: string; platform: string }>('g_client_versions', ['id', 'version', 'platform']),
+      safeQuery<{ id: string; clientVersion: string; platform: string }>('g_client_versions', ['id', 'clientVersion', 'platform']),
       safeQuery<{ tokenId: string }>('g_api_access_token_environments', ['tokenId']),
     ]);
 

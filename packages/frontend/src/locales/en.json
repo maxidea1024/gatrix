@@ -4331,6 +4331,7 @@
       "service": "Service",
       "group": "Group",
       "environment": "Environment",
+      "region": "Region",
       "labels": "Labels",
       "hostname": "Hostname",
       "externalAddress": "External IP",

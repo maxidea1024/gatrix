@@ -29,21 +29,65 @@ function recordCacheMiss(cacheType: string): void {
 
 /**
  * Update cache size metrics from SDK
+ * Uses getAllCachedData() to get counts across all environments
  */
 function updateCacheSizeMetrics(): void {
   const sdk = sdkManager.getSDK();
   if (!sdk) return;
 
-  const versions = sdk.getClientVersions();
-  const banners = sdk.getBanners();
-  const notices = sdk.getServiceNotices();
-  const worlds = sdk.getGameWorlds();
+  // Get all cached data to count items across all environments
+  // getAllCachedData() returns plain objects (not Maps) with environment keys
+  const allData = sdk.getAllCachedData();
 
-  cacheSize.labels('client_versions').set(versions.length);
-  cacheSize.labels('banners').set(banners.length);
-  cacheSize.labels('service_notices').set(notices.length);
-  cacheSize.labels('game_worlds').set(worlds.length);
-  cacheSize.labels('total').set(versions.length + banners.length + notices.length + worlds.length);
+  // Helper to count items from environment-keyed object
+  const countItems = (data: Record<string, unknown[]> | undefined): number => {
+    if (!data || typeof data !== 'object') return 0;
+    let count = 0;
+    for (const key of Object.keys(data)) {
+      const items = data[key];
+      if (Array.isArray(items)) {
+        count += items.length;
+      }
+    }
+    return count;
+  };
+
+  const versionsCount = countItems(allData.clientVersions);
+  const bannersCount = countItems(allData.banners);
+  const noticesCount = countItems(allData.serviceNotices);
+  const worldsCount = countItems(allData.gameWorlds);
+  const surveysCount = countItems(allData.surveys);
+  const popupNoticesCount = countItems(allData.popupNotices);
+  const storeProductsCount = countItems(allData.storeProducts);
+
+  // Helper to count items from environment-keyed object with non-array values (like WhitelistData)
+  const countWhitelistItems = (data: Record<string, { ipWhitelist?: unknown[]; accountWhitelist?: unknown[] }> | undefined): number => {
+    if (!data || typeof data !== 'object') return 0;
+    let count = 0;
+    for (const key of Object.keys(data)) {
+      const whitelist = data[key];
+      if (whitelist) {
+        if (Array.isArray(whitelist.ipWhitelist)) {
+          count += whitelist.ipWhitelist.length;
+        }
+        if (Array.isArray(whitelist.accountWhitelist)) {
+          count += whitelist.accountWhitelist.length;
+        }
+      }
+    }
+    return count;
+  };
+  const whitelistsCount = countWhitelistItems(allData.whitelists);
+
+  cacheSize.labels('client_versions').set(versionsCount);
+  cacheSize.labels('banners').set(bannersCount);
+  cacheSize.labels('service_notices').set(noticesCount);
+  cacheSize.labels('game_worlds').set(worldsCount);
+  cacheSize.labels('surveys').set(surveysCount);
+  cacheSize.labels('popup_notices').set(popupNoticesCount);
+  cacheSize.labels('store_products').set(storeProductsCount);
+  cacheSize.labels('whitelists').set(whitelistsCount);
+  cacheSize.labels('total').set(versionsCount + bannersCount + noticesCount + worldsCount + surveysCount + popupNoticesCount + storeProductsCount + whitelistsCount);
 }
 
 /**
@@ -285,11 +329,17 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
 
 /**
  * @openapi
- * /client/game-worlds:
+ * /client/{environment}/game-worlds:
  *   get:
  *     tags: [EdgeClient]
  *     summary: Get all game worlds (Cached)
  *     description: Returns list of visible game worlds served from edge cache.
+ *     parameters:
+ *       - in: path
+ *         name: environment
+ *         required: true
+ *         schema: { type: string, example: 'production' }
+ *         description: Environment name (e.g., 'staging', 'production')
  *     responses:
  *       200:
  *         description: List of game worlds
@@ -309,23 +359,25 @@ router.get('/:environment/client-version', async (req: Request, res: Response) =
  *                     timestamp: { type: string, format: date-time, example: '2025-12-12T12:00:00Z' }
  *                 cached: { type: boolean, example: true }
  */
-router.get('/game-worlds', async (_req: Request, res: Response) => {
+router.get('/:environment/game-worlds', async (req: Request, res: Response) => {
   try {
     const sdk = getSDKOrError(res);
     if (!sdk) return;
 
-    // Get all game worlds from cache (using getGameWorlds() method)
-    const allWorlds = sdk.getGameWorlds() as GameWorld[];
+    const environment = req.params.environment;
+
+    // Get game worlds from cache for this environment
+    const envWorlds = sdk.getGameWorlds(environment) as GameWorld[];
 
     // Record cache hit/miss
-    if (allWorlds.length > 0) {
+    if (envWorlds.length > 0) {
       recordCacheHit('game_worlds');
     } else {
       recordCacheMiss('game_worlds');
     }
 
     // Filter visible, non-maintenance worlds (same as Backend)
-    const visibleWorlds = allWorlds.filter(
+    const visibleWorlds = envWorlds.filter(
       (w: GameWorld) => w.isMaintenance !== true
     );
 
@@ -346,6 +398,7 @@ router.get('/game-worlds', async (_req: Request, res: Response) => {
     };
 
     logger.debug('Game worlds retrieved', {
+      environment,
       count: visibleWorlds.length,
     });
 

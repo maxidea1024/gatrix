@@ -36,5 +36,11 @@ export { BaseEnvironmentService } from './services/BaseEnvironmentService';
 export { SdkMetrics } from './utils/sdkMetrics';
 export { createMetricsServer, MetricsServerConfig, MetricsServerInstance } from './services/MetricsServer';
 
+// Export environment resolver
+export { EnvironmentResolver } from './utils/EnvironmentResolver';
+
+// Export SDK version
+export { SDK_VERSION } from './version';
+
 // Default export
 export { GatrixServerSDK as default } from './GatrixServerSDK';

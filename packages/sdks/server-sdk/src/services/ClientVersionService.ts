@@ -7,12 +7,13 @@
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 import { ClientVersion, ClientVersionListResponse } from '../types/api';
 import { BaseEnvironmentService } from './BaseEnvironmentService';
 
 export class ClientVersionService extends BaseEnvironmentService<ClientVersion, ClientVersionListResponse, number> {
-  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
-    super(apiClient, logger, defaultEnvironment);
+  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+    super(apiClient, logger, envResolver);
   }
 
   // ==================== Abstract Method Implementations ====================
@@ -49,9 +50,11 @@ export class ClientVersionService extends BaseEnvironmentService<ClientVersion, 
 
   /**
    * Get client version by platform and version string
-   * @param environment Environment name. Only used in multi-environment mode.
+   * @param platform Platform name
+   * @param version Version string
+   * @param environment Environment name (required)
    */
-  getByPlatformAndVersion(platform: string, version: string, environment?: string): ClientVersion | null {
+  getByPlatformAndVersion(platform: string, version: string, environment: string): ClientVersion | null {
     const versions = this.getCached(environment);
     return versions.find(
       (v) => v.platform === platform && v.clientVersion === version
@@ -61,9 +64,11 @@ export class ClientVersionService extends BaseEnvironmentService<ClientVersion, 
   /**
    * Get latest client version by platform
    * Returns the first version with ONLINE status for the given platform
-   * @param environment Environment name. Only used in multi-environment mode.
+   * @param platform Platform name
+   * @param environment Environment name (required)
+   * @param status Optional status filter
    */
-  getLatestByPlatform(platform: string, environment?: string, status?: string): ClientVersion | null {
+  getLatestByPlatform(platform: string, environment: string, status?: string): ClientVersion | null {
     const versions = this.getCached(environment);
     const filtered = versions.filter((v) => {
       if (v.platform !== platform) return false;
@@ -83,9 +88,10 @@ export class ClientVersionService extends BaseEnvironmentService<ClientVersion, 
 
   /**
    * Get all client versions by platform
-   * @param environment Environment name. Only used in multi-environment mode.
+   * @param platform Platform name
+   * @param environment Environment name (required)
    */
-  getByPlatform(platform: string, environment?: string): ClientVersion[] {
+  getByPlatform(platform: string, environment: string): ClientVersion[] {
     const versions = this.getCached(environment);
     return versions.filter((v) => v.platform === platform);
   }

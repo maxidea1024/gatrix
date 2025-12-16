@@ -2,10 +2,17 @@
  * Base Environment Service
  * Generic base class for services that handle per-environment data caching
  * Reduces code duplication across GameWorld, Banner, PopupNotice, Survey, etc.
+ *
+ * DESIGN PRINCIPLES:
+ * - All methods that access cached data MUST receive environment explicitly
+ * - Environment resolution is delegated to EnvironmentResolver
+ * - In multi-environment mode (edge), environment MUST always be provided
+ * - Services use EnvironmentResolver for consistent environment handling
  */
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 
 /**
  * Configuration for extracting items from API response
@@ -24,13 +31,43 @@ export interface ItemExtractor<T, TResponse> {
 export abstract class BaseEnvironmentService<T, TResponse, TId = string | number> {
   protected apiClient: ApiClient;
   protected logger: Logger;
-  protected defaultEnvironment: string;
+  protected envResolver: EnvironmentResolver;
   protected cachedByEnv: Map<string, T[]> = new Map();
+  /**
+   * Whether this feature is enabled.
+   * Set by CacheManager based on SDK configuration.
+   */
+  protected featureEnabled: boolean = true;
 
-  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
+  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.defaultEnvironment = defaultEnvironment;
+    this.envResolver = envResolver;
+  }
+
+  /**
+   * Set feature enabled flag
+   * When false, refresh methods will log a warning
+   */
+  setFeatureEnabled(enabled: boolean): void {
+    this.featureEnabled = enabled;
+  }
+
+  /**
+   * Check if feature is enabled
+   */
+  isFeatureEnabled(): boolean {
+    return this.featureEnabled;
+  }
+
+  /**
+   * Resolve environment using EnvironmentResolver
+   * @param environment Optional environment parameter
+   * @param methodName Method name for error messages
+   */
+  protected resolveEnvironment(environment?: string, methodName?: string): string {
+    const context = methodName ? `${this.getServiceName()}.${methodName}` : this.getServiceName();
+    return this.envResolver.resolve(environment, context);
   }
 
   // ==================== Abstract Methods (must be implemented by subclasses) ====================
@@ -97,28 +134,33 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
   }
 
   /**
-   * Fetch items using default environment (for backward compatibility)
+   * Get cached items for a specific environment
+   * @param environment Environment name (required)
    */
-  async list(): Promise<T[]> {
-    return this.listByEnvironment(this.defaultEnvironment);
+  getCached(environment: string): T[] {
+    return this.cachedByEnv.get(environment) || [];
   }
 
   /**
-   * Get cached items
-   * @param environment If omitted, returns all items as flat array
+   * Get all cached items across all environments (for internal use)
+   * Returns a flat array of all items
    */
-  getCached(environment?: string): T[] {
-    if (environment) {
-      return this.cachedByEnv.get(environment) || [];
-    }
+  getAllCachedFlat(): T[] {
     return Array.from(this.cachedByEnv.values()).flat();
   }
 
   /**
-   * Get all cached items (all environments)
+   * Get all cached items organized by environment (for debugging/monitoring)
    */
   getAllCached(): Map<string, T[]> {
     return this.cachedByEnv;
+  }
+
+  /**
+   * Get list of cached environments
+   */
+  getCachedEnvironments(): string[] {
+    return Array.from(this.cachedByEnv.keys());
   }
 
   /**
@@ -139,65 +181,90 @@ export abstract class BaseEnvironmentService<T, TResponse, TId = string | number
 
   /**
    * Refresh cached items for a specific environment
+   * @param environment Environment name
+   * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
-  async refreshByEnvironment(environment: string): Promise<T[]> {
+  async refreshByEnvironment(environment: string, suppressWarnings?: boolean): Promise<T[]> {
+    if (!this.featureEnabled && !suppressWarnings) {
+      this.logger.warn(`${this.getServiceName()}.refreshByEnvironment() called but feature is disabled`, { environment });
+    }
     this.logger.info(`Refreshing ${this.getServiceName()} cache`, { environment });
     return await this.listByEnvironment(environment);
   }
 
   /**
-   * Refresh cached items using default environment (for backward compatibility)
+   * Refresh cached items for all cached environments
+   * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
-  async refresh(): Promise<T[]> {
-    return this.refreshByEnvironment(this.defaultEnvironment);
+  async refreshAllEnvironments(suppressWarnings?: boolean): Promise<void> {
+    if (!this.featureEnabled && !suppressWarnings) {
+      this.logger.warn(`${this.getServiceName()}.refreshAllEnvironments() called but feature is disabled`);
+    }
+    const environments = this.getCachedEnvironments();
+    if (environments.length === 0) {
+      this.logger.debug(`${this.getServiceName()}: No environments to refresh`);
+      return;
+    }
+
+    await this.listByEnvironments(environments);
   }
 
   /**
    * Update cache with new data
+   * @param items Items to cache
+   * @param environment Environment name (required)
    */
-  updateCache(items: T[], environment?: string): void {
-    const envKey = environment || this.defaultEnvironment;
-    this.cachedByEnv.set(envKey, items);
-    this.logger.debug(`${this.getServiceName()} cache updated`, { environment: envKey, count: items.length });
+  updateCache(items: T[], environment: string): void {
+    this.cachedByEnv.set(environment, items);
+    this.logger.debug(`${this.getServiceName()} cache updated`, { environment, count: items.length });
   }
 
   /**
    * Update a single item in cache (immutable)
+   * @param item Item to update/add
+   * @param environment Environment name (required)
    */
-  protected updateItemInCache(item: T, environment?: string): void {
-    const envKey = environment || this.defaultEnvironment;
-    const currentItems = this.cachedByEnv.get(envKey) || [];
+  protected updateItemInCache(item: T, environment: string): void {
+    const currentItems = this.cachedByEnv.get(environment) || [];
     const itemId = this.getItemId(item);
 
     const existsInCache = currentItems.some(i => this.getItemId(i) === itemId);
 
     if (existsInCache) {
       const newItems = currentItems.map(i => this.getItemId(i) === itemId ? item : i);
-      this.cachedByEnv.set(envKey, newItems);
-      this.logger.debug(`Single ${this.getServiceName()} updated in cache`, { id: itemId, environment: envKey });
+      this.cachedByEnv.set(environment, newItems);
+      this.logger.debug(`Single ${this.getServiceName()} updated in cache`, { id: itemId, environment });
     } else {
       const newItems = [...currentItems, item];
-      this.cachedByEnv.set(envKey, newItems);
-      this.logger.debug(`Single ${this.getServiceName()} added to cache`, { id: itemId, environment: envKey });
+      this.cachedByEnv.set(environment, newItems);
+      this.logger.debug(`Single ${this.getServiceName()} added to cache`, { id: itemId, environment });
     }
   }
 
   /**
    * Remove an item from cache by ID (immutable)
+   * @param id Item ID to remove
+   * @param environment Environment name (required)
    */
-  removeFromCache(id: TId, environment?: string): void {
-    const envKey = environment || this.defaultEnvironment;
-    const currentItems = this.cachedByEnv.get(envKey) || [];
+  removeFromCache(id: TId, environment: string): void {
+    const currentItems = this.cachedByEnv.get(environment) || [];
     const newItems = currentItems.filter(item => this.getItemId(item) !== id);
-    this.cachedByEnv.set(envKey, newItems);
-    this.logger.debug(`${this.getServiceName()} removed from cache`, { id, environment: envKey });
+    this.cachedByEnv.set(environment, newItems);
+    this.logger.debug(`${this.getServiceName()} removed from cache`, { id, environment });
   }
 
   /**
-   * Get default environment
+   * Get default environment (for single-environment mode)
    */
   getDefaultEnvironment(): string {
-    return this.defaultEnvironment;
+    return this.envResolver.getDefaultEnvironment();
+  }
+
+  /**
+   * Check if running in multi-environment mode
+   */
+  isMultiEnvironmentMode(): boolean {
+    return this.envResolver.isMultiEnvironmentMode();
   }
 }
 

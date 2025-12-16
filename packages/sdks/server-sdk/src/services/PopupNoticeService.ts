@@ -7,6 +7,7 @@
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 import { PopupNotice } from '../types/api';
 import { BaseEnvironmentService } from './BaseEnvironmentService';
 
@@ -14,8 +15,8 @@ import { BaseEnvironmentService } from './BaseEnvironmentService';
 type PopupNoticeListResponse = PopupNotice[];
 
 export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, PopupNoticeListResponse, number> {
-  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
-    super(apiClient, logger, defaultEnvironment);
+  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+    super(apiClient, logger, envResolver);
   }
 
   // ==================== Abstract Method Implementations ====================
@@ -41,12 +42,13 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
   /**
    * Get popup notice by ID
    * GET /api/v1/server/:env/ingame-popup-notices/:id
+   * @param id Popup notice ID
+   * @param environment Environment name (required)
    */
-  async getById(id: number, environment?: string): Promise<PopupNotice> {
-    const env = environment || this.defaultEnvironment;
-    this.logger.debug('Fetching popup notice by ID', { id, environment: env });
+  async getById(id: number, environment: string): Promise<PopupNotice> {
+    this.logger.debug('Fetching popup notice by ID', { id, environment });
 
-    const response = await this.apiClient.get<{ notice: PopupNotice }>(`/api/v1/server/${encodeURIComponent(env)}/ingame-popup-notices/${id}`);
+    const response = await this.apiClient.get<{ notice: PopupNotice }>(`/api/v1/server/${encodeURIComponent(environment)}/ingame-popup-notices/${id}`);
 
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch popup notice');
@@ -62,16 +64,17 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
    * If isVisible is false, removes the notice from cache (no API call needed)
    * If isVisible is true but not in cache, fetches and adds it to cache
    * If isVisible is true and in cache, fetches and updates it
+   * @param id Popup notice ID
+   * @param environment Environment name (required)
+   * @param isVisible Optional visibility status
    */
-  async updateSingleNotice(id: number, environment?: string, isVisible?: boolean | number): Promise<void> {
+  async updateSingleNotice(id: number, environment: string, isVisible?: boolean | number): Promise<void> {
     try {
       this.logger.debug('Updating single popup notice in cache', { id, environment, isVisible });
 
-      const envKey = environment || this.defaultEnvironment;
-
       // If isVisible is explicitly false (0 or false), just remove from cache
       if (isVisible === false || isVisible === 0) {
-        this.logger.info('Popup notice isVisible=false, removing from cache', { id, environment: envKey });
+        this.logger.info('Popup notice isVisible=false, removing from cache', { id, environment });
         this.removeFromCache(id, environment);
         return;
       }
@@ -86,7 +89,7 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
         updatedNotice = await this.getById(id, environment);
       } catch (_error: any) {
         // If notice not found (404), it's no longer active or visible
-        this.logger.debug('Popup notice not found or not active, removing from cache', { id, environment: envKey });
+        this.logger.debug('Popup notice not found or not active, removing from cache', { id, environment });
         this.removeFromCache(id, environment);
         return;
       }
@@ -99,22 +102,16 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
         error: error.message,
       });
       // If update fails, fall back to full refresh
-      await this.refresh();
+      await this.refreshByEnvironment(environment);
     }
   }
 
   /**
-   * Remove a popup notice from cache (immutable)
-   * @deprecated Use removeFromCache instead
-   */
-  removeNotice(id: number, environment?: string): void {
-    this.removeFromCache(id, environment);
-  }
-
-  /**
    * Get active notices for a specific world
+   * @param worldId World ID
+   * @param environment Environment name (required)
    */
-  getNoticesForWorld(worldId: string, environment?: string): PopupNotice[] {
+  getNoticesForWorld(worldId: string, environment: string): PopupNotice[] {
     const notices = this.getCached(environment);
     return notices.filter((notice) => {
       if (!notice.targetWorlds || notice.targetWorlds.length === 0) {
@@ -128,19 +125,19 @@ export class PopupNoticeService extends BaseEnvironmentService<PopupNotice, Popu
    * Get active popup notices that are currently visible for the given context
    * Filters by date range (startDate/endDate) and targeting fields
    * Sorted by displayPriority (ascending, lower values mean higher priority)
+   * @param options Options including environment (required) and optional targeting filters
    * @returns Array of active popup notices, empty array if none match
    */
-  getActivePopupNotices(options?: {
+  getActivePopupNotices(options: {
     platform?: string;
     channel?: string;
     subChannel?: string;
     worldId?: string;
     userId?: string;
-    environment?: string;
+    environment: string;
   }): PopupNotice[] {
     const now = new Date();
-    const { platform, channel, subChannel, worldId, userId, environment } = options ?? {};
-
+    const { platform, channel, subChannel, worldId, userId, environment } = options;
     const notices = this.getCached(environment);
     const filtered = notices.filter((notice) => {
       // Check startDate: if set, current time must be after startDate

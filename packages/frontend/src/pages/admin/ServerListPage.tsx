@@ -131,6 +131,9 @@ interface ClusterViewProps {
   groupingBy?: GroupingOption;
 }
 
+// Heartbeat TTL in seconds - configurable via environment variable
+const HEARTBEAT_TTL_SECONDS = parseInt(import.meta.env.VITE_HEARTBEAT_TTL_SECONDS || '30', 10);
+
 const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, groupingBy = 'none' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -148,6 +151,10 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
   const [rumbleCounter, setRumbleCounter] = useState<Map<string, number>>(new Map());
   const prevStatusRef = useRef<Map<string, string>>(new Map());
   const prevHeartbeatRef = useRef<Set<string>>(new Set());
+
+  // Ping gauge state: track last heartbeat time for each node
+  const [lastHeartbeatTime, setLastHeartbeatTime] = useState<Map<string, number>>(new Map());
+  const [pingProgress, setPingProgress] = useState<Map<string, number>>(new Map());
 
   // Pan and zoom state for infinite canvas
   const [viewBox, setViewBox] = useState({ x: 0, y: 0, width: 1200, height: 800 });
@@ -341,6 +348,14 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
         return next;
       });
 
+      // Reset ping gauge: update lastHeartbeatTime for new heartbeats
+      const now = Date.now();
+      setLastHeartbeatTime(prev => {
+        const next = new Map(prev);
+        newHeartbeatNodes.forEach(id => next.set(id, now));
+        return next;
+      });
+
       // Clear animation after 600ms
       setTimeout(() => {
         setHeartbeatAnimNodes(prev => {
@@ -353,6 +368,31 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
 
     prevHeartbeatRef.current = new Set(heartbeatIds);
   }, [heartbeatIds]);
+
+  // Update ping progress every 100ms
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setPingProgress(prev => {
+        const next = new Map<string, number>();
+        services.forEach(service => {
+          const serviceKey = `${service.labels.service}-${service.instanceId}`;
+          const lastTime = lastHeartbeatTime.get(serviceKey);
+          if (lastTime) {
+            const elapsed = (now - lastTime) / 1000; // seconds
+            const progress = Math.min(elapsed / HEARTBEAT_TTL_SECONDS, 1);
+            next.set(serviceKey, progress);
+          } else {
+            // If no heartbeat yet, start from 0 (fresh state)
+            next.set(serviceKey, 0);
+          }
+        });
+        return next;
+      });
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [services, lastHeartbeatTime]);
 
   // Initialize simulation once
   useEffect(() => {
@@ -959,6 +999,20 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
               // Get rumble count for this node to use as animation key
               const currentRumbleCount = rumbleCounter.get(serviceKey) || 0;
 
+              // Ping gauge: calculate arc path
+              const progress = pingProgress.get(serviceKey) || 0;
+              const pingGaugeRadius = nodeRadius + 6;
+              const circumference = 2 * Math.PI * pingGaugeRadius;
+              const strokeDasharray = `${progress * circumference} ${circumference}`;
+              // Color transitions from green (0%) to yellow (50%) to red (100%)
+              const pingGaugeColor = progress >= 1
+                ? '#f44336' // Red when fully elapsed
+                : progress >= 0.7
+                  ? '#ff9800' // Orange when near timeout
+                  : progress >= 0.5
+                    ? '#ffc107' // Yellow at half
+                    : '#4caf50'; // Green when fresh
+
               return (
                 <g
                   key={node.id}
@@ -1065,6 +1119,30 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
                       />
                     )}
                   </circle>
+
+                  {/* Ping gauge - circular progress indicator (only for normal states) */}
+                  {(service.status === 'ready' || service.status === 'initializing') && (
+                    <>
+                      <circle
+                        r={pingGaugeRadius}
+                        fill="none"
+                        stroke="rgba(128,128,128,0.3)"
+                        strokeWidth="3"
+                      />
+                      <circle
+                        r={pingGaugeRadius}
+                        fill="none"
+                        stroke={pingGaugeColor}
+                        strokeWidth="3"
+                        strokeDasharray={strokeDasharray}
+                        strokeLinecap="round"
+                        transform="rotate(-90)"
+                        style={{
+                          transition: 'stroke 0.3s ease-out',
+                        }}
+                      />
+                    </>
+                  )}
 
                   {/* Shine effect */}
                   <ellipse
@@ -1273,6 +1351,7 @@ const ServerListPage: React.FC = () => {
     { id: 'service', labelKey: 'serverList.table.service', visible: true },
     { id: 'group', labelKey: 'serverList.table.group', visible: true },
     { id: 'environment', labelKey: 'serverList.table.environment', visible: true },
+    { id: 'region', labelKey: 'serverList.table.region', visible: true },
     { id: 'labels', labelKey: 'serverList.table.labels', visible: true },
     { id: 'instanceId', labelKey: 'serverList.table.instanceId', visible: true },
     { id: 'hostname', labelKey: 'serverList.table.hostname', visible: true },
@@ -2772,12 +2851,28 @@ const ServerListPage: React.FC = () => {
                                 )}
                               </TableCell>
                             );
+                          case 'region':
+                            return (
+                              <TableCell key={column.id}>
+                                {service.labels.region ? (
+                                  <Chip
+                                    label={service.labels.region}
+                                    size="small"
+                                    variant="outlined"
+                                    color="info"
+                                    sx={{ fontWeight: 600 }}
+                                  />
+                                ) : (
+                                  <Typography variant="caption" color="text.disabled">-</Typography>
+                                )}
+                              </TableCell>
+                            );
                           case 'labels':
                             return (
                               <TableCell key={column.id}>
                                 <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
                                   {Object.entries(service.labels)
-                                    .filter(([key]) => key !== 'service' && key !== 'group')
+                                    .filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'region')
                                     .map(([key, value]) => (
                                       <Chip
                                         key={`${service.instanceId}-${key}`}

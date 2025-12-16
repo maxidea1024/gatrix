@@ -7,12 +7,13 @@
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 import { StoreProduct, StoreProductListResponse } from '../types/api';
 import { BaseEnvironmentService } from './BaseEnvironmentService';
 
 export class StoreProductService extends BaseEnvironmentService<StoreProduct, StoreProductListResponse, string> {
-  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
-    super(apiClient, logger, defaultEnvironment);
+  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
+    super(apiClient, logger, envResolver);
   }
 
   // ==================== Abstract Method Implementations ====================
@@ -30,7 +31,7 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
   }
 
   protected getItemId(item: StoreProduct): string {
-    return item.id;
+    return String(item.cmsProductId);
   }
 
   // ==================== Override for ETag Invalidation ====================
@@ -50,10 +51,11 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
   /**
    * Get a single store product by ID from API
    * Used for updating cache with fresh data
+   * @param id Store product ID
+   * @param environment Environment name (required)
    */
-  async getById(id: string, environment?: string): Promise<StoreProduct> {
-    const env = environment || this.defaultEnvironment;
-    const response = await this.apiClient.get<{ product: StoreProduct }>(`/api/v1/server/${encodeURIComponent(env)}/store-products/${id}`);
+  async getById(id: string, environment: string): Promise<StoreProduct> {
+    const response = await this.apiClient.get<{ product: StoreProduct }>(`/api/v1/server/${encodeURIComponent(environment)}/store-products/${id}`);
     if (!response.success || !response.data) {
       throw new Error(response.error?.message || 'Failed to fetch store product');
     }
@@ -65,17 +67,27 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
    * If isActive is false, removes the product from cache (no API call needed)
    * If isActive is true but not in cache, fetches and adds it to cache
    * If isActive is true and in cache, fetches and updates it
+   * @param id Store product ID
+   * @param environment Environment name (required)
+   * @param isActive Optional active status
    */
-  async updateSingleProduct(id: string, environment?: string, isActive?: boolean | number): Promise<void> {
+  /**
+   * Update a single store product in cache (immutable)
+   * If isActive is false, removes the product from cache (no API call needed)
+   * If isActive is true but not in cache, fetches and adds it to cache
+   * If isActive is true and in cache, fetches and updates it
+   * @param id Store product ID (ULID from event)
+   * @param environment Environment name (required)
+   * @param isActive Optional active status
+   */
+  async updateSingleProduct(id: string, environment: string, isActive?: boolean | number): Promise<void> {
     try {
       this.logger.debug('Updating single store product in cache', { id, environment, isActive });
 
-      const envKey = environment || this.defaultEnvironment;
-
-      // If isActive is explicitly false (0 or false), just remove from cache
+      // If isActive is explicitly false (0 or false), just remove from cache by ULID
       if (isActive === false || isActive === 0) {
-        this.logger.info('Store product isActive=false, removing from cache', { id, environment: envKey });
-        this.removeFromCache(id, environment);
+        this.logger.info('Store product isActive=false, removing from cache', { id, environment });
+        this.removeByUlidFromCache(id, environment);
         return;
       }
 
@@ -88,7 +100,7 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
 
       // Fetch the updated product from backend
       const updatedProduct = await this.getById(id, environment);
-      this.updateItemInCache(updatedProduct, environment);
+      this.updateItemByUlidInCache(updatedProduct, environment);
     } catch (error: any) {
       this.logger.error('Failed to update single store product in cache', {
         id,
@@ -96,62 +108,86 @@ export class StoreProductService extends BaseEnvironmentService<StoreProduct, St
         error: error.message,
       });
       // If update fails, fall back to full refresh
-      await this.refresh();
+      await this.refreshByEnvironment(environment);
     }
   }
 
   /**
-   * Remove a store product from cache (immutable)
-   * @deprecated Use removeFromCache instead
+   * Remove an item from cache by ULID (event uses ULID, not cmsProductId)
    */
-  removeProduct(id: string, environment?: string): void {
-    this.removeFromCache(id, environment);
+  private removeByUlidFromCache(ulid: string, environment: string): void {
+    const currentItems = this.cachedByEnv.get(environment) || [];
+    const newItems = currentItems.filter(item => item.id !== ulid);
+    this.cachedByEnv.set(environment, newItems);
+    this.logger.debug('Store product removed from cache by ULID', { ulid, environment });
+  }
+
+  /**
+   * Update or add an item in cache by ULID (event uses ULID, not cmsProductId)
+   */
+  private updateItemByUlidInCache(item: StoreProduct, environment: string): void {
+    const currentItems = this.cachedByEnv.get(environment) || [];
+    const existsInCache = currentItems.some(i => i.id === item.id);
+
+    if (existsInCache) {
+      const newItems = currentItems.map(i => i.id === item.id ? item : i);
+      this.cachedByEnv.set(environment, newItems);
+      this.logger.debug('Store product updated in cache by ULID', { id: item.id, environment });
+    } else {
+      const newItems = [...currentItems, item];
+      this.cachedByEnv.set(environment, newItems);
+      this.logger.debug('Store product added to cache by ULID', { id: item.id, environment });
+    }
   }
 
   /**
    * Get store product by productId from cache
-   * @param environment Environment name. Only used in multi-environment mode.
+   * @param productId Product ID
+   * @param environment Environment name (required)
    */
-  getByProductId(productId: string, environment?: string): StoreProduct | null {
+  getByProductId(productId: string, environment: string): StoreProduct | null {
     const products = this.getCached(environment);
     return products.find((p) => p.productId === productId) || null;
   }
 
   /**
    * Get store products by store type (google, apple, onestore, etc.)
-   * @param environment Environment name. Only used in multi-environment mode.
+   * @param store Store type
+   * @param environment Environment name (required)
    */
-  getByStore(store: string, environment?: string): StoreProduct[] {
+  getByStore(store: string, environment: string): StoreProduct[] {
     const products = this.getCached(environment);
     return products.filter((p) => p.store === store);
   }
 
   /**
    * Get active store products only
-   * @param environment Environment name. Only used in multi-environment mode.
+   * Note: All cached products are already active (filtered by backend)
+   * This method only filters by sale period
+   * @param environment Environment name (required)
    */
-  getActive(environment?: string): StoreProduct[] {
+  getActive(environment: string): StoreProduct[] {
     const products = this.getCached(environment);
     const now = new Date();
-    
+
     return products.filter((p) => {
-      if (!p.isActive) return false;
-      
-      // Check sale period
+      // All cached products are already isActive=true from backend
+      // Only check sale period
+
       if (p.saleStartAt) {
         const startDate = new Date(p.saleStartAt);
         if (!Number.isNaN(startDate.getTime()) && now < startDate) {
           return false;
         }
       }
-      
+
       if (p.saleEndAt) {
         const endDate = new Date(p.saleEndAt);
         if (!Number.isNaN(endDate.getTime()) && now > endDate) {
           return false;
         }
       }
-      
+
       return true;
     });
   }

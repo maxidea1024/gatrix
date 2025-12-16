@@ -256,23 +256,27 @@ async function main() {
     });
 
     // Helper function to print cached data
+    // In multi-environment mode, use targetEnvironment for environment-specific data
     function printCachedData() {
-      const surveysData = sdk.getSurveys();
       const cachedData = {
-        gameWorlds: sdk.getGameWorlds(),
-        popupNotices: sdk.getPopupNotices(),
-        surveys: surveysData,
-        whitelists: sdk.whitelist.getCached(),
-        maintenance: sdk.getServiceMaintenanceStatus(),
-        banners: sdk.getBanners(),
-        clientVersions: sdk.getClientVersions(),
-        serviceNotices: sdk.getServiceNotices(),
-        storeProducts: sdk.getStoreProducts(),
+        gameWorlds: sdk.getGameWorlds(targetEnvironment),
+        popupNotices: sdk.getPopupNotices(targetEnvironment),
+        surveys: sdk.getSurveys(targetEnvironment),
+        whitelists: sdk.whitelist.getAllCached(),
+        maintenance: sdk.getServiceMaintenanceStatus(targetEnvironment),
+        banners: sdk.getBanners(targetEnvironment),
+        clientVersions: sdk.getClientVersions(targetEnvironment),
+        serviceNotices: sdk.getServiceNotices(targetEnvironment),
+        storeProducts: sdk.getStoreProducts(targetEnvironment),
         timestamp: new Date().toISOString(),
       };
 
       logger.info('CACHED DATA', JSON.stringify(cachedData, null, 2));
     }
+
+    // Print initial cached data
+    logger.info('Initial cached data:');
+    printCachedData();
 
     logger.info('Idle server is running and listening to events...');
     logger.info('Press Ctrl+C to stop or POST to /shutdown endpoint');

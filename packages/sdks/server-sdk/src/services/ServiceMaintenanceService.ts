@@ -2,24 +2,46 @@
  * Service Maintenance Service
  * Handles global service maintenance status retrieval and caching
  * Uses per-environment API pattern: GET /api/v1/server/:env/maintenance
+ *
+ * DESIGN PRINCIPLES:
+ * - All methods that access cached data MUST receive environment explicitly in multi-env mode
+ * - Environment resolution is delegated to EnvironmentResolver
+ * - In multi-environment mode (edge), environment MUST always be provided
  */
 
 import { ApiClient } from '../client/ApiClient';
 import { Logger } from '../utils/logger';
+import { EnvironmentResolver } from '../utils/EnvironmentResolver';
 import { MaintenanceStatus } from '../types/api';
 
 export class ServiceMaintenanceService {
   private apiClient: ApiClient;
   private logger: Logger;
-  // Default environment for single-environment mode
-  private defaultEnvironment: string;
+  private envResolver: EnvironmentResolver;
   // Multi-environment cache: Map<environment (environmentName), MaintenanceStatus>
   private cachedStatusByEnv: Map<string, MaintenanceStatus> = new Map();
+  // Whether this feature is enabled
+  private featureEnabled: boolean = true;
 
-  constructor(apiClient: ApiClient, logger: Logger, defaultEnvironment: string = 'development') {
+  constructor(apiClient: ApiClient, logger: Logger, envResolver: EnvironmentResolver) {
     this.apiClient = apiClient;
     this.logger = logger;
-    this.defaultEnvironment = defaultEnvironment;
+    this.envResolver = envResolver;
+  }
+
+  /**
+   * Set feature enabled flag
+   * When false, refresh methods will log a warning
+   */
+  setFeatureEnabled(enabled: boolean): void {
+    this.featureEnabled = enabled;
+  }
+
+  /**
+   * Check if feature is enabled
+   */
+  isFeatureEnabled(): boolean {
+    return this.featureEnabled;
   }
 
   /**
@@ -75,35 +97,24 @@ export class ServiceMaintenanceService {
   }
 
   /**
-   * Fetch service maintenance status (uses default environment)
-   * For backward compatibility
-   */
-  async getStatus(): Promise<MaintenanceStatus> {
-    return this.getStatusByEnvironment(this.defaultEnvironment);
-  }
-
-  /**
    * Refresh service maintenance cache for a specific environment
+   * @param environment Environment name
+   * @param suppressWarnings If true, suppress feature disabled warnings (used by refreshAll)
    */
-  async refreshByEnvironment(environment: string): Promise<MaintenanceStatus> {
+  async refreshByEnvironment(environment: string, suppressWarnings?: boolean): Promise<MaintenanceStatus> {
+    if (!this.featureEnabled && !suppressWarnings) {
+      this.logger.warn('ServiceMaintenanceService.refreshByEnvironment() called but feature is disabled', { environment });
+    }
     return await this.getStatusByEnvironment(environment);
   }
 
-  /**
-   * Refresh service maintenance cache (uses default environment)
-   * For backward compatibility
-   */
-  async refresh(): Promise<MaintenanceStatus> {
-    return this.refreshByEnvironment(this.defaultEnvironment);
-  }
 
   /**
    * Get cached service maintenance status
-   * @param environment Environment name. If omitted, returns default environment status.
+   * @param environment Environment name (required)
    */
-  getCached(environment?: string): MaintenanceStatus | null {
-    const envKey = environment || this.defaultEnvironment;
-    return this.cachedStatusByEnv.get(envKey) || null;
+  getCached(environment: string): MaintenanceStatus | null {
+    return this.cachedStatusByEnv.get(environment) || null;
   }
 
   /**
@@ -122,23 +133,33 @@ export class ServiceMaintenanceService {
   }
 
   /**
+   * Clear cached data for a specific environment
+   */
+  clearCacheForEnvironment(environment: string): void {
+    this.cachedStatusByEnv.delete(environment);
+    this.logger.debug('Service maintenance cache cleared for environment', { environment });
+  }
+
+  /**
    * Update cached service maintenance status
    * Used by cache manager or event listener when maintenance changes
+   * @param status Maintenance status to cache
+   * @param environment Environment name (required)
    */
-  updateCache(status: MaintenanceStatus | null, environment?: string): void {
-    const envKey = environment || this.defaultEnvironment;
+  updateCache(status: MaintenanceStatus | null, environment: string): void {
     if (status) {
-      this.cachedStatusByEnv.set(envKey, status);
+      this.cachedStatusByEnv.set(environment, status);
     } else {
-      this.cachedStatusByEnv.delete(envKey);
+      this.cachedStatusByEnv.delete(environment);
     }
   }
 
   /**
    * Check if service is currently in maintenance based on flag and time window
+   * @param environment Environment name (required)
    */
-  isMaintenanceActive(environment?: string): boolean {
-    const cachedStatus = this.getCached(environment);
+  isMaintenanceActive(environment: string): boolean {
+    const cachedStatus = this.cachedStatusByEnv.get(environment);
     if (!cachedStatus) {
       return false;
     }
@@ -173,9 +194,11 @@ export class ServiceMaintenanceService {
   /**
    * Get localized maintenance message for the service
    * Returns null when maintenance is not active
+   * @param lang Language code
+   * @param environment Environment name (required)
    */
-  getMessage(lang: 'ko' | 'en' | 'zh' = 'en', environment?: string): string | null {
-    const cachedStatus = this.getCached(environment);
+  getMessage(lang: 'ko' | 'en' | 'zh' = 'en', environment: string): string | null {
+    const cachedStatus = this.cachedStatusByEnv.get(environment);
     if (!this.isMaintenanceActive(environment) || !cachedStatus?.detail) {
       return null;
     }
@@ -190,6 +213,14 @@ export class ServiceMaintenanceService {
 
     // Fallback to default message
     return detail.message || null;
+  }
+
+  /**
+   * Fetch service maintenance status for multiple environments
+   * (Alias for getStatusByEnvironments for consistency with BaseEnvironmentService)
+   */
+  async listByEnvironments(environments: string[]): Promise<MaintenanceStatus[]> {
+    return this.getStatusByEnvironments(environments);
   }
 }
 

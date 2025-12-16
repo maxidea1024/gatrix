@@ -205,8 +205,9 @@ export interface BannerByEnvResponse {
 // ============================================================================
 
 export interface StoreProduct {
-  id: string;
-  isActive: boolean;
+  id: string; // ULID - used for event matching
+  cmsProductId: number; // CMS product ID
+  isActive?: boolean; // Optional - stripped in SDK response
   productId: string;
   productName: string;
   store: string;
@@ -215,8 +216,8 @@ export interface StoreProduct {
   saleStartAt: string | null;
   saleEndAt: string | null;
   description: string | null;
-  metadata: Record<string, any> | null;
-  tags?: { id: number; name: string; color: string }[];
+  metadata?: Record<string, any> | null; // Optional - stripped in SDK response
+  tags?: string[]; // Tag names only
   createdAt?: string;
   updatedAt?: string;
 }
@@ -386,11 +387,15 @@ export interface ServicePorts {
  * Service labels for categorization and filtering
  * - service: Required, service type (e.g., 'world', 'auth', 'lobby')
  * - group: Optional, service group (e.g., 'kr', 'us', 'production')
- * - Additional custom labels can be added (e.g., env, region, role)
+ * - environment: Optional, environment identifier (e.g., 'env_prod', 'env_staging')
+ * - region: Optional, geographic region (e.g., 'kr', 'us', 'eu', 'asia')
+ * - Additional custom labels can be added
  */
 export interface ServiceLabels {
   service: string; // Required: Service type
   group?: string; // Optional: Service group
+  environment?: string; // Optional: Environment identifier
+  region?: string; // Optional: Geographic region
   [key: string]: string | undefined; // Additional custom labels
 }
 
@@ -453,9 +458,10 @@ export interface GetServicesParams {
   service?: string; // Filter by labels.service
   group?: string; // Filter by labels.group
   environment?: string; // Filter by labels.environment
+  region?: string; // Filter by labels.region
   status?: ServiceStatus; // Filter by status
   excludeSelf?: boolean; // Exclude current instance (default: true)
-  labels?: Record<string, string>; // Additional label filters (e.g., { env: 'prod', region: 'ap-northeast-2' })
+  labels?: Record<string, string>; // Additional label filters
 }
 
 // ============================================================================

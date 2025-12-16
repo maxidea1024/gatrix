@@ -43,7 +43,7 @@ function getLocalizedDescription(product: StoreProduct, lang: SdkLanguage): stri
  */
 function stripInternalFields(product: StoreProduct, tags: any[], lang: SdkLanguage) {
   const {
-    id: _id,
+    // Keep id for SDK event matching
     isActive: _isActive,
     metadata: _metadata,
     createdBy: _createdBy,
@@ -64,7 +64,6 @@ function stripInternalFields(product: StoreProduct, tags: any[], lang: SdkLangua
   } = product;
 
   // Suppress unused variable warnings
-  void _id;
   void _isActive;
   void _metadata;
   void _createdBy;
@@ -86,7 +85,8 @@ function stripInternalFields(product: StoreProduct, tags: any[], lang: SdkLangua
     // Return localized name and description based on requested language
     productName: getLocalizedName(product, lang),
     description: getLocalizedDescription(product, lang),
-    tags: tags || [],
+    // Return only tag names for SDK
+    tags: (tags || []).map((t: any) => t.name),
   };
 }
 

@@ -4328,6 +4328,7 @@
       "service": "서비스",
       "group": "그룹",
       "environment": "환경",
+      "region": "지역",
       "labels": "레이블",
       "hostname": "호스트명",
       "externalAddress": "공인 IP",
