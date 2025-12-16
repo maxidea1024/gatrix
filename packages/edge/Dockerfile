@@ -57,6 +57,9 @@ RUN adduser --system --uid 1001 nodejs
 COPY --from=builder /app/packages/edge/dist ./dist
 COPY --from=builder /app/packages/edge/package.json ./package.json
 
+# Copy public folder for static files (game webview pages)
+COPY --from=builder /app/packages/edge/public ./public
+
 # Copy production dependencies
 COPY package.json yarn.lock* ./
 COPY packages/edge/package.json ./packages/edge/
