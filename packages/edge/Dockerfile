@@ -13,7 +13,7 @@ RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 COPY package.json yarn.lock* ./
 COPY packages/edge/package.json ./packages/edge/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
-RUN yarn install --frozen-lockfile --production=false --network-timeout 600000
+RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -29,7 +29,7 @@ COPY packages/edge/package.json ./packages/edge/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install dependencies
-RUN yarn install --frozen-lockfile --production=false --network-timeout 600000
+RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
 
 # Copy source code
 COPY packages/edge ./packages/edge
@@ -65,7 +65,7 @@ COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 # Copy server-sdk source (needed for file: dependency)
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
-RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 && \
+RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 --ignore-optional && \
   yarn cache clean
 
 # Copy built server-sdk dist (overwrite source with built version)

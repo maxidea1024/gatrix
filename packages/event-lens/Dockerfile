@@ -19,7 +19,7 @@ COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
 # Install dependencies (with increased network timeout for slow connections)
-RUN yarn install --frozen-lockfile --production=false --network-timeout 600000
+RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
 
 # Builder stage
 FROM base AS builder
@@ -32,7 +32,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Build server-sdk (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn install --network-timeout 600000 && yarn build
+RUN cd packages/sdks/server-sdk && yarn install --network-timeout 600000 --ignore-optional && yarn build
 
 # Build event-lens
 RUN yarn workspace @gatrix/event-lens build
@@ -58,7 +58,7 @@ COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
 # Install production dependencies only (with increased network timeout for slow connections)
-RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 && \
+RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 --ignore-optional && \
   yarn cache clean
 
 # Copy built server-sdk from builder to node_modules location

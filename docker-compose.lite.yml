@@ -1,0 +1,420 @@
+# Lite version of docker-compose.yml
+# Excludes: clickhouse, event-lens, event-lens-worker
+# For lighter resource usage when analytics features are not needed
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: gatrix-mysql
+    restart: unless-stopped
+    command: --innodb-use-native-aio=0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-gatrix}
+      MYSQL_USER: ${DB_USER:-gatrix_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
+    ports:
+      - "${MYSQL_HOST_PORT:-43306}:3306"
+    volumes:
+      - ${DATA_ROOT:-./data}/mysql:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d
+    networks:
+      - gatrix-network
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u root -p${DB_ROOT_PASSWORD:-rootpassword} && mysql -u root -p${DB_ROOT_PASSWORD:-rootpassword} -e 'SELECT 1' >/dev/null 2>&1" ]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+      start_period: 40s
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: gatrix-redis
+    restart: unless-stopped
+    command: redis-server /usr/local/etc/redis/redis.conf --appendonly yes
+    ports:
+      - "${REDIS_HOST_PORT:-46379}:6379"
+    volumes:
+      - ${DATA_ROOT:-./data}/redis:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - gatrix-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 10s
+
+  # MySQL Exporter for Prometheus metrics
+  mysql-exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: gatrix-mysql-exporter
+    restart: unless-stopped
+    command:
+      - "--mysqld.username=root:${DB_ROOT_PASSWORD:-gatrix_rootpassword}"
+      - "--mysqld.address=mysql:3306"
+    ports:
+      - "49104:9104"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - gatrix-network
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://127.0.0.1:9104/metrics" ]
+      timeout: 10s
+      retries: 3
+      interval: 30s
+      start_period: 10s
+
+  # Redis Exporter for Prometheus metrics
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: gatrix-redis-exporter
+    restart: unless-stopped
+    environment:
+      REDIS_ADDR: "redis:6379"
+    ports:
+      - "49121:9121"
+    networks:
+      - gatrix-network
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: packages/backend/Dockerfile
+    container_name: gatrix-backend
+    restart: unless-stopped
+    user: "0"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-backend
+      PORT: 5000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-gatrix}
+      DB_USER: ${DB_USER:-gatrix_user}
+      DB_PASSWORD: ${DB_PASSWORD:-gatrix_password}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-super-secret-refresh-key-change-this-in-production}
+      SESSION_SECRET: ${SESSION_SECRET:-your-super-secret-session-key-change-this-in-production}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@gatrix.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      ADMIN_NAME: ${ADMIN_NAME:-Administrator}
+      CORS_ORIGIN: "*"
+      DISABLE_X_POWERED_BY: true
+      DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
+      DISABLE_RATE_LIMIT: true
+      MONITORING_ENABLED: ${MONITORING_ENABLED:-true}
+      # Chat Server Integration
+      CHAT_SERVER_URL: http://chat-server:5100
+      # Service Discovery
+      SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-etcd}
+      SERVICE_DISCOVERY_HEARTBEAT_TTL: ${SERVICE_DISCOVERY_HEARTBEAT_TTL:-30}
+      SERVICE_DISCOVERY_INACTIVE_KEEP_TTL: ${SERVICE_DISCOVERY_INACTIVE_KEEP_TTL:-60}
+      SERVICE_DISCOVERY_TERMINATED_MARKER_TTL: ${SERVICE_DISCOVERY_TERMINATED_MARKER_TTL:-300}
+      ETCD_HOSTS: ${ETCD_HOSTS:-http://etcd:2379}
+    ports:
+      - "${BACKEND_PORT:-45000}:5000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - gatrix-network
+    volumes:
+      - ${DATA_ROOT:-./data}/backend/logs:/app/logs
+      - ${DATA_ROOT:-./data}/backend/data:/app/data
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 30s
+
+  # Chat Server
+  chat-server:
+    build:
+      context: .
+      dockerfile: packages/chat-server/Dockerfile
+    container_name: gatrix-chat-server
+    restart: unless-stopped
+    user: "0"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-chat-server
+      PORT: 5100
+      HOST: 0.0.0.0
+      # Database
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${CHAT_DB_NAME:-gatrix_chat}
+      DB_USER: ${DB_USER:-gatrix_user}
+      DB_PASSWORD: ${DB_PASSWORD:-gatrix_password}
+      DB_DEBUG: false
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DB: 1
+      # JWT (must match backend)
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
+      JWT_EXPIRES_IN: 24h
+      # CORS
+      CORS_ORIGIN: "*"
+      # Clustering
+      CLUSTER_ENABLED: ${CHAT_CLUSTER_ENABLED:-true}
+      CLUSTER_WORKERS: ${CHAT_CLUSTER_WORKERS:-0}
+      STICKY_SESSION: ${CHAT_STICKY_SESSION:-true}
+      # Performance
+      BROADCAST_BATCH_SIZE: ${CHAT_BROADCAST_BATCH_SIZE:-1000}
+      USE_MESSAGE_PACK: ${CHAT_USE_MESSAGE_PACK:-true}
+      BROADCAST_COMPRESSION: ${CHAT_BROADCAST_COMPRESSION:-true}
+      WS_MAX_CONNECTIONS: ${CHAT_WS_MAX_CONNECTIONS:-10000}
+      # Monitoring
+      MONITORING_ENABLED: ${CHAT_MONITORING_ENABLED:-true}
+      METRICS_PORT: 9090
+      # Gatrix Integration
+      GATRIX_API_URL: ${GATRIX_API_URL:-http://backend:5000}
+      GATRIX_API_SECRET: ${GATRIX_API_SECRET:-shared-secret-between-servers}
+      # Service Discovery
+      GATRIX_URL: http://backend:5000
+      API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
+      BACKEND_SERVICE_TOKEN: ${BACKEND_SERVICE_TOKEN:-gatrix-backend-service-token-default-key-change-in-production}
+      # Logging
+      LOG_LEVEL: ${CHAT_LOG_LEVEL:-info}
+    ports:
+      - "${CHAT_PORT:-45100}:5100"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      frontend:
+        condition: service_started
+    networks:
+      - gatrix-network
+    volumes:
+      - ${DATA_ROOT:-./data}/chat-server/uploads:/app/uploads
+      - ${DATA_ROOT:-./data}/chat-server/logs:/app/logs
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:5100/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))" ]
+      timeout: 10s
+      retries: 10
+      interval: 10s
+      start_period: 60s
+
+  # Loki - Log aggregation
+  loki:
+    image: grafana/loki:latest
+    container_name: gatrix-loki
+    restart: unless-stopped
+    user: "0"
+    ports:
+      - "${LOKI_PORT:-43100}:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./docker/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
+      - ${DATA_ROOT:-./data}/loki:/loki
+    networks:
+      - gatrix-network
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --spider -q http://127.0.0.1:3100/ready || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Fluent Bit - Log forwarder to Loki
+  fluent-bit:
+    image: fluent/fluent-bit:latest
+    container_name: gatrix-fluent-bit
+    restart: unless-stopped
+    volumes:
+      - ./docker/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      loki:
+        condition: service_started
+    networks:
+      - gatrix-network
+
+  # Prometheus - Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: gatrix-prometheus
+    restart: unless-stopped
+    user: "0"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
+      PROM_RETENTION_TIME: ${PROM_RETENTION_TIME:-14d}
+    ports:
+      - "${PROMETHEUS_PORT:-49090}:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.base.yml:/etc/prometheus/prometheus.base.yml:ro
+      - ./docker/prometheus/entrypoint.sh:/docker/prometheus/entrypoint.sh:ro
+      - ${DATA_ROOT:-./data}/prometheus:/prometheus
+    entrypoint: [ "/bin/sh", "/docker/prometheus/entrypoint.sh" ]
+    depends_on:
+      backend:
+        condition: service_healthy
+      chat-server:
+        condition: service_started
+      mysql-exporter:
+        condition: service_healthy
+      redis-exporter:
+        condition: service_started
+    networks:
+      - gatrix-network
+
+  # Grafana - Dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: gatrix-grafana
+    restart: unless-stopped
+    user: "0"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_SECURITY_COOKIE_SAMESITE: "Lax"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:43000/grafana/}
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+    ports:
+      - "${GRAFANA_PORT:-44000}:3000"
+    volumes:
+      - ${DATA_ROOT:-./data}/grafana:/var/lib/grafana
+      - ./docker/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./docker/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      prometheus:
+        condition: service_started
+    networks:
+      - gatrix-network
+
+  # Frontend (Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: packages/frontend/Dockerfile
+    container_name: gatrix-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: /api/v1
+      VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
+      VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
+      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:44000}
+      VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:43000/bull-board}
+      VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:3400}
+    ports:
+      - "${FRONTEND_PORT:-43000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - gatrix-network
+    volumes:
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:80/health" ]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 30s
+
+  # Edge Server - High-availability client-facing API
+  edge:
+    build:
+      context: .
+      dockerfile: packages/edge/Dockerfile
+    container_name: gatrix-edge
+    restart: unless-stopped
+    user: "0"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      LOG_LEVEL: ${EDGE_LOG_LEVEL:-info}
+      EDGE_PORT: 3400
+      EDGE_METRICS_PORT: 9400
+      GATRIX_URL: http://backend:5000
+      EDGE_BYPASS_TOKEN: ${EDGE_BYPASS_TOKEN:-gatrix-edge-internal-bypass-token}
+      EDGE_APPLICATION_NAME: ${EDGE_APPLICATION_NAME:-edge-server}
+      EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-*}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DB: 0
+      CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-event}
+      CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
+    ports:
+      - "${EDGE_PORT:-3400}:3400"
+    depends_on:
+      backend:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - gatrix-network
+    volumes:
+      - ${DATA_ROOT:-./data}/edge/logs:/app/logs
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 30s
+
+  # etcd for service discovery
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.12
+    container_name: gatrix-etcd
+    restart: unless-stopped
+    user: "0"
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd0
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-advertise-peer-urls=http://etcd:2380
+      - --initial-cluster=etcd0=http://etcd:2380
+      - --initial-cluster-token=etcd-cluster
+      - --initial-cluster-state=new
+      - --log-level=info
+    ports:
+      - "${ETCD_PORT:-42379}:2379"
+      - "42380:2380"
+    volumes:
+      - ${DATA_ROOT:-./data}/etcd:/etcd-data
+    networks:
+      - gatrix-network
+    healthcheck:
+      test: [ "CMD", "etcdctl", "endpoint", "health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  gatrix-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16
+
