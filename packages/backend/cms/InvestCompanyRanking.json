@@ -671,7 +671,7 @@
       "rankingGrade": 1,
       "rankingType": 2,
       "rankingRange": 1,
-      "mailId": 92001231,
+      "mailId": 92001777,
       "seasonRewardValue": [
         2000,
         50,
@@ -684,7 +684,7 @@
       "rankingGrade": 2,
       "rankingType": 2,
       "rankingRange": 2,
-      "mailId": 92001239,
+      "mailId": 92001778,
       "seasonRewardValue": [
         1000,
         40,
@@ -697,7 +697,7 @@
       "rankingGrade": 3,
       "rankingType": 2,
       "rankingRange": 3,
-      "mailId": 92001240,
+      "mailId": 92001779,
       "seasonRewardValue": [
         700,
         30,
@@ -710,7 +710,7 @@
       "rankingGrade": 4,
       "rankingType": 2,
       "rankingRange": 5,
-      "mailId": 92001241,
+      "mailId": 92001780,
       "seasonRewardValue": [
         500,
         20,
@@ -723,7 +723,7 @@
       "rankingGrade": 5,
       "rankingType": 2,
       "rankingRange": 10,
-      "mailId": 92001242,
+      "mailId": 92001781,
       "seasonRewardValue": [
         300,
         15,
@@ -736,7 +736,7 @@
       "rankingGrade": 6,
       "rankingType": 2,
       "rankingRange": 15,
-      "mailId": 92001243,
+      "mailId": 92001782,
       "seasonRewardValue": [
         100,
         10,
@@ -749,7 +749,7 @@
       "rankingGrade": 7,
       "rankingType": 2,
       "rankingRange": 20,
-      "mailId": 92001244,
+      "mailId": 92001783,
       "seasonRewardValue": [
         75,
         7,
@@ -762,7 +762,7 @@
       "rankingGrade": 8,
       "rankingType": 2,
       "rankingRange": 30,
-      "mailId": 92001245,
+      "mailId": 92001784,
       "seasonRewardValue": [
         60,
         5,
@@ -775,7 +775,7 @@
       "rankingGrade": 9,
       "rankingType": 2,
       "rankingRange": 50,
-      "mailId": 92001246,
+      "mailId": 92001785,
       "seasonRewardValue": [
         50,
         3,
@@ -788,7 +788,7 @@
       "rankingGrade": 10,
       "rankingType": 1,
       "rankingRange": 100,
-      "mailId": 92001247,
+      "mailId": 92001786,
       "seasonRewardValue": [
         10,
         1,

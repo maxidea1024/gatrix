@@ -4094,6 +4094,33 @@
       "color2": 16777215,
       "color3_hair": 16764245,
       "backAnim": true
+    },
+    "32000455": {
+      "id": 32000455,
+      "skeleton": "FShorthair18",
+      "atlas": "FShorthair18",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 15921906,
+      "backAnim": true
+    },
+    "32000456": {
+      "id": 32000456,
+      "skeleton": "MMid35",
+      "atlas": "MMid35",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 12883019,
+      "backAnim": true
+    },
+    "32000457": {
+      "id": 32000457,
+      "skeleton": "FLong43",
+      "atlas": "FLong43",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_hair": 12883019,
+      "backAnim": true
     }
   }
 }

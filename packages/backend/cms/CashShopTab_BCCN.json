@@ -53,7 +53,7 @@
       "productSize": 1,
       "name": "특전",
       "productEntryType": 4,
-      "bannereventImage": "WT_CN_CashShopBannerEvent007",
+      "bannereventImage": "WT_CN_CashShopBannerEvent007_Sprite",
       "useEventButton": false
     },
     "104": {
@@ -63,7 +63,7 @@
       "productSize": 1,
       "name": "특화",
       "productEntryType": 4,
-      "bannereventImage": "WT_CN_CashShopBannerEvent009",
+      "bannereventImage": "WT_CN_CashShopBannerEvent010_Sprite",
       "useEventButton": false
     },
     "105": {
@@ -226,7 +226,7 @@
       "productSize": 1,
       "name": "블랙 레이븐",
       "productEntryType": 4,
-      "bannereventImage": "WT_CN_CashShopBannerEvent001",
+      "bannereventImage": "WT_CN_CashShopBannerEvent001_Sprite",
       "useEventButton": false
     },
     "1402": {
@@ -236,7 +236,7 @@
       "productSize": 1,
       "name": "줄리 도비니",
       "productEntryType": 4,
-      "bannereventImage": "WT_CN_CashShopBannerEvent002",
+      "bannereventImage": "WT_CN_CashShopBannerEvent002_Sprite",
       "useEventButton": false
     },
     "1403": {
@@ -246,7 +246,7 @@
       "productSize": 1,
       "name": "예바",
       "productEntryType": 4,
-      "bannereventImage": "WT_CN_CashShopBannerEvent003",
+      "bannereventImage": "WT_CN_CashShopBannerEvent003_Sprite",
       "useEventButton": false
     },
     "1404": {
@@ -256,7 +256,7 @@
       "productSize": 1,
       "name": "갈릴레오 갈릴레이",
       "productEntryType": 4,
-      "bannereventImage": "WT_CN_CashShopBannerEvent004",
+      "bannereventImage": "WT_CN_CashShopBannerEvent004_Sprite",
       "useEventButton": false
     },
     "1405": {
@@ -266,7 +266,7 @@
       "productSize": 1,
       "name": "비비엔 하트",
       "productEntryType": 4,
-      "bannereventImage": "WT_CN_CashShopBannerEvent005",
+      "bannereventImage": "WT_CN_CashShopBannerEvent005_Sprite",
       "useEventButton": false
     },
     "1406": {
@@ -276,7 +276,7 @@
       "productSize": 1,
       "name": "신규 항해",
       "productEntryType": 4,
-      "bannereventImage": "WT_CN_CashShopBannerEvent006",
+      "bannereventImage": "WT_CN_CashShopBannerEvent006_Sprite",
       "useEventButton": false
     },
     "1407": {
@@ -286,7 +286,7 @@
       "productSize": 1,
       "name": "런칭",
       "productEntryType": 4,
-      "bannereventImage": "WT_CN_CashShopBannerEvent008",
+      "bannereventImage": "WT_CN_CashShopBannerEvent008_Sprite",
       "useEventButton": false
     }
   }

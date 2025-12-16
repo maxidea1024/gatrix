@@ -949,7 +949,7 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 99
+          "Count": 255
         }
       ],
       "orders": [
@@ -1132,7 +1132,7 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 99
+          "Count": 255
         }
       ],
       "orders": [
@@ -1306,7 +1306,7 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 99
+          "Count": 255
         }
       ],
       "orders": [
@@ -1336,7 +1336,7 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 99
+          "Count": 255
         }
       ],
       "orders": [
@@ -1635,7 +1635,7 @@
       "contentsTerms": [
         {
           "Id": 81000001,
-          "Count": 99
+          "Count": 255
         }
       ],
       "orders": [
@@ -1645,6 +1645,43 @@
       ],
       "isHideNotHired": true,
       "listOrder": 10002
+    },
+    "20000037": {
+      "id": 20000037,
+      "mateId": 21200036,
+      "startTownId": 11000000,
+      "defaultTowns": [
+        70412033
+      ],
+      "defaultSailor": 21390502,
+      "startOpenFOWTileIds": [
+        1818,
+        1817
+      ],
+      "startRoyalTitelId": 21700000,
+      "isBasicAdmiral": false,
+      "questId0": 82000037,
+      "questId1": 82000037,
+      "questId2": 82000037,
+      "questId3": 82000037,
+      "questId4": 82000037,
+      "questId5": 82000037,
+      "questId6": 82000037,
+      "recruitingPoint": 100004,
+      "recruitingPointValue": 99999,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 255
+        }
+      ],
+      "orders": [
+        {
+          "AdmiralLv": 1
+        }
+      ],
+      "isHideNotHired": true,
+      "listOrder": 133
     }
   }
 }

@@ -55193,7 +55193,7 @@
         }
       ],
       "markerIcon": "icon_skill_battleOrder_134_Sprite",
-      "markerEffect": "BattleOrderBlitzBuff",
+      "markerEffect": "OrderOfTheGovernor",
       "desc": "포격 공격 시, 한 번 더 공격하여 {0}의 추가 피해를 줍니다.(두 번째 공격은 추가 효과를 발동시키지 않습니다.)",
       "descFormatTexts": [
         "50%"

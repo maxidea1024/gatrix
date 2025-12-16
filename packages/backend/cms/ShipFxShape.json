@@ -1114,6 +1114,34 @@
     },
     "48000072": {
       "id": 48000072,
+      "assetName": "P_FX_Ornament_BatColony_Body",
+      "assetType": 4,
+      "socket": "SK_Ship_Body_Bone",
+      "scaleS": 0.5,
+      "scaleM": 0.6,
+      "scaleL": 0.75,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0
+    },
+    "48000073": {
+      "id": 48000073,
+      "assetType": 4,
+      "scaleS": 0.5,
+      "scaleM": 0.7,
+      "scaleL": 0.8,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0,
+      "decorations": [
+        {
+          "name": "BP_FX_Ornarment_SRGiraffe_Top",
+          "socket": "cflag"
+        }
+      ]
+    },
+    "48000074": {
+      "id": 48000074,
       "assetType": 4,
       "scaleS": 0.6,
       "scaleM": 0.75,
@@ -1123,15 +1151,127 @@
       "drawDistance": 0,
       "decorations": [
         {
-          "name": "BP_FX_Ornament_JackOLantern_SideA_R",
+          "name": "BP_FX_Ornament_ChristmasSocks_SideA_L",
+          "socket": "FXCostume_AbeamL1"
+        },
+        {
+          "name": "BP_FX_Ornament_ChristmasSocks_SideB_L",
+          "socket": "FXCostume_AbeamL2"
+        },
+        {
+          "name": "BP_FX_Ornament_ChristmasSocks_SideC_L",
+          "socket": "FXCostume_AbeamL3"
+        }
+      ]
+    },
+    "48000075": {
+      "id": 48000075,
+      "assetType": 4,
+      "scaleS": 0.6,
+      "scaleM": 0.75,
+      "scaleL": 0.85,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0,
+      "decorations": [
+        {
+          "name": "BP_FX_Ornament_ChristmasSocks_SideA_R",
           "socket": "FXCostume_AbeamR1"
         },
         {
-          "name": "BP_FX_Ornament_JackOLantern_SideB_R",
+          "name": "BP_FX_Ornament_ChristmasSocks_SideB_R",
           "socket": "FXCostume_AbeamR2"
         },
         {
-          "name": "BP_FX_Ornament_JackOLantern_SideC_R",
+          "name": "BP_FX_Ornament_ChristmasSocks_SideC_R",
+          "socket": "FXCostume_AbeamR3"
+        }
+      ]
+    },
+    "48000076": {
+      "id": 48000076,
+      "assetName": "P_FX_Ornament_ChristmasSnow_Body",
+      "assetType": 4,
+      "socket": "SK_Ship_Body_Bone",
+      "scaleS": 0.5,
+      "scaleM": 0.6,
+      "scaleL": 0.75,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0
+    },
+    "48000077": {
+      "id": 48000077,
+      "assetType": 4,
+      "scaleS": 0.5,
+      "scaleM": 0.7,
+      "scaleL": 0.8,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0,
+      "decorations": [
+        {
+          "name": "BP_FX_Ornament_DNEyes_Top",
+          "socket": "cflag"
+        }
+      ]
+    },
+    "48000078": {
+      "id": 48000078,
+      "assetName": "P_FX_Ornament_CNFirework_Front",
+      "assetType": 4,
+      "socket": "SOCKET_SK_Ship_Body_FXCostume_Foremast",
+      "scaleS": 0.6,
+      "scaleM": 0.75,
+      "scaleL": 0.85,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0
+    },
+    "48000079": {
+      "id": 48000079,
+      "assetType": 4,
+      "scaleS": 0.6,
+      "scaleM": 0.75,
+      "scaleL": 0.85,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0,
+      "decorations": [
+        {
+          "name": "BP_FX_Ornament_CNRedLantern_SideA_L",
+          "socket": "FXCostume_AbeamL1"
+        },
+        {
+          "name": "BP_FX_Ornament_CNRedLantern_SideB_L",
+          "socket": "FXCostume_AbeamL2"
+        },
+        {
+          "name": "BP_FX_Ornament_CNRedLantern_SideC_L",
+          "socket": "FXCostume_AbeamL3"
+        }
+      ]
+    },
+    "48000080": {
+      "id": 48000080,
+      "assetType": 4,
+      "scaleS": 0.6,
+      "scaleM": 0.75,
+      "scaleL": 0.85,
+      "scaleXL": 1,
+      "detailMode": 1,
+      "drawDistance": 0,
+      "decorations": [
+        {
+          "name": "BP_FX_Ornament_CNRedLantern_SideA_R",
+          "socket": "FXCostume_AbeamR1"
+        },
+        {
+          "name": "BP_FX_Ornament_CNRedLantern_SideB_R",
+          "socket": "FXCostume_AbeamR2"
+        },
+        {
+          "name": "BP_FX_Ornament_CNRedLantern_SideC_R",
           "socket": "FXCostume_AbeamR3"
         }
       ]

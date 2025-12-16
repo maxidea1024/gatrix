@@ -2047,7 +2047,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -2536,7 +2536,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 506600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 14,
+      "relaunchPointValue": 11,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 8
@@ -2787,7 +2787,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -3038,7 +3038,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -3289,7 +3289,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -3540,7 +3540,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 2896000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 82,
+      "relaunchPointValue": 81,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 10
@@ -3801,7 +3801,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 193900,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 6,
+      "relaunchPointValue": 5,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 6
@@ -4052,7 +4052,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 193900,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 6,
+      "relaunchPointValue": 5,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 6
@@ -4303,7 +4303,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 506600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 14,
+      "relaunchPointValue": 11,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 8
@@ -4554,7 +4554,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 2896000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 82,
+      "relaunchPointValue": 81,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 10
@@ -4813,9 +4813,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 3743000,
+      "verifyingPointVal": 6660800,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 100,
+      "relaunchPointValue": 107,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 14
@@ -5074,9 +5074,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 3743000,
+      "verifyingPointVal": 6660800,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 100,
+      "relaunchPointValue": 107,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 14
@@ -5337,7 +5337,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 193900,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 6,
+      "relaunchPointValue": 5,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 6
@@ -5586,9 +5586,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 3297000,
+      "verifyingPointVal": 4633600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 86,
+      "relaunchPointValue": 90,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 12
@@ -5849,7 +5849,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 506600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 14,
+      "relaunchPointValue": 11,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 8
@@ -6098,9 +6098,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 3297000,
+      "verifyingPointVal": 4633600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 86,
+      "relaunchPointValue": 90,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 12
@@ -6359,9 +6359,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 3297000,
+      "verifyingPointVal": 4633600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 86,
+      "relaunchPointValue": 90,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 12
@@ -6620,9 +6620,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 3297000,
+      "verifyingPointVal": 4633600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 86,
+      "relaunchPointValue": 90,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 12
@@ -6881,9 +6881,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 4225000,
+      "verifyingPointVal": 8977600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 115,
+      "relaunchPointValue": 132,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 16
@@ -7144,7 +7144,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 2896000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 82,
+      "relaunchPointValue": 81,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 10
@@ -7403,9 +7403,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 3743000,
+      "verifyingPointVal": 6660800,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 100,
+      "relaunchPointValue": 107,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 14
@@ -7664,9 +7664,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 3297000,
+      "verifyingPointVal": 4633600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 86,
+      "relaunchPointValue": 90,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 12
@@ -7927,7 +7927,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 193900,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 6,
+      "relaunchPointValue": 5,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 6
@@ -8176,9 +8176,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 3743000,
+      "verifyingPointVal": 6660800,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 100,
+      "relaunchPointValue": 107,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 14
@@ -8437,9 +8437,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 4741000,
+      "verifyingPointVal": 11584000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 123,
+      "relaunchPointValue": 164,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 18
@@ -8700,7 +8700,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 2896000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 82,
+      "relaunchPointValue": 81,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 10
@@ -8959,9 +8959,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 4225000,
+      "verifyingPointVal": 8977600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 115,
+      "relaunchPointValue": 132,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 16
@@ -9220,9 +9220,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 34270000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 920,
+      "relaunchPointValue": 900,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 28
@@ -9491,9 +9491,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 5319000,
+      "verifyingPointVal": 14480000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 147,
+      "relaunchPointValue": 203,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 20
@@ -9754,7 +9754,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 31570000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 880,
+      "relaunchPointValue": 802,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 26
@@ -10023,9 +10023,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 5319000,
+      "verifyingPointVal": 14480000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 147,
+      "relaunchPointValue": 203,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 20
@@ -10284,9 +10284,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 6958000,
+      "verifyingPointVal": 21140800,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 188,
+      "relaunchPointValue": 302,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 24
@@ -10545,9 +10545,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 4741000,
+      "verifyingPointVal": 11584000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 123,
+      "relaunchPointValue": 164,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 18
@@ -10806,9 +10806,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 4225000,
+      "verifyingPointVal": 8977600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 115,
+      "relaunchPointValue": 132,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 16
@@ -11067,9 +11067,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 6040000,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 162,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22
@@ -11328,9 +11328,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 4741000,
+      "verifyingPointVal": 11584000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 123,
+      "relaunchPointValue": 164,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 18
@@ -11589,9 +11589,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 4741000,
+      "verifyingPointVal": 11584000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 123,
+      "relaunchPointValue": 164,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 18
@@ -11850,9 +11850,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 5319000,
+      "verifyingPointVal": 14480000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 147,
+      "relaunchPointValue": 203,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 20
@@ -12111,9 +12111,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 37160000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1000,
+      "relaunchPointValue": 1010,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -12384,7 +12384,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 31570000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 880,
+      "relaunchPointValue": 802,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 26
@@ -12655,7 +12655,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 31570000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 880,
+      "relaunchPointValue": 802,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 26
@@ -12924,9 +12924,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 40240000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1080,
+      "relaunchPointValue": 1140,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -13195,9 +13195,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 37160000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1000,
+      "relaunchPointValue": 1010,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -13466,9 +13466,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -13741,9 +13741,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 44000000,
+      "verifyingPointVal": 50650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1500,
+      "relaunchPointValue": 1620,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 38
@@ -14015,9 +14015,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 37160000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1000,
+      "relaunchPointValue": 1010,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -14286,9 +14286,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2900,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -14566,9 +14566,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 70650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1600,
+      "relaunchPointValue": 2120,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 40
@@ -14846,9 +14846,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 34270000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 920,
+      "relaunchPointValue": 900,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 28
@@ -15117,9 +15117,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 69000000,
+      "verifyingPointVal": 95550000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3420,
+      "relaunchPointValue": 2580,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 44
@@ -15399,7 +15399,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 31570000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 880,
+      "relaunchPointValue": 802,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 26
@@ -15668,9 +15668,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 40240000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1080,
+      "relaunchPointValue": 1140,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -15939,9 +15939,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -16209,7 +16209,7 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
       "relaunchPointValue": 1280,
       "repairShipLife": {
@@ -16484,9 +16484,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -16769,9 +16769,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 94300000,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -17049,9 +17049,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 70650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1600,
+      "relaunchPointValue": 2120,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 40
@@ -17610,7 +17610,7 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
       "relaunchPointValue": 1280,
       "repairShipLife": {
@@ -17885,9 +17885,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 152743000,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -18170,9 +18170,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -18455,9 +18455,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 69000000,
+      "verifyingPointVal": 95550000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3420,
+      "relaunchPointValue": 2580,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 44
@@ -18737,7 +18737,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -18988,7 +18988,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 2896000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 82,
+      "relaunchPointValue": 81,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 10
@@ -19249,7 +19249,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 506600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 14,
+      "relaunchPointValue": 11,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 8
@@ -19498,9 +19498,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 3743000,
+      "verifyingPointVal": 6660800,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 100,
+      "relaunchPointValue": 107,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 14
@@ -19759,9 +19759,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 6958000,
+      "verifyingPointVal": 21140800,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 188,
+      "relaunchPointValue": 302,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 24
@@ -20020,9 +20020,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 5319000,
+      "verifyingPointVal": 14480000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 147,
+      "relaunchPointValue": 203,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 20
@@ -20281,9 +20281,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 4741000,
+      "verifyingPointVal": 11584000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 123,
+      "relaunchPointValue": 164,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 18
@@ -20542,9 +20542,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 6040000,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 162,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22
@@ -20803,9 +20803,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 40240000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1080,
+      "relaunchPointValue": 1140,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -21074,7 +21074,7 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
       "relaunchPointValue": 1280,
       "repairShipLife": {
@@ -21349,9 +21349,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 6958000,
+      "verifyingPointVal": 21140800,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 188,
+      "relaunchPointValue": 302,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 24
@@ -21610,9 +21610,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 44000000,
+      "verifyingPointVal": 50650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1500,
+      "relaunchPointValue": 1620,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 38
@@ -21880,9 +21880,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 152743000,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -22434,9 +22434,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -23795,9 +23795,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 6040000,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 162,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22
@@ -24056,9 +24056,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 5319000,
+      "verifyingPointVal": 14480000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 147,
+      "relaunchPointValue": 203,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 20
@@ -24317,9 +24317,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 4225000,
+      "verifyingPointVal": 8977600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 115,
+      "relaunchPointValue": 132,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 16
@@ -24578,9 +24578,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 40240000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1080,
+      "relaunchPointValue": 1140,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -24849,9 +24849,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -25124,9 +25124,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 70650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1600,
+      "relaunchPointValue": 2120,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 40
@@ -25400,9 +25400,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 34270000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 920,
+      "relaunchPointValue": 900,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 28
@@ -25671,9 +25671,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2900,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -25951,9 +25951,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 37160000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1000,
+      "relaunchPointValue": 1010,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -26222,9 +26222,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 94300000,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -26783,7 +26783,7 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
       "relaunchPointValue": 1280,
       "repairShipLife": {
@@ -27058,9 +27058,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 44000000,
+      "verifyingPointVal": 50650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1500,
+      "relaunchPointValue": 1620,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 38
@@ -27328,9 +27328,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -27613,9 +27613,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 70650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1600,
+      "relaunchPointValue": 2120,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 40
@@ -27889,9 +27889,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -28164,9 +28164,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 40240000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1080,
+      "relaunchPointValue": 1140,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -28435,9 +28435,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 69000000,
+      "verifyingPointVal": 95550000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3420,
+      "relaunchPointValue": 2580,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 44
@@ -28715,9 +28715,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 34270000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 920,
+      "relaunchPointValue": 900,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 28
@@ -28986,9 +28986,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 69000000,
+      "verifyingPointVal": 95550000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3420,
+      "relaunchPointValue": 2580,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 44
@@ -29266,9 +29266,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -29541,9 +29541,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 94300000,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -29821,9 +29821,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -30381,9 +30381,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 44000000,
+      "verifyingPointVal": 50650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1500,
+      "relaunchPointValue": 1620,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 38
@@ -30655,9 +30655,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 44000000,
+      "verifyingPointVal": 50650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1500,
+      "relaunchPointValue": 1620,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 38
@@ -31736,9 +31736,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 152743000,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -33398,9 +33398,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 4225000,
+      "verifyingPointVal": 8977600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 115,
+      "relaunchPointValue": 132,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 16
@@ -33666,7 +33666,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 2896000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 82,
+      "relaunchPointValue": 81,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 10
@@ -33925,9 +33925,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 69000000,
+      "verifyingPointVal": 95550000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3420,
+      "relaunchPointValue": 2580,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 44
@@ -34205,9 +34205,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 6958000,
+      "verifyingPointVal": 21140800,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 188,
+      "relaunchPointValue": 302,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 24
@@ -34735,9 +34735,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 94300000,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -35838,9 +35838,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 34270000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 920,
+      "relaunchPointValue": 900,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 28
@@ -36109,9 +36109,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2900,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -36389,7 +36389,7 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
       "relaunchPointValue": 1280,
       "repairShipLife": {
@@ -36933,9 +36933,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 70650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1600,
+      "relaunchPointValue": 2120,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 40
@@ -37213,9 +37213,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -37500,7 +37500,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -37749,9 +37749,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 152743000,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -38849,7 +38849,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 31570000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 880,
+      "relaunchPointValue": 802,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 26
@@ -39118,9 +39118,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 6040000,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 162,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22
@@ -39379,9 +39379,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 6958000,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 162,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22
@@ -39640,9 +39640,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 6958000,
+      "verifyingPointVal": 21140800,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 188,
+      "relaunchPointValue": 302,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 24
@@ -39903,7 +39903,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -40152,9 +40152,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 31570000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 802,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 26
@@ -40377,9 +40377,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 31570000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 802,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 26
@@ -40602,9 +40602,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 38400,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 2
@@ -40827,9 +40827,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 21140800,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 302,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 24
@@ -41063,9 +41063,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 34270000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 920,
+      "relaunchPointValue": 900,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 28
@@ -41334,9 +41334,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 37160000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1000,
+      "relaunchPointValue": 1010,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -41605,9 +41605,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 37160000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 920,
+      "relaunchPointValue": 1010,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -41876,9 +41876,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 2896000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 81,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 10
@@ -42096,9 +42096,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -42316,9 +42316,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -42536,9 +42536,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -42756,9 +42756,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2900,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -43320,9 +43320,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 37160000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1010,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -43565,9 +43565,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1280,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 34
@@ -43815,9 +43815,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 40240000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1140,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -44060,9 +44060,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 40240000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1000,
+      "relaunchPointValue": 1140,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -44331,9 +44331,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1280,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -44576,9 +44576,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1080,
+      "relaunchPointValue": 1280,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -44850,9 +44850,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1280,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 34
@@ -45100,9 +45100,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 37160000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1000,
+      "relaunchPointValue": 1010,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -45351,9 +45351,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 37160000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1000,
+      "relaunchPointValue": 1010,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -87657,7 +87657,7 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
       "relaunchPointValue": 1280,
       "repairShipLife": {
@@ -87908,9 +87908,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 37160000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1000,
+      "relaunchPointValue": 1010,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -88159,9 +88159,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1280,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -88410,9 +88410,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -88912,9 +88912,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -89163,9 +89163,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1280,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -89414,9 +89414,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -89665,9 +89665,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -89916,9 +89916,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -90167,9 +90167,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -90418,9 +90418,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1280,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 34
@@ -90668,9 +90668,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1280,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -90919,9 +90919,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1280,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -91164,9 +91164,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1280,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -91409,9 +91409,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1280,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -91654,9 +91654,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1280,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -91899,9 +91899,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1280,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -92144,9 +92144,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 70650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 2120,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 40
@@ -92395,9 +92395,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 70650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1400,
+      "relaunchPointValue": 2120,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 40
@@ -92646,9 +92646,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 95550000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2580,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -92891,9 +92891,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 70650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1600,
+      "relaunchPointValue": 2120,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 40
@@ -93146,9 +93146,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 70650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1600,
+      "relaunchPointValue": 2120,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 40
@@ -93401,9 +93401,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 30
@@ -93646,9 +93646,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -93925,9 +93925,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -94175,9 +94175,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -94430,9 +94430,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -94709,9 +94709,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -94969,9 +94969,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -95189,9 +95189,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 89500,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 4
@@ -95409,9 +95409,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 14480000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 203,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 20
@@ -95639,9 +95639,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 14480000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 203,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 20
@@ -96124,9 +96124,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 34270000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 900,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 28
@@ -96354,9 +96354,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 4633600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 90,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 12
@@ -97339,9 +97339,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -97584,9 +97584,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 2896000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 81,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 10
@@ -97804,9 +97804,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22
@@ -98034,9 +98034,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 70650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2120,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 40
@@ -98289,9 +98289,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -98534,9 +98534,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22
@@ -98764,9 +98764,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 34270000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 900,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 28
@@ -98994,9 +98994,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 11584000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 164,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 18
@@ -99224,9 +99224,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 11584000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 164,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 18
@@ -99454,9 +99454,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 34270000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 900,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 28
@@ -99718,9 +99718,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22
@@ -99967,9 +99967,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 8977600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 132,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 16
@@ -100216,9 +100216,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22
@@ -100465,9 +100465,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22
@@ -100714,9 +100714,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 8977600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 132,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 16
@@ -100963,9 +100963,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22
@@ -101212,9 +101212,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -101464,9 +101464,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -101716,9 +101716,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 40240000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1140,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -101968,9 +101968,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -102220,9 +102220,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 46990000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 36
@@ -102472,9 +102472,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1600,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 40240000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 1140,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 32
@@ -102986,9 +102986,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -103772,9 +103772,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -104558,9 +104558,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 44000000,
+      "verifyingPointVal": 50650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1500,
+      "relaunchPointValue": 1620,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 76
@@ -105107,7 +105107,7 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
       "relaunchPointValue": 1280,
       "repairShipLife": {
@@ -105357,9 +105357,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1700,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 43520000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2560,
+      "relaunchPointValue": 1280,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 68
@@ -105615,7 +105615,7 @@
       "verifyingPointId": 100001,
       "verifyingPointVal": 31570000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 880,
+      "relaunchPointValue": 802,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 26
@@ -105863,9 +105863,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 44000000,
+      "verifyingPointVal": 50650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1500,
+      "relaunchPointValue": 1620,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 38
@@ -106413,9 +106413,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2900,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -106693,9 +106693,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2000,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 34650000,
+      "verifyingPointVal": 70650000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 1720,
+      "relaunchPointValue": 2120,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 40
@@ -106966,9 +106966,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2900,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -107226,9 +107226,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2900,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -107486,9 +107486,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2900,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -107746,9 +107746,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2900,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -108006,9 +108006,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2900,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -108266,9 +108266,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 46000000,
+      "verifyingPointVal": 82810000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 2900,
+      "relaunchPointValue": 2340,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 42
@@ -108531,7 +108531,7 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 1,
+      "verifyingPointVal": 38400,
       "relaunchPointId": 100003,
       "relaunchPointValue": 1,
       "repairShipLife": {
@@ -108781,9 +108781,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 69000000,
+      "verifyingPointVal": 95550000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3420,
+      "relaunchPointValue": 2580,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 44
@@ -109041,9 +109041,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 69000000,
+      "verifyingPointVal": 95550000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3420,
+      "relaunchPointValue": 2580,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 44
@@ -109301,9 +109301,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 69000000,
+      "verifyingPointVal": 95550000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3420,
+      "relaunchPointValue": 2580,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 44
@@ -109561,9 +109561,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 69000000,
+      "verifyingPointVal": 95550000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3420,
+      "relaunchPointValue": 2580,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 44
@@ -109821,9 +109821,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2200,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 69000000,
+      "verifyingPointVal": 95550000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3420,
+      "relaunchPointValue": 2580,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 44
@@ -110081,9 +110081,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -110341,9 +110341,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -110601,9 +110601,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -111121,9 +111121,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 94300000,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -111685,9 +111685,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -111945,9 +111945,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -112205,9 +112205,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -112465,9 +112465,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -112725,9 +112725,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -112985,9 +112985,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2300,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 108870000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 3990,
+      "relaunchPointValue": 2840,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 46
@@ -113245,9 +113245,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -113505,9 +113505,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -113765,9 +113765,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -114025,9 +114025,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -114285,9 +114285,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -114545,9 +114545,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -114805,9 +114805,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -115065,9 +115065,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -115325,9 +115325,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -115585,9 +115585,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -115845,9 +115845,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -116105,9 +116105,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 152743000,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -116674,9 +116674,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -116934,9 +116934,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -117194,9 +117194,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -117454,9 +117454,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -117714,9 +117714,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 137250000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3440,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 50
@@ -117974,9 +117974,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -118234,9 +118234,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 122130000,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 4610,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -118494,9 +118494,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 2400,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 122770000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 5290,
+      "relaunchPointValue": 3130,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 48
@@ -118754,9 +118754,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 800,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 8977600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 132,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 16
@@ -119231,9 +119231,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 500,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 2896000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 81,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 10
@@ -119471,9 +119471,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 900,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 11584000,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 164,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 18
@@ -119711,9 +119711,9 @@
       "coercionOpenCostType": 100004,
       "coercionOpenCost": 1100,
       "verifyingPointId": 100001,
-      "verifyingPointVal": 999999999,
+      "verifyingPointVal": 17665600,
       "relaunchPointId": 100003,
-      "relaunchPointValue": 99999,
+      "relaunchPointValue": 249,
       "repairShipLife": {
         "PointId": 100003,
         "PointVal": 22

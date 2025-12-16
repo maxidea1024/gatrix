@@ -1,0 +1,5958 @@
+{
+  ":TradeCombo": {
+    ":type": {
+      "id": "key",
+      "difficulty": "number",
+      "addValue": "number",
+      "targetType": "number",
+      "target": [
+        {
+          "id": "number",
+          "value": "number"
+        },
+        {
+          "id": "number",
+          "value": "number"
+        },
+        {
+          "id": "number",
+          "value": "number"
+        },
+        {
+          "id": "number",
+          "value": "number"
+        },
+        {
+          "id": "number",
+          "value": "number"
+        },
+        {
+          "id": "number",
+          "value": "number"
+        },
+        {
+          "id": "number",
+          "value": "number"
+        },
+        {
+          "id": "number",
+          "value": "number"
+        },
+        {
+          "id": "number",
+          "value": "number"
+        },
+        {
+          "id": "number",
+          "value": "number"
+        }
+      ]
+    },
+    ":required": {
+      "difficulty": 1,
+      "addValue": 1,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 1,
+          "value": 1
+        }
+      ]
+    },
+    ":min": {
+      "difficulty": 0,
+      "addValue": 0,
+      "targetType": 0
+    },
+    ":max": {
+      "difficulty": 2,
+      "addValue": 1000,
+      "targetType": 1
+    },
+    ":enum": {},
+    ":asset": {},
+    ":links": {}
+  },
+  "TradeCombo": {
+    "12400000": {
+      "id": 12400000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000251,
+          "value": 50
+        },
+        {
+          "id": 24000387,
+          "value": 50
+        },
+        {
+          "id": 24000279,
+          "value": 50
+        }
+      ]
+    },
+    "12400001": {
+      "id": 12400001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 13,
+          "value": 100
+        }
+      ]
+    },
+    "12400002": {
+      "id": 12400002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000251,
+          "value": 150
+        },
+        {
+          "id": 24000387,
+          "value": 150
+        },
+        {
+          "id": 24000279,
+          "value": 150
+        }
+      ]
+    },
+    "12400100": {
+      "id": 12400100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 50
+        },
+        {
+          "id": 24000279,
+          "value": 50
+        },
+        {
+          "id": 24000179,
+          "value": 50
+        }
+      ]
+    },
+    "12400101": {
+      "id": 12400101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 4,
+          "value": 100
+        }
+      ]
+    },
+    "12400102": {
+      "id": 12400102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 150
+        },
+        {
+          "id": 24000279,
+          "value": 150
+        },
+        {
+          "id": 24000179,
+          "value": 150
+        }
+      ]
+    },
+    "12400200": {
+      "id": 12400200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 50
+        },
+        {
+          "id": 24000279,
+          "value": 50
+        },
+        {
+          "id": 24000338,
+          "value": 50
+        }
+      ]
+    },
+    "12400201": {
+      "id": 12400201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 16,
+          "value": 100
+        }
+      ]
+    },
+    "12400202": {
+      "id": 12400202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 150
+        },
+        {
+          "id": 24000279,
+          "value": 150
+        },
+        {
+          "id": 24000338,
+          "value": 150
+        }
+      ]
+    },
+    "12400300": {
+      "id": 12400300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 50
+        },
+        {
+          "id": 24000244,
+          "value": 50
+        },
+        {
+          "id": 24000211,
+          "value": 50
+        }
+      ]
+    },
+    "12400301": {
+      "id": 12400301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12400302": {
+      "id": 12400302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 150
+        },
+        {
+          "id": 24000244,
+          "value": 150
+        },
+        {
+          "id": 24000211,
+          "value": 150
+        }
+      ]
+    },
+    "12400400": {
+      "id": 12400400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000500,
+          "value": 50
+        },
+        {
+          "id": 24000356,
+          "value": 50
+        },
+        {
+          "id": 24000319,
+          "value": 50
+        }
+      ]
+    },
+    "12400401": {
+      "id": 12400401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 17,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12400402": {
+      "id": 12400402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000500,
+          "value": 150
+        },
+        {
+          "id": 24000356,
+          "value": 150
+        },
+        {
+          "id": 24000319,
+          "value": 150
+        }
+      ]
+    },
+    "12400500": {
+      "id": 12400500,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000139,
+          "value": 50
+        },
+        {
+          "id": 24000414,
+          "value": 50
+        },
+        {
+          "id": 24000385,
+          "value": 50
+        }
+      ]
+    },
+    "12400501": {
+      "id": 12400501,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 5,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        }
+      ]
+    },
+    "12400502": {
+      "id": 12400502,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000139,
+          "value": 150
+        },
+        {
+          "id": 24000414,
+          "value": 150
+        },
+        {
+          "id": 24000385,
+          "value": 150
+        }
+      ]
+    },
+    "12400600": {
+      "id": 12400600,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000317,
+          "value": 50
+        },
+        {
+          "id": 24000196,
+          "value": 50
+        },
+        {
+          "id": 24000383,
+          "value": 50
+        }
+      ]
+    },
+    "12400601": {
+      "id": 12400601,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 15,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        }
+      ]
+    },
+    "12400602": {
+      "id": 12400602,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000317,
+          "value": 150
+        },
+        {
+          "id": 24000196,
+          "value": 150
+        },
+        {
+          "id": 24000383,
+          "value": 150
+        }
+      ]
+    },
+    "12400700": {
+      "id": 12400700,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 50
+        },
+        {
+          "id": 24000379,
+          "value": 50
+        },
+        {
+          "id": 24000244,
+          "value": 50
+        }
+      ]
+    },
+    "12400701": {
+      "id": 12400701,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 16,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        }
+      ]
+    },
+    "12400702": {
+      "id": 12400702,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 150
+        },
+        {
+          "id": 24000379,
+          "value": 150
+        },
+        {
+          "id": 24000244,
+          "value": 150
+        }
+      ]
+    },
+    "12400800": {
+      "id": 12400800,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 50
+        },
+        {
+          "id": 24000379,
+          "value": 50
+        },
+        {
+          "id": 24000211,
+          "value": 50
+        }
+      ]
+    },
+    "12400801": {
+      "id": 12400801,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 16,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12400802": {
+      "id": 12400802,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 150
+        },
+        {
+          "id": 24000379,
+          "value": 150
+        },
+        {
+          "id": 24000211,
+          "value": 150
+        }
+      ]
+    },
+    "12400900": {
+      "id": 12400900,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 50
+        },
+        {
+          "id": 24000500,
+          "value": 50
+        },
+        {
+          "id": 24000213,
+          "value": 50
+        }
+      ]
+    },
+    "12400901": {
+      "id": 12400901,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 10,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12400902": {
+      "id": 12400902,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 150
+        },
+        {
+          "id": 24000500,
+          "value": 150
+        },
+        {
+          "id": 24000213,
+          "value": 150
+        }
+      ]
+    },
+    "12401000": {
+      "id": 12401000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000251,
+          "value": 50
+        },
+        {
+          "id": 24000387,
+          "value": 50
+        },
+        {
+          "id": 24000279,
+          "value": 50
+        }
+      ]
+    },
+    "12401001": {
+      "id": 12401001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 13,
+          "value": 100
+        }
+      ]
+    },
+    "12401002": {
+      "id": 12401002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000251,
+          "value": 150
+        },
+        {
+          "id": 24000387,
+          "value": 150
+        },
+        {
+          "id": 24000279,
+          "value": 150
+        }
+      ]
+    },
+    "12401100": {
+      "id": 12401100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 50
+        },
+        {
+          "id": 24000279,
+          "value": 50
+        },
+        {
+          "id": 24000179,
+          "value": 50
+        }
+      ]
+    },
+    "12401101": {
+      "id": 12401101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 4,
+          "value": 100
+        }
+      ]
+    },
+    "12401102": {
+      "id": 12401102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 150
+        },
+        {
+          "id": 24000279,
+          "value": 150
+        },
+        {
+          "id": 24000179,
+          "value": 150
+        }
+      ]
+    },
+    "12401200": {
+      "id": 12401200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 50
+        },
+        {
+          "id": 24000279,
+          "value": 50
+        },
+        {
+          "id": 24000338,
+          "value": 50
+        }
+      ]
+    },
+    "12401201": {
+      "id": 12401201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 16,
+          "value": 100
+        }
+      ]
+    },
+    "12401202": {
+      "id": 12401202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 150
+        },
+        {
+          "id": 24000279,
+          "value": 150
+        },
+        {
+          "id": 24000338,
+          "value": 150
+        }
+      ]
+    },
+    "12401300": {
+      "id": 12401300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 50
+        },
+        {
+          "id": 24000244,
+          "value": 50
+        },
+        {
+          "id": 24000211,
+          "value": 50
+        }
+      ]
+    },
+    "12401301": {
+      "id": 12401301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12401302": {
+      "id": 12401302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 150
+        },
+        {
+          "id": 24000244,
+          "value": 150
+        },
+        {
+          "id": 24000211,
+          "value": 150
+        }
+      ]
+    },
+    "12401400": {
+      "id": 12401400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000500,
+          "value": 50
+        },
+        {
+          "id": 24000356,
+          "value": 50
+        },
+        {
+          "id": 24000317,
+          "value": 50
+        }
+      ]
+    },
+    "12401401": {
+      "id": 12401401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 17,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12401402": {
+      "id": 12401402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000500,
+          "value": 150
+        },
+        {
+          "id": 24000356,
+          "value": 150
+        },
+        {
+          "id": 24000317,
+          "value": 150
+        }
+      ]
+    },
+    "12401500": {
+      "id": 12401500,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000139,
+          "value": 50
+        },
+        {
+          "id": 24000414,
+          "value": 50
+        },
+        {
+          "id": 24000385,
+          "value": 50
+        }
+      ]
+    },
+    "12401501": {
+      "id": 12401501,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 5,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        }
+      ]
+    },
+    "12401502": {
+      "id": 12401502,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000139,
+          "value": 150
+        },
+        {
+          "id": 24000414,
+          "value": 150
+        },
+        {
+          "id": 24000385,
+          "value": 150
+        }
+      ]
+    },
+    "12402000": {
+      "id": 12402000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 50
+        },
+        {
+          "id": 24000174,
+          "value": 50
+        },
+        {
+          "id": 24000133,
+          "value": 50
+        }
+      ]
+    },
+    "12402001": {
+      "id": 12402001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 5,
+          "value": 100
+        }
+      ]
+    },
+    "12402002": {
+      "id": 12402002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 150
+        },
+        {
+          "id": 24000174,
+          "value": 150
+        },
+        {
+          "id": 24000133,
+          "value": 150
+        }
+      ]
+    },
+    "12402100": {
+      "id": 12402100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 50
+        },
+        {
+          "id": 24000174,
+          "value": 50
+        },
+        {
+          "id": 24000239,
+          "value": 50
+        }
+      ]
+    },
+    "12402101": {
+      "id": 12402101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 10,
+          "value": 100
+        }
+      ]
+    },
+    "12402102": {
+      "id": 12402102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 150
+        },
+        {
+          "id": 24000174,
+          "value": 150
+        },
+        {
+          "id": 24000239,
+          "value": 150
+        }
+      ]
+    },
+    "12402200": {
+      "id": 12402200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 50
+        },
+        {
+          "id": 24000174,
+          "value": 50
+        },
+        {
+          "id": 24000205,
+          "value": 50
+        }
+      ]
+    },
+    "12402201": {
+      "id": 12402201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12402202": {
+      "id": 12402202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 150
+        },
+        {
+          "id": 24000174,
+          "value": 150
+        },
+        {
+          "id": 24000205,
+          "value": 150
+        }
+      ]
+    },
+    "12402300": {
+      "id": 12402300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000158,
+          "value": 50
+        },
+        {
+          "id": 24000356,
+          "value": 50
+        },
+        {
+          "id": 24000317,
+          "value": 50
+        }
+      ]
+    },
+    "12402301": {
+      "id": 12402301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 7,
+          "value": 100
+        },
+        {
+          "id": 17,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12402302": {
+      "id": 12402302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000158,
+          "value": 150
+        },
+        {
+          "id": 24000356,
+          "value": 150
+        },
+        {
+          "id": 24000317,
+          "value": 150
+        }
+      ]
+    },
+    "12402400": {
+      "id": 12402400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 50
+        },
+        {
+          "id": 24000158,
+          "value": 50
+        },
+        {
+          "id": 24000213,
+          "value": 50
+        }
+      ]
+    },
+    "12402401": {
+      "id": 12402401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 10,
+          "value": 100
+        },
+        {
+          "id": 7,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12402402": {
+      "id": 12402402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 150
+        },
+        {
+          "id": 24000158,
+          "value": 150
+        },
+        {
+          "id": 24000213,
+          "value": 150
+        }
+      ]
+    },
+    "12402500": {
+      "id": 12402500,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 50
+        },
+        {
+          "id": 24000158,
+          "value": 50
+        },
+        {
+          "id": 24000319,
+          "value": 50
+        }
+      ]
+    },
+    "12402501": {
+      "id": 12402501,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 10,
+          "value": 100
+        },
+        {
+          "id": 7,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12402502": {
+      "id": 12402502,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 150
+        },
+        {
+          "id": 24000158,
+          "value": 150
+        },
+        {
+          "id": 24000319,
+          "value": 150
+        }
+      ]
+    },
+    "12402600": {
+      "id": 12402600,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 50
+        },
+        {
+          "id": 24000244,
+          "value": 50
+        },
+        {
+          "id": 24000211,
+          "value": 50
+        }
+      ]
+    },
+    "12402601": {
+      "id": 12402601,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12402602": {
+      "id": 12402602,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 150
+        },
+        {
+          "id": 24000244,
+          "value": 150
+        },
+        {
+          "id": 24000211,
+          "value": 150
+        }
+      ]
+    },
+    "12403000": {
+      "id": 12403000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000213,
+          "value": 50
+        },
+        {
+          "id": 24000356,
+          "value": 50
+        },
+        {
+          "id": 24000317,
+          "value": 50
+        }
+      ]
+    },
+    "12403001": {
+      "id": 12403001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 9,
+          "value": 100
+        },
+        {
+          "id": 17,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12403002": {
+      "id": 12403002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000213,
+          "value": 150
+        },
+        {
+          "id": 24000356,
+          "value": 150
+        },
+        {
+          "id": 24000317,
+          "value": 150
+        }
+      ]
+    },
+    "12403100": {
+      "id": 12403100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000139,
+          "value": 50
+        },
+        {
+          "id": 24000209,
+          "value": 50
+        },
+        {
+          "id": 24000414,
+          "value": 50
+        }
+      ]
+    },
+    "12403101": {
+      "id": 12403101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 5,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        }
+      ]
+    },
+    "12403102": {
+      "id": 12403102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000139,
+          "value": 150
+        },
+        {
+          "id": 24000209,
+          "value": 150
+        },
+        {
+          "id": 24000414,
+          "value": 150
+        }
+      ]
+    },
+    "12403200": {
+      "id": 12403200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000445,
+          "value": 50
+        },
+        {
+          "id": 24000317,
+          "value": 50
+        },
+        {
+          "id": 24000196,
+          "value": 50
+        }
+      ]
+    },
+    "12403201": {
+      "id": 12403201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 6,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12403202": {
+      "id": 12403202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000445,
+          "value": 150
+        },
+        {
+          "id": 24000317,
+          "value": 150
+        },
+        {
+          "id": 24000196,
+          "value": 150
+        }
+      ]
+    },
+    "12403300": {
+      "id": 12403300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000389,
+          "value": 50
+        },
+        {
+          "id": 24000317,
+          "value": 50
+        },
+        {
+          "id": 24000196,
+          "value": 50
+        }
+      ]
+    },
+    "12403301": {
+      "id": 12403301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 10,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12403302": {
+      "id": 12403302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000389,
+          "value": 150
+        },
+        {
+          "id": 24000317,
+          "value": 150
+        },
+        {
+          "id": 24000196,
+          "value": 150
+        }
+      ]
+    },
+    "12403400": {
+      "id": 12403400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000317,
+          "value": 50
+        },
+        {
+          "id": 24000303,
+          "value": 50
+        },
+        {
+          "id": 24000196,
+          "value": 50
+        }
+      ]
+    },
+    "12403401": {
+      "id": 12403401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 15,
+          "value": 100
+        },
+        {
+          "id": 14,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12403402": {
+      "id": 12403402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000317,
+          "value": 150
+        },
+        {
+          "id": 24000303,
+          "value": 150
+        },
+        {
+          "id": 24000196,
+          "value": 150
+        }
+      ]
+    },
+    "12403500": {
+      "id": 12403500,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 50
+        },
+        {
+          "id": 24000213,
+          "value": 50
+        },
+        {
+          "id": 24000315,
+          "value": 50
+        }
+      ]
+    },
+    "12403501": {
+      "id": 12403501,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 10,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        },
+        {
+          "id": 14,
+          "value": 100
+        }
+      ]
+    },
+    "12403502": {
+      "id": 12403502,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 150
+        },
+        {
+          "id": 24000213,
+          "value": 150
+        },
+        {
+          "id": 24000315,
+          "value": 150
+        }
+      ]
+    },
+    "12404000": {
+      "id": 12404000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 50
+        },
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000417,
+          "value": 50
+        }
+      ]
+    },
+    "12404001": {
+      "id": 12404001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        }
+      ]
+    },
+    "12404002": {
+      "id": 12404002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 150
+        },
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000417,
+          "value": 150
+        }
+      ]
+    },
+    "12404100": {
+      "id": 12404100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 50
+        },
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000260,
+          "value": 50
+        }
+      ]
+    },
+    "12404101": {
+      "id": 12404101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        }
+      ]
+    },
+    "12404102": {
+      "id": 12404102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 150
+        },
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000260,
+          "value": 150
+        }
+      ]
+    },
+    "12404200": {
+      "id": 12404200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000158,
+          "value": 50
+        },
+        {
+          "id": 24000356,
+          "value": 50
+        },
+        {
+          "id": 24000317,
+          "value": 50
+        }
+      ]
+    },
+    "12404201": {
+      "id": 12404201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 7,
+          "value": 100
+        },
+        {
+          "id": 17,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12404202": {
+      "id": 12404202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000158,
+          "value": 150
+        },
+        {
+          "id": 24000356,
+          "value": 150
+        },
+        {
+          "id": 24000317,
+          "value": 150
+        }
+      ]
+    },
+    "12404300": {
+      "id": 12404300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000037,
+          "value": 50
+        },
+        {
+          "id": 24000178,
+          "value": 50
+        }
+      ]
+    },
+    "12404301": {
+      "id": 12404301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 7,
+          "value": 100
+        }
+      ]
+    },
+    "12404302": {
+      "id": 12404302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000037,
+          "value": 150
+        },
+        {
+          "id": 24000178,
+          "value": 150
+        }
+      ]
+    },
+    "12404400": {
+      "id": 12404400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000120,
+          "value": 50
+        },
+        {
+          "id": 24000178,
+          "value": 50
+        }
+      ]
+    },
+    "12404401": {
+      "id": 12404401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 3,
+          "value": 100
+        },
+        {
+          "id": 7,
+          "value": 100
+        }
+      ]
+    },
+    "12404402": {
+      "id": 12404402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000120,
+          "value": 150
+        },
+        {
+          "id": 24000178,
+          "value": 150
+        }
+      ]
+    },
+    "12404500": {
+      "id": 12404500,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000167,
+          "value": 50
+        },
+        {
+          "id": 24000178,
+          "value": 50
+        }
+      ]
+    },
+    "12404501": {
+      "id": 12404501,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 7,
+          "value": 100
+        }
+      ]
+    },
+    "12404502": {
+      "id": 12404502,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000167,
+          "value": 150
+        },
+        {
+          "id": 24000178,
+          "value": 150
+        }
+      ]
+    },
+    "12404600": {
+      "id": 12404600,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 50
+        },
+        {
+          "id": 24000158,
+          "value": 50
+        },
+        {
+          "id": 24000319,
+          "value": 50
+        }
+      ]
+    },
+    "12404601": {
+      "id": 12404601,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 10,
+          "value": 100
+        },
+        {
+          "id": 7,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12404602": {
+      "id": 12404602,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 150
+        },
+        {
+          "id": 24000158,
+          "value": 150
+        },
+        {
+          "id": 24000319,
+          "value": 150
+        }
+      ]
+    },
+    "12405000": {
+      "id": 12405000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000500,
+          "value": 50
+        },
+        {
+          "id": 24000315,
+          "value": 50
+        },
+        {
+          "id": 24000319,
+          "value": 50
+        }
+      ]
+    },
+    "12405001": {
+      "id": 12405001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 14,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12405002": {
+      "id": 12405002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000500,
+          "value": 150
+        },
+        {
+          "id": 24000315,
+          "value": 150
+        },
+        {
+          "id": 24000319,
+          "value": 150
+        }
+      ]
+    },
+    "12405100": {
+      "id": 12405100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000317,
+          "value": 50
+        },
+        {
+          "id": 24000196,
+          "value": 50
+        },
+        {
+          "id": 24000383,
+          "value": 50
+        }
+      ]
+    },
+    "12405101": {
+      "id": 12405101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 15,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        }
+      ]
+    },
+    "12405102": {
+      "id": 12405102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000317,
+          "value": 150
+        },
+        {
+          "id": 24000196,
+          "value": 150
+        },
+        {
+          "id": 24000383,
+          "value": 150
+        }
+      ]
+    },
+    "12405110": {
+      "id": 12405110,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 50
+        },
+        {
+          "id": 24000500,
+          "value": 50
+        },
+        {
+          "id": 24000356,
+          "value": 50
+        }
+      ]
+    },
+    "12405111": {
+      "id": 12405111,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 10,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 17,
+          "value": 100
+        }
+      ]
+    },
+    "12405112": {
+      "id": 12405112,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 150
+        },
+        {
+          "id": 24000500,
+          "value": 150
+        },
+        {
+          "id": 24000356,
+          "value": 150
+        }
+      ]
+    },
+    "12405200": {
+      "id": 12405200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 50
+        },
+        {
+          "id": 24000500,
+          "value": 50
+        },
+        {
+          "id": 24000317,
+          "value": 50
+        }
+      ]
+    },
+    "12405201": {
+      "id": 12405201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 10,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12405202": {
+      "id": 12405202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 150
+        },
+        {
+          "id": 24000500,
+          "value": 150
+        },
+        {
+          "id": 24000317,
+          "value": 150
+        }
+      ]
+    },
+    "12405210": {
+      "id": 12405210,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000000,
+          "value": 50
+        },
+        {
+          "id": 24000414,
+          "value": 50
+        },
+        {
+          "id": 24000385,
+          "value": 50
+        }
+      ]
+    },
+    "12405211": {
+      "id": 12405211,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        }
+      ]
+    },
+    "12405212": {
+      "id": 12405212,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000000,
+          "value": 150
+        },
+        {
+          "id": 24000414,
+          "value": 150
+        },
+        {
+          "id": 24000385,
+          "value": 150
+        }
+      ]
+    },
+    "12405300": {
+      "id": 12405300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000209,
+          "value": 50
+        },
+        {
+          "id": 24000414,
+          "value": 50
+        },
+        {
+          "id": 24000385,
+          "value": 50
+        }
+      ]
+    },
+    "12405301": {
+      "id": 12405301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 9,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        }
+      ]
+    },
+    "12405302": {
+      "id": 12405302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000209,
+          "value": 150
+        },
+        {
+          "id": 24000414,
+          "value": 150
+        },
+        {
+          "id": 24000385,
+          "value": 150
+        }
+      ]
+    },
+    "12405310": {
+      "id": 12405310,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000294,
+          "value": 50
+        },
+        {
+          "id": 24000414,
+          "value": 50
+        },
+        {
+          "id": 24000385,
+          "value": 50
+        }
+      ]
+    },
+    "12405311": {
+      "id": 12405311,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 14,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        }
+      ]
+    },
+    "12405312": {
+      "id": 12405312,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000294,
+          "value": 150
+        },
+        {
+          "id": 24000414,
+          "value": 150
+        },
+        {
+          "id": 24000385,
+          "value": 150
+        }
+      ]
+    },
+    "12405400": {
+      "id": 12405400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000445,
+          "value": 50
+        },
+        {
+          "id": 24000317,
+          "value": 50
+        },
+        {
+          "id": 24000383,
+          "value": 50
+        }
+      ]
+    },
+    "12405401": {
+      "id": 12405401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 6,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        }
+      ]
+    },
+    "12405402": {
+      "id": 12405402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000445,
+          "value": 150
+        },
+        {
+          "id": 24000317,
+          "value": 150
+        },
+        {
+          "id": 24000383,
+          "value": 150
+        }
+      ]
+    },
+    "12405410": {
+      "id": 12405410,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000445,
+          "value": 50
+        },
+        {
+          "id": 24000196,
+          "value": 50
+        },
+        {
+          "id": 24000383,
+          "value": 50
+        }
+      ]
+    },
+    "12405411": {
+      "id": 12405411,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 6,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        }
+      ]
+    },
+    "12405412": {
+      "id": 12405412,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000445,
+          "value": 150
+        },
+        {
+          "id": 24000196,
+          "value": 150
+        },
+        {
+          "id": 24000383,
+          "value": 150
+        }
+      ]
+    },
+    "12405500": {
+      "id": 12405500,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000258,
+          "value": 50
+        },
+        {
+          "id": 24000245,
+          "value": 50
+        },
+        {
+          "id": 24000165,
+          "value": 50
+        }
+      ]
+    },
+    "12405501": {
+      "id": 12405501,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        }
+      ]
+    },
+    "12405502": {
+      "id": 12405502,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000258,
+          "value": 150
+        },
+        {
+          "id": 24000245,
+          "value": 150
+        },
+        {
+          "id": 24000165,
+          "value": 150
+        }
+      ]
+    },
+    "12405600": {
+      "id": 12405600,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000258,
+          "value": 50
+        },
+        {
+          "id": 24000245,
+          "value": 50
+        },
+        {
+          "id": 24000335,
+          "value": 50
+        }
+      ]
+    },
+    "12405601": {
+      "id": 12405601,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 16,
+          "value": 100
+        }
+      ]
+    },
+    "12405602": {
+      "id": 12405602,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000258,
+          "value": 150
+        },
+        {
+          "id": 24000245,
+          "value": 150
+        },
+        {
+          "id": 24000335,
+          "value": 150
+        }
+      ]
+    },
+    "12405700": {
+      "id": 12405700,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000258,
+          "value": 50
+        },
+        {
+          "id": 24000245,
+          "value": 50
+        },
+        {
+          "id": 24000124,
+          "value": 50
+        }
+      ]
+    },
+    "12405701": {
+      "id": 12405701,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 4,
+          "value": 100
+        }
+      ]
+    },
+    "12405702": {
+      "id": 12405702,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000258,
+          "value": 150
+        },
+        {
+          "id": 24000245,
+          "value": 150
+        },
+        {
+          "id": 24000124,
+          "value": 150
+        }
+      ]
+    },
+    "12405800": {
+      "id": 12405800,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000037,
+          "value": 50
+        },
+        {
+          "id": 24000120,
+          "value": 50
+        }
+      ]
+    },
+    "12405801": {
+      "id": 12405801,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 3,
+          "value": 100
+        }
+      ]
+    },
+    "12405802": {
+      "id": 12405802,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000037,
+          "value": 150
+        },
+        {
+          "id": 24000120,
+          "value": 150
+        }
+      ]
+    },
+    "12405900": {
+      "id": 12405900,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000037,
+          "value": 50
+        },
+        {
+          "id": 24000167,
+          "value": 50
+        }
+      ]
+    },
+    "12405901": {
+      "id": 12405901,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        }
+      ]
+    },
+    "12405902": {
+      "id": 12405902,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000037,
+          "value": 150
+        },
+        {
+          "id": 24000167,
+          "value": 150
+        }
+      ]
+    },
+    "12406000": {
+      "id": 12406000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 50
+        },
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000417,
+          "value": 50
+        }
+      ]
+    },
+    "12406001": {
+      "id": 12406001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        }
+      ]
+    },
+    "12406002": {
+      "id": 12406002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 150
+        },
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000417,
+          "value": 150
+        }
+      ]
+    },
+    "12406100": {
+      "id": 12406100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000417,
+          "value": 50
+        },
+        {
+          "id": 24000260,
+          "value": 50
+        }
+      ]
+    },
+    "12406101": {
+      "id": 12406101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        }
+      ]
+    },
+    "12406102": {
+      "id": 12406102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000417,
+          "value": 150
+        },
+        {
+          "id": 24000260,
+          "value": 150
+        }
+      ]
+    },
+    "12406110": {
+      "id": 12406110,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000415,
+          "value": 50
+        },
+        {
+          "id": 24000356,
+          "value": 50
+        },
+        {
+          "id": 24000319,
+          "value": 50
+        }
+      ]
+    },
+    "12406111": {
+      "id": 12406111,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 17,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12406112": {
+      "id": 12406112,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000415,
+          "value": 150
+        },
+        {
+          "id": 24000356,
+          "value": 150
+        },
+        {
+          "id": 24000319,
+          "value": 150
+        }
+      ]
+    },
+    "12406200": {
+      "id": 12406200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000037,
+          "value": 50
+        },
+        {
+          "id": 24000120,
+          "value": 50
+        }
+      ]
+    },
+    "12406201": {
+      "id": 12406201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 3,
+          "value": 100
+        }
+      ]
+    },
+    "12406202": {
+      "id": 12406202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000037,
+          "value": 150
+        },
+        {
+          "id": 24000120,
+          "value": 150
+        }
+      ]
+    },
+    "12406300": {
+      "id": 12406300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000037,
+          "value": 50
+        },
+        {
+          "id": 24000167,
+          "value": 50
+        }
+      ]
+    },
+    "12406301": {
+      "id": 12406301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        }
+      ]
+    },
+    "12406302": {
+      "id": 12406302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000037,
+          "value": 150
+        },
+        {
+          "id": 24000167,
+          "value": 150
+        }
+      ]
+    },
+    "12406400": {
+      "id": 12406400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000037,
+          "value": 50
+        },
+        {
+          "id": 24000223,
+          "value": 50
+        }
+      ]
+    },
+    "12406401": {
+      "id": 12406401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 10,
+          "value": 100
+        }
+      ]
+    },
+    "12406402": {
+      "id": 12406402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000037,
+          "value": 150
+        },
+        {
+          "id": 24000223,
+          "value": 150
+        }
+      ]
+    },
+    "12406500": {
+      "id": 12406500,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000240,
+          "value": 50
+        },
+        {
+          "id": 24000324,
+          "value": 50
+        },
+        {
+          "id": 24000428,
+          "value": 50
+        }
+      ]
+    },
+    "12406501": {
+      "id": 12406501,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 16,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        }
+      ]
+    },
+    "12406502": {
+      "id": 12406502,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000240,
+          "value": 150
+        },
+        {
+          "id": 24000324,
+          "value": 150
+        },
+        {
+          "id": 24000428,
+          "value": 150
+        }
+      ]
+    },
+    "12406600": {
+      "id": 12406600,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000240,
+          "value": 50
+        },
+        {
+          "id": 24000057,
+          "value": 50
+        },
+        {
+          "id": 24000428,
+          "value": 50
+        }
+      ]
+    },
+    "12406601": {
+      "id": 12406601,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 1,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        }
+      ]
+    },
+    "12406602": {
+      "id": 12406602,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000240,
+          "value": 150
+        },
+        {
+          "id": 24000057,
+          "value": 150
+        },
+        {
+          "id": 24000428,
+          "value": 150
+        }
+      ]
+    },
+    "12407000": {
+      "id": 12407000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 50
+        },
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000417,
+          "value": 50
+        }
+      ]
+    },
+    "12407001": {
+      "id": 12407001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        }
+      ]
+    },
+    "12407002": {
+      "id": 12407002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 150
+        },
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000417,
+          "value": 150
+        }
+      ]
+    },
+    "12407010": {
+      "id": 12407010,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000417,
+          "value": 50
+        },
+        {
+          "id": 24000260,
+          "value": 50
+        }
+      ]
+    },
+    "12407011": {
+      "id": 12407011,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        }
+      ]
+    },
+    "12407012": {
+      "id": 12407012,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000417,
+          "value": 150
+        },
+        {
+          "id": 24000260,
+          "value": 150
+        }
+      ]
+    },
+    "12407100": {
+      "id": 12407100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000415,
+          "value": 50
+        },
+        {
+          "id": 24000356,
+          "value": 50
+        },
+        {
+          "id": 24000317,
+          "value": 50
+        }
+      ]
+    },
+    "12407101": {
+      "id": 12407101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 17,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12407102": {
+      "id": 12407102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000415,
+          "value": 150
+        },
+        {
+          "id": 24000356,
+          "value": 150
+        },
+        {
+          "id": 24000317,
+          "value": 150
+        }
+      ]
+    },
+    "12407200": {
+      "id": 12407200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000037,
+          "value": 50
+        },
+        {
+          "id": 24000120,
+          "value": 50
+        }
+      ]
+    },
+    "12407201": {
+      "id": 12407201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 3,
+          "value": 100
+        }
+      ]
+    },
+    "12407202": {
+      "id": 12407202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000037,
+          "value": 150
+        },
+        {
+          "id": 24000120,
+          "value": 150
+        }
+      ]
+    },
+    "12407300": {
+      "id": 12407300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000037,
+          "value": 50
+        },
+        {
+          "id": 24000167,
+          "value": 50
+        }
+      ]
+    },
+    "12407301": {
+      "id": 12407301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        }
+      ]
+    },
+    "12407302": {
+      "id": 12407302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000037,
+          "value": 150
+        },
+        {
+          "id": 24000167,
+          "value": 150
+        }
+      ]
+    },
+    "12407400": {
+      "id": 12407400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000037,
+          "value": 50
+        },
+        {
+          "id": 24000223,
+          "value": 50
+        }
+      ]
+    },
+    "12407401": {
+      "id": 12407401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 10,
+          "value": 100
+        }
+      ]
+    },
+    "12407402": {
+      "id": 12407402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000037,
+          "value": 150
+        },
+        {
+          "id": 24000223,
+          "value": 150
+        }
+      ]
+    },
+    "12407500": {
+      "id": 12407500,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000240,
+          "value": 50
+        },
+        {
+          "id": 24000324,
+          "value": 50
+        },
+        {
+          "id": 24000428,
+          "value": 50
+        }
+      ]
+    },
+    "12407501": {
+      "id": 12407501,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 16,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        }
+      ]
+    },
+    "12407502": {
+      "id": 12407502,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000240,
+          "value": 150
+        },
+        {
+          "id": 24000324,
+          "value": 150
+        },
+        {
+          "id": 24000428,
+          "value": 150
+        }
+      ]
+    },
+    "12407600": {
+      "id": 12407600,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000240,
+          "value": 50
+        },
+        {
+          "id": 24000057,
+          "value": 50
+        },
+        {
+          "id": 24000428,
+          "value": 50
+        }
+      ]
+    },
+    "12407601": {
+      "id": 12407601,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 1,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        }
+      ]
+    },
+    "12407602": {
+      "id": 12407602,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000240,
+          "value": 150
+        },
+        {
+          "id": 24000057,
+          "value": 150
+        },
+        {
+          "id": 24000428,
+          "value": 150
+        }
+      ]
+    },
+    "12407700": {
+      "id": 12407700,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000240,
+          "value": 50
+        },
+        {
+          "id": 24000428,
+          "value": 50
+        },
+        {
+          "id": 24000312,
+          "value": 50
+        }
+      ]
+    },
+    "12407701": {
+      "id": 12407701,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 14,
+          "value": 100
+        }
+      ]
+    },
+    "12407702": {
+      "id": 12407702,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000240,
+          "value": 150
+        },
+        {
+          "id": 24000428,
+          "value": 150
+        },
+        {
+          "id": 24000312,
+          "value": 150
+        }
+      ]
+    },
+    "12407800": {
+      "id": 12407800,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 50
+        },
+        {
+          "id": 24000415,
+          "value": 50
+        },
+        {
+          "id": 24000213,
+          "value": 50
+        }
+      ]
+    },
+    "12407801": {
+      "id": 12407801,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 10,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12407802": {
+      "id": 12407802,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 150
+        },
+        {
+          "id": 24000415,
+          "value": 150
+        },
+        {
+          "id": 24000213,
+          "value": 150
+        }
+      ]
+    },
+    "12407900": {
+      "id": 12407900,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 50
+        },
+        {
+          "id": 24000415,
+          "value": 50
+        },
+        {
+          "id": 24000319,
+          "value": 50
+        }
+      ]
+    },
+    "12407901": {
+      "id": 12407901,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 10,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12407902": {
+      "id": 12407902,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000233,
+          "value": 150
+        },
+        {
+          "id": 24000415,
+          "value": 150
+        },
+        {
+          "id": 24000319,
+          "value": 150
+        }
+      ]
+    },
+    "12408000": {
+      "id": 12408000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 50
+        },
+        {
+          "id": 24000244,
+          "value": 50
+        },
+        {
+          "id": 24000420,
+          "value": 50
+        }
+      ]
+    },
+    "12408001": {
+      "id": 12408001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        }
+      ]
+    },
+    "12408002": {
+      "id": 12408002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 150
+        },
+        {
+          "id": 24000244,
+          "value": 150
+        },
+        {
+          "id": 24000420,
+          "value": 150
+        }
+      ]
+    },
+    "12408100": {
+      "id": 12408100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 50
+        },
+        {
+          "id": 24000211,
+          "value": 50
+        },
+        {
+          "id": 24000420,
+          "value": 50
+        }
+      ]
+    },
+    "12408101": {
+      "id": 12408101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        }
+      ]
+    },
+    "12408102": {
+      "id": 12408102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 150
+        },
+        {
+          "id": 24000211,
+          "value": 150
+        },
+        {
+          "id": 24000420,
+          "value": 150
+        }
+      ]
+    },
+    "12408200": {
+      "id": 12408200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 50
+        },
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000417,
+          "value": 50
+        }
+      ]
+    },
+    "12408201": {
+      "id": 12408201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        }
+      ]
+    },
+    "12408202": {
+      "id": 12408202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 150
+        },
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000417,
+          "value": 150
+        }
+      ]
+    },
+    "12408300": {
+      "id": 12408300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000417,
+          "value": 50
+        },
+        {
+          "id": 24000260,
+          "value": 50
+        }
+      ]
+    },
+    "12408301": {
+      "id": 12408301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        }
+      ]
+    },
+    "12408302": {
+      "id": 12408302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000417,
+          "value": 150
+        },
+        {
+          "id": 24000260,
+          "value": 150
+        }
+      ]
+    },
+    "12408400": {
+      "id": 12408400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 50
+        },
+        {
+          "id": 24000379,
+          "value": 50
+        },
+        {
+          "id": 24000420,
+          "value": 50
+        }
+      ]
+    },
+    "12408401": {
+      "id": 12408401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 16,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        }
+      ]
+    },
+    "12408402": {
+      "id": 12408402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 150
+        },
+        {
+          "id": 24000379,
+          "value": 150
+        },
+        {
+          "id": 24000420,
+          "value": 150
+        }
+      ]
+    },
+    "12409000": {
+      "id": 12409000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000251,
+          "value": 50
+        },
+        {
+          "id": 24000387,
+          "value": 50
+        },
+        {
+          "id": 24000279,
+          "value": 50
+        }
+      ]
+    },
+    "12409001": {
+      "id": 12409001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 13,
+          "value": 100
+        }
+      ]
+    },
+    "12409002": {
+      "id": 12409002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000251,
+          "value": 150
+        },
+        {
+          "id": 24000387,
+          "value": 150
+        },
+        {
+          "id": 24000279,
+          "value": 150
+        }
+      ]
+    },
+    "12409100": {
+      "id": 12409100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 50
+        },
+        {
+          "id": 24000279,
+          "value": 50
+        },
+        {
+          "id": 24000179,
+          "value": 50
+        }
+      ]
+    },
+    "12409101": {
+      "id": 12409101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 4,
+          "value": 100
+        }
+      ]
+    },
+    "12409102": {
+      "id": 12409102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 150
+        },
+        {
+          "id": 24000279,
+          "value": 150
+        },
+        {
+          "id": 24000179,
+          "value": 150
+        }
+      ]
+    },
+    "12409200": {
+      "id": 12409200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 50
+        },
+        {
+          "id": 24000279,
+          "value": 50
+        },
+        {
+          "id": 24000338,
+          "value": 50
+        }
+      ]
+    },
+    "12409201": {
+      "id": 12409201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 12,
+          "value": 100
+        },
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 16,
+          "value": 100
+        }
+      ]
+    },
+    "12409202": {
+      "id": 12409202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000387,
+          "value": 150
+        },
+        {
+          "id": 24000279,
+          "value": 150
+        },
+        {
+          "id": 24000338,
+          "value": 150
+        }
+      ]
+    },
+    "12409300": {
+      "id": 12409300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 50
+        },
+        {
+          "id": 24000244,
+          "value": 50
+        },
+        {
+          "id": 24000211,
+          "value": 50
+        }
+      ]
+    },
+    "12409301": {
+      "id": 12409301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12409302": {
+      "id": 12409302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 150
+        },
+        {
+          "id": 24000244,
+          "value": 150
+        },
+        {
+          "id": 24000211,
+          "value": 150
+        }
+      ]
+    },
+    "12409400": {
+      "id": 12409400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000139,
+          "value": 50
+        },
+        {
+          "id": 24000414,
+          "value": 50
+        },
+        {
+          "id": 24000385,
+          "value": 50
+        }
+      ]
+    },
+    "12409401": {
+      "id": 12409401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 5,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        }
+      ]
+    },
+    "12409402": {
+      "id": 12409402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000139,
+          "value": 150
+        },
+        {
+          "id": 24000414,
+          "value": 150
+        },
+        {
+          "id": 24000385,
+          "value": 150
+        }
+      ]
+    },
+    "12409500": {
+      "id": 12409500,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000317,
+          "value": 50
+        },
+        {
+          "id": 24000196,
+          "value": 50
+        },
+        {
+          "id": 24000383,
+          "value": 50
+        }
+      ]
+    },
+    "12409501": {
+      "id": 12409501,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 15,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        },
+        {
+          "id": 12,
+          "value": 100
+        }
+      ]
+    },
+    "12409502": {
+      "id": 12409502,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000317,
+          "value": 150
+        },
+        {
+          "id": 24000196,
+          "value": 150
+        },
+        {
+          "id": 24000383,
+          "value": 150
+        }
+      ]
+    },
+    "12409600": {
+      "id": 12409600,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 50
+        },
+        {
+          "id": 24000379,
+          "value": 50
+        },
+        {
+          "id": 24000244,
+          "value": 50
+        }
+      ]
+    },
+    "12409601": {
+      "id": 12409601,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 13,
+          "value": 100
+        },
+        {
+          "id": 16,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        }
+      ]
+    },
+    "12409602": {
+      "id": 12409602,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000274,
+          "value": 150
+        },
+        {
+          "id": 24000379,
+          "value": 150
+        },
+        {
+          "id": 24000244,
+          "value": 150
+        }
+      ]
+    },
+    "12410000": {
+      "id": 12410000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000136,
+          "value": 50
+        },
+        {
+          "id": 24000159,
+          "value": 50
+        },
+        {
+          "id": 24000376,
+          "value": 50
+        }
+      ]
+    },
+    "12410001": {
+      "id": 12410001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 5,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        }
+      ]
+    },
+    "12410002": {
+      "id": 12410002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000136,
+          "value": 150
+        },
+        {
+          "id": 24000159,
+          "value": 150
+        },
+        {
+          "id": 24000376,
+          "value": 150
+        }
+      ]
+    },
+    "12410100": {
+      "id": 12410100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 50
+        },
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000417,
+          "value": 50
+        }
+      ]
+    },
+    "12410101": {
+      "id": 12410101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        }
+      ]
+    },
+    "12410102": {
+      "id": 12410102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 150
+        },
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000417,
+          "value": 150
+        }
+      ]
+    },
+    "12410200": {
+      "id": 12410200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 50
+        },
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000260,
+          "value": 50
+        }
+      ]
+    },
+    "12410201": {
+      "id": 12410201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        }
+      ]
+    },
+    "12410202": {
+      "id": 12410202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 150
+        },
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000260,
+          "value": 150
+        }
+      ]
+    },
+    "12410300": {
+      "id": 12410300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 50
+        },
+        {
+          "id": 24000174,
+          "value": 50
+        },
+        {
+          "id": 24000133,
+          "value": 50
+        }
+      ]
+    },
+    "12410301": {
+      "id": 12410301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 5,
+          "value": 100
+        }
+      ]
+    },
+    "12410302": {
+      "id": 12410302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 150
+        },
+        {
+          "id": 24000174,
+          "value": 150
+        },
+        {
+          "id": 24000133,
+          "value": 150
+        }
+      ]
+    },
+    "12410400": {
+      "id": 12410400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 50
+        },
+        {
+          "id": 24000174,
+          "value": 50
+        },
+        {
+          "id": 24000239,
+          "value": 50
+        }
+      ]
+    },
+    "12410401": {
+      "id": 12410401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 10,
+          "value": 100
+        }
+      ]
+    },
+    "12410402": {
+      "id": 12410402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 150
+        },
+        {
+          "id": 24000174,
+          "value": 150
+        },
+        {
+          "id": 24000239,
+          "value": 150
+        }
+      ]
+    },
+    "12410500": {
+      "id": 12410500,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 50
+        },
+        {
+          "id": 24000174,
+          "value": 50
+        },
+        {
+          "id": 24000205,
+          "value": 50
+        }
+      ]
+    },
+    "12410501": {
+      "id": 12410501,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12410502": {
+      "id": 12410502,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 150
+        },
+        {
+          "id": 24000174,
+          "value": 150
+        },
+        {
+          "id": 24000205,
+          "value": 150
+        }
+      ]
+    },
+    "12410600": {
+      "id": 12410600,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000158,
+          "value": 50
+        },
+        {
+          "id": 24000356,
+          "value": 50
+        },
+        {
+          "id": 24000317,
+          "value": 50
+        }
+      ]
+    },
+    "12410601": {
+      "id": 12410601,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 7,
+          "value": 100
+        },
+        {
+          "id": 17,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12410602": {
+      "id": 12410602,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000158,
+          "value": 150
+        },
+        {
+          "id": 24000356,
+          "value": 150
+        },
+        {
+          "id": 24000317,
+          "value": 150
+        }
+      ]
+    },
+    "12410700": {
+      "id": 12410700,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000037,
+          "value": 50
+        },
+        {
+          "id": 24000178,
+          "value": 50
+        }
+      ]
+    },
+    "12410701": {
+      "id": 12410701,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 7,
+          "value": 100
+        }
+      ]
+    },
+    "12410702": {
+      "id": 12410702,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000037,
+          "value": 150
+        },
+        {
+          "id": 24000178,
+          "value": 150
+        }
+      ]
+    },
+    "12411000": {
+      "id": 12411000,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000136,
+          "value": 50
+        },
+        {
+          "id": 24000159,
+          "value": 50
+        },
+        {
+          "id": 24000376,
+          "value": 50
+        }
+      ]
+    },
+    "12411001": {
+      "id": 12411001,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 5,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        }
+      ]
+    },
+    "12411002": {
+      "id": 12411002,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000136,
+          "value": 150
+        },
+        {
+          "id": 24000159,
+          "value": 150
+        },
+        {
+          "id": 24000376,
+          "value": 150
+        }
+      ]
+    },
+    "12411100": {
+      "id": 12411100,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 50
+        },
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000417,
+          "value": 50
+        }
+      ]
+    },
+    "12411101": {
+      "id": 12411101,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 18,
+          "value": 100
+        }
+      ]
+    },
+    "12411102": {
+      "id": 12411102,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 150
+        },
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000417,
+          "value": 150
+        }
+      ]
+    },
+    "12411200": {
+      "id": 12411200,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 50
+        },
+        {
+          "id": 24000376,
+          "value": 50
+        },
+        {
+          "id": 24000260,
+          "value": 50
+        }
+      ]
+    },
+    "12411201": {
+      "id": 12411201,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 11,
+          "value": 100
+        }
+      ]
+    },
+    "12411202": {
+      "id": 12411202,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000159,
+          "value": 150
+        },
+        {
+          "id": 24000376,
+          "value": 150
+        },
+        {
+          "id": 24000260,
+          "value": 150
+        }
+      ]
+    },
+    "12411300": {
+      "id": 12411300,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 50
+        },
+        {
+          "id": 24000174,
+          "value": 50
+        },
+        {
+          "id": 24000133,
+          "value": 50
+        }
+      ]
+    },
+    "12411301": {
+      "id": 12411301,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 5,
+          "value": 100
+        }
+      ]
+    },
+    "12411302": {
+      "id": 12411302,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 150
+        },
+        {
+          "id": 24000174,
+          "value": 150
+        },
+        {
+          "id": 24000133,
+          "value": 150
+        }
+      ]
+    },
+    "12411400": {
+      "id": 12411400,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 50
+        },
+        {
+          "id": 24000174,
+          "value": 50
+        },
+        {
+          "id": 24000239,
+          "value": 50
+        }
+      ]
+    },
+    "12411401": {
+      "id": 12411401,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 10,
+          "value": 100
+        }
+      ]
+    },
+    "12411402": {
+      "id": 12411402,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 150
+        },
+        {
+          "id": 24000174,
+          "value": 150
+        },
+        {
+          "id": 24000239,
+          "value": 150
+        }
+      ]
+    },
+    "12411500": {
+      "id": 12411500,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 50
+        },
+        {
+          "id": 24000174,
+          "value": 50
+        },
+        {
+          "id": 24000205,
+          "value": 50
+        }
+      ]
+    },
+    "12411501": {
+      "id": 12411501,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 19,
+          "value": 100
+        },
+        {
+          "id": 8,
+          "value": 100
+        },
+        {
+          "id": 9,
+          "value": 100
+        }
+      ]
+    },
+    "12411502": {
+      "id": 12411502,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000375,
+          "value": 150
+        },
+        {
+          "id": 24000174,
+          "value": 150
+        },
+        {
+          "id": 24000205,
+          "value": 150
+        }
+      ]
+    },
+    "12411600": {
+      "id": 12411600,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000158,
+          "value": 50
+        },
+        {
+          "id": 24000356,
+          "value": 50
+        },
+        {
+          "id": 24000319,
+          "value": 50
+        }
+      ]
+    },
+    "12411601": {
+      "id": 12411601,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 7,
+          "value": 100
+        },
+        {
+          "id": 17,
+          "value": 100
+        },
+        {
+          "id": 15,
+          "value": 100
+        }
+      ]
+    },
+    "12411602": {
+      "id": 12411602,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000158,
+          "value": 150
+        },
+        {
+          "id": 24000356,
+          "value": 150
+        },
+        {
+          "id": 24000319,
+          "value": 150
+        }
+      ]
+    },
+    "12411700": {
+      "id": 12411700,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000037,
+          "value": 50
+        },
+        {
+          "id": 24000178,
+          "value": 50
+        }
+      ]
+    },
+    "12411701": {
+      "id": 12411701,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 0,
+          "value": 100
+        },
+        {
+          "id": 7,
+          "value": 100
+        }
+      ]
+    },
+    "12411702": {
+      "id": 12411702,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000037,
+          "value": 150
+        },
+        {
+          "id": 24000178,
+          "value": 150
+        }
+      ]
+    },
+    "12411800": {
+      "id": 12411800,
+      "difficulty": 0,
+      "addValue": 250,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 50
+        },
+        {
+          "id": 24000120,
+          "value": 50
+        },
+        {
+          "id": 24000178,
+          "value": 50
+        }
+      ]
+    },
+    "12411801": {
+      "id": 12411801,
+      "difficulty": 1,
+      "addValue": 300,
+      "targetType": 0,
+      "target": [
+        {
+          "id": 18,
+          "value": 100
+        },
+        {
+          "id": 3,
+          "value": 100
+        },
+        {
+          "id": 7,
+          "value": 100
+        }
+      ]
+    },
+    "12411802": {
+      "id": 12411802,
+      "difficulty": 2,
+      "addValue": 350,
+      "targetType": 1,
+      "target": [
+        {
+          "id": 24000453,
+          "value": 150
+        },
+        {
+          "id": 24000120,
+          "value": 150
+        },
+        {
+          "id": 24000178,
+          "value": 150
+        }
+      ]
+    }
+  }
+}

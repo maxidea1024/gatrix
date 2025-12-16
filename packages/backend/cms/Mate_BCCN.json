@@ -3851,8 +3851,10 @@
       "isReleaseCN": true,
       "acquisitionWay": 1,
       "acquisitionWayGL": 1,
+      "acquisitionWayCN": 1,
       "openPageId": 10510001,
-      "openPageIdGL": 10510001
+      "openPageIdGL": 10510001,
+      "openPageIdCN": 10506004
     },
     "21300012": {
       "id": 21300012,
@@ -4556,8 +4558,10 @@
       "startDateCN": "2026/01/07/00:00:00",
       "acquisitionWay": 1,
       "acquisitionWayGL": 1,
+      "acquisitionWayCN": 1,
       "openPageId": 10510001,
-      "openPageIdGL": 10510001
+      "openPageIdGL": 10510001,
+      "openPageIdCN": 10506010
     },
     "21300022": {
       "id": 21300022,
@@ -41120,8 +41124,10 @@
       "startDateCN": "2026/01/14/00:00:00",
       "acquisitionWay": 1,
       "acquisitionWayGL": 1,
+      "acquisitionWayCN": 1,
       "openPageId": 10510000,
-      "openPageIdGL": 10510000
+      "openPageIdGL": 10510000,
+      "openPageIdCN": 10506013
     },
     "21300600": {
       "id": 21300600,
@@ -41478,8 +41484,10 @@
       "isReleaseCN": true,
       "acquisitionWay": 1,
       "acquisitionWayGL": 1,
+      "acquisitionWayCN": 1,
       "openPageId": 10510000,
-      "openPageIdGL": 10510000
+      "openPageIdGL": 10510000,
+      "openPageIdCN": 10506001
     },
     "21300606": {
       "id": 21300606,
@@ -42440,7 +42448,7 @@
       "id": 21300620,
       "characterId": 21100621,
       "isSpine": false,
-      "localBitFlag": 27,
+      "localBitFlag": 219,
       "needCompanyLv": 1,
       "selectAbleLocalNpcMate": false,
       "mateGrade": 4,
@@ -42459,36 +42467,37 @@
       "stat": [
         {
           "Type": 107,
-          "Val": 80
+          "Val": 82
         },
         {
           "Type": 101,
-          "Val": 72
+          "Val": 81
         },
         {
           "Type": 102,
-          "Val": 66
+          "Val": 79
         },
         {
           "Type": 103,
-          "Val": 78
+          "Val": 84
         },
         {
           "Type": 104,
-          "Val": 92
+          "Val": 93
         },
         {
           "Type": 105,
-          "Val": 89
+          "Val": 91
         },
         {
           "Type": 106,
-          "Val": 83
+          "Val": 89
         }
       ],
       "battleDuelSkillId": 67600000,
-      "autoMateSkillId": 65000001,
-      "autoMatePassiveId": 64900001,
+      "autoMateSkillId": 65010669,
+      "autoMatePassiveId": 64930691,
+      "autoMatePassiveFixedId": 60700663,
       "canCapture": false,
       "CEquipId": [
         22711002,
@@ -42501,12 +42510,13 @@
       "useUniqueTalk": 1,
       "isRelease": true,
       "isReleaseGl": true,
-      "isReleaseCN": false,
+      "isReleaseCN": true,
       "acquisitionWay": 3,
       "acquisitionWayGL": 3,
+      "acquisitionWayCN": 3,
       "acquisitionDesc": "투자 시즌 상점 교환 시즌 5",
       "acquisitionDescGL": "투자 시즌 상점 교환 시즌 5",
-      "acquisitionDescCN": "투자 시즌 상점 교환 시즌 5"
+      "acquisitionDescCN": "투자 시즌 상점 교환 시즌 1"
     },
     "21320005": {
       "id": 21320005,
@@ -63934,8 +63944,10 @@
       "startDateCN": "2025/12/31/00:00:00",
       "acquisitionWay": 1,
       "acquisitionWayGL": 1,
+      "acquisitionWayCN": 1,
       "openPageId": 10510000,
-      "openPageIdGL": 10510000
+      "openPageIdGL": 10510000,
+      "openPageIdCN": 10506007
     },
     "21350079": {
       "id": 21350079,

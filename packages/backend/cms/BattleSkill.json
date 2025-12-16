@@ -88734,7 +88734,7 @@
       "accuType": 2,
       "accuVal": 1000,
       "toolTipIcon": "icon_skill_battleOrder_134_Sprite",
-      "animationName": "BattleOrderPerfectHit",
+      "animationName": "OrderOfTheGovernor",
       "desc": "아군 전체에게 3턴 동안 포격 공격 시, 한번 더 공격하여 {0}의 추가 피해를 주는 능력을 부여합니다.\n(다른 추가 효과와 중첩되지 않으며, 추가 공격은 부가적인 효과를 발동시키지 않습니다)",
       "descFormatTexts": [
         "50%"

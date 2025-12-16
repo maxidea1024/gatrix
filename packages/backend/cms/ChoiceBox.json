@@ -38417,6 +38417,14 @@
       "choiceBoxQuantity": 1,
       "autoMax": false
     },
+    "3002887": {
+      "id": 3002887,
+      "choiceBoxGroup": 100181,
+      "rewardType": 7,
+      "choiceBoxId": 21300620,
+      "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
     "3002888": {
       "id": 3002888,
       "choiceBoxGroup": 100182,
@@ -40551,6 +40559,78 @@
       "rewardType": 9,
       "choiceBoxId": 70101368,
       "choiceBoxQuantity": 1,
+      "autoMax": false
+    },
+    "3003162": {
+      "id": 3003162,
+      "choiceBoxGroup": 100186,
+      "rewardType": 2,
+      "choiceBoxId": 23610010,
+      "choiceBoxQuantity": 30,
+      "autoMax": false
+    },
+    "3003163": {
+      "id": 3003163,
+      "choiceBoxGroup": 100186,
+      "rewardType": 2,
+      "choiceBoxId": 23610011,
+      "choiceBoxQuantity": 20,
+      "autoMax": false
+    },
+    "3003164": {
+      "id": 3003164,
+      "choiceBoxGroup": 100186,
+      "rewardType": 2,
+      "choiceBoxId": 23610012,
+      "choiceBoxQuantity": 15,
+      "autoMax": false
+    },
+    "3003165": {
+      "id": 3003165,
+      "choiceBoxGroup": 100186,
+      "rewardType": 2,
+      "choiceBoxId": 23610019,
+      "choiceBoxQuantity": 15,
+      "autoMax": false
+    },
+    "3003166": {
+      "id": 3003166,
+      "choiceBoxGroup": 100186,
+      "rewardType": 2,
+      "choiceBoxId": 23610020,
+      "choiceBoxQuantity": 10,
+      "autoMax": false
+    },
+    "3003167": {
+      "id": 3003167,
+      "choiceBoxGroup": 100186,
+      "rewardType": 2,
+      "choiceBoxId": 23610021,
+      "choiceBoxQuantity": 8,
+      "autoMax": false
+    },
+    "3003168": {
+      "id": 3003168,
+      "choiceBoxGroup": 100186,
+      "rewardType": 2,
+      "choiceBoxId": 23610037,
+      "choiceBoxQuantity": 8,
+      "autoMax": false
+    },
+    "3003169": {
+      "id": 3003169,
+      "choiceBoxGroup": 100186,
+      "rewardType": 2,
+      "choiceBoxId": 23610038,
+      "choiceBoxQuantity": 5,
+      "autoMax": false
+    },
+    "3003170": {
+      "id": 3003170,
+      "choiceBoxGroup": 100186,
+      "rewardType": 2,
+      "choiceBoxId": 23610039,
+      "choiceBoxQuantity": 4,
       "autoMax": false
     }
   }

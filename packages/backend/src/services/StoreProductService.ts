@@ -126,13 +126,14 @@ class StoreProductService {
       const searchNumber = Number(search);
       if (!isNaN(searchNumber) && String(searchNumber) === search.trim()) {
         // Search by CMS ID if input is a pure number
-        conditions.push('(productId LIKE ? OR productName LIKE ? OR description LIKE ? OR cmsProductId = ?)');
+        conditions.push('(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ? OR description LIKE ? OR cmsProductId = ?)');
         const searchPattern = `%${search}%`;
-        queryParams.push(searchPattern, searchPattern, searchPattern, searchNumber);
+        queryParams.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchNumber);
       } else {
-        conditions.push('(productId LIKE ? OR productName LIKE ? OR description LIKE ?)');
+        // Search by all name fields including localized names
+        conditions.push('(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ? OR description LIKE ?)');
         const searchPattern = `%${search}%`;
-        queryParams.push(searchPattern, searchPattern, searchPattern);
+        queryParams.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
       }
     }
 
@@ -692,6 +693,12 @@ class StoreProductService {
       if (result.affectedRows > 0) {
         try {
           const env = await Environment.query().findById(envId);
+          // Extract environmentName from envId format: {environmentName}.{ulid}
+          const environmentName = env?.environmentName || envId.split('.')[0];
+
+          if (!environmentName) {
+            logger.warn('Could not determine environment name for SDK event', { envId, env });
+          }
 
           // Invalidate ETag cache so SDK fetches fresh data
           await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${envId}`);
@@ -701,10 +708,16 @@ class StoreProductService {
             type: 'store_product.bulk_updated',
             data: {
               count: result.affectedRows,
-              environment: env?.environmentName,
+              environment: environmentName,
               isActive: params.targetIsActive ? 1 : 0,
               timestamp: Date.now()
             }
+          });
+
+          logger.info('Published store product bulk update SDK event', {
+            count: result.affectedRows,
+            environment: environmentName,
+            isActive: params.targetIsActive,
           });
         } catch (eventError) {
           logger.warn('Failed to publish store product SDK event', { eventError });

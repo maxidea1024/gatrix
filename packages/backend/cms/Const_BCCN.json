@@ -7023,15 +7023,15 @@
     },
     "UnpopularDefaultRate": {
       "name": "UnpopularDefaultRate",
-      "value": 30
+      "value": 0
     },
     "UnpopularAddRate": {
       "name": "UnpopularAddRate",
-      "value": 30
+      "value": 0
     },
     "UnpopularMaxRate": {
       "name": "UnpopularMaxRate",
-      "value": 90
+      "value": 0
     },
     "TradeEventUnpopularEndPriceMin": {
       "name": "TradeEventUnpopularEndPriceMin",
@@ -7480,6 +7480,10 @@
     "FloatBannerConfirmDisableActiveDays": {
       "name": "FloatBannerConfirmDisableActiveDays",
       "value": 180
+    },
+    "FleetSpeedCorrection": {
+      "name": "FleetSpeedCorrection",
+      "value": 3
     }
   }
 }

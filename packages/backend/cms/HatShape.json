@@ -5994,6 +5994,16 @@
       "color2": 16777215,
       "backAnim": true,
       "attachMethod": 1
+    },
+    "33000553": {
+      "id": 33000553,
+      "skeleton": "ReplaceHeadSkins",
+      "atlas": "ReplaceHeadSkins0001",
+      "skin": "27",
+      "color1": 16733783,
+      "color2": 16777215,
+      "backAnim": true,
+      "attachMethod": 3
     }
   }
 }

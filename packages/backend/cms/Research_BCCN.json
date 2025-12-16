@@ -2175,11 +2175,11 @@
       "needResearch": [
         {
           "GroupId": 5,
-          "Lv": 2
+          "Lv": 1
         },
         {
           "GroupId": 8,
-          "Lv": 2
+          "Lv": 1
         },
         {
           "GroupId": 10,
@@ -2210,11 +2210,11 @@
       "needResearch": [
         {
           "GroupId": 5,
-          "Lv": 2
+          "Lv": 1
         },
         {
           "GroupId": 8,
-          "Lv": 2
+          "Lv": 1
         },
         {
           "GroupId": 10,
@@ -2249,11 +2249,11 @@
       "needResearch": [
         {
           "GroupId": 5,
-          "Lv": 2
+          "Lv": 1
         },
         {
           "GroupId": 8,
-          "Lv": 2
+          "Lv": 1
         },
         {
           "GroupId": 10,
@@ -2288,11 +2288,11 @@
       "needResearch": [
         {
           "GroupId": 5,
-          "Lv": 2
+          "Lv": 1
         },
         {
           "GroupId": 8,
-          "Lv": 2
+          "Lv": 1
         },
         {
           "GroupId": 10,
@@ -2327,11 +2327,11 @@
       "needResearch": [
         {
           "GroupId": 5,
-          "Lv": 2
+          "Lv": 1
         },
         {
           "GroupId": 8,
-          "Lv": 2
+          "Lv": 1
         },
         {
           "GroupId": 10,
@@ -3637,22 +3637,22 @@
         {
           "Type": 1,
           "Id": 75300181,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300201,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300211,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300221,
-          "Value": 20
+          "Value": 30
         }
       ],
       "desc": "잡화, 염료, 광석, 공업품 구매 수량 3% 증가",
@@ -3683,22 +3683,22 @@
         {
           "Type": 1,
           "Id": 75300181,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300201,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300211,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300221,
-          "Value": 40
+          "Value": 60
         }
       ],
       "desc": "잡화, 염료, 광석, 공업품 구매 수량 6% 증가",
@@ -3729,22 +3729,22 @@
         {
           "Type": 1,
           "Id": 75300181,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300201,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300211,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300221,
-          "Value": 60
+          "Value": 90
         }
       ],
       "desc": "잡화, 염료, 광석, 공업품 구매 수량 9% 증가",
@@ -3775,22 +3775,22 @@
         {
           "Type": 1,
           "Id": 75300181,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300201,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300211,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300221,
-          "Value": 80
+          "Value": 120
         }
       ],
       "desc": "잡화, 염료, 광석, 공업품 구매 수량 12% 증가",
@@ -3821,22 +3821,22 @@
         {
           "Type": 1,
           "Id": 75300181,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300201,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300211,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300221,
-          "Value": 100
+          "Value": 150
         }
       ],
       "desc": "잡화, 염료, 광석, 공업품 구매 수량 15% 증가",
@@ -3863,22 +3863,22 @@
         {
           "Type": 1,
           "Id": 75300231,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300241,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300191,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300251,
-          "Value": 20
+          "Value": 30
         }
       ],
       "desc": "기호품, 섬유, 주류, 직물 구매 수량 3% 증가",
@@ -3909,22 +3909,22 @@
         {
           "Type": 1,
           "Id": 75300231,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300241,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300191,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300251,
-          "Value": 40
+          "Value": 60
         }
       ],
       "desc": "기호품, 섬유, 주류, 직물 구매 수량 6% 증가",
@@ -3955,22 +3955,22 @@
         {
           "Type": 1,
           "Id": 75300231,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300241,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300191,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300251,
-          "Value": 60
+          "Value": 90
         }
       ],
       "desc": "기호품, 섬유, 주류, 직물 구매 수량 9% 증가",
@@ -4001,22 +4001,22 @@
         {
           "Type": 1,
           "Id": 75300231,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300241,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300191,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300251,
-          "Value": 80
+          "Value": 120
         }
       ],
       "desc": "기호품, 섬유, 주류, 직물 구매 수량 12% 증가",
@@ -4047,22 +4047,22 @@
         {
           "Type": 1,
           "Id": 75300231,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300241,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300191,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300251,
-          "Value": 100
+          "Value": 150
         }
       ],
       "desc": "기호품, 섬유, 주류, 직물 구매 수량 15% 증가",
@@ -4089,22 +4089,22 @@
         {
           "Type": 1,
           "Id": 75300261,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300281,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300301,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300271,
-          "Value": 20
+          "Value": 30
         }
       ],
       "desc": "무기류, 공예품, 향신료, 총포류 구매 수량 3% 증가",
@@ -4135,22 +4135,22 @@
         {
           "Type": 1,
           "Id": 75300261,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300281,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300301,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300271,
-          "Value": 40
+          "Value": 60
         }
       ],
       "desc": "무기류, 공예품, 향신료, 총포류 구매 수량 6% 증가",
@@ -4181,22 +4181,22 @@
         {
           "Type": 1,
           "Id": 75300261,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300281,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300301,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300271,
-          "Value": 60
+          "Value": 90
         }
       ],
       "desc": "무기류, 공예품, 향신료, 총포류 구매 수량 9% 증가",
@@ -4227,22 +4227,22 @@
         {
           "Type": 1,
           "Id": 75300261,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300281,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300301,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300271,
-          "Value": 80
+          "Value": 120
         }
       ],
       "desc": "무기류, 공예품, 향신료, 총포류 구매 수량 12% 증가",
@@ -4273,22 +4273,22 @@
         {
           "Type": 1,
           "Id": 75300261,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300281,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300301,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300271,
-          "Value": 100
+          "Value": 150
         }
       ],
       "desc": "무기류, 공예품, 향신료, 총포류 구매 수량 15% 증가",
@@ -4315,22 +4315,22 @@
         {
           "Type": 1,
           "Id": 75300291,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300311,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300321,
-          "Value": 20
+          "Value": 30
         },
         {
           "Type": 1,
           "Id": 75300331,
-          "Value": 20
+          "Value": 30
         }
       ],
       "desc": "미술품, 귀금속, 향료, 보석 구매 수량 3% 증가",
@@ -4361,22 +4361,22 @@
         {
           "Type": 1,
           "Id": 75300291,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300311,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300321,
-          "Value": 40
+          "Value": 60
         },
         {
           "Type": 1,
           "Id": 75300331,
-          "Value": 40
+          "Value": 60
         }
       ],
       "desc": "미술품, 귀금속, 향료, 보석 구매 수량 6% 증가",
@@ -4407,22 +4407,22 @@
         {
           "Type": 1,
           "Id": 75300291,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300311,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300321,
-          "Value": 60
+          "Value": 90
         },
         {
           "Type": 1,
           "Id": 75300331,
-          "Value": 60
+          "Value": 90
         }
       ],
       "desc": "미술품, 귀금속, 향료, 보석 구매 수량 9% 증가",
@@ -4453,22 +4453,22 @@
         {
           "Type": 1,
           "Id": 75300291,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300311,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300321,
-          "Value": 80
+          "Value": 120
         },
         {
           "Type": 1,
           "Id": 75300331,
-          "Value": 80
+          "Value": 120
         }
       ],
       "desc": "미술품, 귀금속, 향료, 보석 구매 수량 12% 증가",
@@ -4499,22 +4499,22 @@
         {
           "Type": 1,
           "Id": 75300291,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300311,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300321,
-          "Value": 100
+          "Value": 150
         },
         {
           "Type": 1,
           "Id": 75300331,
-          "Value": 100
+          "Value": 150
         }
       ],
       "desc": "미술품, 귀금속, 향료, 보석 구매 수량 15% 증가",
@@ -4553,7 +4553,7 @@
           "Value": 10
         }
       ],
-      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 3% 할인",
+      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 1% 할인",
       "skillIcon": "icon_shipResearch_trade_016_Sprite"
     },
     "72600026": {
@@ -4595,7 +4595,7 @@
           "Value": 20
         }
       ],
-      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 6% 할인",
+      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 2% 할인",
       "skillIcon": "icon_shipResearch_trade_016_Sprite"
     },
     "72600027": {
@@ -4637,7 +4637,7 @@
           "Value": 30
         }
       ],
-      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 9% 할인",
+      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 3% 할인",
       "skillIcon": "icon_shipResearch_trade_016_Sprite"
     },
     "72600028": {
@@ -4679,7 +4679,7 @@
           "Value": 40
         }
       ],
-      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 12% 할인",
+      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 4% 할인",
       "skillIcon": "icon_shipResearch_trade_016_Sprite"
     },
     "72600029": {
@@ -4721,7 +4721,7 @@
           "Value": 50
         }
       ],
-      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 15% 할인",
+      "desc": "식료품, 조미료, 가축, 의약품 구매 가격 5% 할인",
       "skillIcon": "icon_shipResearch_trade_016_Sprite"
     },
     "72600030": {
@@ -5885,7 +5885,7 @@
       "needResearch": [
         {
           "GroupId": 1010,
-          "Lv": 1
+          "Lv": 4
         }
       ],
       "researchTaskId": [
@@ -5927,7 +5927,7 @@
       "needResearch": [
         {
           "GroupId": 1010,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1011,
@@ -5973,7 +5973,7 @@
       "needResearch": [
         {
           "GroupId": 1010,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1011,
@@ -6019,7 +6019,7 @@
       "needResearch": [
         {
           "GroupId": 1010,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1011,
@@ -6065,7 +6065,7 @@
       "needResearch": [
         {
           "GroupId": 1010,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1011,
@@ -6111,7 +6111,7 @@
       "needResearch": [
         {
           "GroupId": 1011,
-          "Lv": 1
+          "Lv": 4
         }
       ],
       "researchTaskId": [
@@ -6153,7 +6153,7 @@
       "needResearch": [
         {
           "GroupId": 1011,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1012,
@@ -6199,7 +6199,7 @@
       "needResearch": [
         {
           "GroupId": 1011,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1012,
@@ -6245,7 +6245,7 @@
       "needResearch": [
         {
           "GroupId": 1011,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1012,
@@ -6291,7 +6291,7 @@
       "needResearch": [
         {
           "GroupId": 1011,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1012,
@@ -6337,7 +6337,7 @@
       "needResearch": [
         {
           "GroupId": 1012,
-          "Lv": 1
+          "Lv": 4
         }
       ],
       "researchTaskId": [
@@ -6379,7 +6379,7 @@
       "needResearch": [
         {
           "GroupId": 1012,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1013,
@@ -6425,7 +6425,7 @@
       "needResearch": [
         {
           "GroupId": 1012,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1013,
@@ -6471,7 +6471,7 @@
       "needResearch": [
         {
           "GroupId": 1012,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1013,
@@ -6517,7 +6517,7 @@
       "needResearch": [
         {
           "GroupId": 1012,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1013,
@@ -6563,7 +6563,7 @@
       "needResearch": [
         {
           "GroupId": 1013,
-          "Lv": 1
+          "Lv": 4
         }
       ],
       "researchTaskId": [
@@ -6605,7 +6605,7 @@
       "needResearch": [
         {
           "GroupId": 1013,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1014,
@@ -6651,7 +6651,7 @@
       "needResearch": [
         {
           "GroupId": 1013,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1014,
@@ -6697,7 +6697,7 @@
       "needResearch": [
         {
           "GroupId": 1013,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1014,
@@ -6743,7 +6743,7 @@
       "needResearch": [
         {
           "GroupId": 1013,
-          "Lv": 1
+          "Lv": 4
         },
         {
           "GroupId": 1014,
@@ -6944,6 +6944,10 @@
         {
           "GroupId": 2000,
           "Lv": 1
+        },
+        {
+          "GroupId": 2004,
+          "Lv": 1
         }
       ],
       "researchTaskId": [
@@ -6970,6 +6974,10 @@
       "needResearch": [
         {
           "GroupId": 2000,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2004,
           "Lv": 1
         },
         {
@@ -7004,6 +7012,10 @@
           "Lv": 1
         },
         {
+          "GroupId": 2004,
+          "Lv": 1
+        },
+        {
           "GroupId": 2001,
           "Lv": 2
         }
@@ -7035,6 +7047,10 @@
           "Lv": 1
         },
         {
+          "GroupId": 2004,
+          "Lv": 1
+        },
+        {
           "GroupId": 2001,
           "Lv": 3
         }
@@ -7063,6 +7079,10 @@
       "needResearch": [
         {
           "GroupId": 2000,
+          "Lv": 1
+        },
+        {
+          "GroupId": 2004,
           "Lv": 1
         },
         {

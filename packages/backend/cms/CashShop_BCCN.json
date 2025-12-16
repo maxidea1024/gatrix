@@ -1040,7 +1040,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9999,
-      "eventImage": "WT_CN_RecommandedBanner001",
+      "eventImage": "WT_CN_RecommandedBanner001_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 0
@@ -1358,7 +1358,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9998,
-      "eventImage": "WT_CN_RecommandedBanner002",
+      "eventImage": "WT_CN_RecommandedBanner002_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 0
@@ -1584,7 +1584,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9997,
-      "eventImage": "WT_CN_RecommandedBanner003",
+      "eventImage": "WT_CN_RecommandedBanner003_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
@@ -1656,7 +1656,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9996,
-      "eventImage": "WT_CN_RecommandedBanner004",
+      "eventImage": "WT_CN_RecommandedBanner004_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
@@ -3348,7 +3348,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9995,
-      "eventImage": "WT_CN_RecommandedBanner005",
+      "eventImage": "WT_CN_RecommandedBanner005_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
@@ -3450,7 +3450,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9994,
-      "eventImage": "WT_CN_RecommandedBanner006",
+      "eventImage": "WT_CN_RecommandedBanner006_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
@@ -3553,7 +3553,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9993,
-      "eventImage": "WT_CN_RecommandedBanner007",
+      "eventImage": "WT_CN_RecommandedBanner007_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
@@ -3659,7 +3659,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9992,
-      "eventImage": "WT_CN_RecommandedBanner008",
+      "eventImage": "WT_CN_RecommandedBanner008_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
@@ -3765,7 +3765,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9991,
-      "eventImage": "WT_CN_RecommandedBanner009",
+      "eventImage": "WT_CN_RecommandedBanner009_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
@@ -4512,7 +4512,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9990,
-      "eventImage": "WT_CN_RecommandedBanner010",
+      "eventImage": "WT_CN_RecommandedBanner010_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder3": 39991,
@@ -4648,6 +4648,12 @@
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.6",
       "salePointType": 2,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 10
+        }
+      ],
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331469,
@@ -4657,7 +4663,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9989,
-      "eventImage": "WT_CN_RecommandedBanner011",
+      "eventImage": "WT_CN_RecommandedBanner011_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29978,
@@ -4685,6 +4691,12 @@
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.30",
       "salePointType": 2,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 20
+        }
+      ],
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331470,
@@ -4694,7 +4706,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9988,
-      "eventImage": "WT_CN_RecommandedBanner012",
+      "eventImage": "WT_CN_RecommandedBanner012_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29977,
@@ -4722,6 +4734,12 @@
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.68",
       "salePointType": 2,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 30
+        }
+      ],
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331471,
@@ -4731,7 +4749,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9987,
-      "eventImage": "WT_CN_RecommandedBanner013",
+      "eventImage": "WT_CN_RecommandedBanner013_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29976,
@@ -4759,6 +4777,12 @@
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.128",
       "salePointType": 2,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 40
+        }
+      ],
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331472,
@@ -4768,7 +4792,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9986,
-      "eventImage": "WT_CN_RecommandedBanner014",
+      "eventImage": "WT_CN_RecommandedBanner014_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29975,
@@ -4796,6 +4820,12 @@
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.198",
       "salePointType": 2,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 50
+        }
+      ],
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331473,
@@ -4805,7 +4835,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9985,
-      "eventImage": "WT_CN_RecommandedBanner015",
+      "eventImage": "WT_CN_RecommandedBanner015_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29974,
@@ -4833,6 +4863,12 @@
       "productLocalBitflag": 192,
       "productCodeSdo": "com.uwocn.328",
       "salePointType": 2,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 60
+        }
+      ],
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331474,
@@ -4842,7 +4878,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9984,
-      "eventImage": "WT_CN_RecommandedBanner016",
+      "eventImage": "WT_CN_RecommandedBanner016_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29973,
@@ -4867,9 +4903,15 @@
       "saleType": 5,
       "saleTypeVal": 1,
       "chinaPrice": 328,
-      "productLocalBitflag": 192,
+      "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.328",
       "salePointType": 2,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 70
+        }
+      ],
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331475,
@@ -4879,7 +4921,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9983,
-      "eventImage": "WT_CN_RecommandedBanner017",
+      "eventImage": "WT_CN_RecommandedBanner017_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29972,
@@ -4904,9 +4946,15 @@
       "saleType": 5,
       "saleTypeVal": 1,
       "chinaPrice": 328,
-      "productLocalBitflag": 192,
+      "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.328",
       "salePointType": 2,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 80
+        }
+      ],
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331476,
@@ -4916,7 +4964,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9982,
-      "eventImage": "WT_CN_RecommandedBanner018",
+      "eventImage": "WT_CN_RecommandedBanner018_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29971,
@@ -4941,9 +4989,15 @@
       "saleType": 5,
       "saleTypeVal": 1,
       "chinaPrice": 328,
-      "productLocalBitflag": 192,
+      "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.328",
       "salePointType": 2,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 90
+        }
+      ],
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331477,
@@ -4953,7 +5007,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9981,
-      "eventImage": "WT_CN_RecommandedBanner019",
+      "eventImage": "WT_CN_RecommandedBanner019_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29970,
@@ -4978,9 +5032,15 @@
       "saleType": 5,
       "saleTypeVal": 1,
       "chinaPrice": 328,
-      "productLocalBitflag": 192,
+      "productLocalBitflag": 0,
       "productCodeSdo": "com.uwocn.328",
       "salePointType": 2,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 100
+        }
+      ],
       "isEndDateMake": false,
       "HotSpotResetType": 0,
       "eventPageId": 99331478,
@@ -4990,7 +5050,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9980,
-      "eventImage": "WT_CN_RecommandedBanner020",
+      "eventImage": "WT_CN_RecommandedBanner020_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationOrder2": 29969,
@@ -5027,7 +5087,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9979,
-      "eventImage": "WT_CN_RecommandedBanner021",
+      "eventImage": "WT_CN_RecommandedBanner021_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationLevelMin": 1,
@@ -5129,7 +5189,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9978,
-      "eventImage": "WT_CN_RecommandedBanner022",
+      "eventImage": "WT_CN_RecommandedBanner022_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationLevelMin": 1,
@@ -5228,7 +5288,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9977,
-      "eventImage": "WT_CN_RecommandedBanner023",
+      "eventImage": "WT_CN_RecommandedBanner023_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "recommendationLevelMin": 1,
@@ -5409,7 +5469,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9976,
-      "eventImage": "WT_CN_RecommandedBanner024",
+      "eventImage": "WT_CN_RecommandedBanner024_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
@@ -5687,7 +5747,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9975,
-      "eventImage": "WT_CN_RecommandedBanner025",
+      "eventImage": "WT_CN_RecommandedBanner025_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 2,
@@ -5889,7 +5949,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9974,
-      "eventImage": "WT_CN_RecommandedBanner026",
+      "eventImage": "WT_CN_RecommandedBanner026_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 0
@@ -5925,7 +5985,7 @@
       "eventName": "##",
       "eventDesc": "##",
       "eventOrder": 9973,
-      "eventImage": "WT_CN_RecommandedBanner027",
+      "eventImage": "WT_CN_RecommandedBanner027_Sprite",
       "viewSchedule": false,
       "recommendationOrderHiddenView": true,
       "percentageType": 0

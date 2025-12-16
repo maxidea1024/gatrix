@@ -33370,6 +33370,42 @@
       "armorType": 0,
       "backAnim": true,
       "noDynamicShadow": true
+    },
+    "31002560": {
+      "id": 31002560,
+      "skeleton": "MSkins",
+      "atlas": "M0001Skins0010A",
+      "skin": "3",
+      "color1": 16738691,
+      "color2": 16777215,
+      "color3_skin": 16299987,
+      "spineShadow": "M_Shadow",
+      "armorType": 0,
+      "backAnim": true
+    },
+    "31002561": {
+      "id": 31002561,
+      "skeleton": "FSkins",
+      "atlas": "F0001Skins0013",
+      "skin": "7",
+      "color1": 16738691,
+      "color2": 16777215,
+      "color3_skin": 16299987,
+      "spineShadow": "F_Shadow",
+      "armorType": 0,
+      "backAnim": true
+    },
+    "31002562": {
+      "id": 31002562,
+      "skeleton": "FSkins",
+      "atlas": "F0009Skins0006",
+      "skin": "6",
+      "color1": 16777215,
+      "color2": 16777215,
+      "color3_skin": 16299987,
+      "spineShadow": "F_Shadow",
+      "armorType": 0,
+      "backAnim": true
     }
   }
 }

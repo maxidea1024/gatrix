@@ -3082,6 +3082,22 @@
       "isReRecruit": false,
       "isMustAppear": true
     },
+    "41540034": {
+      "id": 41540034,
+      "group": 11000091,
+      "orderPriority": 2,
+      "mateId": 21300613,
+      "Ratio": 10000,
+      "contentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82000036,
+          "Count": 124
+        }
+      ],
+      "isReRecruit": false,
+      "isMustAppear": true
+    },
     "41550000": {
       "id": 41550000,
       "group": 11000000,

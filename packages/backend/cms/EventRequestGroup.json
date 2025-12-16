@@ -9061,6 +9061,34 @@
       "questId": 82651013,
       "ratio": 1000000,
       "isMustAppear": true
+    },
+    "99811340": {
+      "id": 99811340,
+      "group": 999,
+      "questId": 82651060,
+      "ratio": 1000000,
+      "isMustAppear": true
+    },
+    "99811341": {
+      "id": 99811341,
+      "group": 999,
+      "questId": 82651061,
+      "ratio": 1000000,
+      "isMustAppear": true
+    },
+    "99811342": {
+      "id": 99811342,
+      "group": 999,
+      "questId": 82651062,
+      "ratio": 1000000,
+      "isMustAppear": true
+    },
+    "99811343": {
+      "id": 99811343,
+      "group": 999,
+      "questId": 82651063,
+      "ratio": 1000000,
+      "isMustAppear": true
     }
   }
 }

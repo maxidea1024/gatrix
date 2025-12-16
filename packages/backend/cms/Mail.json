@@ -13431,6 +13431,246 @@
       "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998645
     },
+    "92001777": {
+      "id": 92001777,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investment_rank_reward_CN_1",
+      "languageMailTitle": [
+        "{0} 도시 주간 선단 투자 순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 {0} 도시의 선단 투자 순위 보상이 도착했습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600393
+    },
+    "92001778": {
+      "id": 92001778,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investment_rank_reward_CN_2",
+      "languageMailTitle": [
+        "{0} 도시 주간 선단 투자 순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 {0} 도시의 선단 투자 순위 보상이 도착했습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600394
+    },
+    "92001779": {
+      "id": 92001779,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investment_rank_reward_CN_3",
+      "languageMailTitle": [
+        "{0} 도시 주간 선단 투자 순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 {0} 도시의 선단 투자 순위 보상이 도착했습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600395
+    },
+    "92001780": {
+      "id": 92001780,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investment_rank_reward_CN_4",
+      "languageMailTitle": [
+        "{0} 도시 주간 선단 투자 순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 {0} 도시의 선단 투자 순위 보상이 도착했습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600396
+    },
+    "92001781": {
+      "id": 92001781,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investment_rank_reward_CN_5",
+      "languageMailTitle": [
+        "{0} 도시 주간 선단 투자 순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 {0} 도시의 선단 투자 순위 보상이 도착했습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600397
+    },
+    "92001782": {
+      "id": 92001782,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investment_rank_reward_CN_6",
+      "languageMailTitle": [
+        "{0} 도시 주간 선단 투자 순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 {0} 도시의 선단 투자 순위 보상이 도착했습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600398
+    },
+    "92001783": {
+      "id": 92001783,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investment_rank_reward_CN_7",
+      "languageMailTitle": [
+        "{0} 도시 주간 선단 투자 순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 {0} 도시의 선단 투자 순위 보상이 도착했습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600399
+    },
+    "92001784": {
+      "id": 92001784,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investment_rank_reward_CN_8",
+      "languageMailTitle": [
+        "{0} 도시 주간 선단 투자 순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 {0} 도시의 선단 투자 순위 보상이 도착했습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600400
+    },
+    "92001785": {
+      "id": 92001785,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investment_rank_reward_CN_9",
+      "languageMailTitle": [
+        "{0} 도시 주간 선단 투자 순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 {0} 도시의 선단 투자 순위 보상이 도착했습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600401
+    },
+    "92001786": {
+      "id": 92001786,
+      "mailType": 0,
+      "mailNotiType": 0,
+      "mailKeepTime": 604800,
+      "rsn": "investment_rank_reward_CN_10",
+      "languageMailTitle": [
+        "{0} 도시 주간 선단 투자 순위 보상"
+      ],
+      "languageMailDesc": [
+        "이번 주 {0} 도시의 선단 투자 순위 보상이 도착했습니다."
+      ],
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
+      "rewardFixed": 95600402
+    },
     "92002001": {
       "id": 92002001,
       "mailType": 0,
@@ -18327,6 +18567,23 @@
       ],
       "languagesenderName": [
         "《大航海时代：起源》社区管理员"
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
+    },
+    "92110094": {
+      "id": 92110094,
+      "mailType": 0,
+      "mailNotiType": 1,
+      "mailKeepTime": 82800,
+      "rsn": "season5_eventranking3",
+      "languageMailTitle": [
+        "북해의 모험 경쟁전"
+      ],
+      "languageMailDesc": [
+        "북해의 모험 주화가 숨겨져 있는 지도를 발견했습니다.\n더블린 경쟁전 지역 : 54.7 , -10.48\n그단스크 경쟁전 지역 : 55.89 , 21.4\n나르비크 경쟁전 지역 : 65.13 , 11.52\n레이캬비크 경쟁전 지역 : 63.51 , -17.8\n그린란드 경쟁전 지역 : 60.8 , -42.18"
+      ],
+      "languagesenderName": [
+        "대항해시대 오리진"
       ],
       "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },

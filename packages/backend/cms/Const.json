@@ -7480,6 +7480,10 @@
     "FloatBannerConfirmDisableActiveDays": {
       "name": "FloatBannerConfirmDisableActiveDays",
       "value": 180
+    },
+    "FleetSpeedCorrection": {
+      "name": "FleetSpeedCorrection",
+      "value": 0
     }
   }
 }

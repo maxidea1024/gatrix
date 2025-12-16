@@ -2843,7 +2843,7 @@
       "productOrder": 189,
       "saleType": 3,
       "saleTypeVal": 10,
-      "productLocalBitflag": 219,
+      "productLocalBitflag": 27,
       "salePointId": 100010,
       "salePointVal": 100,
       "contentsTerms": [
@@ -2863,7 +2863,7 @@
       "productOrder": 189,
       "saleType": 3,
       "saleTypeVal": 10,
-      "productLocalBitflag": 219,
+      "productLocalBitflag": 27,
       "salePointId": 100010,
       "salePointVal": 100,
       "contentsTerms": [
@@ -3207,6 +3207,46 @@
       ],
       "productRewardFixedId": 95030999,
       "desc": "강화 흑단나무 포문을 제공합니다"
+    },
+    "10600185": {
+      "id": 10600185,
+      "productName": "공헌도 중형 선박 재료 선택 상자",
+      "productGroup": 1,
+      "productOrder": 189,
+      "saleType": 3,
+      "saleTypeVal": 10,
+      "productLocalBitflag": 192,
+      "salePointId": 100010,
+      "salePointVal": 100,
+      "contentsTerms": [
+        {
+          "Id": 81000042,
+          "Target": 21700003,
+          "Count": 1
+        }
+      ],
+      "productRewardFixedId": 95030899,
+      "desc": "공헌도 중형 선박 재료 선택 상자를 제공합니다"
+    },
+    "10600186": {
+      "id": 10600186,
+      "productName": "공헌도 중형 선박 재료 선택 상자",
+      "productGroup": 2,
+      "productOrder": 189,
+      "saleType": 3,
+      "saleTypeVal": 10,
+      "productLocalBitflag": 192,
+      "salePointId": 100010,
+      "salePointVal": 100,
+      "contentsTerms": [
+        {
+          "Id": 81000042,
+          "Target": 21700003,
+          "Count": 1
+        }
+      ],
+      "productRewardFixedId": 95030899,
+      "desc": "공헌도 중형 선박 재료 선택 상자를 제공합니다"
     }
   }
 }

@@ -2417,6 +2417,33 @@
       "faceAccType": 1,
       "color1_eye": 7634318,
       "backAnim": true
+    },
+    "30000267": {
+      "id": 30000267,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0004",
+      "skin": "21",
+      "faceAccType": 1,
+      "color1_eye": 7432531,
+      "backAnim": true
+    },
+    "30000268": {
+      "id": 30000268,
+      "skeleton": "SkinsM",
+      "atlas": "SkinsM0006",
+      "skin": "12",
+      "faceAccType": 1,
+      "color1_eye": 4541242,
+      "backAnim": true
+    },
+    "30000269": {
+      "id": 30000269,
+      "skeleton": "SkinsF",
+      "atlas": "SkinsF0005",
+      "skin": "1",
+      "faceAccType": 1,
+      "color1_eye": 10265990,
+      "backAnim": true
     }
   }
 }

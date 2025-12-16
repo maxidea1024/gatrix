@@ -397,7 +397,7 @@
       "id": 41130020,
       "name": "첫걸음호",
       "camouflageOrder": 399,
-      "localBitflag": 192,
+      "localBitflag": 0,
       "shipBodyShapeId": 45000152,
       "shipSize": 4,
       "shipcamouflageIcon": "WT_Ship_Sao_Gabriel_Sprite",

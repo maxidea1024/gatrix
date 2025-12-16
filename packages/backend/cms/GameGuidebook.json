@@ -953,7 +953,7 @@
       "id": 117,
       "group": 12,
       "groupOrder": 2,
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "guideSubTitle": "권역",
       "guideWidget": "WBP_HelpGuidePage_Map_Occupation"
     },
@@ -961,7 +961,7 @@
       "id": 118,
       "group": 12,
       "groupOrder": 3,
-      "localBitFlag": 219,
+      "localBitFlag": 0,
       "guideSubTitle": "해역 점유 효과",
       "guideWidget": "WBP_HelpGuidePage_Map_OccupationEffect"
     },

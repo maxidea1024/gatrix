@@ -4422,6 +4422,16 @@
       "color2": 16777215,
       "color3": 16777215,
       "weaponType": 7
+    },
+    "34000392": {
+      "id": 34000392,
+      "skeleton": "date_masamune",
+      "atlas": "date_masamune",
+      "skin": "4",
+      "color1": 15333119,
+      "color2": 16777215,
+      "color3": 16777215,
+      "weaponType": 1
     }
   }
 }

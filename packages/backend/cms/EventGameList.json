@@ -123,6 +123,20 @@
       "ticketPurchaseId": 10500339,
       "ticketPurchaseVal": 3,
       "isLoop": false
+    },
+    "10008": {
+      "id": 10008,
+      "name": "CN_2602 춘절",
+      "type": 1,
+      "groupId": 10008,
+      "costItem": 23340193,
+      "costCount": 1,
+      "referPage": [
+        99310025
+      ],
+      "ticketPurchaseId": 100003,
+      "ticketPurchaseVal": 30,
+      "isLoop": true
     }
   }
 }

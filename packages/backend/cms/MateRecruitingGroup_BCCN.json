@@ -146,7 +146,7 @@
         {
           "Id": 81000039,
           "Target": 82000035,
-          "Count": 10
+          "Count": 7
         }
       ],
       "isReRecruit": false,
@@ -2626,7 +2626,7 @@
         {
           "Id": 81000039,
           "Target": 82000035,
-          "Count": 151
+          "Count": 147
         }
       ],
       "isReRecruit": false,

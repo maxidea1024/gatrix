@@ -43724,6 +43724,2582 @@
         89033195
       ]
     },
+    "83033148": {
+      "id": 83033148,
+      "name": "북풍의 발명가",
+      "summary": "라쳇은 혹한의 항구 사람들을 위해 휴대용 난방 장치를 발명하고, 오렐리와 함께 제작해 출항소에 전달한다.",
+      "script": "Rachet_01_01_001.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033196
+      ]
+    },
+    "83033149": {
+      "id": 83033149,
+      "name": "북풍의 발명가",
+      "script": "Rachet_01_02_002.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033197
+      ]
+    },
+    "83033150": {
+      "id": 83033150,
+      "name": "북풍의 발명가",
+      "script": "Rachet_01_03_003.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033198
+      ]
+    },
+    "83033151": {
+      "id": 83033151,
+      "name": "북풍의 발명가",
+      "script": "Rachet_01_04_004.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033199
+      ]
+    },
+    "83033152": {
+      "id": 83033152,
+      "name": "북풍의 발명가",
+      "script": "Rachet_01_05_005.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033200
+      ]
+    },
+    "83033153": {
+      "id": 83033153,
+      "name": "북풍의 발명가",
+      "script": "Rachet_01_06_006.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033201
+      ]
+    },
+    "83033154": {
+      "id": 83033154,
+      "name": "여정의 시작",
+      "summary": "라쳇은 성당의 의뢰를 받아 ‘빛의 설계’를 완성하고, 한자동맹이 장악한 식량 흐름의 이상을 확인한 라쳇은, 그 원인을 밝히기 위해 뤼베크로 향한다.",
+      "script": "Rachet_02_01_007.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033202
+      ]
+    },
+    "83033155": {
+      "id": 83033155,
+      "name": "여정의 시작",
+      "script": "Rachet_02_02_008.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033203
+      ]
+    },
+    "83033156": {
+      "id": 83033156,
+      "name": "여정의 시작",
+      "script": "Rachet_02_03_009.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033204
+      ]
+    },
+    "83033157": {
+      "id": 83033157,
+      "name": "여정의 시작",
+      "script": "Rachet_02_04_010.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033205
+      ]
+    },
+    "83033158": {
+      "id": 83033158,
+      "name": "여정의 시작",
+      "script": "Rachet_02_05_011.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033206
+      ]
+    },
+    "83033159": {
+      "id": 83033159,
+      "name": "여정의 시작",
+      "script": "Rachet_02_06_012.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033207
+      ]
+    },
+    "83033160": {
+      "id": 83033160,
+      "name": "여정의 시작",
+      "script": "Rachet_02_07_013.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033208
+      ]
+    },
+    "83033161": {
+      "id": 83033161,
+      "name": "여정의 시작",
+      "script": "Rachet_02_08_014.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033209
+      ]
+    },
+    "83033162": {
+      "id": 83033162,
+      "name": "여정의 시작",
+      "script": "Rachet_02_09_015.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033210
+      ]
+    },
+    "83033163": {
+      "id": 83033163,
+      "name": "북해의 균열",
+      "summary": "뤼베크에서 열린 한자동맹 회의를 지켜본 라쳇은 북해 무역이 무너진 전모를 확인하고, 다음 목적지인 칼레로 향한다.",
+      "script": "Rachet_03_01_016.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033211
+      ]
+    },
+    "83033164": {
+      "id": 83033164,
+      "name": "북해의 균열",
+      "script": "Rachet_03_02_017.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033212
+      ]
+    },
+    "83033165": {
+      "id": 83033165,
+      "name": "북해의 균열",
+      "script": "Rachet_03_03_018.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033213
+      ]
+    },
+    "83033166": {
+      "id": 83033166,
+      "name": "북해의 균열",
+      "script": "Rachet_03_04_019.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033214
+      ]
+    },
+    "83033167": {
+      "id": 83033167,
+      "name": "북해의 균열",
+      "script": "Rachet_03_05_020.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033215
+      ]
+    },
+    "83033168": {
+      "id": 83033168,
+      "name": "썩은 청어의 악취",
+      "summary": "뤼베크를 떠난 라쳇은 칼레에서 대량의 청어가 부패해 도착하는 원인을 조사한다. 현장을 직접 확인한 그는 문제의 핵심이 ‘값싼 대량생산 통’에 있음을 밝혀내고, 그 공급지가 런던이라는 사실을 알아내며 다음 목적지로 향한다.",
+      "script": "Rachet_04_01_021.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033216
+      ]
+    },
+    "83033169": {
+      "id": 83033169,
+      "name": "썩은 청어의 악취",
+      "script": "Rachet_04_02_022.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033217
+      ]
+    },
+    "83033170": {
+      "id": 83033170,
+      "name": "썩은 청어의 악취",
+      "script": "Rachet_04_03_023.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033218
+      ]
+    },
+    "83033171": {
+      "id": 83033171,
+      "name": "썩은 청어의 악취",
+      "script": "Rachet_04_04_024.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033219
+      ]
+    },
+    "83033172": {
+      "id": 83033172,
+      "name": "썩은 청어의 악취",
+      "script": "Rachet_04_05_025.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033220
+      ]
+    },
+    "83033173": {
+      "id": 83033173,
+      "name": "썩은 청어의 악취",
+      "script": "Rachet_04_06_026.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033221
+      ]
+    },
+    "83033174": {
+      "id": 83033174,
+      "name": "목재에 새겨진 거짓",
+      "summary": "라쳇은 런던에서 청어 부패의 원인이 겉을 그을려 위장한 값싼 소나무 통 때문임을 밝혀낸다. 문제를 바로잡기 위해 그는 스스로 더 나은 통을 만들겠다며 함부르크로 향한다.",
+      "script": "Rachet_05_01_027.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033222
+      ]
+    },
+    "83033175": {
+      "id": 83033175,
+      "name": "목재에 새겨진 거짓",
+      "script": "Rachet_05_02_028.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033223
+      ]
+    },
+    "83033176": {
+      "id": 83033176,
+      "name": "목재에 새겨진 거짓",
+      "script": "Rachet_05_03_029.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033224
+      ]
+    },
+    "83033177": {
+      "id": 83033177,
+      "name": "목재에 새겨진 거짓",
+      "script": "Rachet_05_04_030.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033225
+      ]
+    },
+    "83033178": {
+      "id": 83033178,
+      "name": "목재에 새겨진 거짓",
+      "script": "Rachet_05_05_031.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033226
+      ]
+    },
+    "83033179": {
+      "id": 83033179,
+      "name": "목재에 새겨진 거짓",
+      "script": "Rachet_05_06_032.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033227
+      ]
+    },
+    "83033180": {
+      "id": 83033180,
+      "name": "목재에 새겨진 거짓",
+      "script": "Rachet_05_07_033.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033228
+      ]
+    },
+    "83033181": {
+      "id": 83033181,
+      "name": "목재에 새겨진 거짓",
+      "script": "Rachet_05_08_034.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033229
+      ]
+    },
+    "83033182": {
+      "id": 83033182,
+      "name": "목재에 새겨진 거짓",
+      "script": "Rachet_05_09_035.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033230
+      ]
+    },
+    "83033183": {
+      "id": 83033183,
+      "name": "목재에 새겨진 거짓",
+      "script": "Rachet_05_10_036.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033231
+      ]
+    },
+    "83033184": {
+      "id": 83033184,
+      "name": "공예가를 꿈꾸는 상인\n다나 칼로스",
+      "summary": "함부르크에 도착한 라쳇은 청어 절임통의 본격적인 개선을 위해 조선공들과 공정을 검토하던 중, 공예가 소녀 다나와 마주한다",
+      "script": "Rachet_06_01_037.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033232
+      ]
+    },
+    "83033185": {
+      "id": 83033185,
+      "name": "공예가를 꿈꾸는 상인\n다나 칼로스",
+      "script": "Rachet_06_02_038.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033233
+      ]
+    },
+    "83033186": {
+      "id": 83033186,
+      "name": "공예가를 꿈꾸는 상인\n다나 칼로스",
+      "script": "Rachet_06_03_039.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033234
+      ]
+    },
+    "83033187": {
+      "id": 83033187,
+      "name": "공예가를 꿈꾸는 상인\n다나 칼로스",
+      "script": "Rachet_06_04_040.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033235
+      ]
+    },
+    "83033188": {
+      "id": 83033188,
+      "name": "공예가를 꿈꾸는 상인\n다나 칼로스",
+      "script": "Rachet_06_05_041.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033236
+      ]
+    },
+    "83033189": {
+      "id": 83033189,
+      "name": "공예가를 꿈꾸는 상인\n다나 칼로스",
+      "script": "Rachet_06_06_042.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033237
+      ]
+    },
+    "83033190": {
+      "id": 83033190,
+      "name": "공예가를 꿈꾸는 상인\n다나 칼로스",
+      "script": "Rachet_06_07_043.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033238
+      ]
+    },
+    "83033191": {
+      "id": 83033191,
+      "name": "공예가를 꿈꾸는 상인\n다나 칼로스",
+      "script": "Rachet_06_08_044.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033239
+      ]
+    },
+    "83033192": {
+      "id": 83033192,
+      "name": "공예가를 꿈꾸는 상인\n다나 칼로스",
+      "script": "Rachet_06_09_045.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033240
+      ]
+    },
+    "83033193": {
+      "id": 83033193,
+      "name": "공예가를 꿈꾸는 상인\n다나 칼로스",
+      "script": "Rachet_06_10_046.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033241
+      ]
+    },
+    "83033194": {
+      "id": 83033194,
+      "name": "공예가를 꿈꾸는 상인\n다나 칼로스",
+      "script": "Rachet_06_11_047.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033242
+      ]
+    },
+    "83033195": {
+      "id": 83033195,
+      "name": "청어의 두 번째 문제",
+      "summary": "라쳇은 청어 부패가 단순한 통 문제가 아니라, 절임 과정의 염도와 시간까지 어긋난 복합적인 문제임을 밝혀낸다. 이를 해결하기 위해 훈제 공정까지 병행할 요리사를 찾기로 한다.",
+      "script": "Rachet_07_01_048.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033243
+      ]
+    },
+    "83033196": {
+      "id": 83033196,
+      "name": "청어의 두 번째 문제",
+      "script": "Rachet_07_02_049.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033244
+      ]
+    },
+    "83033197": {
+      "id": 83033197,
+      "name": "청어의 두 번째 문제",
+      "script": "Rachet_07_03_050.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033245
+      ]
+    },
+    "83033198": {
+      "id": 83033198,
+      "name": "청어의 두 번째 문제",
+      "script": "Rachet_07_04_051.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033246
+      ]
+    },
+    "83033199": {
+      "id": 83033199,
+      "name": "누명 쓴 요리사의 정체",
+      "summary": "라쳇은 독살 혐의로 붙잡힌 요리사 사건을 조사해, 문제가 독이 아니라 부실한 재료 관리에서 비롯된 곰팡이 때문임을 밝혀낸다. 요리사의 결백이 증명되자 라쳇에게 청어 절임과 훈제의 완전한 공정을 전하며, 라쳇은 이 지식을 바탕으로 다음 목적지인 런던으로 향한다.",
+      "script": "Rachet_08_01_052.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033247
+      ]
+    },
+    "83033200": {
+      "id": 83033200,
+      "name": "누명 쓴 요리사의 정체",
+      "script": "Rachet_08_02_053.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033248
+      ]
+    },
+    "83033201": {
+      "id": 83033201,
+      "name": "누명 쓴 요리사의 정체",
+      "script": "Rachet_08_03_054.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033249
+      ]
+    },
+    "83033202": {
+      "id": 83033202,
+      "name": "누명 쓴 요리사의 정체",
+      "script": "Rachet_08_04_055.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033250
+      ]
+    },
+    "83033203": {
+      "id": 83033203,
+      "name": "누명 쓴 요리사의 정체",
+      "script": "Rachet_08_05_056.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033251
+      ]
+    },
+    "83033204": {
+      "id": 83033204,
+      "name": "누명 쓴 요리사의 정체",
+      "script": "Rachet_08_06_057.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033252
+      ]
+    },
+    "83033205": {
+      "id": 83033205,
+      "name": "누명 쓴 요리사의 정체",
+      "script": "Rachet_08_07_058.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033253
+      ]
+    },
+    "83033206": {
+      "id": 83033206,
+      "name": "누명 쓴 요리사의 정체",
+      "script": "Rachet_08_08_059.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033254
+      ]
+    },
+    "83033207": {
+      "id": 83033207,
+      "name": "누명 쓴 요리사의 정체",
+      "script": "Rachet_08_09_060.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033255
+      ]
+    },
+    "83033208": {
+      "id": 83033208,
+      "name": "누명 쓴 요리사의 정체",
+      "script": "Rachet_08_10_061.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033256
+      ]
+    },
+    "83033209": {
+      "id": 83033209,
+      "name": "라쳇식 해결",
+      "summary": "라쳇은 완성된 염장·훈연 복합 공정 설계도를 들고 청어 무역의 중심지인 런던으로 향한다.",
+      "script": "Rachet_09_01_062.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033257
+      ]
+    },
+    "83033210": {
+      "id": 83033210,
+      "name": "라쳇식 해결",
+      "script": "Rachet_09_02_063.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033258
+      ]
+    },
+    "83033211": {
+      "id": 83033211,
+      "name": "라쳇식 해결",
+      "script": "Rachet_09_03_064.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033259
+      ]
+    },
+    "83033212": {
+      "id": 83033212,
+      "name": "라쳇식 해결",
+      "script": "Rachet_09_04_065.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033260
+      ]
+    },
+    "83033213": {
+      "id": 83033213,
+      "name": "라쳇식 해결",
+      "script": "Rachet_09_05_066.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033261
+      ]
+    },
+    "83033214": {
+      "id": 83033214,
+      "name": "라쳇식 해결",
+      "script": "Rachet_09_06_067.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033262
+      ]
+    },
+    "83033215": {
+      "id": 83033215,
+      "name": "라쳇식 해결",
+      "script": "Rachet_09_07_068.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033263
+      ]
+    },
+    "83033216": {
+      "id": 83033216,
+      "name": "돌아갈 곳",
+      "summary": "라쳇은 자신의 청어 공정법 덕분에 번영한 항구를 목격한다. 성당 청어 횡령 의혹이 사실 자신을 향한 시험이었음을 간파하고, '빈 통'을 증거로 제시해 조합과 성당의 갈등을 봉합한다.",
+      "script": "Rachet_10_01_069.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033264
+      ]
+    },
+    "83033217": {
+      "id": 83033217,
+      "name": "돌아갈 곳",
+      "script": "Rachet_10_02_070.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033265
+      ]
+    },
+    "83033218": {
+      "id": 83033218,
+      "name": "돌아갈 곳",
+      "script": "Rachet_10_03_071.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033266
+      ]
+    },
+    "83033219": {
+      "id": 83033219,
+      "name": "돌아갈 곳",
+      "script": "Rachet_10_04_072.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033267
+      ]
+    },
+    "83033220": {
+      "id": 83033220,
+      "name": "돌아갈 곳",
+      "script": "Rachet_10_05_073.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033268
+      ]
+    },
+    "83033221": {
+      "id": 83033221,
+      "name": "돌아갈 곳",
+      "script": "Rachet_10_06_074.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033269
+      ]
+    },
+    "83033222": {
+      "id": 83033222,
+      "name": "돌아갈 곳",
+      "script": "Rachet_10_07_075.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033270
+      ]
+    },
+    "83033223": {
+      "id": 83033223,
+      "name": "왕실의 그림자",
+      "summary": "왕실 상인들이 청어 공정법을 독점하자, 라쳇은 개선된 설계도를 전면 공개하여 독점권을 무력화시킨다.\n이에 왕실이 보존식에 대한 통행세와 검품을 강화하며 압박해오자, 라쳇은 이를 피하기 위해 지도에 없는 위험한 항로를 개척하기로 결심한다.",
+      "script": "Rachet_11_01_076.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033271
+      ]
+    },
+    "83033224": {
+      "id": 83033224,
+      "name": "왕실의 그림자",
+      "script": "Rachet_11_02_077.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033272
+      ]
+    },
+    "83033225": {
+      "id": 83033225,
+      "name": "왕실의 그림자",
+      "script": "Rachet_11_03_078.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033273
+      ]
+    },
+    "83033226": {
+      "id": 83033226,
+      "name": "왕실의 그림자",
+      "script": "Rachet_11_04_079.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033274
+      ]
+    },
+    "83033227": {
+      "id": 83033227,
+      "name": "왕실의 그림자",
+      "script": "Rachet_11_05_080.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033275
+      ]
+    },
+    "83033228": {
+      "id": 83033228,
+      "name": "왕실의 그림자",
+      "script": "Rachet_11_06_081.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033276
+      ]
+    },
+    "83033229": {
+      "id": 83033229,
+      "name": "그림자가 닿지 않는 곳",
+      "summary": "라쳇은 왕실의 감시를 피하기 위해 치밀한 계산으로 항로를 설계하고, 항구 관리인의 묵인 하에 야간에 몰래 출항하여 에든버러에 도착한다.\n이후 지도에도 없는 북해의 거친 해류와 역풍을 뚫고 위험한 항해를 감행한 끝에, 반파된 배를 이끌고 베르겐에 도착하는 데 성공한다.",
+      "script": "Rachet_12_01_082.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033277
+      ]
+    },
+    "83033230": {
+      "id": 83033230,
+      "name": "그림자가 닿지 않는 곳",
+      "script": "Rachet_12_02_083.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033278
+      ]
+    },
+    "83033231": {
+      "id": 83033231,
+      "name": "그림자가 닿지 않는 곳",
+      "script": "Rachet_12_03_084.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033279
+      ]
+    },
+    "83033232": {
+      "id": 83033232,
+      "name": "그림자가 닿지 않는 곳",
+      "script": "Rachet_12_04_085.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033280
+      ]
+    },
+    "83033233": {
+      "id": 83033233,
+      "name": "그림자가 닿지 않는 곳",
+      "script": "Rachet_12_05_086.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033281
+      ]
+    },
+    "83033234": {
+      "id": 83033234,
+      "name": "그림자가 닿지 않는 곳",
+      "script": "Rachet_12_06_087.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033282
+      ]
+    },
+    "83033235": {
+      "id": 83033235,
+      "name": "그림자가 닿지 않는 곳",
+      "script": "Rachet_12_07_088.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033283
+      ]
+    },
+    "83033236": {
+      "id": 83033236,
+      "name": "그림자가 닿지 않는 곳",
+      "script": "Rachet_12_08_089.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033284
+      ]
+    },
+    "83033237": {
+      "id": 83033237,
+      "name": "그림자가 닿지 않는 곳",
+      "script": "Rachet_12_09_090.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033285
+      ]
+    },
+    "83033238": {
+      "id": 83033238,
+      "name": "그림자가 닿지 않는 곳",
+      "script": "Rachet_12_10_091.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033286
+      ]
+    },
+    "83033239": {
+      "id": 83033239,
+      "name": "진짜로 납치 당한 라쳇",
+      "summary": "왕실 순시선을 극적으로 따돌리고 베르겐에 도착한 라쳇은 납치되어 베네치아 감옥에 갇히게 된다.",
+      "script": "Rachet_13_01_092.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033287
+      ]
+    },
+    "83033240": {
+      "id": 83033240,
+      "name": "진짜로 납치 당한 라쳇",
+      "script": "Rachet_13_02_093.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033288
+      ]
+    },
+    "83033241": {
+      "id": 83033241,
+      "name": "진짜로 납치 당한 라쳇",
+      "script": "Rachet_13_03_094.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033289
+      ]
+    },
+    "83033242": {
+      "id": 83033242,
+      "name": "진짜로 납치 당한 라쳇",
+      "script": "Rachet_13_04_095.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033290
+      ]
+    },
+    "83033243": {
+      "id": 83033243,
+      "name": "질서에 맞선 계산",
+      "summary": "라쳇이 항해 도면 유포 혐의로 왕실 재판을 받지만 민중 시위로 위기를 모면한다. 이후 해적단 선장의 요청으로 왕실의 위조 신호에 대응할 신호 체계를 개발하러 플리머스로 향한다.",
+      "script": "Rachet_14_01_096.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033291
+      ]
+    },
+    "83033244": {
+      "id": 83033244,
+      "name": "질서에 맞선 계산",
+      "script": "Rachet_14_02_097.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033292
+      ]
+    },
+    "83033245": {
+      "id": 83033245,
+      "name": "질서에 맞선 계산",
+      "script": "Rachet_14_03_098.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033293
+      ]
+    },
+    "83033246": {
+      "id": 83033246,
+      "name": "밤낮의 눈",
+      "summary": "라쳇이 플리머스에서 청동과 유리로 빛을 반사하는 해상 신호 장치 '밤낮의 눈'을 제작한다.",
+      "script": "Rachet_15_01_099.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033294
+      ]
+    },
+    "83033247": {
+      "id": 83033247,
+      "name": "밤낮의 눈",
+      "script": "Rachet_15_02_100.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033295
+      ]
+    },
+    "83033248": {
+      "id": 83033248,
+      "name": "밤낮의 눈",
+      "script": "Rachet_15_03_101.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033296
+      ]
+    },
+    "83033249": {
+      "id": 83033249,
+      "name": "밤낮의 눈",
+      "script": "Rachet_15_04_102.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033297
+      ]
+    },
+    "83033250": {
+      "id": 83033250,
+      "name": "밤낮의 눈",
+      "script": "Rachet_15_05_103.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033298
+      ]
+    },
+    "83033251": {
+      "id": 83033251,
+      "name": "밤낮의 눈",
+      "script": "Rachet_15_06_104.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033299
+      ]
+    },
+    "83033252": {
+      "id": 83033252,
+      "name": "밤낮의 눈",
+      "script": "Rachet_15_07_105.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033300
+      ]
+    },
+    "83033253": {
+      "id": 83033253,
+      "name": "밤낮의 눈",
+      "script": "Rachet_15_08_106.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033301
+      ]
+    },
+    "83033254": {
+      "id": 83033254,
+      "name": "계산의 끝은 집으로",
+      "summary": "라쳇이 해적 선장에게 신호 장치를 전달한 후, 3개월 계약이 끝났지만 오렐리에게 계속 함께하자고 말한다. 오렐리와 슈발리에 럼도 기뻐하며 셋은 상트로 돌아간다.",
+      "script": "Rachet_16_01_107.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033302
+      ]
+    },
+    "83033255": {
+      "id": 83033255,
+      "name": "계산의 끝은 집으로",
+      "script": "Rachet_16_02_108.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033303
+      ]
+    },
+    "83033256": {
+      "id": 83033256,
+      "name": "계산의 끝은 집으로",
+      "script": "Rachet_16_03_109.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033304
+      ]
+    },
+    "83033257": {
+      "id": 83033257,
+      "name": "계산의 끝은 집으로",
+      "script": "Rachet_16_04_110.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200037
+      ],
+      "questGoalId": [
+        89033305
+      ]
+    },
+    "83037001": {
+      "id": 83037001,
+      "name": "동방에서 온 선단",
+      "script": "Huang_01_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037001
+      ]
+    },
+    "83037002": {
+      "id": 83037002,
+      "name": "동방에서 온 선단",
+      "summary": "헨리 블랙번은 동료를 모두 잃고 조난당한 절망적인 상황에서 황진화와 양충이 이끄는 명 선단에 구조된다.\n평소 동방견문록의 카타이를 동경해 온 블랙번은 유럽 항로에 익숙하지 않은 그들에게 길잡이를 자처한다.",
+      "script": "Huang_01_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037002
+      ]
+    },
+    "83037003": {
+      "id": 83037003,
+      "name": "동방에서 온 선단",
+      "summary": "블랙번은 발렌시아까지의 항해를 성공적으로 이끌며 선단이 맡은 의뢰를 완수하도록 돕고, 이를 계기로 황진화의 신뢰를 얻는다.\n황진화는 자신들이 명 황제의 명을 받아 유럽과의 교류 및 조사를 위해 파견된 선단임을 밝힌다.\n그녀는 황제의 권위보다는 상인의 유연함으로 임무를 수행하려 하지만, 보수적인 부관 양충은 이러한 태도를 우려한다.\n블랙번은 이들의 대화를 통해 꿈에 그리던 카타이를 떠올리지만, 황제의 사절단이라기에는 지나치게 초라한 선단의 규모와 행색에 의문을 품는다.",
+      "script": "Huang_01_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037003
+      ]
+    },
+    "83037004": {
+      "id": 83037004,
+      "name": "동방에서 온 선단",
+      "summary": "황제의 명을 받았다는 선단이 어째서 이렇게 초라한 모습이냐고 물은 블랙번.\n그러자 양충이 황진화를 대신해 하소연한다. 제법 큰 선단이 출전했지만, 불운하게도 여러 차례 폭풍을 만나면서 선박이 소모되었고, 유럽에 거의 다다랐을 무렵에는 기함이 노후로 침몰해 배 세 척만 남았다고 한다.\n그 과정에서 값비싼 교역품 상당수를 잃어버렸다.",
+      "script": "Huang_01_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037004
+      ]
+    },
+    "83037005": {
+      "id": 83037005,
+      "name": "동방에서 온 선단",
+      "summary": "양충은 초라한 행색 탓에 에스파냐 왕에게조차 문전박대당해 밑바닥부터 다시 시작해야 하는 처지를 토로한다.\n그들이 진정 카타이에서 왔음을 확신한 블랙번은 자신의 꿈을 이루고자 정식 일행이 되기를 간청한다.\n양충은 블랙번의 거친 인상을 경계했으나, 황진화가 그를 흔쾌히 받아들이면서 블랙번은 황진화 선단의 일원으로 합류한다.",
+      "script": "Huang_01_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037005
+      ]
+    },
+    "83037006": {
+      "id": 83037006,
+      "name": "명 최고의 상인 가문",
+      "script": "Huang_02_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037006
+      ]
+    },
+    "83037007": {
+      "id": 83037007,
+      "name": "명 최고의 상인 가문",
+      "script": "Huang_02_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037007
+      ]
+    },
+    "83037008": {
+      "id": 83037008,
+      "name": "명 최고의 상인 가문",
+      "script": "Huang_02_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037008
+      ]
+    },
+    "83037009": {
+      "id": 83037009,
+      "name": "명 최고의 상인 가문",
+      "script": "Huang_02_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037009
+      ]
+    },
+    "83037010": {
+      "id": 83037010,
+      "name": "명 최고의 상인 가문",
+      "script": "Huang_02_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037010,
+        89037011,
+        89037012
+      ]
+    },
+    "83037011": {
+      "id": 83037011,
+      "name": "명 최고의 상인 가문",
+      "script": "Huang_02_06.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037013
+      ]
+    },
+    "83037012": {
+      "id": 83037012,
+      "name": "명 최고의 상인 가문",
+      "summary": "황진화는 선단 재건 자금을 마련하기 위해 에스파냐 해군과 해적 하이레딘 레이스의 전쟁 상황을 역이용한다.\n그녀는 보급이 끊겨 곤경에 처한 에스파냐 해군에게 식료품을 고가에 매각하여 신뢰를 얻고, 하이레딘 해적단 정찰대를 몰래 격파하여 시라쿠사로 진입한다.",
+      "script": "Huang_02_07.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037014
+      ]
+    },
+    "83037013": {
+      "id": 83037013,
+      "name": "명 최고의 상인 가문",
+      "script": "Huang_02_08.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037015
+      ]
+    },
+    "83037014": {
+      "id": 83037014,
+      "name": "명 최고의 상인 가문",
+      "script": "Huang_02_09.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037016
+      ]
+    },
+    "83037015": {
+      "id": 83037015,
+      "name": "명 최고의 상인 가문",
+      "script": "Huang_02_10.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037017
+      ]
+    },
+    "83037016": {
+      "id": 83037016,
+      "name": "명 최고의 상인 가문",
+      "summary": "출항 직전 하이레딘의 부하들과 충돌한 일행은 도주를 시도하다 결국 하이레딘 레이스에게 붙잡힌다. \n블랙번이 양충을 구하는 활약을 펼쳤음에도 포위된 상황.\n황진화는 자신은 어느 편에도 서지 않는 대명국의 상인이라 당당히 주장하여 하이레딘의 흥미를 유발하고 풀려난다. 세비야로 돌아온 일행은 레몬 기름을 팔아 막대한 수익과 명성을 얻지만, 동시에 레몬기름을 팔려던 프랑스 교역상의 원한을 사게 된다.",
+      "script": "Huang_02_11.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037018
+      ]
+    },
+    "83037017": {
+      "id": 83037017,
+      "name": "명 최고의 상인 가문",
+      "summary": "성공을 자축하는 자리에서 양충은 블랙번에게 감사를 표하며, 황진화가 무공으로 황제의 신임을 얻은 금의위 도독이며 자신은 한림원 학사 출신이라는 과거를 털어놓는다.\n이어 황진화가 유럽인들이 자신들을 카타이라 부르는 연유를 묻자, 블랙번은 마르코 폴로의 동방견문록을 언급하며 그들이 전설 속 대국에서 왔음을 확신한다고 답한다.\n이에 기행문에 관심이 많은 양충이 흥미를 보이면서, 세 사람은 서로의 배경과 문화를 이해하며 결속을 다진다.",
+      "script": "Huang_02_12.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037019
+      ]
+    },
+    "83037018": {
+      "id": 83037018,
+      "name": "블랙번의 정체",
+      "summary": "황진화는 불길한 꿈을 꾼 뒤, 본대가 도착하기 전 세력을 키워야 한다는 압박감을 느낀다.",
+      "script": "Huang_03_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037020
+      ]
+    },
+    "83037019": {
+      "id": 83037019,
+      "name": "블랙번의 정체",
+      "summary": "이에 그녀는 선단을 확장하기 위해 유럽식 선박을 건조하기로 결심하고, 리스본 조선소 주인과 친분이 있는 블랙번을 내세워 협상을 시도한다.\n일행은 조선소에 필요한 자재인 통나무를 조달해 주는 조건으로 유럽형 선박의 설계도를 받기로 합의한다.",
+      "script": "Huang_03_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037021
+      ]
+    },
+    "83037020": {
+      "id": 83037020,
+      "name": "블랙번의 정체",
+      "script": "Huang_03_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037022
+      ]
+    },
+    "83037021": {
+      "id": 83037021,
+      "name": "블랙번의 정체",
+      "script": "Huang_03_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037023
+      ]
+    },
+    "83037022": {
+      "id": 83037022,
+      "name": "블랙번의 정체",
+      "summary": "통나무를 구한 일행은 앙심을 품은 프랑스 교역상의 사주로, 해적들의 기습을 받는다.\n전투 끝에 적을 물리쳤으나, 이 과정에서 블랙번이 과거 사략해적이었다는 사실이 드러나고 만다.\n평소 황진화가 해적을 혐오함을 알고 있던 블랙번은, 자신으로 인해 누를 끼치지 않기 위해 설계도 입수까지만 돕고 선단을 떠나겠다고 선언한다.",
+      "script": "Huang_03_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037024
+      ]
+    },
+    "83037023": {
+      "id": 83037023,
+      "name": "블랙번의 정체",
+      "summary": "리스본으로 돌아와 약속대로 설계도를 확보한 블랙번은 미련 없이 황진화에게 작별을 고한다. 황진화는 그가 비록 해적 출신이었으나 그간 보여준 헌신과 선량한 인품을 인정하며 아쉬움 속에 그를 떠나보낸다. 유능한 길잡이이자 동료를 잃은 황진화는 씁쓸한 마음을 뒤로하고, 홀로 남은 상황에서 묵묵히 선박 건조 작업에 착수한다.",
+      "script": "Huang_03_06.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037025
+      ]
+    },
+    "83037024": {
+      "id": 83037024,
+      "name": "소중한 동료",
+      "script": "Huang_04_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037026
+      ]
+    },
+    "83037025": {
+      "id": 83037025,
+      "name": "소중한 동료",
+      "summary": "선박 건조가 완료된 후, 황진화는 조선소 주인을 통해 블랙번이 본래 흉악한 해적이 아니었으며 동방견문록에 심취해 카타이를 꿈꾸던 순수한 항해사였음을 알게 된다.\n블랙번의 진심과 자신들을 향한 애정을 뒤늦게 확인한 황진화와 양충은 그를 다시 동료로 받아들이기로 결심한다.\n그러나 블랙번은 이미 프랑스 교역상의 고발로 공관에 구금된 상태였다.",
+      "script": "Huang_04_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037027
+      ]
+    },
+    "83037026": {
+      "id": 83037026,
+      "name": "소중한 동료",
+      "summary": "황진화가 공관에 도착해 블랙번을 구명하려 애쓰던 찰나, 포르투갈의 유력자인 레온 페레로 공작의 집사 마르코가 나타나 개입한다.\n마르코는 공작의 권위를 빌려 블랙번의 혐의를 무마시키고 그를 석방한다.",
+      "script": "Huang_04_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037028
+      ]
+    },
+    "83037027": {
+      "id": 83037027,
+      "name": "소중한 동료",
+      "summary": "이후 일행을 저택으로 초대한 마르코는 초라한 선단의 위상을 높이고 유럽 상류층의 관심을 끌기 위해, 단순한 상인이 아닌 미지의 영역을 개척하는 모험가로서 활동할 것을 제안한다.\n마르코는 포르투갈을 대신해 탐험에 나선다면 그들을 정식 동방 사절로 인정하고 모든 편의를 제공하겠다는 공작의 파격적인 제안을 전달한다.\n황진화는 공작의 부재에도 불구하고 유럽 내 입지를 다지기에 더할 나위 없는 기회라 판단하여 이를 긍정적으로 수락한다.",
+      "script": "Huang_04_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037029
+      ]
+    },
+    "83037028": {
+      "id": 83037028,
+      "name": "소중한 동료",
+      "summary": "이로써 블랙번과 다시 의기투합한 황진화 일행.\n조합의 의뢰를 시작으로 본격적인 모험가로서의 첫발을 내디딘다.",
+      "script": "Huang_04_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037030
+      ]
+    },
+    "83037029": {
+      "id": 83037029,
+      "name": "비단길의 종착지",
+      "summary": "마르코 집사는 황진화 일행을 호출하여, 동방인이라는 신분을 활용해 오스만 제국 흑해 연안의 비단길 교역 현황을 조사해 달라고 의뢰한다.\n황진화는 이것이 경쟁 상대인 오스만의 육로 무역 정보를 수집하려는 포르투갈의 정략적 계산임을 간파했으나, 유럽 내에서의 입지를 굳히기 위해 제안을 수락하고 이스탄불로 향한다.",
+      "script": "Huang_05_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037031
+      ]
+    },
+    "83037030": {
+      "id": 83037030,
+      "name": "비단길의 종착지",
+      "summary": "이스탄불에서 일행은 진귀한 동방 물품들이 술탄과 귀족들에게 독점되어 일반 시장에서는 구하기 어려운 실태를 확인한다.",
+      "script": "Huang_05_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037032
+      ]
+    },
+    "83037031": {
+      "id": 83037031,
+      "name": "비단길의 종착지",
+      "script": "Huang_05_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037033
+      ]
+    },
+    "83037032": {
+      "id": 83037032,
+      "name": "비단길의 종착지",
+      "script": "Huang_05_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037034
+      ]
+    },
+    "83037033": {
+      "id": 83037033,
+      "name": "비단길의 종착지",
+      "script": "Huang_05_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037035
+      ]
+    },
+    "83037034": {
+      "id": 83037034,
+      "name": "비단길의 종착지",
+      "summary": "큰 이권이 걸린 위험한 임무임을 감지한 황진화는 흑해 연안을 탐색하여 비단길 상인들의 거점인 카라반사라이를 찾아내는 성과를 거둔다.\n일행은 그곳에서 먼 길을 건너온 진귀한 교역품과 상인들의 의지에 감탄하지만, 곧 정체를 의심한 오스만 병사들에게 발각되어 체포될 위기에 처한다.\n일행은 긴박한 상황 속에서 가까스로 추격을 따돌리고 무사히 탈출하는 데 성공한다.",
+      "script": "Huang_05_06.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037036
+      ]
+    },
+    "83037035": {
+      "id": 83037035,
+      "name": "비단길의 종착지",
+      "summary": "탐험을 마치고 돌아온 일행은 조사 결과를 마르코에게 보고하고 사례금을 받는다.\n마르코는 페레로 공작이 약속을 지키기로 했다며, 곧 포르투갈 국왕을 알현할 준비를 하라고 전한다.\n이에 황진화는 몰래 안도의 한숨을 내쉰다.",
+      "script": "Huang_05_07.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037037
+      ]
+    },
+    "83037036": {
+      "id": 83037036,
+      "name": "카타이의 정체",
+      "script": "Huang_06_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037038
+      ]
+    },
+    "83037037": {
+      "id": 83037037,
+      "name": "카타이의 정체",
+      "script": "Huang_06_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037039
+      ]
+    },
+    "83037038": {
+      "id": 83037038,
+      "name": "카타이의 정체",
+      "script": "Huang_06_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037040
+      ]
+    },
+    "83037039": {
+      "id": 83037039,
+      "name": "카타이의 정체",
+      "summary": "후원자였던 페레로 공작의 저택이 돌연 폐쇄되고 마르코의 연락이 두절되자 일행은 불안감에 휩싸인다. \n설상가상으로 명 선단의 본대를 이끄는 해국왕 주용의 서신이 도착하여 황진화가 그의 첩이 될 운명임이 가시화되자, 그녀는 깊은 절망에 빠진다.\n양충과 블랙번은 황진화를 구하기 위해 백방으로 노력하던 중, 나폴리의 줄리아노 교수가 주관하는 '카타이의 정체를 증명하라'는 대규모 의뢰를 발견하고 이를 돌파구로 삼기로 한다.",
+      "script": "Huang_06_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037041
+      ]
+    },
+    "83037040": {
+      "id": 83037040,
+      "name": "카타이의 정체",
+      "summary": "나폴리로 향한 일행은 카타이가 명임을 학술적으로 규명하려는 줄리아노 교수를 만난다.\n교수는 동방견문록의 구술 작가인 루스티첼로가 비단길 지도를 필사해 원고에 첨부했었다는 편지를 보여주며, 이것이 카타이의 실체를 증명할 결정적 증거라고 설명한다.\n루스티첼로의 원고가 베이루트 영주에게 압수당했다는 기록에 따라, 일행은 최초의 원고를 찾기 위해 베이루트로 향한다.",
+      "script": "Huang_06_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037042
+      ]
+    },
+    "83037041": {
+      "id": 83037041,
+      "name": "카타이의 정체",
+      "script": "Huang_06_06.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037043
+      ]
+    },
+    "83037042": {
+      "id": 83037042,
+      "name": "카타이의 정체",
+      "summary": "베이루트 관리는 200년 전의 문서고를 뒤져 원고의 행방을 쫓지만, 영주의 명령으로 원고가 이미 불태워졌다는 절망적인 기록만을 찾아낸다.\n그러나 일행은 포기하지 않고 관련 기록을 샅샅이 조사하여, 루스티첼로가 '북쪽의 튀르크족 마을'에서 지도를 베꼈다는 취조 내용을 발견한다. 원본 지도를 찾을 수 있다는 실낱같은 희망을 품은 일행은 지체 없이 북쪽 마을로 발걸음을 옮긴다.",
+      "script": "Huang_06_07.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037044
+      ]
+    },
+    "83037043": {
+      "id": 83037043,
+      "name": "비단길 지도",
+      "summary": "운 좋게도 마을에서 사막 대상의 원로를 만난 황진화 일행은 비단길 지도를 요청하지만, 처음엔 거절당한다.\n그러나 황진화의 간곡한 설득 끝에, 대장은 교역에 쓸 낙타를 구해오면 지도를 보여주겠다고 한다.",
+      "script": "Huang_07_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037045
+      ]
+    },
+    "83037044": {
+      "id": 83037044,
+      "name": "비단길 지도",
+      "summary": "황진화 일행은 낙타를 구해 오고, 대장은 약속대로 그들에게 지도를 선물한다.",
+      "script": "Huang_07_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037046,
+        89037047
+      ]
+    },
+    "83037045": {
+      "id": 83037045,
+      "name": "비단길 지도",
+      "summary": "줄리아노 교수에게 돌아온 일행.\n지도를 분석한 교수는, 콘스탄티노플에서 북경까지의 경로가 상세히 기록되어 있음을 확인하고 흥분한다.그는 “이로써 카타이가 오늘날의 명임이 입증되었다!”며 기뻐한다.",
+      "script": "Huang_07_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037048
+      ]
+    },
+    "83037046": {
+      "id": 83037046,
+      "name": "비단길 지도",
+      "summary": "이후 황진화 일행은 암스테르담으로 가, 다른 견해를 주장하던 메르카토르를 만나 설득에 성공하고 그의 승복을 받아낸다.",
+      "script": "Huang_07_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037049
+      ]
+    },
+    "83037047": {
+      "id": 83037047,
+      "name": "대명국의 황족",
+      "script": "Huang_08_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037050
+      ]
+    },
+    "83037048": {
+      "id": 83037048,
+      "name": "대명국의 황족",
+      "script": "Huang_08_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037051
+      ]
+    },
+    "83037049": {
+      "id": 83037049,
+      "name": "대명국의 황족",
+      "summary": "메르카토르가 카타이의 실체를 입증하고 그 공로를 황진화에게 돌리면서, 일행은 유럽 각국의 주목을 받으며 명성을 떨치게 된다.\n황명을 완수할 수 있다는 희망에 부푼 것도 잠시, 주용이 이끄는 명 선단 본대가 리스본에 당도하며 상황은 급변한다.\n황진화는 주용에게 적대감을 드러내고, 주용은 이제 명의 진정한 대표자가 누구인지 가려보자며 본격적인 대결을 선언한다.",
+      "script": "Huang_08_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037052
+      ]
+    },
+    "83037050": {
+      "id": 83037050,
+      "name": "대명국의 황족",
+      "summary": "주용은 호화로운 사치품을 앞세워 포르투갈 왕실을 매료시킨다. \n황진화 일행은 주용의 위세에 눌려 속수무책인 상황에 처하고, 주용은 국왕에게 자신을 명의 유일한 대표자로 인정하라고 압박한다.\n국왕이 주용의 기세에 밀려 그 요구를 수락하려던 찰나, 레온 페레로 공작이 상황을 반전시킨다. \n공작은 주용의 고귀한 신분을 인정하면서도, 그간 황진화가 유럽에서 보여준 실질적인 활약과 신뢰를 근거로 그녀를 주 소통 창구로 삼겠다고 공표한다. \n뜻밖의 일격에 물러난 주용은 다른 유럽 국가들에서 승부를 계속하자며 훗날을 기약하고, 위기를 넘긴 황진화 일행은 공작에게 감사를 표하며 이어질 치열한 경쟁을 대비한다.",
+      "script": "Huang_08_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037053
+      ]
+    },
+    "83037051": {
+      "id": 83037051,
+      "name": "중원의 보물",
+      "script": "Huang_09_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037054
+      ]
+    },
+    "83037052": {
+      "id": 83037052,
+      "name": "중원의 보물",
+      "script": "Huang_09_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037055
+      ]
+    },
+    "83037053": {
+      "id": 83037053,
+      "name": "중원의 보물",
+      "summary": "프랑스 국왕의 초청을 받아 마르세유에 도착한 황진화 일행.\n프랑스 국왕이 자랑스레 내보인 인도산 모조 도자기를 비웃듯, 주용은 경덕진의 최상품 청화백자를 진상하여 국왕을 매료시키고 명의 대표 자리를 압박한다.\n이에 질 수 없었던 황진화는 주용의 것보다 뛰어난 도자기를 구해오겠다고 호언장담하지만, 현실적으로 그 이상의 진품을 구하는 것은 불가능에 가까운 상황이었다.\n고심 끝에 일행은 오스만에서 도자기가 생산된다는 점에 착안하여 오스만으로 향한다.",
+      "script": "Huang_09_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037056
+      ]
+    },
+    "83037054": {
+      "id": 83037054,
+      "name": "중원의 보물",
+      "script": "Huang_09_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037057
+      ]
+    },
+    "83037055": {
+      "id": 83037055,
+      "name": "중원의 보물",
+      "script": "Huang_09_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037058
+      ]
+    },
+    "83037056": {
+      "id": 83037056,
+      "name": "중원의 보물",
+      "summary": "오스만에서 치니라 불리는 도자기를 접한 황진화는 중원의 문화가 이역만리에서 꽃피운 것에 감동하며, 도공에게 프랑스 왕실의 상징인 백합 문장이 그려진 특별한 접시 제작을 의뢰한다.",
+      "script": "Huang_09_06.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037059,
+        89037060
+      ]
+    },
+    "83037057": {
+      "id": 83037057,
+      "name": "중원의 보물",
+      "script": "Huang_09_07.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037061
+      ]
+    },
+    "83037058": {
+      "id": 83037058,
+      "name": "중원의 보물",
+      "script": "Huang_09_08.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037062
+      ]
+    },
+    "83037059": {
+      "id": 83037059,
+      "name": "중원의 보물",
+      "summary": "도자기를 완성하여 귀환하던 길에 해적의 습격을 받아 위기에 처했으나, 구면인 하이레딘 레이스의 도움으로 무사히 위기를 모면한다.",
+      "script": "Huang_09_09.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037063
+      ]
+    },
+    "83037060": {
+      "id": 83037060,
+      "name": "중원의 보물",
+      "summary": "황진화가 가져온 도자기를 본 주용은 질 나쁜 위조품이라며 경멸하지만, 황진화는 이것이 단순한 모방이 아닌 중원 문물이 현지에 맞게 재해석된 문화적 융합의 산물임을 역설한다.\n프랑스 국왕은 품질 면에서는 주용의 청화백자가 우위임을 인정하면서도, 자신을 위해 맞춤 제작된 도자기에 담긴 정성과 그 의미를 높이 평가하여 황진화의 손을 들어준다.\n뜻밖의 패배에 자존심이 상한 주용은 자리를 뜨고, 황진화 일행은 값진 승리를 자축한다.",
+      "script": "Huang_09_10.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037064
+      ]
+    },
+    "83037061": {
+      "id": 83037061,
+      "name": "카타이식 연회",
+      "summary": "프랑스에서의 승리 후, 황진화 일행은 잉글랜드 왕실의 초청을 받아 블랙번의 고향인 런던에 도착한다.",
+      "script": "Huang_10_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037065
+      ]
+    },
+    "83037062": {
+      "id": 83037062,
+      "name": "카타이식 연회",
+      "summary": "런던의 왕궁 분위기는 예상과 달랐다.\n왕실 감독관 길버트 경은 일행을 국빈이 아닌 고용된 연회 주최자로 취급하며, 국왕을 위해 요즘 유행하는 카타이식 연회를 준비하라고 오만하게 명령한다.\n경쟁자인 주용이 나타나지 않은 상황에서 황진화는 이번 기회에 잉글랜드 왕실을 확실히 자신의 편으로 만들기로 결심한다.\n일행은 국왕을 매료시킬 비책으로 화려한 불꽃놀이를 기획하지만, 선단 내에 전문 화약 기술자가 없어 난관에 봉착한다. 이에 학식 있는 양충이 서적에서 본 지식을 총동원하여 직접 폭죽 제조에 나선다.",
+      "script": "Huang_10_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037066
+      ]
+    },
+    "83037063": {
+      "id": 83037063,
+      "name": "카타이식 연회",
+      "script": "Huang_10_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037067,
+        89037068,
+        89037069
+      ]
+    },
+    "83037064": {
+      "id": 83037064,
+      "name": "카타이식 연회",
+      "summary": "우여곡절 끝에 폭죽 제조를 마치고 성능을 시험하려던 찰나, 불시에 방문한 길버트가 폭죽을 가로채 직접 점화하는 돌발 행동을 저지른다.\n양충이 급조한 폭죽은 불을 붙이자마자 그 자리에서 폭발하여 길버트를 기절시키고 만다.\n사태를 수습할 방법이 없다고 판단한 황진화 일행은 기절한 감독관을 뒤로하고 황급히 줄행랑을 치는 신세가 된다.",
+      "script": "Huang_10_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037070
+      ]
+    },
+    "83037065": {
+      "id": 83037065,
+      "name": "액운을 막는 불화살",
+      "summary": "제대로 된 폭죽을 만들어 누명을 풀기로 다짐한 일행. 숙련된 기술자를 어디서 찾아야 할지 고민하던 중, 줄리아노 교수가 유럽의 전문가를 소개해주겠다고 한 말을 떠올리고 나폴리로 향한다. 줄리아노 교수는 마침 적합한 인재가 있다며 앞장 선다.",
+      "script": "Huang_11_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037071
+      ]
+    },
+    "83037066": {
+      "id": 83037066,
+      "name": "액운을 막는 불화살",
+      "summary": "줄리아노 교수는 나폴리 조선소에서 일하는 기술자를 소개해준다.\n기술자는 폭약을 담은 관이 문제라며, 당장 해결하려면 시간이 오래 걸리니, 폭죽을 화전 형태로 만들어 공중에서 폭발시키고 불꽃을 퍼트리자고 제안한다.",
+      "script": "Huang_11_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037072
+      ]
+    },
+    "83037067": {
+      "id": 83037067,
+      "name": "액운을 막는 불화살",
+      "script": "Huang_11_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037073
+      ]
+    },
+    "83037068": {
+      "id": 83037068,
+      "name": "액운을 막는 불화살",
+      "script": "Huang_11_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037074
+      ]
+    },
+    "83037069": {
+      "id": 83037069,
+      "name": "액운을 막는 불화살",
+      "summary": "이를 받아들인 황진화 일행은 폭죽 재료가 되는 종이를 공수하고, 기술자는 이를 통해 폭죽 제조에 나선다.\n폭죽 완성을 기다리던 일행은 “잘하면 무기로도 쓸 수 있지 않을까”라며 잡담을 나눈다.\n그때, 주용을 보필하는 내관이 당도하여 주용의 명을 전한다. 황명에 따라 서아프리카에 우호관계를 조성하고, 명에서 유럽으로 가는 길목을 보강하라는 것이었다.\n공식적인 명이었기에 황진화는 마지못해 나서지만, 주용의 행동에 수상함을 느낀다.",
+      "script": "Huang_11_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037075
+      ]
+    },
+    "83037070": {
+      "id": 83037070,
+      "name": "아프리카로",
+      "script": "Huang_12_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037076
+      ]
+    },
+    "83037071": {
+      "id": 83037071,
+      "name": "아프리카로",
+      "script": "Huang_12_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037077
+      ]
+    },
+    "83037072": {
+      "id": 83037072,
+      "name": "아프리카로",
+      "script": "Huang_12_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037078
+      ]
+    },
+    "83037073": {
+      "id": 83037073,
+      "name": "아프리카로",
+      "summary": "아프리카로 이동한 황진화 일행은, 서아프리카의 중심지인 시에라리온으로 향해 주용의 명대로 우호관계를 형성하려 한다.\n하지만 현지인들은 외지인 때문에 고통받았다며 일행을 외면한다.\n영문을 모르던 일행이 지쳐 배가 고파지던 차, 방랑 요리사 슈발리에 럼이 나타난다.\n그는 야생에서 사냥한 고기로 아프리카식 꼬치구이를 만들어주겠다고 제안한다.\n다만 질 좋은 소금이 필요하다며 소금을 요구한다.",
+      "script": "Huang_12_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037079
+      ]
+    },
+    "83037074": {
+      "id": 83037074,
+      "name": "아프리카로",
+      "script": "Huang_12_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037080
+      ]
+    },
+    "83037075": {
+      "id": 83037075,
+      "name": "아프리카로",
+      "summary": "선단에 소금이 없었기에 일행은 다른 도시에서 소금을 가져온다.\n슈발리에는 여관에서 꼬치구이를 만들어 대접한다.\n맛있는 음식 냄새와 황진화 일행이 맛있게 먹는 모습을 본 시에라리온 사람들은 마음이 풀린다.\n슈발리에가 나누어주는 꼬치구이를 먹고, 이번에는 음식을 먹고도 아프지 않다며 적대감을 풀게 된다.\n알고 보니, 이전에 외지인들이 나누어준 음식 때문에 병에 걸린 적이 있어 경계했던 것이었다.\n이 일로 황진화 일행은 공관에 초대되어, 공관 관리 겸 부족장에게 여러 도시의 투자를 제안받는다.",
+      "script": "Huang_12_06.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037081
+      ]
+    },
+    "83037076": {
+      "id": 83037076,
+      "name": "아프리카의 밤",
+      "script": "Huang_13_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037082
+      ]
+    },
+    "83037077": {
+      "id": 83037077,
+      "name": "아프리카의 밤",
+      "script": "Huang_13_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037083
+      ]
+    },
+    "83037078": {
+      "id": 83037078,
+      "name": "아프리카의 밤",
+      "summary": "황진화 일행은 도시 세 곳에 투자를 진행한다.\n시에라리온에서 마지막 투자를 진행하자마자, 저번에 사람들을 병들게 한 외지인이 여관에 나타났다는 소식이 들려온다.\n황진화는 그들을 응징하기로 마음먹고 여관으로 향한다.",
+      "script": "Huang_13_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037084
+      ]
+    },
+    "83037079": {
+      "id": 83037079,
+      "name": "아프리카의 밤",
+      "summary": "그 외지인은 저번에 블랙번에게 시비를 걸었던 아조레스의 해적들이었다.\n아프리카 사람들을 괴롭혀 이득을 취하려는 그들을 황진화 일행이 가로막는다.\n해적들의 두목은 순순히 사라지지만, 수상함을 느낀 일행은 뒤쫓는다.",
+      "script": "Huang_13_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037085
+      ]
+    },
+    "83037080": {
+      "id": 83037080,
+      "name": "아프리카의 밤",
+      "summary": "예상대로 아조레스 해적들은 본인들의 함대를 이끌고 와서 공격하려 한다.\n황진화 일행은 그들을 바다에서 요격하여 무찌른다.",
+      "script": "Huang_13_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037086
+      ]
+    },
+    "83037081": {
+      "id": 83037081,
+      "name": "아프리카의 밤",
+      "summary": "부족장은 축제를 열어 황진화 일행과의 우호 관계를 선언한다.\n황진화는 나폴리에서 챙겨 온 폭죽을 터트리며, 아프리카 사람들과 아름다운 밤을 보낸다.\n밤을 보내던 중, 블랙번은 주용의 명을 전하던 내관과 주용의 부관이 숨어 있는 것을 발견한다.",
+      "script": "Huang_13_06.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037087
+      ]
+    },
+    "83037082": {
+      "id": 83037082,
+      "name": "아프리카의 밤",
+      "summary": "그들의 염탐질을 추궁한 황진화는, 주용이 그들의 시선을 돌릴 목적으로 필요 없는 명을 내린 것임을 알아낸다.\n주용의 기만에 화가 난 황진화는 내관으로부터 주용이 신대륙으로 간다는 정보를 받아내고, “전하의 명을 직접 받으러 간다”는 명분으로 신대륙을 향해 출발한다.",
+      "script": "Huang_13_07.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037088
+      ]
+    },
+    "83037083": {
+      "id": 83037083,
+      "name": "신대륙으로",
+      "script": "Huang_14_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037089
+      ]
+    },
+    "83037084": {
+      "id": 83037084,
+      "name": "신대륙으로",
+      "summary": "신대륙 산후안에 도착한 황진화 일행. 주용에게 단단히 화가 난 황진화는, 주용을 전하가 아닌 이름으로 부르는 불경까지 저지른다.\n어떻게든 도독을 돕기로 마음먹은 양충과 블랙번은, 명 선단을 카르타헤나 인근에서 봤다는 정보를 접하고 그곳으로 이동한다.",
+      "script": "Huang_14_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037090
+      ]
+    },
+    "83037085": {
+      "id": 83037085,
+      "name": "신대륙으로",
+      "script": "Huang_14_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037091
+      ]
+    },
+    "83037086": {
+      "id": 83037086,
+      "name": "신대륙으로",
+      "summary": "카르타헤나에서 양충은 명의 엽차와 비슷한 마떼차를 발견하고 기뻐한다. 황진화는 급한 마음에도 사기 진작을 위해 마떼차를 챙기는 것을 허용한다.",
+      "script": "Huang_14_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037092
+      ]
+    },
+    "83037087": {
+      "id": 83037087,
+      "name": "신대륙으로",
+      "summary": "곧이어 주용 선단의 흔적을 찾아 동쪽으로 이동한 일행.\n카라카스에서 주용 선단의 흔적을 발견하지만, 그곳 사람들이 오염된 강물 때문에 병에 걸려 있음을 알아낸다.\n일행은 병을 치료하고자 마떼차를 부탁받고, 황진화는 사람들을 돕기 위해 마떼차를 제공한다.",
+      "script": "Huang_14_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037093
+      ]
+    },
+    "83037088": {
+      "id": 83037088,
+      "name": "신대륙으로",
+      "summary": "잠시 쉬어가던 황진화 일행.\n양충은 주용에 대한 적개감 때문에 초심을 잃어 시무룩해진 황진화를 응원한다.\n그때, 마을의 사냥꾼이 오염된 강물 상류에서 유럽인들이 지은 이상한 건축물을 보았다고 알려준다.",
+      "script": "Huang_14_06.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037094
+      ]
+    },
+    "83037089": {
+      "id": 83037089,
+      "name": "신대륙으로",
+      "summary": "황진화 일행은 수상함을 느끼며 요새가 있다는 강으로 몰래 접근한다. 그곳에는 정체불명의 유럽 세력이 지은 요새와, 군대가 주둔해 있었다.",
+      "script": "Huang_14_07.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037095
+      ]
+    },
+    "83037090": {
+      "id": 83037090,
+      "name": "나라를 위한 보물",
+      "script": "Huang_15_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037096
+      ]
+    },
+    "83037091": {
+      "id": 83037091,
+      "name": "나라를 위한 보물",
+      "summary": "포를라마르에 입항한 황진화는 레온 페레로 공작의 만류를 뿌리치고 떠나는 주용을 목격한다.\n페레로는 주용이 접촉한 에스트라다 남작이 과거 포르투갈 내 반란 세력인 '신성 왕국'의 잔당이며, 그들이 주용을 노리고 있음을 황진화에게 경고한다.",
+      "script": "Huang_15_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037097
+      ]
+    },
+    "83037092": {
+      "id": 83037092,
+      "name": "나라를 위한 보물",
+      "summary": "주용을 뒤쫓아 추궁한 황진화.\n주용은 위험을 이미 감지하고 있었기에 황진화를 휘말리지 않게 하려 했다며 오히려 화를 낸다.\n주용은 명이 재난과 외침으로 재정적 위기에 처해 있어, 전설의 태감처럼 외부에서 막대한 재원을 확보하겠다는 약속을 황제에게 했음을 털어놓는다.\n그는 에스트라다가 제시한 거대 은광의 정보가 사실이라면 함정일지라도 직접 확인할 가치가 있다고 판단한 것이다.\n주용은 자신에게 변고가 생기면 황진화가 대업을 이어가라고 당부하며 홀로 위험 속으로 향하려 한다.\n그 과정에서 주용은 황진화가 어린 시절 유일하게 자신에게만 말했던 전설의 태감에 대한 동경을 언급한다.\n이를 들은 황진화는 자신을 황제에게 천거하고 보이지 않는 곳에서 묵묵히 후원해 온 장본인이 바로 주용이었음을 뒤늦게 깨닫는다.\n황진화는 그를 사지로 홀로 보낼 수 없어 떠나가는 주용의 선단을 급히 뒤따른다.",
+      "script": "Huang_15_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037098
+      ]
+    },
+    "83037093": {
+      "id": 83037093,
+      "name": "나라를 위한 보물",
+      "summary": "황진화 일행은 에스트라다와의 접선 장소에 잠입하여 그가 주용을 노리고 파놓은 함정을 확인한다.\n주용의 선단이 압도적인 적의 병력 앞에 위기에 처하자, 황진화는 화전형 폭죽을 발사해 적 포병대를 교란시킨다.\n이 틈을 타 주용이 반격에 성공하여 지상군을 패주시켰으나, 곧이어 해상에서 에스트라다의 함대에 포위된다.\n주용은 황진화를 도독으로 인정하며 협공을 명한다.",
+      "script": "Huang_15_04.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037099
+      ]
+    },
+    "83037094": {
+      "id": 83037094,
+      "name": "나라를 위한 보물",
+      "summary": "치열한 해전 끝에 레온 페레로 공작의 지원군이 합류하면서 전세는 급격히 기운다.\n명과 포르투갈 연합 함대는 에스트라다의 요새를 포격하여 파괴하고 승리를 거둔다.",
+      "script": "Huang_15_05.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037100
+      ]
+    },
+    "83037095": {
+      "id": 83037095,
+      "name": "나라를 위한 보물",
+      "summary": "에스트라다의 요새를 초토화했지만 은광의 존재는 확인되지 않았다.\n주용은 미끼로 쓰인 은괴가 진품이었던 만큼 어딘가에 숨겨진 보물이 있을 것이라 확신하며 독자적인 탐색을 지속하기로 한다.\n주용은 유럽 내 대명의 대표 자격이 황진화에게 있음을 공식적으로 인정한다.\n아울러 그는 황진화를 첩으로 삼겠다는 약조를 파기하고 그녀에게 완전한 자유를 허락한다.",
+      "script": "Huang_15_06.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037101
+      ]
+    },
+    "83037096": {
+      "id": 83037096,
+      "name": "카타이의 대표자",
+      "summary": "주용과 작별하고 유럽으로 돌아온 황진화 일행은, 유럽에서 명의 대표자로 인정받았음을 친구들에게 알린다.\n폭죽을 만들어준 나폴리의 기술자는 이 폭죽을 명의 문물이라 알리고 제작해 팔겠다며 허락을 구하고, 황진화는 이를 허락한다.",
+      "script": "Huang_16_01.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037102
+      ]
+    },
+    "83037097": {
+      "id": 83037097,
+      "name": "카타이의 대표자",
+      "summary": "프랑스 국왕은 황진화가 대표자가 된 것을 축하하며, 명과 교류하기 위한 선단을 출항시키겠다고 알려준다.",
+      "script": "Huang_16_02.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037103
+      ]
+    },
+    "83037098": {
+      "id": 83037098,
+      "name": "카타이의 대표자",
+      "summary": "이렇게 인사를 마치고 리스본으로 돌아온 황진화 일행은, 동방으로 떠나는 포르투갈 선단을 지켜보며 두 세상의 교류를 위해 앞으로도 애쓰기로 다짐한다.\n더불어 카타이를 동경하는 블랙번에게 명 방문을 약속한다.",
+      "script": "Huang_16_03.json",
+      "blockScriptByMateCondition": true,
+      "needMateId": [
+        21200036
+      ],
+      "questGoalId": [
+        89037104
+      ]
+    },
     "83300101": {
       "id": 83300101,
       "name": "내부의 적, 외부의 적",
@@ -49381,7 +51957,7 @@
     "83305017": {
       "id": 83305017,
       "name": "커다란 꿈",
-      "summary": "에스파냐 선박을 약탈한 존 호킨스.\n약탈한 교역품을 매각할 장소를 찾는다.",
+      "summary": "해적을 사냥한 존 호킨스.\n획득한 장물 교역품을 매각할 장소를 찾는다.",
       "script": "Relation_005_2_06.json",
       "blockScriptByMateCondition": true,
       "needMateId": [
@@ -49394,7 +51970,7 @@
     "83305018": {
       "id": 83305018,
       "name": "커다란 꿈",
-      "summary": "밀수업자에게 약탈한 교역품을 매각한다.",
+      "summary": "밀수업자에게 장물을 매각한다.",
       "script": "Relation_005_2_07.json",
       "blockScriptByMateCondition": true,
       "needMateId": [
@@ -55323,6 +57899,7 @@
     "83035021": {
       "id": 83035021,
       "name": "전투",
+      "summary": "홀로 대규모 해적단을 상대하려던 일행은 해군과 해적단 사이에 끼어 위험에 처하지만, 거대 고래의 출몰로 위기에서 벗어난다.",
       "script": "Joan_CN_04_04.json",
       "blockScriptByMateCondition": false,
       "needMateId": [
@@ -55335,7 +57912,6 @@
     "83035022": {
       "id": 83035022,
       "name": "전투",
-      "summary": "홀로 대규모 해적단을 상대하려던 일행은 해군과 해적단 사이에 끼어 위험에 처하지만, 거대 고래의 출몰로 위기에서 벗어난다.",
       "script": "Joan_CN_04_05.json",
       "blockScriptByMateCondition": false,
       "needMateId": [
@@ -71009,6 +73585,319 @@
         89350117
       ]
     },
+    "83660101": {
+      "id": 83660101,
+      "script": "SpecialSynthesis1_80_1.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350118
+      ]
+    },
+    "83660102": {
+      "id": 83660102,
+      "script": "SpecialSynthesis1_80_2.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350119
+      ]
+    },
+    "83660103": {
+      "id": 83660103,
+      "script": "SpecialSynthesis1_80_3.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350120
+      ]
+    },
+    "83660104": {
+      "id": 83660104,
+      "script": "SpecialSynthesis1_80_4.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350121
+      ]
+    },
+    "83660105": {
+      "id": 83660105,
+      "script": "SpecialSynthesis1_80_5.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350122
+      ]
+    },
+    "83660106": {
+      "id": 83660106,
+      "script": "SpecialSynthesis1_80_6.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350123
+      ]
+    },
+    "83660107": {
+      "id": 83660107,
+      "script": "SpecialSynthesis1_80_7.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350124
+      ]
+    },
+    "83660108": {
+      "id": 83660108,
+      "script": "SpecialSynthesis2_10_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350125
+      ],
+      "nodeJumpIdx": [
+        1,
+        2,
+        3
+      ]
+    },
+    "83660109": {
+      "id": 83660109,
+      "script": "SpecialSynthesis2_10_01_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350126
+      ],
+      "nodeJumpIdx": [
+        2,
+        3
+      ]
+    },
+    "83660110": {
+      "id": 83660110,
+      "script": "SpecialSynthesis2_10_01_01_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350127
+      ]
+    },
+    "83660111": {
+      "id": 83660111,
+      "script": "SpecialSynthesis2_10_01_01_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350128
+      ]
+    },
+    "83660112": {
+      "id": 83660112,
+      "script": "SpecialSynthesis2_10_01_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350129
+      ]
+    },
+    "83660113": {
+      "id": 83660113,
+      "script": "SpecialSynthesis2_10_01_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350130
+      ]
+    },
+    "83660114": {
+      "id": 83660114,
+      "script": "SpecialSynthesis2_10_01_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350131
+      ]
+    },
+    "83660115": {
+      "id": 83660115,
+      "script": "SpecialSynthesis2_10_01_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350132
+      ]
+    },
+    "83660116": {
+      "id": 83660116,
+      "script": "SpecialSynthesis2_10_01_06.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350133
+      ]
+    },
+    "83660117": {
+      "id": 83660117,
+      "script": "SpecialSynthesis2_10_02_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350134
+      ]
+    },
+    "83660118": {
+      "id": 83660118,
+      "script": "SpecialSynthesis2_10_02_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350135
+      ]
+    },
+    "83660119": {
+      "id": 83660119,
+      "script": "SpecialSynthesis2_10_02_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350136
+      ]
+    },
+    "83660120": {
+      "id": 83660120,
+      "script": "SpecialSynthesis2_10_02_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350137
+      ]
+    },
+    "83660121": {
+      "id": 83660121,
+      "script": "SpecialSynthesis2_10_02_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350138
+      ]
+    },
+    "83660122": {
+      "id": 83660122,
+      "script": "SpecialSynthesis2_10_02_06.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350139
+      ]
+    },
+    "83660123": {
+      "id": 83660123,
+      "script": "SpecialSynthesis2_10_02_07.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350140
+      ]
+    },
+    "83660124": {
+      "id": 83660124,
+      "script": "SpecialSynthesis2_10_03_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350141
+      ]
+    },
+    "83660125": {
+      "id": 83660125,
+      "script": "SpecialSynthesis2_10_03_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350142
+      ]
+    },
+    "83660126": {
+      "id": 83660126,
+      "script": "SpecialSynthesis2_10_03_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350143
+      ]
+    },
+    "83660127": {
+      "id": 83660127,
+      "script": "SpecialSynthesis2_10_03_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350144
+      ]
+    },
+    "83660128": {
+      "id": 83660128,
+      "script": "SpecialSynthesis2_10_03_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350145
+      ]
+    },
+    "83660129": {
+      "id": 83660129,
+      "script": "SpecialSynthesis2_10_03_06.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350146
+      ]
+    },
+    "83660130": {
+      "id": 83660130,
+      "script": "SpecialSynthesis2_10_03_07.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350147
+      ]
+    },
+    "83660131": {
+      "id": 83660131,
+      "script": "SpecialSynthesis2_10_04_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350148
+      ]
+    },
+    "83660132": {
+      "id": 83660132,
+      "script": "SpecialSynthesis2_10_04_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350149
+      ]
+    },
+    "83660133": {
+      "id": 83660133,
+      "script": "SpecialSynthesis2_10_04_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350150
+      ]
+    },
+    "83660134": {
+      "id": 83660134,
+      "script": "SpecialSynthesis2_10_04_03_battle.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83660135": {
+      "id": 83660135,
+      "script": "SpecialSynthesis2_10_04_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350151
+      ]
+    },
+    "83660136": {
+      "id": 83660136,
+      "script": "SpecialSynthesis2_10_04_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350152
+      ]
+    },
+    "83660137": {
+      "id": 83660137,
+      "script": "SpecialSynthesis2_10_04_06.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350153
+      ]
+    },
+    "83660138": {
+      "id": 83660138,
+      "script": "SpecialSynthesis2_10_04_07.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89350154
+      ]
+    },
     "83700001": {
       "id": 83700001,
       "script": "RoyalOrder_Lisbon80001_01.json",
@@ -86107,6 +88996,214 @@
         89601010
       ]
     },
+    "83800969": {
+      "id": 83800969,
+      "script": "PubStaff1_21800019_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601011
+      ]
+    },
+    "83800970": {
+      "id": 83800970,
+      "script": "PubStaff1_21800019_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601012
+      ]
+    },
+    "83800971": {
+      "id": 83800971,
+      "script": "PubStaff1_21800019_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601013
+      ]
+    },
+    "83800972": {
+      "id": 83800972,
+      "script": "PubStaff1_21800019_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601014
+      ]
+    },
+    "83800973": {
+      "id": 83800973,
+      "script": "PubStaff1_21800019_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601015
+      ]
+    },
+    "83800974": {
+      "id": 83800974,
+      "script": "PubStaff2_21800019_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601016
+      ]
+    },
+    "83800975": {
+      "id": 83800975,
+      "script": "PubStaff2_21800019_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601017
+      ]
+    },
+    "83800976": {
+      "id": 83800976,
+      "script": "PubStaff2_21800019_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601018
+      ]
+    },
+    "83800977": {
+      "id": 83800977,
+      "script": "PubStaff2_21800019_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601019
+      ]
+    },
+    "83800978": {
+      "id": 83800978,
+      "script": "PubStaff2_21800019_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601020
+      ]
+    },
+    "83800979": {
+      "id": 83800979,
+      "script": "PubStaff3_21800019_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601021
+      ]
+    },
+    "83800980": {
+      "id": 83800980,
+      "script": "PubStaff3_21800019_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601022
+      ]
+    },
+    "83800981": {
+      "id": 83800981,
+      "script": "PubStaff3_21800019_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601023
+      ]
+    },
+    "83800982": {
+      "id": 83800982,
+      "script": "PubStaff3_21800019_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601024
+      ]
+    },
+    "83800983": {
+      "id": 83800983,
+      "script": "PubStaff1_21800003_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601025
+      ]
+    },
+    "83800984": {
+      "id": 83800984,
+      "script": "PubStaff1_21800003_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601026
+      ]
+    },
+    "83800985": {
+      "id": 83800985,
+      "script": "PubStaff1_21800003_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601027
+      ]
+    },
+    "83800986": {
+      "id": 83800986,
+      "script": "PubStaff2_21800003_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601028
+      ]
+    },
+    "83800987": {
+      "id": 83800987,
+      "script": "PubStaff2_21800003_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601029
+      ]
+    },
+    "83800988": {
+      "id": 83800988,
+      "script": "PubStaff2_21800003_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601030
+      ]
+    },
+    "83800989": {
+      "id": 83800989,
+      "script": "PubStaff2_21800003_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601031
+      ]
+    },
+    "83800990": {
+      "id": 83800990,
+      "script": "PubStaff2_21800003_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601032
+      ]
+    },
+    "83800991": {
+      "id": 83800991,
+      "script": "PubStaff3_21800003_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601033
+      ]
+    },
+    "83800992": {
+      "id": 83800992,
+      "script": "PubStaff3_21800003_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601034
+      ]
+    },
+    "83800993": {
+      "id": 83800993,
+      "script": "PubStaff3_21800003_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601035
+      ]
+    },
+    "83800994": {
+      "id": 83800994,
+      "script": "PubStaff3_21800003_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89601036
+      ]
+    },
     "83850000": {
       "id": 83850000,
       "script": "Union_AccumBase.json",
@@ -98618,6 +101715,987 @@
         89701536
       ]
     },
+    "83851547": {
+      "id": 83851547,
+      "script": "2025Event_Christmas_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701537
+      ]
+    },
+    "83851548": {
+      "id": 83851548,
+      "script": "2025Event_Christmas_01_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701538
+      ]
+    },
+    "83851549": {
+      "id": 83851549,
+      "script": "2025Event_Christmas_01_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701539
+      ]
+    },
+    "83851550": {
+      "id": 83851550,
+      "script": "2025Event_Christmas_01_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701540
+      ]
+    },
+    "83851551": {
+      "id": 83851551,
+      "script": "2025Event_Christmas_01_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701541
+      ]
+    },
+    "83851552": {
+      "id": 83851552,
+      "script": "2025Event_Christmas_01_06.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701542
+      ]
+    },
+    "83851553": {
+      "id": 83851553,
+      "script": "2025Event_Christmas_01_07.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701543
+      ]
+    },
+    "83851554": {
+      "id": 83851554,
+      "script": "2025Event_Christmas_01_08.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701544
+      ]
+    },
+    "83851555": {
+      "id": 83851555,
+      "script": "2025Event_Christmas_01_09.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701545
+      ]
+    },
+    "83851556": {
+      "id": 83851556,
+      "script": "2025Event_Christmas_02_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701546
+      ]
+    },
+    "83851557": {
+      "id": 83851557,
+      "script": "2025Event_Christmas_02_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701547
+      ]
+    },
+    "83851558": {
+      "id": 83851558,
+      "script": "2025Event_Christmas_02_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701548
+      ]
+    },
+    "83851559": {
+      "id": 83851559,
+      "script": "2025Event_Christmas_02_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701549
+      ]
+    },
+    "83851560": {
+      "id": 83851560,
+      "script": "2025Event_Christmas_03_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701550
+      ]
+    },
+    "83851561": {
+      "id": 83851561,
+      "script": "2025Event_Christmas_03_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701551,
+        89701552,
+        89701553,
+        89701554
+      ]
+    },
+    "83851562": {
+      "id": 83851562,
+      "script": "2025Event_Christmas_03_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701555
+      ]
+    },
+    "83851563": {
+      "id": 83851563,
+      "script": "2025Event_Christmas_03_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701556
+      ]
+    },
+    "83851564": {
+      "id": 83851564,
+      "script": "2025Event_Christmas_04_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701557
+      ]
+    },
+    "83851565": {
+      "id": 83851565,
+      "script": "2025Event_Christmas_04_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701558
+      ]
+    },
+    "83851566": {
+      "id": 83851566,
+      "script": "2025Event_Christmas_04_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701559
+      ]
+    },
+    "83851567": {
+      "id": 83851567,
+      "script": "2025Event_Christmas_04_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701560
+      ]
+    },
+    "83851568": {
+      "id": 83851568,
+      "script": "2025Event_Christmas_04_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701561
+      ]
+    },
+    "83851569": {
+      "id": 83851569,
+      "script": "2025Event_Christmas_04_06.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701562
+      ]
+    },
+    "83851570": {
+      "id": 83851570,
+      "script": "2025Event_Christmas_05_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701563
+      ]
+    },
+    "83851571": {
+      "id": 83851571,
+      "script": "2025Event_Christmas_05_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701564
+      ]
+    },
+    "83851572": {
+      "id": 83851572,
+      "script": "2025Event_Christmas_05_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701565
+      ]
+    },
+    "83851573": {
+      "id": 83851573,
+      "script": "2025Event_Christmas_05_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701566
+      ]
+    },
+    "83851574": {
+      "id": 83851574,
+      "script": "2025Event_Christmas_05_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701567
+      ]
+    },
+    "83851575": {
+      "id": 83851575,
+      "script": "2025Event_Christmas_06_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701568
+      ]
+    },
+    "83851576": {
+      "id": 83851576,
+      "script": "2025Event_Christmas_06_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701569
+      ]
+    },
+    "83851577": {
+      "id": 83851577,
+      "script": "2025Event_Christmas_06_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701570
+      ]
+    },
+    "83851578": {
+      "id": 83851578,
+      "script": "2025Event_Christmas_06_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701571
+      ]
+    },
+    "83851579": {
+      "id": 83851579,
+      "script": "2025Event_Christmas_06_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701572
+      ]
+    },
+    "83851580": {
+      "id": 83851580,
+      "script": "2025Event_Christmas_06_06.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701573
+      ]
+    },
+    "83851581": {
+      "id": 83851581,
+      "script": "2025Event_Christmas_07_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701574
+      ]
+    },
+    "83851582": {
+      "id": 83851582,
+      "script": "2025Event_Christmas_07_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701575
+      ]
+    },
+    "83851583": {
+      "id": 83851583,
+      "script": "2025Event_Christmas_07_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701576
+      ]
+    },
+    "83851584": {
+      "id": 83851584,
+      "script": "2025Event_Christmas_07_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701577
+      ]
+    },
+    "83851585": {
+      "id": 83851585,
+      "script": "2025Event_Christmas_07_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701578
+      ]
+    },
+    "83851586": {
+      "id": 83851586,
+      "script": "2025Event_Christmas_07_06.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701579
+      ]
+    },
+    "83851587": {
+      "id": 83851587,
+      "script": "2025Event_Christmas_08_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701580
+      ]
+    },
+    "83851588": {
+      "id": 83851588,
+      "script": "2025Event_Christmas_08_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701581
+      ]
+    },
+    "83851589": {
+      "id": 83851589,
+      "script": "2025Event_Christmas_08_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701582
+      ]
+    },
+    "83851590": {
+      "id": 83851590,
+      "script": "2025Event_Christmas_08_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701583
+      ]
+    },
+    "83851591": {
+      "id": 83851591,
+      "script": "2025Event_Christmas_08_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701584
+      ]
+    },
+    "83851592": {
+      "id": 83851592,
+      "script": "2025Event_Christmas_09_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701585
+      ]
+    },
+    "83851593": {
+      "id": 83851593,
+      "script": "2025Event_Christmas_09_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701586
+      ]
+    },
+    "83851594": {
+      "id": 83851594,
+      "script": "2025Event_Christmas_09_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701587
+      ]
+    },
+    "83851595": {
+      "id": 83851595,
+      "script": "2025Event_Christmas_09_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701588
+      ]
+    },
+    "83851596": {
+      "id": 83851596,
+      "script": "2025Event_Christmas_09_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701589
+      ]
+    },
+    "83851597": {
+      "id": 83851597,
+      "script": "2025Event_Christmas_09_06.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701590
+      ]
+    },
+    "83851598": {
+      "id": 83851598,
+      "script": "2025Event_Christmas_09_07.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701591
+      ]
+    },
+    "83851599": {
+      "id": 83851599,
+      "script": "2025Event_Christmas_10_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701592
+      ]
+    },
+    "83851600": {
+      "id": 83851600,
+      "script": "2025Event_Christmas_10_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701593
+      ]
+    },
+    "83851601": {
+      "id": 83851601,
+      "script": "SpecialSynthesis_Battle.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83851602": {
+      "id": 83851602,
+      "script": "Season5Elite.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83851603": {
+      "id": 83851603,
+      "script": "Lighthouse_P51.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83851604": {
+      "id": 83851604,
+      "script": "Lighthouse_P55.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89000000
+      ]
+    },
+    "83851605": {
+      "id": 83851605,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701594
+      ]
+    },
+    "83851606": {
+      "id": 83851606,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701595
+      ]
+    },
+    "83851607": {
+      "id": 83851607,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701596
+      ]
+    },
+    "83851608": {
+      "id": 83851608,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701597
+      ]
+    },
+    "83851609": {
+      "id": 83851609,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701598
+      ]
+    },
+    "83851610": {
+      "id": 83851610,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701599
+      ]
+    },
+    "83851611": {
+      "id": 83851611,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701600
+      ]
+    },
+    "83851612": {
+      "id": 83851612,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701601
+      ]
+    },
+    "83851613": {
+      "id": 83851613,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701602
+      ]
+    },
+    "83851614": {
+      "id": 83851614,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701603
+      ]
+    },
+    "83851615": {
+      "id": 83851615,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701604
+      ]
+    },
+    "83851616": {
+      "id": 83851616,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701605
+      ]
+    },
+    "83851617": {
+      "id": 83851617,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701606
+      ]
+    },
+    "83851618": {
+      "id": 83851618,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701607
+      ]
+    },
+    "83851619": {
+      "id": 83851619,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701608
+      ]
+    },
+    "83851620": {
+      "id": 83851620,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701609
+      ]
+    },
+    "83851621": {
+      "id": 83851621,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701610
+      ]
+    },
+    "83851622": {
+      "id": 83851622,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701611
+      ]
+    },
+    "83851623": {
+      "id": 83851623,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701612
+      ]
+    },
+    "83851624": {
+      "id": 83851624,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701613
+      ]
+    },
+    "83851625": {
+      "id": 83851625,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701614
+      ]
+    },
+    "83851626": {
+      "id": 83851626,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701615
+      ]
+    },
+    "83851627": {
+      "id": 83851627,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701616
+      ]
+    },
+    "83851628": {
+      "id": 83851628,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701617
+      ]
+    },
+    "83851629": {
+      "id": 83851629,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701618
+      ]
+    },
+    "83851630": {
+      "id": 83851630,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701619
+      ]
+    },
+    "83851631": {
+      "id": 83851631,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701620
+      ]
+    },
+    "83851632": {
+      "id": 83851632,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701621
+      ]
+    },
+    "83851633": {
+      "id": 83851633,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701622
+      ]
+    },
+    "83851634": {
+      "id": 83851634,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701623
+      ]
+    },
+    "83851635": {
+      "id": 83851635,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701624
+      ]
+    },
+    "83851636": {
+      "id": 83851636,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701625
+      ]
+    },
+    "83851637": {
+      "id": 83851637,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701626
+      ]
+    },
+    "83851638": {
+      "id": 83851638,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701627
+      ]
+    },
+    "83851639": {
+      "id": 83851639,
+      "script": "2024Event_Treasure_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701628
+      ]
+    },
+    "83851640": {
+      "id": 83851640,
+      "script": "2026Event_CnNewYear_01_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701630
+      ]
+    },
+    "83851641": {
+      "id": 83851641,
+      "script": "2026Event_CnNewYear_01_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701631
+      ]
+    },
+    "83851642": {
+      "id": 83851642,
+      "script": "2026Event_CnNewYear_01_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701632
+      ]
+    },
+    "83851643": {
+      "id": 83851643,
+      "script": "2026Event_CnNewYear_01_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701633
+      ]
+    },
+    "83851644": {
+      "id": 83851644,
+      "script": "2026Event_CnNewYear_02_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701634
+      ]
+    },
+    "83851645": {
+      "id": 83851645,
+      "script": "2026Event_CnNewYear_02_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701635
+      ]
+    },
+    "83851646": {
+      "id": 83851646,
+      "script": "2026Event_CnNewYear_02_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701636
+      ]
+    },
+    "83851647": {
+      "id": 83851647,
+      "script": "2026Event_CnNewYear_02_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701637
+      ]
+    },
+    "83851648": {
+      "id": 83851648,
+      "script": "2026Event_CnNewYear_02_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701638
+      ]
+    },
+    "83851649": {
+      "id": 83851649,
+      "script": "2026Event_CnNewYear_02_06.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701639
+      ]
+    },
+    "83851650": {
+      "id": 83851650,
+      "script": "2026Event_CnNewYear_02_07.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701640
+      ]
+    },
+    "83851651": {
+      "id": 83851651,
+      "script": "2026Event_CnNewYear_02_08.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701641
+      ]
+    },
+    "83851652": {
+      "id": 83851652,
+      "script": "2026Event_CnNewYear_02_09.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701642
+      ]
+    },
+    "83851653": {
+      "id": 83851653,
+      "script": "2026Event_CnNewYear_02_10.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701643
+      ]
+    },
+    "83851654": {
+      "id": 83851654,
+      "script": "2026Event_CnNewYear_03_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701644
+      ]
+    },
+    "83851655": {
+      "id": 83851655,
+      "script": "2026Event_CnNewYear_03_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701645
+      ]
+    },
+    "83851656": {
+      "id": 83851656,
+      "script": "2026Event_CnNewYear_03_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701646
+      ]
+    },
+    "83851657": {
+      "id": 83851657,
+      "script": "2026Event_CnNewYear_03_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701647
+      ]
+    },
+    "83851658": {
+      "id": 83851658,
+      "script": "2026Event_CnNewYear_03_05.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701648
+      ]
+    },
+    "83851659": {
+      "id": 83851659,
+      "script": "2026Event_CnNewYear_03_06.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701649
+      ]
+    },
+    "83851660": {
+      "id": 83851660,
+      "script": "2026Event_CnNewYear_03_07.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701650
+      ]
+    },
+    "83851661": {
+      "id": 83851661,
+      "script": "2026Event_CnNewYear_03_08.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701651
+      ]
+    },
+    "83851662": {
+      "id": 83851662,
+      "script": "2026Event_CnNewYear_03_09.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701652
+      ]
+    },
+    "83851663": {
+      "id": 83851663,
+      "script": "2026Event_CnNewYear_03_10.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701653
+      ]
+    },
+    "83851664": {
+      "id": 83851664,
+      "script": "2026Event_CnNewYear_03_11.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701654
+      ]
+    },
+    "83851665": {
+      "id": 83851665,
+      "script": "2026Event_CnNewYear_04_01.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701655
+      ]
+    },
+    "83851666": {
+      "id": 83851666,
+      "script": "2026Event_CnNewYear_04_02.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701656
+      ]
+    },
+    "83851667": {
+      "id": 83851667,
+      "script": "2026Event_CnNewYear_04_03.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701657,
+        89701658,
+        89701659
+      ]
+    },
+    "83851668": {
+      "id": 83851668,
+      "script": "2026Event_CnNewYear_04_04.json",
+      "blockScriptByMateCondition": true,
+      "questGoalId": [
+        89701660
+      ]
+    },
     "83900001": {
       "id": 83900001,
       "script": "EliteMonster_001.json",
@@ -101817,7 +105895,7 @@
         89990101
       ],
       "nodeJumpIdx": [
-        24
+        20
       ]
     },
     "83990252": {

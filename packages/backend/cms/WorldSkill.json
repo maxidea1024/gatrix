@@ -1036,7 +1036,7 @@
       "actionType": 1,
       "worldbuffId": 38030027,
       "skillIcon": "icon_skill_tradeOrder_28_Sprite",
-      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+      "skillFXShip": "TradeOrderSkillsOfTheHwangClan"
     },
     "75000299": {
       "id": 75000299,
@@ -1053,7 +1053,7 @@
       "actionType": 1,
       "worldbuffId": 38030026,
       "skillIcon": "icon_skill_tradeOrder_27_Sprite",
-      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+      "skillFXShip": "TradeOrderHwangsAccountingSecrets"
     },
     "75080001": {
       "id": 75080001,

@@ -30,7 +30,7 @@
     },
     ":max": {
       "category": 5,
-      "rankTargetType": 16,
+      "rankTargetType": 17,
       "rankPeriodType": 4,
       "rankTarget": 2
     },
@@ -68,7 +68,7 @@
       "id": 1200002,
       "name": "상회 누적 기여도",
       "category": 5,
-      "listOrder": 106,
+      "listOrder": 107,
       "viewRankingList": true,
       "rankTargetType": 6,
       "rankPeriodType": 1,
@@ -91,7 +91,7 @@
       "id": 1200004,
       "name": "주간 발견 보고",
       "category": 3,
-      "listOrder": 105,
+      "listOrder": 106,
       "viewRankingList": true,
       "rankTargetType": 4,
       "rankPeriodType": 2,
@@ -127,7 +127,7 @@
       "id": 1200007,
       "name": "폐허의 등대",
       "category": 1,
-      "listOrder": 107,
+      "listOrder": 108,
       "viewRankingList": true,
       "rankTargetType": 14,
       "rankPeriodType": 3,
@@ -139,7 +139,7 @@
       "id": 1200008,
       "name": "투자 시즌 점수",
       "category": 4,
-      "listOrder": 108,
+      "listOrder": 109,
       "viewRankingList": false,
       "rankTargetType": 15,
       "rankPeriodType": 4,
@@ -150,12 +150,23 @@
       "id": 1200010,
       "name": "대격돌 승점",
       "category": 1,
-      "listOrder": 110,
+      "listOrder": 111,
       "viewRankingList": true,
       "rankTargetType": 16,
       "rankPeriodType": 2,
       "rankTarget": 1,
       "desc": "대격돌 시즌 승점 순위"
+    },
+    "1200011": {
+      "id": 1200011,
+      "name": "주간 1회 최고 순이익",
+      "category": 2,
+      "listOrder": 105,
+      "viewRankingList": true,
+      "rankTargetType": 17,
+      "rankPeriodType": 2,
+      "rankTarget": 1,
+      "desc": "일주일간 기록한 1회 최고 순이익의 순위"
     }
   }
 }

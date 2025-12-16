@@ -14446,7 +14446,7 @@
       "marketPlaceUpperLimitPrice": 10000000000,
       "iconType": 3,
       "icon": "Icon_Item_23340023_Sprite",
-      "desc": "투자 시즌 상점에서만 획득할 수 있는 특별한 항해사와 교환할 수 있는 교환권.\n\n대상 항해사\n- 클라라",
+      "desc": "투자 시즌 상점에서만 획득할 수 있는 특별한 항해사와 교환할 수 있는 교환권.\n\n대상 항해사\n- 클라라 반 슈네",
       "descFormat": [
         {
           "Type": 2,
@@ -14459,7 +14459,8 @@
         }
       ],
       "discoveryType": 0,
-      "rewardNotice": false
+      "rewardNotice": false,
+      "choiceBoxGroup": 100181
     },
     "23340188": {
       "id": 23340188,
@@ -14606,7 +14607,7 @@
       "icon": "Icon_Item_23340193_Sprite",
       "desc": "행복한 춘절을 보낼 수 있는 최고의 선물.\n붉은 봉투로 다양한 선물을 교환해보세요!\n※ 해당 아이템은 도구점에 판매할 수 없습니다. 이벤트 기간에만 획득할 수 있습니다.",
       "discoveryType": 0,
-      "pointIconType": 81,
+      "pointIconType": 102,
       "rewardNotice": false
     },
     "23347001": {
@@ -93352,6 +93353,65 @@
       "discoveryType": 0,
       "rewardNotice": false,
       "choiceBoxGroup": 100178
+    },
+    "23710308": {
+      "id": 23710308,
+      "name": "공헌도 중형 선박 재료 선택 상자",
+      "type": 27,
+      "filterType": 1,
+      "detailType": 21,
+      "mainGrade": 3,
+      "subGrade": 1,
+      "maxStack": 99999,
+      "isUsable": true,
+      "isMultipleUsable": true,
+      "isNotSell": true,
+      "isNotDelete": false,
+      "isSlotOccupied": false,
+      "isCash": false,
+      "isCashMarket": false,
+      "isShipyardShopSale": false,
+      "CashMarketLowerLimitPrice": 10,
+      "CashMarketUpperLimitPrice": 10000000,
+      "bundleQuantityUnit": 1,
+      "marketPlaceLowerLimitPrice": 10,
+      "marketPlaceUpperLimitPrice": 10000000000,
+      "iconType": 2,
+      "icon": "Icon_Item_23430001_Sprite",
+      "desc": "중형 선박을 건조할 때 사용하는 판재, 돛대, 포문 중 한 종류를 받을 수 있는 상자.",
+      "discoveryType": 0,
+      "rewardNotice": false,
+      "choiceBoxGroup": 100186
+    },
+    "23710309": {
+      "id": 23710309,
+      "name": "초보자 건조 상자",
+      "type": 23,
+      "filterType": 1,
+      "detailType": 21,
+      "mainGrade": 2,
+      "subGrade": 1,
+      "sellPrice": 1,
+      "maxStack": 99999,
+      "isUsable": true,
+      "isMultipleUsable": true,
+      "isNotSell": true,
+      "isNotDelete": false,
+      "isSlotOccupied": false,
+      "isCash": false,
+      "isCashMarket": false,
+      "isShipyardShopSale": false,
+      "CashMarketLowerLimitPrice": 10,
+      "CashMarketUpperLimitPrice": 10000000,
+      "bundleQuantityUnit": 1,
+      "marketPlaceLowerLimitPrice": 10,
+      "marketPlaceUpperLimitPrice": 10000000000,
+      "iconType": 0,
+      "icon": "Icon_gatcha_A_Sprite",
+      "gachaRewardId": 90134722,
+      "desc": "선박 건조 재료를 제공합니다.",
+      "discoveryType": 0,
+      "rewardNotice": false
     },
     "23720001": {
       "id": 23720001,

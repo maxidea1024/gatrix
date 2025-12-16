@@ -25460,6 +25460,12 @@
           "Count": 1
         }
       ],
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 20
+        }
+      ],
       "fishId": 77800031,
       "isUsedDiscovery": true
     },
@@ -33299,6 +33305,12 @@
           "Type": 1,
           "Id": 23420019,
           "Count": 1
+        }
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 20
         }
       ],
       "fishId": 77800285,

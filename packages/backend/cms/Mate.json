@@ -2984,7 +2984,7 @@
       "autoMateOrderId": 65100032,
       "autoMateSkillId": 65010660,
       "autoMatePassiveId": 64930682,
-      "autoMatePassiveFixedId": 60700658,
+      "autoMatePassiveFixedId": 60700510,
       "canCapture": false,
       "CEquipId": [
         22711024,
@@ -41995,7 +41995,7 @@
       "battleDuelSkillId": 67600010,
       "autoMateSkillId": 65010661,
       "autoMatePassiveId": 64930683,
-      "autoMatePassiveFixedId": 60700659,
+      "autoMatePassiveFixedId": 60700510,
       "canCapture": false,
       "CEquipId": [
         22711022,
@@ -42130,7 +42130,7 @@
       "battleDuelSkillId": 67600010,
       "autoMateSkillId": 65010662,
       "autoMatePassiveId": 64930684,
-      "autoMatePassiveFixedId": 60700660,
+      "autoMatePassiveFixedId": 60700510,
       "canCapture": false,
       "CEquipId": [
         22711022,
@@ -42424,36 +42424,37 @@
       "stat": [
         {
           "Type": 107,
-          "Val": 80
+          "Val": 82
         },
         {
           "Type": 101,
-          "Val": 72
+          "Val": 81
         },
         {
           "Type": 102,
-          "Val": 66
+          "Val": 79
         },
         {
           "Type": 103,
-          "Val": 78
+          "Val": 84
         },
         {
           "Type": 104,
-          "Val": 92
-        },
-        {
-          "Type": 105,
           "Val": 89
         },
         {
+          "Type": 105,
+          "Val": 93
+        },
+        {
           "Type": 106,
-          "Val": 83
+          "Val": 91
         }
       ],
       "battleDuelSkillId": 67600000,
-      "autoMateSkillId": 65000001,
-      "autoMatePassiveId": 64900001,
+      "autoMateSkillId": 65010669,
+      "autoMatePassiveId": 64930691,
+      "autoMatePassiveFixedId": 60700663,
       "canCapture": false,
       "CEquipId": [
         22711002,
@@ -42466,12 +42467,13 @@
       "useUniqueTalk": 1,
       "isRelease": true,
       "isReleaseGl": true,
-      "isReleaseCN": false,
+      "isReleaseCN": true,
       "acquisitionWay": 3,
       "acquisitionWayGL": 3,
+      "acquisitionWayCN": 3,
       "acquisitionDesc": "투자 시즌 상점 교환 시즌 5",
       "acquisitionDescGL": "투자 시즌 상점 교환 시즌 5",
-      "acquisitionDescCN": "투자 시즌 상점 교환 시즌 5"
+      "acquisitionDescCN": "투자 시즌 상점 교환 시즌 1"
     },
     "21320005": {
       "id": 21320005,
@@ -59724,7 +59726,7 @@
       "battleDuelSkillId": 67600000,
       "autoMateSkillId": 65010668,
       "autoMatePassiveId": 64930690,
-      "autoMatePassiveFixedId": 60700662,
+      "autoMatePassiveFixedId": 60700510,
       "canCapture": false,
       "awakenPieceId": 23419015,
       "pieceId": 23419015,
@@ -63470,7 +63472,7 @@
       "battleDuelSkillId": 67600000,
       "autoMateSkillId": 65010667,
       "autoMatePassiveId": 64930689,
-      "autoMatePassiveFixedId": 60700661,
+      "autoMatePassiveFixedId": 60700510,
       "canCapture": false,
       "awakenPieceId": 23419072,
       "pieceId": 23419072,
