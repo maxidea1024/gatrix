@@ -2465,6 +2465,7 @@
       "surveysDesc": "创建和管理问卷调查",
       "operationEventsDesc": "管理运营活动",
       "bannersDesc": "管理横幅图片",
+      "storeProductsDesc": "管理商店商品",
       "planningDataDesc": "管理策划数据",
       "securityDesc": "管理 API 令牌和白名单",
       "auditLogsDesc": "查看系统审计日志",

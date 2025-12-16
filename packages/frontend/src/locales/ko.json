@@ -2412,6 +2412,7 @@
       "surveysDesc": "설문지 생성 및 관리",
       "operationEventsDesc": "운영 이벤트 관리",
       "bannersDesc": "배너 이미지 관리",
+      "storeProductsDesc": "스토어 상품 관리",
       "planningDataDesc": "기획 데이터 관리",
       "securityDesc": "API 토큰 및 화이트리스트 관리",
       "auditLogsDesc": "시스템 감사 로그 조회",

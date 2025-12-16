@@ -50,6 +50,7 @@ import {
   OpenInNew as OpenInNewIcon,
   Refresh as RefreshIcon,
   Block as BlockIcon,
+  Storefront as StorefrontIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
@@ -62,6 +63,7 @@ import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceSer
 import { CrashEvent } from '@/types/crash';
 import { BugReport as BugReportIcon } from '@mui/icons-material';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
+import { formatDateTime, formatRelativeTime } from '@/utils/dateFormat';
 
 // Stats card component with modern design
 interface StatsCardProps {
@@ -257,7 +259,7 @@ interface EnvironmentWithCounts extends Environment {
 
 const DashboardPage: React.FC = () => {
   const theme = useTheme();
-  const { user, isAdmin, hasPermission } = useAuth();
+  const { user, isAdmin, hasPermission, permissionsLoading } = useAuth();
   const { data: statsData, isLoading: statsLoading, mutate: refreshStats } = useUserStats();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -433,6 +435,16 @@ const DashboardPage: React.FC = () => {
       });
     }
 
+    if (hasPermission(PERMISSIONS.STORE_PRODUCTS_VIEW)) {
+      actions.push({
+        key: 'storeProducts',
+        title: t('sidebar.storeProducts'),
+        description: t('dashboard.quickActions.storeProductsDesc'),
+        icon: <StorefrontIcon />,
+        path: '/game/store-products',
+      });
+    }
+
     if (hasPermission(PERMISSIONS.PLANNING_DATA_VIEW)) {
       actions.push({
         key: 'planningData',
@@ -489,7 +501,7 @@ const DashboardPage: React.FC = () => {
     }
 
     return actions;
-  }, [hasPermission, t, stats.pending, alertsSummary.firing, theme.palette.error.main]);
+  }, [hasPermission, t, stats.pending, alertsSummary.firing, theme.palette.error.main, permissionsLoading]);
 
   // Load alerts summary
   useEffect(() => {
@@ -842,7 +854,7 @@ const DashboardPage: React.FC = () => {
                             {t('dashboard.maintenanceStartsAt')}
                           </Typography>
                           <Typography variant="body2" fontWeight={500}>
-                            {startsAt.toLocaleString()}
+                            {formatDateTime(startsAt)}
                           </Typography>
                         </Box>
                       )}
@@ -852,7 +864,7 @@ const DashboardPage: React.FC = () => {
                             {t('dashboard.maintenanceEndsAt')}
                           </Typography>
                           <Typography variant="body2" fontWeight={500}>
-                            {endsAt.toLocaleString()}
+                            {formatDateTime(endsAt)}
                           </Typography>
                         </Box>
                       )}
@@ -1343,7 +1355,7 @@ const DashboardPage: React.FC = () => {
                               </Typography>
                               <Typography variant="caption" color="text.disabled">•</Typography>
                               <Typography variant="caption" color="text.secondary">
-                                {new Date(activity.timestamp).toLocaleString()}
+                                {formatRelativeTime(activity.timestamp)}
                               </Typography>
                             </Box>
                           }
@@ -1428,7 +1440,7 @@ const DashboardPage: React.FC = () => {
                                 <Chip label={`v${event.appVersion}`} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
                               )}
                               <Typography variant="caption" color="text.secondary">
-                                {new Date(event.createdAt).toLocaleString()}
+                                {formatRelativeTime(event.createdAt)}
                               </Typography>
                             </Box>
                           }

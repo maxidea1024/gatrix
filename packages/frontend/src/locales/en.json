@@ -2412,6 +2412,7 @@
       "surveysDesc": "Create and manage surveys",
       "operationEventsDesc": "Manage operation events",
       "bannersDesc": "Manage banner images",
+      "storeProductsDesc": "Manage store products",
       "planningDataDesc": "Manage planning data",
       "securityDesc": "Manage API tokens and whitelists",
       "auditLogsDesc": "View system audit logs",
