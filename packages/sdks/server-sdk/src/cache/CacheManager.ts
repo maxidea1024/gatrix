@@ -1070,6 +1070,18 @@ export class CacheManager {
   }
 
   /**
+   * Refresh store products cache for an environment
+   */
+  async refreshStoreProducts(environment?: string): Promise<void> {
+    if (environment) {
+      await this.storeProductService?.refreshByEnvironment(environment);
+    } else {
+      // If no environment specified, refresh all cached environments
+      await this.storeProductService?.refresh();
+    }
+  }
+
+  /**
    * Update a single banner in cache (immutable)
    */
   async updateSingleBanner(bannerId: string, environment?: string, status?: string): Promise<void> {

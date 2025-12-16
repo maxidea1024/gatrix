@@ -260,6 +260,7 @@ export class EventListener {
       'store_product.created',
       'store_product.updated',
       'store_product.deleted',
+      'store_product.bulk_updated',
       'environment.created',
       'environment.deleted',
     ].includes(type);
@@ -463,6 +464,22 @@ export class EventListener {
         }
         // Remove the deleted store product from cache (immutable)
         this.cacheManager.removeStoreProduct(String(event.data.id), event.data.environment);
+        break;
+      }
+
+      case 'store_product.bulk_updated': {
+        const features = this.cacheManager.getFeatures();
+        if (features.storeProduct !== true) {
+          this.logger.debug('Store product bulk update event ignored - feature is disabled', { event: event.type });
+          break;
+        }
+        // For bulk updates, refresh all store products for the environment
+        this.logger.info('Store product bulk update event received, refreshing cache', {
+          count: event.data.count,
+          environment: event.data.environment,
+          isActive: event.data.isActive,
+        });
+        await this.cacheManager.refreshStoreProducts(event.data.environment);
         break;
       }
 

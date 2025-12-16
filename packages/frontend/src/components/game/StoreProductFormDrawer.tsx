@@ -58,6 +58,10 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   // Form state
   const [productId, setProductId] = useState('');
   const [productName, setProductName] = useState('');
+  // Multi-language name fields
+  const [nameKo, setNameKo] = useState('');
+  const [nameEn, setNameEn] = useState('');
+  const [nameZh, setNameZh] = useState('');
   const [store, setStore] = useState('');
   const [price, setPrice] = useState<number>(0);
   const [currency, setCurrency] = useState('USD');
@@ -65,6 +69,10 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
   const [saleStartAt, setSaleStartAt] = useState<Dayjs | null>(null);
   const [saleEndAt, setSaleEndAt] = useState<Dayjs | null>(null);
   const [description, setDescription] = useState('');
+  // Multi-language description fields
+  const [descriptionKo, setDescriptionKo] = useState('');
+  const [descriptionEn, setDescriptionEn] = useState('');
+  const [descriptionZh, setDescriptionZh] = useState('');
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [saving, setSaving] = useState(false);
@@ -102,6 +110,10 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
 
       setProductId(product.productId);
       setProductName(product.productName);
+      // Multi-language name fields
+      setNameKo(product.nameKo || '');
+      setNameEn(product.nameEn || '');
+      setNameZh(product.nameZh || '');
       setStore(product.store);
       setPrice(product.price);
       setCurrency(product.currency || 'USD');
@@ -109,6 +121,10 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
       setSaleStartAt(product.saleStartAt ? dayjs(product.saleStartAt) : null);
       setSaleEndAt(product.saleEndAt ? dayjs(product.saleEndAt) : null);
       setDescription(product.description || '');
+      // Multi-language description fields
+      setDescriptionKo(product.descriptionKo || '');
+      setDescriptionEn(product.descriptionEn || '');
+      setDescriptionZh(product.descriptionZh || '');
 
       // Convert tags to Tag objects
       if (product.tags && Array.isArray(product.tags)) {
@@ -128,6 +144,9 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
       // Reset form for new product
       setProductId('');
       setProductName('');
+      setNameKo('');
+      setNameEn('');
+      setNameZh('');
       setStore('sdo'); // Default to SDO
       setPrice(0);
       setCurrency('CNY'); // Default to CNY
@@ -135,6 +154,9 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
       setSaleStartAt(null);
       setSaleEndAt(null);
       setDescription('');
+      setDescriptionKo('');
+      setDescriptionEn('');
+      setDescriptionZh('');
       setSelectedTags([]);
       setIsCopy(false);
     }
@@ -172,6 +194,10 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
       const payload = {
         productId: productId.trim(),
         productName: productName.trim(),
+        // Multi-language name fields
+        nameKo: nameKo.trim() || undefined,
+        nameEn: nameEn.trim() || undefined,
+        nameZh: nameZh.trim() || undefined,
         store,
         price,
         currency,
@@ -179,6 +205,10 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
         saleStartAt: saleStartAt ? saleStartAt.toISOString() : null,
         saleEndAt: saleEndAt ? saleEndAt.toISOString() : null,
         description: description.trim() || undefined,
+        // Multi-language description fields
+        descriptionKo: descriptionKo.trim() || undefined,
+        descriptionEn: descriptionEn.trim() || undefined,
+        descriptionZh: descriptionZh.trim() || undefined,
         tagIds,
       };
 
@@ -270,6 +300,42 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                     readOnly: isEditMode,
                   }}
                 />
+              </Box>
+
+              {/* Multi-language Product Names */}
+              <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 2 }}>
+                <Typography variant="subtitle2" sx={{ mb: 2, color: 'text.secondary' }}>
+                  {t('storeProducts.multiLangNames')}
+                </Typography>
+                <Stack spacing={1.5}>
+                  <TextField
+                    label={t('storeProducts.nameKo')}
+                    value={nameKo}
+                    onChange={(e) => setNameKo(e.target.value)}
+                    fullWidth
+                    size="small"
+                    disabled={isEditMode}
+                    InputProps={{ readOnly: isEditMode }}
+                  />
+                  <TextField
+                    label={t('storeProducts.nameEn')}
+                    value={nameEn}
+                    onChange={(e) => setNameEn(e.target.value)}
+                    fullWidth
+                    size="small"
+                    disabled={isEditMode}
+                    InputProps={{ readOnly: isEditMode }}
+                  />
+                  <TextField
+                    label={t('storeProducts.nameZh')}
+                    value={nameZh}
+                    onChange={(e) => setNameZh(e.target.value)}
+                    fullWidth
+                    size="small"
+                    disabled={isEditMode}
+                    InputProps={{ readOnly: isEditMode }}
+                  />
+                </Stack>
               </Box>
 
               {/* Store - Read-only in edit mode */}
@@ -381,7 +447,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                 </Box>
               </Box>
 
-              {/* Description */}
+              {/* Description (default) */}
               <Box>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
                   {t('storeProducts.description')}
@@ -391,7 +457,7 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                   onChange={(e) => setDescription(e.target.value)}
                   fullWidth
                   multiline
-                  rows={3}
+                  rows={2}
                   size="small"
                   placeholder={t('storeProducts.descriptionHelp')}
                   slotProps={{
@@ -400,6 +466,48 @@ const StoreProductFormDrawer: React.FC<StoreProductFormDrawerProps> = ({
                     },
                   }}
                 />
+              </Box>
+
+              {/* Multi-language Descriptions */}
+              <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 2 }}>
+                <Typography variant="subtitle2" sx={{ mb: 2, color: 'text.secondary' }}>
+                  {t('storeProducts.multiLangDescriptions')}
+                </Typography>
+                <Stack spacing={1.5}>
+                  <TextField
+                    label={t('storeProducts.descriptionKo')}
+                    value={descriptionKo}
+                    onChange={(e) => setDescriptionKo(e.target.value)}
+                    fullWidth
+                    multiline
+                    rows={2}
+                    size="small"
+                    disabled={isEditMode}
+                    InputProps={{ readOnly: isEditMode }}
+                  />
+                  <TextField
+                    label={t('storeProducts.descriptionEn')}
+                    value={descriptionEn}
+                    onChange={(e) => setDescriptionEn(e.target.value)}
+                    fullWidth
+                    multiline
+                    rows={2}
+                    size="small"
+                    disabled={isEditMode}
+                    InputProps={{ readOnly: isEditMode }}
+                  />
+                  <TextField
+                    label={t('storeProducts.descriptionZh')}
+                    value={descriptionZh}
+                    onChange={(e) => setDescriptionZh(e.target.value)}
+                    fullWidth
+                    multiline
+                    rows={2}
+                    size="small"
+                    disabled={isEditMode}
+                    InputProps={{ readOnly: isEditMode }}
+                  />
+                </Stack>
               </Box>
 
               {/* Tags */}

@@ -8,12 +8,20 @@ export interface StoreProduct {
   productId: string;
   cmsProductId: number | null;
   productName: string;
+  // Multi-language name fields
+  nameKo: string | null;
+  nameEn: string | null;
+  nameZh: string | null;
   store: string;
   price: number;
   currency: string;
   saleStartAt: string | null;
   saleEndAt: string | null;
   description: string | null;
+  // Multi-language description fields
+  descriptionKo: string | null;
+  descriptionEn: string | null;
+  descriptionZh: string | null;
   metadata: Record<string, any> | null;
   createdBy: number | null;
   updatedBy: number | null;
@@ -25,6 +33,10 @@ export interface StoreProduct {
 export interface CreateStoreProductInput {
   productId: string;
   productName: string;
+  // Multi-language name fields
+  nameKo?: string;
+  nameEn?: string;
+  nameZh?: string;
   store: string;
   price: number;
   currency?: string;
@@ -32,6 +44,10 @@ export interface CreateStoreProductInput {
   saleStartAt?: string | null;
   saleEndAt?: string | null;
   description?: string;
+  // Multi-language description fields
+  descriptionKo?: string;
+  descriptionEn?: string;
+  descriptionZh?: string;
   metadata?: Record<string, any>;
   tagIds?: number[];
 }
@@ -39,6 +55,10 @@ export interface CreateStoreProductInput {
 export interface UpdateStoreProductInput {
   productId?: string;
   productName?: string;
+  // Multi-language name fields
+  nameKo?: string;
+  nameEn?: string;
+  nameZh?: string;
   store?: string;
   price?: number;
   currency?: string;
@@ -46,6 +66,10 @@ export interface UpdateStoreProductInput {
   saleStartAt?: string | null;
   saleEndAt?: string | null;
   description?: string;
+  // Multi-language description fields
+  descriptionKo?: string;
+  descriptionEn?: string;
+  descriptionZh?: string;
   metadata?: Record<string, any>;
   tagIds?: number[];
 }
@@ -167,6 +191,29 @@ class StoreProductService {
   }
 
   /**
+   * Bulk update active status by filter (for batch processing)
+   */
+  async bulkUpdateActiveStatusByFilter(params: {
+    search?: string;
+    currentIsActive?: boolean;
+    targetIsActive: boolean;
+  }): Promise<{ affectedCount: number; affectedIds: string[] }> {
+    const response = await api.patch('/admin/store-products/bulk-active-by-filter', params);
+    return response.data;
+  }
+
+  /**
+   * Get count of products matching filter criteria (for batch processing preview)
+   */
+  async getCountByFilter(params: {
+    search?: string;
+    isActive?: boolean;
+  }): Promise<number> {
+    const response = await api.get('/admin/store-products/count-by-filter', { params });
+    return response.data.count;
+  }
+
+  /**
    * Get CMS CashShop products from CashShop_BCCN.json
    * Returns only valid products (with chinaPrice and productCodeSdo)
    */
@@ -217,9 +264,15 @@ export interface SyncChange {
 export interface SyncAddItem {
   cmsProductId: number;
   productCode: string;
-  name: string;
+  name: string;  // Display name (default language)
+  nameKo: string;
+  nameEn: string;
+  nameZh: string;
   price: number;
-  description: string | null;
+  description: string | null;  // Display description (default language)
+  descriptionKo: string | null;
+  descriptionEn: string | null;
+  descriptionZh: string | null;
 }
 
 export interface SyncUpdateItem {

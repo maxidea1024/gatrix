@@ -506,20 +506,19 @@ export class PlanningDataService {
   }
 
   /**
-   * Get CashShop lookup data
+   * Get CashShop lookup data (unified multi-language file)
    * @param environmentId Environment ULID
-   * @param lang Language code (kr, en, zh)
    */
-  static async getCashShopLookup(environmentId: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<Record<string, any>> {
+  static async getCashShopLookup(environmentId: string): Promise<Record<string, any>> {
     try {
-      const cacheKey = this.getEnvCacheKey(environmentId, `${this.CACHE_KEYS.CASH_SHOP}:${lang}`);
-      const filePath = this.getFilePath(environmentId, `cashshop-lookup-${lang}.json`);
+      const cacheKey = this.getEnvCacheKey(environmentId, this.CACHE_KEYS.CASH_SHOP);
+      const filePath = this.getFilePath(environmentId, 'cashshop-lookup.json');
 
       // Try to get from Redis cache first
       const cached = await cacheService.get<Record<string, any>>(cacheKey);
       if (cached) {
         await cacheService.setWithoutTTL(cacheKey, cached);
-        logger.debug(`CashShop lookup data (${lang}) retrieved from cache`, { environmentId });
+        logger.debug('CashShop lookup data retrieved from cache', { environmentId });
         return cached;
       }
 
@@ -584,10 +583,8 @@ export class PlanningDataService {
         'oceannpcarea-lookup-kr.json',
         'oceannpcarea-lookup-en.json',
         'oceannpcarea-lookup-zh.json',
-        // CashShop data
-        'cashshop-lookup-kr.json',
-        'cashshop-lookup-en.json',
-        'cashshop-lookup-zh.json',
+        // CashShop data (unified multi-language file)
+        'cashshop-lookup.json',
       ];
 
       // Validate uploaded files

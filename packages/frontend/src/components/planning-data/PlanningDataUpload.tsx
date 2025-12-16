@@ -71,10 +71,8 @@ const SUPPORTED_FILES = [
   { name: 'oceannpcarea-lookup-kr.json', category: 'Event', description: 'OceanNpcArea (Korean)' },
   { name: 'oceannpcarea-lookup-en.json', category: 'Event', description: 'OceanNpcArea (English)' },
   { name: 'oceannpcarea-lookup-zh.json', category: 'Event', description: 'OceanNpcArea (Chinese)' },
-  // CashShop data
-  { name: 'cashshop-lookup-kr.json', category: 'CashShop', description: 'CashShop (Korean)' },
-  { name: 'cashshop-lookup-en.json', category: 'CashShop', description: 'CashShop (English)' },
-  { name: 'cashshop-lookup-zh.json', category: 'CashShop', description: 'CashShop (Chinese)' },
+  // CashShop data (unified multi-language file)
+  { name: 'cashshop-lookup.json', category: 'CashShop', description: 'CashShop (Unified Multi-Language)' },
 ];
 
 const REQUIRED_FILES = SUPPORTED_FILES.map(f => f.name);

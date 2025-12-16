@@ -3332,6 +3332,7 @@ function buildOceanNpcAreaSpawnerLookup(cmsDir, outputDir, loctab = {}) {
 /**
  * Build CashShop lookup from CashShop_BCCN.json
  * Only includes valid products (with chinaPrice and productCodeSdo)
+ * Creates a single unified file with multi-language support
  */
 function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
   console.log('💰 Building CashShop lookup...');
@@ -3356,7 +3357,7 @@ function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
       return localizedTemplate.replace('{0}', formatText || '');
     };
 
-    // Extract valid products
+    // Extract valid products with unified multi-language structure
     const items = Object.entries(cashShopData.CashShop)
       .filter(([key, item]) => {
         if (!item || !item.id || key.startsWith(':')) return false;
@@ -3364,44 +3365,51 @@ function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
         return item.chinaPrice && item.productCodeSdo;
       })
       .map(([, item]) => {
-        const nameKr = formatProductName(
+        const nameKo = formatProductName(
           item.productName || '',
           item.productNameFormatText || '',
           {} // Korean: no translation
         );
-        const nameCn = formatProductName(
+        const nameZh = formatProductName(
           item.productName || '',
           item.productNameFormatText || '',
           loctab
         );
         // Translate productDesc
-        const descKr = item.productDesc || '';
-        const descCn = loctab[descKr] || descKr;
+        const descKo = item.productDesc || '';
+        const descZh = loctab[descKo] || descKo;
 
+        // Unified structure with language keys (ko, en, zh)
         return {
           id: item.id,
-          name: nameKr,
-          nameKr,
-          nameEn: nameKr, // English: use Korean (no translation available)
-          nameCn,
+          name: {
+            ko: nameKo,
+            en: nameKo, // English: use Korean (no translation available)
+            zh: nameZh,
+          },
+          description: {
+            ko: descKo,
+            en: descKo, // English: use Korean (no translation available)
+            zh: descZh,
+          },
           productCode: item.productCodeSdo,
           price: item.chinaPrice,
           productCategory: item.productCategory || 0,
           productType: item.productType || 0,
           saleType: item.saleType || 0,
-          productDesc: descKr,
-          productDescKr: descKr,
-          productDescEn: descKr, // English: use Korean (no translation available)
-          productDescCn: descCn,
         };
       });
 
     items.sort((a, b) => a.id - b.id);
 
-    const lookupData = { items };
+    const lookupData = {
+      totalCount: items.length,
+      items,
+    };
 
-    // Convert to language-specific files
-    convertCashShopToLanguageSpecific(lookupData, 'cashshop', outputDir);
+    // Save unified file
+    const unifiedFile = path.join(outputDir, 'cashshop-lookup.json');
+    fs.writeFileSync(unifiedFile, JSON.stringify(lookupData, null, 2), 'utf8');
 
     console.log(`   ✅ CashShop lookup built (${items.length} items)`);
     return lookupData;
@@ -3409,70 +3417,6 @@ function buildCashShopLookup(cmsDir, outputDir, loctab = {}) {
     console.log(`   ⚠️  Error building CashShop lookup:`, error.message);
     return null;
   }
-}
-
-/**
- * Convert CashShop data to language-specific files
- * Handles both name and productDesc translations
- */
-function convertCashShopToLanguageSpecific(data, eventType, outputDir) {
-  const languageData = {
-    kr: { totalCount: 0, items: [] },
-    en: { totalCount: 0, items: [] },
-    zh: { totalCount: 0, items: [] },
-  };
-
-  for (const item of data.items) {
-    // Korean
-    languageData.kr.items.push({
-      id: item.id,
-      name: item.nameKr,
-      productCode: item.productCode,
-      price: item.price,
-      productCategory: item.productCategory,
-      productType: item.productType,
-      saleType: item.saleType,
-      productDesc: item.productDescKr,
-    });
-
-    // English
-    languageData.en.items.push({
-      id: item.id,
-      name: item.nameEn,
-      productCode: item.productCode,
-      price: item.price,
-      productCategory: item.productCategory,
-      productType: item.productType,
-      saleType: item.saleType,
-      productDesc: item.productDescEn,
-    });
-
-    // Chinese
-    languageData.zh.items.push({
-      id: item.id,
-      name: item.nameCn,
-      productCode: item.productCode,
-      price: item.price,
-      productCategory: item.productCategory,
-      productType: item.productType,
-      saleType: item.saleType,
-      productDesc: item.productDescCn,
-    });
-  }
-
-  languageData.kr.totalCount = languageData.kr.items.length;
-  languageData.en.totalCount = languageData.en.items.length;
-  languageData.zh.totalCount = languageData.zh.items.length;
-
-  // Save language-specific files
-  const krFile = path.join(outputDir, `${eventType}-lookup-kr.json`);
-  fs.writeFileSync(krFile, JSON.stringify(languageData.kr, null, 2), 'utf8');
-
-  const enFile = path.join(outputDir, `${eventType}-lookup-en.json`);
-  fs.writeFileSync(enFile, JSON.stringify(languageData.en, null, 2), 'utf8');
-
-  const zhFile = path.join(outputDir, `${eventType}-lookup-zh.json`);
-  fs.writeFileSync(zhFile, JSON.stringify(languageData.zh, null, 2), 'utf8');
 }
 
 // ============================================================================
@@ -3618,9 +3562,7 @@ Examples:
 
     const cashShop = buildCashShopLookup(cmsDir, outputDir, loctab);
     if (cashShop) {
-      generatedFiles.push({ name: 'cashshop-lookup-kr.json', description: 'CashShop (Korean)' });
-      generatedFiles.push({ name: 'cashshop-lookup-en.json', description: 'CashShop (English)' });
-      generatedFiles.push({ name: 'cashshop-lookup-zh.json', description: 'CashShop (Chinese)' });
+      generatedFiles.push({ name: 'cashshop-lookup.json', description: 'CashShop (Unified Multi-Language)' });
     }
   }
 

@@ -255,14 +255,59 @@ export class StoreProductController {
   });
 
   /**
+   * Bulk update active status by filter (for batch processing)
+   * PATCH /api/v1/admin/store-products/bulk-active-by-filter
+   */
+  static bulkUpdateActiveStatusByFilter = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { search, currentIsActive, targetIsActive } = req.body;
+    const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+
+    if (targetIsActive === undefined) {
+      throw new GatrixError('targetIsActive value is required', 400);
+    }
+
+    const result = await StoreProductService.bulkUpdateActiveStatusByFilter(
+      {
+        search: search as string,
+        currentIsActive: currentIsActive !== undefined ? Boolean(currentIsActive) : undefined,
+        targetIsActive: Boolean(targetIsActive),
+      },
+      userId
+    );
+
+    res.json({
+      success: true,
+      data: result,
+      message: `${result.affectedCount} products ${targetIsActive ? 'activated' : 'deactivated'} successfully`,
+    });
+  });
+
+  /**
+   * Get count of products matching filter criteria (for batch processing preview)
+   * GET /api/v1/admin/store-products/count-by-filter
+   */
+  static getCountByFilter = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { search, isActive } = req.query;
+
+    const count = await StoreProductService.getCountByFilter({
+      search: search as string,
+      isActive: isActive !== undefined ? isActive === 'true' : undefined,
+    });
+
+    res.json({
+      success: true,
+      data: { count },
+    });
+  });
+
+  /**
    * Preview sync with planning data
    * GET /api/v1/admin/store-products/sync/preview
    */
   static previewSync = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const lang = (req.query.lang as 'kr' | 'en' | 'zh') || 'kr';
     const environmentId = req.environmentId;
 
-    const result = await StoreProductService.previewSync(environmentId, lang);
+    const result = await StoreProductService.previewSync(environmentId);
 
     res.json({
       success: true,
@@ -276,12 +321,11 @@ export class StoreProductController {
    * POST /api/v1/admin/store-products/sync/apply
    */
   static applySync = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const lang = (req.query.lang as 'kr' | 'en' | 'zh') || 'kr';
     const environmentId = req.environmentId;
     const userId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
     const selected = req.body; // { toAdd: number[], toUpdate: number[], toDelete: string[] }
 
-    const result = await StoreProductService.applySync(environmentId, lang, userId, selected);
+    const result = await StoreProductService.applySync(environmentId, userId, selected);
 
     res.json({
       success: true,

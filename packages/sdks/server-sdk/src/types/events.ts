@@ -30,11 +30,12 @@ export type StandardEventType =
   | 'store_product.created'
   | 'store_product.updated'
   | 'store_product.deleted'
+  | 'store_product.bulk_updated'
   | 'environment.created'
   | 'environment.deleted';
 
 export interface StandardEventData {
-  id: number | string;
+  id?: number | string; // Optional for bulk events that don't have a single id
   timestamp: number;
   /**
    * Environment identifier (environmentName value).
@@ -49,6 +50,7 @@ export interface StandardEventData {
   maintenanceEndDate?: string; // For maintenance.settings.updated events
   maintenanceMessage?: string; // For maintenance.settings.updated events
   maintenanceLocales?: Array<{ lang: string; message: string }>; // For maintenance.settings.updated events
+  count?: number; // For bulk events (store_product.bulk_updated)
 }
 
 export interface StandardEvent {

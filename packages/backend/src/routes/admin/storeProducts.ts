@@ -10,6 +10,10 @@ router.post('/sync/apply', StoreProductController.applySync);
 // Stats route (must be before /:id to avoid conflict)
 router.get('/stats', StoreProductController.getStats);
 
+// Batch processing routes (must be before /:id to avoid conflict)
+router.get('/count-by-filter', StoreProductController.getCountByFilter);
+router.patch('/bulk-active-by-filter', StoreProductController.bulkUpdateActiveStatusByFilter);
+
 // Store product CRUD routes
 router.get('/', StoreProductController.getStoreProducts);
 router.get('/:id', StoreProductController.getStoreProductById);

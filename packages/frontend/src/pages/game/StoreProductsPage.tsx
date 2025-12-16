@@ -33,12 +33,15 @@ import {
   ContentCopy as ContentCopyIcon,
   Refresh as RefreshIcon,
   Sync as SyncIcon,
+  PlaylistPlay as BatchProcessIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import i18n from 'i18next';
 import { useSnackbar } from 'notistack';
 import storeProductService, { StoreProduct, SyncPreviewResult, SelectedSyncItems, StoreProductStats } from '../../services/storeProductService';
 import { tagService } from '../../services/tagService';
 import SyncPreviewDialog, { SelectedSyncItems as DialogSelectedSyncItems } from '../../components/game/SyncPreviewDialog';
+import BatchProcessDialog from '../../components/game/BatchProcessDialog';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
@@ -87,6 +90,9 @@ const StoreProductsPage: React.FC = () => {
   const [syncDialogOpen, setSyncDialogOpen] = useState(false);
   const [syncPreview, setSyncPreview] = useState<SyncPreviewResult | null>(null);
   const [syncLoading, setSyncLoading] = useState(false);
+
+  // Batch process state
+  const [batchProcessDialogOpen, setBatchProcessDialogOpen] = useState(false);
 
   // Stats state
   const [productStats, setProductStats] = useState<StoreProductStats>({ total: 0, active: 0, inactive: 0 });
@@ -484,6 +490,34 @@ const StoreProductsPage: React.FC = () => {
     setSyncPreview(null);
   };
 
+  // Batch process handlers
+  const handleBatchProcessExecute = async (params: {
+    search?: string;
+    currentIsActive?: boolean;
+    targetIsActive: boolean;
+  }) => {
+    const result = await storeProductService.bulkUpdateActiveStatusByFilter(params);
+    const actionLabel = params.targetIsActive
+      ? t('storeProducts.bulkActivate')
+      : t('storeProducts.bulkDeactivate');
+    enqueueSnackbar(
+      t('storeProducts.batchExecuteSuccess', { count: result.affectedCount }),
+      { variant: 'success' }
+    );
+    setPage(0);
+    setSelectedIds([]);
+    await loadProducts();
+    loadStats();
+    return result;
+  };
+
+  const handleBatchProcessGetCount = async (params: {
+    search?: string;
+    isActive?: boolean;
+  }) => {
+    return await storeProductService.getCountByFilter(params);
+  };
+
   const handleDelete = (product: StoreProduct) => {
     setDeletingProduct(product);
     setDeleteConfirmOpen(true);
@@ -742,6 +776,18 @@ const StoreProductsPage: React.FC = () => {
                         </Typography>
                       </Box>
                     </Box>
+
+                    {/* Divider and Batch Process Button */}
+                    <Divider orientation="vertical" flexItem sx={{ mx: 1.5 }} />
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<BatchProcessIcon />}
+                      onClick={() => setBatchProcessDialogOpen(true)}
+                      sx={{ whiteSpace: 'nowrap' }}
+                    >
+                      {t('storeProducts.batchProcess')}
+                    </Button>
                   </Box>
                 }
               />
@@ -954,6 +1000,15 @@ const StoreProductsPage: React.FC = () => {
                           );
                         }
                         if (column.id === 'productName') {
+                          // Get localized product name based on current dashboard language
+                          let displayName = product.productName;
+                          if (i18n.language === 'ko' && product.nameKo) {
+                            displayName = product.nameKo;
+                          } else if (i18n.language === 'en' && product.nameEn) {
+                            displayName = product.nameEn;
+                          } else if (i18n.language === 'zh' && product.nameZh) {
+                            displayName = product.nameZh;
+                          }
                           return (
                             <TableCell key={column.id}>
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -964,13 +1019,13 @@ const StoreProductsPage: React.FC = () => {
                                   }}
                                   onClick={() => handleEdit(product)}
                                 >
-                                  {product.productName}
+                                  {displayName}
                                 </Typography>
                                 <Tooltip title={t('common.copy')}>
                                   <IconButton
                                     size="small"
                                     onClick={() => {
-                                      navigator.clipboard.writeText(product.productName);
+                                      navigator.clipboard.writeText(displayName);
                                       enqueueSnackbar(t('common.copied'), { variant: 'success' });
                                     }}
                                     sx={{ p: 0.25 }}
@@ -1165,6 +1220,14 @@ const StoreProductsPage: React.FC = () => {
         onApply={handleSyncApply}
         preview={syncPreview}
         loading={syncLoading}
+      />
+
+      {/* Batch Process Dialog */}
+      <BatchProcessDialog
+        open={batchProcessDialogOpen}
+        onClose={() => setBatchProcessDialogOpen(false)}
+        onExecute={handleBatchProcessExecute}
+        onGetCount={handleBatchProcessGetCount}
       />
     </Box>
   );

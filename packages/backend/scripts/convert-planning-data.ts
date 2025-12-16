@@ -146,9 +146,7 @@ class PlanningDataConverter {
       'oceannpcarea-lookup-kr.json',
       'oceannpcarea-lookup-en.json',
       'oceannpcarea-lookup-zh.json',
-      'cashshop-lookup-kr.json',
-      'cashshop-lookup-en.json',
-      'cashshop-lookup-zh.json',
+      'cashshop-lookup.json',
     ];
 
     this.log('Verifying output files...');

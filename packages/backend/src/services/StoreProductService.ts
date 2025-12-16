@@ -17,12 +17,20 @@ export interface StoreProduct {
   productId: string;
   cmsProductId: number | null;
   productName: string;
+  // Multi-language name fields
+  nameKo: string | null;
+  nameEn: string | null;
+  nameZh: string | null;
   store: string;
   price: number;
   currency: string;
   saleStartAt: Date | null;
   saleEndAt: Date | null;
   description: string | null;
+  // Multi-language description fields
+  descriptionKo: string | null;
+  descriptionEn: string | null;
+  descriptionZh: string | null;
   metadata: Record<string, any> | null;
   createdBy: number | null;
   updatedBy: number | null;
@@ -34,6 +42,10 @@ export interface StoreProduct {
 export interface CreateStoreProductInput {
   productId: string;
   productName: string;
+  // Multi-language name fields
+  nameKo?: string;
+  nameEn?: string;
+  nameZh?: string;
   store: string;
   price: number;
   currency?: string;
@@ -41,6 +53,10 @@ export interface CreateStoreProductInput {
   saleStartAt?: Date | null;
   saleEndAt?: Date | null;
   description?: string;
+  // Multi-language description fields
+  descriptionKo?: string;
+  descriptionEn?: string;
+  descriptionZh?: string;
   metadata?: Record<string, any>;
   createdBy?: number;
 }
@@ -48,6 +64,10 @@ export interface CreateStoreProductInput {
 export interface UpdateStoreProductInput {
   productId?: string;
   productName?: string;
+  // Multi-language name fields
+  nameKo?: string;
+  nameEn?: string;
+  nameZh?: string;
   store?: string;
   price?: number;
   currency?: string;
@@ -55,6 +75,10 @@ export interface UpdateStoreProductInput {
   saleStartAt?: Date | null;
   saleEndAt?: Date | null;
   description?: string;
+  // Multi-language description fields
+  descriptionKo?: string;
+  descriptionEn?: string;
+  descriptionZh?: string;
   metadata?: Record<string, any>;
   updatedBy?: number;
 }
@@ -272,21 +296,28 @@ class StoreProductService {
     try {
       await pool.execute(
         `INSERT INTO g_store_products
-         (id, environmentId, isActive, productId, productName, store, price, currency,
-          saleStartAt, saleEndAt, description, metadata, createdBy, createdAt, updatedAt)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+         (id, environmentId, isActive, productId, productName, nameKo, nameEn, nameZh,
+          store, price, currency, saleStartAt, saleEndAt, description,
+          descriptionKo, descriptionEn, descriptionZh, metadata, createdBy, createdAt, updatedAt)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
         [
           id,
           envId,
           input.isActive !== undefined ? (input.isActive ? 1 : 0) : 1,
           input.productId,
           input.productName,
+          input.nameKo || null,
+          input.nameEn || null,
+          input.nameZh || null,
           input.store,
           input.price,
           input.currency || 'USD',
           input.saleStartAt || null,
           input.saleEndAt || null,
           input.description || null,
+          input.descriptionKo || null,
+          input.descriptionEn || null,
+          input.descriptionZh || null,
           input.metadata ? JSON.stringify(input.metadata) : null,
           input.createdBy || null,
         ]
@@ -343,6 +374,19 @@ class StoreProductService {
       updates.push('productName = ?');
       values.push(input.productName);
     }
+    // Multi-language name fields
+    if (input.nameKo !== undefined) {
+      updates.push('nameKo = ?');
+      values.push(input.nameKo);
+    }
+    if (input.nameEn !== undefined) {
+      updates.push('nameEn = ?');
+      values.push(input.nameEn);
+    }
+    if (input.nameZh !== undefined) {
+      updates.push('nameZh = ?');
+      values.push(input.nameZh);
+    }
     if (input.store !== undefined) {
       updates.push('store = ?');
       values.push(input.store);
@@ -370,6 +414,19 @@ class StoreProductService {
     if (input.description !== undefined) {
       updates.push('description = ?');
       values.push(input.description);
+    }
+    // Multi-language description fields
+    if (input.descriptionKo !== undefined) {
+      updates.push('descriptionKo = ?');
+      values.push(input.descriptionKo);
+    }
+    if (input.descriptionEn !== undefined) {
+      updates.push('descriptionEn = ?');
+      values.push(input.descriptionEn);
+    }
+    if (input.descriptionZh !== undefined) {
+      updates.push('descriptionZh = ?');
+      values.push(input.descriptionZh);
     }
     if (input.metadata !== undefined) {
       updates.push('metadata = ?');
@@ -581,18 +638,142 @@ class StoreProductService {
   }
 
   /**
+   * Bulk update active status by filter (search term and/or current isActive status)
+   * Returns the count of affected products
+   */
+  static async bulkUpdateActiveStatusByFilter(
+    params: {
+      search?: string;
+      currentIsActive?: boolean;
+      targetIsActive: boolean;
+    },
+    updatedBy?: number,
+    environmentId?: string
+  ): Promise<{ affectedCount: number; affectedIds: string[] }> {
+    const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
+
+    try {
+      // Build WHERE clause
+      const conditions: string[] = ['environmentId = ?'];
+      const queryParams: any[] = [envId];
+
+      if (params.search) {
+        conditions.push('(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ?)');
+        const searchPattern = `%${params.search}%`;
+        queryParams.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
+      }
+
+      if (params.currentIsActive !== undefined) {
+        conditions.push('isActive = ?');
+        queryParams.push(params.currentIsActive ? 1 : 0);
+      }
+
+      const whereClause = `WHERE ${conditions.join(' AND ')}`;
+
+      // First, get the IDs that will be affected
+      const [affectedRows] = await pool.execute<any[]>(
+        `SELECT id FROM g_store_products ${whereClause}`,
+        queryParams
+      );
+      const affectedIds = affectedRows.map((row: any) => row.id);
+
+      if (affectedIds.length === 0) {
+        return { affectedCount: 0, affectedIds: [] };
+      }
+
+      // Perform the update
+      const [result] = await pool.execute<any>(
+        `UPDATE g_store_products SET isActive = ?, updatedBy = ?, updatedAt = NOW() ${whereClause}`,
+        [params.targetIsActive ? 1 : 0, updatedBy || null, ...queryParams]
+      );
+
+      // Invalidate ETag cache and publish SDK events
+      if (result.affectedRows > 0) {
+        try {
+          const env = await Environment.query().findById(envId);
+
+          // Invalidate ETag cache so SDK fetches fresh data
+          await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.STORE_PRODUCTS}:${envId}`);
+
+          // Publish a batch event instead of individual events for performance
+          await pubSubService.publishSDKEvent({
+            type: 'store_product.bulk_updated',
+            data: {
+              count: result.affectedRows,
+              environment: env?.environmentName,
+              isActive: params.targetIsActive ? 1 : 0,
+              timestamp: Date.now()
+            }
+          });
+        } catch (eventError) {
+          logger.warn('Failed to publish store product SDK event', { eventError });
+        }
+      }
+
+      return { affectedCount: result.affectedRows, affectedIds };
+    } catch (error) {
+      logger.error('Failed to bulk update active status by filter', { error, params });
+      throw new GatrixError('Failed to bulk update active status by filter', 500);
+    }
+  }
+
+  /**
+   * Get count of products matching filter criteria
+   */
+  static async getCountByFilter(
+    params: {
+      search?: string;
+      isActive?: boolean;
+    },
+    environmentId?: string
+  ): Promise<number> {
+    const pool = database.getPool();
+    const envId = environmentId ?? getCurrentEnvironmentId();
+
+    try {
+      // Build WHERE clause
+      const conditions: string[] = ['environmentId = ?'];
+      const queryParams: any[] = [envId];
+
+      if (params.search) {
+        conditions.push('(productId LIKE ? OR productName LIKE ? OR nameKo LIKE ? OR nameEn LIKE ? OR nameZh LIKE ?)');
+        const searchPattern = `%${params.search}%`;
+        queryParams.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
+      }
+
+      if (params.isActive !== undefined) {
+        conditions.push('isActive = ?');
+        queryParams.push(params.isActive ? 1 : 0);
+      }
+
+      const whereClause = `WHERE ${conditions.join(' AND ')}`;
+
+      const [rows] = await pool.execute<any[]>(
+        `SELECT COUNT(*) as total FROM g_store_products ${whereClause}`,
+        queryParams
+      );
+
+      return rows[0].total;
+    } catch (error) {
+      logger.error('Failed to get count by filter', { error, params });
+      throw new GatrixError('Failed to get count by filter', 500);
+    }
+  }
+
+  /**
    * Preview sync with planning data
    * Returns what changes would be made without applying them
    */
-  static async previewSync(environmentId?: string, lang: 'kr' | 'en' | 'zh' = 'kr'): Promise<SyncPreviewResult> {
+  static async previewSync(environmentId?: string): Promise<SyncPreviewResult> {
     const envId = environmentId || getCurrentEnvironmentId();
     if (!envId) {
       throw new GatrixError('Environment ID is required', 400);
     }
 
     try {
-      // Get planning data products
-      const planningData = await PlanningDataService.getCashShopLookup(envId, lang);
+      // Get planning data products (unified multi-language file)
+      const planningData = await PlanningDataService.getCashShopLookup(envId);
       const planningProducts: CmsCashShopProduct[] = planningData.items || [];
 
       // Get current DB products
@@ -624,43 +805,57 @@ class StoreProductService {
       for (const [cmsProductId, planningProduct] of planningMap) {
         const dbProduct = dbMap.get(cmsProductId);
 
+        // Get multi-language values from planning data
+        const nameKo = planningProduct.name?.ko || '';
+        const nameEn = planningProduct.name?.en || '';
+        const nameZh = planningProduct.name?.zh || '';
+        const descKo = planningProduct.description?.ko || null;
+        const descEn = planningProduct.description?.en || null;
+        const descZh = planningProduct.description?.zh || null;
+
         if (!dbProduct) {
           // New product to add
           toAdd.push({
             productCode: planningProduct.productCode,
-            name: planningProduct.name,
+            name: nameZh || nameKo,  // Default display name (zh preferred)
+            nameKo,
+            nameEn,
+            nameZh,
             price: planningProduct.price,
-            description: planningProduct.productDesc || null,
+            description: descZh || descKo,  // Default display description (zh preferred)
+            descriptionKo: descKo,
+            descriptionEn: descEn,
+            descriptionZh: descZh,
             cmsProductId: planningProduct.id,
           });
         } else {
           // Check for changes
           const changes: SyncChange[] = [];
 
-          if (dbProduct.productName !== planningProduct.name) {
-            changes.push({
-              field: 'productName',
-              oldValue: dbProduct.productName,
-              newValue: planningProduct.name,
-            });
+          // Check multi-language name changes
+          if (dbProduct.nameKo !== nameKo) {
+            changes.push({ field: 'nameKo', oldValue: dbProduct.nameKo, newValue: nameKo });
+          }
+          if (dbProduct.nameEn !== nameEn) {
+            changes.push({ field: 'nameEn', oldValue: dbProduct.nameEn, newValue: nameEn });
+          }
+          if (dbProduct.nameZh !== nameZh) {
+            changes.push({ field: 'nameZh', oldValue: dbProduct.nameZh, newValue: nameZh });
           }
 
           if (Number(dbProduct.price) !== planningProduct.price) {
-            changes.push({
-              field: 'price',
-              oldValue: dbProduct.price,
-              newValue: planningProduct.price,
-            });
+            changes.push({ field: 'price', oldValue: dbProduct.price, newValue: planningProduct.price });
           }
 
-          const dbDesc = dbProduct.description || '';
-          const planningDesc = planningProduct.productDesc || '';
-          if (dbDesc !== planningDesc) {
-            changes.push({
-              field: 'description',
-              oldValue: dbDesc,
-              newValue: planningDesc,
-            });
+          // Check multi-language description changes
+          if ((dbProduct.descriptionKo || '') !== (descKo || '')) {
+            changes.push({ field: 'descriptionKo', oldValue: dbProduct.descriptionKo, newValue: descKo });
+          }
+          if ((dbProduct.descriptionEn || '') !== (descEn || '')) {
+            changes.push({ field: 'descriptionEn', oldValue: dbProduct.descriptionEn, newValue: descEn });
+          }
+          if ((dbProduct.descriptionZh || '') !== (descZh || '')) {
+            changes.push({ field: 'descriptionZh', oldValue: dbProduct.descriptionZh, newValue: descZh });
           }
 
           if (changes.length > 0) {
@@ -668,7 +863,7 @@ class StoreProductService {
               id: dbProduct.id,
               cmsProductId: planningProduct.id,
               productCode: planningProduct.productCode,
-              name: planningProduct.name,
+              name: nameZh || nameKo,  // Default display name
               changes,
             });
           }
@@ -709,7 +904,6 @@ class StoreProductService {
    */
   static async applySync(
     environmentId?: string,
-    lang: 'kr' | 'en' | 'zh' = 'kr',
     userId?: number,
     selected?: SelectedSyncItems
   ): Promise<SyncApplyResult> {
@@ -719,7 +913,7 @@ class StoreProductService {
     }
 
     const pool = await database.getPool();
-    const preview = await this.previewSync(envId, lang);
+    const preview = await this.previewSync(envId);
 
     // Filter items based on selection if provided
     const toAddFiltered = selected?.toAdd
@@ -737,27 +931,35 @@ class StoreProductService {
     let deletedCount = 0;
 
     try {
-      // Add new products
+      // Add new products with multi-language columns
       for (const item of toAddFiltered) {
         const id = ulid();
         await pool.execute(
           `INSERT INTO g_store_products
-           (id, environmentId, isActive, productId, cmsProductId, productName, store, price, currency,
-            saleStartAt, saleEndAt, description, metadata, createdBy, createdAt, updatedAt)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+           (id, environmentId, isActive, productId, cmsProductId, productName,
+            nameKo, nameEn, nameZh, store, price, currency,
+            saleStartAt, saleEndAt, description, descriptionKo, descriptionEn, descriptionZh,
+            metadata, createdBy, createdAt, updatedAt)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
           [
             id,
             envId,
             0, // isActive = false for new products
             item.productCode,
             item.cmsProductId,
-            item.name,
+            item.name,  // productName (default display name)
+            item.nameKo,
+            item.nameEn,
+            item.nameZh,
             'sdo', // Default store
             item.price,
             'CNY', // Default currency
             null, // saleStartAt
             null, // saleEndAt
-            item.description,
+            item.description,  // description (default display description)
+            item.descriptionKo,
+            item.descriptionEn,
+            item.descriptionZh,
             null, // metadata
             userId || null,
           ]
@@ -765,22 +967,33 @@ class StoreProductService {
         addedCount++;
       }
 
-      // Update existing products
+      // Update existing products with multi-language columns
       for (const item of toUpdateFiltered) {
         const updates: string[] = [];
         const values: any[] = [];
 
         for (const change of item.changes) {
-          if (change.field === 'productName') {
-            updates.push('productName = ?');
-            values.push(change.newValue);
-          } else if (change.field === 'price') {
-            updates.push('price = ?');
-            values.push(change.newValue);
-          } else if (change.field === 'description') {
-            updates.push('description = ?');
-            values.push(change.newValue || null);
+          const field = change.field;
+          // Handle multi-language fields
+          if (['nameKo', 'nameEn', 'nameZh', 'descriptionKo', 'descriptionEn', 'descriptionZh', 'price'].includes(field)) {
+            updates.push(`${field} = ?`);
+            values.push(change.newValue ?? null);
           }
+        }
+
+        // Also update productName and description with default language values
+        const nameZhChange = item.changes.find(c => c.field === 'nameZh');
+        const nameKoChange = item.changes.find(c => c.field === 'nameKo');
+        if (nameZhChange || nameKoChange) {
+          updates.push('productName = ?');
+          values.push(nameZhChange?.newValue || nameKoChange?.newValue || '');
+        }
+
+        const descZhChange = item.changes.find(c => c.field === 'descriptionZh');
+        const descKoChange = item.changes.find(c => c.field === 'descriptionKo');
+        if (descZhChange || descKoChange) {
+          updates.push('description = ?');
+          values.push(descZhChange?.newValue || descKoChange?.newValue || null);
         }
 
         if (updates.length > 0) {
@@ -838,9 +1051,15 @@ export interface SyncChange {
 
 export interface SyncAddItem {
   productCode: string;
-  name: string;
+  name: string;  // Display name (default language)
+  nameKo: string;
+  nameEn: string;
+  nameZh: string;
   price: number;
-  description: string | null;
+  description: string | null;  // Display description (default language)
+  descriptionKo: string | null;
+  descriptionEn: string | null;
+  descriptionZh: string | null;
   cmsProductId: number;
 }
 
