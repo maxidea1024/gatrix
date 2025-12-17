@@ -10,14 +10,10 @@ const LogsPage: React.FC = () => {
   const grafanaUrl = useMemo(() => {
     // Check runtime config first (for production Docker deployment)
     const runtimeEnv = (window as any)?.ENV?.VITE_GRAFANA_URL as string | undefined;
-    if (runtimeEnv && runtimeEnv.trim()) {
+    if (runtimeEnv && runtimeEnv.trim() && !runtimeEnv.includes('localhost')) {
       return runtimeEnv.trim();
     }
-    // Check build-time env
-    if (import.meta.env.VITE_GRAFANA_URL) {
-      return import.meta.env.VITE_GRAFANA_URL;
-    }
-    // Fallback: use current hostname with Grafana port
+    // Always use current hostname with Grafana port for better cross-machine compatibility
     return `${window.location.protocol}//${window.location.hostname}:44000`;
   }, []);
 
