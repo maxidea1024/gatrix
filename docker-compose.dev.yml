@@ -161,7 +161,7 @@ services:
       VITE_API_URL: ${VITE_API_URL:-/api/v1}
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
-      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:44000}
+      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-}
       VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:43000/bull-board}
       VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:3400}
 
@@ -445,11 +445,11 @@ services:
       EDGE_APPLICATION_NAME: ${EDGE_APPLICATION_NAME:-edge-server}
       # Target environments - use '*' for all environments (Edge mode)
       EDGE_ENVIRONMENTS: ${EDGE_ENVIRONMENTS:-*}
-      # Redis for PubSub
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ""
-      REDIS_DB: 0
+      # Edge cache Redis configuration (for PubSub in event mode)
+      EDGE_CACHE_REDIS_HOST: ${EDGE_CACHE_REDIS_HOST:-redis}
+      EDGE_CACHE_REDIS_PORT: ${EDGE_CACHE_REDIS_PORT:-6379}
+      EDGE_CACHE_REDIS_PASSWORD: ${EDGE_CACHE_REDIS_PASSWORD:-}
+      EDGE_CACHE_REDIS_DB: ${EDGE_CACHE_REDIS_DB:-0}
       # Cache configuration (event mode uses Redis PubSub for real-time sync)
       CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-event}
       CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
@@ -549,14 +549,13 @@ services:
     image: grafana/grafana:latest
     container_name: gatrix-grafana-dev
     restart: unless-stopped
-    user: "0"  # Run as root to avoid volume permission issues
+    user: "0" # Run as root to avoid volume permission issues
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_SECURITY_ALLOW_EMBEDDING: "true"
       GF_SECURITY_COOKIE_SAMESITE: "Lax"
-      # Direct access on port 44000
       GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:44000/}
     ports:
       - "0.0.0.0:${GRAFANA_PORT:-44000}:3000"

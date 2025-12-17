@@ -439,7 +439,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
       simulation.stop();
       simulationRef.current = null;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Helper function to get group key from service based on grouping option
@@ -616,7 +616,7 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
     if (hasChanges) {
       simulation.alpha(groupingChanged ? 0.8 : 0.3).restart();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serviceIds, getSavedCenterPosition, groupingBy, getGroupKey]);
 
   // Convert mouse position to SVG coordinates
@@ -858,10 +858,10 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
 
                 {/* Heartbeat border glow filter */}
                 <filter id="heartbeatGlow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur" />
                   <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
                   </feMerge>
                 </filter>
               </defs>
@@ -917,273 +917,273 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
                       transform={`translate(${node.x || 0}, ${node.y || 0})`}
                       style={{ cursor: 'grab' }}
                       onMouseDown={(e) => handleMouseDown(node.id, e)}
+                    >
+                      <defs>
+                        <linearGradient id={`centerGradient-${node.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#667eea" />
+                          <stop offset="100%" stopColor="#764ba2" />
+                        </linearGradient>
+                      </defs>
+                      <circle
+                        r={centerRadius}
+                        fill={`url(#centerGradient-${node.id})`}
+                        stroke="#fff"
+                        strokeWidth="3"
+                      />
+                      {node.groupKey ? (
+                        // Grouped center node - show group key and count
+                        <>
+                          <text
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize="12"
+                            fontWeight="bold"
+                            dy="-12"
+                          >
+                            {node.groupKey === 'unknown' ? '---' : node.groupKey.toUpperCase()}
+                          </text>
+                          <text
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize="20"
+                            fontWeight="bold"
+                            dy="8"
+                          >
+                            {centerCount}
+                          </text>
+                          <text
+                            textAnchor="middle"
+                            fill="rgba(255,255,255,0.8)"
+                            fontSize="9"
+                            dy="22"
+                          >
+                            INSTANCES
+                          </text>
+                        </>
+                      ) : (
+                        // Single center node - show total count
+                        <>
+                          <text
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize="24"
+                            fontWeight="bold"
+                            dy="-5"
+                          >
+                            {centerCount}
+                          </text>
+                          <text
+                            textAnchor="middle"
+                            fill="rgba(255,255,255,0.8)"
+                            fontSize="11"
+                            dy="12"
+                          >
+                            INSTANCES
+                          </text>
+                        </>
+                      )}
+                    </g>
+                  );
+                }
+
+                // Service node - use serviceMap to get latest service data
+                const serviceKey = node.id;
+                const service = serviceMap.get(serviceKey) || node.service!;
+                const hasHeartbeat = heartbeatIds.has(serviceKey);
+                const hasRumble = rumbleNodes.has(serviceKey);
+                const hasHeartbeatAnim = heartbeatAnimNodes.has(serviceKey);
+                const nodeColor = getNodeColor(service.status);
+
+                // Combine rumble triggers: status change OR heartbeat
+                const shouldRumble = hasRumble || hasHeartbeatAnim;
+
+                // Get rumble count for this node to use as animation key
+                const currentRumbleCount = rumbleCounter.get(serviceKey) || 0;
+
+                // Ping gauge: calculate arc path
+                const progress = pingProgress.get(serviceKey) || 0;
+                const pingGaugeRadius = nodeRadius + 6;
+                const circumference = 2 * Math.PI * pingGaugeRadius;
+                const strokeDasharray = `${progress * circumference} ${circumference}`;
+                // Color transitions from green (0%) to yellow (50%) to red (100%)
+                // When progress is 0 (or very small), make it transparent
+                const pingGaugeColor = progress < 0.01
+                  ? 'transparent'
+                  : progress >= 1
+                    ? '#f44336' // Red when fully elapsed
+                    : progress >= 0.7
+                      ? '#ff9800' // Orange when near timeout
+                      : progress >= 0.5
+                        ? '#ffc107' // Yellow at half
+                        : '#4caf50'; // Green when fresh
+
+                return (
+                  <g
+                    key={node.id}
+                    transform={`translate(${node.x || 0}, ${node.y || 0})`}
+                    style={{ cursor: 'grab' }}
+                    onMouseDown={(e) => handleMouseDown(node.id, e)}
                   >
-                    <defs>
-                      <linearGradient id={`centerGradient-${node.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#667eea" />
-                        <stop offset="100%" stopColor="#764ba2" />
-                      </linearGradient>
-                    </defs>
-                    <circle
-                      r={centerRadius}
-                      fill={`url(#centerGradient-${node.id})`}
-                      stroke="#fff"
-                      strokeWidth="3"
-                    />
-                    {node.groupKey ? (
-                      // Grouped center node - show group key and count
+                    {/* Subtle ripple effect on heartbeat/status change */}
+                    {shouldRumble && (
                       <>
-                        <text
-                          textAnchor="middle"
-                          fill="#fff"
-                          fontSize="12"
-                          fontWeight="bold"
-                          dy="-12"
+                        <circle
+                          key={`ripple1-${currentRumbleCount}`}
+                          r={nodeRadius}
+                          fill="none"
+                          stroke="rgba(255,255,255,0.6)"
+                          strokeWidth="2"
                         >
-                          {node.groupKey === 'unknown' ? '---' : node.groupKey.toUpperCase()}
-                        </text>
-                        <text
-                          textAnchor="middle"
-                          fill="#fff"
-                          fontSize="20"
-                          fontWeight="bold"
-                          dy="8"
+                          <animate
+                            attributeName="r"
+                            from={`${nodeRadius}`}
+                            to={`${nodeRadius + 15}`}
+                            dur="0.6s"
+                            fill="freeze"
+                          />
+                          <animate
+                            attributeName="opacity"
+                            from="0.6"
+                            to="0"
+                            dur="0.6s"
+                            fill="freeze"
+                          />
+                        </circle>
+                        <circle
+                          key={`ripple2-${currentRumbleCount}`}
+                          r={nodeRadius}
+                          fill="none"
+                          stroke="rgba(255,255,255,0.4)"
+                          strokeWidth="1"
                         >
-                          {centerCount}
-                        </text>
-                        <text
-                          textAnchor="middle"
-                          fill="rgba(255,255,255,0.8)"
-                          fontSize="9"
-                          dy="22"
-                        >
-                          INSTANCES
-                        </text>
-                      </>
-                    ) : (
-                      // Single center node - show total count
-                      <>
-                        <text
-                          textAnchor="middle"
-                          fill="#fff"
-                          fontSize="24"
-                          fontWeight="bold"
-                          dy="-5"
-                        >
-                          {centerCount}
-                        </text>
-                        <text
-                          textAnchor="middle"
-                          fill="rgba(255,255,255,0.8)"
-                          fontSize="11"
-                          dy="12"
-                        >
-                          INSTANCES
-                        </text>
+                          <animate
+                            attributeName="r"
+                            from={`${nodeRadius}`}
+                            to={`${nodeRadius + 25}`}
+                            dur="0.8s"
+                            fill="freeze"
+                          />
+                          <animate
+                            attributeName="opacity"
+                            from="0.4"
+                            to="0"
+                            dur="0.8s"
+                            fill="freeze"
+                          />
+                        </circle>
                       </>
                     )}
+
+                    {/* Outer glow for active services */}
+                    {service.status === 'ready' && (
+                      <circle
+                        r={nodeRadius + 5}
+                        fill="none"
+                        stroke={nodeColor}
+                        strokeWidth="2"
+                        opacity="0.4"
+                      >
+                        <animate
+                          attributeName="r"
+                          values={`${nodeRadius + 3};${nodeRadius + 8};${nodeRadius + 3}`}
+                          dur="2s"
+                          repeatCount="indefinite"
+                        />
+                        <animate
+                          attributeName="opacity"
+                          values="0.4;0.2;0.4"
+                          dur="2s"
+                          repeatCount="indefinite"
+                        />
+                      </circle>
+                    )}
+
+                    {/* Main circle with glow effects */}
+                    <circle
+                      r={nodeRadius}
+                      fill={nodeColor}
+                      stroke="#fff"
+                      strokeWidth="2"
+                      style={{
+                        filter: shouldRumble
+                          ? 'drop-shadow(0 0 10px #e53935) drop-shadow(0 0 5px #ff6659)'
+                          : 'none',
+                        transition: 'filter 0.3s ease-out',
+                      }}
+                    >
+                      {/* Soft breathing opacity animation for initializing services */}
+                      {service.status === 'initializing' && (
+                        <animate
+                          attributeName="opacity"
+                          values="1;0.5;1"
+                          dur="2s"
+                          repeatCount="indefinite"
+                          calcMode="spline"
+                          keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"
+                        />
+                      )}
+                    </circle>
+
+                    {/* Ping gauge - circular progress indicator (only for normal states) */}
+                    {(service.status === 'ready' || service.status === 'initializing') && (
+                      <>
+                        <circle
+                          r={pingGaugeRadius}
+                          fill="none"
+                          stroke="rgba(128,128,128,0.3)"
+                          strokeWidth="3"
+                        />
+                        <circle
+                          r={pingGaugeRadius}
+                          fill="none"
+                          stroke={pingGaugeColor}
+                          strokeWidth="3"
+                          strokeDasharray={strokeDasharray}
+                          strokeLinecap="round"
+                          transform="rotate(-90)"
+                          style={{
+                            transition: 'stroke 0.3s ease-out',
+                          }}
+                        />
+                      </>
+                    )}
+
+                    {/* Shine effect */}
+                    <ellipse
+                      cx={-10}
+                      cy={-12}
+                      rx="10"
+                      ry="7"
+                      fill="rgba(255,255,255,0.25)"
+                    />
+
+                    {/* Service type label */}
+                    <text
+                      y={-6}
+                      textAnchor="middle"
+                      fill="#fff"
+                      fontSize="10"
+                      fontWeight="bold"
+                      fontFamily="D2Coding, monospace"
+                    >
+                      {(service.labels.service || '').substring(0, 7).toUpperCase()}
+                    </text>
+
+                    {/* Hostname */}
+                    <text
+                      y={10}
+                      textAnchor="middle"
+                      fill="rgba(255,255,255,0.9)"
+                      fontSize="9"
+                      fontFamily="D2Coding, monospace"
+                    >
+                      {(service.hostname || '').substring(0, 8)}
+                    </text>
                   </g>
                 );
-              }
-
-              // Service node - use serviceMap to get latest service data
-              const serviceKey = node.id;
-              const service = serviceMap.get(serviceKey) || node.service!;
-              const hasHeartbeat = heartbeatIds.has(serviceKey);
-              const hasRumble = rumbleNodes.has(serviceKey);
-              const hasHeartbeatAnim = heartbeatAnimNodes.has(serviceKey);
-              const nodeColor = getNodeColor(service.status);
-
-              // Combine rumble triggers: status change OR heartbeat
-              const shouldRumble = hasRumble || hasHeartbeatAnim;
-
-              // Get rumble count for this node to use as animation key
-              const currentRumbleCount = rumbleCounter.get(serviceKey) || 0;
-
-              // Ping gauge: calculate arc path
-              const progress = pingProgress.get(serviceKey) || 0;
-              const pingGaugeRadius = nodeRadius + 6;
-              const circumference = 2 * Math.PI * pingGaugeRadius;
-              const strokeDasharray = `${progress * circumference} ${circumference}`;
-              // Color transitions from green (0%) to yellow (50%) to red (100%)
-              // When progress is 0 (or very small), make it transparent
-              const pingGaugeColor = progress < 0.01
-                ? 'transparent'
-                : progress >= 1
-                  ? '#f44336' // Red when fully elapsed
-                  : progress >= 0.7
-                    ? '#ff9800' // Orange when near timeout
-                    : progress >= 0.5
-                      ? '#ffc107' // Yellow at half
-                      : '#4caf50'; // Green when fresh
-
-              return (
-                <g
-                  key={node.id}
-                  transform={`translate(${node.x || 0}, ${node.y || 0})`}
-                  style={{ cursor: 'grab' }}
-                  onMouseDown={(e) => handleMouseDown(node.id, e)}
-                >
-                  {/* Subtle ripple effect on heartbeat/status change */}
-                  {shouldRumble && (
-                    <>
-                      <circle
-                        key={`ripple1-${currentRumbleCount}`}
-                        r={nodeRadius}
-                        fill="none"
-                        stroke="rgba(255,255,255,0.6)"
-                        strokeWidth="2"
-                      >
-                        <animate
-                          attributeName="r"
-                          from={`${nodeRadius}`}
-                          to={`${nodeRadius + 15}`}
-                          dur="0.6s"
-                          fill="freeze"
-                        />
-                        <animate
-                          attributeName="opacity"
-                          from="0.6"
-                          to="0"
-                          dur="0.6s"
-                          fill="freeze"
-                        />
-                      </circle>
-                      <circle
-                        key={`ripple2-${currentRumbleCount}`}
-                        r={nodeRadius}
-                        fill="none"
-                        stroke="rgba(255,255,255,0.4)"
-                        strokeWidth="1"
-                      >
-                        <animate
-                          attributeName="r"
-                          from={`${nodeRadius}`}
-                          to={`${nodeRadius + 25}`}
-                          dur="0.8s"
-                          fill="freeze"
-                        />
-                        <animate
-                          attributeName="opacity"
-                          from="0.4"
-                          to="0"
-                          dur="0.8s"
-                          fill="freeze"
-                        />
-                      </circle>
-                    </>
-                  )}
-
-                  {/* Outer glow for active services */}
-                  {service.status === 'ready' && (
-                    <circle
-                      r={nodeRadius + 5}
-                      fill="none"
-                      stroke={nodeColor}
-                      strokeWidth="2"
-                      opacity="0.4"
-                    >
-                      <animate
-                        attributeName="r"
-                        values={`${nodeRadius + 3};${nodeRadius + 8};${nodeRadius + 3}`}
-                        dur="2s"
-                        repeatCount="indefinite"
-                      />
-                      <animate
-                        attributeName="opacity"
-                        values="0.4;0.2;0.4"
-                        dur="2s"
-                        repeatCount="indefinite"
-                      />
-                    </circle>
-                  )}
-
-                  {/* Main circle with glow effects */}
-                  <circle
-                    r={nodeRadius}
-                    fill={nodeColor}
-                    stroke="#fff"
-                    strokeWidth="2"
-                    style={{
-                      filter: shouldRumble
-                        ? 'drop-shadow(0 0 10px #e53935) drop-shadow(0 0 5px #ff6659)'
-                        : 'none',
-                      transition: 'filter 0.3s ease-out',
-                    }}
-                  >
-                    {/* Soft breathing opacity animation for initializing services */}
-                    {service.status === 'initializing' && (
-                      <animate
-                        attributeName="opacity"
-                        values="1;0.5;1"
-                        dur="2s"
-                        repeatCount="indefinite"
-                        calcMode="spline"
-                        keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"
-                      />
-                    )}
-                  </circle>
-
-                  {/* Ping gauge - circular progress indicator (only for normal states) */}
-                  {(service.status === 'ready' || service.status === 'initializing') && (
-                    <>
-                      <circle
-                        r={pingGaugeRadius}
-                        fill="none"
-                        stroke="rgba(128,128,128,0.3)"
-                        strokeWidth="3"
-                      />
-                      <circle
-                        r={pingGaugeRadius}
-                        fill="none"
-                        stroke={pingGaugeColor}
-                        strokeWidth="3"
-                        strokeDasharray={strokeDasharray}
-                        strokeLinecap="round"
-                        transform="rotate(-90)"
-                        style={{
-                          transition: 'stroke 0.3s ease-out',
-                        }}
-                      />
-                    </>
-                  )}
-
-                  {/* Shine effect */}
-                  <ellipse
-                    cx={-10}
-                    cy={-12}
-                    rx="10"
-                    ry="7"
-                    fill="rgba(255,255,255,0.25)"
-                  />
-
-                  {/* Service type label */}
-                  <text
-                    y={-6}
-                    textAnchor="middle"
-                    fill="#fff"
-                    fontSize="10"
-                    fontWeight="bold"
-                    fontFamily="D2Coding, monospace"
-                  >
-                    {(service.labels.service || '').substring(0, 7).toUpperCase()}
-                  </text>
-
-                  {/* Hostname */}
-                  <text
-                    y={10}
-                    textAnchor="middle"
-                    fill="rgba(255,255,255,0.9)"
-                    fontSize="9"
-                    fontFamily="D2Coding, monospace"
-                  >
-                    {(service.hostname || '').substring(0, 8)}
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
-        </Box>
+              })}
+            </svg>
+          </Box>
         </>
       )}
     </Card>
@@ -2084,17 +2084,17 @@ const ServerListPage: React.FC = () => {
     },
   ];
 
-  // Filter handlers
+  // Filter handlers - use functional updates to avoid stale closure issues
   const handleFilterAdd = (filter: ActiveFilter) => {
-    setActiveFilters([...activeFilters, filter]);
+    setActiveFilters(prev => [...prev, filter]);
   };
 
   const handleFilterRemove = (filterKey: string) => {
-    setActiveFilters(activeFilters.filter(f => f.key !== filterKey));
+    setActiveFilters(prev => prev.filter(f => f.key !== filterKey));
   };
 
   const handleFilterChange = (filterKey: string, value: any) => {
-    setActiveFilters(activeFilters.map(f =>
+    setActiveFilters(prev => prev.map(f =>
       f.key === filterKey ? { ...f, value } : f
     ));
   };
@@ -2822,360 +2822,360 @@ const ServerListPage: React.FC = () => {
                     // Use service.status for highlight color (current status)
                     const highlightStatus = updatedStatus || service.status;
                     return (
-                    <TableRow
-                      key={serviceKey}
-                      hover
-                      sx={{
-                        bgcolor: isUpdated
-                          ? (theme) => getHighlightColor(highlightStatus, theme)
-                          : (theme) => getStatusBgColor(service.status, theme),
-                        animation: isNew
-                          ? 'appearEffect 0.5s ease-out'
-                          : isUpdated
-                            ? `flashEffect-${highlightStatus} 2s ease-out`
-                            : 'none',
-                        '@keyframes appearEffect': {
-                          '0%': { opacity: 0, transform: 'scale(0.95)' },
-                          '100%': { opacity: 1, transform: 'scale(1)' },
-                        },
-                        [`@keyframes flashEffect-${highlightStatus}`]: {
-                          '0%': {
-                            bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme),
+                      <TableRow
+                        key={serviceKey}
+                        hover
+                        sx={{
+                          bgcolor: isUpdated
+                            ? (theme) => getHighlightColor(highlightStatus, theme)
+                            : (theme) => getStatusBgColor(service.status, theme),
+                          animation: isNew
+                            ? 'appearEffect 0.5s ease-out'
+                            : isUpdated
+                              ? `flashEffect-${highlightStatus} 2s ease-out`
+                              : 'none',
+                          '@keyframes appearEffect': {
+                            '0%': { opacity: 0, transform: 'scale(0.95)' },
+                            '100%': { opacity: 1, transform: 'scale(1)' },
                           },
-                          '100%': {
-                            bgcolor: (theme) => getStatusBgColor(service.status, theme),
+                          [`@keyframes flashEffect-${highlightStatus}`]: {
+                            '0%': {
+                              bgcolor: (theme) => getHighlightColorStart(highlightStatus, theme),
+                            },
+                            '100%': {
+                              bgcolor: (theme) => getStatusBgColor(service.status, theme),
+                            },
                           },
-                        },
-                      }}
-                    >
-                      {columns.filter(col => col.visible).map((column) => {
-                        switch (column.id) {
-                          case 'instanceId':
-                            return (
-                              <TableCell key={column.id}>
-                                <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
-                                  {service.instanceId}
-                                </Typography>
-                              </TableCell>
-                            );
-                          case 'service':
-                            return (
-                              <TableCell key={column.id}>
-                                {getTypeChip(service.labels.service)}
-                              </TableCell>
-                            );
-                          case 'group':
-                            return (
-                              <TableCell key={column.id}>
-                                {service.labels.group ? (
-                                  <Chip
-                                    label={service.labels.group}
-                                    size="small"
-                                    variant="outlined"
-                                    color="primary"
-                                    sx={{ fontWeight: 600, borderRadius: 1 }}
-                                  />
-                                ) : (
-                                  <Typography variant="caption" color="text.disabled">-</Typography>
-                                )}
-                              </TableCell>
-                            );
-                          case 'environment':
-                            return (
-                              <TableCell key={column.id}>
-                                {service.labels.environment ? (
-                                  <Chip
-                                    label={service.labels.environment}
-                                    size="small"
-                                    variant="outlined"
-                                    color="secondary"
-                                    sx={{ fontWeight: 600, borderRadius: 1 }}
-                                  />
-                                ) : (
-                                  <Typography variant="caption" color="text.disabled">-</Typography>
-                                )}
-                              </TableCell>
-                            );
-                          case 'region':
-                            return (
-                              <TableCell key={column.id}>
-                                {service.labels.region ? (
-                                  <Chip
-                                    label={service.labels.region}
-                                    size="small"
-                                    variant="outlined"
-                                    color="info"
-                                    sx={{ fontWeight: 600, borderRadius: 1 }}
-                                  />
-                                ) : (
-                                  <Typography variant="caption" color="text.disabled">-</Typography>
-                                )}
-                              </TableCell>
-                            );
-                          case 'labels':
-                            return (
-                              <TableCell key={column.id}>
-                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                  {Object.entries(service.labels)
-                                    .filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'region')
-                                    .map(([key, value]) => (
-                                      <Chip
-                                        key={`${service.instanceId}-${key}`}
-                                        label={`${key}=${value}`}
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{ fontSize: '0.7rem', height: '22px', borderRadius: 1 }}
-                                      />
-                                    ))}
-                                </Box>
-                              </TableCell>
-                            );
-                          case 'hostname':
-                            return (
-                              <TableCell key={column.id}>
-                                <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
-                                  {service.hostname}
-                                </Typography>
-                              </TableCell>
-                            );
-                          case 'externalAddress':
-                            return (
-                              <TableCell key={column.id}>
-                                <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
-                                  {service.externalAddress}
-                                </Typography>
-                              </TableCell>
-                            );
-                          case 'internalAddress':
-                            return (
-                              <TableCell key={column.id}>
-                                <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
-                                  {service.internalAddress}
-                                </Typography>
-                              </TableCell>
-                            );
-                          case 'ports':
-                            const portEntries = Object.entries(service.ports || {});
-                            return (
-                              <TableCell key={column.id}>
-                                {portEntries.length > 0 && (
+                        }}
+                      >
+                        {columns.filter(col => col.visible).map((column) => {
+                          switch (column.id) {
+                            case 'instanceId':
+                              return (
+                                <TableCell key={column.id}>
+                                  <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
+                                    {service.instanceId}
+                                  </Typography>
+                                </TableCell>
+                              );
+                            case 'service':
+                              return (
+                                <TableCell key={column.id}>
+                                  {getTypeChip(service.labels.service)}
+                                </TableCell>
+                              );
+                            case 'group':
+                              return (
+                                <TableCell key={column.id}>
+                                  {service.labels.group ? (
+                                    <Chip
+                                      label={service.labels.group}
+                                      size="small"
+                                      variant="outlined"
+                                      color="primary"
+                                      sx={{ fontWeight: 600, borderRadius: 1 }}
+                                    />
+                                  ) : (
+                                    <Typography variant="caption" color="text.disabled">-</Typography>
+                                  )}
+                                </TableCell>
+                              );
+                            case 'environment':
+                              return (
+                                <TableCell key={column.id}>
+                                  {service.labels.environment ? (
+                                    <Chip
+                                      label={service.labels.environment}
+                                      size="small"
+                                      variant="outlined"
+                                      color="secondary"
+                                      sx={{ fontWeight: 600, borderRadius: 1 }}
+                                    />
+                                  ) : (
+                                    <Typography variant="caption" color="text.disabled">-</Typography>
+                                  )}
+                                </TableCell>
+                              );
+                            case 'region':
+                              return (
+                                <TableCell key={column.id}>
+                                  {service.labels.region ? (
+                                    <Chip
+                                      label={service.labels.region}
+                                      size="small"
+                                      variant="outlined"
+                                      color="info"
+                                      sx={{ fontWeight: 600, borderRadius: 1 }}
+                                    />
+                                  ) : (
+                                    <Typography variant="caption" color="text.disabled">-</Typography>
+                                  )}
+                                </TableCell>
+                              );
+                            case 'labels':
+                              return (
+                                <TableCell key={column.id}>
                                   <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                    {portEntries.map(([name, port]) => (
-                                      <Chip
-                                        key={`${service.instanceId}-${name}`}
-                                        label={`${name}:${port}`}
-                                        size="small"
-                                        sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.875rem', height: '24px', borderRadius: 1 }}
-                                      />
-                                    ))}
+                                    {Object.entries(service.labels)
+                                      .filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'region')
+                                      .map(([key, value]) => (
+                                        <Chip
+                                          key={`${service.instanceId}-${key}`}
+                                          label={`${key}=${value}`}
+                                          size="small"
+                                          variant="outlined"
+                                          sx={{ fontSize: '0.7rem', height: '22px', borderRadius: 1 }}
+                                        />
+                                      ))}
                                   </Box>
-                                )}
-                              </TableCell>
-                            );
-                          case 'status':
-                            // Only show heartbeat icon for initializing/ready status
-                            const showHeartbeatIcon = service.status === 'initializing' || service.status === 'ready';
-                            return (
-                              <TableCell key={column.id}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  {getStatusBadge(service.status)}
-                                  {showHeartbeatIcon && (
-                                    <Box
-                                      sx={{
-                                        width: 26,
-                                        height: 26,
-                                        borderRadius: '50%',
-                                        border: 1,
-                                        borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        bgcolor: 'background.paper',
-                                      }}
-                                    >
-                                      <FavoriteIcon
-                                        sx={{
-                                          fontSize: 14,
-                                          color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
-                                          opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
-                                          animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
-                                          '@keyframes heartbeat': {
-                                            '0%': { transform: 'scale(1)' },
-                                            '25%': { transform: 'scale(1.3)' },
-                                            '50%': { transform: 'scale(1)' },
-                                            '75%': { transform: 'scale(1.2)' },
-                                            '100%': { transform: 'scale(1)' },
-                                          },
-                                        }}
-                                      />
+                                </TableCell>
+                              );
+                            case 'hostname':
+                              return (
+                                <TableCell key={column.id}>
+                                  <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
+                                    {service.hostname}
+                                  </Typography>
+                                </TableCell>
+                              );
+                            case 'externalAddress':
+                              return (
+                                <TableCell key={column.id}>
+                                  <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
+                                    {service.externalAddress}
+                                  </Typography>
+                                </TableCell>
+                              );
+                            case 'internalAddress':
+                              return (
+                                <TableCell key={column.id}>
+                                  <Typography variant="body2" sx={{ fontFamily: '"D2Coding", monospace' }}>
+                                    {service.internalAddress}
+                                  </Typography>
+                                </TableCell>
+                              );
+                            case 'ports':
+                              const portEntries = Object.entries(service.ports || {});
+                              return (
+                                <TableCell key={column.id}>
+                                  {portEntries.length > 0 && (
+                                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                                      {portEntries.map(([name, port]) => (
+                                        <Chip
+                                          key={`${service.instanceId}-${name}`}
+                                          label={`${name}:${port}`}
+                                          size="small"
+                                          sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.875rem', height: '24px', borderRadius: 1 }}
+                                        />
+                                      ))}
                                     </Box>
                                   )}
-                                </Box>
-                              </TableCell>
-                            );
-                          case 'stats':
-                            return (
-                              <TableCell key={column.id}>
-                                {service.stats && Object.keys(service.stats).length > 0 && (
-                                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                    {Object.entries(service.stats).map(([key, value]) => (
-                                      <Typography key={`${service.instanceId}-${key}`} variant="caption" color="text.secondary">
-                                        {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
-                                      </Typography>
-                                    ))}
-                                  </Box>
-                                )}
-                              </TableCell>
-                            );
-                          case 'meta':
-                            return (
-                              <TableCell key={column.id}>
-                                {service.meta && Object.keys(service.meta).length > 0 && (
-                                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                    {Object.entries(service.meta).map(([key, value]) => (
-                                      <Typography key={key} variant="caption" color="text.secondary">
-                                        {key}: {String(value)}
-                                      </Typography>
-                                    ))}
-                                  </Box>
-                                )}
-                              </TableCell>
-                            );
-                          case 'createdAt':
-                            return (
-                              <TableCell key={column.id}>
-                                <RelativeTime date={service.createdAt} showSeconds />
-                              </TableCell>
-                            );
-                          case 'updatedAt':
-                            const updatedAtServiceKey = `${service.labels.service}-${service.instanceId}`;
-                            const updatedAtProgress = listViewPingProgress.get(updatedAtServiceKey) || 0;
-                            const updatedAtProgressColor = updatedAtProgress >= 1
-                              ? 'error'
-                              : updatedAtProgress >= 0.7
-                                ? 'warning'
-                                : 'success';
-                            return (
-                              <TableCell key={column.id}>
-                                <Box sx={{ position: 'relative', width: 100, height: 20 }}>
-                                  <LinearProgress
-                                    variant="determinate"
-                                    value={updatedAtProgress * 100}
-                                    color={updatedAtProgressColor}
-                                    sx={{
-                                      height: 20,
-                                      borderRadius: 1,
-                                      bgcolor: 'action.hover',
-                                      '& .MuiLinearProgress-bar': {
-                                        borderRadius: 1,
-                                        // Hide the bar when progress is nearly zero
-                                        opacity: updatedAtProgress < 0.01 ? 0 : 1,
-                                      },
-                                    }}
-                                  />
-                                  <Box
-                                    sx={{
-                                      position: 'absolute',
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      bottom: 0,
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                    }}
-                                  >
-                                    <RelativeTime
-                                      date={service.updatedAt}
-                                      showSeconds
-                                      showTooltip={false}
-                                      variant="caption"
-                                      sx={{
-                                        fontWeight: 500,
-                                        fontSize: 11,
-                                        color: 'text.primary',
-                                        textShadow: '0 0 2px rgba(255,255,255,0.8)',
-                                      }}
-                                    />
-                                  </Box>
-                                </Box>
-                              </TableCell>
-                            );
-                          case 'actions':
-                            const actionsServiceKey = `${service.labels.service}-${service.instanceId}`;
-                            const actionsHealthStatus = healthCheckStatus.get(actionsServiceKey);
-                            return (
-                              <TableCell key={column.id} align="center">
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-                                  {hasWebPort(service) && (
-                                    actionsHealthStatus?.cooldown && actionsHealthStatus.result ? (
-                                      // Show result: ms or X
+                                </TableCell>
+                              );
+                            case 'status':
+                              // Only show heartbeat icon for initializing/ready status
+                              const showHeartbeatIcon = service.status === 'initializing' || service.status === 'ready';
+                              return (
+                                <TableCell key={column.id}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    {getStatusBadge(service.status)}
+                                    {showHeartbeatIcon && (
                                       <Box
                                         sx={{
-                                          minWidth: 44,
-                                          height: 24,
+                                          width: 26,
+                                          height: 26,
+                                          borderRadius: '50%',
+                                          border: 1,
+                                          borderColor: heartbeatIds.has(serviceKey) ? 'error.main' : 'divider',
                                           display: 'flex',
                                           alignItems: 'center',
                                           justifyContent: 'center',
-                                          borderRadius: 1,
-                                          bgcolor: actionsHealthStatus.result.healthy ? 'success.main' : 'error.main',
-                                          color: 'white',
-                                          fontSize: '0.75rem',
-                                          fontWeight: 600,
-                                          px: 0.75,
-                                          animation: actionsHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
-                                          '@keyframes wiggleFade': {
-                                            '0%': { opacity: 1, transform: 'scale(1)' },
-                                            '20%': { transform: 'scale(1.1) rotate(-3deg)' },
-                                            '40%': { transform: 'scale(0.9) rotate(3deg)' },
-                                            '60%': { transform: 'scale(1.05) rotate(-2deg)' },
-                                            '80%': { opacity: 0.5, transform: 'scale(0.95) rotate(1deg)' },
-                                            '100%': { opacity: 0, transform: 'scale(0.8)' },
-                                          },
+                                          bgcolor: 'background.paper',
                                         }}
                                       >
-                                        {actionsHealthStatus.result.healthy
-                                          ? `${actionsHealthStatus.result.latency}ms`
-                                          : '✕'}
-                                      </Box>
-                                    ) : (
-                                      // Show button (rounded style like view mode buttons)
-                                      <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
-                                        <IconButton
-                                          size="small"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleHealthCheck(service);
-                                          }}
-                                          disabled={actionsHealthStatus?.loading}
+                                        <FavoriteIcon
                                           sx={{
-                                            width: 28,
-                                            height: 28,
-                                            bgcolor: 'background.paper',
-                                            border: 1,
-                                            borderColor: 'divider',
-                                            '&:hover': {
-                                              bgcolor: 'action.hover',
+                                            fontSize: 14,
+                                            color: heartbeatIds.has(serviceKey) ? 'error.main' : 'action.disabled',
+                                            opacity: heartbeatIds.has(serviceKey) ? 1 : 0.3,
+                                            animation: heartbeatIds.has(serviceKey) ? 'heartbeat 0.6s ease-in-out' : 'none',
+                                            '@keyframes heartbeat': {
+                                              '0%': { transform: 'scale(1)' },
+                                              '25%': { transform: 'scale(1.3)' },
+                                              '50%': { transform: 'scale(1)' },
+                                              '75%': { transform: 'scale(1.2)' },
+                                              '100%': { transform: 'scale(1)' },
+                                            },
+                                          }}
+                                        />
+                                      </Box>
+                                    )}
+                                  </Box>
+                                </TableCell>
+                              );
+                            case 'stats':
+                              return (
+                                <TableCell key={column.id}>
+                                  {service.stats && Object.keys(service.stats).length > 0 && (
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                      {Object.entries(service.stats).map(([key, value]) => (
+                                        <Typography key={`${service.instanceId}-${key}`} variant="caption" color="text.secondary">
+                                          {key}: {typeof value === 'number' ? value.toFixed(2) : String(value)}
+                                        </Typography>
+                                      ))}
+                                    </Box>
+                                  )}
+                                </TableCell>
+                              );
+                            case 'meta':
+                              return (
+                                <TableCell key={column.id}>
+                                  {service.meta && Object.keys(service.meta).length > 0 && (
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                      {Object.entries(service.meta).map(([key, value]) => (
+                                        <Typography key={key} variant="caption" color="text.secondary">
+                                          {key}: {String(value)}
+                                        </Typography>
+                                      ))}
+                                    </Box>
+                                  )}
+                                </TableCell>
+                              );
+                            case 'createdAt':
+                              return (
+                                <TableCell key={column.id}>
+                                  <RelativeTime date={service.createdAt} showSeconds />
+                                </TableCell>
+                              );
+                            case 'updatedAt':
+                              const updatedAtServiceKey = `${service.labels.service}-${service.instanceId}`;
+                              const updatedAtProgress = listViewPingProgress.get(updatedAtServiceKey) || 0;
+                              const updatedAtProgressColor = updatedAtProgress >= 1
+                                ? 'error'
+                                : updatedAtProgress >= 0.7
+                                  ? 'warning'
+                                  : 'success';
+                              return (
+                                <TableCell key={column.id}>
+                                  <Box sx={{ position: 'relative', width: 100, height: 20 }}>
+                                    <LinearProgress
+                                      variant="determinate"
+                                      value={updatedAtProgress * 100}
+                                      color={updatedAtProgressColor}
+                                      sx={{
+                                        height: 20,
+                                        borderRadius: 1,
+                                        bgcolor: 'action.hover',
+                                        '& .MuiLinearProgress-bar': {
+                                          borderRadius: 1,
+                                          // Hide the bar when progress is nearly zero
+                                          opacity: updatedAtProgress < 0.01 ? 0 : 1,
+                                        },
+                                      }}
+                                    />
+                                    <Box
+                                      sx={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                      }}
+                                    >
+                                      <RelativeTime
+                                        date={service.updatedAt}
+                                        showSeconds
+                                        showTooltip={false}
+                                        variant="caption"
+                                        sx={{
+                                          fontWeight: 500,
+                                          fontSize: 11,
+                                          color: 'text.primary',
+                                          textShadow: '0 0 2px rgba(255,255,255,0.8)',
+                                        }}
+                                      />
+                                    </Box>
+                                  </Box>
+                                </TableCell>
+                              );
+                            case 'actions':
+                              const actionsServiceKey = `${service.labels.service}-${service.instanceId}`;
+                              const actionsHealthStatus = healthCheckStatus.get(actionsServiceKey);
+                              return (
+                                <TableCell key={column.id} align="center">
+                                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                                    {hasWebPort(service) && (
+                                      actionsHealthStatus?.cooldown && actionsHealthStatus.result ? (
+                                        // Show result: ms or X
+                                        <Box
+                                          sx={{
+                                            minWidth: 44,
+                                            height: 24,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            borderRadius: 1,
+                                            bgcolor: actionsHealthStatus.result.healthy ? 'success.main' : 'error.main',
+                                            color: 'white',
+                                            fontSize: '0.75rem',
+                                            fontWeight: 600,
+                                            px: 0.75,
+                                            animation: actionsHealthStatus.fading ? 'wiggleFade 0.5s ease-out forwards' : 'none',
+                                            '@keyframes wiggleFade': {
+                                              '0%': { opacity: 1, transform: 'scale(1)' },
+                                              '20%': { transform: 'scale(1.1) rotate(-3deg)' },
+                                              '40%': { transform: 'scale(0.9) rotate(3deg)' },
+                                              '60%': { transform: 'scale(1.05) rotate(-2deg)' },
+                                              '80%': { opacity: 0.5, transform: 'scale(0.95) rotate(1deg)' },
+                                              '100%': { opacity: 0, transform: 'scale(0.8)' },
                                             },
                                           }}
                                         >
-                                          {actionsHealthStatus?.loading ? (
-                                            <CircularProgress size={14} />
-                                          ) : (
-                                            <TouchAppIcon fontSize="small" />
-                                          )}
-                                        </IconButton>
-                                      </Tooltip>
-                                    )
-                                  )}
-                                </Box>
-                              </TableCell>
-                            );
-                          default:
-                            return null;
-                        }
-                      })}
-                    </TableRow>
+                                          {actionsHealthStatus.result.healthy
+                                            ? `${actionsHealthStatus.result.latency}ms`
+                                            : '✕'}
+                                        </Box>
+                                      ) : (
+                                        // Show button (rounded style like view mode buttons)
+                                        <Tooltip title={t('serverList.healthCheck.tooltip')} arrow>
+                                          <IconButton
+                                            size="small"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleHealthCheck(service);
+                                            }}
+                                            disabled={actionsHealthStatus?.loading}
+                                            sx={{
+                                              width: 28,
+                                              height: 28,
+                                              bgcolor: 'background.paper',
+                                              border: 1,
+                                              borderColor: 'divider',
+                                              '&:hover': {
+                                                bgcolor: 'action.hover',
+                                              },
+                                            }}
+                                          >
+                                            {actionsHealthStatus?.loading ? (
+                                              <CircularProgress size={14} />
+                                            ) : (
+                                              <TouchAppIcon fontSize="small" />
+                                            )}
+                                          </IconButton>
+                                        </Tooltip>
+                                      )
+                                    )}
+                                  </Box>
+                                </TableCell>
+                              );
+                            default:
+                              return null;
+                          }
+                        })}
+                      </TableRow>
                     );
                   })
                 )}
@@ -4024,45 +4024,45 @@ const ServerListPage: React.FC = () => {
             >
               {bulkHealthCheckRunning ? t('serverList.bulkHealthCheck.checking') : t('serverList.bulkHealthCheck.start')}
             </Button>
-          <Box
-            sx={{
-              width: '1px',
-              height: '24px',
-              bgcolor: 'divider',
-              mx: 1,
-            }}
-          />
-          <Button
-            onClick={handleExportMenuOpen}
-            disabled={!hasCompletedHealthCheck || bulkHealthCheckRunning}
-            startIcon={<FileDownloadIcon />}
-          >
-            {t('common.export')}
-          </Button>
-          <Menu
-            anchorEl={exportMenuAnchor}
-            open={Boolean(exportMenuAnchor)}
-            onClose={handleExportMenuClose}
-          >
-            <MenuItem onClick={() => handleExportHealthCheck('csv')}>
-              <ListItemIcon>
-                <FileDownloadIcon fontSize="small" />
-              </ListItemIcon>
-              CSV
-            </MenuItem>
-            <MenuItem onClick={() => handleExportHealthCheck('xlsx')}>
-              <ListItemIcon>
-                <FileDownloadIcon fontSize="small" />
-              </ListItemIcon>
-              Excel (XLSX)
-            </MenuItem>
-            <MenuItem onClick={() => handleExportHealthCheck('json')}>
-              <ListItemIcon>
-                <FileDownloadIcon fontSize="small" />
-              </ListItemIcon>
-              JSON
-            </MenuItem>
-          </Menu>
+            <Box
+              sx={{
+                width: '1px',
+                height: '24px',
+                bgcolor: 'divider',
+                mx: 1,
+              }}
+            />
+            <Button
+              onClick={handleExportMenuOpen}
+              disabled={!hasCompletedHealthCheck || bulkHealthCheckRunning}
+              startIcon={<FileDownloadIcon />}
+            >
+              {t('common.export')}
+            </Button>
+            <Menu
+              anchorEl={exportMenuAnchor}
+              open={Boolean(exportMenuAnchor)}
+              onClose={handleExportMenuClose}
+            >
+              <MenuItem onClick={() => handleExportHealthCheck('csv')}>
+                <ListItemIcon>
+                  <FileDownloadIcon fontSize="small" />
+                </ListItemIcon>
+                CSV
+              </MenuItem>
+              <MenuItem onClick={() => handleExportHealthCheck('xlsx')}>
+                <ListItemIcon>
+                  <FileDownloadIcon fontSize="small" />
+                </ListItemIcon>
+                Excel (XLSX)
+              </MenuItem>
+              <MenuItem onClick={() => handleExportHealthCheck('json')}>
+                <ListItemIcon>
+                  <FileDownloadIcon fontSize="small" />
+                </ListItemIcon>
+                JSON
+              </MenuItem>
+            </Menu>
           </Box>
         </DialogActions>
       </Dialog>

@@ -8,15 +8,17 @@ const LogsPage: React.FC = () => {
   const { t } = useTranslation();
 
   const grafanaUrl = useMemo(() => {
-    // In development (DEV mode or port 43000), access Grafana directly on port 44000
-    // In production, also use direct access
-    const isDevelopment = import.meta.env.DEV || window.location.port === '43000';
-    if (isDevelopment) {
-      return `${window.location.protocol}//${window.location.hostname}:44000`;
-    } else {
-      // Production: use VITE_GRAFANA_URL or default to port 44000
-      return import.meta.env.VITE_GRAFANA_URL || `${window.location.protocol}//${window.location.hostname}:44000`;
+    // Check runtime config first (for production Docker deployment)
+    const runtimeEnv = (window as any)?.ENV?.VITE_GRAFANA_URL as string | undefined;
+    if (runtimeEnv && runtimeEnv.trim()) {
+      return runtimeEnv.trim();
     }
+    // Check build-time env
+    if (import.meta.env.VITE_GRAFANA_URL) {
+      return import.meta.env.VITE_GRAFANA_URL;
+    }
+    // Fallback: use current hostname with Grafana port
+    return `${window.location.protocol}//${window.location.hostname}:44000`;
   }, []);
 
   const iframeUrl = useMemo(() => {

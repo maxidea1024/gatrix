@@ -29,12 +29,13 @@ export const config = {
         .map(e => e.trim())
         .filter(Boolean),
 
-  // Redis configuration (for PubSub only)
+  // Redis configuration (for cache PubSub in event mode)
+  // Edge cache-specific Redis settings take priority over global settings
   redis: {
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379', 10),
-    password: process.env.REDIS_PASSWORD || undefined,
-    db: parseInt(process.env.REDIS_DB || '0', 10),
+    host: process.env.EDGE_CACHE_REDIS_HOST || process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.EDGE_CACHE_REDIS_PORT || process.env.REDIS_PORT || '6379', 10),
+    password: process.env.EDGE_CACHE_REDIS_PASSWORD || process.env.REDIS_PASSWORD || undefined,
+    db: parseInt(process.env.EDGE_CACHE_REDIS_DB || process.env.REDIS_DB || '0', 10),
   },
 
   // Cache configuration

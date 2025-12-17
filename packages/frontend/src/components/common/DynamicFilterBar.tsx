@@ -123,7 +123,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
 
     const filter = activeFilters.find(f => f.key === filterKey);
     if (!filter || filter.value === undefined || filter.value === '' ||
-        (Array.isArray(filter.value) && filter.value.length === 0)) {
+      (Array.isArray(filter.value) && filter.value.length === 0)) {
       handleRemoveFilter(filterKey);
     } else {
       setEditingFilter(null);
@@ -1001,9 +1001,21 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
     );
   };
 
-  // Get filters that are not yet active
+  // Helper function to check if a filter has a meaningful value
+  const hasFilterValue = (filter: ActiveFilter): boolean => {
+    if (filter.value === undefined || filter.value === null || filter.value === '') {
+      return false;
+    }
+    if (Array.isArray(filter.value) && filter.value.length === 0) {
+      return false;
+    }
+    return true;
+  };
+
+  // Get filters that are not yet active (only exclude filters with actual values)
+  // This fixes the bug where cancelled/empty filters disappear from the menu
   const availableToAdd = availableFilters.filter(
-    f => !activeFilters.some(af => af.key === f.key)
+    f => !activeFilters.some(af => af.key === f.key && hasFilterValue(af))
   );
 
   return (
