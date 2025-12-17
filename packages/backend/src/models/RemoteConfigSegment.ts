@@ -53,10 +53,10 @@ export class RemoteConfigSegment extends Model implements RemoteConfigSegmentDat
       required: ['environmentId', 'segmentName', 'displayName', 'segmentConditions', 'createdBy'],
       properties: {
         id: { type: 'integer' },
-        environmentId: { type: 'integer' },
-        segmentName: { 
-          type: 'string', 
-          minLength: 1, 
+        environmentId: { type: 'string' },
+        segmentName: {
+          type: 'string',
+          minLength: 1,
           maxLength: 200,
           pattern: '^[a-z0-9_-]+$'
         },

@@ -72,10 +72,10 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
       required: ['environmentId', 'templateName', 'displayName', 'templateType', 'templateData', 'createdBy'],
       properties: {
         id: { type: 'integer' },
-        environmentId: { type: 'integer' },
-        templateName: { 
-          type: 'string', 
-          minLength: 1, 
+        environmentId: { type: 'string' },
+        templateName: {
+          type: 'string',
+          minLength: 1,
           maxLength: 200,
           pattern: '^[a-z0-9_-]+$'
         },
@@ -157,7 +157,7 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
   generateMetadata(): void {
     const configCount = Object.keys(this.templateData.configs || {}).length;
     const campaignCount = (this.templateData.campaigns || []).length;
-    
+
     this.metadata = {
       configCount,
       campaignCount,
@@ -184,11 +184,11 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
     let query = this.query()
       .where('environmentId', environmentId)
       .where('status', 'published');
-    
+
     if (templateType) {
       query = query.where('templateType', templateType);
     }
-    
+
     return await query.orderBy('templateName');
   }
 
@@ -281,7 +281,7 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
    */
   async createVersion(changeDescription?: string, createdBy?: number): Promise<void> {
     const { RemoteConfigTemplateVersion } = require('./RemoteConfigTemplateVersion');
-    
+
     await RemoteConfigTemplateVersion.query().insert({
       templateId: this.id,
       version: this.version,
@@ -322,7 +322,7 @@ export class RemoteConfigTemplate extends Model implements RemoteConfigTemplateD
    */
   static validateConfigItem(key: string, config: ConfigItem): void {
     const validTypes = ['string', 'number', 'boolean', 'json', 'yaml'];
-    
+
     if (!validTypes.includes(config.type)) {
       throw new Error(`Invalid config type '${config.type}' for '${key}'. Must be one of: ${validTypes.join(', ')}`);
     }

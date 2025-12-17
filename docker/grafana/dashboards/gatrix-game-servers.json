@@ -5,24 +5,18 @@
   "schemaVersion": 39,
   "version": 1,
   "refresh": "10s",
-  "tags": ["gatrix", "game", "servers"],
+  "tags": [
+    "gatrix",
+    "game",
+    "servers"
+  ],
   "templating": {
     "list": [
-      {
-        "name": "server_type",
-        "type": "query",
-        "datasource": "Prometheus",
-        "query": "label_values(game_online_players, server_type)",
-        "includeAll": true,
-        "allValue": ".*",
-        "multi": true,
-        "refresh": 1
-      },
       {
         "name": "service",
         "type": "query",
         "datasource": "Prometheus",
-        "query": "label_values(game_requests_total, service)",
+        "query": "label_values(up{job=\"gatrix-discovered\"}, service)",
         "includeAll": true,
         "allValue": ".*",
         "multi": true,
@@ -32,7 +26,17 @@
         "name": "group",
         "type": "query",
         "datasource": "Prometheus",
-        "query": "label_values(game_requests_total, group)",
+        "query": "label_values(up{job=\"gatrix-discovered\"}, group)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "environment",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(up{job=\"gatrix-discovered\"}, environment)",
         "includeAll": true,
         "allValue": ".*",
         "multi": true,
@@ -43,28 +47,41 @@
         "type": "interval",
         "label": "Window",
         "query": "5m,10m,30m,1h",
-        "current": {"text": "5m", "value": "5m"}
+        "current": {
+          "text": "5m",
+          "value": "5m"
+        }
       }
     ]
   },
-  "time": {"from": "now-1h", "to": "now"},
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "panels": [
     {
       "id": 1,
       "title": "Online Players",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(game_online_players{server_type=~\"$server_type\", service=~\"$service\", group=~\"$group\"}) by (server_type)",
-          "legendFormat": "{{server_type}}"
+          "expr": "sum(game_online_players{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}) by (service)",
+          "legendFormat": "{{service}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -72,18 +89,25 @@
       "id": 2,
       "title": "Connected Clients",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(game_connected_clients{service=~\"$service\", group=~\"$group\"}) by (connection_type)",
+          "expr": "sum(game_connected_clients{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}) by (connection_type)",
           "legendFormat": "{{connection_type}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -91,18 +115,25 @@
       "id": 3,
       "title": "Request Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_requests_total{service=~\"$service\", group=~\"$group\"}[$window])) by (handler, status)",
+          "expr": "sum(rate(game_requests_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (handler, status)",
           "legendFormat": "{{handler}} - {{status}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "reqps",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -110,18 +141,25 @@
       "id": 4,
       "title": "Request Duration (p95)",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum(rate(game_request_duration_seconds_bucket{service=~\"$service\", group=~\"$group\"}[$window])) by (handler, le))",
+          "expr": "histogram_quantile(0.95, sum(rate(game_request_duration_seconds_bucket{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (handler, le))",
           "legendFormat": "{{handler}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "s",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -129,18 +167,25 @@
       "id": 5,
       "title": "Error Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_errors_total{service=~\"$service\", group=~\"$group\"}[$window])) by (type, code)",
+          "expr": "sum(rate(game_errors_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (type, code)",
           "legendFormat": "{{type}} - {{code}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -148,18 +193,25 @@
       "id": 6,
       "title": "Tick Duration (p95)",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum(rate(game_tick_duration_seconds_bucket{service=~\"$service\", group=~\"$group\"}[$window])) by (tick_type, le))",
+          "expr": "histogram_quantile(0.95, sum(rate(game_tick_duration_seconds_bucket{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (tick_type, le))",
           "legendFormat": "{{tick_type}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "s",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -167,18 +219,25 @@
       "id": 7,
       "title": "Zone Count",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(game_zone_count{service=~\"$service\", group=~\"$group\"}) by (zone_type)",
+          "expr": "sum(game_zone_count{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}) by (zone_type)",
           "legendFormat": "{{zone_type}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -186,18 +245,25 @@
       "id": 8,
       "title": "Entity Count",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(game_entity_count{service=~\"$service\", group=~\"$group\"}) by (entity_type)",
+          "expr": "sum(game_entity_count{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}) by (entity_type)",
           "legendFormat": "{{entity_type}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -205,25 +271,37 @@
       "id": 100,
       "title": "💰 Economy",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 32},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
       "collapsed": false
     },
     {
       "id": 101,
       "title": "Ducat Earned Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 33},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 33
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_ducat_earned_total{service=~\"$service\", group=~\"$group\"}[$window])) by (source)",
+          "expr": "sum(rate(game_ducat_earned_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (source)",
           "legendFormat": "{{source}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -231,18 +309,25 @@
       "id": 102,
       "title": "Ducat Spent Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 33},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 33
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_ducat_spent_total{service=~\"$service\", group=~\"$group\"}[$window])) by (category)",
+          "expr": "sum(rate(game_ducat_spent_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (category)",
           "legendFormat": "{{category}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -250,18 +335,25 @@
       "id": 103,
       "title": "Cash Purchases Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 33},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 33
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_cash_purchases_total{service=~\"$service\", group=~\"$group\"}[$window])) by (product_type)",
+          "expr": "sum(rate(game_cash_purchases_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (product_type)",
           "legendFormat": "{{product_type}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -269,25 +361,37 @@
       "id": 200,
       "title": "⚔️ Battle",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 41},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 41
+      },
       "collapsed": false
     },
     {
       "id": 201,
       "title": "Battles Started Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 42},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 42
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_battles_started_total{service=~\"$service\", group=~\"$group\"}[$window])) by (battle_type)",
+          "expr": "sum(rate(game_battles_started_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (battle_type)",
           "legendFormat": "{{battle_type}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -295,18 +399,25 @@
       "id": 202,
       "title": "Battles Completed Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 42},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 42
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_battles_completed_total{service=~\"$service\", group=~\"$group\"}[$window])) by (battle_type, result)",
+          "expr": "sum(rate(game_battles_completed_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (battle_type, result)",
           "legendFormat": "{{battle_type}} - {{result}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -314,25 +425,37 @@
       "id": 300,
       "title": "📜 Quest",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 50},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
       "collapsed": false
     },
     {
       "id": 301,
       "title": "Quests Accepted Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 51},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 51
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_quests_accepted_total{service=~\"$service\", group=~\"$group\"}[$window])) by (category)",
+          "expr": "sum(rate(game_quests_accepted_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (category)",
           "legendFormat": "{{category}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -340,18 +463,25 @@
       "id": 302,
       "title": "Quests Completed Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 51},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 51
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_quests_completed_total{service=~\"$service\", group=~\"$group\"}[$window])) by (category)",
+          "expr": "sum(rate(game_quests_completed_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (category)",
           "legendFormat": "{{category}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -359,18 +489,25 @@
       "id": 303,
       "title": "Quests Dropped Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 51},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 51
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_quests_dropped_total{service=~\"$service\", group=~\"$group\"}[$window])) by (category, reason)",
+          "expr": "sum(rate(game_quests_dropped_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (category, reason)",
           "legendFormat": "{{category}} - {{reason}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -378,25 +515,37 @@
       "id": 400,
       "title": "🏪 Marketplace",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 59},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 59
+      },
       "collapsed": false
     },
     {
       "id": 401,
       "title": "Marketplace Registered Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 60},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 60
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_marketplace_registered_total{service=~\"$service\", group=~\"$group\"}[$window])) by (item_category)",
+          "expr": "sum(rate(game_marketplace_registered_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (item_category)",
           "legendFormat": "{{item_category}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -404,18 +553,25 @@
       "id": 402,
       "title": "Marketplace Sold Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 60},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 60
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_marketplace_sold_total{service=~\"$service\", group=~\"$group\"}[$window])) by (item_category)",
+          "expr": "sum(rate(game_marketplace_sold_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (item_category)",
           "legendFormat": "{{item_category}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -423,18 +579,25 @@
       "id": 403,
       "title": "Marketplace Bought Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 60},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 60
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_marketplace_bought_total{service=~\"$service\", group=~\"$group\"}[$window])) by (item_category)",
+          "expr": "sum(rate(game_marketplace_bought_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (item_category)",
           "legendFormat": "{{item_category}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -442,25 +605,37 @@
       "id": 500,
       "title": "⛵ Sailing & Ships",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 68},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 68
+      },
       "collapsed": false
     },
     {
       "id": 501,
       "title": "Ships Built Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 69},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 69
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_ships_built_total{service=~\"$service\", group=~\"$group\"}[$window])) by (ship_grade)",
+          "expr": "sum(rate(game_ships_built_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (ship_grade)",
           "legendFormat": "{{ship_grade}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -468,18 +643,25 @@
       "id": 502,
       "title": "Sailing Started Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 69},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 69
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_sailing_started_total{service=~\"$service\", group=~\"$group\"}[$window])) by (sail_type)",
+          "expr": "sum(rate(game_sailing_started_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (sail_type)",
           "legendFormat": "{{sail_type}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -487,18 +669,25 @@
       "id": 503,
       "title": "Sailing Distance Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 69},
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 69
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_sailing_distance_total{service=~\"$service\", group=~\"$group\"}[$window]))",
+          "expr": "sum(rate(game_sailing_distance_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window]))",
           "legendFormat": "Distance"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -506,25 +695,37 @@
       "id": 600,
       "title": "📈 Player Progression",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 77},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 77
+      },
       "collapsed": false
     },
     {
       "id": 601,
       "title": "Player Level Ups Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 78},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 78
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_player_levelups_total{service=~\"$service\", group=~\"$group\"}[$window])) by (level_range)",
+          "expr": "sum(rate(game_player_levelups_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (level_range)",
           "legendFormat": "{{level_range}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -532,18 +733,25 @@
       "id": 602,
       "title": "Shop Purchases Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 78},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 78
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_shop_purchases_total{service=~\"$service\", group=~\"$group\"}[$window])) by (shop_type)",
+          "expr": "sum(rate(game_shop_purchases_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (shop_type)",
           "legendFormat": "{{shop_type}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -551,25 +759,37 @@
       "id": 700,
       "title": "💎 Cash Shop",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 86},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 86
+      },
       "collapsed": false
     },
     {
       "id": 701,
       "title": "Cash Purchases Rate",
       "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 87},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 87
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(game_cash_purchases_total{service=~\"$service\", group=~\"$group\"}[$window])) by (product_type)",
+          "expr": "sum(rate(game_cash_purchases_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (product_type)",
           "legendFormat": "{{product_type}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       }
     },
@@ -577,23 +797,32 @@
       "id": 702,
       "title": "Cash Purchases Total",
       "type": "stat",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 87},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 87
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(increase(game_cash_purchases_total{service=~\"$service\", group=~\"$group\"}[$__range])) by (product_type)",
+          "expr": "sum(increase(game_cash_purchases_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$__range])) by (product_type)",
           "legendFormat": "{{product_type}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       },
       "options": {
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -608,34 +837,48 @@
       "id": 800,
       "title": "📊 Key Metrics Summary",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 95},
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 95
+      },
       "collapsed": false
     },
     {
       "id": 801,
       "title": "Total Economy (Ducat Flow)",
       "type": "stat",
-      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 96},
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 96
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(increase(game_ducat_earned_total{service=~\"$service\", group=~\"$group\"}[$__range]))",
+          "expr": "sum(increase(game_ducat_earned_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$__range]))",
           "legendFormat": "Earned"
         },
         {
-          "expr": "sum(increase(game_ducat_spent_total{service=~\"$service\", group=~\"$group\"}[$__range]))",
+          "expr": "sum(increase(game_ducat_spent_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$__range]))",
           "legendFormat": "Spent"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": {"mode": "palette-classic"}
+          "color": {
+            "mode": "palette-classic"
+          }
         }
       },
       "options": {
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -650,11 +893,16 @@
       "id": 802,
       "title": "Battle Win Rate",
       "type": "gauge",
-      "gridPos": {"h": 6, "w": 8, "x": 8, "y": 96},
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 96
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(increase(game_battles_completed_total{service=~\"$service\", group=~\"$group\", result=\"win\"}[$__range])) / sum(increase(game_battles_completed_total{service=~\"$service\", group=~\"$group\"}[$__range])) * 100",
+          "expr": "sum(increase(game_battles_completed_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\", result=\"win\"}[$__range])) / sum(increase(game_battles_completed_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$__range])) * 100",
           "legendFormat": "Win Rate"
         }
       ],
@@ -666,10 +914,22 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "red", "value": null},
-              {"color": "orange", "value": 30},
-              {"color": "yellow", "value": 50},
-              {"color": "green", "value": 70}
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 30
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 70
+              }
             ]
           }
         }
@@ -679,11 +939,16 @@
       "id": 803,
       "title": "Quest Completion Rate",
       "type": "gauge",
-      "gridPos": {"h": 6, "w": 8, "x": 16, "y": 96},
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 96
+      },
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(increase(game_quests_completed_total{service=~\"$service\", group=~\"$group\"}[$__range])) / (sum(increase(game_quests_accepted_total{service=~\"$service\", group=~\"$group\"}[$__range])) + 0.0001) * 100",
+          "expr": "sum(increase(game_quests_completed_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$__range])) / (sum(increase(game_quests_accepted_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$__range])) + 0.0001) * 100",
           "legendFormat": "Completion Rate"
         }
       ],
@@ -695,10 +960,22 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "red", "value": null},
-              {"color": "orange", "value": 40},
-              {"color": "yellow", "value": 60},
-              {"color": "green", "value": 80}
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 40
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
             ]
           }
         }
@@ -706,4 +983,3 @@
     }
   ]
 }
-

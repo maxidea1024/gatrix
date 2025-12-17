@@ -149,6 +149,7 @@ export class GatrixServerSDK {
     const configWithDefaults = {
       ...config,
       apiToken: config.apiToken || 'gatrix-unsecured-server-api-token',
+      environment: config.environment || 'development', // Temporary fallback
     };
 
     // Validate config
@@ -446,7 +447,7 @@ export class GatrixServerSDK {
    */
   isMultiEnvironmentMode(): boolean {
     return this.config.environments === '*' ||
-           (Array.isArray(this.config.environments) && this.config.environments.length > 0);
+      (Array.isArray(this.config.environments) && this.config.environments.length > 0);
   }
 
   /**

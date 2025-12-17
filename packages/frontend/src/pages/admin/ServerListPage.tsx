@@ -1448,10 +1448,10 @@ const ServerListPage: React.FC = () => {
     '/admin/services',
     () => serviceDiscoveryService.getServices(),
     {
-      revalidateOnFocus: false, // SSE handles real-time updates, no need to refetch on focus
+      revalidateOnFocus: true, // Refetch when page becomes visible (SSE may have missed events while in background)
       revalidateOnReconnect: true, // Refetch on reconnect
       refreshInterval: 0, // Disable auto-refresh, SSE handles real-time updates
-      dedupingInterval: 0, // Don't dedupe requests
+      dedupingInterval: 2000, // Dedupe requests within 2 seconds
     }
   );
 
@@ -1461,16 +1461,24 @@ const ServerListPage: React.FC = () => {
     () => serviceDiscoveryService.getServiceTypes()
   );
 
-  // Initialize services from SWR data (only on initial load)
-  // Use a ref to track if we've already initialized to prevent re-initialization on data changes
+  // Sync services from SWR data
+  // - On initial load: set services
+  // - On focus revalidation: update services with fresh data (in case SSE missed events while in background)
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (data && !initializedRef.current) {
-      setServices(data);
-      initializedRef.current = true;
+    if (data) {
+      if (!initializedRef.current) {
+        // First load
+        setServices(data);
+        initializedRef.current = true;
+      } else {
+        // Focus revalidation - merge with current state to preserve any pending animations
+        // Replace entire list with fresh data from server
+        setServices(data);
+      }
     }
-  }, []);
+  }, [data]);
 
   // Setup SSE connection for real-time updates (only once on mount)
   useEffect(() => {
@@ -1480,16 +1488,9 @@ const ServerListPage: React.FC = () => {
       eventSource = serviceDiscoveryService.createSSEConnection(
         (event) => {
           if (event.type === 'init') {
-            // Initial data - only apply if services is empty (first connection)
-            // This prevents overwriting user's filtered/deleted servers on reconnection
-            setServices((prev) => {
-              if (prev.length === 0) {
-                // First connection - apply initial data
-                return event.data;
-              }
-              // Reconnection - ignore init event to preserve current state
-              return prev;
-            });
+            // Initial/reconnection data - always apply to ensure fresh state
+            // This handles both first connection and SSE reconnection after network issues
+            setServices(event.data);
             setPendingUpdates([]);
           } else if (isPausedRef.current) {
             // If paused, store updates in pending queue
@@ -2782,8 +2783,8 @@ const ServerListPage: React.FC = () => {
 
       {/* List View */}
       {!isLoading && viewMode === 'list' && (
-        <Card>
-          <TableContainer>
+        <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+          <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -3193,9 +3194,13 @@ const ServerListPage: React.FC = () => {
 
         return (
           <Box sx={{
+            flex: 1,
+            minHeight: 0,
+            overflow: 'auto',
             display: 'grid',
             gridTemplateColumns: 'repeat(5, 1fr)',
             gap: 0.5,
+            alignContent: 'start',
             '@media (max-width: 1400px)': { gridTemplateColumns: 'repeat(4, 1fr)' },
             '@media (max-width: 1100px)': { gridTemplateColumns: 'repeat(3, 1fr)' },
             '@media (max-width: 800px)': { gridTemplateColumns: 'repeat(2, 1fr)' },

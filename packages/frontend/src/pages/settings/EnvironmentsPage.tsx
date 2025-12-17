@@ -316,9 +316,11 @@ const EnvironmentsPage: React.FC = () => {
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Tooltip title={t('common.refresh')}>
-            <IconButton onClick={loadEnvironments} disabled={loading}>
-              <RefreshIcon />
-            </IconButton>
+            <span>
+              <IconButton onClick={loadEnvironments} disabled={loading}>
+                <RefreshIcon />
+              </IconButton>
+            </span>
           </Tooltip>
           {canManage && (
             <>

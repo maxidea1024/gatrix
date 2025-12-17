@@ -34,10 +34,13 @@ import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
 import KeyValueFormDrawer from '@/components/settings/KeyValueFormDrawer';
 
+import { useEnvironment } from '@/contexts/EnvironmentContext';
+
 const KeyValuePage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
+  const { currentEnvironmentId } = useEnvironment();
   const canManage = hasPermission([PERMISSIONS.SYSTEM_SETTINGS_MANAGE]);
 
   const [items, setItems] = useState<VarItem[]>([]);
@@ -65,7 +68,7 @@ const KeyValuePage: React.FC = () => {
 
   useEffect(() => {
     loadItems();
-  }, []);
+  }, [currentEnvironmentId]);
 
   // Handle create
   const handleCreate = () => {

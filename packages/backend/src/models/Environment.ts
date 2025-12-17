@@ -16,6 +16,7 @@ export interface EnvironmentData {
   description?: string;
   environmentType: EnvironmentType;
   isSystemDefined: boolean;
+  isHidden: boolean;
   displayOrder: number;
   color: string;
   projectId?: string; // ULID
@@ -37,6 +38,7 @@ export class Environment extends Model implements EnvironmentData {
   description?: string;
   environmentType!: EnvironmentType;
   isSystemDefined!: boolean;
+  isHidden!: boolean;
   displayOrder!: number;
   color!: string;
   projectId?: string; // ULID
@@ -69,6 +71,7 @@ export class Environment extends Model implements EnvironmentData {
         description: { type: ['string', 'null'], maxLength: 1000 },
         environmentType: { type: 'string', enum: ['development', 'staging', 'production'] },
         isSystemDefined: { type: 'boolean' },
+        isHidden: { type: 'boolean' },
         displayOrder: { type: 'integer', minimum: 0 },
         color: { type: 'string', maxLength: 7, pattern: '^#[0-9A-Fa-f]{6}$' },
         projectId: { type: ['string', 'null'], minLength: 26, maxLength: 26 }, // ULID
@@ -141,10 +144,16 @@ export class Environment extends Model implements EnvironmentData {
   }
 
   /**
-   * Get all active environments ordered by displayOrder
+   * Get all active environments ordered by displayOrder (excluding hidden ones by default)
    */
-  static async getAll(): Promise<Environment[]> {
-    return await this.query().orderBy('displayOrder', 'asc').orderBy('environmentName');
+  static async getAll(includeHidden: boolean = false): Promise<Environment[]> {
+    const query = this.query().orderBy('displayOrder', 'asc').orderBy('environmentName');
+
+    if (!includeHidden) {
+      query.where('isHidden', false);
+    }
+
+    return await query;
   }
 
   /**

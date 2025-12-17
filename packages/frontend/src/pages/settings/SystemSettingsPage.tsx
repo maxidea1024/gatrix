@@ -20,10 +20,13 @@ import { serviceDiscoveryConfigService, ServiceDiscoveryConfig } from '@/service
 import { useSnackbar } from 'notistack';
 import KeyValuePage from './KeyValuePage';
 
+import { useEnvironment } from '@/contexts/EnvironmentContext';
+
 // System Settings Page - requires admin role + system-settings permission
 const SystemSettingsPage: React.FC = () => {
   const { t } = useTranslation();
   const { user, hasPermission } = useAuth();
+  const { currentEnvironmentId } = useEnvironment();
   const canManage = hasPermission([PERMISSIONS.SYSTEM_SETTINGS_MANAGE]);
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -64,7 +67,7 @@ const SystemSettingsPage: React.FC = () => {
         // ignore load errors
       }
     })();
-  }, []);
+  }, [currentEnvironmentId]);
 
   // Load service discovery config
   useEffect(() => {

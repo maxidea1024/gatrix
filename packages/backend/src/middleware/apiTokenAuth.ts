@@ -5,9 +5,7 @@ import { CacheService } from '../services/CacheService';
 import logger from '../config/logger';
 import { HEADERS, HEADER_VALUES } from '../constants/headers';
 import {
-  getCurrentEnvironmentId,
   getDefaultEnvironmentId,
-  runWithEnvironmentAsync,
   isDefaultEnvironmentInitialized
 } from '../utils/environmentContext';
 
@@ -126,31 +124,8 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       });
     }
 
-    // Check environment access for multi-environment support
-    const currentEnvId = getCurrentEnvironmentId();
-    if (currentEnvId && !apiToken.allowAllEnvironments) {
-      // Check if token has access to current environment
-      let hasAccess = false;
-
-      if (typeof apiToken.hasEnvironmentAccess === 'function') {
-        hasAccess = await apiToken.hasEnvironmentAccess(currentEnvId);
-      } else {
-        // For cached plain objects, query the database
-        const { default: knex } = await import('../config/knex');
-        const envAccess = await knex('g_api_access_token_environments')
-          .where('tokenId', apiToken.id)
-          .where('environmentId', currentEnvId)
-          .first();
-        hasAccess = !!envAccess;
-      }
-
-      if (!hasAccess) {
-        return res.status(403).json({
-          success: false,
-          message: 'API token does not have access to this environment'
-        });
-      }
-    }
+    // Environment access check is deferred to setSDKEnvironment middleware
+    // where the target environment is definitively resolved.
 
     // Get environments if token has specific environment access
     let environments: Environment[] = [];
@@ -270,7 +245,44 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
     const requestedEnvId = req.headers[HEADERS.X_ENVIRONMENT_ID] as string;
 
     // Get environment ID from header or use default
-    let environmentId = requestedEnvId;
+    // SDK sends 'X-Environment', but backend defines 'x-environment-id'
+    let environmentId = (req.headers['x-environment'] as string) ||
+      (req.headers[HEADERS.X_ENVIRONMENT_ID] as string) ||
+      requestedEnvId;
+
+    // Use pre-resolved environment if available (e.g. from URL params)
+    if (!environmentId && req.environment?.id) {
+      environmentId = req.environment.id;
+    }
+
+    // Attempt to resolve from URL (specifically for server routes like /api/v1/server/:env/...)
+    if (!environmentId) {
+      let envParam = req.params?.env;
+
+      // Fallback: Manually parse URL if req.params is not populated (middleware order issue)
+      // Look for /api/v1/server/:env/ pattern
+      if (!envParam) {
+        const path = req.originalUrl || req.url;
+        const match = path.match(/\/api\/v1\/server\/([^\/]+)\//);
+        if (match && match[1] && match[1] !== 'services' && match[1] !== 'internal' && match[1] !== 'auth') {
+          envParam = match[1];
+        }
+      }
+
+      if (envParam) {
+        // Try to find environment by ID first
+        let resolvedEnv = await Environment.query().findById(envParam);
+
+        // If not found by ID, try by name
+        if (!resolvedEnv) {
+          resolvedEnv = await Environment.getByName(envParam);
+        }
+
+        if (resolvedEnv) {
+          environmentId = resolvedEnv.id;
+        }
+      }
+    }
 
     if (!environmentId) {
       // Use default environment if not specified
@@ -290,6 +302,44 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
       });
     }
 
+    // Fetch environment from database FIRST to resolve ID vs Name ambiguity
+    // This handles cases where client sends environment name (e.g. 'development') instead of ID
+    const cacheKey = `sdk_env:${environmentId}`;
+    let environment: Environment | null = await CacheService.get<Environment>(cacheKey);
+
+    if (!environment) {
+      // Try to find by ID
+      let foundEnv = await Environment.query().findById(environmentId);
+
+      // If not found by ID, try by name
+      if (!foundEnv) {
+        foundEnv = await Environment.getByName(environmentId);
+      }
+
+      if (!foundEnv) {
+        return res.status(404).json({
+          success: false,
+          message: `Environment not found: ${environmentId}`
+        });
+      }
+
+      environment = foundEnv;
+
+      // Cache environment for 5 minutes
+      // Cache using the key we looked up with
+      await CacheService.set(cacheKey, environment, 300);
+
+      // Also cache by canonical ID if we looked up by name
+      if (environment.id !== environmentId) {
+        await CacheService.set(`sdk_env:${environment.id}`, environment, 300);
+      }
+    }
+
+    // Update environmentId to the canonical ID from the database
+    // This ensures subsequent checks use the correct ID even if name was passed
+    environmentId = environment.id;
+    req.environment = environment;
+
     // Validate token has access to this environment (skip for unsecured tokens)
     if (!req.isUnsecuredToken && apiToken && !apiToken.allowAllEnvironments) {
       let hasAccess = false;
@@ -307,40 +357,31 @@ export const setSDKEnvironment = async (req: SDKRequest, res: Response, next: Ne
       }
 
       if (!hasAccess) {
+        // Detailed logging for debugging
+        logger.error('API token environment access denied:', {
+          tokenId: apiToken.id,
+          tokenName: apiToken.tokenName,
+          environmentId: environmentId,
+          isUnsecuredToken: req.isUnsecuredToken,
+          allowAllEnvironments: apiToken.allowAllEnvironments,
+          path: req.originalUrl
+        });
+
         return res.status(403).json({
           success: false,
-          message: 'API token does not have access to this environment'
+          message: 'API token does not have access to this environment',
+          debug: {
+            tokenId: apiToken.id,
+            tokenName: apiToken.tokenName,
+            environmentId: environmentId,
+            environmentName: environment.environmentName,
+          }
         });
       }
     }
 
-    // Fetch environment from database
-    const cacheKey = `sdk_env:${environmentId}`;
-    let environment: Environment | null = await CacheService.get<Environment>(cacheKey);
-
-    if (!environment) {
-      const foundEnv = await Environment.query().findById(environmentId);
-
-      if (!foundEnv) {
-        return res.status(404).json({
-          success: false,
-          message: 'Environment not found'
-        });
-      }
-
-      environment = foundEnv;
-
-      // Cache environment for 5 minutes
-      await CacheService.set(cacheKey, environment, 300);
-    }
-
-    // Set environment on request
-    req.environment = environment;
-
-    // Run the rest of the request with environment context
-    await runWithEnvironmentAsync(environmentId, async () => {
-      next();
-    });
+    // Proceed without AsyncLocalStorage context wrapper
+    next();
   } catch (error) {
     logger.error('Error setting SDK environment:', error);
     return res.status(500).json({

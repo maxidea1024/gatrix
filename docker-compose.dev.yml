@@ -265,6 +265,7 @@ services:
       CLICKHOUSE_PASSWORD: ""
       # Service Discovery
       GATRIX_URL: http://backend-dev:5000
+      GATRIX_ENVIRONMENT: development
       API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -399,6 +400,7 @@ services:
       GATRIX_API_SECRET: ${GATRIX_API_SECRET:-dev-shared-secret}
       # Service Discovery
       GATRIX_URL: http://backend-dev:5000
+      GATRIX_ENVIRONMENT: development
       API_TOKEN: ${API_TOKEN:-gatrix-unsecured-server-api-token}
       # Backend Service Token (for Backend -> Chat Server communication)
       BACKEND_SERVICE_TOKEN: ${BACKEND_SERVICE_TOKEN:-gatrix-backend-service-token-default-key-change-in-production}

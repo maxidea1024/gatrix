@@ -16,6 +16,7 @@ export interface VarItem {
   updatedAt: string;
   createdByName?: string;
   updatedByName?: string;
+  isCopyable?: boolean;
 }
 
 export interface CreateVarData {

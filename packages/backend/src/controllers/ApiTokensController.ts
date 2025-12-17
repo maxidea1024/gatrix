@@ -63,8 +63,8 @@ class ApiTokensController {
       const tokenIds = tokens.map((t: any) => t.id);
       const environmentAssignments = tokenIds.length > 0
         ? await knex('g_api_access_token_environments')
-            .whereIn('tokenId', tokenIds)
-            .select('tokenId', 'environmentId')
+          .whereIn('tokenId', tokenIds)
+          .select('tokenId', 'environmentId')
         : [];
 
       // Group environment IDs by token
@@ -293,6 +293,14 @@ class ApiTokensController {
         }
       };
 
+      // Invalidate token cache (use token value prefix for cache key)
+      // Cache key format: api_token:{first 16 chars}... or server_api_token:{first 16 chars}...
+      if (existingToken.tokenValue) {
+        const tokenPrefix = existingToken.tokenValue.substring(0, 16);
+        await pubSubService.invalidateByPattern(`api_token:${tokenPrefix}.*`);
+        await pubSubService.invalidateByPattern(`server_api_token:${tokenPrefix}.*`);
+      }
+
       // Publish token updated event for Edge mirroring
       try {
         await pubSubService.publishSDKEvent({
@@ -352,6 +360,13 @@ class ApiTokensController {
           updatedAt: knex.fn.now()
         });
 
+      // Invalidate OLD token cache (the old tokenValue is no longer valid)
+      if (existingToken.tokenValue) {
+        const oldTokenPrefix = existingToken.tokenValue.substring(0, 16);
+        await pubSubService.invalidateByPattern(`api_token:${oldTokenPrefix}.*`);
+        await pubSubService.invalidateByPattern(`server_api_token:${oldTokenPrefix}.*`);
+      }
+
       // Publish token updated event for Edge mirroring (regenerate = token value changed)
       try {
         await pubSubService.publishSDKEvent({
@@ -405,6 +420,13 @@ class ApiTokensController {
           success: false,
           error: { message: 'API token not found' }
         });
+      }
+
+      // Invalidate token cache BEFORE deletion
+      if (existingToken.tokenValue) {
+        const tokenPrefix = existingToken.tokenValue.substring(0, 16);
+        await pubSubService.invalidateByPattern(`api_token:${tokenPrefix}.*`);
+        await pubSubService.invalidateByPattern(`server_api_token:${tokenPrefix}.*`);
       }
 
       // Use transaction to delete token and its environment assignments

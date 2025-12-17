@@ -14,7 +14,7 @@ export class EnvironmentController {
    */
   static getEnvironments = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const environments = await Environment.getAll();
-    
+
     // Get stats for each environment
     const environmentsWithStats = await Promise.all(
       environments.map(async (env) => {
@@ -37,7 +37,7 @@ export class EnvironmentController {
    */
   static getEnvironment = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    
+
     const environment = await Environment.query()
       .findById(id)
       .withGraphFetched('[creator(basicInfo), updater(basicInfo)]')
@@ -106,6 +106,7 @@ export class EnvironmentController {
         description,
         environmentType: environmentType || 'development',
         isSystemDefined: false, // User-created environments are never system-defined
+        isHidden: false,
         displayOrder: displayOrder || 99,
         color: color || '#607D8B',
         projectId: projectId || undefined,
@@ -366,7 +367,7 @@ export class EnvironmentController {
    */
   static getEnvironmentSegments = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    
+
     const environment = await Environment.query().findById(id);
     if (!environment) {
       return res.status(404).json({
@@ -429,7 +430,7 @@ export class EnvironmentController {
    */
   static getEnvironmentStats = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    
+
     const environment = await Environment.query().findById(id);
     if (!environment) {
       return res.status(404).json({

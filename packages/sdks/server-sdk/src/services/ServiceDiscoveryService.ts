@@ -16,6 +16,7 @@ export class ServiceDiscoveryService {
   private labels?: ServiceLabels;
   private heartbeatInterval?: NodeJS.Timeout;
   private heartbeatIntervalMs: number = 15000; // 15 seconds (half of default 30s TTL)
+  private isUpdating: boolean = false; // Prevent concurrent heartbeat requests
 
   // Backup registration data for auto-recovery
   private registrationBackup?: {
@@ -179,8 +180,10 @@ export class ServiceDiscoveryService {
    * using the provided hostname, internalAddress, ports, and meta fields.
    */
   async updateStatus(input: UpdateServiceStatusInput): Promise<void> {
+    // Silently skip if not registered - register() must be called first
     if (!this.instanceId || !this.labels) {
-      throw new Error('Service not registered');
+      this.logger.debug('Skipping updateStatus - service not registered yet');
+      return;
     }
 
     this.logger.debug('Updating service status via API', {
@@ -212,38 +215,51 @@ export class ServiceDiscoveryService {
       const errorMessage = response.error?.message || 'Failed to update service status';
 
       // Check if error is "Service not found" and we have backup data
-      if (errorMessage.includes('not found') && this.registrationBackup) {
-        this.logger.warn('Service not found in registry, attempting auto-registration', {
-          instanceId: this.instanceId,
-          service: this.labels?.service,
-        });
-
-        try {
-          // Re-register using backup data
-          await this.register({
-            instanceId: this.instanceId,
-            labels: this.labels!,
-            hostname: this.registrationBackup.hostname,
-            internalAddress: this.registrationBackup.internalAddress,
-            ports: this.registrationBackup.ports,
-            meta: this.registrationBackup.meta,
-            status: (input.status || this.registrationBackup.status || 'ready') as any,
-            stats: input.stats,
-          });
-
-          this.logger.info('Service auto-registered successfully', {
+      if (errorMessage.includes('not found')) {
+        if (this.registrationBackup) {
+          this.logger.warn('Service not found in registry, attempting auto-registration', {
             instanceId: this.instanceId,
             service: this.labels?.service,
           });
 
-          // Successfully re-registered, return without error
-          return;
-        } catch (reregisterError: any) {
-          this.logger.error('Failed to auto-register service', {
+          try {
+            // Re-register using backup data
+            await this.register({
+              instanceId: this.instanceId,
+              labels: this.labels!,
+              hostname: this.registrationBackup.hostname,
+              internalAddress: this.registrationBackup.internalAddress,
+              ports: this.registrationBackup.ports,
+              meta: this.registrationBackup.meta,
+              status: (input.status || this.registrationBackup.status || 'ready') as any,
+              stats: input.stats,
+            });
+
+            this.logger.info('Service auto-registered successfully', {
+              instanceId: this.instanceId,
+              service: this.labels?.service,
+            });
+
+            // Successfully re-registered, return without error
+            return;
+          } catch (reregisterError: any) {
+            this.logger.error('Failed to auto-register service', {
+              instanceId: this.instanceId,
+              error: reregisterError.message || String(reregisterError),
+            });
+            // Fall through to throw original error
+          }
+        } else {
+          // No backup data - this happens when server was restarted but register() was not called first
+          // Clear the stale instanceId and labels to force a fresh register()
+          this.logger.error('Service not found and no backup data available. Did you call register() first?', {
             instanceId: this.instanceId,
-            error: reregisterError.message || String(reregisterError),
+            service: this.labels?.service,
           });
-          // Fall through to throw original error
+          this.stopHeartbeat();
+          this.instanceId = undefined;
+          this.labels = undefined;
+          throw new Error('Service not found. Please call register() to re-register the service.');
         }
       }
 
@@ -355,12 +371,21 @@ export class ServiceDiscoveryService {
     }
 
     this.heartbeatInterval = setInterval(async () => {
+      // Skip if previous update is still in progress (e.g., retrying after backend restart)
+      if (this.isUpdating) {
+        this.logger.debug('Skipping heartbeat - previous update still in progress', {
+          instanceId: this.instanceId,
+        });
+        return;
+      }
+
       try {
         if (!this.instanceId || !this.labels) {
           this.stopHeartbeat();
           return;
         }
 
+        this.isUpdating = true;
         await this.updateStatus({
           status: 'ready',
           autoRegisterIfMissing: true,
@@ -375,6 +400,8 @@ export class ServiceDiscoveryService {
           instanceId: this.instanceId,
           error: error instanceof Error ? error.message : String(error),
         });
+      } finally {
+        this.isUpdating = false;
       }
     }, this.heartbeatIntervalMs);
 
