@@ -241,6 +241,7 @@ export class Environment extends Model implements EnvironmentData {
     jobs: { count: number; items: Array<{ id: string; name: string }> };
     clientVersions: { count: number; items: Array<{ id: string; clientVersion: string; platform: string }> };
     apiTokens: { count: number; items: Array<{ id: string; name: string }> };
+    storeProducts: { count: number; items: Array<{ id: string; productId: string; productName: string }> };
     total: number;
   }> {
     const { default: knex } = await import('../config/knex');
@@ -294,6 +295,7 @@ export class Environment extends Model implements EnvironmentData {
       jobs,
       clientVersions,
       apiTokenEnvs,
+      storeProducts,
     ] = await Promise.all([
       safeQuery<{ id: string; name: string }>('g_remote_config_templates', ['id', 'name']),
       safeQuery<{ id: string; worldId: string; name: string }>('g_game_worlds', ['id', 'worldId', 'name']),
@@ -302,7 +304,7 @@ export class Environment extends Model implements EnvironmentData {
       // Since we just removed environmentId from tags in logic, safeQuery might fail or return 0 if column missing.
       // But typically safeQuery checks for column existence.
       // The user wants tags to be global, so getting "related data" for environment might not make sense for tags anymore.
-      // However, for consistency, if column remains (rollback) it counts. 
+      // However, for consistency, if column remains (rollback) it counts.
       // If column is gone (migration applied), safeQuery returns 0.
       safeQuery<{ id: string; name: string }>('g_tags', ['id', 'name']),
       safeQuery<{ id: string; varKey: string }>('g_vars', ['id', 'varKey'], (qb) => {
@@ -319,6 +321,9 @@ export class Environment extends Model implements EnvironmentData {
       safeQuery<{ id: string; name: string }>('g_jobs', ['id', 'name']),
       safeQuery<{ id: string; clientVersion: string; platform: string }>('g_client_versions', ['id', 'clientVersion', 'platform']),
       safeQuery<{ tokenId: string }>('g_api_access_token_environments', ['tokenId']),
+      safeQuery<{ id: string; productId: string; productName: string }>('g_store_products', ['id', 'productId', 'productName'], (qb) => {
+        qb.where('isActive', true);
+      }),
     ]);
 
     // For API tokens, we need to get the token names
@@ -347,12 +352,14 @@ export class Environment extends Model implements EnvironmentData {
       jobs,
       clientVersions,
       apiTokens,
+      storeProducts,
       total: 0,
     };
 
     result.total = templates.count + gameWorlds.count + segments.count + tags.count +
       vars.count + messageTemplates.count + serviceNotices.count + ingamePopups.count +
-      surveys.count + coupons.count + banners.count + jobs.count + clientVersions.count + apiTokens.count;
+      surveys.count + coupons.count + banners.count + jobs.count + clientVersions.count +
+      apiTokens.count + storeProducts.count;
 
     return result;
   }
@@ -375,6 +382,7 @@ export class Environment extends Model implements EnvironmentData {
     jobs: number;
     clientVersions: number;
     apiTokens: number;
+    storeProducts: number;
     total: number;
   }> {
     const details = await this.getRelatedDataDetails();
@@ -393,6 +401,7 @@ export class Environment extends Model implements EnvironmentData {
       jobs: details.jobs.count,
       clientVersions: details.clientVersions.count,
       apiTokens: details.apiTokens.count,
+      storeProducts: details.storeProducts.count,
       total: details.total,
     };
   }

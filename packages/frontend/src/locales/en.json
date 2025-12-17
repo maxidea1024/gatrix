@@ -2363,6 +2363,7 @@
     "envBanners": "Banners",
     "envJobs": "Scheduled Jobs",
     "envApiTokens": "API Tokens",
+    "envStoreProducts": "Products On Sale",
     "envTotal": "Total Data",
     "envNoData": "No data",
     "systemOverview": "System Overview",

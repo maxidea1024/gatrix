@@ -250,6 +250,7 @@ interface EnvironmentDataCounts {
   jobs: number;
   clientVersions: number;
   apiTokens: number;
+  storeProducts: number;
 }
 
 interface EnvironmentWithCounts extends Environment {
@@ -700,6 +701,7 @@ const DashboardPage: React.FC = () => {
               jobs: rawData.jobs?.count ?? 0,
               clientVersions: rawData.clientVersions?.count ?? 0,
               apiTokens: rawData.apiTokens?.count ?? 0,
+              storeProducts: rawData.storeProducts?.count ?? 0,
             } : null;
             return {
               ...env,
@@ -1117,6 +1119,7 @@ const DashboardPage: React.FC = () => {
                           { label: 'envIngamePopups', value: env.counts.ingamePopups, path: '/game/ingame-popup-notices' },
                           { label: 'envBanners', value: env.counts.banners, path: '/game/banners' },
                           { label: 'envJobs', value: env.counts.jobs, path: '/admin/jobs' },
+                          { label: 'envStoreProducts', value: env.counts.storeProducts, path: '/game/store-products' },
                         ].map((item) => (
                           <Box
                             key={item.label}
@@ -1399,60 +1402,62 @@ const DashboardPage: React.FC = () => {
               </Box>
 
               {crashEventsLoading ? (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {[1, 2, 3].map((i) => (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, height: 300 }}>
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
                     <Skeleton key={i} height={48} />
                   ))}
                 </Box>
               ) : recentCrashEvents.length > 0 ? (
-                <List disablePadding dense>
-                  {recentCrashEvents.slice(0, 10).map((event, index) => (
-                    <React.Fragment key={event.id}>
-                      <ListItem
-                        disablePadding
-                        sx={{ py: 1, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-                        onClick={() => navigate(`/admin/crash-events?id=${event.id}`)}
-                      >
-                        <ListItemIcon sx={{ minWidth: 36 }}>
-                          <Avatar
-                            sx={{
-                              width: 28,
-                              height: 28,
-                              bgcolor: alpha(theme.palette.error.main, 0.1),
-                              color: 'error.main',
-                              fontSize: 12,
-                            }}
-                          >
-                            <BugReportIcon sx={{ fontSize: 16 }} />
-                          </Avatar>
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <Typography variant="body2" noWrap sx={{ maxWidth: 400 }}>
-                              {event.firstLine || event.crashId}
-                            </Typography>
-                          }
-                          secondary={
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
-                              <Chip label={event.platform} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
-                              <Chip label={event.branch} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
-                              {event.appVersion && (
-                                <Chip label={`v${event.appVersion}`} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
-                              )}
-                              <Typography variant="caption" color="text.secondary">
-                                {formatRelativeTime(event.createdAt)}
+                <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+                  <List disablePadding dense>
+                    {recentCrashEvents.slice(0, 10).map((event, index) => (
+                      <React.Fragment key={event.id}>
+                        <ListItem
+                          disablePadding
+                          sx={{ py: 1, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+                          onClick={() => navigate(`/admin/crash-events?id=${event.id}`)}
+                        >
+                          <ListItemIcon sx={{ minWidth: 36 }}>
+                            <Avatar
+                              sx={{
+                                width: 28,
+                                height: 28,
+                                bgcolor: alpha(theme.palette.error.main, 0.1),
+                                color: 'error.main',
+                                fontSize: 12,
+                              }}
+                            >
+                              <BugReportIcon sx={{ fontSize: 16 }} />
+                            </Avatar>
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Typography variant="body2" noWrap sx={{ maxWidth: 400 }}>
+                                {event.firstLine || event.crashId}
                               </Typography>
-                            </Box>
-                          }
-                          secondaryTypographyProps={{ component: 'div' }}
-                        />
-                      </ListItem>
-                      {index < Math.min(recentCrashEvents.length, 10) - 1 && <Divider />}
-                    </React.Fragment>
-                  ))}
-                </List>
+                            }
+                            secondary={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
+                                <Chip label={event.platform} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
+                                <Chip label={event.branch} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
+                                {event.appVersion && (
+                                  <Chip label={`v${event.appVersion}`} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
+                                )}
+                                <Typography variant="caption" color="text.secondary">
+                                  {formatRelativeTime(event.createdAt)}
+                                </Typography>
+                              </Box>
+                            }
+                            secondaryTypographyProps={{ component: 'div' }}
+                          />
+                        </ListItem>
+                        {index < Math.min(recentCrashEvents.length, 10) - 1 && <Divider />}
+                      </React.Fragment>
+                    ))}
+                  </List>
+                </Box>
               ) : (
-                <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+                <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary', height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Typography variant="body2">{t('dashboard.noCrashEvents')}</Typography>
                 </Box>
               )}

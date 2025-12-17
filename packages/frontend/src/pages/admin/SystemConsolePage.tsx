@@ -1095,7 +1095,7 @@ const SystemConsolePage: React.FC = () => {
         display: 'flex',
         flexDirection: 'column',
         p: 3,
-        flex: 1,
+        height: 'calc(100vh - 64px)',
         minHeight: 0,
         overflow: 'hidden'
       }}
@@ -1104,7 +1104,7 @@ const SystemConsolePage: React.FC = () => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') e.preventDefault();
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3, flexShrink: 0 }}>
         <TerminalIcon sx={{ fontSize: 32, color: 'primary.main' }} />
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700 }}>
@@ -1201,7 +1201,7 @@ const SystemConsolePage: React.FC = () => {
           {t('common.paste')}
         </MenuItem>
       </Menu>
-      <Box sx={{ mt: 1 }}>
+      <Box sx={{ mt: 1, flexShrink: 0 }}>
         <Typography variant="caption" color="text.secondary">
           {t('console.hint')}: echo --green "Hello World" | help | date | time | timezone | uptime
         </Typography>

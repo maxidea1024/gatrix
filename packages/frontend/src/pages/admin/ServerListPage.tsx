@@ -17,6 +17,7 @@ import {
   TextField,
   InputAdornment,
   CircularProgress,
+  LinearProgress,
   Alert,
   Badge,
   IconButton,
@@ -772,8 +773,8 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
         p: 2,
         overflow: 'hidden',
         width: '100%',
-        height: 'calc(100vh - 220px)', // Fill available height with margin for header/toolbar
-        minHeight: 400,
+        flex: 1,
+        minHeight: 0,
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
@@ -1005,13 +1006,16 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
               const circumference = 2 * Math.PI * pingGaugeRadius;
               const strokeDasharray = `${progress * circumference} ${circumference}`;
               // Color transitions from green (0%) to yellow (50%) to red (100%)
-              const pingGaugeColor = progress >= 1
-                ? '#f44336' // Red when fully elapsed
-                : progress >= 0.7
-                  ? '#ff9800' // Orange when near timeout
-                  : progress >= 0.5
-                    ? '#ffc107' // Yellow at half
-                    : '#4caf50'; // Green when fresh
+              // When progress is 0 (or very small), make it transparent
+              const pingGaugeColor = progress < 0.01
+                ? 'transparent'
+                : progress >= 1
+                  ? '#f44336' // Red when fully elapsed
+                  : progress >= 0.7
+                    ? '#ff9800' // Orange when near timeout
+                    : progress >= 0.5
+                      ? '#ffc107' // Yellow at half
+                      : '#4caf50'; // Green when fresh
 
               return (
                 <g
@@ -1291,6 +1295,10 @@ const ServerListPage: React.FC = () => {
   // Track heartbeat for pulse animation
   const [heartbeatIds, setHeartbeatIds] = useState<Set<string>>(new Set());
 
+  // Track last heartbeat time for ping progress bar (for list view only)
+  const [listViewLastHeartbeatTime, setListViewLastHeartbeatTime] = useState<Map<string, number>>(new Map());
+  const [listViewPingProgress, setListViewPingProgress] = useState<Map<string, number>>(new Map());
+
   // Cleanup confirmation dialog
   const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false);
 
@@ -1344,6 +1352,37 @@ const ServerListPage: React.FC = () => {
     });
     return counts;
   }, [services]);
+
+  // Update ping progress every 100ms (for list view progress bar only)
+  useEffect(() => {
+    // Only run interval when in list view mode to avoid affecting cluster view performance
+    if (viewMode !== 'list') return;
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setListViewPingProgress(() => {
+        const next = new Map<string, number>();
+        services.forEach((service) => {
+          const serviceKey = `${service.labels.service}-${service.instanceId}`;
+          const lastTime = listViewLastHeartbeatTime.get(serviceKey);
+          if (lastTime) {
+            const elapsed = (now - lastTime) / 1000; // seconds
+            const progress = Math.min(elapsed / HEARTBEAT_TTL_SECONDS, 1);
+            next.set(serviceKey, progress);
+          } else {
+            // If no heartbeat yet, calculate from updatedAt
+            const updatedTime = new Date(service.updatedAt).getTime();
+            const elapsed = (now - updatedTime) / 1000;
+            const progress = Math.min(elapsed / HEARTBEAT_TTL_SECONDS, 1);
+            next.set(serviceKey, progress);
+          }
+        });
+        return next;
+      });
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [viewMode, services, listViewLastHeartbeatTime]);
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -1502,6 +1541,9 @@ const ServerListPage: React.FC = () => {
                     });
                   }, 600); // Short pulse duration
 
+                  // Reset ping progress bar on heartbeat (for list view)
+                  setListViewLastHeartbeatTime((prev) => new Map(prev).set(serviceKey, Date.now()));
+
                   const newServices = [...prev];
                   newServices[index] = event.data;
                   return newServices;
@@ -1515,6 +1557,9 @@ const ServerListPage: React.FC = () => {
                       return newSet;
                     });
                   }, 1000); // Animation duration
+
+                  // Initialize ping progress for new service (for list view)
+                  setListViewLastHeartbeatTime((prev) => new Map(prev).set(serviceKey, Date.now()));
 
                   // Add new service and sort by createdAt (ascending - oldest first, newest last)
                   const newServices = [...prev, event.data];
@@ -2241,7 +2286,7 @@ const ServerListPage: React.FC = () => {
         label={type}
         size="small"
         variant="outlined"
-        sx={{ fontWeight: 600 }}
+        sx={{ fontWeight: 600, borderRadius: 1 }}
       />
     );
   };
@@ -2305,9 +2350,9 @@ const ServerListPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, height: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* Header */}
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ mb: 3, flexShrink: 0 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <DnsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Box sx={{ flex: 1 }}>
@@ -2322,7 +2367,7 @@ const ServerListPage: React.FC = () => {
       </Box>
 
       {/* Search and Filters */}
-      <Card sx={{ mb: 3 }}>
+      <Card sx={{ mb: 3, flexShrink: 0 }}>
         <CardContent>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             {/* Search */}
@@ -2828,7 +2873,7 @@ const ServerListPage: React.FC = () => {
                                     size="small"
                                     variant="outlined"
                                     color="primary"
-                                    sx={{ fontWeight: 600 }}
+                                    sx={{ fontWeight: 600, borderRadius: 1 }}
                                   />
                                 ) : (
                                   <Typography variant="caption" color="text.disabled">-</Typography>
@@ -2844,7 +2889,7 @@ const ServerListPage: React.FC = () => {
                                     size="small"
                                     variant="outlined"
                                     color="secondary"
-                                    sx={{ fontWeight: 600 }}
+                                    sx={{ fontWeight: 600, borderRadius: 1 }}
                                   />
                                 ) : (
                                   <Typography variant="caption" color="text.disabled">-</Typography>
@@ -2860,7 +2905,7 @@ const ServerListPage: React.FC = () => {
                                     size="small"
                                     variant="outlined"
                                     color="info"
-                                    sx={{ fontWeight: 600 }}
+                                    sx={{ fontWeight: 600, borderRadius: 1 }}
                                   />
                                 ) : (
                                   <Typography variant="caption" color="text.disabled">-</Typography>
@@ -2879,7 +2924,7 @@ const ServerListPage: React.FC = () => {
                                         label={`${key}=${value}`}
                                         size="small"
                                         variant="outlined"
-                                        sx={{ fontSize: '0.7rem', height: '22px' }}
+                                        sx={{ fontSize: '0.7rem', height: '22px', borderRadius: 1 }}
                                       />
                                     ))}
                                 </Box>
@@ -2920,7 +2965,7 @@ const ServerListPage: React.FC = () => {
                                         key={`${service.instanceId}-${name}`}
                                         label={`${name}:${port}`}
                                         size="small"
-                                        sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.875rem', height: '24px' }}
+                                        sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.875rem', height: '24px', borderRadius: 1 }}
                                       />
                                     ))}
                                   </Box>
@@ -3003,9 +3048,57 @@ const ServerListPage: React.FC = () => {
                               </TableCell>
                             );
                           case 'updatedAt':
+                            const updatedAtServiceKey = `${service.labels.service}-${service.instanceId}`;
+                            const updatedAtProgress = listViewPingProgress.get(updatedAtServiceKey) || 0;
+                            const updatedAtProgressColor = updatedAtProgress >= 1
+                              ? 'error'
+                              : updatedAtProgress >= 0.7
+                                ? 'warning'
+                                : 'success';
                             return (
                               <TableCell key={column.id}>
-                                <RelativeTime date={service.updatedAt} showSeconds />
+                                <Box sx={{ position: 'relative', width: 100, height: 20 }}>
+                                  <LinearProgress
+                                    variant="determinate"
+                                    value={updatedAtProgress * 100}
+                                    color={updatedAtProgressColor}
+                                    sx={{
+                                      height: 20,
+                                      borderRadius: 1,
+                                      bgcolor: 'action.hover',
+                                      '& .MuiLinearProgress-bar': {
+                                        borderRadius: 1,
+                                        // Hide the bar when progress is nearly zero
+                                        opacity: updatedAtProgress < 0.01 ? 0 : 1,
+                                      },
+                                    }}
+                                  />
+                                  <Box
+                                    sx={{
+                                      position: 'absolute',
+                                      top: 0,
+                                      left: 0,
+                                      right: 0,
+                                      bottom: 0,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                    }}
+                                  >
+                                    <RelativeTime
+                                      date={service.updatedAt}
+                                      showSeconds
+                                      showTooltip={false}
+                                      variant="caption"
+                                      sx={{
+                                        fontWeight: 500,
+                                        fontSize: 11,
+                                        color: 'text.primary',
+                                        textShadow: '0 0 2px rgba(255,255,255,0.8)',
+                                      }}
+                                    />
+                                  </Box>
+                                </Box>
                               </TableCell>
                             );
                           case 'actions':
@@ -3384,7 +3477,7 @@ const ServerListPage: React.FC = () => {
                                 size="small"
                                 variant="outlined"
                                 color="primary"
-                                sx={{ fontWeight: 500, height: 20, fontSize: '0.7rem' }}
+                                sx={{ fontWeight: 500, height: 20, fontSize: '0.7rem', borderRadius: 1 }}
                               />
                             )}
                           </Box>
@@ -3475,6 +3568,7 @@ const ServerListPage: React.FC = () => {
                                   height: 24,
                                   fontSize: '0.8rem',
                                   fontFamily: '"D2Coding", monospace',
+                                  borderRadius: 1,
                                   '& .MuiChip-label': { px: 1 },
                                 }}
                               />
@@ -3491,7 +3585,7 @@ const ServerListPage: React.FC = () => {
                                 label={`${key}=${value}`}
                                 size="small"
                                 variant="outlined"
-                                sx={{ fontSize: '0.8rem', height: 24, fontFamily: '"D2Coding", monospace' }}
+                                sx={{ fontSize: '0.8rem', height: 24, fontFamily: '"D2Coding", monospace', borderRadius: 1 }}
                               />
                             ))}
                           </Box>
@@ -3725,24 +3819,28 @@ const ServerListPage: React.FC = () => {
               label={`${t('serverList.bulkHealthCheck.total')}: ${bulkHealthCheckStats.total}`}
               color="default"
               variant="outlined"
+              sx={{ borderRadius: 1 }}
             />
             <Chip
               icon={<CheckCircleIcon />}
               label={`${t('serverList.bulkHealthCheck.success')}: ${bulkHealthCheckStats.success}`}
               color="success"
               variant={bulkHealthCheckStats.success > 0 ? 'filled' : 'outlined'}
+              sx={{ borderRadius: 1 }}
             />
             <Chip
               icon={<ErrorIcon />}
               label={`${t('serverList.bulkHealthCheck.failed')}: ${bulkHealthCheckStats.failed}`}
               color="error"
               variant={bulkHealthCheckStats.failed > 0 ? 'filled' : 'outlined'}
+              sx={{ borderRadius: 1 }}
             />
             {bulkHealthCheckStats.success > 0 && (
               <Chip
                 label={`${t('serverList.bulkHealthCheck.avgLatency')}: ${Math.round(bulkHealthCheckStats.avgLatency)}ms`}
                 color="info"
                 variant="outlined"
+                sx={{ borderRadius: 1 }}
               />
             )}
           </Box>

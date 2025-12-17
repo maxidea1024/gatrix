@@ -294,8 +294,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   }, [user?.id, navigate]);
 
   // Handle role change dialog confirmation
-  const handleRoleChangeConfirm = useCallback(() => {
+  const handleRoleChangeConfirm = useCallback(async () => {
     setRoleChangeDialogOpen(false);
+    try {
+      // Fetch latest user profile to update localStorage before reload
+      // This ensures the new role/permissions are reflected after page refresh
+      const { AuthService } = await import('@/services/auth');
+      await AuthService.getProfile();
+    } catch (error) {
+      // Continue with reload even if profile fetch fails
+      console.error('Failed to refresh profile:', error);
+    }
     // Navigate to dashboard and force a full page reload to refresh auth state
     navigate('/dashboard');
     window.location.reload();

@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
     command: --innodb-use-native-aio=0
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-gatrix_rootpassword}
       MYSQL_DATABASE: ${DB_NAME:-gatrix}
       MYSQL_USER: ${DB_USER:-gatrix_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
@@ -28,7 +28,7 @@ services:
     networks:
       - gatrix-network
     healthcheck:
-      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u root -p${DB_ROOT_PASSWORD:-rootpassword} && mysql -u root -p${DB_ROOT_PASSWORD:-rootpassword} -e 'SELECT 1' >/dev/null 2>&1" ]
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u root -p${DB_ROOT_PASSWORD:-gatrix_rootpassword} && mysql -u root -p${DB_ROOT_PASSWORD:-gatrix_rootpassword} -e 'SELECT 1' >/dev/null 2>&1" ]
       timeout: 20s
       retries: 10
       interval: 10s
@@ -59,8 +59,10 @@ services:
     image: prom/mysqld-exporter:latest
     container_name: gatrix-mysql-exporter
     restart: unless-stopped
+    environment:
+      MYSQLD_EXPORTER_PASSWORD: ${DB_ROOT_PASSWORD:-gatrix_rootpassword}
     command:
-      - "--mysqld.username=root:${DB_ROOT_PASSWORD:-gatrix_rootpassword}"
+      - "--mysqld.username=root"
       - "--mysqld.address=mysql:3306"
     ports:
       - "59104:9104"

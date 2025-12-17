@@ -7,7 +7,7 @@ services:
     # Disable native AIO to avoid "OS error 22" on Windows/WSL2 bind mounts
     command: --innodb-use-native-aio=0
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-gatrix_rootpassword}
       MYSQL_DATABASE: ${DB_NAME:-gatrix}
       MYSQL_USER: ${DB_USER:-gatrix_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
@@ -20,7 +20,7 @@ services:
     networks:
       - gatrix-dev-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}" ]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-gatrix_rootpassword}" ]
       timeout: 20s
       retries: 10
       interval: 30s
@@ -52,8 +52,10 @@ services:
     image: prom/mysqld-exporter:latest
     container_name: gatrix-mysql-exporter-dev
     restart: unless-stopped
+    environment:
+      MYSQLD_EXPORTER_PASSWORD: ${DB_ROOT_PASSWORD:-gatrix_rootpassword}
     command:
-      - "--mysqld.username=root:${DB_ROOT_PASSWORD:-gatrix_rootpassword}"
+      - "--mysqld.username=root"
       - "--mysqld.address=mysql:3306"
     ports:
       - "0.0.0.0:49104:9104"
@@ -554,16 +556,8 @@ services:
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_SECURITY_ALLOW_EMBEDDING: "true"
       GF_SECURITY_COOKIE_SAMESITE: "Lax"
-      # Anonymous access for embedding
-      GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_AUTH_ANONYMOUS_ORG_NAME: "Main Org."
-      GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
-      # Disable basic auth to prevent login prompt
-      GF_AUTH_BASIC_ENABLED: "false"
-      GF_AUTH_DISABLE_LOGIN_FORM: "true"
-      # Subpath support for nginx proxy
-      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:43000/grafana/}
-      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      # Direct access on port 44000
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:44000/}
     ports:
       - "0.0.0.0:${GRAFANA_PORT:-44000}:3000"
     volumes:

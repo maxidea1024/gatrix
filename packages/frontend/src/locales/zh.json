@@ -2416,6 +2416,7 @@
     "envBanners": "横幅",
     "envJobs": "定时任务",
     "envApiTokens": "API令牌",
+    "envStoreProducts": "在售商品",
     "envTotal": "总数据",
     "envNoData": "无数据",
     "systemOverview": "系统概览",

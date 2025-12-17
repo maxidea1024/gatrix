@@ -37,13 +37,14 @@ export const GrafanaDashboardPage: React.FC = () => {
   }, [searchParams]);
 
   const grafanaUrl = useMemo(() => {
-    // In vite dev mode (port 5173), access Grafana directly on port 44000
-    // In docker-compose or production, use /grafana subpath proxy
-    const isViteDev = import.meta.env.DEV && window.location.port === '5173';
-    if (isViteDev) {
+    // In development (DEV mode or port 43000), access Grafana directly on port 44000
+    // In production, also use direct access
+    const isDevelopment = import.meta.env.DEV || window.location.port === '43000';
+    if (isDevelopment) {
       return `${window.location.protocol}//${window.location.hostname}:44000`;
     } else {
-      return `${window.location.protocol}//${window.location.host}/grafana`;
+      // Production: use VITE_GRAFANA_URL or default to port 44000
+      return import.meta.env.VITE_GRAFANA_URL || `${window.location.protocol}//${window.location.hostname}:44000`;
     }
   }, []);
 

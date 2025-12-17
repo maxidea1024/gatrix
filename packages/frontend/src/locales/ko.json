@@ -2363,6 +2363,7 @@
     "envBanners": "배너",
     "envJobs": "스케줄 작업",
     "envApiTokens": "API 토큰",
+    "envStoreProducts": "판매중 상품",
     "envTotal": "총 데이터",
     "envNoData": "데이터 없음",
     "systemOverview": "시스템 개요",

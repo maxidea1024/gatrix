@@ -1135,13 +1135,10 @@ export class GatrixServerSDK {
 
   /**
    * Register this service instance via Backend API
-   * Note: metricsApi port is automatically added from SDK config (default: 9337)
+   * Note: metricsApi port is automatically added from SDK config (default: 9337) if not provided in input.ports
    * Note: environment and region labels are automatically added from SDK config if not provided
    */
   async registerService(input: RegisterServiceInput): Promise<{ instanceId: string; hostname: string; internalAddress: string; externalAddress: string }> {
-    // Auto-add metricsApi port from metrics config (default: 9337)
-    const metricsPort = this.config.metrics?.port ?? parseInt(process.env.SDK_METRICS_PORT || '9337', 10);
-
     // Auto-add environment and region labels from SDK config if not already provided
     const enhancedLabels: RegisterServiceInput['labels'] = {
       ...input.labels,
@@ -1160,13 +1157,17 @@ export class GatrixServerSDK {
     // Always add SDK version to labels
     enhancedLabels.sdkVersion = SDK_VERSION;
 
+    // Build ports with metricsApi fallback (use input.ports.metricsApi if provided, otherwise use SDK config default)
+    const enhancedPorts = { ...input.ports };
+    if (!enhancedPorts.metricsApi) {
+      const metricsPort = this.config.metrics?.port ?? parseInt(process.env.SDK_METRICS_PORT || '9337', 10);
+      enhancedPorts.metricsApi = metricsPort;
+    }
+
     const inputWithEnhancements = {
       ...input,
       labels: enhancedLabels,
-      ports: {
-        ...input.ports,
-        metricsApi: metricsPort,
-      },
+      ports: enhancedPorts,
     };
     const result = await this.serviceDiscovery.register(inputWithEnhancements);
     return result;
