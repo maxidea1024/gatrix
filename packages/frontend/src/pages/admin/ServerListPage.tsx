@@ -1541,11 +1541,11 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
                   }}
                 >
                   {service.status === 'ready' ? 'READY' :
-                    service.status === 'initializing' ? 'INIT' :
-                      service.status === 'shutting_down' ? 'DOWN' :
-                        service.status === 'terminated' ? 'TERM' :
-                          service.status === 'error' ? 'ERR' :
-                            service.status === 'no-response' ? 'N/A' : '?'}
+                    service.status === 'initializing' ? 'INITIALIZING' :
+                      service.status === 'shutting_down' ? 'SHUTTING DOWN' :
+                        service.status === 'terminated' ? 'TERMINATED' :
+                          service.status === 'error' ? 'ERROR' :
+                            service.status === 'no-response' ? 'NO RESPONSE' : '?'}
                 </Typography>
               </Box>
             </Tooltip>
@@ -1624,24 +1624,46 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 1.5, pb: 1.5, borderBottom: 1, borderColor: 'divider' }}>
-              <Typography
-                variant="h6"
+              <Box
                 sx={{
-                  fontWeight: 700,
-                  fontSize: '1rem',
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
+                  alignItems: 'stretch',
+                  height: 32,
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: 'divider',
+                  overflow: 'hidden',
                 }}
               >
-                {groupKey}
-              </Typography>
-              <Chip
-                label={groups.get(groupKey)!.length}
-                size="small"
-                color="primary"
-                sx={{ height: 22, fontWeight: 700, borderRadius: 1 }}
-              />
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    px: 1.5,
+                    fontSize: '0.9rem',
+                    fontWeight: 700,
+                    color: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
+                    bgcolor: (theme) => theme.palette.mode === 'dark' ? theme.palette.grey[200] : theme.palette.grey[700],
+                  }}
+                >
+                  {groupKey}
+                </Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minWidth: 32,
+                    px: 1,
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    color: 'primary.contrastText',
+                    bgcolor: 'primary.main',
+                  }}
+                >
+                  {groups.get(groupKey)!.length}
+                </Box>
+              </Box>
               <Box sx={{ flex: 1 }} />
               <StatusStatsDisplay services={groups.get(groupKey)!} t={t} />
             </Box>
