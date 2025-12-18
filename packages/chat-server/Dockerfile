@@ -28,13 +28,12 @@ WORKDIR /app
 # Copy dependencies
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy all source files
-COPY . .
+# Copy and build server-sdk (required dependency)
+COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+RUN yarn workspace @gatrix/server-sdk build
 
-# Build server-sdk (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn install --ignore-optional && yarn build
-
-# Build chat-server
+# Copy and build chat-server
+COPY packages/chat-server ./packages/chat-server
 RUN yarn workspace @gatrix/chat-server build
 
 # Production stage

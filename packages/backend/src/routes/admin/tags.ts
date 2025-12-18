@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import { authenticate, requireAdmin } from '../../middleware/auth';
 import { auditLog } from '../../middleware/auditLog';
 import { TagController } from '../../controllers/TagController';
@@ -13,7 +13,7 @@ router.post('/',
   auditLog({
     action: 'tag_create',
     resourceType: 'tag',
-    // ?�그 ?�성 ?�에??ID가 ?�직 ?�으므�?getResourceId ?�거
+    // ?쒓렇 ?앹꽦 ?쒖뿉??ID媛 ?꾩쭅 ?놁쑝誘濡?getResourceId ?쒓굅
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.tag?.id,
   }) as any,

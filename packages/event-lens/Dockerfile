@@ -28,13 +28,12 @@ WORKDIR /app
 # Copy dependencies
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy all source files
-COPY . .
+# Copy and build server-sdk (required dependency)
+COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+RUN yarn workspace @gatrix/server-sdk build
 
-# Build server-sdk (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn install --network-timeout 600000 --ignore-optional && yarn build
-
-# Build event-lens
+# Copy and build event-lens
+COPY packages/event-lens ./packages/event-lens
 RUN yarn workspace @gatrix/event-lens build
 
 # Production stage

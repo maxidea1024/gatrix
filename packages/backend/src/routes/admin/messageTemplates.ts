@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import { authenticate, requireAdmin } from '../../middleware/auth';
 import { MessageTemplateController } from '../../controllers/MessageTemplateController';
 import { auditLog } from '../../middleware/auditLog';
@@ -14,7 +14,7 @@ router.post('/',
   auditLog({
     action: 'message_template_create',
     resourceType: 'message_template',
-    // 메시지 ?�플�??�성 ?�에??ID가 ?�직 ?�으므�?getResourceId ?�거
+    // 硫붿떆吏 ?쒗뵆由??앹꽦 ?쒖뿉??ID媛 ?꾩쭅 ?놁쑝誘濡?getResourceId ?쒓굅
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
@@ -49,7 +49,7 @@ router.delete('/:id',
   MessageTemplateController.remove as any
 );
 
-// ?�그 관???�우??(관리자�?
+// ?쒓렇 愿???쇱슦??(愿由ъ옄留?
 router.get('/:id/tags', MessageTemplateController.getTags as any);
 router.put('/:id/tags',
   auditLog({

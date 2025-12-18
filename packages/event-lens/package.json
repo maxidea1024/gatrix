@@ -7,7 +7,7 @@
     "dev": "yarn migrate:safe && ts-node-dev --poll --respawn --transpile-only --ignore-watch node_modules --ignore-watch dist --ignore-watch logs src/index.ts",
     "dev:no-migrate": "ts-node-dev --poll --respawn --transpile-only --ignore-watch node_modules --ignore-watch dist --ignore-watch logs src/index.ts",
     "dev:worker": "ts-node-dev --poll --respawn --transpile-only --ignore-watch node_modules --ignore-watch dist --ignore-watch logs src/worker.ts",
-    "build": "tsc",
+    "build": "swc src -d dist",
     "start": "yarn migrate:safe && node dist/index.js",
     "start:no-migrate": "node dist/index.js",
     "start:worker": "node dist/worker.js",
@@ -31,11 +31,11 @@
   "author": "Gatrix Team",
   "license": "MIT",
   "dependencies": {
-    "@gatrix/server-sdk": "file:../sdks/server-sdk",
     "@clickhouse/client": "^1.0.0",
     "@fastify/cors": "^8.4.2",
     "@fastify/helmet": "^11.1.1",
     "@fastify/rate-limit": "^9.1.0",
+    "@gatrix/server-sdk": "file:../sdks/server-sdk",
     "axios": "^1.13.2",
     "bullmq": "^5.0.0",
     "dotenv": "^16.3.1",
@@ -51,15 +51,17 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@swc/cli": "^0.7.9",
+    "@swc/core": "^1.15.5",
     "@types/node": "^20.10.4",
     "@types/ua-parser-js": "^0.7.39",
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",
     "eslint": "^8.54.0",
     "jest": "^29.7.0",
-    "ts-node-dev": "^2.0.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.2"
   },
   "engines": {

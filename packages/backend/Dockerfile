@@ -37,13 +37,12 @@ COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 # Install dependencies
 RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
 
-# Copy source code
-COPY . .
+# Copy and build server-sdk (required dependency)
+COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+RUN yarn workspace @gatrix/server-sdk build
 
-# Build server-sdk first (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn install --network-timeout 600000 --ignore-optional && yarn build
-
-# Build the backend
+# Copy and build backend source
+COPY packages/backend ./packages/backend
 RUN yarn workspace @gatrix/backend build
 
 # Production image, copy all the files and run the app

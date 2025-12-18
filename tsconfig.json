@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -21,10 +23,18 @@
     "rootDir": "./",
     "baseUrl": ".",
     "paths": {
-      "@backend/*": ["packages/backend/src/*"],
-      "@frontend/*": ["packages/frontend/src/*"],
-      "@shared/*": ["packages/shared/src/*"]
-    }
+      "@backend/*": [
+        "packages/backend/src/*"
+      ],
+      "@frontend/*": [
+        "packages/frontend/src/*"
+      ],
+      "@shared/*": [
+        "packages/shared/src/*"
+      ]
+    },
+    "incremental": true,
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
   },
   "include": [
     "packages/*/src/**/*",
