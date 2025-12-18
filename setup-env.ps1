@@ -8,6 +8,7 @@
 
 .PARAMETER HostAddress
     Server host address (localhost, IP, or domain)
+    Note: Must be a domain or IP only (no http://, no port).
 
 .PARAMETER Environment
     Execution environment (development or production, default: development)
@@ -131,6 +132,19 @@ function Validate-Inputs {
         Write-Host "  .\scripts\setup-env.ps1 -HostAddress localhost -Environment development"
         Write-Host "  .\scripts\setup-env.ps1 -HostAddress 192.168.1.100 -Environment production"
         Write-Host "  .\scripts\setup-env.ps1 -HostAddress example.com -Environment production"
+        exit 1
+    }
+
+    # Validate Host (no protocol, no port)
+    if ($HostAddress -like "*://*" -or $HostAddress -match "^http(s)?://") {
+        Write-Error-Custom "Host address should not include protocol (http:// or https://)."
+        Write-Info "Please provide only the domain or IP address literal (e.g., localhost, 127.0.0.1, example.com)."
+        exit 1
+    }
+
+    if ($HostAddress.Contains(":")) {
+        Write-Error-Custom "Host address should not include a port number."
+        Write-Info "Please provide only the domain or IP address literal (e.g., localhost, 127.0.0.1, example.com)."
         exit 1
     }
 

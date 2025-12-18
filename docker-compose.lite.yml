@@ -293,7 +293,7 @@ services:
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_SECURITY_ALLOW_EMBEDDING: "true"
       GF_SECURITY_COOKIE_SAMESITE: "Lax"
-      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:43000/grafana/}
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:${FRONTEND_PORT:-43000}/grafana/}
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
     ports:
       - "${GRAFANA_PORT:-44000}:3000"
@@ -319,7 +319,7 @@ services:
       VITE_API_URL: /api/v1
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
-      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:44000}
+      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-/grafana}
       VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:43000/bull-board}
       VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:3400}
     ports:
@@ -419,4 +419,3 @@ networks:
     ipam:
       config:
         - subnet: 172.22.0.0/16
-

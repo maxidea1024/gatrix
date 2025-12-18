@@ -37,13 +37,13 @@ export const GrafanaDashboardPage: React.FC = () => {
   }, [searchParams]);
 
   const grafanaUrl = useMemo(() => {
-    // Check runtime config first (for production Docker deployment)
+    // Priority 1: Check runtime config (from docker-entrypoint.sh / config.js)
     const runtimeEnv = (window as any)?.ENV?.VITE_GRAFANA_URL as string | undefined;
-    if (runtimeEnv && runtimeEnv.trim() && !runtimeEnv.includes('localhost')) {
+    if (runtimeEnv && runtimeEnv.trim()) {
       return runtimeEnv.trim();
     }
-    // Always use current hostname with Grafana port for better cross-machine compatibility
-    return `${window.location.protocol}//${window.location.hostname}:44000`;
+    // Priority 2: Standard subpath proxy (works for both Dev/Vite and Prod/Nginx)
+    return '/grafana';
   }, []);
 
   const currentDashboard = useMemo(

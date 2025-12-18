@@ -9,6 +9,8 @@
 # Usage:
 #   ./setup-env.sh [HOST] [ENVIRONMENT] [LANGUAGE] [OPTIONS]
 #
+#   Note: [HOST] must be a domain or IP only (no http://, no port).
+#
 # Options:
 #   --force                    Overwrite existing .env file
 #   --nobackup                 Do not create backup file when overwriting
@@ -86,6 +88,19 @@ validate_inputs() {
     echo "  $0 192.168.1.100 production"
     echo "  $0 example.cn production zh"
     echo "  $0 localhost development zh --force"
+    exit 1
+  fi
+
+  # Validate Host (no protocol, no port)
+  if [[ "$HOST" == http://* ]] || [[ "$HOST" == https://* ]] || [[ "$HOST" == *"://"* ]]; then
+    print_error "Host address should not include protocol (http:// or https://)."
+    print_info "Please provide only the domain or IP address literal (e.g., localhost, 127.0.0.1, example.com)."
+    exit 1
+  fi
+
+  if [[ "$HOST" == *":"* ]]; then
+    print_error "Host address should not include a port number."
+    print_info "Please provide only the domain or IP address literal (e.g., localhost, 127.0.0.1, example.com)."
     exit 1
   fi
 

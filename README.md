@@ -219,6 +219,9 @@ gatrix/
 
 2. **Auto-generate `.env` file** (Recommended):
 
+   > **Important:** The `HOST` argument must be a **domain name** (e.g., `example.com`) or **IP address literal** (e.g., `127.0.0.1`, `localhost`) only. 
+   > **Do not include protocols (`http://`, `https://`) or port numbers.**
+
    **Basic Setup (Development):**
    ```powershell
    # Windows

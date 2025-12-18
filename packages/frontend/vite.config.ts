@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -26,7 +27,6 @@ const httpAgent = new http.Agent({
   maxSockets: 50,
   maxFreeSockets: 10,
   timeout: 60000,
-  freeSocketTimeout: 30000,
 });
 
 const httpsAgent = new https.Agent({
@@ -35,7 +35,6 @@ const httpsAgent = new https.Agent({
   maxSockets: 50,
   maxFreeSockets: 10,
   timeout: 60000,
-  freeSocketTimeout: 30000,
 });
 
 console.log(`🔧 Vite proxy configuration:`, {
@@ -134,14 +133,20 @@ export default defineConfig({
         rewrite: undefined, // Don't rewrite the path
         bypass: undefined, // Don't bypass any requests
       },
+      '/grafana': {
+        target: isDocker ? 'http://gatrix-grafana-dev:3000' : 'http://localhost:44000',
+        changeOrigin: true,
+        secure: false,
+        // Don't rewrite path because Grafana is configured to serve from /grafana subpath
+      },
     },
   },
   build: {
     outDir: 'dist',
     sourcemap: true,
-    // 청크 크기 경고 임계값 증가 (기본값: 500KB)
+    // chunkSizeWarningLimit increased (default: 500KB)
     chunkSizeWarningLimit: 1000,
-    // 빌드 성능 최적화
+    // Performance optimization
     minify: 'esbuild',
     target: 'es2020',
     rollupOptions: {
@@ -156,5 +161,5 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-  },
+  } as any, // Cast to any to avoid vitest/vite type mismatch in some environments
 })

@@ -76,6 +76,9 @@ docker-compose --version
 
 Run the setup script to automatically generate the `.env` file with secure encryption keys.
 
+> **Important:** The `HostAddress` must be a **domain name** or **IP address literal** only. 
+> **Do not include protocols (`http://`, `https://`) or port numbers.**
+
 **For Development (Linux/Mac):**
 ```bash
 ./setup-env.sh localhost development

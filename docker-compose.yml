@@ -89,7 +89,7 @@ services:
       dockerfile: packages/backend/Dockerfile
     container_name: gatrix-backend
     restart: unless-stopped
-    user: "0"  # Run as root to avoid volume permission issues
+    user: "0" # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_FORMAT: json
@@ -150,7 +150,7 @@ services:
     image: clickhouse/clickhouse-server:24.12.2.29
     container_name: gatrix-clickhouse
     restart: unless-stopped
-    user: "0"  # Run as root to avoid volume permission issues
+    user: "0" # Run as root to avoid volume permission issues
     ports:
       - "${CLICKHOUSE_HTTP_PORT:-48123}:8123"
       - "${CLICKHOUSE_NATIVE_PORT:-49000}:9000"
@@ -172,7 +172,7 @@ services:
       dockerfile: packages/event-lens/Dockerfile
     container_name: gatrix-event-lens
     restart: unless-stopped
-    user: "0"  # Run as root to avoid volume permission issues
+    user: "0" # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_FORMAT: json
@@ -224,7 +224,7 @@ services:
       dockerfile: packages/event-lens/Dockerfile
     container_name: gatrix-event-lens-worker
     restart: unless-stopped
-    user: "0"  # Run as root to avoid volume permission issues
+    user: "0" # Run as root to avoid volume permission issues
     command: [ "node", "packages/event-lens/dist/worker.js" ]
     environment:
       NODE_ENV: ${NODE_ENV:-production}
@@ -266,7 +266,7 @@ services:
       dockerfile: packages/chat-server/Dockerfile
     container_name: gatrix-chat-server
     restart: unless-stopped
-    user: "0"  # Run as root to avoid volume permission issues
+    user: "0" # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_FORMAT: json
@@ -372,7 +372,7 @@ services:
     image: prom/prometheus:latest
     container_name: gatrix-prometheus
     restart: unless-stopped
-    user: "0"  # Run as root to avoid volume permission issues
+    user: "0" # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PROM_SCRAPE_INTERVAL: ${PROM_SCRAPE_INTERVAL:-15s}
@@ -403,7 +403,7 @@ services:
     image: grafana/grafana:latest
     container_name: gatrix-grafana
     restart: unless-stopped
-    user: "0"  # Run as root to avoid volume permission issues
+    user: "0" # Run as root to avoid volume permission issues
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
@@ -412,7 +412,7 @@ services:
       GF_SECURITY_COOKIE_SAMESITE: "Lax"
       # Subpath support for nginx proxy
       # Use explicit URL since template variables may not work in env vars
-      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:43000/grafana/}
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:${FRONTEND_PORT:-43000}/grafana/}
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
     ports:
       - "${GRAFANA_PORT:-44000}:3000"
@@ -438,7 +438,7 @@ services:
       VITE_API_URL: /api/v1
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
-      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-http://localhost:44000}
+      VITE_GRAFANA_URL: ${VITE_GRAFANA_URL:-/grafana}
       VITE_BULL_BOARD_URL: ${VITE_BULL_BOARD_URL:-http://localhost:43000/bull-board}
       VITE_EDGE_URL: ${VITE_EDGE_URL:-http://localhost:3400}
 
@@ -465,7 +465,7 @@ services:
       dockerfile: packages/edge/Dockerfile
     container_name: gatrix-edge
     restart: unless-stopped
-    user: "0"  # Run as root to avoid volume permission issues
+    user: "0" # Run as root to avoid volume permission issues
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-info}
@@ -515,7 +515,7 @@ services:
     image: quay.io/coreos/etcd:v3.5.12
     container_name: gatrix-etcd
     restart: unless-stopped
-    user: "0"  # Run as root to avoid volume permission issues
+    user: "0" # Run as root to avoid volume permission issues
     command:
       - /usr/local/bin/etcd
       - --name=etcd0
