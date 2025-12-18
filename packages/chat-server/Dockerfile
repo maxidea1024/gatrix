@@ -21,18 +21,32 @@ COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 # Install dependencies (with increased network timeout for slow connections)
 RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
 
-# Install SWC native binding for Alpine Linux (musl)
-RUN yarn add -W --dev @swc/core-linux-x64-musl --ignore-scripts
-
 # Builder stage
 FROM base AS builder
 WORKDIR /app
 
-# Copy dependencies
-COPY --from=deps /app/node_modules ./node_modules
+# Use Tencent npm mirror for faster downloads in China
+RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
 
-# Copy and build server-sdk (required dependency)
+# Copy all package files first
+COPY package.json yarn.lock* ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/frontend/package.json ./packages/frontend/
+COPY packages/chat-server/package.json ./packages/chat-server/
+COPY packages/event-lens/package.json ./packages/event-lens/
+COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
+
+# Install dependencies
+RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
+
+# Install SWC native binding for Alpine Linux (musl)
+RUN yarn add -W --dev @swc/core-linux-x64-musl --ignore-scripts
+
+# Copy source and config files
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+COPY tsconfig.json ./
+
+# Build server-sdk first (required because main points to dist/index.js)
 RUN cd packages/sdks/server-sdk && yarn build
 
 # Copy and build chat-server
