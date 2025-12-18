@@ -36,6 +36,9 @@ COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
+# Skip Cypress binary download - not needed in production Docker image
+ENV CYPRESS_INSTALL_BINARY=0
+
 # Install dependencies
 RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
 

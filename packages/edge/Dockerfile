@@ -28,6 +28,9 @@ COPY package.json yarn.lock* ./
 COPY packages/edge/package.json ./packages/edge/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
+# Skip Cypress binary download - not needed in production Docker image
+ENV CYPRESS_INSTALL_BINARY=0
+
 # Install dependencies
 RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
 
