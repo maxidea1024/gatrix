@@ -31,6 +31,9 @@ COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 # Install dependencies
 RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
 
+# Install SWC native binding for Alpine Linux (musl)
+RUN yarn add --dev @swc/core-linux-x64-musl --ignore-scripts
+
 # Copy source code
 COPY packages/edge ./packages/edge
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk

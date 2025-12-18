@@ -21,6 +21,9 @@ COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 # Install dependencies (with increased network timeout for slow connections)
 RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
 
+# Install SWC native binding for Alpine Linux (musl)
+RUN yarn add --dev @swc/core-linux-x64-musl --ignore-scripts
+
 # Builder stage
 FROM base AS builder
 WORKDIR /app
