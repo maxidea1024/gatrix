@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "yarn migrate:safe && ts-node-dev --poll --respawn --transpile-only --ignore-watch node_modules --ignore-watch dist --ignore-watch logs src/index.ts",
     "dev:no-migrate": "ts-node-dev --poll --respawn --transpile-only --ignore-watch node_modules --ignore-watch dist --ignore-watch logs src/index.ts",
-    "build": "swc src -d dist",
+    "build": "yarn swc src -d dist",
     "typecheck": "tsc --noEmit",
     "start": "yarn migrate:safe && node dist/index.js",
     "start:no-migrate": "node dist/index.js",

@@ -137,6 +137,7 @@ export default defineConfig({
         target: isDocker ? 'http://gatrix-grafana-dev:3000' : 'http://localhost:44000',
         changeOrigin: true,
         secure: false,
+        ws: true, // Enable WebSocket proxying for Grafana Live
         // Don't rewrite path because Grafana is configured to serve from /grafana subpath
       },
     },
@@ -161,5 +162,5 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-  } as any, // Cast to any to avoid vitest/vite type mismatch in some environments
-})
+  },
+} as any)

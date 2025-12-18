@@ -138,9 +138,9 @@ services:
     healthcheck:
       test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
       timeout: 10s
-      retries: 5
+      retries: 10
       interval: 30s
-      start_period: 30s
+      start_period: 60s
 
   # ClickHouse
   # NOTE: Using named volume instead of bind mount to avoid filesystem compatibility issues
@@ -213,9 +213,9 @@ services:
     healthcheck:
       test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:5200/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
       timeout: 10s
-      retries: 5
+      retries: 10
       interval: 30s
-      start_period: 30s
+      start_period: 60s
 
   # Event Lens Worker
   event-lens-worker:
@@ -408,12 +408,17 @@ services:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
       GF_USERS_ALLOW_SIGN_UP: "false"
-      GF_SECURITY_ALLOW_EMBEDDING: "true"
-      GF_SECURITY_COOKIE_SAMESITE: "Lax"
-      # Subpath support for nginx proxy
-      # Use explicit URL since template variables may not work in env vars
-      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:${FRONTEND_PORT:-43000}/grafana/}
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SERVER_DOMAIN: ${GRAFANA_DOMAIN:-localhost}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      # GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      # Allow embedding and relax CSRF
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_SECURITY_CSRF_ALWAYS_CHECK: "false"
+      GF_SECURITY_CSRF_TRUSTED_ORIGINS: ${GRAFANA_TRUSTED_ORIGINS:-*}
+      GF_SECURITY_COOKIE_SAMESITE: "disabled"
+      # Allow Live WebSockets from any origin
+      GF_LIVE_ALLOWED_ORIGINS: ${GRAFANA_ALLOWED_ORIGINS:-*}
     ports:
       - "${GRAFANA_PORT:-44000}:3000"
     volumes:
@@ -505,9 +510,9 @@ services:
     healthcheck:
       test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
       timeout: 10s
-      retries: 5
+      retries: 10
       interval: 30s
-      start_period: 30s
+      start_period: 60s
 
   # etcd for service discovery (optional)
   # Note: Ports changed from 52879/52880 to 52379/52380 for Windows compatibility

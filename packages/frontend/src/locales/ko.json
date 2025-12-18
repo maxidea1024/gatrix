@@ -4286,6 +4286,7 @@
     "viewMode": {
       "list": "리스트 뷰",
       "grid": "그리드 뷰",
+      "checkerboard": "체커보드 뷰",
       "card": "카드 뷰",
       "cluster": "클러스터 뷰"
     },
@@ -4357,6 +4358,13 @@
       "shuttingDown": "종료중",
       "terminated": "종료됨",
       "error": "오류"
+    },
+    "contextMenu": {
+      "copyJson": "서버 정보 복사 (JSON)",
+      "copyInstanceId": "인스턴스 ID 복사",
+      "copyHostname": "호스트명 복사",
+      "copyAddress": "IP 주소 복사",
+      "healthCheck": "상태 확인"
     }
   },
   "REWARD_TYPE_POINT": "포인트",

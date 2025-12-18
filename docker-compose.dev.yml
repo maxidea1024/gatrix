@@ -145,7 +145,13 @@ services:
       - .:/app:cached
       - /app/node_modules
       - ${DATA_ROOT:-./data}/backend/logs:/app/packages/backend/logs
-    command: sh -c "yarn workspace @gatrix/server-sdk build && mkdir -p /app/packages/backend/logs && chmod 777 /app/packages/backend/logs && yarn workspace @gatrix/backend dev"
+    command: sh -c "mkdir -p /app/packages/backend/logs && chmod 777 /app/packages/backend/logs && yarn workspace @gatrix/backend dev"
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
 
   # Frontend for development (with hot reload)
   frontend-dev:
@@ -301,9 +307,13 @@ services:
       - .:/app:cached
       - /app/node_modules
       - ${DATA_ROOT:-./data}/event-lens/logs:/app/packages/event-lens/logs
-    command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/event-lens dev"
+    command: yarn workspace @gatrix/event-lens dev
     healthcheck:
-      disable: true
+      test: [ "CMD-SHELL", "node -e \"require('http').get('http://localhost:5200/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1); });\"" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
 
   # Event Lens Worker for development (with hot reload)
   event-lens-worker-dev:
@@ -351,7 +361,7 @@ services:
       - .:/app:cached
       - /app/node_modules
       - ${DATA_ROOT:-./data}/event-lens/logs:/app/packages/event-lens/logs
-    command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/event-lens dev:worker"
+    command: yarn workspace @gatrix/event-lens dev:worker
 
   # Chat Server for development (with hot reload)
   chat-server-dev:
@@ -424,7 +434,13 @@ services:
       - /app/node_modules
       - ${DATA_ROOT:-./data}/chat-server/uploads:/app/packages/chat-server/uploads
       - ${DATA_ROOT:-./data}/chat-server/logs:/app/packages/chat-server/logs
-    command: sh -c "yarn workspace @gatrix/server-sdk build && cd packages/chat-server && yarn migrate:safe && exec node_modules/.bin/ts-node src/index.ts"
+    command: sh -c "cd packages/chat-server && yarn migrate:safe && exec node_modules/.bin/ts-node src/index.ts"
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:5100/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
 
   # Edge Server for development (with hot reload)
   edge-dev:
@@ -473,13 +489,13 @@ services:
       - .:/app:cached
       - /app/node_modules
       - ${DATA_ROOT:-./data}/edge/logs:/app/packages/edge/logs
-    command: sh -c "yarn workspace @gatrix/server-sdk build && yarn workspace @gatrix/edge dev"
+    command: yarn workspace @gatrix/edge dev
     healthcheck:
       test: [ "CMD", "node", "-e", "require('http').get('http://127.0.0.1:3400/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" ]
       timeout: 10s
-      retries: 5
+      retries: 10
       interval: 30s
-      start_period: 30s
+      start_period: 60s
 
   # Loki - Log aggregation (development)
   loki:
@@ -556,10 +572,18 @@ services:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
       GF_USERS_ALLOW_SIGN_UP: "false"
-      GF_SECURITY_ALLOW_EMBEDDING: "true"
-      GF_SECURITY_COOKIE_SAMESITE: "Lax"
       GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:${FRONTEND_PORT:-43000}/grafana/}
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SERVER_DOMAIN: localhost
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      # GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      # Allow embedding and relax CSRF for local development
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_SECURITY_CSRF_ALWAYS_CHECK: "false"
+      GF_SECURITY_CSRF_TRUSTED_ORIGINS: "*"
+      GF_SECURITY_COOKIE_SAMESITE: "disabled"
+      # Allow Live WebSockets from any origin during development
+      GF_LIVE_ALLOWED_ORIGINS: "*"
     ports:
       - "0.0.0.0:${GRAFANA_PORT:-44000}:3000"
     volumes:

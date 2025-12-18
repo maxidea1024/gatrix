@@ -4289,6 +4289,7 @@
     "viewMode": {
       "list": "List View",
       "grid": "Grid View",
+      "checkerboard": "Checkerboard View",
       "card": "Card View",
       "cluster": "Cluster View"
     },
@@ -4360,6 +4361,13 @@
       "shuttingDown": "Shutting Down",
       "terminated": "Terminated",
       "error": "Error"
+    },
+    "contextMenu": {
+      "copyJson": "Copy Server Info (JSON)",
+      "copyInstanceId": "Copy Instance ID",
+      "copyHostname": "Copy Hostname",
+      "copyAddress": "Copy IP Address",
+      "healthCheck": "Health Check"
     }
   },
   "REWARD_TYPE_POINT": "Point",

@@ -4337,6 +4337,7 @@
     "viewMode": {
       "list": "列表视图",
       "grid": "网格视图",
+      "checkerboard": "格子视图",
       "card": "卡片视图",
       "cluster": "集群视图"
     },
@@ -4408,6 +4409,13 @@
       "shuttingDown": "关闭中",
       "terminated": "已终止",
       "error": "错误"
+    },
+    "contextMenu": {
+      "copyJson": "复制服务器信息 (JSON)",
+      "copyInstanceId": "复制实例 ID",
+      "copyHostname": "复制主机名",
+      "copyAddress": "复制 IP 地址",
+      "healthCheck": "健康检查"
     }
   },
   "REWARD_TYPE_POINT": "点数",
