@@ -33,11 +33,11 @@ COPY --from=deps /app/node_modules ./node_modules
 
 # Copy and build server-sdk (required dependency)
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
-RUN yarn workspace @gatrix/server-sdk build
+RUN cd packages/sdks/server-sdk && yarn build
 
 # Copy and build chat-server
 COPY packages/chat-server ./packages/chat-server
-RUN yarn workspace @gatrix/chat-server build
+RUN cd packages/chat-server && yarn build
 
 # Production stage
 FROM base AS runner

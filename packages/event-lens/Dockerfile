@@ -33,11 +33,11 @@ COPY --from=deps /app/node_modules ./node_modules
 
 # Copy and build server-sdk (required dependency)
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
-RUN yarn workspace @gatrix/server-sdk build
+RUN cd packages/sdks/server-sdk && yarn build
 
 # Copy and build event-lens
 COPY packages/event-lens ./packages/event-lens
-RUN yarn workspace @gatrix/event-lens build
+RUN cd packages/event-lens && yarn build
 
 # Production stage
 FROM base AS runner
