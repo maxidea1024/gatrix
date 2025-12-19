@@ -482,11 +482,14 @@ export class ClientVersionModel {
     }
   }
 
-  static async checkDuplicate(platform: string, clientVersion: string, excludeId?: number): Promise<boolean> {
+  static async checkDuplicate(platform: string, clientVersion: string, excludeId?: number, environmentId?: string): Promise<boolean> {
     try {
+      const envId = environmentId ?? getCurrentEnvironmentId();
+
       let query = db('g_client_versions')
         .where('platform', platform)
-        .where('clientVersion', clientVersion);
+        .where('clientVersion', clientVersion)
+        .where('environmentId', envId);
 
       if (excludeId) {
         query = query.where('id', '!=', excludeId);

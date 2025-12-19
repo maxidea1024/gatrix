@@ -49,6 +49,8 @@ export class CacheManager {
   private environmentService?: EnvironmentService;
   // Cached environment list (for '*' mode)
   private cachedEnvironmentList: string[] = [];
+  // Last cache refresh timestamp
+  private lastRefreshedAt: Date | null = null;
 
   constructor(
     config: CacheConfig,
@@ -382,6 +384,9 @@ export class CacheManager {
 
       // Load all enabled features in parallel
       await Promise.all(promises);
+
+      // Record initial load timestamp
+      this.lastRefreshedAt = new Date();
 
       this.logger.info('SDK cache initialized', {
         enabledFeatures: featureTypes,
@@ -810,6 +815,9 @@ export class CacheManager {
 
       await Promise.all(promises);
 
+      // Record last refresh timestamp
+      this.lastRefreshedAt = new Date();
+
       try {
         const duration = Number(process.hrtime.bigint() - start) / 1e9;
         this.metrics?.incRefresh('all');
@@ -935,6 +943,7 @@ export class CacheManager {
     };
 
     return {
+      lastRefreshedAt: this.lastRefreshedAt?.toISOString() || null,
       gameWorlds: mapToObject(this.gameWorldService?.getAllCached()),
       popupNotices: mapToObject(this.popupNoticeService?.getAllCached()),
       surveys: mapToObject(this.surveyService?.getAllCached()),
@@ -945,6 +954,13 @@ export class CacheManager {
       banners: mapToObject(this.bannerService?.getAllCached()),
       storeProducts: mapToObject(this.storeProductService?.getAllCached()),
     };
+  }
+
+  /**
+   * Get last cache refresh timestamp
+   */
+  getLastRefreshedAt(): Date | null {
+    return this.lastRefreshedAt;
   }
 
   /**

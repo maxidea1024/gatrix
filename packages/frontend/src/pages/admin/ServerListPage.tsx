@@ -4003,44 +4003,7 @@ const ServerListPage: React.FC = () => {
                             </Typography>
                           )}
                         </Box>
-                        {/* Heartbeat Gauge - at the bottom */}
-                        <Box sx={{ mt: 0.5 }}>
-                          {(() => {
-                            const progress = listViewPingProgress.get(serviceKey) || 0;
-                            const color = progress >= 1 ? 'error' : progress >= 0.7 ? 'warning' : 'success';
-                            return (
-                              <Box sx={{
-                                position: 'relative',
-                                height: 20,
-                                width: '100%',
-                                border: 1,
-                                borderColor: 'divider',
-                                borderRadius: 1,
-                                bgcolor: 'action.hover',
-                                overflow: 'hidden',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                              }}>
-                                <LinearProgress
-                                  variant="determinate"
-                                  value={progress * 100}
-                                  color={color}
-                                  sx={{
-                                    position: 'absolute',
-                                    width: '100%',
-                                    height: '100%',
-                                    bgcolor: 'transparent',
-                                    zIndex: 0
-                                  }}
-                                />
-                                <Box sx={{ position: 'relative', zIndex: 1, display: 'flex' }}>
-                                  <RelativeTime date={service.updatedAt} variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 600, color: 'text.primary' }} showSeconds />
-                                </Box>
-                              </Box>
-                            );
-                          })()}
-                        </Box>
+
                       </CardContent>
                     </Card>
                   );
@@ -4051,7 +4014,7 @@ const ServerListPage: React.FC = () => {
                     key={`empty-${idx}`}
                     variant="outlined"
                     sx={{
-                      height: 130,
+                      height: 175,
                       borderStyle: 'dashed',
                       borderColor: 'divider',
                       bgcolor: (theme) => theme.palette.mode === 'dark'
@@ -4373,44 +4336,7 @@ const ServerListPage: React.FC = () => {
                           </Box>
                         )}
 
-                        {/* Heartbeat Gauge */}
-                        <Box sx={{ mt: 1 }}>
-                          {(() => {
-                            const progress = listViewPingProgress.get(serviceKey) || 0;
-                            const color = progress >= 1 ? 'error' : progress >= 0.7 ? 'warning' : 'success';
-                            return (
-                              <Box sx={{
-                                position: 'relative',
-                                height: 24,
-                                width: '100%',
-                                border: 1,
-                                borderColor: 'divider',
-                                borderRadius: 1,
-                                bgcolor: 'action.hover',
-                                overflow: 'hidden',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                              }}>
-                                <LinearProgress
-                                  variant="determinate"
-                                  value={progress * 100}
-                                  color={color}
-                                  sx={{
-                                    position: 'absolute',
-                                    width: '100%',
-                                    height: '100%',
-                                    bgcolor: 'transparent',
-                                    zIndex: 0
-                                  }}
-                                />
-                                <Box sx={{ position: 'relative', zIndex: 1, display: 'flex' }}>
-                                  <RelativeTime date={service.updatedAt} variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }} showSeconds />
-                                </Box>
-                              </Box>
-                            );
-                          })()}
-                        </Box>
+
 
                         {/* Footer: Health + Updated time removed as redundant */}
                       </CardContent>

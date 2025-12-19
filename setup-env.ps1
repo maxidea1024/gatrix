@@ -49,14 +49,14 @@
 #>
 
 param(
-    [Parameter(Mandatory = $true, HelpMessage = "Host address (localhost, IP, or domain)")]
+    [Parameter(Mandatory = $true, Position = 0, HelpMessage = "Host address (localhost, IP, or domain)")]
     [string]$HostAddress,
 
-    [Parameter(Mandatory = $false, HelpMessage = "Environment (development or production)")]
+    [Parameter(Mandatory = $false, Position = 1, HelpMessage = "Environment (development or production)")]
     [ValidateSet("development", "production")]
     [string]$Environment = "development",
 
-    [Parameter(Mandatory = $false, HelpMessage = "Default language (ko, en, zh, etc.)")]
+    [Parameter(Mandatory = $false, Position = 2, HelpMessage = "Default language (ko, en, zh, etc.)")]
     [string]$DefaultLanguage = "zh",
 
     [Parameter(Mandatory = $false, HelpMessage = "Admin password (default: admin123)")]

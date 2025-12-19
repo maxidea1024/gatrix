@@ -1,6 +1,7 @@
 import { config, validateConfig } from './config/env';
 import logger from './config/logger';
 import app from './app';
+import internalApp from './internalApp';
 import { sdkManager } from './services/sdkManager';
 import { startMetricsServer, sdkInitialized } from './services/metricsServer';
 import { tokenMirrorService } from './services/tokenMirrorService';
@@ -39,13 +40,27 @@ async function main(): Promise<void> {
       logger.info(`Target environments: ${config.environments === '*' ? '*' : config.environments.join(', ')}`);
     });
 
+    // Start internal HTTP server on separate port (main port + 10)
+    const internalPort = config.port + 10;
+    const internalServer = internalApp.listen(internalPort, () => {
+      logger.info(`Edge internal server listening on port ${internalPort}`);
+    });
+
     // Graceful shutdown
     const shutdown = async (signal: string) => {
       logger.info(`Received ${signal}, shutting down gracefully...`);
 
+      // Close both servers
       server.close(async () => {
-        logger.info('HTTP server closed');
+        logger.info('Main HTTP server closed');
+      });
 
+      internalServer.close(async () => {
+        logger.info('Internal HTTP server closed');
+      });
+
+      // Wait a bit for servers to close, then cleanup
+      setTimeout(async () => {
         try {
           await tokenUsageTracker.shutdown();
           await sdkManager.shutdown();
@@ -57,7 +72,7 @@ async function main(): Promise<void> {
           logger.error('Error during shutdown:', error);
           process.exit(1);
         }
-      });
+      }, 1000);
 
       // Force exit after 30 seconds
       setTimeout(() => {
@@ -77,4 +92,3 @@ async function main(): Promise<void> {
 
 // Run main
 main();
-

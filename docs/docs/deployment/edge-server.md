@@ -94,7 +94,8 @@ CACHE_POLLING_INTERVAL_MS: 60000
 | Endpoint | Description |
 |----------|-------------|
 | `GET /health` | Basic health check |
-| `GET /health/cache` | Detailed cache status with per-environment counts |
+| `GET /health/ready` | Readiness check |
+| `GET /health/live` | Liveness check |
 
 ### Client APIs
 
@@ -109,6 +110,30 @@ All client APIs require authentication headers:
 | `GET /api/v1/client/banners` | Banners |
 | `GET /api/v1/client/notices` | Service notices |
 | `GET /api/v1/client/game-worlds` | Game worlds |
+
+### Internal APIs (Separate Port)
+
+⚠️ **Security Note**: Internal APIs run on a **separate port** (main port + 10) for security isolation. These endpoints should NOT be exposed to the public internet.
+
+| Port | Description |
+|------|-------------|
+| `3400` | Main Edge server (public-facing) |
+| `3410` | Internal server (operations only) |
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/cache` | GET | Detailed cache status with per-environment counts and last refresh time |
+| `/cache/refresh` | POST | Force refresh all caches and return updated status |
+
+**Example: Check cache status**
+```bash
+curl http://localhost:3410/cache
+```
+
+**Example: Force cache refresh**
+```bash
+curl -X POST http://localhost:3410/cache/refresh
+```
 
 ## Health Check Response Example
 
@@ -133,6 +158,22 @@ All client APIs require authentication headers:
       "production": 0
     }
   }
+}
+```
+
+## Internal Cache Status Response Example
+
+```json
+{
+  "status": "ready",
+  "timestamp": "2025-12-19T15:20:00.000Z",
+  "lastRefreshedAt": "2025-12-19T15:15:00.000Z",
+  "summary": {
+    "clientVersions": { "development": 5, "qa": 3 },
+    "gameWorlds": { "development": 3 },
+    "storeProducts": { "development": 2 }
+  },
+  "detail": { ... }
 }
 ```
 

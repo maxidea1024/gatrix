@@ -1,0 +1,25 @@
+meta {
+  name: http://121.5.26.153:3400/api/v1/client/qa/client-version?platform=pc
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://121.5.26.153:3400/api/v1/client/qa/client-version?platform=pc
+  body: none
+  auth: inherit
+}
+
+params:query {
+  platform: pc
+}
+
+headers {
+  x-api-token: gatrix-unsecured-edge-api-token
+  x-applicaiton-name: client
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

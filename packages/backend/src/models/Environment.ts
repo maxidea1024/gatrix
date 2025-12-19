@@ -227,8 +227,7 @@ export class Environment extends Model implements EnvironmentData {
 
     return await this.$query().patchAndFetch({
       ...data,
-      updatedBy,
-      updatedAt: new Date()
+      updatedBy
     });
   }
 

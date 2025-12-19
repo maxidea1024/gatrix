@@ -340,9 +340,10 @@ export class ClientVersionService {
     //   );
     // }
 
-    // 중복 체크
+    // 중복 체크 (환경 컨텍스트 내에서 자동으로 체크됨)
     const duplicates = [];
     for (const platform of data.platforms) {
+      // checkDuplicate now automatically uses getCurrentEnvironmentId() from context
       const isDuplicate = await ClientVersionModel.checkDuplicate(platform.platform, data.clientVersion);
       if (isDuplicate) {
         duplicates.push(`${platform.platform}-${data.clientVersion}`);
@@ -350,7 +351,7 @@ export class ClientVersionService {
     }
 
     if (duplicates.length > 0) {
-      throw new Error(`Duplicate client versions found: ${duplicates.join(', ')}`);
+      throw new Error(`DUPLICATE_CLIENT_VERSIONS:${duplicates.join(', ')}`);
     }
 
     // 받은 데이터를 각 플랫폼별로 클라이언트 버전 배열로 변환
@@ -495,9 +496,10 @@ export class ClientVersionService {
   static async checkDuplicate(
     platform: string,
     clientVersion: string,
-    excludeId?: number
+    excludeId?: number,
+    environmentId?: string
   ): Promise<boolean> {
-    return await ClientVersionModel.checkDuplicate(platform, clientVersion, excludeId);
+    return await ClientVersionModel.checkDuplicate(platform, clientVersion, excludeId, environmentId);
   }
 
   /**

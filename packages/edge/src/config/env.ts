@@ -10,7 +10,8 @@ export const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
 
   // Backend API configuration
-  gatrixUrl: process.env.GATRIX_URL || 'http://localhost:3000',
+  gatrixUrl: process.env.GATRIX_URL || 'http://localhost:5000',
+
   // Edge bypass token - allows access to all environments and internal APIs
   // Can be configured via EDGE_BYPASS_TOKEN or EDGE_API_TOKEN environment variable
   apiToken: process.env.EDGE_BYPASS_TOKEN || process.env.EDGE_API_TOKEN || 'gatrix-edge-internal-bypass-token',
@@ -25,9 +26,9 @@ export const config = {
   environments: process.env.EDGE_ENVIRONMENTS === '*'
     ? '*' as const
     : (process.env.EDGE_ENVIRONMENTS || '')
-        .split(',')
-        .map(e => e.trim())
-        .filter(Boolean),
+      .split(',')
+      .map(e => e.trim())
+      .filter(Boolean),
 
   // Redis configuration (for cache PubSub in event mode)
   // Edge cache-specific Redis settings take priority over global settings
@@ -40,12 +41,12 @@ export const config = {
 
   // Cache configuration
   cache: {
-    pollingIntervalMs: parseInt(process.env.CACHE_POLLING_INTERVAL_MS || '60000', 10),
-    syncMethod: (process.env.CACHE_SYNC_METHOD || 'polling') as 'polling' | 'event' | 'manual',
+    pollingIntervalMs: parseInt(process.env.EDGE_CACHE_POLLING_INTERVAL_MS || '30000', 10),
+    syncMethod: (process.env.EDGE_CACHE_SYNC_METHOD || 'polling') as 'polling' | 'event' | 'manual',
   },
 
   // Logging
-  logLevel: process.env.LOG_LEVEL || 'info',
+  logLevel: process.env.EDGE_LOG_LEVEL || 'info',
 
   // Unsecured client token for testing purposes (client -> edge)
   // This token bypasses normal token validation and allows access to all environments
@@ -69,4 +70,3 @@ export function validateConfig(): void {
     throw new Error(`Configuration errors:\n${errors.join('\n')}`);
   }
 }
-

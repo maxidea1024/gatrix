@@ -1889,6 +1889,7 @@
     "createSuccess": "클라이언트 버전 [{{version}}:{{platform}}] 을 등록했습니다.",
     "versionTooOld": "입력한 버전({{newVersion}})이 현재 최신 버전({{latestVersion}})보다 낮습니다. 최신 버전보다 높은 버전만 등록할 수 있습니다.",
     "versionTooOldBulk": "입력한 버전이 일부 플랫폼의 최신 버전보다 낮습니다: {{platforms}}. 최신 버전보다 높은 버전만 등록할 수 있습니다.",
+    "duplicateClientVersions": "이미 등록된 클라이언트 버전입니다: {{duplicates}}. 같은 환경에서 동일한 플랫폼과 버전 조합은 중복 등록할 수 없습니다.",
     "customPayload": "사용자 정의 페이로드",
     "deleteConfirmTitle": "삭제 확인",
     "deleteConfirmMessage": "정말로 이 클라이언트 버전을 삭제하시겠습니까?",
@@ -4777,7 +4778,12 @@
     "editTitle": "환경 편집",
     "editDescription": "환경의 표시 이름, 설명, 색상 등을 수정합니다.",
     "updateSuccess": "환경이 수정되었습니다",
-    "updateFailed": "환경 수정에 실패했습니다"
+    "updateFailed": "환경 수정에 실패했습니다",
+    "hide": "숨기기",
+    "show": "보이기",
+    "hideSuccess": "환경이 숨겨졌습니다",
+    "showSuccess": "환경이 표시됩니다",
+    "toggleVisibilityFailed": "환경 표시 상태 변경에 실패했습니다"
   },
   "projects": {
     "title": "프로젝트",

@@ -358,10 +358,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         // 선택된 태그를 포함 (필요한 필드만 전송)
         tags: selectedTags && selectedTags.length > 0
           ? selectedTags.map(tag => ({
-              id: tag.id,
-              name: tag.name,
-              color: tag.color
-            }))
+            id: tag.id,
+            name: tag.name,
+            color: tag.color
+          }))
           : []
       };
 
@@ -388,6 +388,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       } else if (error.message?.startsWith('VERSION_TOO_OLD_BULK:')) {
         const platforms = error.message.split(':')[1];
         errorMessage = t('clientVersions.versionTooOldBulk', { platforms });
+      } else if (error.message?.startsWith('DUPLICATE_CLIENT_VERSIONS:')) {
+        const duplicates = error.message.split(':')[1];
+        errorMessage = t('clientVersions.duplicateClientVersions', { duplicates });
       }
 
       enqueueSnackbar(errorMessage, { variant: 'error' });
@@ -537,36 +540,36 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                   )}
                 />
 
-	                {isMaintenanceMode && (
-	                  <MaintenanceSettingsInput
-	                    startDate={watch('maintenanceStartDate') || ''}
-	                    endDate={watch('maintenanceEndDate') || ''}
-	                    onStartDateChange={(date) => setValue('maintenanceStartDate', date)}
-	                    onEndDateChange={(date) => setValue('maintenanceEndDate', date)}
-	                    inputMode={inputMode}
-	                    onInputModeChange={setInputMode}
-	                    maintenanceMessage={watch('maintenanceMessage') || ''}
-	                    onMaintenanceMessageChange={(message) => setValue('maintenanceMessage', message)}
-	                    supportsMultiLanguage={supportsMultiLanguage}
-	                    onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
-	                    maintenanceLocales={maintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
-	                    onMaintenanceLocalesChange={(locales) => {
-	                      setMaintenanceLocales(locales);
-	                      setValue('maintenanceLocales', locales);
-	                      // 번역 결과가 있으면 자동으로 언어별 메시지 사용 활성화
-	                      const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
-	                      if (hasNonEmptyLocales && !supportsMultiLanguage) {
-	                        setSupportsMultiLanguage(true);
-	                        setValue('supportsMultiLanguage', true);
-	                      }
-	                    }}
-	                    templates={templates}
-	                    selectedTemplateId={selectedTemplateId}
-	                    onSelectedTemplateIdChange={setSelectedTemplateId}
-	                    messageError={!!errors.maintenanceMessage}
-	                    messageRequired={true}
-	                  />
-	                )}
+                {isMaintenanceMode && (
+                  <MaintenanceSettingsInput
+                    startDate={watch('maintenanceStartDate') || ''}
+                    endDate={watch('maintenanceEndDate') || ''}
+                    onStartDateChange={(date) => setValue('maintenanceStartDate', date)}
+                    onEndDateChange={(date) => setValue('maintenanceEndDate', date)}
+                    inputMode={inputMode}
+                    onInputModeChange={setInputMode}
+                    maintenanceMessage={watch('maintenanceMessage') || ''}
+                    onMaintenanceMessageChange={(message) => setValue('maintenanceMessage', message)}
+                    supportsMultiLanguage={supportsMultiLanguage}
+                    onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
+                    maintenanceLocales={maintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
+                    onMaintenanceLocalesChange={(locales) => {
+                      setMaintenanceLocales(locales);
+                      setValue('maintenanceLocales', locales);
+                      // 번역 결과가 있으면 자동으로 언어별 메시지 사용 활성화
+                      const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
+                      if (hasNonEmptyLocales && !supportsMultiLanguage) {
+                        setSupportsMultiLanguage(true);
+                        setValue('supportsMultiLanguage', true);
+                      }
+                    }}
+                    templates={templates}
+                    selectedTemplateId={selectedTemplateId}
+                    onSelectedTemplateIdChange={setSelectedTemplateId}
+                    messageError={!!errors.maintenanceMessage}
+                    messageRequired={true}
+                  />
+                )}
 
               </Stack>
             </Paper>
@@ -645,62 +648,62 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                   {t('clientVersions.form.additionalSettingsDescription')}
                 </Typography>
 
-              <Stack spacing={2}>
-                <Controller
-                  name="guestModeAllowed"
-                  control={control}
-                  render={({ field }) => (
-                    <Box>
-                      <FormControlLabel
-                        control={<Switch {...field} checked={field.value || false} />}
-                        label={t('clientVersions.guestModeAllowed')}
+                <Stack spacing={2}>
+                  <Controller
+                    name="guestModeAllowed"
+                    control={control}
+                    render={({ field }) => (
+                      <Box>
+                        <FormControlLabel
+                          control={<Switch {...field} checked={field.value || false} />}
+                          label={t('clientVersions.guestModeAllowed')}
+                        />
+                        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                          {t('clientVersions.form.guestModeAllowedHelp')}
+                        </Typography>
+                      </Box>
+                    )}
+                  />
+
+                  <Controller
+                    name="externalClickLink"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        value={field.value || ''}
+                        fullWidth
+                        label={t('clientVersions.externalClickLink')}
+                        error={!!errors.externalClickLink}
+                        helperText={errors.externalClickLink?.message || t('clientVersions.form.externalClickLinkHelp')}
+                        inputProps={{
+                          autoComplete: 'off',
+                          autoCorrect: 'off',
+                          autoCapitalize: 'off',
+                          spellCheck: false
+                        }}
                       />
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                        {t('clientVersions.form.guestModeAllowedHelp')}
-                      </Typography>
-                    </Box>
-                  )}
-                />
+                    )}
+                  />
 
-                <Controller
-                  name="externalClickLink"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      value={field.value || ''}
-                      fullWidth
-                      label={t('clientVersions.externalClickLink')}
-                      error={!!errors.externalClickLink}
-                      helperText={errors.externalClickLink?.message || t('clientVersions.form.externalClickLinkHelp')}
-                      inputProps={{
-                        autoComplete: 'off',
-                        autoCorrect: 'off',
-                        autoCapitalize: 'off',
-                        spellCheck: false
-                      }}
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="memo"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      value={field.value || ''}
-                      fullWidth
-                      label={t('clientVersions.memo')}
-                      multiline
-                      rows={3}
-                      error={!!errors.memo}
-                      helperText={errors.memo?.message || t('clientVersions.form.memoHelp')}
-                    />
-                  )}
-                />
-              </Stack>
-            </AccordionDetails>
+                  <Controller
+                    name="memo"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        value={field.value || ''}
+                        fullWidth
+                        label={t('clientVersions.memo')}
+                        multiline
+                        rows={3}
+                        error={!!errors.memo}
+                        helperText={errors.memo?.message || t('clientVersions.form.memoHelp')}
+                      />
+                    )}
+                  />
+                </Stack>
+              </AccordionDetails>
             </Accordion>
 
             {selectedPlatforms.length > 0 && (

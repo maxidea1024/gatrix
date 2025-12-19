@@ -37,6 +37,8 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   Warning as WarningIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -84,7 +86,8 @@ const EnvironmentsPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await environmentService.getEnvironments();
+      // Include hidden environments in management page so they can be unhidden
+      const data = await environmentService.getEnvironments(true);
       setEnvironments(data);
     } catch (err) {
       setError(t('common.loadError'));
@@ -303,6 +306,22 @@ const EnvironmentsPage: React.FC = () => {
     }
   };
 
+  // Handle toggle visibility
+  const handleToggleVisibility = async (env: Environment) => {
+    try {
+      await environmentService.updateEnvironment(env.id, { isHidden: !env.isHidden });
+      enqueueSnackbar(
+        env.isHidden ? t('environments.showSuccess') : t('environments.hideSuccess'),
+        { variant: 'success' }
+      );
+      loadEnvironments();
+      refreshEnvironments();
+    } catch (err) {
+      console.error('Failed to toggle environment visibility:', err);
+      enqueueSnackbar(t('environments.toggleVisibilityFailed'), { variant: 'error' });
+    }
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -422,6 +441,15 @@ const EnvironmentsPage: React.FC = () => {
                   {canManage && (
                     <TableCell align="center">
                       <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
+                        <Tooltip title={env.isHidden ? t('environments.show') : t('environments.hide')}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleToggleVisibility(env)}
+                            sx={{ color: env.isHidden ? 'text.disabled' : 'text.secondary' }}
+                          >
+                            {env.isHidden ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
+                          </IconButton>
+                        </Tooltip>
                         <Tooltip title={t('common.edit')}>
                           <IconButton
                             size="small"

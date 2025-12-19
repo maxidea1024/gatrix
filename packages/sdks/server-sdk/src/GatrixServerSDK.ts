@@ -1434,6 +1434,13 @@ export class GatrixServerSDK {
     return this.cacheManager.getAllCachedData();
   }
 
+  /**
+   * Get last cache refresh timestamp
+   */
+  getLastRefreshedAt(): Date | null {
+    return this.cacheManager?.getLastRefreshedAt() ?? null;
+  }
+
   // ============================================================================
   // Cleanup Methods
   // ============================================================================

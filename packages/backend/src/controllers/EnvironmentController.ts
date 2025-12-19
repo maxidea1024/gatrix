@@ -13,7 +13,8 @@ export class EnvironmentController {
    * Get all environments
    */
   static getEnvironments = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const environments = await Environment.getAll();
+    const includeHidden = req.query.includeHidden === 'true';
+    const environments = await Environment.getAll(includeHidden);
 
     // Get stats for each environment
     const environmentsWithStats = await Promise.all(
@@ -200,7 +201,7 @@ export class EnvironmentController {
    */
   static updateEnvironment = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { displayName, description, requiresApproval, requiredApprovers, isDefault } = req.body;
+    const { displayName, description, requiresApproval, requiredApprovers, isDefault, isHidden } = req.body;
     const userId = (req.user as any)?.userId;
 
     if (!userId) {
@@ -218,13 +219,23 @@ export class EnvironmentController {
       });
     }
 
+    // Prevent modifying hidden status for system environments like gatrix-env
+    if (isHidden !== undefined && environment.environmentName === 'gatrix-env') {
+      return res.status(400).json({
+        success: false,
+        code: 'CANNOT_MODIFY_SYSTEM_ENVIRONMENT',
+        message: 'Cannot modify visibility of system environment'
+      });
+    }
+
     try {
       const updatedEnvironment = await environment.updateEnvironment({
         displayName,
         description,
         requiresApproval,
         requiredApprovers,
-        isDefault
+        isDefault,
+        isHidden
       }, userId);
 
       logger.info(`Environment updated: ${environment.environmentName} by user ${userId}`);

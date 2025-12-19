@@ -7,6 +7,7 @@ export interface Environment {
   environmentType: 'development' | 'staging' | 'production';
   description?: string;
   isSystemDefined: boolean;
+  isHidden: boolean;
   displayOrder: number;
   color?: string;
   createdAt: string;
@@ -29,6 +30,7 @@ export interface UpdateEnvironmentData {
   environmentType?: 'development' | 'staging' | 'production';
   color?: string;
   displayOrder?: number;
+  isHidden?: boolean;
 }
 
 export interface CopyOptions {
@@ -177,9 +179,11 @@ class EnvironmentService {
   /**
    * Get all environments
    */
-  async getEnvironments(): Promise<Environment[]> {
+  async getEnvironments(includeHidden: boolean = false): Promise<Environment[]> {
     try {
-      const response = await api.get('/admin/environments');
+      const response = await api.get('/admin/environments', {
+        params: includeHidden ? { includeHidden: 'true' } : undefined
+      });
       return response.data || [];
     } catch (error) {
       console.error('Error fetching environments:', error);
