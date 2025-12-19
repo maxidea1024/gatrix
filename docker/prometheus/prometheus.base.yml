@@ -19,7 +19,7 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets:
-          - edge__SERVICE_SUFFIX__:9337
+          - edge__SERVICE_SUFFIX__:9400
         labels:
           service: edge
           instance: edge

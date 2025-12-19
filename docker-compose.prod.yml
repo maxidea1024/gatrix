@@ -442,7 +442,7 @@ services:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-info}
       EDGE_PORT: 1337
-      EDGE_METRICS_PORT: 9337
+      EDGE_METRICS_PORT: 9400
       GATRIX_URL: http://backend:5000
       EDGE_API_TOKEN: ${EDGE_API_TOKEN:-gatrix-unsecured-server-api-token}
       EDGE_APPLICATION_NAME: ${EDGE_APPLICATION_NAME:-edge-server}
