@@ -444,16 +444,27 @@ export class EventListener {
           this.logger.warn('Client version updated event missing environment', { event: event.type });
           break;
         }
-        this.logger.info('Client version updated event received, refreshing client version cache', {
-          id: event.data.id,
-          environment: cvEnvironment
-        });
-        try {
-          // Use refreshByEnvironment to refresh the specific environment's cache
-          await this.cacheManager.getClientVersionService()?.refreshByEnvironment(cvEnvironment);
-          this.logger.info('Client version cache refreshed successfully');
-        } catch (error: any) {
-          this.logger.error('Failed to refresh client version cache', { error: error.message });
+
+        // Check if full data is available in event payload
+        const clientVersionData = event.data.clientVersion;
+        if (clientVersionData) {
+          this.logger.info('Client version event received, updating cache directly', {
+            id: event.data.id,
+            environment: cvEnvironment
+          });
+          this.cacheManager.getClientVersionService()?.updateSingleClientVersion(clientVersionData, cvEnvironment);
+        } else {
+          // Fallback to refresh if full data not available
+          this.logger.info('Client version event received (no full data), refreshing cache', {
+            id: event.data.id,
+            environment: cvEnvironment
+          });
+          try {
+            await this.cacheManager.getClientVersionService()?.refreshByEnvironment(cvEnvironment);
+            this.logger.info('Client version cache refreshed successfully');
+          } catch (error: any) {
+            this.logger.error('Failed to refresh client version cache', { error: error.message });
+          }
         }
         break;
       }
@@ -526,16 +537,27 @@ export class EventListener {
           this.logger.warn('Service notice updated event missing environment', { event: event.type });
           break;
         }
-        this.logger.info('Service notice updated event received, refreshing service notice cache', {
-          id: event.data.id,
-          environment: noticeEnvironment
-        });
-        try {
-          // Use refreshByEnvironment to refresh the specific environment's cache
-          await this.cacheManager.getServiceNoticeService()?.refreshByEnvironment(noticeEnvironment);
-          this.logger.info('Service notice cache refreshed successfully');
-        } catch (error: any) {
-          this.logger.error('Failed to refresh service notice cache', { error: error.message });
+
+        // Check if full data is available in event payload
+        const serviceNoticeData = event.data.serviceNotice;
+        if (serviceNoticeData) {
+          this.logger.info('Service notice event received, updating cache directly', {
+            id: event.data.id,
+            environment: noticeEnvironment
+          });
+          this.cacheManager.getServiceNoticeService()?.updateSingleServiceNotice(serviceNoticeData, noticeEnvironment);
+        } else {
+          // Fallback to refresh if full data not available
+          this.logger.info('Service notice event received (no full data), refreshing cache', {
+            id: event.data.id,
+            environment: noticeEnvironment
+          });
+          try {
+            await this.cacheManager.getServiceNoticeService()?.refreshByEnvironment(noticeEnvironment);
+            this.logger.info('Service notice cache refreshed successfully');
+          } catch (error: any) {
+            this.logger.error('Failed to refresh service notice cache', { error: error.message });
+          }
         }
         break;
       }

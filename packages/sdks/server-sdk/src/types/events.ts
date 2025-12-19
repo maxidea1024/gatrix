@@ -22,11 +22,15 @@ export type StandardEventType =
   | 'maintenance.started'
   | 'maintenance.ended'
   | 'whitelist.updated'
+  | 'client_version.created'
   | 'client_version.updated'
+  | 'client_version.deleted'
   | 'banner.created'
   | 'banner.updated'
   | 'banner.deleted'
+  | 'service_notice.created'
   | 'service_notice.updated'
+  | 'service_notice.deleted'
   | 'store_product.created'
   | 'store_product.updated'
   | 'store_product.deleted'
@@ -51,6 +55,9 @@ export interface StandardEventData {
   maintenanceMessage?: string; // For maintenance.settings.updated events
   maintenanceLocales?: Array<{ lang: string; message: string }>; // For maintenance.settings.updated events
   count?: number; // For bulk events (store_product.bulk_updated)
+  // Full object data for direct cache updates (avoiding list refresh)
+  clientVersion?: any; // For client_version.created, client_version.updated events
+  serviceNotice?: any; // For service_notice.created, service_notice.updated events
 }
 
 export interface StandardEvent {

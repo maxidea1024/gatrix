@@ -299,7 +299,7 @@ export class ClientVersionService {
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${result.environmentId}`);
     }
 
-    // Publish event
+    // Publish event with full data for SDK cache update
     try {
       let environment: string | undefined;
       if (result.environmentId) {
@@ -307,12 +307,16 @@ export class ClientVersionService {
         environment = env?.environmentName;
       }
 
+      // Get full client version with tags for SDK cache
+      const fullClientVersion = await this.getClientVersionById(result.id);
+
       await pubSubService.publishSDKEvent({
         type: 'client_version.created',
         data: {
           id: result.id,
           environment,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          clientVersion: fullClientVersion
         }
       });
     } catch (err) {
@@ -427,7 +431,7 @@ export class ClientVersionService {
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:${updatedClientVersion.environmentId}`);
     }
 
-    // Publish event
+    // Publish event with full data for SDK cache update
     if (updatedClientVersion) {
       try {
         let environment: string | undefined;
@@ -441,7 +445,8 @@ export class ClientVersionService {
           data: {
             id: updatedClientVersion.id,
             environment,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            clientVersion: updatedClientVersion
           }
         });
       } catch (err) {

@@ -276,7 +276,7 @@ class ServiceNoticeService {
       throw new Error('Failed to retrieve created service notice');
     }
 
-    // Invalidate ETag cache and publish SDK Event
+    // Invalidate ETag cache and publish SDK Event with full data for cache update
     try {
       const env = await Environment.query().findById(envId);
 
@@ -284,11 +284,12 @@ class ServiceNoticeService {
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${envId}`);
 
       await pubSubService.publishSDKEvent({
-        type: 'service_notice.updated',
+        type: 'service_notice.created',
         data: {
           id: notice.id,
           environment: env?.environmentName,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          serviceNotice: notice
         }
       });
     } catch (err) {
@@ -375,7 +376,7 @@ class ServiceNoticeService {
       throw new Error('Service notice not found');
     }
 
-    // Invalidate ETag cache and publish SDK Event
+    // Invalidate ETag cache and publish SDK Event with full data for cache update
     try {
       const env = await Environment.query().findById(envId);
 
@@ -387,7 +388,8 @@ class ServiceNoticeService {
         data: {
           id: notice.id,
           environment: env?.environmentName,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          serviceNotice: notice
         }
       });
     } catch (err) {
@@ -413,7 +415,7 @@ class ServiceNoticeService {
       await pubSubService.invalidateKey(`${SERVER_SDK_ETAG.SERVICE_NOTICES}:${envId}`);
 
       await pubSubService.publishSDKEvent({
-        type: 'service_notice.updated',
+        type: 'service_notice.deleted',
         data: {
           id: id,
           environment: env?.environmentName,
@@ -443,7 +445,7 @@ class ServiceNoticeService {
     try {
       const env = await Environment.query().findById(envId);
       await pubSubService.publishSDKEvent({
-        type: 'service_notice.updated',
+        type: 'service_notice.deleted',
         data: {
           environment: env?.environmentName,
           timestamp: Date.now()
