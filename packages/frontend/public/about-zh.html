@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,15 +9,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "思源黑体", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: #0a0a0a;
       color: #fff;
       line-height: 1.6;
     }
+
     /* Side decorations */
-    body::before, body::after {
+    body::before,
+    body::after {
       content: '';
       position: fixed;
       top: 0;
@@ -26,76 +34,297 @@
       pointer-events: none;
       z-index: 0;
     }
-    body::before { left: 0; border-right: 1px solid rgba(20, 184, 166, 0.1); }
-    body::after { right: 0; border-left: 1px solid rgba(20, 184, 166, 0.1); }
-    @media (max-width: 1200px) { body::before, body::after { width: 40px; } }
-    @media (max-width: 768px) { body::before, body::after { display: none; } }
-    
-    .container { max-width: 900px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
-    
-    /* Header */
-    header { padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .header-inner { display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 24px; font-weight: 700; color: #14b8a6; text-decoration: none; }
-    .back-btn {
-      padding: 8px 16px; background: rgba(255,255,255,0.1); border: none; border-radius: 6px;
-      color: #fff; font-size: 14px; cursor: pointer; text-decoration: none; transition: background 0.2s;
+
+    body::before {
+      left: 0;
+      border-right: 1px solid rgba(20, 184, 166, 0.1);
     }
-    .back-btn:hover { background: rgba(255,255,255,0.2); }
-    
-    /* Hero */
-    .hero { padding: 80px 0 60px; text-align: center; }
-    .hero h1 { font-size: 42px; font-weight: 700; margin-bottom: 16px; color: #fff; }
-    .hero p { font-size: 18px; color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto 32px; }
-    .cta-btn {
-      display: inline-block; padding: 14px 32px; background: #14b8a6; color: #000;
-      font-weight: 600; border-radius: 8px; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+
+    body::after {
+      right: 0;
+      border-left: 1px solid rgba(20, 184, 166, 0.1);
     }
-    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(20, 184, 166, 0.3); }
-    
-    /* Why section */
-    .why { padding: 60px 0; border-top: 1px solid rgba(255,255,255,0.1); }
-    .why h2 { font-size: 28px; margin-bottom: 12px; }
-    .why > p { color: rgba(255,255,255,0.6); margin-bottom: 40px; }
-    .benefits { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
-    .benefit { padding: 24px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
-    .benefit h3 { font-size: 16px; margin-bottom: 8px; color: #14b8a6; }
-    .benefit p { font-size: 14px; color: rgba(255,255,255,0.7); }
-    
-    /* Features */
-    .features { padding: 60px 0; border-top: 1px solid rgba(255,255,255,0.1); }
-    .features h2 { font-size: 28px; margin-bottom: 12px; }
-    .features > p { color: rgba(255,255,255,0.6); margin-bottom: 48px; }
-    .feature { display: flex; gap: 48px; margin-bottom: 64px; align-items: center; }
-    .feature:nth-child(even) { flex-direction: row-reverse; }
-    .feature-img { flex: 1; min-width: 0; }
-    .feature-img svg { width: 100%; height: auto; max-height: 220px; }
-    .feature-text { flex: 1; }
-    .feature-text h3 { font-size: 22px; margin-bottom: 12px; }
-    .feature-text p { color: rgba(255,255,255,0.7); font-size: 15px; }
+
+    @media (max-width: 1200px) {
+
+      body::before,
+      body::after {
+        width: 40px;
+      }
+    }
+
     @media (max-width: 768px) {
-      .feature, .feature:nth-child(even) { flex-direction: column; gap: 24px; }
-      .hero h1 { font-size: 32px; }
+
+      body::before,
+      body::after {
+        display: none;
+      }
     }
-    
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: #14b8a6;
+      text-decoration: none;
+    }
+
+    .back-btn {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.7);
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: #14b8a6;
+      color: #000;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(20, 184, 166, 0.3);
+    }
+
+    /* Why section */
+    .why {
+      padding: 60px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .why h2 {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+
+    .why>p {
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 40px;
+    }
+
+    .benefits {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .benefit {
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .benefit h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: #14b8a6;
+    }
+
+    .benefit p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Features */
+    .features {
+      padding: 60px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .features h2 {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+
+    .features>p {
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 48px;
+    }
+
+    .feature {
+      display: flex;
+      gap: 48px;
+      margin-bottom: 64px;
+      align-items: center;
+    }
+
+    .feature:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    .feature-img {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .feature-img svg {
+      width: 100%;
+      height: auto;
+      max-height: 220px;
+    }
+
+    .feature-text {
+      flex: 1;
+    }
+
+    .feature-text h3 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .feature-text p {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 15px;
+    }
+
+    @media (max-width: 768px) {
+
+      .feature,
+      .feature:nth-child(even) {
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+    }
+
     /* CTA */
-    .cta-section { padding: 80px 0; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); }
-    .cta-section h2 { font-size: 28px; margin-bottom: 12px; }
-    .cta-section p { color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-    
+    .cta-section {
+      padding: 80px 0;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cta-section h2 {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+
+    .cta-section p {
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 24px;
+    }
+
     /* Footer */
-    footer { padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
-    footer p { color: rgba(255,255,255,0.4); font-size: 13px; }
-    
+    footer {
+      padding: 24px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    footer p {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 13px;
+    }
+
     /* SVG Animations */
-    @keyframes pulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    .anim-pulse { animation: pulse 2s ease-in-out infinite; }
-    .anim-blink { animation: blink 1.5s ease-in-out infinite; }
-    .anim-float { animation: float 3s ease-in-out infinite; }
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 0.8;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .anim-pulse {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .anim-blink {
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    .anim-float {
+      animation: float 3s ease-in-out infinite;
+    }
   </style>
 </head>
+
 <body>
   <header>
     <div class="container header-inner">
@@ -143,22 +372,22 @@
         <div class="feature">
           <div class="feature-img">
             <svg viewBox="0 0 400 220" fill="none">
-              <rect x="20" y="10" width="360" height="180" rx="12" fill="#1a1a2e" stroke="#14b8a6" stroke-width="2"/>
-              <rect x="40" y="35" width="140" height="70" rx="8" fill="#0f3433"/>
-              <path d="M60 85 L80 65 L100 75 L120 50 L140 60 L160 40" stroke="#14b8a6" stroke-width="3" fill="none"/>
-              <circle class="anim-blink" cx="160" cy="40" r="4" fill="#14b8a6"/>
-              <rect x="200" y="35" width="160" height="28" rx="6" fill="#0f3433"/>
-              <rect class="anim-pulse" x="210" y="43" width="90" height="12" rx="4" fill="#14b8a6" opacity="0.8"/>
-              <rect x="200" y="70" width="160" height="28" rx="6" fill="#0f3433"/>
-              <rect class="anim-pulse" x="210" y="78" width="60" height="12" rx="4" fill="#0ea5e9" opacity="0.8"/>
-              <rect x="40" y="115" width="320" height="55" rx="8" fill="#0f3433"/>
-              <circle cx="75" cy="142" r="16" stroke="#34d399" stroke-width="2" fill="none"/>
+              <rect x="20" y="10" width="360" height="180" rx="12" fill="#1a1a2e" stroke="#14b8a6" stroke-width="2" />
+              <rect x="40" y="35" width="140" height="70" rx="8" fill="#0f3433" />
+              <path d="M60 85 L80 65 L100 75 L120 50 L140 60 L160 40" stroke="#14b8a6" stroke-width="3" fill="none" />
+              <circle class="anim-blink" cx="160" cy="40" r="4" fill="#14b8a6" />
+              <rect x="200" y="35" width="160" height="28" rx="6" fill="#0f3433" />
+              <rect class="anim-pulse" x="210" y="43" width="90" height="12" rx="4" fill="#14b8a6" opacity="0.8" />
+              <rect x="200" y="70" width="160" height="28" rx="6" fill="#0f3433" />
+              <rect class="anim-pulse" x="210" y="78" width="60" height="12" rx="4" fill="#0ea5e9" opacity="0.8" />
+              <rect x="40" y="115" width="320" height="55" rx="8" fill="#0f3433" />
+              <circle cx="75" cy="142" r="16" stroke="#34d399" stroke-width="2" fill="none" />
               <text x="68" y="147" fill="#34d399" font-size="11" font-weight="bold">OK</text>
-              <circle cx="130" cy="142" r="16" stroke="#34d399" stroke-width="2" fill="none"/>
+              <circle cx="130" cy="142" r="16" stroke="#34d399" stroke-width="2" fill="none" />
               <text x="123" y="147" fill="#34d399" font-size="11" font-weight="bold">OK</text>
-              <circle class="anim-blink" cx="185" cy="142" r="16" stroke="#fbbf24" stroke-width="2" fill="none"/>
+              <circle class="anim-blink" cx="185" cy="142" r="16" stroke="#fbbf24" stroke-width="2" fill="none" />
               <text x="181" y="147" fill="#fbbf24" font-size="12" font-weight="bold">!</text>
-              <circle cx="240" cy="142" r="16" stroke="#34d399" stroke-width="2" fill="none"/>
+              <circle cx="240" cy="142" r="16" stroke="#34d399" stroke-width="2" fill="none" />
               <text x="233" y="147" fill="#34d399" font-size="11" font-weight="bold">OK</text>
             </svg>
           </div>
@@ -172,14 +401,14 @@
         <div class="feature">
           <div class="feature-img">
             <svg viewBox="0 0 400 220" fill="none">
-              <rect x="80" y="20" width="240" height="140" rx="12" fill="#1a1a2e" stroke="#f59e0b" stroke-width="2"/>
-              <rect class="anim-pulse" x="100" y="40" width="200" height="28" rx="4" fill="#0f3433"/>
+              <rect x="80" y="20" width="240" height="140" rx="12" fill="#1a1a2e" stroke="#f59e0b" stroke-width="2" />
+              <rect class="anim-pulse" x="100" y="40" width="200" height="28" rx="4" fill="#0f3433" />
               <text x="115" y="60" fill="#f59e0b" font-size="14" font-weight="bold">⚠️ 服务器维护</text>
-              <rect x="100" y="78" width="200" height="65" rx="4" fill="#0f3433"/>
+              <rect x="100" y="78" width="200" height="65" rx="4" fill="#0f3433" />
               <text x="115" y="102" fill="#fff" font-size="11" opacity="0.7">预定：14:00 - 16:00</text>
               <text x="115" y="122" fill="#fff" font-size="11" opacity="0.7">时长：2小时</text>
               <g class="anim-float">
-                <rect x="140" y="170" width="120" height="35" rx="17" fill="#f59e0b"/>
+                <rect x="140" y="170" width="120" height="35" rx="17" fill="#f59e0b" />
                 <text x="165" y="193" fill="#000" font-size="13" font-weight="bold">通知全部</text>
               </g>
             </svg>
@@ -194,20 +423,20 @@
         <div class="feature">
           <div class="feature-img">
             <svg viewBox="0 0 400 220" fill="none">
-              <rect x="40" y="30" width="90" height="150" rx="10" fill="#1a1a2e" stroke="#14b8a6" stroke-width="2"/>
-              <rect x="50" y="42" width="70" height="8" rx="4" fill="#0f3433"/>
-              <rect x="50" y="58" width="70" height="100" rx="4" fill="#0f3433"/>
+              <rect x="40" y="30" width="90" height="150" rx="10" fill="#1a1a2e" stroke="#14b8a6" stroke-width="2" />
+              <rect x="50" y="42" width="70" height="8" rx="4" fill="#0f3433" />
+              <rect x="50" y="58" width="70" height="100" rx="4" fill="#0f3433" />
               <text x="62" y="105" fill="#14b8a6" font-size="18" font-weight="bold">v2.1</text>
               <text x="57" y="125" fill="#34d399" font-size="9">✓ 最新</text>
-              <rect x="155" y="30" width="90" height="150" rx="10" fill="#1a1a2e" stroke="#0ea5e9" stroke-width="2"/>
-              <rect x="165" y="42" width="70" height="8" rx="4" fill="#0f3433"/>
-              <rect x="165" y="58" width="70" height="100" rx="4" fill="#0f3433"/>
+              <rect x="155" y="30" width="90" height="150" rx="10" fill="#1a1a2e" stroke="#0ea5e9" stroke-width="2" />
+              <rect x="165" y="42" width="70" height="8" rx="4" fill="#0f3433" />
+              <rect x="165" y="58" width="70" height="100" rx="4" fill="#0f3433" />
               <text x="177" y="105" fill="#0ea5e9" font-size="18" font-weight="bold">v2.1</text>
               <text x="172" y="125" fill="#34d399" font-size="9">✓ 最新</text>
               <g class="anim-float">
-                <rect x="270" y="40" width="55" height="85" rx="8" fill="#1a1a2e" stroke="#f87171" stroke-width="2"/>
-                <rect x="280" y="50" width="35" height="5" rx="2" fill="#0f3433"/>
-                <rect x="280" y="62" width="35" height="45" rx="3" fill="#0f3433"/>
+                <rect x="270" y="40" width="55" height="85" rx="8" fill="#1a1a2e" stroke="#f87171" stroke-width="2" />
+                <rect x="280" y="50" width="35" height="5" rx="2" fill="#0f3433" />
+                <rect x="280" y="62" width="35" height="45" rx="3" fill="#0f3433" />
                 <text x="283" y="88" fill="#f87171" font-size="11" font-weight="bold">v1.9</text>
                 <text x="280" y="100" fill="#f87171" font-size="7">⚠ 旧版</text>
               </g>
@@ -225,19 +454,19 @@
           <div class="feature-img">
             <svg viewBox="0 0 400 220" fill="none">
               <g class="anim-float">
-                <rect x="60" y="15" width="280" height="140" rx="12" fill="#1a1a2e" stroke="#14b8a6" stroke-width="2"/>
-                <rect x="80" y="35" width="240" height="100" rx="8" fill="#0f3433"/>
-                <rect x="95" y="50" width="200" height="25" rx="4" fill="#14b8a6" opacity="0.2"/>
+                <rect x="60" y="15" width="280" height="140" rx="12" fill="#1a1a2e" stroke="#14b8a6" stroke-width="2" />
+                <rect x="80" y="35" width="240" height="100" rx="8" fill="#0f3433" />
+                <rect x="95" y="50" width="200" height="25" rx="4" fill="#14b8a6" opacity="0.2" />
                 <text x="110" y="68" fill="#14b8a6" font-size="12" font-weight="bold">🎉 新活动！</text>
                 <text x="95" y="95" fill="#fff" font-size="10" opacity="0.8">双倍经验周末来啦！</text>
                 <text x="95" y="112" fill="#fff" font-size="10" opacity="0.8">现在玩，升级更快。</text>
               </g>
               <g class="anim-pulse">
-                <rect x="30" y="170" width="140" height="40" rx="8" fill="#1a1a2e" stroke="#f472b6" stroke-width="2"/>
+                <rect x="30" y="170" width="140" height="40" rx="8" fill="#1a1a2e" stroke="#f472b6" stroke-width="2" />
                 <text x="60" y="195" fill="#f472b6" font-size="11">📢 推送通知</text>
               </g>
               <g class="anim-pulse">
-                <rect x="230" y="170" width="140" height="40" rx="8" fill="#1a1a2e" stroke="#fbbf24" stroke-width="2"/>
+                <rect x="230" y="170" width="140" height="40" rx="8" fill="#1a1a2e" stroke="#fbbf24" stroke-width="2" />
                 <text x="260" y="195" fill="#fbbf24" font-size="11">🎯 游戏内弹窗</text>
               </g>
             </svg>
@@ -253,18 +482,18 @@
           <div class="feature-img">
             <svg viewBox="0 0 400 220" fill="none">
               <g class="anim-float">
-                <rect x="50" y="50" width="180" height="120" rx="8" fill="#1a1a2e" stroke="#14b8a6" stroke-width="2"/>
-                <path d="M50 68 L140 120 L230 68" stroke="#14b8a6" stroke-width="2" fill="none"/>
-                <rect x="68" y="130" width="144" height="25" rx="4" fill="#0f3433"/>
+                <rect x="50" y="50" width="180" height="120" rx="8" fill="#1a1a2e" stroke="#14b8a6" stroke-width="2" />
+                <path d="M50 68 L140 120 L230 68" stroke="#14b8a6" stroke-width="2" fill="none" />
+                <rect x="68" y="130" width="144" height="25" rx="4" fill="#0f3433" />
                 <text x="83" y="148" fill="#fff" font-size="10" opacity="0.7">🎁 + 100宝石附件</text>
               </g>
-              <rect x="260" y="35" width="100" height="165" rx="8" fill="#1a1a2e" stroke="#0ea5e9" stroke-width="2"/>
+              <rect x="260" y="35" width="100" height="165" rx="8" fill="#1a1a2e" stroke="#0ea5e9" stroke-width="2" />
               <text x="280" y="58" fill="#0ea5e9" font-size="11" font-weight="bold">收件人</text>
-              <rect x="270" y="70" width="80" height="22" rx="4" fill="#0f3433"/>
+              <rect x="270" y="70" width="80" height="22" rx="4" fill="#0f3433" />
               <text x="278" y="85" fill="#34d399" font-size="9">✓ VIP用户</text>
-              <rect x="270" y="100" width="80" height="22" rx="4" fill="#0f3433"/>
+              <rect x="270" y="100" width="80" height="22" rx="4" fill="#0f3433" />
               <text x="278" y="115" fill="#34d399" font-size="9">✓ 50级以上</text>
-              <rect x="270" y="130" width="80" height="22" rx="4" fill="#0f3433"/>
+              <rect x="270" y="130" width="80" height="22" rx="4" fill="#0f3433" />
               <text x="278" y="145" fill="#34d399" font-size="9">✓ 7日内活跃</text>
               <text x="275" y="175" fill="#fff" font-size="10" opacity="0.6">12,847人</text>
               <text x="275" y="192" fill="#14b8a6" font-size="10" font-weight="bold">全部发送 →</text>
@@ -281,15 +510,16 @@
           <div class="feature-img">
             <svg viewBox="0 0 400 220" fill="none">
               <g class="anim-pulse">
-                <rect x="40" y="65" width="180" height="90" rx="12" fill="#1a1a2e" stroke="#f59e0b" stroke-width="2"/>
-                <line x1="130" y1="65" x2="130" y2="155" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,6"/>
-                <circle cx="130" cy="65" r="8" fill="#0a0a0a"/>
-                <circle cx="130" cy="155" r="8" fill="#0a0a0a"/>
+                <rect x="40" y="65" width="180" height="90" rx="12" fill="#1a1a2e" stroke="#f59e0b" stroke-width="2" />
+                <line x1="130" y1="65" x2="130" y2="155" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,6" />
+                <circle cx="130" cy="65" r="8" fill="#0a0a0a" />
+                <circle cx="130" cy="155" r="8" fill="#0a0a0a" />
                 <text x="53" y="100" fill="#f59e0b" font-size="10">兑换码</text>
                 <text x="53" y="128" fill="#fff" font-size="18" font-weight="bold">5折优惠</text>
-                <text x="143" y="115" fill="#fff" font-size="12" font-weight="bold" font-family="monospace">SUMMER25</text>
+                <text x="143" y="115" fill="#fff" font-size="12" font-weight="bold"
+                  font-family="monospace">SUMMER25</text>
               </g>
-              <rect x="250" y="40" width="110" height="155" rx="8" fill="#1a1a2e" stroke="#14b8a6" stroke-width="2"/>
+              <rect x="250" y="40" width="110" height="155" rx="8" fill="#1a1a2e" stroke="#14b8a6" stroke-width="2" />
               <text x="280" y="65" fill="#14b8a6" font-size="11" font-weight="bold">统计</text>
               <text x="263" y="90" fill="#fff" font-size="10" opacity="0.6">已生成：</text>
               <text x="263" y="107" fill="#14b8a6" font-size="13" font-weight="bold">10,000</text>
@@ -322,5 +552,5 @@
     </div>
   </footer>
 </body>
-</html>
 
+</html>

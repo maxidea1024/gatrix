@@ -139,6 +139,30 @@ class VideoBlot extends BlockEmbed {
 
 Quill.register(CustomImageBlot, true); // true to overwrite default image format
 Quill.register(VideoBlot, true); // true to suppress overwrite warning
+
+// Register Font Attributor
+const Font = Quill.import('attributors/style/font') as any;
+const fontList = [
+  'Arial',
+  'Verdana',
+  'Helvetica',
+  'Tahoma',
+  'Trebuchet MS',
+  'Times New Roman',
+  'Georgia',
+  'Garamond',
+  'Courier New',
+  'Brush Script MT',
+  'Inter',
+  'Roboto',
+  'Microsoft YaHei',
+  'SimSun',
+  'SimHei',
+  'Source Han Sans SC',
+  'Noto Sans SC'
+];
+Font.whitelist = fontList;
+Quill.register(Font, true);
 import {
   EmojiEmotions as EmojiIcon,
   FormatBold as BoldIcon,
@@ -956,8 +980,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (imageShadow !== 'none') {
       const blur =
         imageShadow === 'small' ? '4px' :
-        imageShadow === 'medium' ? '8px' :
-        '16px';
+          imageShadow === 'medium' ? '8px' :
+            '16px';
 
       let shadowValue = '';
       if (imageShadowDirection === 'all') {
@@ -1072,21 +1096,22 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       toolbar: readOnly
         ? false
         : {
-            container: [
-              [{ header: [1, 2, 3, false] }],
-              [{ size: ['small', false, 'large', 'huge'] }], // Font size selector
-              ['bold', 'italic', 'underline', 'strike'],
-              [{ color: [] }, { background: [] }],
-              [{ list: 'ordered' }, { list: 'bullet' }],
-              [{ align: [] }], // Text alignment
-              ['link', 'image', 'video'],
-              ['clean'],
-            ],
-            handlers: {
-              image: imageHandler,
-              video: insertVideo,
-            },
+          container: [
+            [{ font: fontList }], // Font selector
+            [{ header: [1, 2, 3, false] }],
+            [{ size: ['small', false, 'large', 'huge'] }], // Font size selector
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ color: [] }, { background: [] }],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ align: [] }], // Text alignment
+            ['link', 'image', 'video'],
+            ['clean'],
+          ],
+          handlers: {
+            image: imageHandler,
+            video: insertVideo,
           },
+        },
       clipboard: {
         matchVisual: false,
         matchers: [
@@ -1119,7 +1144,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           // Handle delete key for custom embeds (video, image)
           'delete': {
             key: 'Delete',
-            handler: function(this: any, range: any) {
+            handler: function (this: any, range: any) {
               const editor = this.quill;
               if (range.length > 0) {
                 // If there's a selection, delete it
@@ -1132,7 +1157,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           // Handle backspace key for custom embeds
           'backspace': {
             key: 'Backspace',
-            handler: function(this: any, range: any) {
+            handler: function (this: any, range: any) {
               const editor = this.quill;
               if (range.length > 0) {
                 // If there's a selection, delete it
@@ -1170,7 +1195,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   useEffect(() => {
     if (!quillRef.current || readOnly) return;
 
-    const toolbar = quillRef.current.getEditor().getModule('toolbar');
+    const toolbar = quillRef.current.getEditor().getModule('toolbar') as any;
     if (!toolbar || !toolbar.container) return;
 
     const container = toolbar.container as HTMLElement;
@@ -1194,6 +1219,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       '.ql-image': t('richTextEditor.image'),
       '.ql-video': t('richTextEditor.video'),
       '.ql-clean': t('richTextEditor.clean'),
+      '.ql-font .ql-picker-label': t('richTextEditor.font', 'Font'),
+      '.ql-font .ql-picker-item': '', // No tooltip for items
     };
 
     // Apply tooltips
@@ -1242,99 +1269,99 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             alignItems: 'center',
             gap: '4px',
           },
-        '& .ql-container': {
-          borderTop: 'none',
-          borderLeft: 'none',
-          borderRight: 'none',
-          borderBottom: 'none',
-          fontSize: '14px',
-          fontFamily: theme.typography.fontFamily,
-          minHeight: `${minHeight}px`,
-          overflow: 'visible', // Allow tooltip to overflow
-        },
-        '& .ql-editor': {
-          minHeight: `${minHeight}px`,
-          color: theme.palette.text.primary,
-          '&.ql-blank::before': {
-            color: theme.palette.text.secondary,
-            fontStyle: 'normal',
+          '& .ql-container': {
+            borderTop: 'none',
+            borderLeft: 'none',
+            borderRight: 'none',
+            borderBottom: 'none',
+            fontSize: '14px',
+            fontFamily: theme.typography.fontFamily,
+            minHeight: `${minHeight}px`,
+            overflow: 'visible', // Allow tooltip to overflow
           },
-          // Image styling
-          '& img': {
-            maxWidth: '100%',
-            height: 'auto',
-            display: 'inline-block',
-            verticalAlign: 'middle',
-          },
-        },
-        '& .ql-stroke': {
-          stroke: theme.palette.text.primary,
-        },
-        '& .ql-fill': {
-          fill: theme.palette.text.primary,
-        },
-        '& .ql-picker-label': {
-          color: theme.palette.text.primary,
-        },
-        '& .ql-picker-options': {
-          backgroundColor: theme.palette.background.paper,
-          border: `1px solid ${theme.palette.divider}`,
-        },
-        '& .ql-toolbar button:hover, & .ql-toolbar button:focus': {
-          color: theme.palette.primary.main,
-          '& .ql-stroke': {
-            stroke: theme.palette.primary.main,
-          },
-          '& .ql-fill': {
-            fill: theme.palette.primary.main,
-          },
-        },
-        '& .ql-toolbar button.ql-active': {
-          color: theme.palette.primary.main,
-          '& .ql-stroke': {
-            stroke: theme.palette.primary.main,
-          },
-          '& .ql-fill': {
-            fill: theme.palette.primary.main,
-          },
-        },
-        // Link tooltip positioning
-        '& .ql-tooltip': {
-          position: 'absolute',
-          zIndex: 9999,
-          backgroundColor: theme.palette.background.paper,
-          border: `1px solid ${theme.palette.divider}`,
-          boxShadow: theme.shadows[4],
-          color: theme.palette.text.primary,
-          padding: '8px 12px',
-          borderRadius: '4px',
-          left: '0 !important', // Override default positioning
-          transform: 'translateY(10px)', // Position below the selection
-          '& input[type="text"]': {
-            backgroundColor: theme.palette.background.default,
+          '& .ql-editor': {
+            minHeight: `${minHeight}px`,
             color: theme.palette.text.primary,
-            border: `1px solid ${theme.palette.divider}`,
-            padding: '6px 8px',
-            borderRadius: '4px',
-            '&:focus': {
-              outline: 'none',
-              borderColor: theme.palette.primary.main,
+            '&.ql-blank::before': {
+              color: theme.palette.text.secondary,
+              fontStyle: 'normal',
+            },
+            // Image styling
+            '& img': {
+              maxWidth: '100%',
+              height: 'auto',
+              display: 'inline-block',
+              verticalAlign: 'middle',
             },
           },
-          '& a.ql-action::after': {
-            content: '"Edit"',
+          '& .ql-stroke': {
+            stroke: theme.palette.text.primary,
+          },
+          '& .ql-fill': {
+            fill: theme.palette.text.primary,
+          },
+          '& .ql-picker-label': {
+            color: theme.palette.text.primary,
+          },
+          '& .ql-picker-options': {
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+          },
+          '& .ql-toolbar button:hover, & .ql-toolbar button:focus': {
             color: theme.palette.primary.main,
+            '& .ql-stroke': {
+              stroke: theme.palette.primary.main,
+            },
+            '& .ql-fill': {
+              fill: theme.palette.primary.main,
+            },
           },
-          '& a.ql-remove::before': {
-            content: '"Remove"',
-            color: theme.palette.error.main,
+          '& .ql-toolbar button.ql-active': {
+            color: theme.palette.primary.main,
+            '& .ql-stroke': {
+              stroke: theme.palette.primary.main,
+            },
+            '& .ql-fill': {
+              fill: theme.palette.primary.main,
+            },
           },
-        },
-        '& .ql-tooltip.ql-editing': {
-          left: '0 !important',
-        },
-      }}
-    >
+          // Link tooltip positioning
+          '& .ql-tooltip': {
+            position: 'absolute',
+            zIndex: 9999,
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow: theme.shadows[4],
+            color: theme.palette.text.primary,
+            padding: '8px 12px',
+            borderRadius: '4px',
+            left: '0 !important', // Override default positioning
+            transform: 'translateY(10px)', // Position below the selection
+            '& input[type="text"]': {
+              backgroundColor: theme.palette.background.default,
+              color: theme.palette.text.primary,
+              border: `1px solid ${theme.palette.divider}`,
+              padding: '6px 8px',
+              borderRadius: '4px',
+              '&:focus': {
+                outline: 'none',
+                borderColor: theme.palette.primary.main,
+              },
+            },
+            '& a.ql-action::after': {
+              content: '"Edit"',
+              color: theme.palette.primary.main,
+            },
+            '& a.ql-remove::before': {
+              content: '"Remove"',
+              color: theme.palette.error.main,
+            },
+          },
+          '& .ql-tooltip.ql-editing': {
+            left: '0 !important',
+          },
+        }}
+      >
         <Box onContextMenu={handleContextMenu}>
           <ReactQuill
             ref={quillRef}
@@ -1443,6 +1470,21 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           ]}
         />
       </Popover>
+
+
+
+      {/* Dynamic styles for font picker */}
+      <style>
+        {`
+          ${fontList.map(font => `
+            .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="${font}"]::before,
+            .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="${font}"]::before {
+              content: "${font}";
+              font-family: "${font}";
+            }
+          `).join('')}
+        `}
+      </style>
 
       {/* Context Menu */}
       <Menu
@@ -1601,274 +1643,274 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             {/* Left Panel: Settings */}
             <Box sx={{ width: '50%', height: '100%', overflow: 'auto', p: 3, borderRight: (theme) => `1px solid ${theme.palette.divider}` }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-            {/* Image Source Group */}
-            <Paper variant="outlined" sx={{ p: 2 }}>
-              <Typography variant="subtitle2" gutterBottom sx={{ mb: 2, fontWeight: 600 }}>
-                {t('richTextEditor.imageSource')}
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {/* Image URL */}
-                <TextField
-                  autoFocus
-                  label={t('richTextEditor.imageUrl')}
-                  placeholder="https://example.com/image.jpg"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  fullWidth
-                  required
-                  error={imageUrlValid === false}
-                  helperText={
-                    imageUrlValidating
-                      ? t('richTextEditor.imageUrlValidating')
-                      : imageUrlValid === false
-                      ? t('richTextEditor.imageUrlInvalid')
-                      : imageUrlValid === true && imageOriginalSize
-                      ? `${t('richTextEditor.imageOriginalSize')}: ${imageOriginalSize.width} × ${imageOriginalSize.height}`
-                      : t('richTextEditor.imageUrlHelp')
-                  }
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' && imageUrl && imageUrlValid === true) {
-                      handleImageInsert();
-                    }
-                  }}
-                />
+                {/* Image Source Group */}
+                <Paper variant="outlined" sx={{ p: 2 }}>
+                  <Typography variant="subtitle2" gutterBottom sx={{ mb: 2, fontWeight: 600 }}>
+                    {t('richTextEditor.imageSource')}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {/* Image URL */}
+                    <TextField
+                      autoFocus
+                      label={t('richTextEditor.imageUrl')}
+                      placeholder="https://example.com/image.jpg"
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      fullWidth
+                      required
+                      error={imageUrlValid === false}
+                      helperText={
+                        imageUrlValidating
+                          ? t('richTextEditor.imageUrlValidating')
+                          : imageUrlValid === false
+                            ? t('richTextEditor.imageUrlInvalid')
+                            : imageUrlValid === true && imageOriginalSize
+                              ? `${t('richTextEditor.imageOriginalSize')}: ${imageOriginalSize.width} × ${imageOriginalSize.height}`
+                              : t('richTextEditor.imageUrlHelp')
+                      }
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && imageUrl && imageUrlValid === true) {
+                          handleImageInsert();
+                        }
+                      }}
+                    />
 
-                {/* Alt Text */}
-                <TextField
-                  label={t('richTextEditor.imageAltText')}
-                  placeholder={t('richTextEditor.imageAltTextPlaceholder')}
-                  value={imageAltText}
-                  onChange={(e) => setImageAltText(e.target.value)}
-                  fullWidth
-                  helperText={t('richTextEditor.imageAltTextHelp')}
-                />
-              </Box>
-            </Paper>
+                    {/* Alt Text */}
+                    <TextField
+                      label={t('richTextEditor.imageAltText')}
+                      placeholder={t('richTextEditor.imageAltTextPlaceholder')}
+                      value={imageAltText}
+                      onChange={(e) => setImageAltText(e.target.value)}
+                      fullWidth
+                      helperText={t('richTextEditor.imageAltTextHelp')}
+                    />
+                  </Box>
+                </Paper>
 
-            {/* Advanced Options Accordion */}
-            <Accordion
-              expanded={advancedOptionsExpanded}
-              onChange={handleAdvancedOptionsChange}
-              sx={{
-                '&:before': { display: 'none' },
-                boxShadow: 'none',
-                border: `1px solid ${theme.palette.divider}`,
-              }}
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                  {t('richTextEditor.imageAdvancedOptions')}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                  {/* Width Selection and Aspect Ratio */}
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-              <FormControl fullWidth>
-                <InputLabel>{t('richTextEditor.imageWidth')}</InputLabel>
-                <Select
-                  value={imageWidth}
-                  label={t('richTextEditor.imageWidth')}
-                  onChange={(e) => setImageWidth(e.target.value as any)}
-                >
-                  <MenuItem value="original">{t('richTextEditor.imageWidthOriginal')}</MenuItem>
-                  <MenuItem value="25">{t('richTextEditor.imageWidth25')}</MenuItem>
-                  <MenuItem value="50">{t('richTextEditor.imageWidth50')}</MenuItem>
-                  <MenuItem value="75">{t('richTextEditor.imageWidth75')}</MenuItem>
-                  <MenuItem value="100">{t('richTextEditor.imageWidth100')}</MenuItem>
-                  <MenuItem value="custom">{t('richTextEditor.imageWidthCustom')}</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={imageAspectRatio}
-                    onChange={(e) => setImageAspectRatio(e.target.checked)}
-                  />
-                }
-                label={t('richTextEditor.imageAspectRatio')}
-                sx={{ whiteSpace: 'nowrap' }}
-              />
-            </Box>
-
-            {/* Custom Width Input */}
-            {imageWidth === 'custom' && (
-              <TextField
-                label={t('richTextEditor.imageWidthCustom')}
-                placeholder={t('richTextEditor.imageWidthCustomPlaceholder')}
-                value={imageCustomWidth}
-                onChange={(e) => setImageCustomWidth(e.target.value.replace(/[^0-9]/g, ''))}
-                fullWidth
-                helperText={t('richTextEditor.imageWidthCustomHelp')}
-                type="number"
-              />
-            )}
-
-            {/* Alignment */}
-            <FormControl component="fieldset">
-              <FormLabel component="legend">{t('richTextEditor.imageAlign')}</FormLabel>
-              <RadioGroup
-                row
-                value={imageAlign}
-                onChange={(e) => setImageAlign(e.target.value as any)}
-              >
-                <FormControlLabel
-                  value="left"
-                  control={<Radio />}
-                  label={t('richTextEditor.imageAlignLeft')}
-                />
-                <FormControlLabel
-                  value="center"
-                  control={<Radio />}
-                  label={t('richTextEditor.imageAlignCenter')}
-                />
-                <FormControlLabel
-                  value="right"
-                  control={<Radio />}
-                  label={t('richTextEditor.imageAlignRight')}
-                />
-              </RadioGroup>
-            </FormControl>
-
-            {/* Border Selection and Color - One Line */}
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-              <FormControl sx={{ flex: 1 }}>
-                <InputLabel>{t('richTextEditor.imageBorder')}</InputLabel>
-                <Select
-                  value={imageBorder}
-                  label={t('richTextEditor.imageBorder')}
-                  onChange={(e) => setImageBorder(e.target.value as any)}
-                >
-                  <MenuItem value="none">{t('richTextEditor.imageBorderNone')}</MenuItem>
-                  <MenuItem value="thin">{t('richTextEditor.imageBorderThin')}</MenuItem>
-                  <MenuItem value="medium">{t('richTextEditor.imageBorderMedium')}</MenuItem>
-                  <MenuItem value="thick">{t('richTextEditor.imageBorderThick')}</MenuItem>
-                </Select>
-              </FormControl>
-
-              {/* Border Color (conditional, same line) */}
-              {imageBorder !== 'none' && (
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flex: 1 }}>
-                  <TextField
-                    label={t('richTextEditor.imageBorderColor')}
-                    value={imageBorderColor}
-                    onChange={(e) => setImageBorderColor(e.target.value)}
-                    fullWidth
-                    placeholder="#cccccc"
-                  />
-                  <Box
-                    component="input"
-                    type="color"
-                    value={imageBorderColor}
-                    onChange={(e) => setImageBorderColor((e.target as HTMLInputElement).value)}
-                    sx={{
-                      width: 60,
-                      height: 40,
-                      border: 'none',
-                      borderRadius: 1,
-                      cursor: 'pointer',
-                      flexShrink: 0,
-                    }}
-                  />
-                </Box>
-              )}
-            </Box>
-
-            {/* Border Radius - One Line with Custom Input */}
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-              <FormControl sx={{ flex: 1 }}>
-                <InputLabel>{t('richTextEditor.imageBorderRadius')}</InputLabel>
-                <Select
-                  value={imageBorderRadius}
-                  label={t('richTextEditor.imageBorderRadius')}
-                  onChange={(e) => setImageBorderRadius(e.target.value as any)}
-                >
-                  <MenuItem value="none">{t('richTextEditor.imageBorderRadiusNone')}</MenuItem>
-                  <MenuItem value="small">{t('richTextEditor.imageBorderRadiusSmall')}</MenuItem>
-                  <MenuItem value="medium">{t('richTextEditor.imageBorderRadiusMedium')}</MenuItem>
-                  <MenuItem value="large">{t('richTextEditor.imageBorderRadiusLarge')}</MenuItem>
-                  <MenuItem value="custom">{t('richTextEditor.imageBorderRadiusCustom')}</MenuItem>
-                </Select>
-              </FormControl>
-
-              {/* Custom Border Radius Input (conditional, same line) */}
-              {imageBorderRadius === 'custom' && (
-                <TextField
-                  label={t('richTextEditor.imageCustomBorderRadius')}
-                  type="number"
-                  value={imageCustomBorderRadius}
-                  onChange={(e) => setImageCustomBorderRadius(e.target.value)}
-                  sx={{ flex: 1 }}
-                  placeholder="8"
-                  inputProps={{ min: 0 }}
-                />
-              )}
-            </Box>
-
-            {/* Shadow Selection and Direction - One Line */}
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-              <FormControl sx={{ flex: 1 }}>
-                <InputLabel>{t('richTextEditor.imageShadow')}</InputLabel>
-                <Select
-                  value={imageShadow}
-                  label={t('richTextEditor.imageShadow')}
-                  onChange={(e) => setImageShadow(e.target.value as any)}
-                >
-                  <MenuItem value="none">{t('richTextEditor.imageShadowNone')}</MenuItem>
-                  <MenuItem value="small">{t('richTextEditor.imageShadowSmall')}</MenuItem>
-                  <MenuItem value="medium">{t('richTextEditor.imageShadowMedium')}</MenuItem>
-                  <MenuItem value="large">{t('richTextEditor.imageShadowLarge')}</MenuItem>
-                </Select>
-              </FormControl>
-
-              {/* Shadow Direction (conditional, same line) */}
-              {imageShadow !== 'none' && (
-                <FormControl sx={{ flex: 1 }}>
-                  <InputLabel>{t('richTextEditor.imageShadowDirection')}</InputLabel>
-                  <Select
-                    value={imageShadowDirection}
-                    label={t('richTextEditor.imageShadowDirection')}
-                    onChange={(e) => setImageShadowDirection(e.target.value as any)}
-                  >
-                    <MenuItem value="all">{t('richTextEditor.imageShadowDirectionAll')}</MenuItem>
-                    <MenuItem value="top">{t('richTextEditor.imageShadowDirectionTop')}</MenuItem>
-                    <MenuItem value="bottom">{t('richTextEditor.imageShadowDirectionBottom')}</MenuItem>
-                    <MenuItem value="left">{t('richTextEditor.imageShadowDirectionLeft')}</MenuItem>
-                    <MenuItem value="right">{t('richTextEditor.imageShadowDirectionRight')}</MenuItem>
-                  </Select>
-                </FormControl>
-              )}
-            </Box>
-
-            {/* Shadow Color (conditional, separate line) */}
-            {imageShadow !== 'none' && (
-              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                <TextField
-                  label={t('richTextEditor.imageShadowColor')}
-                  value={imageShadowColor}
-                  onChange={(e) => setImageShadowColor(e.target.value)}
-                  fullWidth
-                  placeholder="rgba(0, 0, 0, 0.3)"
-                />
-                <Box
-                  component="input"
-                  type="color"
-                  value={imageShadowColor.startsWith('rgba') || imageShadowColor.startsWith('rgb') ? '#000000' : imageShadowColor}
-                  onChange={(e) => setImageShadowColor((e.target as HTMLInputElement).value)}
+                {/* Advanced Options Accordion */}
+                <Accordion
+                  expanded={advancedOptionsExpanded}
+                  onChange={handleAdvancedOptionsChange}
                   sx={{
-                    width: 60,
-                    height: 40,
-                    border: 'none',
-                    borderRadius: 1,
-                    cursor: 'pointer',
-                    flexShrink: 0,
+                    '&:before': { display: 'none' },
+                    boxShadow: 'none',
+                    border: `1px solid ${theme.palette.divider}`,
                   }}
-                />
-              </Box>
-            )}
-                </Box>
-              </AccordionDetails>
-            </Accordion>
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                      {t('richTextEditor.imageAdvancedOptions')}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                      {/* Width Selection and Aspect Ratio */}
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <FormControl fullWidth>
+                          <InputLabel>{t('richTextEditor.imageWidth')}</InputLabel>
+                          <Select
+                            value={imageWidth}
+                            label={t('richTextEditor.imageWidth')}
+                            onChange={(e) => setImageWidth(e.target.value as any)}
+                          >
+                            <MenuItem value="original">{t('richTextEditor.imageWidthOriginal')}</MenuItem>
+                            <MenuItem value="25">{t('richTextEditor.imageWidth25')}</MenuItem>
+                            <MenuItem value="50">{t('richTextEditor.imageWidth50')}</MenuItem>
+                            <MenuItem value="75">{t('richTextEditor.imageWidth75')}</MenuItem>
+                            <MenuItem value="100">{t('richTextEditor.imageWidth100')}</MenuItem>
+                            <MenuItem value="custom">{t('richTextEditor.imageWidthCustom')}</MenuItem>
+                          </Select>
+                        </FormControl>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={imageAspectRatio}
+                              onChange={(e) => setImageAspectRatio(e.target.checked)}
+                            />
+                          }
+                          label={t('richTextEditor.imageAspectRatio')}
+                          sx={{ whiteSpace: 'nowrap' }}
+                        />
+                      </Box>
+
+                      {/* Custom Width Input */}
+                      {imageWidth === 'custom' && (
+                        <TextField
+                          label={t('richTextEditor.imageWidthCustom')}
+                          placeholder={t('richTextEditor.imageWidthCustomPlaceholder')}
+                          value={imageCustomWidth}
+                          onChange={(e) => setImageCustomWidth(e.target.value.replace(/[^0-9]/g, ''))}
+                          fullWidth
+                          helperText={t('richTextEditor.imageWidthCustomHelp')}
+                          type="number"
+                        />
+                      )}
+
+                      {/* Alignment */}
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">{t('richTextEditor.imageAlign')}</FormLabel>
+                        <RadioGroup
+                          row
+                          value={imageAlign}
+                          onChange={(e) => setImageAlign(e.target.value as any)}
+                        >
+                          <FormControlLabel
+                            value="left"
+                            control={<Radio />}
+                            label={t('richTextEditor.imageAlignLeft')}
+                          />
+                          <FormControlLabel
+                            value="center"
+                            control={<Radio />}
+                            label={t('richTextEditor.imageAlignCenter')}
+                          />
+                          <FormControlLabel
+                            value="right"
+                            control={<Radio />}
+                            label={t('richTextEditor.imageAlignRight')}
+                          />
+                        </RadioGroup>
+                      </FormControl>
+
+                      {/* Border Selection and Color - One Line */}
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                        <FormControl sx={{ flex: 1 }}>
+                          <InputLabel>{t('richTextEditor.imageBorder')}</InputLabel>
+                          <Select
+                            value={imageBorder}
+                            label={t('richTextEditor.imageBorder')}
+                            onChange={(e) => setImageBorder(e.target.value as any)}
+                          >
+                            <MenuItem value="none">{t('richTextEditor.imageBorderNone')}</MenuItem>
+                            <MenuItem value="thin">{t('richTextEditor.imageBorderThin')}</MenuItem>
+                            <MenuItem value="medium">{t('richTextEditor.imageBorderMedium')}</MenuItem>
+                            <MenuItem value="thick">{t('richTextEditor.imageBorderThick')}</MenuItem>
+                          </Select>
+                        </FormControl>
+
+                        {/* Border Color (conditional, same line) */}
+                        {imageBorder !== 'none' && (
+                          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flex: 1 }}>
+                            <TextField
+                              label={t('richTextEditor.imageBorderColor')}
+                              value={imageBorderColor}
+                              onChange={(e) => setImageBorderColor(e.target.value)}
+                              fullWidth
+                              placeholder="#cccccc"
+                            />
+                            <Box
+                              component="input"
+                              type="color"
+                              value={imageBorderColor}
+                              onChange={(e) => setImageBorderColor((e.target as HTMLInputElement).value)}
+                              sx={{
+                                width: 60,
+                                height: 40,
+                                border: 'none',
+                                borderRadius: 1,
+                                cursor: 'pointer',
+                                flexShrink: 0,
+                              }}
+                            />
+                          </Box>
+                        )}
+                      </Box>
+
+                      {/* Border Radius - One Line with Custom Input */}
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                        <FormControl sx={{ flex: 1 }}>
+                          <InputLabel>{t('richTextEditor.imageBorderRadius')}</InputLabel>
+                          <Select
+                            value={imageBorderRadius}
+                            label={t('richTextEditor.imageBorderRadius')}
+                            onChange={(e) => setImageBorderRadius(e.target.value as any)}
+                          >
+                            <MenuItem value="none">{t('richTextEditor.imageBorderRadiusNone')}</MenuItem>
+                            <MenuItem value="small">{t('richTextEditor.imageBorderRadiusSmall')}</MenuItem>
+                            <MenuItem value="medium">{t('richTextEditor.imageBorderRadiusMedium')}</MenuItem>
+                            <MenuItem value="large">{t('richTextEditor.imageBorderRadiusLarge')}</MenuItem>
+                            <MenuItem value="custom">{t('richTextEditor.imageBorderRadiusCustom')}</MenuItem>
+                          </Select>
+                        </FormControl>
+
+                        {/* Custom Border Radius Input (conditional, same line) */}
+                        {imageBorderRadius === 'custom' && (
+                          <TextField
+                            label={t('richTextEditor.imageCustomBorderRadius')}
+                            type="number"
+                            value={imageCustomBorderRadius}
+                            onChange={(e) => setImageCustomBorderRadius(e.target.value)}
+                            sx={{ flex: 1 }}
+                            placeholder="8"
+                            inputProps={{ min: 0 }}
+                          />
+                        )}
+                      </Box>
+
+                      {/* Shadow Selection and Direction - One Line */}
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                        <FormControl sx={{ flex: 1 }}>
+                          <InputLabel>{t('richTextEditor.imageShadow')}</InputLabel>
+                          <Select
+                            value={imageShadow}
+                            label={t('richTextEditor.imageShadow')}
+                            onChange={(e) => setImageShadow(e.target.value as any)}
+                          >
+                            <MenuItem value="none">{t('richTextEditor.imageShadowNone')}</MenuItem>
+                            <MenuItem value="small">{t('richTextEditor.imageShadowSmall')}</MenuItem>
+                            <MenuItem value="medium">{t('richTextEditor.imageShadowMedium')}</MenuItem>
+                            <MenuItem value="large">{t('richTextEditor.imageShadowLarge')}</MenuItem>
+                          </Select>
+                        </FormControl>
+
+                        {/* Shadow Direction (conditional, same line) */}
+                        {imageShadow !== 'none' && (
+                          <FormControl sx={{ flex: 1 }}>
+                            <InputLabel>{t('richTextEditor.imageShadowDirection')}</InputLabel>
+                            <Select
+                              value={imageShadowDirection}
+                              label={t('richTextEditor.imageShadowDirection')}
+                              onChange={(e) => setImageShadowDirection(e.target.value as any)}
+                            >
+                              <MenuItem value="all">{t('richTextEditor.imageShadowDirectionAll')}</MenuItem>
+                              <MenuItem value="top">{t('richTextEditor.imageShadowDirectionTop')}</MenuItem>
+                              <MenuItem value="bottom">{t('richTextEditor.imageShadowDirectionBottom')}</MenuItem>
+                              <MenuItem value="left">{t('richTextEditor.imageShadowDirectionLeft')}</MenuItem>
+                              <MenuItem value="right">{t('richTextEditor.imageShadowDirectionRight')}</MenuItem>
+                            </Select>
+                          </FormControl>
+                        )}
+                      </Box>
+
+                      {/* Shadow Color (conditional, separate line) */}
+                      {imageShadow !== 'none' && (
+                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                          <TextField
+                            label={t('richTextEditor.imageShadowColor')}
+                            value={imageShadowColor}
+                            onChange={(e) => setImageShadowColor(e.target.value)}
+                            fullWidth
+                            placeholder="rgba(0, 0, 0, 0.3)"
+                          />
+                          <Box
+                            component="input"
+                            type="color"
+                            value={imageShadowColor.startsWith('rgba') || imageShadowColor.startsWith('rgb') ? '#000000' : imageShadowColor}
+                            onChange={(e) => setImageShadowColor((e.target as HTMLInputElement).value)}
+                            sx={{
+                              width: 60,
+                              height: 40,
+                              border: 'none',
+                              borderRadius: 1,
+                              cursor: 'pointer',
+                              flexShrink: 0,
+                            }}
+                          />
+                        </Box>
+                      )}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
               </Box>
             </Box>
 
@@ -1934,9 +1976,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                           })() : 'none',
                           borderRadius: imageBorderRadius !== 'none' ?
                             imageBorderRadius === 'small' ? '4px' :
-                            imageBorderRadius === 'medium' ? '8px' :
-                            imageBorderRadius === 'large' ? '16px' :
-                            imageBorderRadius === 'custom' && imageCustomBorderRadius ? `${imageCustomBorderRadius}px` : '0' : '0',
+                              imageBorderRadius === 'medium' ? '8px' :
+                                imageBorderRadius === 'large' ? '16px' :
+                                  imageBorderRadius === 'custom' && imageCustomBorderRadius ? `${imageCustomBorderRadius}px` : '0' : '0',
                         }}
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
@@ -2009,120 +2051,120 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             {/* Left Panel: Settings */}
             <Box sx={{ width: '50%', height: '100%', overflow: 'auto', p: 3, borderRight: (theme) => `1px solid ${theme.palette.divider}` }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {/* Video URL */}
-            <TextField
-              autoFocus
-              label={t('richTextEditor.videoUrl')}
-              value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
-              fullWidth
-              placeholder="https://www.youtube.com/watch?v=... / https://www.bilibili.com/video/BV... / https://www.tiktok.com/@user/video/..."
-              helperText={t('richTextEditor.videoUrlHelp')}
-            />
-
-            {/* Width */}
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-              <FormControl sx={{ flex: 1 }}>
-                <InputLabel>{t('richTextEditor.videoWidth')}</InputLabel>
-                <Select
-                  value={videoWidth}
-                  label={t('richTextEditor.videoWidth')}
-                  onChange={(e) => setVideoWidth(e.target.value as any)}
-                >
-                  <MenuItem value="25">25%</MenuItem>
-                  <MenuItem value="50">50%</MenuItem>
-                  <MenuItem value="75">75%</MenuItem>
-                  <MenuItem value="100">100%</MenuItem>
-                  <MenuItem value="custom">{t('richTextEditor.videoWidthCustom')}</MenuItem>
-                </Select>
-              </FormControl>
-
-              {/* Custom Width (conditional) */}
-              {videoWidth === 'custom' && (
+                {/* Video URL */}
                 <TextField
-                  label={t('richTextEditor.videoWidthPixels')}
-                  value={videoCustomWidth}
-                  onChange={(e) => setVideoCustomWidth(e.target.value.replace(/\D/g, ''))}
-                  placeholder="640"
-                  sx={{ flex: 1 }}
-                  type="number"
+                  autoFocus
+                  label={t('richTextEditor.videoUrl')}
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  fullWidth
+                  placeholder="https://www.youtube.com/watch?v=... / https://www.bilibili.com/video/BV... / https://www.tiktok.com/@user/video/..."
+                  helperText={t('richTextEditor.videoUrlHelp')}
                 />
-              )}
-            </Box>
 
-            {/* Alignment */}
-            <FormControl>
-              <FormLabel>{t('richTextEditor.videoAlign')}</FormLabel>
-              <RadioGroup
-                row
-                value={videoAlign}
-                onChange={(e) => setVideoAlign(e.target.value as any)}
-              >
-                <FormControlLabel
-                  value="left"
-                  control={<Radio />}
-                  label={t('richTextEditor.videoAlignLeft')}
-                />
-                <FormControlLabel
-                  value="center"
-                  control={<Radio />}
-                  label={t('richTextEditor.videoAlignCenter')}
-                />
-                <FormControlLabel
-                  value="right"
-                  control={<Radio />}
-                  label={t('richTextEditor.videoAlignRight')}
-                />
-              </RadioGroup>
-            </FormControl>
+                {/* Width */}
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                  <FormControl sx={{ flex: 1 }}>
+                    <InputLabel>{t('richTextEditor.videoWidth')}</InputLabel>
+                    <Select
+                      value={videoWidth}
+                      label={t('richTextEditor.videoWidth')}
+                      onChange={(e) => setVideoWidth(e.target.value as any)}
+                    >
+                      <MenuItem value="25">25%</MenuItem>
+                      <MenuItem value="50">50%</MenuItem>
+                      <MenuItem value="75">75%</MenuItem>
+                      <MenuItem value="100">100%</MenuItem>
+                      <MenuItem value="custom">{t('richTextEditor.videoWidthCustom')}</MenuItem>
+                    </Select>
+                  </FormControl>
 
-            {/* Autoplay */}
-            <FormControl>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={videoAutoplay}
-                    onChange={(e) => setVideoAutoplay(e.target.checked)}
+                  {/* Custom Width (conditional) */}
+                  {videoWidth === 'custom' && (
+                    <TextField
+                      label={t('richTextEditor.videoWidthPixels')}
+                      value={videoCustomWidth}
+                      onChange={(e) => setVideoCustomWidth(e.target.value.replace(/\D/g, ''))}
+                      placeholder="640"
+                      sx={{ flex: 1 }}
+                      type="number"
+                    />
+                  )}
+                </Box>
+
+                {/* Alignment */}
+                <FormControl>
+                  <FormLabel>{t('richTextEditor.videoAlign')}</FormLabel>
+                  <RadioGroup
+                    row
+                    value={videoAlign}
+                    onChange={(e) => setVideoAlign(e.target.value as any)}
+                  >
+                    <FormControlLabel
+                      value="left"
+                      control={<Radio />}
+                      label={t('richTextEditor.videoAlignLeft')}
+                    />
+                    <FormControlLabel
+                      value="center"
+                      control={<Radio />}
+                      label={t('richTextEditor.videoAlignCenter')}
+                    />
+                    <FormControlLabel
+                      value="right"
+                      control={<Radio />}
+                      label={t('richTextEditor.videoAlignRight')}
+                    />
+                  </RadioGroup>
+                </FormControl>
+
+                {/* Autoplay */}
+                <FormControl>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={videoAutoplay}
+                        onChange={(e) => setVideoAutoplay(e.target.checked)}
+                      />
+                    }
+                    label={t('richTextEditor.videoAutoplay')}
                   />
-                }
-                label={t('richTextEditor.videoAutoplay')}
-              />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
-                {t('richTextEditor.videoAutoplayHelp')}
-              </Typography>
-            </FormControl>
+                  <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
+                    {t('richTextEditor.videoAutoplayHelp')}
+                  </Typography>
+                </FormControl>
 
-            {/* Muted */}
-            <FormControl>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={videoMuted}
-                    onChange={(e) => setVideoMuted(e.target.checked)}
+                {/* Muted */}
+                <FormControl>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={videoMuted}
+                        onChange={(e) => setVideoMuted(e.target.checked)}
+                      />
+                    }
+                    label={t('richTextEditor.videoMuted')}
                   />
-                }
-                label={t('richTextEditor.videoMuted')}
-              />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
-                {t('richTextEditor.videoMutedHelp')}
-              </Typography>
-            </FormControl>
+                  <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
+                    {t('richTextEditor.videoMutedHelp')}
+                  </Typography>
+                </FormControl>
 
-            {/* Loop */}
-            <FormControl>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={videoLoop}
-                    onChange={(e) => setVideoLoop(e.target.checked)}
+                {/* Loop */}
+                <FormControl>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={videoLoop}
+                        onChange={(e) => setVideoLoop(e.target.checked)}
+                      />
+                    }
+                    label={t('richTextEditor.videoLoop')}
                   />
-                }
-                label={t('richTextEditor.videoLoop')}
-              />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
-                {t('richTextEditor.videoLoopHelp')}
-              </Typography>
-            </FormControl>
+                  <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
+                    {t('richTextEditor.videoLoopHelp')}
+                  </Typography>
+                </FormControl>
               </Box>
             </Box>
 
@@ -2238,7 +2280,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Box >
   );
 };
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +12,8 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -21,6 +23,18 @@
       font-family: 'Noto Sans KR', Arial, sans-serif;
       background: #E8DDD0;
       color: #3D3228;
+    }
+
+    /* Chinese fonts for zh-CN locale */
+    html[lang="zh"],
+    html[lang="zh-CN"],
+    html[lang="zh-Hans"] {
+
+      body,
+      .content-text,
+      .notice-item-title {
+        font-family: "Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "思源黑体", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      }
     }
 
     .container {
@@ -251,15 +265,20 @@
       padding: 0;
     }
 
-    .content-text h1, .content-text h2, .content-text h3,
-    .content-text h4, .content-text h5, .content-text h6 {
+    .content-text h1,
+    .content-text h2,
+    .content-text h3,
+    .content-text h4,
+    .content-text h5,
+    .content-text h6 {
       color: #3D3228;
       font-weight: 700;
       margin-top: 1.2em;
       margin-bottom: 0.5em;
     }
 
-    .content-text ul, .content-text ol {
+    .content-text ul,
+    .content-text ol {
       padding-left: 2.5em;
       margin: 0.75em 0;
     }
@@ -279,7 +298,9 @@
       display: block;
     }
 
-    .loading, .error, .empty {
+    .loading,
+    .error,
+    .empty {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -379,6 +400,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="sidebar" id="sidebar">
@@ -395,13 +417,20 @@
     const NOTICES_ENDPOINT_BASE = '/public';
     const READ_NOTICES_KEY = 'serviceNotices_readStatus';
 
+    // Detect language from URL parameter and set html lang attribute
+    (function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const lang = urlParams.get('lang') || urlParams.get('language') || 'ko';
+      document.documentElement.lang = lang;
+    })();
+
     // State
     let notices = [];
     let selectedNotice = null;
     let readNotices = new Set();
 
     // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       loadReadNotices();
       loadNotices();
       initializeTouchScroll();
@@ -414,20 +443,20 @@
       let startY = 0;
       let scrollTop = 0;
 
-      sidebar.addEventListener('touchstart', function(e) {
+      sidebar.addEventListener('touchstart', function (e) {
         isScrolling = true;
         startY = e.touches[0].clientY;
         scrollTop = sidebar.scrollTop;
       }, false);
 
-      sidebar.addEventListener('touchmove', function(e) {
+      sidebar.addEventListener('touchmove', function (e) {
         if (!isScrolling) return;
         const currentY = e.touches[0].clientY;
         const diff = startY - currentY;
         sidebar.scrollTop = scrollTop + diff;
       }, false);
 
-      sidebar.addEventListener('touchend', function(e) {
+      sidebar.addEventListener('touchend', function (e) {
         isScrolling = false;
       }, false);
     }
@@ -532,16 +561,16 @@
       }
 
       fetch(apiUrl + queryString)
-        .then(function(response) {
+        .then(function (response) {
           if (!response.ok) {
             throw new Error('Failed to load notices');
           }
           return response.json();
         })
-        .then(function(data) {
+        .then(function (data) {
           // API response structure: { success: true, data: { notices: [...], total: ... } }
           const noticeList = data.data && data.data.notices ? data.data.notices : [];
-          notices = noticeList.filter(function(notice) {
+          notices = noticeList.filter(function (notice) {
             const now = new Date();
             const startDate = notice.startDate ? new Date(notice.startDate) : null;
             const endDate = notice.endDate ? new Date(notice.endDate) : null;
@@ -557,7 +586,7 @@
             document.getElementById('content').innerHTML = '<div class="empty">No active notices</div>';
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.error('Error loading notices:', error);
           sidebar.innerHTML = '<div class="error">Failed to load notices</div>';
         });
@@ -589,7 +618,7 @@
       }
 
       let html = '';
-      noticeList.forEach(function(notice) {
+      noticeList.forEach(function (notice) {
         const isRead = readNotices.has(notice.id);
         const categoryIcon = getCategoryIcon(notice.category);
         const unreadIcon = getUnreadIcon();
@@ -610,7 +639,7 @@
 
     // Select notice by ID
     function selectNoticeById(noticeId) {
-      const notice = notices.find(function(n) { return n.id === noticeId; });
+      const notice = notices.find(function (n) { return n.id === noticeId; });
       if (notice) {
         selectNotice(notice);
       }
@@ -633,7 +662,7 @@
       }
 
       // Update active state
-      document.querySelectorAll('.notice-item').forEach(function(item) {
+      document.querySelectorAll('.notice-item').forEach(function (item) {
         item.classList.remove('active');
       });
 
@@ -682,9 +711,9 @@
         '"': '&quot;',
         "'": '&#039;'
       };
-      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+      return text.replace(/[&<>"']/g, function (m) { return map[m]; });
     }
   </script>
 </body>
-</html>
 
+</html>

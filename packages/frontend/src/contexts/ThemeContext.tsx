@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { createTheme, Theme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
 import { ThemeMode } from '@/types';
 
 interface ThemeContextType {
@@ -13,7 +14,12 @@ interface ThemeContextType {
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Theme configurations
-const getTheme = (mode: 'light' | 'dark'): Theme => {
+const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
+  const isChinese = language.startsWith('zh');
+  const fontFamily = isChinese
+    ? '"Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "思源黑体", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Roboto", "Helvetica", "Arial", sans-serif'
+    : '"Roboto", "Helvetica", "Arial", sans-serif';
+
   return createTheme({
     palette: {
       mode,
@@ -47,7 +53,7 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
       tooltip: 1600,
     },
     typography: {
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontFamily,
       h1: {
         fontSize: '2.5rem',
         fontWeight: 500,
@@ -77,8 +83,8 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
       MuiAppBar: {
         styleOverrides: {
           root: {
-            boxShadow: mode === 'dark' 
-              ? '0px 2px 4px rgba(0, 0, 0, 0.3)' 
+            boxShadow: mode === 'dark'
+              ? '0px 2px 4px rgba(0, 0, 0, 0.3)'
               : '0px 2px 4px rgba(0, 0, 0, 0.1)',
           },
         },
@@ -293,12 +299,13 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [mode, setMode] = useState<ThemeMode>(getStoredTheme);
   const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(getSystemTheme);
+  const { i18n } = useTranslation();
 
   // Listen for system theme changes
   useEffect(() => {
     if (typeof window !== 'undefined' && window.matchMedia) {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      
+
       const handleChange = (e: MediaQueryListEvent) => {
         setSystemTheme(e.matches ? 'dark' : 'light');
       };
@@ -310,7 +317,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   // Determine actual theme based on mode
   const actualTheme = mode === 'auto' ? systemTheme : mode;
-  const theme = getTheme(actualTheme);
+  const theme = React.useMemo(() => getTheme(actualTheme, i18n.language), [actualTheme, i18n.language]);
   const isDark = actualTheme === 'dark';
 
   // Set data-theme attribute on document root for CSS selectors
