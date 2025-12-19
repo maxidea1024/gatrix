@@ -5,12 +5,14 @@ import {
   UpdateGameWorldData,
   GameWorldListParams
 } from '../models/GameWorld';
+import { Environment } from '../models/Environment';
 import { GatrixError } from '../middleware/errorHandler';
 import {
   ENV_SCOPED,
   withCurrentEnvironment,
   allEnvironmentsPattern
 } from '../constants/cacheKeys';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 import { createLogger } from '../config/logger';
 import { pubSubService } from './PubSubService';
 
@@ -83,6 +85,26 @@ export class GameWorldService {
     }
   }
 
+  /**
+   * Helper to resolve environment name from ID (which might be ULID or composite string)
+   */
+  private static async resolveEnvironmentName(envId: string): Promise<string> {
+    if (!envId) return '';
+
+    try {
+      // Try to get from Environment model first
+      const env = await Environment.query().findById(envId);
+      if (env) {
+        return env.environmentName;
+      }
+      // Fallback: assume format {name}.{ulid} or just use as is if split fails
+      return envId.split('.')[0];
+    } catch (error) {
+      // Fallback on error
+      return envId.split('.')[0];
+    }
+  }
+
   static async createGameWorld(worldData: CreateGameWorldData): Promise<GameWorld> {
     try {
       const normalized: CreateGameWorldData = {
@@ -101,13 +123,17 @@ export class GameWorldService {
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
 
+      // Resolve environment name before publishing
+      const envName = await this.resolveEnvironmentName(result.environmentId);
+
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
         type: 'gameworld.created',
         data: {
           id: result.id,
           timestamp: Date.now(),
-          isVisible: result.isVisible
+          isVisible: result.isVisible,
+          environment: envName
         },
       });
 
@@ -146,13 +172,17 @@ export class GameWorldService {
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
 
+      // Resolve environment name before publishing
+      const envName = await this.resolveEnvironmentName(updatedWorld.environmentId);
+
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
         type: 'gameworld.updated',
         data: {
           id: updatedWorld.id,
           timestamp: Date.now(),
-          isVisible: updatedWorld.isVisible
+          isVisible: updatedWorld.isVisible,
+          environment: envName
         },
       });
 
@@ -183,10 +213,17 @@ export class GameWorldService {
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
 
+      // Resolve environment name before publishing
+      const envName = await this.resolveEnvironmentName(existingWorld.environmentId);
+
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
         type: 'gameworld.deleted',
-        data: { id, timestamp: Date.now() },
+        data: {
+          id,
+          timestamp: Date.now(),
+          environment: envName
+        },
       });
     } catch (error) {
       if (error instanceof GatrixError) {
@@ -224,13 +261,17 @@ export class GameWorldService {
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
       logger.info('Cache invalidation completed');
 
+      // Resolve environment name before publishing
+      const envName = await this.resolveEnvironmentName(updatedWorld.environmentId);
+
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
         type: 'gameworld.updated',
         data: {
           id: updatedWorld.id,
           timestamp: Date.now(),
-          isVisible: updatedWorld.isVisible
+          isVisible: updatedWorld.isVisible,
+          environment: envName
         },
       });
 
@@ -263,10 +304,17 @@ export class GameWorldService {
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
 
+      // Resolve environment name before publishing
+      const envName = await this.resolveEnvironmentName(updatedWorld.environmentId);
+
       // Publish event for SDK real-time updates
       await pubSubService.publishSDKEvent({
         type: 'gameworld.updated',
-        data: { id: updatedWorld.id, timestamp: Date.now() },
+        data: {
+          id: updatedWorld.id,
+          timestamp: Date.now(),
+          environment: envName
+        },
       });
 
       return updatedWorld;
@@ -283,10 +331,14 @@ export class GameWorldService {
     try {
       await GameWorldModel.updateDisplayOrders(orderUpdates);
 
+      const currentEnvId = getCurrentEnvironmentId();
       // Invalidate all game worlds cache (both public and admin, environment-scoped)
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.PUBLIC));
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.GAME_WORLDS.ADMIN));
       await pubSubService.invalidateKey(withCurrentEnvironment(ENV_SCOPED.SDK_ETAG.GAME_WORLDS));
+
+      // Resolve environment name before publishing
+      const envName = await this.resolveEnvironmentName(currentEnvId);
 
       // Publish event for SDK to clear entire game worlds cache
       await pubSubService.publishSDKEvent({
@@ -294,6 +346,7 @@ export class GameWorldService {
         data: {
           id: 0, // Dummy id for order_changed event
           timestamp: Date.now(),
+          environment: envName
         },
       });
     } catch (error) {

@@ -21,8 +21,8 @@ internalApp.use((req: Request, res: Response, next: NextFunction) => {
     next();
 });
 
-// Mount internal routes at root (since this is a dedicated server)
-internalApp.use('/', internalRoutes);
+// Mount internal routes at /internal
+internalApp.use('/internal', internalRoutes);
 
 // 404 handler
 internalApp.use((req: Request, res: Response) => {

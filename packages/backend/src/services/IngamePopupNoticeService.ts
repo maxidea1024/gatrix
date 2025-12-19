@@ -2,6 +2,8 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import database from '../config/database';
 import { convertFromMySQLDateTime, convertToMySQLDateTime } from '../utils/dateUtils';
 import { getCurrentEnvironmentId } from '../utils/environmentContext';
+import { pubSubService } from './PubSubService';
+import { Environment } from '../models/Environment';
 
 export interface IngamePopupNotice {
   id: number;
@@ -55,7 +57,7 @@ export interface CreateIngamePopupNoticeData {
   endDate?: string | null;
 }
 
-export interface UpdateIngamePopupNoticeData extends Partial<CreateIngamePopupNoticeData> {}
+export interface UpdateIngamePopupNoticeData extends Partial<CreateIngamePopupNoticeData> { }
 
 export interface IngamePopupNoticeFilters {
   isActive?: boolean;
@@ -71,6 +73,26 @@ export interface IngamePopupNoticeFilters {
 }
 
 class IngamePopupNoticeService {
+  /**
+   * Helper to resolve environment name from ID (which might be ULID or composite string)
+   */
+  private async resolveEnvironmentName(envId: string): Promise<string> {
+    if (!envId) return '';
+
+    try {
+      // Try to get from Environment model first
+      const env = await Environment.query().findById(envId);
+      if (env) {
+        return env.environmentName;
+      }
+      // Fallback: assume format {name}.{ulid} or just use as is if split fails
+      return envId.split('.')[0];
+    } catch (error) {
+      // Fallback on error
+      return envId.split('.')[0];
+    }
+  }
+
   /**
    * Get ingame popup notices with pagination and filters
    */
@@ -233,6 +255,20 @@ class IngamePopupNoticeService {
       throw new Error('Failed to create ingame popup notice');
     }
 
+    // Resolve environment name before publishing
+    const envName = await this.resolveEnvironmentName(envId);
+
+    // Publish SDK event
+    await pubSubService.publishSDKEvent({
+      type: 'popup.created',
+      data: {
+        id: notice.id,
+        timestamp: Date.now(),
+        isVisible: notice.isActive,
+        environment: envName
+      }
+    });
+
     return notice;
   }
 
@@ -341,6 +377,20 @@ class IngamePopupNoticeService {
       throw new Error('Ingame popup notice not found');
     }
 
+    // Resolve environment name before publishing
+    const envName = await this.resolveEnvironmentName(envId);
+
+    // Publish SDK event
+    await pubSubService.publishSDKEvent({
+      type: 'popup.updated',
+      data: {
+        id: notice.id,
+        timestamp: Date.now(),
+        isVisible: notice.isActive,
+        environment: envName
+      }
+    });
+
     return notice;
   }
 
@@ -350,7 +400,21 @@ class IngamePopupNoticeService {
   async deleteIngamePopupNotice(id: number, environmentId?: string): Promise<void> {
     const pool = database.getPool();
     const envId = environmentId ?? getCurrentEnvironmentId();
+
+    // Resolve environment name before deleting (need it for event)
+    const envName = await this.resolveEnvironmentName(envId);
+
     await pool.execute('DELETE FROM g_ingame_popup_notices WHERE id = ? AND environmentId = ?', [id, envId]);
+
+    // Publish SDK event
+    await pubSubService.publishSDKEvent({
+      type: 'popup.deleted',
+      data: {
+        id,
+        timestamp: Date.now(),
+        environment: envName
+      }
+    });
   }
 
   /**
@@ -360,10 +424,26 @@ class IngamePopupNoticeService {
     const pool = database.getPool();
     const envId = environmentId ?? getCurrentEnvironmentId();
     const placeholders = ids.map(() => '?').join(',');
+
+    // Resolve environment name before deleting
+    const envName = await this.resolveEnvironmentName(envId);
+
     await pool.execute(
       `DELETE FROM g_ingame_popup_notices WHERE id IN (${placeholders}) AND environmentId = ?`,
       [...ids, envId]
     );
+
+    // Publish SDK events for each deleted notice
+    for (const id of ids) {
+      await pubSubService.publishSDKEvent({
+        type: 'popup.deleted',
+        data: {
+          id,
+          timestamp: Date.now(),
+          environment: envName
+        }
+      });
+    }
   }
 
   /**
@@ -382,14 +462,17 @@ class IngamePopupNoticeService {
       throw new Error('Ingame popup notice not found');
     }
 
+    // Resolve environment name before publishing
+    const envName = await this.resolveEnvironmentName(envId);
+
     // Publish SDK event for toggle
-    const { pubSubService } = await import('./PubSubService');
     await pubSubService.publishSDKEvent({
       type: 'popup.updated',
       data: {
         id: notice.id,
         timestamp: Date.now(),
         isVisible: notice.isActive,
+        environment: envName
       }
     });
 
@@ -539,4 +622,3 @@ class IngamePopupNoticeService {
 }
 
 export default new IngamePopupNoticeService();
-

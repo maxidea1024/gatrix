@@ -6,8 +6,10 @@ import {
   IpWhitelistFilters,
   IpWhitelistListResponse
 } from '../models/IpWhitelist';
+import { Environment } from '../models/Environment';
 import { GatrixError } from '../middleware/errorHandler';
 import { normalizeIPOrCIDR, isValidIPOrCIDR } from '../utils/ipValidation';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
@@ -40,6 +42,26 @@ function ipMatchesCIDR(ip: string, cidr: string): boolean {
 }
 
 export class IpWhitelistService {
+  /**
+   * Helper to resolve environment name from ID (which might be ULID or composite string)
+   */
+  private static async resolveEnvironmentName(envId: string): Promise<string> {
+    if (!envId) return '';
+
+    try {
+      // Try to get from Environment model first
+      const env = await Environment.query().findById(envId);
+      if (env) {
+        return env.environmentName;
+      }
+      // Fallback: assume format {name}.{ulid} or just use as is if split fails
+      return envId.split('.')[0];
+    } catch (error) {
+      // Fallback on error
+      return envId.split('.')[0];
+    }
+  }
+
   /**
    * Get all IP whitelist entries with pagination and filtering
    */
@@ -132,9 +154,16 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
+        const envId = getCurrentEnvironmentId();
+        const envName = await this.resolveEnvironmentName(envId);
+
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
-          data: { id: created.id, timestamp: Date.now() },
+          data: {
+            id: created.id,
+            timestamp: Date.now(),
+            environment: envName
+          },
         });
 
         await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
@@ -209,9 +238,16 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
+        const envId = getCurrentEnvironmentId();
+        const envName = await this.resolveEnvironmentName(envId);
+
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
-          data: { id: updated.id, timestamp: Date.now() },
+          data: {
+            id: updated.id,
+            timestamp: Date.now(),
+            environment: envName
+          },
         });
 
         await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
@@ -251,9 +287,16 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
+        const envId = getCurrentEnvironmentId();
+        const envName = await this.resolveEnvironmentName(envId);
+
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
-          data: { id, timestamp: Date.now() },
+          data: {
+            id,
+            timestamp: Date.now(),
+            environment: envName
+          },
         });
 
         await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
@@ -294,9 +337,16 @@ export class IpWhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
+        const envId = getCurrentEnvironmentId();
+        const envName = await this.resolveEnvironmentName(envId);
+
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
-          data: { id: updated.id, timestamp: Date.now() },
+          data: {
+            id: updated.id,
+            timestamp: Date.now(),
+            environment: envName
+          },
         });
 
         await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);

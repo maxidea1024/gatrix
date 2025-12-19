@@ -473,6 +473,7 @@ services:
       EDGE_CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
     ports:
       - "0.0.0.0:${EDGE_PORT:-3400}:3400"
+      - "0.0.0.0:${EDGE_INTERNAL_PORT:-3410}:3410" # Internal port (default: 3410)
       # Note: Metrics port (9400) is NOT exposed externally for security
     depends_on:
       backend-dev:

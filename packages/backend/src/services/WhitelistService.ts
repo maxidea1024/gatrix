@@ -1,5 +1,7 @@
 import { WhitelistModel, Whitelist, CreateWhitelistData, UpdateWhitelistData, WhitelistFilters, WhitelistListResponse } from '../models/AccountWhitelist';
+import { Environment } from '../models/Environment';
 import { GatrixError } from '../middleware/errorHandler';
+import { getCurrentEnvironmentId } from '../utils/environmentContext';
 import logger from '../config/logger';
 import { pubSubService } from './PubSubService';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
@@ -13,6 +15,26 @@ export interface BulkCreateEntry {
 }
 
 export class WhitelistService {
+  /**
+   * Helper to resolve environment name from ID (which might be ULID or composite string)
+   */
+  private static async resolveEnvironmentName(envId: string): Promise<string> {
+    if (!envId) return '';
+
+    try {
+      // Try to get from Environment model first
+      const env = await Environment.query().findById(envId);
+      if (env) {
+        return env.environmentName;
+      }
+      // Fallback: assume format {name}.{ulid} or just use as is if split fails
+      return envId.split('.')[0];
+    } catch (error) {
+      // Fallback on error
+      return envId.split('.')[0];
+    }
+  }
+
   static async getAllWhitelists(
     filters: WhitelistFilters = {},
     pagination: { page?: number; limit?: number } = {}
@@ -64,9 +86,16 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
+        const envId = getCurrentEnvironmentId();
+        const envName = await this.resolveEnvironmentName(envId);
+
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
-          data: { id: whitelist.id, timestamp: Date.now() },
+          data: {
+            id: whitelist.id,
+            timestamp: Date.now(),
+            environment: envName
+          },
         });
 
         await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
@@ -113,9 +142,16 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
+        const envId = getCurrentEnvironmentId();
+        const envName = await this.resolveEnvironmentName(envId);
+
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
-          data: { id: updated.id, timestamp: Date.now() },
+          data: {
+            id: updated.id,
+            timestamp: Date.now(),
+            environment: envName
+          },
         });
 
         await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
@@ -154,9 +190,16 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
+        const envId = getCurrentEnvironmentId();
+        const envName = await this.resolveEnvironmentName(envId);
+
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
-          data: { id, timestamp: Date.now() },
+          data: {
+            id,
+            timestamp: Date.now(),
+            environment: envName
+          },
         });
 
         await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
@@ -214,6 +257,19 @@ export class WhitelistService {
       });
 
       try {
+        const envId = getCurrentEnvironmentId();
+        const envName = await this.resolveEnvironmentName(envId);
+
+        // Publish event for SDK update (using 0 as ID to signify bulk change)
+        await pubSubService.publishSDKEvent({
+          type: 'whitelist.updated',
+          data: {
+            id: 0,
+            timestamp: Date.now(),
+            environment: envName
+          },
+        });
+
         await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
       } catch (eventError) {
         logger.warn('Failed to invalidate whitelist ETag cache after bulk create:', eventError);
@@ -257,9 +313,16 @@ export class WhitelistService {
 
       // Publish whitelist.updated event for SDK real-time updates
       try {
+        const envId = getCurrentEnvironmentId();
+        const envName = await this.resolveEnvironmentName(envId);
+
         await pubSubService.publishSDKEvent({
           type: 'whitelist.updated',
-          data: { id: updated.id, timestamp: Date.now() },
+          data: {
+            id: updated.id,
+            timestamp: Date.now(),
+            environment: envName
+          },
         });
 
         await pubSubService.invalidateKey(SERVER_SDK_ETAG.WHITELISTS);
