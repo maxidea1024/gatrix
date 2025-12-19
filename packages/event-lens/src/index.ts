@@ -69,6 +69,12 @@ async function start() {
           serviceNotice: false,
           banner: false,
         },
+        metrics: {
+          enabled: true,
+          serverEnabled: true,
+          port: parseInt(process.env.METRICS_PORT || '9400', 10),
+          userMetricsEnabled: true,
+        },
       });
 
       await gatrixSdk.initialize();
@@ -81,7 +87,7 @@ async function start() {
         },
         ports: {
           internalApi: config.port,
-          metricsApi: config.port,
+          metricsApi: parseInt(process.env.METRICS_PORT || '9400', 10),
         },
         status: 'ready',
         meta: {

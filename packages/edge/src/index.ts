@@ -3,7 +3,7 @@ import logger from './config/logger';
 import app from './app';
 import internalApp from './internalApp';
 import { sdkManager } from './services/sdkManager';
-import { startMetricsServer, sdkInitialized } from './services/metricsServer';
+import { initEdgeMetrics, sdkInitialized } from './services/edgeMetrics';
 import { tokenMirrorService } from './services/tokenMirrorService';
 import { tokenUsageTracker } from './services/tokenUsageTracker';
 
@@ -18,12 +18,13 @@ async function main(): Promise<void> {
     validateConfig();
     logger.info('Configuration validated');
 
-    // Start metrics server (internal only)
-    startMetricsServer();
-
     // Initialize SDK first (waits for backend to be ready)
+    // This also starts the SDK metrics serverinternally
     await sdkManager.initialize();
-    sdkInitialized.set(1);
+
+    // Initialize custom edge metrics using the SDK registry
+    initEdgeMetrics();
+    if (sdkInitialized) sdkInitialized.set(1);
 
     // Initialize token mirror service (for local token validation)
     // This comes after SDK initialization since backend should be ready at this point

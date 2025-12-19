@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { sdkManager } from '../services/sdkManager';
 import logger from '../config/logger';
-import { cacheHitsTotal, cacheMissesTotal } from '../services/metricsServer';
+import { cacheHitsTotal, cacheMissesTotal } from '../services/edgeMetrics';
 
 const router = Router();
 
@@ -13,14 +13,14 @@ const router = Router();
  * Record cache hit metric
  */
 function recordCacheHit(cacheType: string): void {
-  cacheHitsTotal.labels(cacheType).inc();
+  cacheHitsTotal?.labels(cacheType).inc();
 }
 
 /**
  * Record cache miss metric
  */
 function recordCacheMiss(cacheType: string): void {
-  cacheMissesTotal.labels(cacheType).inc();
+  cacheMissesTotal?.labels(cacheType).inc();
 }
 
 /**

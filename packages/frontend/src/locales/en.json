@@ -4322,6 +4322,10 @@
       "terminated": "The server has been shut down or has stopped. This is the final state.",
       "noResponse": "The server has not sent a heartbeat within the expected interval. It may be unresponsive or experiencing network issues."
     },
+    "tooltip": {
+      "addressExt": "Address (Ext)",
+      "addressInt": "Address (Int)"
+    },
     "healthCheck": {
       "tooltip": "Check server health (ping /health endpoint)",
       "healthyTooltip": "Healthy ({{latency}}ms)",

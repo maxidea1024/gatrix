@@ -6,7 +6,7 @@ import logger from './config/logger';
 import clientRoutes from './routes/client';
 import healthRoutes from './routes/health';
 import publicRoutes from './routes/public';
-import { httpRequestsTotal, httpRequestDuration } from './services/metricsServer';
+import { sdkManager } from './services/sdkManager';
 
 // Create Express application
 const app: Application = express();
@@ -63,44 +63,20 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
-    const durationSeconds = duration / 1000;
-
-    // Use originalUrl to get the full path including router mount point
-    const normalizedPath = normalizePath(req.originalUrl);
-
-    // Record metrics
-    httpRequestsTotal.inc({
-      method: req.method,
-      path: normalizedPath,
-      status: res.statusCode.toString(),
-    });
-
-    httpRequestDuration.observe(
-      {
-        method: req.method,
-        path: normalizedPath,
-        status: res.statusCode.toString(),
-      },
-      durationSeconds
-    );
-
     logger.debug(`${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`);
   });
   next();
 });
 
-/**
- * Normalize path for metrics to avoid high cardinality
- * e.g., /api/v1/client/versions -> /api/v1/client/versions
- */
-function normalizePath(url: string): string {
-  // Remove query strings
-  const basePath = url.split('?')[0];
+// Use SDK HTTP metrics middleware (public scope)
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const sdk = sdkManager.getSDK();
+  if (sdk) {
+    return sdk.createHttpMetricsMiddleware({ scope: 'public' })(req, res, next);
+  }
+  next();
+});
 
-  // For now, just return the base path
-  // Add more normalization rules as needed (e.g., replace IDs with :id)
-  return basePath;
-}
 
 // Health check routes (no auth required)
 app.use('/health', healthRoutes);

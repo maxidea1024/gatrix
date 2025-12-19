@@ -4319,6 +4319,10 @@
       "terminated": "서버가 종료되었거나 중지되었습니다. 이것은 최종 상태입니다.",
       "noResponse": "서버가 예상 시간 내에 하트비트를 보내지 않았습니다. 서버가 응답하지 않거나 네트워크 문제가 발생했을 수 있습니다."
     },
+    "tooltip": {
+      "addressExt": "주소 (외부)",
+      "addressInt": "주소 (내부)"
+    },
     "healthCheck": {
       "tooltip": "서버 상태 확인 (/health 엔드포인트 호출)",
       "healthyTooltip": "정상 ({{latency}}ms)",

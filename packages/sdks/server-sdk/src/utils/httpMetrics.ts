@@ -7,7 +7,8 @@ import { Request, Response, NextFunction } from 'express';
 
 export type HttpMetricsOptions = {
     registry: any; // prom-client Registry
-    prefix?: string; // Optional metric name prefix
+    prefix?: string; // Optional metric name prefix (default: 'app_')
+    scope?: string; // Optional scope label (e.g., 'private', 'public')
     buckets?: number[]; // Custom duration buckets
 };
 
@@ -16,17 +17,19 @@ export type HttpMetricsOptions = {
  * Registers 'http_request_duration_seconds' and 'http_requests_total'
  */
 export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
-    const { registry, prefix = 'app_', buckets = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10] } = options;
+    const { registry, prefix = 'app_', scope = 'default', buckets = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10] } = options;
     const promClient = require('prom-client');
 
     const name = `${prefix}http_request_duration_seconds`;
     const counterName = `${prefix}http_requests_total`;
 
+    const labelNames = ['method', 'route', 'status', 'scope'];
+
     // Register Histogram for latency
     const httpRequestDuration = new promClient.Histogram({
         name,
         help: 'Duration of HTTP requests in seconds',
-        labelNames: ['method', 'route', 'status'],
+        labelNames,
         buckets,
         registers: [registry],
     });
@@ -35,7 +38,7 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
     const httpRequestsTotal = new promClient.Counter({
         name: counterName,
         help: 'Total number of HTTP requests',
-        labelNames: ['method', 'route', 'status'],
+        labelNames,
         registers: [registry],
     });
 
@@ -51,12 +54,13 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
                 method: req.method,
                 route: route || 'unknown',
                 status: res.statusCode,
+                scope,
             };
 
             try {
                 httpRequestDuration.observe(labels, durationSeconds);
                 httpRequestsTotal.inc(labels);
-            } catch (err) {
+            } catch (_err) {
                 // Silently catch registration/label errors
             }
         });

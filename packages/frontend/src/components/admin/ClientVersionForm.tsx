@@ -564,11 +564,17 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
       // Handle version validation error
       let errorMessage = error.message || t('clientVersions.saveError');
+
       if (error.message?.startsWith('VERSION_TOO_OLD:')) {
         const latestVersion = error.message.split(':')[1];
         errorMessage = t('clientVersions.versionTooOld', {
           newVersion: data.clientVersion,
           latestVersion
+        });
+      } else if (error.message?.startsWith('DUPLICATE_CLIENT_VERSIONS:')) {
+        const duplicates = error.message.split(':')[1];
+        errorMessage = t('clientVersions.duplicateClientVersions', {
+          duplicates
         });
       }
 
@@ -759,36 +765,36 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                   )}
                 />
 
-	                {isMaintenanceMode && (
-	                  <MaintenanceSettingsInput
-	                    startDate={watch('maintenanceStartDate') || ''}
-	                    endDate={watch('maintenanceEndDate') || ''}
-	                    onStartDateChange={(date) => setValue('maintenanceStartDate', date)}
-	                    onEndDateChange={(date) => setValue('maintenanceEndDate', date)}
-	                    inputMode={inputMode}
-	                    onInputModeChange={setInputMode}
-	                    maintenanceMessage={watch('maintenanceMessage') || ''}
-	                    onMaintenanceMessageChange={(message) => setValue('maintenanceMessage', message)}
-	                    supportsMultiLanguage={supportsMultiLanguage}
-	                    onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
-	                    maintenanceLocales={maintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
-	                    onMaintenanceLocalesChange={(locales) => {
-	                      setMaintenanceLocales(locales);
-	                      setValue('maintenanceLocales', locales);
-	                      // 번역 결과가 있으면 자동으로 언어별 메시지 사용 활성화
-	                      const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
-	                      if (hasNonEmptyLocales && !supportsMultiLanguage) {
-	                        setSupportsMultiLanguage(true);
-	                        setValue('supportsMultiLanguage', true);
-	                      }
-	                    }}
-	                    templates={templates}
-	                    selectedTemplateId={selectedTemplateId}
-	                    onSelectedTemplateIdChange={setSelectedTemplateId}
-	                    messageError={!!errors.maintenanceMessage}
-	                    messageRequired={true}
-	                  />
-	                )}
+                {isMaintenanceMode && (
+                  <MaintenanceSettingsInput
+                    startDate={watch('maintenanceStartDate') || ''}
+                    endDate={watch('maintenanceEndDate') || ''}
+                    onStartDateChange={(date) => setValue('maintenanceStartDate', date)}
+                    onEndDateChange={(date) => setValue('maintenanceEndDate', date)}
+                    inputMode={inputMode}
+                    onInputModeChange={setInputMode}
+                    maintenanceMessage={watch('maintenanceMessage') || ''}
+                    onMaintenanceMessageChange={(message) => setValue('maintenanceMessage', message)}
+                    supportsMultiLanguage={supportsMultiLanguage}
+                    onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
+                    maintenanceLocales={maintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
+                    onMaintenanceLocalesChange={(locales) => {
+                      setMaintenanceLocales(locales);
+                      setValue('maintenanceLocales', locales);
+                      // 번역 결과가 있으면 자동으로 언어별 메시지 사용 활성화
+                      const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
+                      if (hasNonEmptyLocales && !supportsMultiLanguage) {
+                        setSupportsMultiLanguage(true);
+                        setValue('supportsMultiLanguage', true);
+                      }
+                    }}
+                    templates={templates}
+                    selectedTemplateId={selectedTemplateId}
+                    onSelectedTemplateIdChange={setSelectedTemplateId}
+                    messageError={!!errors.maintenanceMessage}
+                    messageRequired={true}
+                  />
+                )}
 
               </Stack>
             </Paper>
@@ -969,90 +975,90 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                   {t('clientVersions.form.additionalSettingsDescription')}
                 </Typography>
 
-              <Stack spacing={2}>
+                <Stack spacing={2}>
 
-                {/* 게스트 모드 허용 */}
-                <Controller
-                  name="guestModeAllowed"
-                  control={control}
-                  render={({ field }) => (
-                    <Box>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={field.value}
-                            onChange={field.onChange}
-                          />
-                        }
-                        label={t('clientVersions.guestModeAllowed')}
+                  {/* 게스트 모드 허용 */}
+                  <Controller
+                    name="guestModeAllowed"
+                    control={control}
+                    render={({ field }) => (
+                      <Box>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={field.value}
+                              onChange={field.onChange}
+                            />
+                          }
+                          label={t('clientVersions.guestModeAllowed')}
+                        />
+                        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                          {t('clientVersions.form.guestModeAllowedHelp')}
+                        </Typography>
+                      </Box>
+                    )}
+                  />
+
+                  {/* 외부 클릭 링크 */}
+                  <Controller
+                    name="externalClickLink"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label={t('clientVersions.externalClickLink')}
+                        error={!!errors.externalClickLink}
+                        helperText={errors.externalClickLink?.message || t('clientVersions.form.externalClickLinkHelp')}
+                        inputProps={{
+                          autoComplete: 'off',
+                          autoCorrect: 'off',
+                          autoCapitalize: 'off',
+                          spellCheck: false
+                        }}
                       />
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                        {t('clientVersions.form.guestModeAllowedHelp')}
-                      </Typography>
-                    </Box>
-                  )}
-                />
+                    )}
+                  />
 
-                {/* 외부 클릭 링크 */}
-                <Controller
-                  name="externalClickLink"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label={t('clientVersions.externalClickLink')}
-                      error={!!errors.externalClickLink}
-                      helperText={errors.externalClickLink?.message || t('clientVersions.form.externalClickLinkHelp')}
-                      inputProps={{
-                        autoComplete: 'off',
-                        autoCorrect: 'off',
-                        autoCapitalize: 'off',
-                        spellCheck: false
-                      }}
-                    />
-                  )}
-                />
+                  {/* 메모 */}
+                  <Controller
+                    name="memo"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        multiline
+                        rows={3}
+                        label={t('clientVersions.memo')}
+                        error={!!errors.memo}
+                        helperText={errors.memo?.message || t('clientVersions.form.memoHelp')}
+                      />
+                    )}
+                  />
 
-                {/* 메모 */}
-                <Controller
-                  name="memo"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      multiline
-                      rows={3}
-                      label={t('clientVersions.memo')}
-                      error={!!errors.memo}
-                      helperText={errors.memo?.message || t('clientVersions.form.memoHelp')}
-                    />
-                  )}
-                />
+                  {/* 커스텀 페이로드 */}
+                  <Controller
+                    name="customPayload"
+                    control={control}
+                    render={({ field }) => (
+                      <JsonEditor
+                        value={field.value || '{}'}
+                        onChange={(newValue) => {
+                          field.onChange(newValue);
+                        }}
+                        height="200px"
+                        label={t('clientVersions.customPayload')}
+                        placeholder='{\n  "key": "value"\n}'
+                        error={errors.customPayload?.message}
+                        helperText={t('clientVersions.form.customPayloadHelp')}
+                      />
+                    )}
+                  />
 
-                {/* 커스텀 페이로드 */}
-                <Controller
-                  name="customPayload"
-                  control={control}
-                  render={({ field }) => (
-                    <JsonEditor
-                      value={field.value || '{}'}
-                      onChange={(newValue) => {
-                        field.onChange(newValue);
-                      }}
-                      height="200px"
-                      label={t('clientVersions.customPayload')}
-                      placeholder='{\n  "key": "value"\n}'
-                      error={errors.customPayload?.message}
-                      helperText={t('clientVersions.form.customPayloadHelp')}
-                    />
-                  )}
-                />
-
-                {/* 태그 선택: 섹션 외부로 이동됨 */}
-              </Stack>
-            </AccordionDetails>
+                  {/* 태그 선택: 섹션 외부로 이동됨 */}
+                </Stack>
+              </AccordionDetails>
             </Accordion>
           </Stack>
         </Box>

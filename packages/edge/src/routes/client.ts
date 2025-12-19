@@ -5,7 +5,7 @@ import { sdkManager } from '../services/sdkManager';
 import { config } from '../config/env';
 import logger from '../config/logger';
 import { ClientVersion, Banner, GameWorld } from '@gatrix/server-sdk';
-import { cacheHitsTotal, cacheMissesTotal, cacheSize } from '../services/metricsServer';
+import { cacheHitsTotal, cacheMissesTotal, cacheSize } from '../services/edgeMetrics';
 
 const router = Router();
 
@@ -17,14 +17,14 @@ const router = Router();
  * Record cache hit metric
  */
 function recordCacheHit(cacheType: string): void {
-  cacheHitsTotal.labels(cacheType).inc();
+  cacheHitsTotal?.labels(cacheType).inc();
 }
 
 /**
  * Record cache miss metric
  */
 function recordCacheMiss(cacheType: string): void {
-  cacheMissesTotal.labels(cacheType).inc();
+  cacheMissesTotal?.labels(cacheType).inc();
 }
 
 /**
@@ -79,15 +79,15 @@ function updateCacheSizeMetrics(): void {
   };
   const whitelistsCount = countWhitelistItems(allData.whitelists);
 
-  cacheSize.labels('client_versions').set(versionsCount);
-  cacheSize.labels('banners').set(bannersCount);
-  cacheSize.labels('service_notices').set(noticesCount);
-  cacheSize.labels('game_worlds').set(worldsCount);
-  cacheSize.labels('surveys').set(surveysCount);
-  cacheSize.labels('popup_notices').set(popupNoticesCount);
-  cacheSize.labels('store_products').set(storeProductsCount);
-  cacheSize.labels('whitelists').set(whitelistsCount);
-  cacheSize.labels('total').set(versionsCount + bannersCount + noticesCount + worldsCount + surveysCount + popupNoticesCount + storeProductsCount + whitelistsCount);
+  cacheSize?.labels('client_versions').set(versionsCount);
+  cacheSize?.labels('banners').set(bannersCount);
+  cacheSize?.labels('service_notices').set(noticesCount);
+  cacheSize?.labels('game_worlds').set(worldsCount);
+  cacheSize?.labels('surveys').set(surveysCount);
+  cacheSize?.labels('popup_notices').set(popupNoticesCount);
+  cacheSize?.labels('store_products').set(storeProductsCount);
+  cacheSize?.labels('whitelists').set(whitelistsCount);
+  cacheSize?.labels('total').set(versionsCount + bannersCount + noticesCount + worldsCount + surveysCount + popupNoticesCount + storeProductsCount + whitelistsCount);
 }
 
 /**

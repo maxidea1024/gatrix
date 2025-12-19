@@ -62,6 +62,14 @@ class SDKManager {
         banner: true,
         storeProduct: true,
       },
+
+      // Enable metrics
+      metrics: {
+        enabled: true,
+        serverEnabled: true,
+        port: config.metricsPort,
+        userMetricsEnabled: true,
+      },
     };
 
     try {

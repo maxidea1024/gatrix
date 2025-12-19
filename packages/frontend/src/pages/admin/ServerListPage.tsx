@@ -1391,25 +1391,47 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
                         <TableCell sx={{ fontWeight: 500, fontSize: '0.75rem' }}>{service.hostname}</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>Address (Ext)</TableCell>
+                        <TableCell sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>{t('serverList.tooltip.addressExt')}</TableCell>
                         <TableCell sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.75rem' }}>{service.externalAddress}</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>Address (Int)</TableCell>
+                        <TableCell sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>{t('serverList.tooltip.addressInt')}</TableCell>
                         <TableCell sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.75rem' }}>{service.internalAddress}</TableCell>
                       </TableRow>
-                      <TableRow>
-                        <TableCell sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>{t('serverList.table.updatedAt')}</TableCell>
-                        <TableCell sx={{ fontSize: '0.75rem', fontWeight: 500 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <RelativeTime date={service.updatedAt} variant="caption" />
-                            <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
-                              ({formatDateTimeDetailed(service.updatedAt)})
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
+                      {service.labels.environment && (
+                        <TableRow>
+                          <TableCell sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>{t('serverList.table.environment')}</TableCell>
+                          <TableCell sx={{ fontSize: '0.75rem' }}>
+                            <Chip
+                              label={service.labels.environment}
+                              size="small"
+                              variant="outlined"
+                              color="secondary"
+                              sx={{ height: 20, fontSize: '0.65rem', fontWeight: 600, borderRadius: 0.5 }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )}
+                      {service.labels.region && (
+                        <TableRow>
+                          <TableCell sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>{t('serverList.table.region')}</TableCell>
+                          <TableCell sx={{ fontSize: '0.75rem' }}>
+                            <Chip
+                              label={service.labels.region}
+                              size="small"
+                              variant="outlined"
+                              color="info"
+                              sx={{ height: 20, fontSize: '0.65rem', fontWeight: 600, borderRadius: 0.5 }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )}
+                      {service.labels.version && (
+                        <TableRow>
+                          <TableCell sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600 }}>{t('serverList.filters.version')}</TableCell>
+                          <TableCell sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.75rem' }}>{service.labels.version}</TableCell>
+                        </TableRow>
+                      )}
                   </Table>
                 </Box>
               }>

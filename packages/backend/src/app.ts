@@ -26,7 +26,6 @@ import routes from './routes';
 import { authenticate, requireAdmin } from './middleware/auth';
 import { BullBoardConfig } from './config/bullboard';
 
-import { initMetrics } from './services/MetricsService';
 
 const app = express();
 
@@ -95,8 +94,20 @@ app.use(cookieParser() as any);
 
 // Request logging
 app.use(requestLogger);
-// Monitoring metrics (no-op if disabled)
-initMetrics(app);
+
+// Use SDK HTTP metrics middleware (private scope)
+let httpMetricsMiddleware: any = null;
+app.use((req, res, next) => {
+  const { gatrixSdk } = require('./index');
+  if (gatrixSdk && !httpMetricsMiddleware) {
+    httpMetricsMiddleware = gatrixSdk.createHttpMetricsMiddleware({ scope: 'private' });
+  }
+
+  if (httpMetricsMiddleware) {
+    return httpMetricsMiddleware(req, res, next);
+  }
+  next();
+});
 
 
 // Rate limiting

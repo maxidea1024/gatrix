@@ -32,9 +32,19 @@ export interface LoggerConfig {
 export interface MetricsConfig {
   enabled?: boolean; // Enable SDK internal metrics (default: false - must be explicitly enabled)
   // Use 'any' to avoid hard dependency on prom-client types
-  registry?: any; // Optional custom prom-client Registry to register metrics into
+  registry?: any; // Optional custom prom-client Registry to register internal metrics into
+
   // Metrics server configuration
+  serverEnabled?: boolean; // Enable standalone metrics server (default: false)
   port?: number; // Metrics server port (default: 9337 or SDK_METRICS_PORT env)
+  bindAddress?: string; // Bind address (default: 0.0.0.0 in dev, 127.0.0.1 in production)
+
+  // Game metrics configuration
+  /**
+   * If true, enables a separate Prometheus registry for user-specific metrics (e.g. game data).
+   */
+  userMetricsEnabled?: boolean;
+  collectDefaultMetrics?: boolean; // Whether to collect default Node.js metrics in game registry (default: true)
 }
 
 /**

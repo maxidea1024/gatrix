@@ -69,8 +69,18 @@ class ChatServerApp {
     // Request logging
     this.app.use(requestLogger);
 
-    // Initialize metrics (attaches /metrics endpoint)
-    initMetrics(this.app);
+    // Use SDK HTTP metrics middleware (public scope for chat server)
+    let httpMetricsMiddleware: any = null;
+    this.app.use((req, res, next) => {
+      if (gatrixSdk && !httpMetricsMiddleware) {
+        httpMetricsMiddleware = gatrixSdk.createHttpMetricsMiddleware({ scope: 'public' });
+      }
+
+      if (httpMetricsMiddleware) {
+        return httpMetricsMiddleware(req, res, next);
+      }
+      next();
+    });
 
     // Health check middleware
     this.app.use('/health', (req, res) => {
@@ -313,6 +323,13 @@ class ChatServerApp {
                 clientVersion: false,
                 serviceNotice: false,
                 banner: false,
+              },
+              // Enable metrics
+              metrics: {
+                enabled: true,
+                serverEnabled: true,
+                port: config.monitoring.metricsPort,
+                userMetricsEnabled: true,
               },
             });
 

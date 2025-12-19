@@ -20,6 +20,8 @@ import { CacheManager } from './cache/CacheManager';
 import { EventListener } from './cache/EventListener';
 import { EventCallback, SdkEvent } from './types/events';
 import { SdkMetrics } from './utils/sdkMetrics';
+import { createMetricsServer, MetricsServerInstance } from './services/MetricsServer';
+import { createHttpMetricsMiddleware } from './utils/httpMetrics';
 import { MaintenanceEventData } from './cache/MaintenanceWatcher';
 import {
   RedeemCouponRequest,
@@ -58,6 +60,10 @@ export class GatrixServerSDK {
   private cacheManager?: CacheManager;
   private eventListener?: EventListener;
   private metrics?: SdkMetrics;
+  private metricsServer?: MetricsServerInstance;
+  private httpRegistry?: any; // prom-client Registry
+  private userRegistry?: any; // prom-client Registry
+
   // Maintenance event listeners (separate from standard event listeners)
   private maintenanceEventListeners: Map<string, EventCallback[]> = new Map();
 
@@ -169,6 +175,43 @@ export class GatrixServerSDK {
       applicationName: configWithDefaults.applicationName,
       registry: configWithDefaults.metrics?.registry,
     });
+
+    // Initialize additional registries if metrics enabled
+    if (configWithDefaults.metrics?.enabled !== false) {
+      try {
+        const promClient = require('prom-client');
+
+        // Registry for HTTP middleware metrics (both private/public)
+        this.httpRegistry = new promClient.Registry();
+        this.httpRegistry.setDefaultLabels({
+          sdk: 'gatrix-server-sdk',
+          service: configWithDefaults.service,
+          group: configWithDefaults.group,
+          environment: configWithDefaults.environment,
+          application: configWithDefaults.applicationName,
+        });
+
+        // Registry for user-specific custom metrics or default Node.js metrics
+        if (configWithDefaults.metrics?.userMetricsEnabled || configWithDefaults.metrics?.collectDefaultMetrics !== false) {
+          this.userRegistry = new promClient.Registry();
+          this.userRegistry.setDefaultLabels({
+            sdk: 'gatrix-server-sdk',
+            service: configWithDefaults.service,
+            group: configWithDefaults.group,
+            environment: configWithDefaults.environment,
+            application: configWithDefaults.applicationName,
+          });
+
+          // Collect default Node.js metrics in user registry if requested
+          // Collect default Node.js metrics in user registry if requested
+          // if (configWithDefaults.metrics?.collectDefaultMetrics !== false) {
+          //   promClient.collectDefaultMetrics({ register: this.userRegistry });
+          // }
+        }
+      } catch (_e) {
+        // Silently fail if prom-client is not available
+      }
+    }
 
     // Initialize API client (inject metrics for HTTP instrumentation)
     this.apiClient = new ApiClient({
@@ -348,6 +391,30 @@ export class GatrixServerSDK {
       }
 
       this.initialized = true;
+
+      // Initialize metrics server if enabled
+      if (this.config.metrics?.serverEnabled) {
+        // Collect all registries to merge in MetricsServer
+        const additionalRegistries = [];
+        if (this.httpRegistry) additionalRegistries.push(this.httpRegistry);
+        if (this.userRegistry) additionalRegistries.push(this.userRegistry);
+
+        this.metricsServer = createMetricsServer({
+          port: this.config.metrics.port,
+          bindAddress: this.config.metrics.bindAddress,
+          service: this.config.service,
+          group: this.config.group,
+          environment: this.config.environment,
+          applicationName: this.config.applicationName,
+          logger: this.logger,
+          registry: this.metrics?.getRegistry(), // Use internal SDK registry as primary
+          additionalRegistries,
+          collectDefaultMetrics: this.config.metrics?.collectDefaultMetrics !== false,
+        });
+
+        this.metricsServer.start();
+        this.logger.info('Metrics server started');
+      }
 
       this.logger.info('GatrixServerSDK initialized successfully');
     } catch (error: any) {
@@ -1228,6 +1295,63 @@ export class GatrixServerSDK {
   }
 
   /**
+   * Create an HTTP metrics middleware for tracking express requests.
+   * Supports 'scope' label to distinguish between interfaces (e.g. private, public).
+   *
+   * @param options - Middleware options
+   * @returns Express middleware function
+   */
+  createHttpMetricsMiddleware(options: { scope?: 'private' | 'public' | string; prefix?: string } = {}) {
+    if (!this.httpRegistry) {
+      return (_req: any, _res: any, next: any) => next();
+    }
+
+    return createHttpMetricsMiddleware({
+      registry: this.httpRegistry,
+      scope: options.scope,
+      prefix: options.prefix,
+    });
+  }
+
+  /**
+   * Get the user-specific metrics registry.
+   * Use this to register custom application/game metrics that should be kept separate from SDK metrics.
+   * Returns undefined if user metrics are not enabled in config.
+   */
+  getUserMetricsRegistry(): any | undefined {
+    return this.userRegistry;
+  }
+
+  /**
+   * Get a metrics provider for the user registry.
+   * Provides convenient methods to create counters, gauges, and histograms.
+   * Returns undefined if user metrics are not enabled in config.
+   */
+  getUserMetricsProvider(): {
+    createCounter: (name: string, help: string, labelNames?: string[]) => any;
+    createGauge: (name: string, help: string, labelNames?: string[]) => any;
+    createHistogram: (name: string, help: string, labelNames?: string[], buckets?: number[]) => any;
+  } | undefined {
+    if (!this.userRegistry) return undefined;
+
+    // Lazy require to avoid hard dependency if not used
+    const promClient = require('prom-client');
+    const registry = this.userRegistry;
+
+    return {
+      createCounter(name: string, help: string, labelNames: string[] = []): any {
+        return new promClient.Counter({ name, help, labelNames, registers: [registry] });
+      },
+      createGauge(name: string, help: string, labelNames: string[] = []): any {
+        return new promClient.Gauge({ name, help, labelNames, registers: [registry] });
+      },
+      createHistogram(name: string, help: string, labelNames: string[] = [], buckets: number[] = [0.005, 0.01, 0.05, 0.1, 0.3, 1, 3, 5, 10]): any {
+        return new promClient.Histogram({ name, help, labelNames, buckets, registers: [registry] });
+      },
+    };
+  }
+
+  /**
    * Fetch whitelists (IP and Account)
    * Performs API call via WhitelistService and updates cache
    * @param environment Optional in single-env mode, required in multi-env mode
@@ -1462,6 +1586,12 @@ export class GatrixServerSDK {
       if (this.eventListener) {
         await this.eventListener.close();
         this.eventListener = undefined;
+      }
+
+      // Stop metrics server
+      if (this.metricsServer) {
+        await this.metricsServer.stop();
+        this.metricsServer = undefined;
       }
 
       this.initialized = false;

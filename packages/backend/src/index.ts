@@ -18,7 +18,7 @@ let SSENotificationService: any;
 // Backend service instance ID for service discovery
 let backendInstanceId: string | null = null;
 // GatrixServerSDK instance for service discovery
-let gatrixSdk: GatrixServerSDK | null = null;
+export let gatrixSdk: GatrixServerSDK | null = null;
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error: Error) => {
@@ -321,14 +321,15 @@ const startServer = async () => {
           },
           // Disable all features since backend doesn't need cached data from itself
           features: {
-            gameWorld: false,
-            popupNotice: false,
-            survey: false,
-            whitelist: false,
-            serviceMaintenance: false,
-            clientVersion: false,
             serviceNotice: false,
             banner: false,
+          },
+          // Enable metrics
+          metrics: {
+            enabled: true,
+            serverEnabled: true,
+            port: parseInt(process.env.METRICS_PORT || '9400', 10),
+            userMetricsEnabled: true,
           },
         });
 
@@ -341,7 +342,7 @@ const startServer = async () => {
           },
           ports: {
             internalApi: config.port,
-            metricsApi: config.port,
+            metricsApi: parseInt(process.env.METRICS_PORT || '9400', 10),
           },
           status: 'ready',
           meta: {

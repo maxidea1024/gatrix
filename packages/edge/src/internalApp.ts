@@ -1,6 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import internalRoutes from './routes/internal';
 import logger from './config/logger';
+import { sdkManager } from './services/sdkManager';
 
 // Create Express application for internal endpoints
 const internalApp: Application = express();
@@ -18,6 +19,15 @@ internalApp.use((req: Request, res: Response, next: NextFunction) => {
         const duration = Date.now() - start;
         logger.debug(`[Internal] ${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`);
     });
+    next();
+});
+
+// Use SDK HTTP metrics middleware (private scope)
+internalApp.use((req: Request, res: Response, next: NextFunction) => {
+    const sdk = sdkManager.getSDK();
+    if (sdk) {
+        return sdk.createHttpMetricsMiddleware({ scope: 'private' })(req, res, next);
+    }
     next();
 });
 
