@@ -109,7 +109,7 @@ update_service() {
         image_service="event-lens"
     fi
     
-    local new_image="uwocn.tencentcloudcr.com/uwocn/uwocn:${image_service}-${version}"
+    local new_image="uwocn.tencentcloudcr.com/uwocn/gatrix-${image_service}:${version}"
     
     if docker service inspect "$full_service_name" &> /dev/null; then
         log_info "Updating $service to version $version..."

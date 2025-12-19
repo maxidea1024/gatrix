@@ -164,7 +164,7 @@ services:
   # ============================================
 
   backend:
-    image: uwocn.tencentcloudcr.com/uwocn/uwocn:backend-${GATRIX_VERSION:-latest}
+    image: uwocn.tencentcloudcr.com/uwocn/gatrix-backend:${GATRIX_VERSION:-latest}
     environment:
       NODE_ENV: production
       LOG_FORMAT: json
@@ -217,7 +217,7 @@ services:
     logging: *default-logging
 
   frontend:
-    image: uwocn.tencentcloudcr.com/uwocn/uwocn:frontend-${GATRIX_VERSION:-latest}
+    image: uwocn.tencentcloudcr.com/uwocn/gatrix-frontend:${GATRIX_VERSION:-latest}
     environment:
       VITE_API_URL: /api/v1
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
@@ -242,7 +242,7 @@ services:
     logging: *default-logging
 
   event-lens:
-    image: uwocn.tencentcloudcr.com/uwocn/uwocn:event-lens-${GATRIX_VERSION:-latest}
+    image: uwocn.tencentcloudcr.com/uwocn/gatrix-event-lens:${GATRIX_VERSION:-latest}
     environment:
       NODE_ENV: production
       LOG_FORMAT: json
@@ -285,7 +285,7 @@ services:
     logging: *default-logging
 
   event-lens-worker:
-    image: uwocn.tencentcloudcr.com/uwocn/uwocn:event-lens-${GATRIX_VERSION:-latest}
+    image: uwocn.tencentcloudcr.com/uwocn/gatrix-event-lens:${GATRIX_VERSION:-latest}
     command: ["node", "packages/event-lens/dist/worker.js"]
     environment:
       NODE_ENV: production
@@ -323,7 +323,7 @@ services:
     logging: *default-logging
 
   chat-server:
-    image: uwocn.tencentcloudcr.com/uwocn/uwocn:chat-server-${GATRIX_VERSION:-latest}
+    image: uwocn.tencentcloudcr.com/uwocn/gatrix-chat-server:${GATRIX_VERSION:-latest}
     environment:
       NODE_ENV: production
       LOG_FORMAT: json
@@ -379,7 +379,7 @@ services:
     logging: *default-logging
 
   edge:
-    image: uwocn.tencentcloudcr.com/uwocn/uwocn:edge-${GATRIX_VERSION:-latest}
+    image: uwocn.tencentcloudcr.com/uwocn/gatrix-edge:${GATRIX_VERSION:-latest}
     environment:
       NODE_ENV: production
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-info}

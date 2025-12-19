@@ -165,10 +165,10 @@ pull_images() {
     local services=("backend" "frontend" "event-lens" "chat-server" "edge")
 
     for service in "${services[@]}"; do
-        log_info "Pulling uwocn.tencentcloudcr.com/uwocn/uwocn:${service}-${VERSION}"
-        docker pull "uwocn.tencentcloudcr.com/uwocn/uwocn:${service}-${VERSION}" || {
-            log_warn "Failed to pull ${service}-${VERSION}, trying latest..."
-            docker pull "uwocn.tencentcloudcr.com/uwocn/uwocn:${service}-latest"
+        log_info "Pulling uwocn.tencentcloudcr.com/uwocn/gatrix-${service}:${VERSION}"
+        docker pull "uwocn.tencentcloudcr.com/uwocn/gatrix-${service}:${VERSION}" || {
+            log_warn "Failed to pull gatrix-${service}:${VERSION}, trying latest..."
+            docker pull "uwocn.tencentcloudcr.com/uwocn/gatrix-${service}:latest"
         }
     done
 }
