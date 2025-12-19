@@ -326,6 +326,7 @@ class ChatServerApp {
               },
               ports: {
                 internalApi: config.port,
+                metricsApi: config.port,
               },
               status: 'ready',
               meta: {

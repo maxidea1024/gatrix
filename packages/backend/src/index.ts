@@ -341,6 +341,7 @@ const startServer = async () => {
           },
           ports: {
             internalApi: config.port,
+            metricsApi: config.port,
           },
           status: 'ready',
           meta: {

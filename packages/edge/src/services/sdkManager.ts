@@ -80,6 +80,8 @@ class SDKManager {
         },
         ports: {
           externalApi: config.port,
+          internalApi: config.port,
+          metricsApi: config.metricsPort,
         },
         status: 'ready',
         meta: {

@@ -81,6 +81,7 @@ async function start() {
         },
         ports: {
           internalApi: config.port,
+          metricsApi: config.port,
         },
         status: 'ready',
         meta: {
