@@ -174,15 +174,7 @@ class IngamePopupNoticeController {
         targetChannels: ['popup', 'admin'],
       });
 
-      // Publish SDK event
-      await pubSubService.publishSDKEvent({
-        type: 'popup.created',
-        data: {
-          id: notice.id,
-          timestamp: Date.now(),
-          isVisible: notice.isActive
-        },
-      });
+
 
       await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
 
@@ -230,15 +222,7 @@ class IngamePopupNoticeController {
         targetChannels: ['popup', 'admin'],
       });
 
-      // Publish SDK event
-      await pubSubService.publishSDKEvent({
-        type: 'popup.updated',
-        data: {
-          id: notice.id,
-          timestamp: Date.now(),
-          isVisible: notice.isActive
-        },
-      });
+
 
       await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
 
@@ -267,11 +251,7 @@ class IngamePopupNoticeController {
         targetChannels: ['popup', 'admin'],
       });
 
-      // Publish SDK event
-      await pubSubService.publishSDKEvent({
-        type: 'popup.deleted',
-        data: { id, timestamp: Date.now() },
-      });
+
 
       await pubSubService.invalidateKey(SERVER_SDK_ETAG.POPUP_NOTICES);
 

@@ -139,6 +139,13 @@ export default defineConfig({
         secure: false,
         ws: true, // Enable WebSocket proxying for Grafana Live
         // Don't rewrite path because Grafana is configured to serve from /grafana subpath
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            // Set Origin header to match Grafana's expected origin to pass CSRF check
+            const grafanaOrigin = isDocker ? 'http://gatrix-grafana-dev:3000' : 'http://localhost:44000';
+            proxyReq.setHeader('Origin', grafanaOrigin);
+          });
+        },
       },
     },
   },

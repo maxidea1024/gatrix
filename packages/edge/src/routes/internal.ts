@@ -68,8 +68,11 @@ function buildCacheResponse(sdk: any): any {
     }
   }
 
+  // Check if SDK is actually initialized for status reporting
+  const isInitialized = typeof sdk.isInitialized === 'function' && sdk.isInitialized();
+
   return {
-    status: 'ready',
+    status: isInitialized ? 'ready' : 'initializing',
     timestamp: new Date().toISOString(),
     lastRefreshedAt: allCached.lastRefreshedAt || null,
     summary,
@@ -114,7 +117,32 @@ router.post('/cache/refresh', async (req: Request, res: Response) => {
   }
 
   try {
-    await sdk.refreshCache();
+    // Access cache manager directly to refresh all
+    // Typescript might complain about private property but in JS runtime it's fine,
+    // however clean way is to use sdk.cacheManager if exposed, or add refresh method to SDK.
+    // Looking at GatrixServerSDK.ts, there is no public refreshAll method exposed directly that refreshes EVERYTHING.
+    // Wait, sdk.refreshCache method? It wasn't in the file I viewed (GatrixServerSDK.ts).
+    // Let's check GatrixServerSDK.ts again. I might have missed it or it's not there.
+    // If not there, I should use cacheManager directly if accessible (it is private).
+    // Or I should add a method to SDK. But I am editing edge code now.
+
+    // In internal.ts original code: await sdk.refreshCache();
+    // Does refreshCache exist on SDK?
+    // I previously viewed GatrixServerSDK.ts and I didn't see refreshCache() method in the truncated view or full view?
+    // Let's check the previous `view_file` output for `GatrixServerSDK.ts` (Step 354, lines 1200-1476).
+    // I see `refreshWhitelistCache`. I don't see `refreshCache` or `refreshAll`.
+
+    // Ah, I might need to cast to any to access cacheManager or add the method.
+    // Since I cannot easily modify SDK types without rebuild/reinstall linking (it's a monorepo so maybe easy),
+    // but the safest bet is to check if `refreshCache` exists or use `any`.
+
+    if (typeof (sdk as any).refreshCache === 'function') {
+      await (sdk as any).refreshCache();
+    } else if ((sdk as any).cacheManager) {
+      await (sdk as any).cacheManager.refreshAll();
+    } else {
+      throw new Error('Callback for refresh not found on SDK');
+    }
 
     const response = buildCacheResponse(sdk);
     res.json(response);

@@ -581,7 +581,7 @@ services:
       # Allow embedding and relax CSRF for local development
       GF_SECURITY_ALLOW_EMBEDDING: "true"
       GF_SECURITY_CSRF_ALWAYS_CHECK: "false"
-      GF_SECURITY_CSRF_TRUSTED_ORIGINS: "*"
+      GF_SECURITY_CSRF_TRUSTED_ORIGINS: "http://localhost:43000,http://localhost:44000,http://127.0.0.1:43000,http://127.0.0.1:44000,http://localhost:3000"
       GF_SECURITY_COOKIE_SAMESITE: "disabled"
       # Allow Live WebSockets from any origin during development
       GF_LIVE_ALLOWED_ORIGINS: "*"

@@ -110,7 +110,7 @@ export class SurveyController {
    */
   static createSurvey = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
-    
+
     if (!authenticatedUserId) {
       throw new GatrixError('User authentication required', 401);
     }
@@ -129,15 +129,7 @@ export class SurveyController {
       targetChannels: ['survey', 'admin'],
     });
 
-    // Publish SDK event
-    await pubSubService.publishSDKEvent({
-      type: 'survey.created',
-      data: {
-        id: survey.id,
-        timestamp: Date.now(),
-        isActive: survey.isActive
-      },
-    });
+
 
     await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEYS);
 
@@ -174,15 +166,7 @@ export class SurveyController {
       targetChannels: ['survey', 'admin'],
     });
 
-    // Publish SDK event
-    await pubSubService.publishSDKEvent({
-      type: 'survey.updated',
-      data: {
-        id: survey.id,
-        timestamp: Date.now(),
-        isActive: survey.isActive
-      },
-    });
+
 
     await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEYS);
 
@@ -213,11 +197,7 @@ export class SurveyController {
       targetChannels: ['survey', 'admin'],
     });
 
-    // Publish SDK event
-    await pubSubService.publishSDKEvent({
-      type: 'survey.deleted',
-      data: { id: parseInt(id), timestamp: Date.now() },
-    });
+
 
     await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEYS);
 
@@ -245,15 +225,7 @@ export class SurveyController {
       updatedBy: authenticatedUserId,
     });
 
-    // Publish SDK event
-    await pubSubService.publishSDKEvent({
-      type: 'survey.updated',
-      data: {
-        id: survey.id,
-        timestamp: Date.now(),
-        isActive: survey.isActive
-      },
-    });
+
 
     await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEYS);
 
@@ -285,14 +257,6 @@ export class SurveyController {
   static updateSurveyConfig = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const config = await SurveyService.updateSurveyConfig(req.body);
 
-    // Publish SDK event for settings change
-    await pubSubService.publishSDKEvent({
-      type: 'survey.settings.updated',
-      data: {
-        id: 'survey-settings',
-        timestamp: Date.now(),
-      },
-    });
 
     await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEY_SETTINGS);
     await pubSubService.invalidateKey(SERVER_SDK_ETAG.SURVEYS);
