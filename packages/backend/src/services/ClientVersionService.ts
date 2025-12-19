@@ -308,7 +308,7 @@ export class ClientVersionService {
       }
 
       await pubSubService.publishSDKEvent({
-        type: 'client_version.updated',
+        type: 'client_version.created',
         data: {
           id: result.id,
           environment,
@@ -453,14 +453,21 @@ export class ClientVersionService {
   }
 
   static async deleteClientVersion(id: number): Promise<boolean> {
+    const clientVersion = await ClientVersionModel.findById(id);
     await ClientVersionModel.delete(id);
     const deletedRowsCount = 1;
 
     if (deletedRowsCount > 0) {
+      let environment: string | undefined;
+      if (clientVersion?.environmentId) {
+        const env = await Environment.query().findById(clientVersion.environmentId);
+        environment = env?.environmentName;
+      }
+
       // Publish generic update event (deletion)
       await pubSubService.publishSDKEvent({
-        type: 'client_version.updated',
-        data: { id, timestamp: Date.now() }
+        type: 'client_version.deleted',
+        data: { id, environment, timestamp: Date.now() }
       });
 
       // Invalidate client version cache (including ETag cache - all environments for deletion)

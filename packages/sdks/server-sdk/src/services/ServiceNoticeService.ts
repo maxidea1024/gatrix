@@ -169,6 +169,40 @@ export class ServiceNoticeService {
   }
 
   /**
+   * Update a single service notice in cache (immutable)
+   * @param notice Service notice to update
+   * @param environment Environment name (required)
+   */
+  updateSingleServiceNotice(notice: ServiceNotice, environment: string): void {
+    const currentItems = this.cachedNoticesByEnv.get(environment) || [];
+    const itemId = notice.id;
+
+    const existsInCache = currentItems.some(i => i.id === itemId);
+
+    if (existsInCache) {
+      const newItems = currentItems.map(i => i.id === itemId ? notice : i);
+      this.cachedNoticesByEnv.set(environment, newItems);
+      this.logger.debug('Single service notice updated in cache', { id: itemId, environment });
+    } else {
+      const newItems = [...currentItems, notice];
+      this.cachedNoticesByEnv.set(environment, newItems);
+      this.logger.debug('Single service notice added to cache', { id: itemId, environment });
+    }
+  }
+
+  /**
+   * Remove a service notice from cache (immutable)
+   * @param id Service notice ID
+   * @param environment Environment name (required)
+   */
+  removeFromCache(id: number, environment: string): void {
+    const currentItems = this.cachedNoticesByEnv.get(environment) || [];
+    const newItems = currentItems.filter(item => item.id !== id);
+    this.cachedNoticesByEnv.set(environment, newItems);
+    this.logger.debug('Service notice removed from cache', { id, environment });
+  }
+
+  /**
    * Get service notice by ID
    * @param environment Environment name (required)
    */

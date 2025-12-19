@@ -46,6 +46,15 @@ export class ClientVersionService extends BaseEnvironmentService<ClientVersion, 
     return await this.listByEnvironment(environment);
   }
 
+  /**
+   * Update a single client version in cache (immutable)
+   * @param item Client version to update
+   * @param environment Environment name (required)
+   */
+  updateSingleClientVersion(item: ClientVersion, environment: string): void {
+    this.updateItemInCache(item, environment);
+  }
+
   // ==================== Domain-specific Methods ====================
 
   /**

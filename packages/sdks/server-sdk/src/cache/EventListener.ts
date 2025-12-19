@@ -234,32 +234,7 @@ export class EventListener {
    * because they are local events emitted by MaintenanceWatcher, not backend events
    */
   private isStandardEvent(type: string): boolean {
-    return [
-      'gameworld.created',
-      'gameworld.updated',
-      'gameworld.deleted',
-      'gameworld.order_changed',
-      'popup.created',
-      'popup.updated',
-      'popup.deleted',
-      'survey.created',
-      'survey.updated',
-      'survey.deleted',
-      'survey.settings.updated',
-      'maintenance.settings.updated',
-      'whitelist.updated',
-      'client_version.updated',
-      'banner.created',
-      'banner.updated',
-      'banner.deleted',
-      'service_notice.updated',
-      'store_product.created',
-      'store_product.updated',
-      'store_product.deleted',
-      'store_product.bulk_updated',
-      'environment.created',
-      'environment.deleted',
-    ].includes(type);
+    return !type.startsWith('local.') && !type.startsWith('custom.');
   }
 
   /**
@@ -458,20 +433,21 @@ export class EventListener {
         break;
       }
 
+      case 'client_version.created':
       case 'client_version.updated': {
         if (features.clientVersion !== true) {
           this.logger.debug('Client version event ignored - feature is disabled', { event: event.type });
           break;
         }
         const cvEnvironment = event.data.environment as string;
-        this.logger.info('Client version updated event received, refreshing client version cache', {
-          id: event.data.id,
-          environment: cvEnvironment
-        });
         if (!cvEnvironment) {
           this.logger.warn('Client version updated event missing environment', { event: event.type });
           break;
         }
+        this.logger.info('Client version updated event received, refreshing client version cache', {
+          id: event.data.id,
+          environment: cvEnvironment
+        });
         try {
           // Use refreshByEnvironment to refresh the specific environment's cache
           await this.cacheManager.getClientVersionService()?.refreshByEnvironment(cvEnvironment);
@@ -479,6 +455,26 @@ export class EventListener {
         } catch (error: any) {
           this.logger.error('Failed to refresh client version cache', { error: error.message });
         }
+        break;
+      }
+
+      case 'client_version.deleted': {
+        if (features.clientVersion !== true) {
+          this.logger.debug('Client version event ignored - feature is disabled', { event: event.type });
+          break;
+        }
+        const cvEnvironment = event.data.environment as string;
+        if (!cvEnvironment) {
+          this.logger.warn('Client version deleted event missing environment', { event: event.type });
+          break;
+        }
+        const id = Number(event.data.id);
+        this.logger.info('Client version deleted event received, removing from cache', {
+          id: id,
+          environment: cvEnvironment
+        });
+
+        this.cacheManager.getClientVersionService()?.removeFromCache(id, cvEnvironment);
         break;
       }
 
@@ -519,6 +515,7 @@ export class EventListener {
         break;
       }
 
+      case 'service_notice.created':
       case 'service_notice.updated': {
         if (features.serviceNotice !== true) {
           this.logger.debug('Service notice event ignored - feature is disabled', { event: event.type });
@@ -540,6 +537,25 @@ export class EventListener {
         } catch (error: any) {
           this.logger.error('Failed to refresh service notice cache', { error: error.message });
         }
+        break;
+      }
+
+      case 'service_notice.deleted': {
+        if (features.serviceNotice !== true) {
+          this.logger.debug('Service notice event ignored - feature is disabled', { event: event.type });
+          break;
+        }
+        const noticeEnvironment = event.data.environment as string;
+        if (!noticeEnvironment) {
+          this.logger.warn('Service notice deleted event missing environment', { event: event.type });
+          break;
+        }
+        const id = Number(event.data.id);
+        this.logger.info('Service notice deleted event received, removing from cache', {
+          id: id,
+          environment: noticeEnvironment
+        });
+        this.cacheManager.getServiceNoticeService()?.removeFromCache(id, noticeEnvironment);
         break;
       }
 

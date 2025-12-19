@@ -826,6 +826,7 @@ export class CacheManager {
       } catch (_) { }
 
       this.logger.info('All caches refreshed successfully', { types: refreshedTypes });
+      this.lastRefreshedAt = new Date();
 
       // Check and emit maintenance state changes
       if (this.features.serviceMaintenance !== false || this.features.gameWorld !== false) {
@@ -1145,11 +1146,29 @@ export class CacheManager {
   }
 
   /**
+   * Update a single client version in cache (immutable)
+   * @param item Client version to update
+   * @param environment Environment name (required)
+   */
+  async updateSingleClientVersion(item: any, environment: string): Promise<void> {
+    this.clientVersionService?.updateSingleClientVersion(item, environment);
+  }
+
+  /**
    * Get cached service notices
    * @param environment Environment name (required)
    */
   getServiceNotices(environment: string): ServiceNotice[] {
     return this.serviceNoticeService?.getCached(environment) || [];
+  }
+
+  /**
+   * Update a single service notice in cache (immutable)
+   * @param notice Service notice to update
+   * @param environment Environment name (required)
+   */
+  async updateSingleServiceNotice(notice: any, environment: string): Promise<void> {
+    this.serviceNoticeService?.updateSingleServiceNotice(notice, environment);
   }
 
   /**
