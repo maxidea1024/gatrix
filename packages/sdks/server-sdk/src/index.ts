@@ -35,6 +35,7 @@ export { BaseEnvironmentService } from './services/BaseEnvironmentService';
 // Export metrics helpers
 export { SdkMetrics } from './utils/sdkMetrics';
 export { createMetricsServer, MetricsServerConfig, MetricsServerInstance } from './services/MetricsServer';
+export { createHttpMetricsMiddleware, HttpMetricsOptions } from './utils/httpMetrics';
 
 // Export environment resolver
 export { EnvironmentResolver } from './utils/EnvironmentResolver';

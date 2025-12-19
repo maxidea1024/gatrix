@@ -26,6 +26,10 @@ export type MetricsServerConfig = {
   applicationName?: string;
   /** Logger instance */
   logger?: Logger;
+  /** Existing prom-client registry to use as the primary registry (optional) */
+  registry?: any;
+  /** Additional registries to merge into the /metrics output (optional) */
+  additionalRegistries?: any[];
 };
 
 export type MetricsServerInstance = {
@@ -60,17 +64,21 @@ export function createMetricsServer(config: MetricsServerConfig = {}): MetricsSe
   const nodeEnv = process.env.NODE_ENV || 'development';
   const bindAddress = config.bindAddress || (nodeEnv === 'production' ? '127.0.0.1' : '0.0.0.0');
 
-  // Create a separate registry for SDK metrics
-  const registry: Registry = new promClient.Registry();
+  // Use provided registry or create a new one
+  const registry: Registry = config.registry || new promClient.Registry();
+  const isNewRegistry = !config.registry;
 
-  // Set default labels
-  registry.setDefaultLabels({
-    sdk: 'gatrix-server-sdk',
-    service: config.service || 'unknown',
-    group: config.group || 'unknown',
-    environment: config.environment || 'unknown',
-    application: config.applicationName || process.env.SDK_APPLICATION_NAME || 'unknown',
-  });
+  // Set default labels only if it's a new registry or specifically requested
+  // In most cases, we want consistent labels across all metrics in the registry
+  if (isNewRegistry) {
+    registry.setDefaultLabels({
+      sdk: 'gatrix-server-sdk',
+      service: config.service || 'unknown',
+      group: config.group || 'unknown',
+      environment: config.environment || 'unknown',
+      application: config.applicationName || process.env.SDK_APPLICATION_NAME || 'unknown',
+    });
+  }
 
   // Collect default Node.js metrics if enabled (default: true)
   if (config.collectDefaultMetrics !== false) {
@@ -83,8 +91,19 @@ export function createMetricsServer(config: MetricsServerConfig = {}): MetricsSe
   // Metrics endpoint
   app.get('/metrics', async (_req: Request, res: Response) => {
     try {
+      let metricsOutput: string;
+
+      if (config.additionalRegistries && config.additionalRegistries.length > 0) {
+        // Merge multiple registries for output
+        const allRegistries = [registry, ...config.additionalRegistries];
+        metricsOutput = await promClient.Registry.merge(allRegistries).metrics();
+      } else {
+        // Single registry output
+        metricsOutput = await registry.metrics();
+      }
+
       res.set('Content-Type', registry.contentType);
-      res.end(await registry.metrics());
+      res.end(metricsOutput);
     } catch (error) {
       config.logger?.error('Error generating metrics:', error);
       res.status(500).end();
