@@ -80,8 +80,23 @@ export function createMetricsServer(config: MetricsServerConfig = {}): MetricsSe
     });
   }
 
-  // Collect default Node.js metrics if enabled (default: true)
-  if (config.collectDefaultMetrics !== false) {
+  // Check if default Node.js metrics are already present in any of the registries
+  // Use 'process_cpu_user_seconds_total' as a proxy for default metrics
+  const PROXY_METRIC = 'process_cpu_user_seconds_total';
+  const allRegistriesToCheck = [registry, ...(config.additionalRegistries || [])];
+
+  let hasDefaultMetrics = false;
+  try {
+    hasDefaultMetrics = allRegistriesToCheck.some(reg => {
+      // getSingleMetric returns the metric if found, undefined otherwise
+      return !!reg.getSingleMetric(PROXY_METRIC);
+    });
+  } catch (e) {
+    // Ignore errors during check
+  }
+
+  // Collect default Node.js metrics if enabled (default: true) AND not already present
+  if (config.collectDefaultMetrics !== false && !hasDefaultMetrics) {
     promClient.collectDefaultMetrics({ register: registry });
   }
 

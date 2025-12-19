@@ -108,7 +108,7 @@
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20.10.4",
-    "concurrently": "^8.2.2",
+    "concurrently": "^9.2.1",
     "ssh2-sftp-client": "^12.0.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3"
@@ -128,6 +128,7 @@
   "dependencies": {
     "@dnd-kit/modifiers": "^9.0.0",
     "canvas-confetti": "^1.9.4",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.3.1",
     "glob": "^11.0.3",
     "ioredis": "^5.3.2",

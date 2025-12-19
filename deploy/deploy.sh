@@ -156,10 +156,7 @@ create_secrets() {
 }
 
 # Login to registry
-login_registry() {
-    log_info "Logging in to Tencent Cloud Registry..."
-    docker login uwocn.tencentcloudcr.com --username 100017829504 --password eyJhbGciOiJSUzI1NiIsImtpZCI6IkdDTzU6Q0I2UjpaQzVEOlJISUo6WkJTRjpCUlpFOlk0Qkg6R1BJWDpJVUZMOklQS1k6M1RNNTpSQjJOIn0.eyJvd25lclVpbiI6IjMyNzAzMzIzNjIiLCJvcGVyYXRvclVpbiI6IjEwMDAxNzgyOTUwNCIsInRva2VuSWQiOiJkNHA1bTIzbDdhMzNxZzFnMG9mZyIsImV4cCI6MjA4MDI2Nzc4NCwibmJmIjoxNzY0OTA3Nzg0LCJpYXQiOjE3NjQ5MDc3ODR9.e7YpMUd3ui0bJGlpOdC3ABDq4OW6R0T5v05XDvmE2AqU3BzsZN36uoN0S5FTnpjrA-RnDtEOTgaJ8sVPM2nov4GgKekrtaTYhNn4zg4aejfnS2QsDJb-o7tKLpm2_2Ckw7MW-lKfNQb73ZJaQzjkZK7FwvjNExtn_Gp5C2tgLr0DkJZTVSvfPfxeyvkJXQKL-KoKs2A3oyAxdqdsVUTT0viLvulTapFab47ciLsMaY_GW2BBLAI-DGSDeVKOh0Qm0FNVnEl5uVzSkJvU8Dc6vBfsOyj4_yhrNLiTsgfyHVsZ-oSCKPBS2C_uWqlDR6mKeq_9aH5rTX6eqNqIaybq6A
-}
+source "$(dirname "${BASH_SOURCE[0]}")/login_registry.sh"
 
 # Pull images
 pull_images() {

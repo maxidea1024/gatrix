@@ -1,0 +1,178 @@
+#!/bin/bash
+#
+# Gatrix Build and Push Script
+#
+# Usage:
+#   ./build_and_push.sh [options]
+#
+# Options:
+#   -t, --tag <tag>           Image tag (default: latest)
+#   -p, --push                Push images to registry
+#   -s, --service <name>      Service to build (can be used multiple times)
+#   -h, --help                Show help
+
+set -e
+
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+# Default values
+TAG="latest"
+PUSH=false
+REGISTRY="uwocn.tencentcloudcr.com"
+NAMESPACE="uwocn"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+LOGIN_SCRIPT="$SCRIPT_DIR/login_registry.sh"
+
+# Available services
+declare -A ALL_SERVICES
+ALL_SERVICES=(
+    ["backend"]="packages/backend/Dockerfile"
+    ["frontend"]="packages/frontend/Dockerfile"
+    ["edge"]="packages/edge/Dockerfile"
+    ["chat-server"]="packages/chat-server/Dockerfile"
+    ["event-lens"]="packages/event-lens/Dockerfile"
+)
+
+# Targeted services (empty means all)
+TARGET_SERVICES=()
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -t|--tag)
+            TAG="$2"
+            shift 2
+            ;;
+        -p|--push)
+            PUSH=true
+            shift
+            ;;
+        -s|--service)
+            TARGET_SERVICES+=("$2")
+            shift 2
+            ;;
+        -h|--help)
+            echo "Gatrix Build and Push Script"
+            echo ""
+            echo "Usage: ./build_and_push.sh [options]"
+            echo ""
+            echo "Options:"
+            echo "  -t, --tag <tag>           Image tag (default: latest)"
+            echo "  -p, --push                Push images to registry"
+            echo "  -s, --service <name>      Service to build (repeatable)"
+            echo "  -h, --help                Show help"
+            echo ""
+            echo "Example:"
+            echo "  ./build_and_push.sh --service backend --service frontend --push"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+log_warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Determine services to build
+declare -A SERVICES_TO_BUILD
+if [ ${#TARGET_SERVICES[@]} -gt 0 ]; then
+    for svc in "${TARGET_SERVICES[@]}"; do
+        if [ -n "${ALL_SERVICES[$svc]}" ]; then
+            SERVICES_TO_BUILD[$svc]="${ALL_SERVICES[$svc]}"
+        else
+            log_warn "Service '$svc' not found. Skipping."
+        fi
+    done
+    if [ ${#SERVICES_TO_BUILD[@]} -eq 0 ]; then
+        log_error "No valid services specified."
+        exit 1
+    fi
+else
+    # Copy all
+    for key in "${!ALL_SERVICES[@]}"; do
+        SERVICES_TO_BUILD[$key]="${ALL_SERVICES[$key]}"
+    done
+fi
+
+
+echo "========================================"
+echo "   Gatrix Build & Push"
+echo "========================================"
+echo "Root Directory: $ROOT_DIR"
+echo "Tag: $TAG"
+echo "Registry: $REGISTRY/$NAMESPACE/gatrix-<service>:<tag>"
+echo "Services: ${!SERVICES_TO_BUILD[@]}"
+echo ""
+
+# Login if pushing
+if [ "$PUSH" = true ]; then
+    if [ -f "$LOGIN_SCRIPT" ]; then
+        log_info "Calling registry login script..."
+        source "$LOGIN_SCRIPT"
+        if type login_registry &>/dev/null; then
+             login_registry
+        fi
+    else
+        log_warn "Login script not found at $LOGIN_SCRIPT. Assuming already logged in."
+    fi
+fi
+
+for SERVICE_NAME in "${!SERVICES_TO_BUILD[@]}"; do
+    DOCKERFILE="${SERVICES_TO_BUILD[$SERVICE_NAME]}"
+    IMAGE_NAME="$REGISTRY/$NAMESPACE/gatrix-$SERVICE_NAME:$TAG"
+    
+    log_info "Building image for $SERVICE_NAME: $IMAGE_NAME..."
+    
+    FULL_DOCKER_PATH="$ROOT_DIR/$DOCKERFILE"
+    
+    if [ ! -f "$FULL_DOCKER_PATH" ]; then
+        log_warn "Dockerfile not found for $SERVICE_NAME at $FULL_DOCKER_PATH. Skipping."
+        continue
+    fi
+    
+    # Build
+    (
+        cd "$ROOT_DIR"
+        if docker build -f "$DOCKERFILE" -t "$IMAGE_NAME" .; then
+            log_success "[$SERVICE_NAME] Build success."
+            
+            if [ "$PUSH" = true ]; then
+                log_info "[$SERVICE_NAME] Pushing to registry..."
+                if docker push "$IMAGE_NAME"; then
+                    log_success "[$SERVICE_NAME] Push success."
+                else
+                    log_error "[$SERVICE_NAME] Push failed."
+                    exit 1
+                fi
+            fi
+        else
+            log_error "[$SERVICE_NAME] Build failed."
+            exit 1
+        fi
+    ) || exit 1
+done
+
+echo ""
+log_success "Done."

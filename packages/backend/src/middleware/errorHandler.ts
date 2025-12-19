@@ -36,12 +36,12 @@ export const errorHandler = (
 
   // Check if this is a client abort error (common and expected)
   const isClientAbort = error.message?.includes('request aborted') ||
-                       error.message?.includes('aborted') ||
-                       (error as any)?.code === 'ECONNABORTED' ||
-                       (error as any)?.code === 'ECONNRESET' ||
-                       (error as any)?.code === 'EPIPE' ||
-                       (error as any)?.type === 'request.aborted' ||
-                       error.name === 'BadRequestError';
+    error.message?.includes('aborted') ||
+    (error as any)?.code === 'ECONNABORTED' ||
+    (error as any)?.code === 'ECONNRESET' ||
+    (error as any)?.code === 'EPIPE' ||
+    (error as any)?.type === 'request.aborted' ||
+    error.name === 'BadRequestError';
 
   if (isClientAbort) {
     // Log client aborts at debug level only
@@ -105,11 +105,19 @@ export const errorHandler = (
 
 export const notFoundHandler = (req: Request, res: Response): void => {
   const message = `Route ${req.originalUrl} not found`;
-  logger.warn(message, {
-    url: req.originalUrl,
-    method: req.method,
-    ip: req.ip,
-  });
+  if (req.originalUrl === '/metrics') {
+    logger.debug(message, {
+      url: req.originalUrl,
+      method: req.method,
+      ip: req.ip,
+    });
+  } else {
+    logger.warn(message, {
+      url: req.originalUrl,
+      method: req.method,
+      ip: req.ip,
+    });
+  }
 
   res.status(404).json({
     success: false,

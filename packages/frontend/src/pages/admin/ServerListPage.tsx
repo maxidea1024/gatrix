@@ -1432,6 +1432,7 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
                           <TableCell sx={{ fontFamily: '"D2Coding", monospace', fontSize: '0.75rem' }}>{service.labels.version}</TableCell>
                         </TableRow>
                       )}
+                    </TableBody>
                   </Table>
                 </Box>
               }>
