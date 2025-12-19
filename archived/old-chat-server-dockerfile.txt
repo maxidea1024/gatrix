@@ -1,4 +1,4 @@
-# Base stage
+﻿# Base stage
 FROM node:22-alpine AS base
 RUN apk add --no-cache libc6-compat dumb-init
 WORKDIR /app
@@ -18,11 +18,8 @@ COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
-# Skip Cypress binary download - not needed in production Docker image
-ENV CYPRESS_INSTALL_BINARY=0
-
 # Install dependencies (with increased network timeout for slow connections)
-RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
+RUN yarn install --frozen-lockfile --production=false --network-timeout 600000
 
 # Builder stage
 FROM base AS builder
@@ -35,7 +32,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Build server-sdk (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn install --ignore-optional && yarn build
+RUN cd packages/sdks/server-sdk && yarn install && yarn build
 
 # Build chat-server
 RUN yarn workspace @gatrix/chat-server build
@@ -65,7 +62,7 @@ COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
 # Install production dependencies only (with increased network timeout for slow connections)
-RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 --ignore-optional && \
+RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 && \
   yarn cache clean
 
 # Copy built server-sdk from builder to node_modules location

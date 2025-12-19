@@ -1,0 +1,379 @@
+﻿docker : #0 building with "desktop-linux" instance using docker driver
+위치 줄:1 문자:1
++ docker build -f packages/chat-server/Dockerfile -t test-chat-server - ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (#0 building wit...g docker driver:String 
+   ) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 4.61kB done
+#1 DONE 0.0s
+
+#2 [auth] library/node:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:22-alpine
+#3 DONE 1.4s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 392B done
+#4 DONE 0.0s
+
+#5 [base 1/3] FROM docker.io/library/node:22-alpine@sha256:0340fa682d72068edf603c305bf
+bc10e23219fb0e40df58d9ea4d6f33a9798bf
+#5 resolve docker.io/library/node:22-alpine@sha256:0340fa682d72068edf603c305bfbc10e232
+19fb0e40df58d9ea4d6f33a9798bf 0.0s done
+#5 CACHED
+
+#6 [internal] load build context
+#6 transferring context: 11.56kB 0.0s done
+#6 DONE 0.1s
+
+#7 [base 2/3] RUN apk add --no-cache libc6-compat dumb-init
+#7 0.820 (1/4) Installing dumb-init (1.2.5-r3)
+#7 0.842 (2/4) Installing musl-obstack (1.2.3-r2)
+#7 0.851 (3/4) Installing libucontext (1.3.3-r0)
+#7 0.854 (4/4) Installing gcompat (1.1.0-r4)
+#7 0.861 Executing busybox-1.37.0-r30.trigger
+#7 0.870 OK: 11.1 MiB in 22 packages
+#7 DONE 0.9s
+
+#8 [base 3/3] WORKDIR /app
+#8 DONE 0.1s
+
+#9 [builder  1/15] WORKDIR /app
+#9 DONE 0.1s
+
+#10 [runner  2/17] RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
+#10 0.390 yarn config v1.22.22
+#10 0.422 success Set "registry" to "http://mirrors.cloud.tencent.com/npm/".
+#10 0.422 Done in 0.04s.
+#10 DONE 0.5s
+
+#11 [builder  2/15] RUN yarn config set registry http://mirrors.cloud.tencent.com/npm/
+#11 0.390 yarn config v1.22.22
+#11 0.426 success Set "registry" to "http://mirrors.cloud.tencent.com/npm/".
+#11 0.426 Done in 0.04s.
+#11 DONE 0.5s
+
+#12 [builder  3/15] COPY package.json yarn.lock* ./
+#12 DONE 0.2s
+
+#13 [runner  3/17] RUN addgroup -g 1001 -S nodejs &&   adduser -S chatserver -u 1001
+#13 ...
+
+#14 [builder  4/15] COPY packages/backend/package.json ./packages/backend/
+#14 DONE 0.1s
+
+#13 [runner  3/17] RUN addgroup -g 1001 -S nodejs &&   adduser -S chatserver -u 1001
+#13 DONE 0.4s
+
+#15 [builder  5/15] COPY packages/frontend/package.json ./packages/frontend/
+#15 DONE 0.1s
+
+#16 [runner  4/17] COPY package.json yarn.lock* ./
+#16 DONE 0.2s
+
+#17 [builder  6/15] COPY packages/chat-server/package.json ./packages/chat-server/
+#17 DONE 0.2s
+
+#18 [builder  7/15] COPY packages/event-lens/package.json ./packages/event-lens/
+#18 ...
+
+#19 [runner  5/17] COPY packages/backend/package.json ./packages/backend/
+#19 DONE 0.2s
+
+#18 [builder  7/15] COPY packages/event-lens/package.json ./packages/event-lens/
+#18 DONE 0.2s
+
+#20 [runner  6/17] COPY packages/frontend/package.json ./packages/frontend/
+#20 DONE 0.2s
+
+#21 [builder  8/15] COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-
+sdk/
+#21 DONE 0.2s
+
+#22 [runner  7/17] COPY packages/chat-server/package.json ./packages/chat-server/
+#22 DONE 0.2s
+
+#23 [builder  9/15] RUN yarn install --frozen-lockfile --production=false --network-ti
+meout 600000 --ignore-optional
+#23 ...
+
+#24 [runner  8/17] COPY packages/event-lens/package.json ./packages/event-lens/
+#24 DONE 0.1s
+
+#25 [runner  9/17] COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-s
+dk/
+#25 DONE 0.1s
+
+#23 [builder  9/15] RUN yarn install --frozen-lockfile --production=false --network-ti
+meout 600000 --ignore-optional
+#23 ...
+
+#26 [runner 10/17] COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+#26 DONE 0.1s
+
+#23 [builder  9/15] RUN yarn install --frozen-lockfile --production=false --network-ti
+meout 600000 --ignore-optional
+#23 0.364 yarn install v1.22.22
+#23 0.438 [1/5] Validating package.json...
+#23 0.443 [2/5] Resolving packages...
+#23 0.674 [3/5] Fetching packages...
+#23 0.679 warning Pattern ["debug@latest"] is trying to unpack in the same destination
+ "/usr/local/share/.cache/yarn/v6/npm-debug-4.4.1-integrity/node_modules/debug" as pat
+tern ["debug@^4.3.4","debug@^4.3.6","debug@^4.3.4","debug@^4.3.4","debug@^4.3.2","debu
+g@^4.3.4","debug@^4.3.4","debug@^4.3.4","debug@^4.4.0","debug@^4.3.4","debug@^4.3.2","
+debug@^4.3.4","debug@^4.3.4","debug@^4.3.2","debug@^4.3.1","debug@^4.3.4","debug@^4.1.
+0","debug@^4.1.1","debug@^4.3.4","debug@4","debug@^4.3.4","debug@^4.4.0","debug@^4.4.0
+","debug@^4.4.0","debug@^4.3.5","debug@^4.3.4","debug@^4.3.4","debug@^4.3.1","debug@^4
+.3.2","debug@^4.3.1","debug@^4.3.4","debug@^4.1.1","debug@^4.4.0"]. This could result 
+in non-deterministic behavior, skipping.
+#23 ...
+
+#27 [runner 11/17] RUN yarn install --frozen-lockfile --production=true --network-time
+out 600000 --ignore-optional &&   yarn cache clean
+#27 0.278 yarn install v1.22.22
+#27 0.352 [1/5] Validating package.json...
+#27 0.358 [2/5] Resolving packages...
+#27 0.509 [3/5] Fetching packages...
+#27 0.512 warning Pattern ["debug@latest"] is trying to unpack in the same destination
+ "/usr/local/share/.cache/yarn/v6/npm-debug-4.4.1-integrity/node_modules/debug" as pat
+tern ["debug@^4.3.4","debug@^4.3.6","debug@^4.4.0","debug@^4.4.0","debug@^4.4.0","debu
+g@^4.4.0","debug@^4.3.5","debug@^4.3.1"]. This could result in non-deterministic behav
+ior, skipping.
+#27 46.44 warning lru.min@1.1.3: The engine "bun" appears to be invalid.
+#27 46.44 warning lru.min@1.1.3: The engine "deno" appears to be invalid.
+#27 46.44 warning chart.js@4.5.0: The engine "pnpm" appears to be invalid.
+#27 46.44 [4/5] Linking dependencies...
+#27 46.44 warning " > @dnd-kit/modifiers@9.0.0" has unmet peer dependency "@dnd-kit/co
+re@^6.3.0".
+#27 46.44 warning " > @dnd-kit/modifiers@9.0.0" has unmet peer dependency "react@>=16.
+8.0".
+#27 46.44 warning "@dnd-kit/modifiers > @dnd-kit/utilities@3.2.2" has unmet peer depen
+dency "react@>=16.8.0".
+#27 46.44 warning "workspace-aggregator-a2d76401-4fe6-4c48-bb93-750ca39f7088 > @gatrix
+/chat-server > @socket.io/redis-adapter@8.3.0" has unmet peer dependency "socket.io-ad
+apter@^2.5.4".
+#27 46.44 warning "workspace-aggregator-a2d76401-4fe6-4c48-bb93-750ca39f7088 > @gatrix
+/frontend > @chatscope/chat-ui-kit-react@2.1.1" has unmet peer dependency "prop-types@
+^15.7.2".
+#27 46.44 warning "workspace-aggregator-a2d76401-4fe6-4c48-bb93-750ca39f7088 > @gatrix
+/frontend > @mui/x-data-grid@8.11.3" has unmet peer dependency "@mui/system@^5.15.14 |
+| ^6.0.0 || ^7.0.0".
+#27 46.44 warning "workspace-aggregator-a2d76401-4fe6-4c48-bb93-750ca39f7088 > @gatrix
+/frontend > @mui/x-date-pickers@8.11.3" has unmet peer dependency "@mui/system@^5.15.1
+4 || ^6.0.0 || ^7.0.0".
+#27 46.44 warning "workspace-aggregator-a2d76401-4fe6-4c48-bb93-750ca39f7088 > @gatrix
+/frontend > @mui/x-date-pickers-pro@8.11.3" has unmet peer dependency "@mui/system@^5.
+15.14 || ^6.0.0 || ^7.0.0".
+#27 46.45 warning "workspace-aggregator-a2d76401-4fe6-4c48-bb93-750ca39f7088 > @gatrix
+/frontend > @mui/material > @types/react-transition-group@4.4.12" has unmet peer depen
+dency "@types/react@*".
+#27 46.45 warning "workspace-aggregator-a2d76401-4fe6-4c48-bb93-750ca39f7088 > @gatrix
+/frontend > notistack > goober@2.1.16" has unmet peer dependency "csstype@^3.0.10".
+#27 46.45 warning "workspace-aggregator-a2d76401-4fe6-4c48-bb93-750ca39f7088 > @gatrix
+/backend > swagger-jsdoc > swagger-parser > @apidevtools/swagger-parser@10.0.3" has un
+met peer dependency "openapi-types@>=7".
+#27 46.46 warning Workspaces can only be enabled in private projects.
+#27 ...
+
+#23 [builder  9/15] RUN yarn install --frozen-lockfile --production=false --network-ti
+meout 600000 --ignore-optional
+#23 55.14 warning lru.min@1.1.3: The engine "bun" appears to be invalid.
+#23 55.14 warning lru.min@1.1.3: The engine "deno" appears to be invalid.
+#23 55.14 warning chart.js@4.5.0: The engine "pnpm" appears to be invalid.
+#23 55.15 [4/5] Linking dependencies...
+#23 55.15 warning " > @dnd-kit/modifiers@9.0.0" has unmet peer dependency "@dnd-kit/co
+re@^6.3.0".
+#23 55.15 warning " > @dnd-kit/modifiers@9.0.0" has unmet peer dependency "react@>=16.
+8.0".
+#23 55.15 warning "@dnd-kit/modifiers > @dnd-kit/utilities@3.2.2" has unmet peer depen
+dency "react@>=16.8.0".
+#23 55.15 warning "workspace-aggregator-39819cc9-8c4a-48a8-a94c-9eb299a60fd1 > @gatrix
+/chat-server > @socket.io/redis-adapter@8.3.0" has unmet peer dependency "socket.io-ad
+apter@^2.5.4".
+#23 55.15 warning "workspace-aggregator-39819cc9-8c4a-48a8-a94c-9eb299a60fd1 > @gatrix
+/frontend > @chatscope/chat-ui-kit-react@2.1.1" has unmet peer dependency "prop-types@
+^15.7.2".
+#23 55.15 warning "workspace-aggregator-39819cc9-8c4a-48a8-a94c-9eb299a60fd1 > @gatrix
+/frontend > @mui/x-data-grid@8.11.3" has unmet peer dependency "@mui/system@^5.15.14 |
+| ^6.0.0 || ^7.0.0".
+#23 55.15 warning "workspace-aggregator-39819cc9-8c4a-48a8-a94c-9eb299a60fd1 > @gatrix
+/frontend > @mui/x-date-pickers@8.11.3" has unmet peer dependency "@mui/system@^5.15.1
+4 || ^6.0.0 || ^7.0.0".
+#23 55.15 warning "workspace-aggregator-39819cc9-8c4a-48a8-a94c-9eb299a60fd1 > @gatrix
+/frontend > @mui/x-date-pickers-pro@8.11.3" has unmet peer dependency "@mui/system@^5.
+15.14 || ^6.0.0 || ^7.0.0".
+#23 55.16 warning "workspace-aggregator-39819cc9-8c4a-48a8-a94c-9eb299a60fd1 > @gatrix
+/frontend > @testing-library/user-event@14.6.1" has unmet peer dependency "@testing-li
+brary/dom@>=7.21.4".
+#23 55.16 warning "workspace-aggregator-39819cc9-8c4a-48a8-a94c-9eb299a60fd1 > @gatrix
+/frontend > notistack > goober@2.1.16" has unmet peer dependency "csstype@^3.0.10".
+#23 55.16 warning "workspace-aggregator-39819cc9-8c4a-48a8-a94c-9eb299a60fd1 > @gatrix
+/backend > swagger-jsdoc > swagger-parser > @apidevtools/swagger-parser@10.0.3" has un
+met peer dependency "openapi-types@>=7".
+#23 55.18 warning Workspaces can only be enabled in private projects.
+#23 ...
+
+#27 [runner 11/17] RUN yarn install --frozen-lockfile --production=true --network-time
+out 600000 --ignore-optional &&   yarn cache clean
+#27 71.15 [5/5] Building fresh packages...
+#27 73.06 Done in 72.78s.
+#27 73.28 yarn cache v1.22.22
+#27 76.64 success Cleared cache.
+#27 76.64 Done in 3.36s.
+#27 DONE 80.2s
+
+#23 [builder  9/15] RUN yarn install --frozen-lockfile --production=false --network-ti
+meout 600000 --ignore-optional
+#23 88.32 [5/5] Building fresh packages...
+#23 93.42 Done in 93.06s.
+#23 DONE 96.3s
+
+#28 [builder 10/15] RUN yarn add -W --dev @swc/core-linux-x64-musl --ignore-scripts
+#28 1.134 yarn add v1.22.22
+#28 1.206 [1/5] Validating package.json...
+#28 1.211 [2/5] Resolving packages...
+#28 2.415 [3/5] Fetching packages...
+#28 2.421 warning Pattern ["debug@latest"] is trying to unpack in the same destination
+ "/usr/local/share/.cache/yarn/v6/npm-debug-4.4.1-integrity/node_modules/debug" as pat
+tern ["debug@^4.3.4","debug@^4.3.6","debug@^4.3.4","debug@^4.3.4","debug@^4.3.2","debu
+g@^4.3.4","debug@^4.3.4","debug@^4.3.4","debug@^4.4.0","debug@^4.3.4","debug@^4.3.2","
+debug@^4.3.4","debug@^4.3.4","debug@^4.3.2","debug@^4.3.1","debug@^4.3.4","debug@^4.1.
+0","debug@^4.1.1","debug@^4.3.4","debug@4","debug@^4.3.4","debug@^4.4.0","debug@^4.4.0
+","debug@^4.4.0","debug@^4.3.5","debug@^4.3.4","debug@^4.3.4","debug@^4.3.1","debug@^4
+.3.2","debug@^4.3.1","debug@^4.3.4","debug@^4.1.1","debug@^4.4.0"]. This could result 
+in non-deterministic behavior, skipping.
+#28 4.567 warning lru.min@1.1.3: The engine "bun" appears to be invalid.
+#28 4.567 warning lru.min@1.1.3: The engine "deno" appears to be invalid.
+#28 4.568 warning chart.js@4.5.0: The engine "pnpm" appears to be invalid.
+#28 4.599 [4/5] Linking dependencies...
+#28 4.600 warning " > @dnd-kit/modifiers@9.0.0" has unmet peer dependency "@dnd-kit/co
+re@^6.3.0".
+#28 4.600 warning " > @dnd-kit/modifiers@9.0.0" has unmet peer dependency "react@>=16.
+8.0".
+#28 4.600 warning "@dnd-kit/modifiers > @dnd-kit/utilities@3.2.2" has unmet peer depen
+dency "react@>=16.8.0".
+#28 4.601 warning "workspace-aggregator-416ca636-4492-4bc4-90c3-4a772b6652b1 > @gatrix
+/chat-server > @socket.io/redis-adapter@8.3.0" has unmet peer dependency "socket.io-ad
+apter@^2.5.4".
+#28 4.601 warning "workspace-aggregator-416ca636-4492-4bc4-90c3-4a772b6652b1 > @gatrix
+/frontend > @chatscope/chat-ui-kit-react@2.1.1" has unmet peer dependency "prop-types@
+^15.7.2".
+#28 4.602 warning "workspace-aggregator-416ca636-4492-4bc4-90c3-4a772b6652b1 > @gatrix
+/frontend > @mui/x-data-grid@8.11.3" has unmet peer dependency "@mui/system@^5.15.14 |
+| ^6.0.0 || ^7.0.0".
+#28 4.602 warning "workspace-aggregator-416ca636-4492-4bc4-90c3-4a772b6652b1 > @gatrix
+/frontend > @mui/x-date-pickers@8.11.3" has unmet peer dependency "@mui/system@^5.15.1
+4 || ^6.0.0 || ^7.0.0".
+#28 4.602 warning "workspace-aggregator-416ca636-4492-4bc4-90c3-4a772b6652b1 > @gatrix
+/frontend > @mui/x-date-pickers-pro@8.11.3" has unmet peer dependency "@mui/system@^5.
+15.14 || ^6.0.0 || ^7.0.0".
+#28 4.603 warning "workspace-aggregator-416ca636-4492-4bc4-90c3-4a772b6652b1 > @gatrix
+/frontend > @testing-library/user-event@14.6.1" has unmet peer dependency "@testing-li
+brary/dom@>=7.21.4".
+#28 4.605 warning "workspace-aggregator-416ca636-4492-4bc4-90c3-4a772b6652b1 > @gatrix
+/frontend > notistack > goober@2.1.16" has unmet peer dependency "csstype@^3.0.10".
+#28 4.606 warning "workspace-aggregator-416ca636-4492-4bc4-90c3-4a772b6652b1 > @gatrix
+/backend > swagger-jsdoc > swagger-parser > @apidevtools/swagger-parser@10.0.3" has un
+met peer dependency "openapi-types@>=7".
+#28 4.625 warning Workspaces can only be enabled in private projects.
+#28 16.74 warning Ignored scripts due to flag.
+#28 16.74 [5/5] Building fresh packages...
+#28 16.81 success Saved lockfile.
+#28 16.83 warning Workspaces can only be enabled in private projects.
+#28 16.88 success Saved 1 new dependency.
+#28 16.88 info Direct dependencies
+#28 16.88 ?붴? @swc/core-linux-x64-musl@1.15.7
+#28 16.88 info All dependencies
+#28 16.88 ?붴? @swc/core-linux-x64-musl@1.15.7
+#28 16.88 Done in 15.75s.
+#28 DONE 17.4s
+
+#29 [builder 11/15] COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
+#29 DONE 0.1s
+
+#30 [builder 12/15] COPY tsconfig.json ./
+#30 DONE 0.1s
+
+#31 [builder 13/15] RUN cd packages/sdks/server-sdk && yarn build
+#31 0.268 yarn run v1.22.22
+#31 0.304 $ concurrently "yarn swc src -d dist" "yarn tsc --emitDeclarationOnly"
+#31 0.532 [0] $ /app/node_modules/.bin/swc src -d dist
+#31 0.532 [1] $ /app/node_modules/.bin/tsc --emitDeclarationOnly
+#31 0.740 [0] Successfully compiled: 31 files with swc (149.54ms)
+#31 0.779 [0] yarn swc src -d dist exited with code 0
+#31 1.602 [1] yarn tsc --emitDeclarationOnly exited with code 0
+#31 1.606 Done in 1.34s.
+#31 DONE 1.7s
+
+#32 [builder 14/15] COPY packages/chat-server ./packages/chat-server
+#32 DONE 0.1s
+
+#33 [builder 15/15] RUN set -ex &&   npx swc packages/chat-server/src -d packages/chat
+-server/dist --config-file packages/chat-server/.swcrc &&   echo "=== Build completed,
+ listing dist folder ===" &&   ls -la packages/chat-server/dist/ || echo "dist folder 
+does not exist" &&   ls -la packages/chat-server/dist/index.js || echo "index.js does 
+not exist"
+#33 4.151 + npx swc packages/chat-server/src -d packages/chat-server/dist --config-fil
+e packages/chat-server/.swcrc
+#33 10.96 Successfully compiled: 53 files with swc (602.09ms)
+#33 13.10 + echo '=== Build completed, listing dist folder ==='
+#33 13.10 + ls -la packages/chat-server/dist/
+#33 13.10 === Build completed, listing dist folder ===
+#33 13.10 total 12
+#33 13.10 drwxr-xr-x    3 root     root          4096 Dec 19 02:04 .
+#33 13.10 drwxr-xr-x    1 root     root          4096 Dec 19 02:04 ..
+#33 13.10 drwxr-xr-x    3 root     root          4096 Dec 19 02:04 packages
+#33 13.10 + ls -la packages/chat-server/dist/index.js
+#33 13.10 ls: packages/chat-server/dist/index.js: No such file or directory
+#33 13.10 + echo 'index.js does not exist'
+#33 13.10 index.js does not exist
+#33 DONE 13.1s
+
+#34 [runner 12/17] COPY --from=builder /app/packages/sdks/server-sdk/dist ./packages/c
+hat-server/node_modules/@gatrix/server-sdk/dist
+#34 DONE 0.4s
+
+#35 [runner 13/17] COPY --from=builder /app/packages/sdks/server-sdk/package.json ./pa
+ckages/chat-server/node_modules/@gatrix/server-sdk/package.json
+#35 DONE 0.1s
+
+#36 [runner 14/17] COPY --from=builder /app/packages/chat-server/dist ./packages/chat-
+server/dist
+#36 DONE 0.1s
+
+#37 [runner 15/17] COPY packages/chat-server/src/database/migrations ./packages/chat-s
+erver/dist/database/migrations
+#37 DONE 0.1s
+
+#38 [runner 16/17] COPY packages/chat-server/knexfile.js ./packages/chat-server/
+#38 DONE 0.1s
+
+#39 [runner 17/17] RUN mkdir -p logs uploads && chown -R chatserver:nodejs logs upload
+s
+#39 DONE 0.2s
+
+#40 exporting to image
+#40 exporting layers
+#40 exporting layers 11.6s done
+#40 exporting manifest sha256:d933cd3ed5dc560479249226e4fa3b62163cfb6f10685b1cb662f3e4
+41a8466d 0.0s done
+#40 exporting config sha256:be9ce052cc63ce0948d6027951933adf60ce6bded712334030a0a411c8
+7f58c6 0.0s done
+#40 exporting attestation manifest sha256:fac382b9b9b260e112574dd8d538b463d346c769a962
+14db5fcc1fbb35d6f30b 0.0s done
+#40 exporting manifest list sha256:17388c0e3cd78ed289c1b1808d19b6063bf84070db0a02cc004
+27ee2dfb97f42
+#40 exporting manifest list sha256:17388c0e3cd78ed289c1b1808d19b6063bf84070db0a02cc004
+27ee2dfb97f42 0.0s done
+#40 naming to docker.io/library/test-chat-server:latest done
+#40 unpacking to docker.io/library/test-chat-server:latest
+#40 unpacking to docker.io/library/test-chat-server:latest 7.0s done
+#40 DONE 18.8s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/yggtf
+3qifid1ur57h2sr4agl4

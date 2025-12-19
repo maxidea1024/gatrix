@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "yarn migrate:up && ts-node-dev --poll --respawn --transpile-only --ignore-watch node_modules --ignore-watch dist --ignore-watch logs --ignore-watch cms --ignore-watch uploads src/index.ts",
     "dev:no-migrate": "ts-node-dev --poll --respawn --transpile-only --ignore-watch node_modules --ignore-watch dist --ignore-watch logs --ignore-watch cms --ignore-watch uploads src/index.ts",
-    "build": "concurrently \"yarn swc src -d dist\" \"yarn swc scripts -d dist/scripts\"",
+    "build": "tsc && tsc -p tsconfig.scripts.json",
     "build:tsc": "tsc && tsc -p tsconfig.scripts.json",
     "typecheck": "tsc --noEmit",
     "start": "yarn migrate:up && node dist/index.js",

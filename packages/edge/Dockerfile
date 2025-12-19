@@ -47,6 +47,8 @@ RUN cd packages/sdks/server-sdk && yarn build
 
 # Build the edge server
 RUN cd packages/edge && yarn build
+# Verify dist/index.js exists
+RUN ls -la packages/edge/dist/index.js
 
 # Production image, copy all the files and run the app
 FROM base AS runner

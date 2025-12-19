@@ -29,6 +29,8 @@ ENV NODE_ENV=production
 # Increase Node.js heap size for build process to prevent out of memory errors
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN yarn workspace @gatrix/frontend build
+# Verify dist/index.html exists
+RUN ls -la packages/frontend/dist/index.html
 
 # Production image with Nginx
 FROM nginx:alpine AS runner

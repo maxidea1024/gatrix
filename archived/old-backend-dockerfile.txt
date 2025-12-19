@@ -1,4 +1,4 @@
-# Multi-stage build for production optimization
+﻿# Multi-stage build for production optimization
 FROM node:22-alpine AS base
 
 # Install dependencies only when needed
@@ -16,11 +16,7 @@ COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
-
-# Skip Cypress binary download - not needed in production Docker image
-ENV CYPRESS_INSTALL_BINARY=0
-
-RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
+RUN yarn install --frozen-lockfile --production=false --network-timeout 600000
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -38,17 +34,14 @@ COPY packages/chat-server/package.json ./packages/chat-server/
 COPY packages/event-lens/package.json ./packages/event-lens/
 COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 
-# Skip Cypress binary download - not needed in production Docker image
-ENV CYPRESS_INSTALL_BINARY=0
-
 # Install dependencies
-RUN yarn install --frozen-lockfile --production=false --network-timeout 600000 --ignore-optional
+RUN yarn install --frozen-lockfile --production=false --network-timeout 600000
 
-# Copy all source files
+# Copy source code
 COPY . .
 
 # Build server-sdk first (required because main points to dist/index.js)
-RUN cd packages/sdks/server-sdk && yarn build
+RUN cd packages/sdks/server-sdk && yarn install --network-timeout 600000 && yarn build
 
 # Build the backend
 RUN yarn workspace @gatrix/backend build
@@ -79,11 +72,8 @@ COPY packages/sdks/server-sdk/package.json ./packages/sdks/server-sdk/
 # Copy server-sdk source (needed for file: dependency)
 COPY packages/sdks/server-sdk ./packages/sdks/server-sdk
 
-RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 --ignore-optional && \
+RUN yarn install --frozen-lockfile --production=true --network-timeout 600000 && \
   yarn cache clean
-
-# Copy built server-sdk dist to node_modules (required because main points to dist/index.js)
-COPY --from=builder /app/packages/sdks/server-sdk/dist ./node_modules/@gatrix/server-sdk/dist
 
 # Create logs, uploads, and data directories
 RUN mkdir -p logs uploads data && chown nodejs:nodejs logs uploads data
