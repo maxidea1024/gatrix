@@ -41,6 +41,12 @@ router.get('/prometheus/targets', async (_req, res) => {
       if (s.externalAddress) {
         labels.externalIp = s.externalAddress;
       }
+      if (s.labels.environment) {
+        labels.environment = s.labels.environment;
+      }
+      if (s.labels.region) {
+        labels.region = s.labels.region;
+      }
       if (s.labels.group) {
         labels.group = s.labels.group;
       }
