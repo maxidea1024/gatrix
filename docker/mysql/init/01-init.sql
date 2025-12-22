@@ -26,5 +26,10 @@ GRANT ALL PRIVILEGES ON gatrix_chat.* TO 'gatrix_user'@'%';
 -- Flush privileges
 FLUSH PRIVILEGES;
 
+-- Create MySQL exporter user
+CREATE USER IF NOT EXISTS 'mysqld_exporter'@'%' IDENTIFIED BY 'exporter_password';
+GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'mysqld_exporter'@'%';
+FLUSH PRIVILEGES;
+
 -- Log initialization
 SELECT 'Gatrix database initialization completed' AS message;

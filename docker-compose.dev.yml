@@ -53,9 +53,9 @@ services:
     container_name: gatrix-mysql-exporter-dev
     restart: unless-stopped
     environment:
-      MYSQLD_EXPORTER_PASSWORD: ${DB_ROOT_PASSWORD:-gatrix_rootpassword}
+      MYSQLD_EXPORTER_PASSWORD: exporter_password
     command:
-      - "--mysqld.username=root"
+      - "--mysqld.username=mysqld_exporter"
       - "--mysqld.address=mysql:3306"
     ports:
       - "0.0.0.0:49104:9104"
@@ -97,6 +97,8 @@ services:
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-backend
       MONITORING_ENABLED: "true"
+      GATRIX_LOKI_ENABLED: "true"
+      GATRIX_LOKI_URL: "http://loki:3100/loki/api/v1/push"
       PORT: 5000
       DB_HOST: mysql
       DB_PORT: 3306
@@ -263,6 +265,8 @@ services:
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-event-lens
       MONITORING_ENABLED: "true"
+      GATRIX_LOKI_ENABLED: "true"
+      GATRIX_LOKI_URL: "http://loki:3100/loki/api/v1/push"
       PORT: 5200
       LOG_LEVEL: ${EVENT_LENS_LOG_LEVEL:-debug}
       CLICKHOUSE_HOST: clickhouse
@@ -329,6 +333,8 @@ services:
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-event-lens-worker
       MONITORING_ENABLED: "true"
+      GATRIX_LOKI_ENABLED: "true"
+      GATRIX_LOKI_URL: "http://loki:3100/loki/api/v1/push"
       LOG_LEVEL: ${EVENT_LENS_LOG_LEVEL:-debug}
       CLICKHOUSE_HOST: clickhouse
       CLICKHOUSE_PORT: 8123
@@ -378,6 +384,8 @@ services:
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-chat-server
       MONITORING_ENABLED: "true"
+      GATRIX_LOKI_ENABLED: "true"
+      GATRIX_LOKI_URL: "http://loki:3100/loki/api/v1/push"
       PORT: 5100
       HOST: 0.0.0.0
       # Database
@@ -452,6 +460,8 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: development
+      GATRIX_LOKI_ENABLED: "true"
+      GATRIX_LOKI_URL: "http://loki:3100/loki/api/v1/push"
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-edge
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-debug}
@@ -528,21 +538,6 @@ services:
     volumes:
       - ./docker/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
-    depends_on:
-      loki:
-        condition: service_started
-    networks:
-      - gatrix-dev-network
-
-  # Promtail - Log collector for non-dockerized game servers
-  promtail:
-    image: grafana/promtail:latest
-    container_name: gatrix-promtail-dev
-    restart: unless-stopped
-    volumes:
-      - ./docker/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
-      - C:/Users/jhseo/.pm2/logs:/mnt/pm2logs:ro
-    command: -config.file=/etc/promtail/config.yml
     depends_on:
       loki:
         condition: service_started

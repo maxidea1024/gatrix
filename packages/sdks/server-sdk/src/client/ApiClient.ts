@@ -5,7 +5,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { ulid } from 'ulid';
 import { Logger } from '../utils/logger';
-import { ErrorCode, createError } from '../utils/errors';
+import { ErrorCode, createError, isGatrixSDKError } from '../utils/errors';
 import { ApiResponse } from '../types/api';
 import { RetryConfig } from '../types/config';
 import { SdkMetrics } from '../utils/sdkMetrics';
@@ -200,18 +200,30 @@ export class ApiClient {
   /**
    * Check if error is retryable
    */
-  private isRetryableError(error: AxiosError): boolean {
+  private isRetryableError(error: any): boolean {
     if (!this.retryConfig.enabled) {
       return false;
     }
 
+    // Handle GatrixSDKError (as errors are wrapped in interceptor)
+    if (isGatrixSDKError(error)) {
+      if (error.statusCode) {
+        return this.retryConfig.retryableStatusCodes.includes(error.statusCode);
+      }
+      // Network errors are retryable
+      return error.code === ErrorCode.NETWORK_ERROR;
+    }
+
+    // Handle raw AxiosError
+    const axiosError = error as AxiosError;
+
     // Network errors are retryable
-    if (!error.response) {
+    if (!axiosError.response) {
       return true;
     }
 
     // Check if status code is retryable
-    const status = error.response.status;
+    const status = axiosError.response.status;
     return this.retryConfig.retryableStatusCodes.includes(status);
   }
 
@@ -260,7 +272,7 @@ export class ApiClient {
     fn: () => Promise<AxiosResponse<ApiResponse<T>>>,
     context: { method: string; url: string }
   ): Promise<ApiResponse<T>> {
-    let lastError: AxiosError | undefined;
+    let lastError: any;
     const isInfiniteRetry = this.retryConfig.maxRetries === -1;
     const maxAttempts = isInfiniteRetry ? Number.MAX_SAFE_INTEGER : this.retryConfig.maxRetries;
 
@@ -269,7 +281,7 @@ export class ApiClient {
         const response = await fn();
         return response.data;
       } catch (error) {
-        lastError = error as AxiosError;
+        lastError = error;
 
         // If not retryable or last attempt, throw error
         if (!this.isRetryableError(lastError) || attempt === maxAttempts) {
@@ -505,4 +517,3 @@ export class ApiClient {
     this.logger.debug('Cleared all ETag cache', { count });
   }
 }
-

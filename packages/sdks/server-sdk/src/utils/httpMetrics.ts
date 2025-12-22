@@ -26,8 +26,8 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
     const labelNames = ['method', 'route', 'status', 'scope'];
 
     // Check existing metrics first to avoid duplicate registration
-    let httpRequestDuration = registry.getSingleMetric(name) || promClient.register.getSingleMetric(name);
-    let httpRequestsTotal = registry.getSingleMetric(counterName) || promClient.register.getSingleMetric(counterName);
+    let httpRequestDuration = registry.getSingleMetric(name);
+    let httpRequestsTotal = registry.getSingleMetric(counterName);
 
     // Register Histogram for latency (only if not already registered)
     if (!httpRequestDuration) {
@@ -40,12 +40,8 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
                 registers: [registry],
             });
         } catch (_err) {
-            // If new failed, try one last time to get it (might have been registered concurrently or globally)
-            httpRequestDuration = registry.getSingleMetric(name) || promClient.register.getSingleMetric(name);
-            if (!httpRequestDuration) {
-                // Return a dummy object if still null to satisfy subsequent calls without crashing
-                httpRequestDuration = { observe: () => { } };
-            }
+            // If creation failed, it might have been created by another call.
+            httpRequestDuration = registry.getSingleMetric(name);
         }
     }
 
@@ -59,12 +55,14 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
                 registers: [registry],
             });
         } catch (_err) {
-            httpRequestsTotal = registry.getSingleMetric(counterName) || promClient.register.getSingleMetric(counterName);
-            if (!httpRequestsTotal) {
-                httpRequestsTotal = { inc: () => { } };
-            }
+            httpRequestsTotal = registry.getSingleMetric(counterName);
         }
     }
+
+    // Final safety check: if we still don't have the metrics, create dummy ones
+    // This happens only if something is really wrong (e.g. incompatible types in registry)
+    if (!httpRequestDuration) httpRequestDuration = { observe: () => { } };
+    if (!httpRequestsTotal) httpRequestsTotal = { inc: () => { } };
 
     return (req: Request, res: Response, next: NextFunction) => {
         const start = process.hrtime();

@@ -267,45 +267,48 @@ If the Grafana Logs dashboard only shows `info` logs even when `level=All` is se
 - All UI labels for the Grafana menu item are localized (ko/en/zh).
 - When adding new guidance strings, ensure localization keys are unique and friendly (Korean guidelines ending with "...합니다.").
 
-## External Log Collection (Non-Docker) via Promtail
+## Loki Direct Log Push (SDK)
 
-For game servers running outside of Docker (using PM2), logs are collected using **Promtail** and forwarded to Loki.
+Game servers and services now push logs directly to Loki using the `@gatrix/server-sdk`. This modern approach replaces file-based scraping (Promtail), providing better performance, structured data, and simplified deployment.
 
-### Architecture
+### How it Works
 
-- **Loki**: Central log store (running in Docker).
-- **Promtail**: Log agent (running in Docker) that monitors host log files.
-- **Fluent Bit**: Collects logs from Docker containers and sends them to Loki.
+1.  **SDK Logger**: The SDK includes a `LokiTransport` that batches log entries and sends them via HTTP POST to the Loki push API.
+2.  **SDK Manager Integration**: The `gatrixSdkManager.ts` initializes the SDK with Loki settings from `mconf`.
+3.  **mlog Hooking**: After SDK initialization, the SDK's logger is injected into the game's global `mlog` instance. All logs sent through `mlog` (info, error, etc.) are automatically forwarded to Loki.
+4.  **Automatic Labeling**: Logs are automatically tagged with metadata: `service`, `group`, `environment`, `application`, and `hostname`.
 
 ### Configuration
 
-Promtail is configured to watch the PM2 log directory on the host machine:
+Loki can be enabled and configured in `mconf.ts` or via `default.json5`:
 
-- **Host Path**: `C:/Users/jhseo/.pm2/logs/*.log`
-- **Container Path**: `/mnt/pm2logs/*.log` (mounted as read-only)
-
-The configuration file is located at `docker/promtail/promtail-config.yml`.
-
-### How to access host logs in Docker
-
-In `docker-compose.yml`, the host directory is mounted to the Promtail container:
-
-```yaml
-  promtail:
-    image: grafana/promtail:latest
-    container_name: gatrix-promtail
-    volumes:
-      - ./docker/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
-      - C:/Users/jhseo/.pm2/logs:/mnt/pm2logs:ro
-    command: -config.file=/etc/promtail/config.yml
+```json5
+gatrix: {
+  loki: {
+    /** Enable/disable direct Loki logging */
+    enabled: true,
+    /** Loki push API URL */
+    url: "http://localhost:43100/loki/api/v1/push",
+    /** Optional additional labels */
+    labels: {
+      source_category: "game-server"
+    },
+    /** Maximum number of log entries per batch (default: 1000) */
+    batchSize: 1000,
+    /** Maximum interval between batches in ms (default: 5000) */
+    batchInterval: 5000
+  }
+}
 ```
 
-### Log Pipeline
+### Environment Variables
 
-The Promtail config includes a multiline stage to correctly handle stack traces and multi-line log entries by grouping lines that start with a date/time pattern.
+While configuration via `mconf` is preferred, the SDK also supports automatic activation via environment variables for non-game services:
 
-- **First line pattern**: `^(\d{4}-\d{2}-\d{2}|\d{2}/\d{2} \d{2}:\d{2}:\d{2})`
-- **Labels added**: `job="game-servers"`, `host="host-machine"`
+- `GATRIX_LOKI_ENABLED`: Set to `true` to enable.
+- `GATRIX_LOKI_URL`: Loki push endpoint.
 
-In Grafana, these logs can be queried using `{job="game-servers"}`.
+### Migration from Promtail
+
+Promtail is no longer required for game server log collection. All relevant `docker-compose` services and documentation have been updated to reflect this change. Host-based PM2 logs are now natively pushed by the application process itself.
 

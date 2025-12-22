@@ -16,6 +16,14 @@ export interface CacheConfig {
   skipBackendReady?: boolean; // Skip waiting for backend to be ready during initialization (default: false). Set to true for backend self-registration to avoid infinite wait.
 }
 
+export interface LokiConfig {
+  enabled?: boolean; // Enable Loki direct push (default: false)
+  url: string; // Loki push URL (e.g., http://loki:3100/loki/api/v1/push)
+  labels?: Record<string, string>; // Common labels for Loki (e.g., { service: 'auth' })
+  batchSize?: number; // Number of logs to buffer before sending (default: 10)
+  batchInterval?: number; // Maximum time in ms to wait before sending a batch (default: 5000)
+}
+
 export interface LoggerConfig {
   level?: 'debug' | 'info' | 'warn' | 'error';
   customLogger?: (level: string, message: string, meta?: any) => void;
@@ -23,6 +31,8 @@ export interface LoggerConfig {
   timestampFormat?: 'iso8601' | 'local'; // Timestamp format. Default: 'iso8601'
   format?: 'pretty' | 'json'; // Output format. Default: 'pretty'
   context?: Record<string, any>; // Additional context fields to include in every log entry (JSON format only)
+  sourceCategory?: string; // Source category for logs
+  loki?: LokiConfig; // Loki configuration for direct log push
 }
 
 /**

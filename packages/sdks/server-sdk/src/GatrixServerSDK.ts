@@ -158,13 +158,43 @@ export class GatrixServerSDK {
       environment: config.environment || 'development', // Temporary fallback
     };
 
+    // Auto-configure Loki from environment variables if enabled
+    const lokiEnabled = process.env.GATRIX_LOKI_ENABLED === 'true';
+    const lokiUrl = process.env.GATRIX_LOKI_URL;
+
+    if (lokiEnabled && lokiUrl) {
+      configWithDefaults.logger = {
+        ...configWithDefaults.logger,
+        loki: {
+          enabled: true,
+          url: lokiUrl,
+          ...(configWithDefaults.logger?.loki || {}),
+        }
+      };
+    }
+
     // Validate config
     this.validateConfig(configWithDefaults);
 
     this.config = configWithDefaults;
 
-    // Initialize logger
-    this.logger = new Logger(configWithDefaults.logger);
+    // Initialize logger with default Loki labels (inject SDK identity)
+    const loggerConfig = { ...configWithDefaults.logger };
+    if (loggerConfig.loki) {
+      loggerConfig.loki = {
+        ...loggerConfig.loki,
+        labels: {
+          job: 'gatrix',
+          service: configWithDefaults.service,
+          group: configWithDefaults.group,
+          environment: configWithDefaults.environment,
+          application: configWithDefaults.applicationName,
+          hostname: require('os').hostname(),
+          ...loggerConfig.loki.labels,
+        },
+      };
+    }
+    this.logger = new Logger(loggerConfig);
 
     // Initialize metrics first
     this.metrics = new SdkMetrics({
@@ -421,6 +451,20 @@ export class GatrixServerSDK {
       this.logger.error('Failed to initialize SDK', { error: error.message });
       throw error;
     }
+  }
+
+  /**
+   * Get internal logger instance
+   */
+  getLogger(): Logger {
+    return this.logger;
+  }
+
+  /**
+   * Get SDK configuration
+   */
+  getConfig(): GatrixSDKConfig {
+    return this.config;
   }
 
   /**

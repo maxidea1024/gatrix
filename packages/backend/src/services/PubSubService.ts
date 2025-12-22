@@ -406,7 +406,7 @@ export class PubSubService extends EventEmitter {
   /**
    * Publish standard event (for SDK real-time events like maintenance.started, maintenance.ended)
    */
-  async publishEvent(event: { type: string; data: { id: number | string; timestamp: number } }): Promise<void> {
+  async publishEvent(event: { type: string; data: { id: number | string; timestamp: number;[key: string]: any } }): Promise<void> {
     try {
       const client = redisClient.getClient();
       const eventChannel = 'gatrix-sdk-events';

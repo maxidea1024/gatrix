@@ -73,13 +73,14 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
   const lineNumberBaseStyle = useMemo(() => ({
     minWidth: '60px',
     px: 1,
-    py: 0.25,
+    py: 0, // Reduced from 0.25
     textAlign: 'right' as const,
     borderRight: '1px solid',
     borderColor: 'grey.700',
     cursor: 'pointer',
     userSelect: 'none' as const,
     fontFamily: 'D2Coding, monospace',
+    fontSize: '0.725rem', // Slightly smaller
     '&:hover': {
       color: 'grey.300',
       bgcolor: 'grey.700',
@@ -89,10 +90,11 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
   const lineContentStyle = useMemo(() => ({
     flex: 1,
     px: 2,
-    py: 0.25,
+    py: 0, // Reduced from 0.25
     whiteSpace: 'pre-wrap' as const,
     wordBreak: 'break-all' as const,
     fontFamily: 'D2Coding, monospace',
+    fontSize: '0.725rem', // Slightly smaller
   }), []);
 
   // Scroll to line if hash is present in URL or initialScrollLine is provided

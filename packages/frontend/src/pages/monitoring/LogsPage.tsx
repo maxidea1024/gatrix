@@ -26,32 +26,20 @@ const LogsPage: React.FC = () => {
   return (
     <Box
       sx={{
-        width: '100%',
+        width: 'calc(100% + 48px)',
         height: 'calc(100vh - 64px)',
+        m: -3,
+        p: 0,
         overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        p: 3,
       }}
     >
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700 }}>
-          {t('monitoring.logs.title')}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          {t('monitoring.logs.subtitle')}
-        </Typography>
-      </Box>
-
-      <Box sx={{ flex: 1, minHeight: 0 }}>
-        <iframe
-          key={iframeUrl}
-          src={iframeUrl}
-          style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
-          title={t('monitoring.logs.title')}
-          allowFullScreen
-        />
-      </Box>
+      <iframe
+        key={iframeUrl}
+        src={iframeUrl}
+        style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+        title={t('monitoring.logs.title')}
+        allowFullScreen
+      />
     </Box>
   );
 };

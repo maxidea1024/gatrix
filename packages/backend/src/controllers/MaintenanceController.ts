@@ -160,7 +160,7 @@ export class MaintenanceController {
       // Publish maintenance.settings.updated event to SDK
       await pubSubService.publishEvent({
         type: 'maintenance.settings.updated',
-        data: { id: 'maintenance', timestamp: Date.now() }
+        data: { id: 'maintenance', environment: (req as any).environmentName, timestamp: Date.now() }
       });
 
       // Broadcast via PubSub so all instances fan-out to their SSE clients

@@ -403,9 +403,15 @@ export class ClientVersionService {
     await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
 
     // Publish generic update event (bulk op)
+    // Resolve environment name from the first result
+    let bulkEnvName: string | undefined;
+    if (result[0]?.environmentId) {
+      const env = await Environment.query().findById(result[0].environmentId);
+      bulkEnvName = env?.environmentName;
+    }
     await pubSubService.publishSDKEvent({
       type: 'client_version.updated',
-      data: { timestamp: Date.now() } // Bulk op, refresh all
+      data: { timestamp: Date.now(), environment: bulkEnvName }
     });
 
     return result;
@@ -488,6 +494,9 @@ export class ClientVersionService {
 
     if (result > 0) {
       // Publish generic update event (bulk status)
+      // Note: Bulk status update may affect multiple environments
+      // For now, sdk will refresh all environments when environment is missing
+      // TODO: Consider getting environment from the first affected item
       await pubSubService.publishSDKEvent({
         type: 'client_version.updated',
         data: { timestamp: Date.now() }

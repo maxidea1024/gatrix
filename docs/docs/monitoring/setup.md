@@ -33,8 +33,16 @@ docker compose -f docker-compose.dev.yml up -d
 5) Restart policy
 - Use `docker compose down` then `up` (do not use `restart`).
 
-6) External Log Collection (Non-Docker)
-- Game servers running via PM2 are collected using **Promtail**.
-- Promtail is configured to watch `C:/Users/jhseo/.pm2/logs/*.log`.
-- Log entries are forwarded to Loki and available in Grafana.
+6) Direct Log Push (SDK)
+- Game servers now push logs directly to Loki via the `@gatrix/server-sdk`.
+- This eliminates the need for Promtail or file scraping.
+- Configuration in `mconf.ts` (or `default.json5`):
+  ```json5
+  gatrix: {
+    loki: {
+      enabled: true,
+      url: "http://localhost:43100/loki/api/v1/push"
+    }
+  }
+  ```
 

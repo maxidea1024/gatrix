@@ -17,6 +17,20 @@
   "templating": {
     "list": [
       {
+        "name": "source_category",
+        "type": "query",
+        "datasource": "Loki",
+        "label": "Source Category",
+        "query": {
+          "queryType": "label_values",
+          "label": "source_category"
+        },
+        "refresh": 2,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true
+      },
+      {
         "name": "service",
         "type": "query",
         "datasource": "Loki",
@@ -24,6 +38,20 @@
         "query": {
           "queryType": "label_values",
           "label": "service"
+        },
+        "refresh": 2,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true
+      },
+      {
+        "name": "group",
+        "type": "query",
+        "datasource": "Loki",
+        "label": "Group",
+        "query": {
+          "queryType": "label_values",
+          "label": "group"
         },
         "refresh": 2,
         "includeAll": true,
@@ -78,6 +106,12 @@
         "multi": true
       },
       {
+        "name": "userId",
+        "type": "textbox",
+        "label": "User ID",
+        "query": ""
+      },
+      {
         "name": "search",
         "type": "textbox",
         "label": "Search (message, url, method, etc.)",
@@ -94,7 +128,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (logLevel) (count_over_time({job=\"gatrix\", service=~\"$service\", level=~\"$level\"} | json | hostname=~\"$hostname\" | internalIp=~\"$internalIp\" | externalIp=~\"$externalIp\" | label_format logLevel=\"{{.level}}\" | line_format \"{{.}}\" |~ \"(?i)$search\" [1m]))",
+          "expr": "sum by (logLevel) (count_over_time({job=\"gatrix\", service=~\"$service\", group=~\"$group\", level=~\"$level\", source_category=~\"$source_category\"} | json | hostname=~\"$hostname\" | internalIp=~\"$internalIp\" | externalIp=~\"$externalIp\" |~ \"(?i)$userId\" | label_format logLevel=\"{{.level}}\" | line_format \"{{.}}\" |~ \"(?i)$search\" [1m]))",
           "queryType": "range",
           "legendFormat": "{{logLevel}}",
           "step": "15s"
@@ -197,7 +231,7 @@
         }
       },
       "gridPos": {
-        "h": 6,
+        "h": 4,
         "w": 12,
         "x": 0,
         "y": 0
@@ -211,7 +245,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (service) (count_over_time({job=\"gatrix\", service=~\"$service\"} | json | level=~\"error|fatal\" | hostname=~\"$hostname\" | internalIp=~\"$internalIp\" | externalIp=~\"$externalIp\" | line_format \"{{.}}\" |~ \"(?i)$search\" [1m]))",
+          "expr": "sum by (service) (count_over_time({job=\"gatrix\", service=~\"$service\", group=~\"$group\", source_category=~\"$source_category\"} | json | level=~\"error|fatal\" | hostname=~\"$hostname\" | internalIp=~\"$internalIp\" | externalIp=~\"$externalIp\" |~ \"(?i)$userId\" | line_format \"{{.}}\" |~ \"(?i)$search\" [1m]))",
           "queryType": "range",
           "legendFormat": "{{service}}",
           "step": "30s"
@@ -253,7 +287,7 @@
         }
       },
       "gridPos": {
-        "h": 6,
+        "h": 4,
         "w": 12,
         "x": 12,
         "y": 0
@@ -264,16 +298,16 @@
       "title": "Logs",
       "id": 1,
       "gridPos": {
-        "h": 18,
+        "h": 42,
         "w": 24,
         "x": 0,
-        "y": 12
+        "y": 4
       },
       "datasource": "Loki",
       "targets": [
         {
           "refId": "A",
-          "expr": "{job=\"gatrix\", service=~\"$service\", level=~\"$level\"} | json | json responseBody=\"responseBody\", queryParams=\"queryParams\" | hostname=~\"$hostname\" | internalIp=~\"$internalIp\" | externalIp=~\"$externalIp\" | line_format `{{if .level}}[{{.level}}]{{end}} {{if .service}}[{{.service}}]{{end}} {{or .message __line__}}` |~ \"(?i)$search\"",
+          "expr": "{job=\"gatrix\", service=~\"$service\", group=~\"$group\", level=~\"$level\", source_category=~\"$source_category\"} | json | json responseBody=\"responseBody\", queryParams=\"queryParams\" | hostname=~\"$hostname\" | internalIp=~\"$internalIp\" | externalIp=~\"$externalIp\" |~ \"(?i)$userId\" | line_format `{{if .service}}[{{.service}}]{{end}} {{or .message __line__}}` |~ \"(?i)$search\"",
           "queryType": "range"
         }
       ],
