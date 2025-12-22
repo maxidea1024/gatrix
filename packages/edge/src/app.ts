@@ -69,10 +69,20 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // Use SDK HTTP metrics middleware (public scope)
+// We use a lazy-initialized middleware to ensure it's created only once after the SDK is ready
+let httpMetricsMiddleware: ((req: Request, res: Response, next: NextFunction) => void) | null = null;
+
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const sdk = sdkManager.getSDK();
-  if (sdk) {
-    return sdk.createHttpMetricsMiddleware({ scope: 'public' })(req, res, next);
+  if (!httpMetricsMiddleware) {
+    const sdk = sdkManager.getSDK();
+    if (sdk) {
+      logger.info('Initializing HTTP metrics middleware');
+      httpMetricsMiddleware = sdk.createHttpMetricsMiddleware({ scope: 'public' });
+    }
+  }
+
+  if (httpMetricsMiddleware) {
+    return httpMetricsMiddleware(req, res, next);
   }
   next();
 });

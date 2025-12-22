@@ -26,28 +26,44 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
     const labelNames = ['method', 'route', 'status', 'scope'];
 
     // Check existing metrics first to avoid duplicate registration
-    let httpRequestDuration = registry.getSingleMetric(name);
-    let httpRequestsTotal = registry.getSingleMetric(counterName);
+    let httpRequestDuration = registry.getSingleMetric(name) || promClient.register.getSingleMetric(name);
+    let httpRequestsTotal = registry.getSingleMetric(counterName) || promClient.register.getSingleMetric(counterName);
 
     // Register Histogram for latency (only if not already registered)
     if (!httpRequestDuration) {
-        httpRequestDuration = new promClient.Histogram({
-            name,
-            help: 'Duration of HTTP requests in seconds',
-            labelNames,
-            buckets,
-            registers: [registry],
-        });
+        try {
+            httpRequestDuration = new promClient.Histogram({
+                name,
+                help: 'Duration of HTTP requests in seconds',
+                labelNames,
+                buckets,
+                registers: [registry],
+            });
+        } catch (_err) {
+            // If new failed, try one last time to get it (might have been registered concurrently or globally)
+            httpRequestDuration = registry.getSingleMetric(name) || promClient.register.getSingleMetric(name);
+            if (!httpRequestDuration) {
+                // Return a dummy object if still null to satisfy subsequent calls without crashing
+                httpRequestDuration = { observe: () => { } };
+            }
+        }
     }
 
     // Register Counter for throughput (only if not already registered)
     if (!httpRequestsTotal) {
-        httpRequestsTotal = new promClient.Counter({
-            name: counterName,
-            help: 'Total number of HTTP requests',
-            labelNames,
-            registers: [registry],
-        });
+        try {
+            httpRequestsTotal = new promClient.Counter({
+                name: counterName,
+                help: 'Total number of HTTP requests',
+                labelNames,
+                registers: [registry],
+            });
+        } catch (_err) {
+            httpRequestsTotal = registry.getSingleMetric(counterName) || promClient.register.getSingleMetric(counterName);
+            if (!httpRequestsTotal) {
+                httpRequestsTotal = { inc: () => { } };
+            }
+        }
     }
 
     return (req: Request, res: Response, next: NextFunction) => {
