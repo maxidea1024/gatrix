@@ -1,6 +1,19 @@
 # Lite version of docker-compose.yml
 # Excludes: clickhouse, event-lens, event-lens-worker
 # For lighter resource usage when analytics features are not needed
+# Uses pre-built images from registry
+#
+# Usage (Ubuntu/Linux):
+#   export REGISTRY_HOST=uwocn.tencentcloudcr.com
+#   export REGISTRY_NAMESPACE=uwocn
+#   export IMAGE_TAG=latest  # or specific version like v1.0.0
+#   docker compose -f docker-compose.lite.yml up -d --pull always
+#
+# Usage (Windows PowerShell):
+#   $env:REGISTRY_HOST="uwocn.tencentcloudcr.com"
+#   $env:REGISTRY_NAMESPACE="uwocn"
+#   $env:IMAGE_TAG="latest"
+#   docker compose -f docker-compose.lite.yml up -d --pull always
 
 services:
   # MySQL Database
@@ -55,9 +68,9 @@ services:
     container_name: gatrix-mysql-exporter
     restart: unless-stopped
     environment:
-      MYSQLD_EXPORTER_PASSWORD: ${DB_ROOT_PASSWORD:-gatrix_rootpassword}
+      MYSQLD_EXPORTER_PASSWORD: exporter_password
     command:
-      - "--mysqld.username=root"
+      - "--mysqld.username=mysqld_exporter"
       - "--mysqld.address=mysql:3306"
     ports:
       - "49104:9104"
@@ -87,9 +100,7 @@ services:
 
   # Backend API
   backend:
-    build:
-      context: .
-      dockerfile: packages/backend/Dockerfile
+    image: ${REGISTRY_HOST:-uwocn.tencentcloudcr.com}/${REGISTRY_NAMESPACE:-uwocn}/gatrix-backend:${IMAGE_TAG:-latest}
     container_name: gatrix-backend
     restart: unless-stopped
     user: "0"
@@ -97,6 +108,9 @@ services:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-backend
+      MONITORING_ENABLED: "true"
+      GATRIX_LOKI_ENABLED: ${GATRIX_LOKI_ENABLED:-true}
+      GATRIX_LOKI_URL: ${GATRIX_LOKI_URL:-http://loki:3100/loki/api/v1/push}
       PORT: 5000
       DB_HOST: mysql
       DB_PORT: 3306
@@ -116,7 +130,6 @@ services:
       DISABLE_X_POWERED_BY: true
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
       DISABLE_RATE_LIMIT: true
-      MONITORING_ENABLED: ${MONITORING_ENABLED:-true}
       # Chat Server Integration
       CHAT_SERVER_URL: http://chat-server:5100
       # Service Discovery
@@ -146,9 +159,7 @@ services:
 
   # Chat Server
   chat-server:
-    build:
-      context: .
-      dockerfile: packages/chat-server/Dockerfile
+    image: ${REGISTRY_HOST:-uwocn.tencentcloudcr.com}/${REGISTRY_NAMESPACE:-uwocn}/gatrix-chat-server:${IMAGE_TAG:-latest}
     container_name: gatrix-chat-server
     restart: unless-stopped
     user: "0"
@@ -156,6 +167,9 @@ services:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-chat-server
+      MONITORING_ENABLED: "true"
+      GATRIX_LOKI_ENABLED: ${GATRIX_LOKI_ENABLED:-true}
+      GATRIX_LOKI_URL: ${GATRIX_LOKI_URL:-http://loki:3100/loki/api/v1/push}
       PORT: 5100
       HOST: 0.0.0.0
       # Database
@@ -184,8 +198,6 @@ services:
       USE_MESSAGE_PACK: ${CHAT_USE_MESSAGE_PACK:-true}
       BROADCAST_COMPRESSION: ${CHAT_BROADCAST_COMPRESSION:-true}
       WS_MAX_CONNECTIONS: ${CHAT_WS_MAX_CONNECTIONS:-10000}
-      # Monitoring
-      MONITORING_ENABLED: ${CHAT_MONITORING_ENABLED:-true}
       METRICS_PORT: 9090
       # Gatrix Integration
       GATRIX_API_URL: ${GATRIX_API_URL:-http://backend:5000}
@@ -317,9 +329,7 @@ services:
 
   # Frontend (Nginx)
   frontend:
-    build:
-      context: .
-      dockerfile: packages/frontend/Dockerfile
+    image: ${REGISTRY_HOST:-uwocn.tencentcloudcr.com}/${REGISTRY_NAMESPACE:-uwocn}/gatrix-frontend:${IMAGE_TAG:-latest}
     container_name: gatrix-frontend
     restart: unless-stopped
     environment:
@@ -347,15 +357,17 @@ services:
 
   # Edge Server - High-availability client-facing API
   edge:
-    build:
-      context: .
-      dockerfile: packages/edge/Dockerfile
+    image: ${REGISTRY_HOST:-uwocn.tencentcloudcr.com}/${REGISTRY_NAMESPACE:-uwocn}/gatrix-edge:${IMAGE_TAG:-latest}
     container_name: gatrix-edge
     restart: unless-stopped
     user: "0"
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LOG_LEVEL: ${EDGE_LOG_LEVEL:-info}
+      LOG_FORMAT: json
+      LOG_SERVICE_NAME: gatrix-edge
+      GATRIX_LOKI_ENABLED: ${GATRIX_LOKI_ENABLED:-true}
+      GATRIX_LOKI_URL: ${GATRIX_LOKI_URL:-http://loki:3100/loki/api/v1/push}
       EDGE_PORT: 3400
       EDGE_METRICS_PORT: 9400
       GATRIX_URL: http://backend:5000
@@ -370,6 +382,8 @@ services:
       # Cache configuration (event mode uses Redis PubSub for real-time sync)
       EDGE_CACHE_SYNC_METHOD: ${EDGE_CACHE_SYNC_METHOD:-event}
       EDGE_CACHE_POLLING_INTERVAL_MS: ${EDGE_CACHE_POLLING_INTERVAL_MS:-60000}
+      # HTTPS enforcement (set to 'false' for HTTP-only environments)
+      EDGE_FORCE_HTTPS: ${EDGE_FORCE_HTTPS:-true}
     ports:
       - "${EDGE_PORT:-3400}:3400"
     depends_on:
