@@ -33,3 +33,8 @@ docker compose -f docker-compose.dev.yml up -d
 5) Restart policy
 - Use `docker compose down` then `up` (do not use `restart`).
 
+6) External Log Collection (Non-Docker)
+- Game servers running via PM2 are collected using **Promtail**.
+- Promtail is configured to watch `C:/Users/jhseo/.pm2/logs/*.log`.
+- Log entries are forwarded to Loki and available in Grafana.
+

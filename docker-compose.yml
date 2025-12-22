@@ -368,6 +368,21 @@ services:
     networks:
       - gatrix-network
 
+  # Promtail - Log collector for non-dockerized game servers
+  promtail:
+    image: grafana/promtail:latest
+    container_name: gatrix-promtail
+    restart: unless-stopped
+    volumes:
+      - ./docker/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - C:/Users/jhseo/.pm2/logs:/mnt/pm2logs:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      loki:
+        condition: service_started
+    networks:
+      - gatrix-network
+
   # Prometheus - Monitoring
   prometheus:
     image: prom/prometheus:latest

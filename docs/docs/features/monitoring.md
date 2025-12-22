@@ -267,3 +267,45 @@ If the Grafana Logs dashboard only shows `info` logs even when `level=All` is se
 - All UI labels for the Grafana menu item are localized (ko/en/zh).
 - When adding new guidance strings, ensure localization keys are unique and friendly (Korean guidelines ending with "...합니다.").
 
+## External Log Collection (Non-Docker) via Promtail
+
+For game servers running outside of Docker (using PM2), logs are collected using **Promtail** and forwarded to Loki.
+
+### Architecture
+
+- **Loki**: Central log store (running in Docker).
+- **Promtail**: Log agent (running in Docker) that monitors host log files.
+- **Fluent Bit**: Collects logs from Docker containers and sends them to Loki.
+
+### Configuration
+
+Promtail is configured to watch the PM2 log directory on the host machine:
+
+- **Host Path**: `C:/Users/jhseo/.pm2/logs/*.log`
+- **Container Path**: `/mnt/pm2logs/*.log` (mounted as read-only)
+
+The configuration file is located at `docker/promtail/promtail-config.yml`.
+
+### How to access host logs in Docker
+
+In `docker-compose.yml`, the host directory is mounted to the Promtail container:
+
+```yaml
+  promtail:
+    image: grafana/promtail:latest
+    container_name: gatrix-promtail
+    volumes:
+      - ./docker/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - C:/Users/jhseo/.pm2/logs:/mnt/pm2logs:ro
+    command: -config.file=/etc/promtail/config.yml
+```
+
+### Log Pipeline
+
+The Promtail config includes a multiline stage to correctly handle stack traces and multi-line log entries by grouping lines that start with a date/time pattern.
+
+- **First line pattern**: `^(\d{4}-\d{2}-\d{2}|\d{2}/\d{2} \d{2}:\d{2}:\d{2})`
+- **Labels added**: `job="game-servers"`, `host="host-machine"`
+
+In Grafana, these logs can be queried using `{job="game-servers"}`.
+
