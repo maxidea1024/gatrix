@@ -375,41 +375,62 @@ class ChatServerApp {
   private async gracefulShutdown(signal: string): Promise<void> {
     logger.info(`Received ${signal}. Starting graceful shutdown...`);
 
+    // Set a hard timeout to force exit if graceful shutdown takes too long
+    const SHUTDOWN_TIMEOUT = 10000; // 10 seconds
+    const shutdownTimer = setTimeout(() => {
+      logger.warn('Graceful shutdown timeout exceeded, forcing exit');
+      process.exit(1);
+    }, SHUTDOWN_TIMEOUT);
+
     try {
-      // Unregister from Service Discovery via SDK
+      // 1. Shutdown WebSocket service FIRST (this closes all WebSocket connections)
+      // This must happen before closing HTTP server to prevent hanging
+      if (this.webSocketService) {
+        await this.webSocketService.shutdown();
+        logger.info('WebSocket service shutdown completed');
+      }
+
+      // 2. Close HTTP server (now that WebSocket connections are gone, this should be fast)
+      await new Promise<void>((resolve, reject) => {
+        const serverCloseTimeout = setTimeout(() => {
+          logger.warn('HTTP server close timeout, forcing');
+          resolve();
+        }, 5000);
+
+        this.server.close((err) => {
+          clearTimeout(serverCloseTimeout);
+          if (err) {
+            logger.warn('Error closing HTTP server:', err);
+          }
+          logger.info('HTTP server closed');
+          resolve();
+        });
+      });
+
+      // 3. Unregister from Service Discovery via SDK
       if (gatrixSdk) {
         try {
           await gatrixSdk.unregisterService();
+          await gatrixSdk.close();
           logger.info('Chat Server service unregistered from Service Discovery');
         } catch (error) {
           logger.warn('Error unregistering Chat Server service:', error);
         }
       }
 
-      // Stop accepting new connections
-      this.server.close(() => {
-        logger.info('HTTP server closed');
-      });
-
-      // User synchronization service is no longer used
-
-      // Shutdown WebSocket service
-      if (this.webSocketService) {
-        await this.webSocketService.shutdown();
-        logger.info('WebSocket service shutdown completed');
-      }
-
-      // Close database connections
+      // 4. Close database connections
       await databaseManager.close();
       logger.info('Database connections closed');
 
-      // Close Redis connections
+      // 5. Close Redis connections
       await redisManager.disconnect();
       logger.info('Redis connections closed');
 
+      clearTimeout(shutdownTimer);
       logger.info('Graceful shutdown completed');
       process.exit(0);
     } catch (error) {
+      clearTimeout(shutdownTimer);
       logger.error('Error during graceful shutdown:', error);
       process.exit(1);
     }

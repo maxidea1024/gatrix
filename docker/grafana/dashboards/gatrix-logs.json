@@ -1,7 +1,10 @@
 {
   "uid": "gatrix-logs",
   "title": "Gatrix Logs",
-  "tags": ["gatrix", "logs"],
+  "tags": [
+    "gatrix",
+    "logs"
+  ],
   "timezone": "browser",
   "schemaVersion": 38,
   "version": 1,
@@ -24,6 +27,7 @@
         },
         "refresh": 2,
         "includeAll": true,
+        "allValue": ".*",
         "multi": true
       },
       {
@@ -37,6 +41,7 @@
         },
         "refresh": 2,
         "includeAll": true,
+        "allValue": ".*",
         "multi": true
       },
       {
@@ -47,6 +52,7 @@
         "query": "label_values(hostname)",
         "refresh": 2,
         "includeAll": true,
+        "allValue": ".*",
         "multi": true
       },
       {
@@ -57,6 +63,7 @@
         "query": "label_values(internalIp)",
         "refresh": 2,
         "includeAll": true,
+        "allValue": ".*",
         "multi": true
       },
       {
@@ -67,6 +74,7 @@
         "query": "label_values(externalIp)",
         "refresh": 2,
         "includeAll": true,
+        "allValue": ".*",
         "multi": true
       },
       {
@@ -86,7 +94,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (logLevel) (count_over_time({job=\"gatrix\", service=~\"$service\", internalIp=~\"$internalIp\", externalIp=~\"$externalIp\"} | json | level=~\"$level\" | hostname=~\"$hostname\" | label_format logLevel=\"{{.level}}\" | line_format \"{{.}}\" |~ \"(?i)$search\" [1m]))",
+          "expr": "sum by (logLevel) (count_over_time({job=\"gatrix\", service=~\"$service\", level=~\"$level\"} | json | hostname=~\"$hostname\" | internalIp=~\"$internalIp\" | externalIp=~\"$externalIp\" | label_format logLevel=\"{{.level}}\" | line_format \"{{.}}\" |~ \"(?i)$search\" [1m]))",
           "queryType": "range",
           "legendFormat": "{{logLevel}}",
           "step": "15s"
@@ -95,7 +103,9 @@
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "linear",
@@ -114,27 +124,63 @@
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "error" },
+            "matcher": {
+              "id": "byName",
+              "options": "error"
+            },
             "properties": [
-              { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "warn" },
+            "matcher": {
+              "id": "byName",
+              "options": "warn"
+            },
             "properties": [
-              { "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "info" },
+            "matcher": {
+              "id": "byName",
+              "options": "info"
+            },
             "properties": [
-              { "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } }
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "debug" },
+            "matcher": {
+              "id": "byName",
+              "options": "debug"
+            },
             "properties": [
-              { "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
             ]
           }
         ]
@@ -150,7 +196,12 @@
           "sort": "none"
         }
       },
-      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 0 }
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      }
     },
     {
       "id": 3,
@@ -160,7 +211,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (service) (count_over_time({job=\"gatrix\", service=~\"$service\", internalIp=~\"$internalIp\", externalIp=~\"$externalIp\"} | json | level=~\"error|fatal\" | hostname=~\"$hostname\" | line_format \"{{.}}\" |~ \"(?i)$search\" [1m]))",
+          "expr": "sum by (service) (count_over_time({job=\"gatrix\", service=~\"$service\"} | json | level=~\"error|fatal\" | hostname=~\"$hostname\" | internalIp=~\"$internalIp\" | externalIp=~\"$externalIp\" | line_format \"{{.}}\" |~ \"(?i)$search\" [1m]))",
           "queryType": "range",
           "legendFormat": "{{service}}",
           "step": "30s"
@@ -169,7 +220,9 @@
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "linear",
@@ -199,18 +252,28 @@
           "sort": "none"
         }
       },
-      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 0 }
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      }
     },
     {
       "type": "logs",
       "title": "Logs",
       "id": 1,
-      "gridPos": { "h": 18, "w": 24, "x": 0, "y": 12 },
+      "gridPos": {
+        "h": 18,
+        "w": 24,
+        "x": 0,
+        "y": 12
+      },
       "datasource": "Loki",
       "targets": [
         {
           "refId": "A",
-          "expr": "{job=\"gatrix\", service=~\"$service\", internalIp=~\"$internalIp\", externalIp=~\"$externalIp\"} | json | json responseBody=\"responseBody\", queryParams=\"queryParams\" | level=~\"$level\" | hostname=~\"$hostname\" | line_format `[{{.level}}] [{{.service}}] {{.message}}` |~ \"(?i)$search\"",
+          "expr": "{job=\"gatrix\", service=~\"$service\", level=~\"$level\"} | json | json responseBody=\"responseBody\", queryParams=\"queryParams\" | hostname=~\"$hostname\" | internalIp=~\"$internalIp\" | externalIp=~\"$externalIp\" | line_format `{{if .level}}[{{.level}}]{{end}} {{if .service}}[{{.service}}]{{end}} {{or .message __line__}}` |~ \"(?i)$search\"",
           "queryType": "range"
         }
       ],
@@ -231,4 +294,3 @@
     }
   ]
 }
-

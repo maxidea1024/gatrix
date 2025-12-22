@@ -79,7 +79,7 @@ class ServiceDiscoveryService {
   async updateStatus(input: UpdateServiceStatusInput, autoRegisterIfMissing = false): Promise<void> {
     await this.provider.updateStatus(input, autoRegisterIfMissing);
     const serviceType = input.labels.service;
-    logger.info(`Service status updated: ${serviceType}:${input.instanceId}`, {
+    logger.debug(`Service status updated: ${serviceType}:${input.instanceId}`, {
       status: input.status,
       autoRegisterIfMissing
     });

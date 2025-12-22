@@ -215,9 +215,52 @@ Implementation pattern (Node.js/Express):
 
 ## Troubleshooting
 
+### Prometheus Targets
+
 - Prometheus has a `Targets` page to verify discovered endpoints.
 - If targets are missing, check the Backend HTTP-SD endpoint and service discovery configuration.
 - Ensure ports do not conflict (Prometheus uses 49090/9090).
+
+### Host-Based Game Server Metrics (Docker Environment)
+
+When Prometheus runs in Docker but game servers run on the host (via PM2), Prometheus cannot access host IPs directly.
+
+**Solution**: The Backend automatically converts host IPs to `host.docker.internal` when `RUNNING_IN_DOCKER=true`:
+
+1. Add to `docker-compose.yml` (backend service):
+   ```yaml
+   environment:
+     RUNNING_IN_DOCKER: "true"
+   ```
+
+2. Add to `docker-compose.yml` (prometheus service):
+   ```yaml
+   extra_hosts:
+     - "host.docker.internal:host-gateway"
+   ```
+
+### Grafana Logs Dashboard Not Showing All Log Levels
+
+If the Grafana Logs dashboard only shows `info` logs even when `level=All` is selected:
+
+**Root Cause**: Loki requires labels in stream selectors to **exist** on log lines. If `externalIp` or `internalIp` labels are missing from some logs (e.g., error logs), those logs are filtered out.
+
+**Solution**: 
+1. Move optional labels (`internalIp`, `externalIp`) from **stream selector** to **log pipeline filter**:
+   - Before: `{job="gatrix", level=~"$level", internalIp=~"...", externalIp=~"..."}`
+   - After: `{job="gatrix", level=~"$level"} | json | internalIp=~"..." | externalIp=~"..."`
+
+2. Add `allValue: ".*"` to all multi-select variables in the dashboard JSON:
+   ```json
+   {
+     "name": "service",
+     "includeAll": true,
+     "allValue": ".*",
+     "multi": true
+   }
+   ```
+
+3. Restart Grafana: `docker restart gatrix-grafana-dev`
 
 ## Internationalization
 

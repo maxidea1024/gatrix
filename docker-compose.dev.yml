@@ -93,6 +93,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: development
+      RUNNING_IN_DOCKER: "true"
       LOG_FORMAT: json
       LOG_SERVICE_NAME: gatrix-backend
       MONITORING_ENABLED: "true"
@@ -562,6 +563,8 @@ services:
         condition: service_started
     networks:
       - gatrix-dev-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   # Grafana - Dashboards (development)
   grafana:

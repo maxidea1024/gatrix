@@ -262,6 +262,13 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           },
         },
       },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            borderRadius: 4, // Square shape instead of round
+          },
+        },
+      },
     },
   });
 };

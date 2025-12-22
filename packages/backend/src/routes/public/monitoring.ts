@@ -23,7 +23,25 @@ router.get('/prometheus/targets', async (_req, res) => {
         continue;
       }
 
-      const target = `${s.internalAddress}:${port}`;
+      // In Docker environment, use host.docker.internal to access host machine services
+      // This allows Prometheus in Docker to scrape metrics from game servers running on host
+      const isDocker = process.env.RUNNING_IN_DOCKER === 'true';
+      let targetAddress = s.internalAddress;
+
+      // Check if the address is a private/local host IP (not a Docker container)
+      // Docker containers typically have IPs starting with 172.x.x.x
+      // Host machines have IPs like 10.x.x.x, 192.168.x.x, etc.
+      if (isDocker && targetAddress) {
+        const isDockerInternalNetwork = targetAddress.startsWith('172.');
+        const isLocalhost = targetAddress === '127.0.0.1' || targetAddress === 'localhost';
+
+        if (!isDockerInternalNetwork && !isLocalhost) {
+          // This is likely a host machine IP, use host.docker.internal
+          targetAddress = 'host.docker.internal';
+        }
+      }
+
+      const target = `${targetAddress}:${port}`;
       const labels: Record<string, string> = {
         service: serviceType,
         metrics_path: metricsPath,

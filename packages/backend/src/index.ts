@@ -14,6 +14,7 @@ let apiTokenUsageService: any;
 let setDatabaseTimezoneToUTC: any;
 let appInstance: any;
 let SSENotificationService: any;
+let httpServer: any;
 
 // Backend service instance ID for service discovery
 let backendInstanceId: string | null = null;
@@ -40,8 +41,39 @@ const gracefulShutdown = async (signal: string) => {
     console.log(`Received ${signal}. Starting graceful shutdown...`);
   }
 
+  // Set a hard timeout to force exit if graceful shutdown takes too long
+  const SHUTDOWN_TIMEOUT = 10000; // 10 seconds
+  const shutdownTimer = setTimeout(() => {
+    if (logger) {
+      logger.warn('Graceful shutdown timeout exceeded, forcing exit');
+    } else {
+      console.warn('Graceful shutdown timeout exceeded, forcing exit');
+    }
+    process.exit(1);
+  }, SHUTDOWN_TIMEOUT);
+
   try {
-    // Close ApiTokenUsageService
+    // 1. Close HTTP server first (stop accepting new connections)
+    if (httpServer) {
+      await new Promise<void>((resolve) => {
+        const serverCloseTimeout = setTimeout(() => {
+          if (logger) logger.warn('HTTP server close timeout, forcing');
+          resolve();
+        }, 5000);
+
+        httpServer.close((err: any) => {
+          clearTimeout(serverCloseTimeout);
+          if (err) {
+            if (logger) logger.warn('Error closing HTTP server:', err);
+          } else {
+            if (logger) logger.info('HTTP server closed');
+          }
+          resolve();
+        });
+      });
+    }
+
+    // 2. Close ApiTokenUsageService
     if (apiTokenUsageService) {
       try {
         await apiTokenUsageService.shutdown();
@@ -50,7 +82,7 @@ const gracefulShutdown = async (signal: string) => {
       }
     }
 
-    // Close Queue service
+    // 3. Close Queue service
     if (queueService) {
       try {
         await queueService.shutdown();
@@ -59,7 +91,7 @@ const gracefulShutdown = async (signal: string) => {
       }
     }
 
-    // Close PubSub service
+    // 4. Close PubSub service
     if (pubSubService) {
       try {
         await pubSubService.shutdown();
@@ -68,27 +100,7 @@ const gracefulShutdown = async (signal: string) => {
       }
     }
 
-    // Close database connections
-    if (database) {
-      await database.close();
-    }
-
-    // Close Redis connection
-    if (redisClient) {
-      try {
-        await redisClient.disconnect();
-      } catch (error) {
-        if (logger) logger.warn('Error disconnecting Redis:', error);
-      }
-    }
-
-    // Clear etcd cleanup interval
-    if ((global as any).etcdCleanupInterval) {
-      clearInterval((global as any).etcdCleanupInterval);
-      if (logger) logger.info('etcd cleanup interval cleared');
-    }
-
-    // Unregister backend service from service discovery via SDK
+    // 5. Unregister backend service from service discovery via SDK
     if (gatrixSdk && backendInstanceId) {
       try {
         await gatrixSdk.unregisterService();
@@ -99,6 +111,27 @@ const gracefulShutdown = async (signal: string) => {
       }
     }
 
+    // 6. Close database connections
+    if (database) {
+      await database.close();
+    }
+
+    // 7. Close Redis connection
+    if (redisClient) {
+      try {
+        await redisClient.disconnect();
+      } catch (error) {
+        if (logger) logger.warn('Error disconnecting Redis:', error);
+      }
+    }
+
+    // 8. Clear etcd cleanup interval
+    if ((global as any).etcdCleanupInterval) {
+      clearInterval((global as any).etcdCleanupInterval);
+      if (logger) logger.info('etcd cleanup interval cleared');
+    }
+
+    clearTimeout(shutdownTimer);
     if (logger) {
       logger.info('Graceful shutdown completed');
     } else {
@@ -106,6 +139,7 @@ const gracefulShutdown = async (signal: string) => {
     }
     process.exit(0);
   } catch (error) {
+    clearTimeout(shutdownTimer);
     if (logger) {
       logger.error('Error during graceful shutdown:', error);
     } else {
@@ -290,6 +324,7 @@ const startServer = async () => {
 
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)
     const server = createServer(app);
+    httpServer = server; // Store reference for graceful shutdown
 
     server.listen(config.port, async () => {
       logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`, appInstance.getLogInfo());

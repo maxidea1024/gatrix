@@ -25,22 +25,30 @@ export function createHttpMetricsMiddleware(options: HttpMetricsOptions) {
 
     const labelNames = ['method', 'route', 'status', 'scope'];
 
-    // Register Histogram for latency
-    const httpRequestDuration = new promClient.Histogram({
-        name,
-        help: 'Duration of HTTP requests in seconds',
-        labelNames,
-        buckets,
-        registers: [registry],
-    });
+    // Check existing metrics first to avoid duplicate registration
+    let httpRequestDuration = registry.getSingleMetric(name);
+    let httpRequestsTotal = registry.getSingleMetric(counterName);
 
-    // Register Counter for throughput
-    const httpRequestsTotal = new promClient.Counter({
-        name: counterName,
-        help: 'Total number of HTTP requests',
-        labelNames,
-        registers: [registry],
-    });
+    // Register Histogram for latency (only if not already registered)
+    if (!httpRequestDuration) {
+        httpRequestDuration = new promClient.Histogram({
+            name,
+            help: 'Duration of HTTP requests in seconds',
+            labelNames,
+            buckets,
+            registers: [registry],
+        });
+    }
+
+    // Register Counter for throughput (only if not already registered)
+    if (!httpRequestsTotal) {
+        httpRequestsTotal = new promClient.Counter({
+            name: counterName,
+            help: 'Total number of HTTP requests',
+            labelNames,
+            registers: [registry],
+        });
+    }
 
     return (req: Request, res: Response, next: NextFunction) => {
         const start = process.hrtime();

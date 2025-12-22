@@ -386,9 +386,15 @@ export class ServiceDiscoveryService {
         }
 
         this.isUpdating = true;
+
+        // Include registration backup data for auto-register if service is missing from etcd
         await this.updateStatus({
           status: 'ready',
           autoRegisterIfMissing: true,
+          hostname: this.registrationBackup?.hostname,
+          internalAddress: this.registrationBackup?.internalAddress,
+          ports: this.registrationBackup?.ports,
+          meta: this.registrationBackup?.meta,
         });
 
         this.logger.debug('Heartbeat sent', {
