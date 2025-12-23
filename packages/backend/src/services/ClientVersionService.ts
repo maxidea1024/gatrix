@@ -530,11 +530,13 @@ export class ClientVersionService {
    */
   static async findByExact(
     platform: string,
-    clientVersion: string
+    clientVersion: string,
+    environmentId?: string
   ): Promise<ClientVersionAttributes | null> {
     const result = await ClientVersionModel.findAll({
       platform,
       clientVersion,
+      environmentId,
       limit: 1,
       offset: 0,
       sortBy: 'id',
@@ -569,10 +571,12 @@ export class ClientVersionService {
    */
   static async findLatestByPlatform(
     platform: string,
-    status?: ClientStatus | ClientStatus[]
+    status?: ClientStatus | ClientStatus[],
+    environmentId?: string
   ): Promise<ClientVersionAttributes | null> {
     const queryOptions: any = {
       platform,
+      environmentId,
       limit: 1,
       offset: 0,
       sortBy: 'id',

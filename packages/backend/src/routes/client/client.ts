@@ -368,13 +368,13 @@ const validateRequest = (req: any, res: any, next: any) => {
 
 router.use(requestLogger);
 
-router.get('/client-version', ClientController.getClientVersion);
+router.get('/client-version', clientSDKAuth, ClientController.getClientVersion);
 
-router.get('/game-worlds', ClientController.getGameWorlds);
+router.get('/game-worlds', clientSDKAuth, ClientController.getGameWorlds);
 
-router.get('/cache-stats', ClientController.getCacheStats);
+router.get('/cache-stats', clientSDKAuth, ClientController.getCacheStats);
 
-router.post('/invalidate-cache', ClientController.invalidateCache);
+router.post('/invalidate-cache', clientSDKAuth, ClientController.invalidateCache);
 
 router.post('/remote-config/evaluate',
   body('context').optional().isObject(),

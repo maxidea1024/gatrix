@@ -4,11 +4,12 @@ import { ClientVersionModel, ClientStatus } from '../models/ClientVersion';
 import { GameWorldService } from '../services/GameWorldService';
 import { cacheService } from '../services/CacheService';
 import { pubSubService } from '../services/PubSubService';
-import { GAME_WORLDS, DEFAULT_CONFIG } from '../constants/cacheKeys';
+import { GAME_WORLDS, DEFAULT_CONFIG, withEnvironment } from '../constants/cacheKeys';
 import logger from '../config/logger';
 import { asyncHandler } from '../utils/asyncHandler';
 import VarsModel from '../models/Vars';
 import { IpWhitelistService } from '../services/IpWhitelistService';
+import { SDKRequest } from '../middleware/apiTokenAuth';
 
 export class ClientController {
   /**
@@ -16,8 +17,8 @@ export class ClientController {
    */
   private static getClientIp(req: Request): string {
     let clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
-                   req.socket.remoteAddress ||
-                   '';
+      req.socket.remoteAddress ||
+      '';
 
     // Remove "::ffff:" prefix from IPv4-mapped IPv6 addresses
     if (clientIp.startsWith('::ffff:')) {
@@ -37,7 +38,7 @@ export class ClientController {
    * - status (optional): Filter by status (e.g., 'ONLINE', 'MAINTENANCE'). Only applied when fetching latest version.
    * - lang (optional): Language code for localized maintenance messages
    */
-  static getClientVersion = asyncHandler(async (req: Request, res: Response) => {
+  static getClientVersion = asyncHandler(async (req: SDKRequest, res: Response) => {
     const { platform, version, status, lang } = req.query as {
       platform?: string;
       version?: string;
@@ -53,16 +54,9 @@ export class ClientController {
       });
     }
 
-    // Validate required headers
-    const appName = req.headers['x-application-name'];
-    const apiToken = req.headers['x-api-token'];
-
-    if (!appName || !apiToken) {
-      return res.status(400).json({
-        success: false,
-        message: 'X-Application-Name and X-API-Token headers are required',
-      });
-    }
+    // Environment is resolved by clientSDKAuth middleware
+    const environment = req.environment;
+    const envId = environment?.id;
 
     // Validate status parameter if provided
     const validStatuses = Object.values(ClientStatus);
@@ -84,7 +78,10 @@ export class ClientController {
     // Create cache key (use 'latest' for latest requests)
     const versionKey = isLatestRequest ? 'latest' : version;
     const statusKey = statusFilter ? `:${statusFilter}` : '';
-    const cacheKey = `client_version:${platform}:${versionKey}${statusKey}${lang ? `:${lang}` : ''}`;
+    const baseCacheKey = `client_version:${platform}:${versionKey}${statusKey}${lang ? `:${lang}` : ''}`;
+
+    // Scoping cache by environment ID
+    const cacheKey = envId ? withEnvironment(envId, baseCacheKey) : baseCacheKey;
 
     // Try to get from cache first
     const cachedData = await cacheService.get(cacheKey);
@@ -102,38 +99,40 @@ export class ClientController {
 
     let record;
     if (isLatestRequest) {
-      // Get the latest version for the platform (with optional status filter)
-      record = await ClientVersionService.findLatestByPlatform(platform, statusFilter);
+      // Get the latest version for the platform (with optional status filter and environment)
+      record = await ClientVersionService.findLatestByPlatform(platform, statusFilter, envId);
     } else {
       // Get exact version match
-      record = await ClientVersionService.findByExact(platform, version);
+      record = await ClientVersionService.findByExact(platform, version, envId);
     }
 
     if (!record) {
       return res.status(404).json({
         success: false,
         message: isLatestRequest
-          ? `No client version found for platform: ${platform}${statusFilter ? ` with status: ${statusFilter}` : ''}`
+          ? `No client version found for platform: ${platform} in environment: ${environment?.environmentName || 'default'}${statusFilter ? ` with status: ${statusFilter}` : ''}`
           : 'Client version not found',
       });
     }
 
-    // Get clientVersionPassiveData from KV settings
+    // Get clientVersionPassiveData from KV settings for the specific environment
     let passiveData = {};
     try {
-      const passiveDataStr = await VarsModel.get('$clientVersionPassiveData');
+      const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', envId);
       if (passiveDataStr) {
         passiveData = JSON.parse(passiveDataStr);
       }
     } catch (error) {
-      logger.warn('Failed to parse clientVersionPassiveData:', error);
+      logger.warn(`Failed to parse clientVersionPassiveData for environment ${envId || 'default'}:`, error);
     }
 
     // Parse customPayload
     let customPayload = {};
     try {
       if (record.customPayload) {
-        customPayload = JSON.parse(record.customPayload);
+        customPayload = typeof record.customPayload === 'string'
+          ? JSON.parse(record.customPayload)
+          : record.customPayload;
       }
     } catch (error) {
       logger.warn('Failed to parse customPayload:', error);
@@ -197,7 +196,6 @@ export class ClientController {
     };
 
     // Add maintenance message if status is MAINTENANCE
-    // Always include maintenanceMessage field when status is MAINTENANCE
     if (record.clientStatus === ClientStatus.MAINTENANCE) {
       clientData.maintenanceMessage = maintenanceMessage || '';
     }
@@ -216,8 +214,9 @@ export class ClientController {
    * Get all game worlds
    * GET /api/v1/client/game-worlds
    */
-  static getGameWorlds = asyncHandler(async (req: Request, res: Response) => {
-    const cacheKey = GAME_WORLDS.PUBLIC;
+  static getGameWorlds = asyncHandler(async (req: SDKRequest, res: Response) => {
+    const envId = req.environment?.id;
+    const cacheKey = envId ? withEnvironment(envId, GAME_WORLDS.PUBLIC) : GAME_WORLDS.PUBLIC;
 
     // Try to get from cache first
     const cachedData = await cacheService.get(cacheKey);
@@ -230,13 +229,14 @@ export class ClientController {
       });
     }
 
-    // If not in cache, fetch from database
+    // If not in cache, fetch from database for the specific environment
     logger.debug(`Cache miss for game worlds: ${cacheKey}`);
 
     // No pagination: fetch all visible, non-maintenance worlds ordered by displayOrder ASC
     const worlds = await GameWorldService.getAllGameWorlds({
       isVisible: true,
       isMaintenance: false,
+      environmentId: envId,
     });
 
     // Transform data for client consumption (remove sensitive fields)
@@ -247,6 +247,7 @@ export class ClientController {
         name: world.name,
         description: world.description,
         displayOrder: world.displayOrder,
+        meta: world.customPayload || {},
         createdAt: world.createdAt,
         updatedAt: world.updatedAt
       })),
@@ -268,7 +269,7 @@ export class ClientController {
    * Get cache statistics (for monitoring)
    * GET /api/v1/client/cache-stats
    */
-  static getCacheStats = asyncHandler(async (req: Request, res: Response) => {
+  static getCacheStats = asyncHandler(async (req: SDKRequest, res: Response) => {
     const cacheStats = cacheService.getStats();
     const queueStats = await pubSubService.getQueueStats();
 
@@ -289,7 +290,7 @@ export class ClientController {
    * Invalidate game worlds cache (for testing)
    * POST /api/v1/client/invalidate-cache
    */
-  static invalidateCache = asyncHandler(async (req: Request, res: Response) => {
+  static invalidateCache = asyncHandler(async (req: SDKRequest, res: Response) => {
     await GameWorldService.invalidateCache();
 
     res.json({
