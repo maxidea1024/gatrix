@@ -398,12 +398,24 @@ const ServiceNoticesPage: React.FC = () => {
   // Copy notice URL to clipboard (Edge server URL)
   const handleCopyNoticeUrl = async () => {
     const noticeUrl = getEdgeWebviewUrl();
-    copyToClipboardWithNotification(
-      noticeUrl,
-      () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
-      () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
-    );
-    handleWebviewMenuClose();
+    if (!noticeUrl) {
+      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
+      handleWebviewMenuClose();
+      return;
+    }
+
+    try {
+      await copyToClipboardWithNotification(
+        noticeUrl,
+        () => enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' }),
+        () => enqueueSnackbar(t('common.copyFailed'), { variant: 'error' })
+      );
+    } catch (error) {
+      console.error('Copy failed:', error);
+      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
+    } finally {
+      handleWebviewMenuClose();
+    }
   };
 
   const handleToggleActive = async (notice: ServiceNotice) => {

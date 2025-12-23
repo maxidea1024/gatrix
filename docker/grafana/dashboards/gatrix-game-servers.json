@@ -165,7 +165,7 @@
     },
     {
       "id": 5,
-      "title": "Error Rate",
+      "title": "Error Rate (Logic vs HTTP)",
       "type": "timeseries",
       "gridPos": {
         "h": 8,
@@ -177,7 +177,11 @@
       "targets": [
         {
           "expr": "sum(rate(game_errors_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\"}[$window])) by (type, code)",
-          "legendFormat": "{{type}} - {{code}}"
+          "legendFormat": "Logic: {{type}} - {{code}}"
+        },
+        {
+          "expr": "sum(rate(game_requests_total{service=~\"$service\", group=~\"$group\", environment=~\"$environment\", status=~\"5..\"}[$window])) by (handler, status)",
+          "legendFormat": "HTTP: {{handler}} - {{status}}"
         }
       ],
       "fieldConfig": {

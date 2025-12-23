@@ -220,32 +220,29 @@ export class GatrixServerSDK {
       try {
         const promClient = require('prom-client');
 
-        // Registry for HTTP middleware metrics (both private/public)
-        this.httpRegistry = new promClient.Registry();
-        this.httpRegistry.setDefaultLabels({
-          sdk: 'gatrix-server-sdk',
-          service: configWithDefaults.service,
-          group: configWithDefaults.group,
-          environment: configWithDefaults.environment,
-          application: configWithDefaults.applicationName,
-        });
+        // Use the primary SDK metrics registry if available to avoid merge issues
+        // All metrics will be in one place, distinguished by their names (sdk_ vs app_ vs game_)
+        const mainRegistry = this.metrics?.getRegistry() || new promClient.Registry();
 
-        // Registry for user-specific custom metrics or default Node.js metrics
-        if (configWithDefaults.metrics?.userMetricsEnabled || configWithDefaults.metrics?.collectDefaultMetrics !== false) {
-          this.userRegistry = new promClient.Registry();
-          this.userRegistry.setDefaultLabels({
+        // Registry for HTTP middleware metrics (both private/public)
+        this.httpRegistry = mainRegistry;
+
+        // Only set default labels if they haven't been set yet
+        // SdkMetrics already sets them, so we skip if it's the same registry
+        if (!this.metrics?.getRegistry()) {
+          this.httpRegistry.setDefaultLabels({
             sdk: 'gatrix-server-sdk',
             service: configWithDefaults.service,
             group: configWithDefaults.group,
             environment: configWithDefaults.environment,
             application: configWithDefaults.applicationName,
           });
+        }
 
-          // Collect default Node.js metrics in user registry if requested
-          // Collect default Node.js metrics in user registry if requested
-          // if (configWithDefaults.metrics?.collectDefaultMetrics !== false) {
-          //   promClient.collectDefaultMetrics({ register: this.userRegistry });
-          // }
+
+        // Registry for user-specific custom metrics or default Node.js metrics
+        if (configWithDefaults.metrics?.userMetricsEnabled || configWithDefaults.metrics?.collectDefaultMetrics !== false) {
+          this.userRegistry = mainRegistry;
         }
       } catch (_e) {
         // Silently fail if prom-client is not available
@@ -447,23 +444,37 @@ export class GatrixServerSDK {
       this.initialized = true;
 
       // Initialize metrics server if enabled
-      if (this.config.metrics?.serverEnabled) {
-        // Collect all registries to merge in MetricsServer
-        const additionalRegistries = [];
-        if (this.httpRegistry) additionalRegistries.push(this.httpRegistry);
-        if (this.userRegistry) additionalRegistries.push(this.userRegistry);
+      if (this.config.metrics?.serverEnabled && !this.metricsServer) {
+        // Collect unique registries to merge in MetricsServer
+        const primaryRegistry = this.metrics?.getRegistry();
+        const registrySet = new Set<any>();
+
+        if (primaryRegistry) {
+          registrySet.add(primaryRegistry);
+        }
+
+        if (this.httpRegistry) {
+          registrySet.add(this.httpRegistry);
+        }
+
+        if (this.userRegistry) {
+          registrySet.add(this.userRegistry);
+        }
+
+        // Remove the primary from additional before passing
+        const additionalRegistries = Array.from(registrySet).filter(reg => reg !== primaryRegistry);
 
         this.metricsServer = createMetricsServer({
-          port: this.config.metrics.port,
-          bindAddress: this.config.metrics.bindAddress,
+          port: this.config.metrics?.port,
+          bindAddress: this.config.metrics?.bindAddress,
+          collectDefaultMetrics: this.config.metrics?.collectDefaultMetrics,
           service: this.config.service,
           group: this.config.group,
           environment: this.config.environment,
           applicationName: this.config.applicationName,
           logger: this.logger,
-          registry: this.metrics?.getRegistry(), // Use internal SDK registry as primary
+          registry: primaryRegistry as any,
           additionalRegistries,
-          collectDefaultMetrics: this.config.metrics?.collectDefaultMetrics !== false,
         });
 
         this.metricsServer.start();
@@ -1418,7 +1429,7 @@ export class GatrixServerSDK {
     return createHttpMetricsMiddleware({
       registry: this.httpRegistry,
       scope: options.scope,
-      prefix: options.prefix,
+      prefix: options.prefix || 'game_', // Match dashboard expectation (sdk_http_...)
     });
   }
 

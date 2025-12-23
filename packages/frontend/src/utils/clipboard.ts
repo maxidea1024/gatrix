@@ -8,12 +8,12 @@
  * @returns Promise that resolves when copy is successful
  */
 export const copyToClipboard = async (text: string): Promise<boolean> => {
+  if (!text) return false;
+
   console.log('[Clipboard] Starting copy, text length:', text.length);
-  console.log('[Clipboard] navigator.clipboard available:', !!navigator.clipboard);
 
   // Try modern Clipboard API first (HTTPS/localhost only)
-  // Note: window.isSecureContext includes localhost and HTTPS
-  if (navigator.clipboard) {
+  if (navigator.clipboard && window.isSecureContext) {
     try {
       console.log('[Clipboard] Trying modern Clipboard API...');
       await navigator.clipboard.writeText(text);
@@ -21,23 +21,36 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
       return true;
     } catch (error) {
       console.warn('[Clipboard] Modern Clipboard API failed, trying fallback:', error);
-      // Fall through to fallback method
     }
   }
 
-  // Fallback method for non-HTTPS environments
+  // Fallback method for non-HTTPS environments or if modern API fails
   try {
     console.log('[Clipboard] Using fallback method (execCommand)...');
     const textArea = document.createElement('textarea');
     textArea.value = text;
+
+    // Ensure the textarea is not visible but still part of the DOM
     textArea.style.position = 'fixed';
-    textArea.style.left = '-999999px';
-    textArea.style.top = '-999999px';
+    textArea.style.left = '-9999px';
+    textArea.style.top = '0';
+    textArea.style.width = '2em';
+    textArea.style.height = '2em';
+    textArea.style.padding = '0';
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+    textArea.style.background = 'transparent';
+
     document.body.appendChild(textArea);
 
     // Select and copy
     textArea.focus();
     textArea.select();
+
+    // Some browsers require explicit selection range for better compatibility
+    textArea.setSelectionRange(0, 99999);
+
     const successful = document.execCommand('copy');
 
     // Clean up
