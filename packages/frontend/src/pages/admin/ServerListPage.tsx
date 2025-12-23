@@ -1566,6 +1566,19 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
                     <ErrorIcon sx={{ fontSize: 18, color: 'white' }} />
                   ) : service.status === 'no-response' ? (
                     <WarningIcon sx={{ fontSize: 18, color: 'white' }} />
+                  ) : service.status === 'busy' ? (
+                    <SearchIcon sx={{
+                      fontSize: 20,
+                      color: 'white',
+                      animation: 'searchingAnim 2s ease-in-out infinite',
+                      '@keyframes searchingAnim': {
+                        '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                        '25%': { transform: 'translate(2px, -2px) rotate(15deg)' },
+                        '50%': { transform: 'translate(-2px, 2px) rotate(-15deg)' },
+                        '75%': { transform: 'translate(2px, 2px) rotate(15deg)' },
+                        '100%': { transform: 'translate(0, 0) rotate(0deg)' },
+                      },
+                    }} />
                   ) : (
                     <HelpOutlineIcon sx={{ fontSize: 18, color: 'white' }} />
                   )}
@@ -1591,7 +1604,8 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
                       service.status === 'shutting_down' ? 'SHUTTING DOWN' :
                         service.status === 'terminated' ? 'TERMINATED' :
                           service.status === 'error' ? 'ERROR' :
-                            service.status === 'no-response' ? 'NO RESPONSE' : '?'}
+                            service.status === 'no-response' ? 'NO RESPONSE' :
+                              service.status === 'busy' ? 'BUSY' : '?'}
                 </Typography>
               </Box>
             </Tooltip>
@@ -2930,6 +2944,22 @@ const ServerListPage: React.FC = () => {
       shutting_down: { color: 'info' as const, icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.shuttingDown'), tooltipKey: 'shuttingDown' },
       terminated: { color: 'default' as const, icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.terminated'), tooltipKey: 'terminated' },
       'no-response': { color: 'warning' as const, icon: <WarningIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.noResponse'), tooltipKey: 'noResponse' },
+      busy: {
+        color: 'warning' as const,
+        icon: <SearchIcon sx={{
+          fontSize: 16,
+          animation: 'searchingAnimSmall 2s ease-in-out infinite',
+          '@keyframes searchingAnimSmall': {
+            '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+            '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
+            '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
+            '75%': { transform: 'translate(1px, 1px) rotate(10deg)' },
+            '100%': { transform: 'translate(0, 0) rotate(0deg)' },
+          },
+        }} />,
+        label: t('serverList.status.busy') || 'Busy',
+        tooltipKey: 'busy'
+      },
     };
 
     const config = statusConfig[status];
