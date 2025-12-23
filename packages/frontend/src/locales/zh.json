@@ -2113,6 +2113,7 @@
     "action": "操作",
     "actions": "操作",
     "add": "添加",
+    "addFirstItem": "添加您的第一个项目开始使用",
     "addTag": "添加标签",
     "all": "全部",
     "andMore": "还有 {{count}} 项",
@@ -4346,7 +4347,9 @@
       "status": "状态",
       "instanceId": "实例ID",
       "group": "组",
-      "region": "地区",
+      "cloudProvider": "云服务商",
+      "cloudRegion": "云区域",
+      "cloudZone": "云可用区",
       "env": "环境",
       "role": "角色",
       "hostname": "主机名",
@@ -4369,6 +4372,10 @@
       "terminated": "服务器已关闭或已停止。这是最终状态。",
       "noResponse": "服务器在预期时间内未发送心跳。服务器可能无响应或存在网络问题。"
     },
+    "tooltip": {
+      "addressExt": "地址 (外部)",
+      "addressInt": "地址 (内部)"
+    },
     "healthCheck": {
       "tooltip": "检查服务器健康状态（调用 /health 端点）",
       "healthyTooltip": "健康 ({{latency}}ms)",
@@ -4382,7 +4389,9 @@
       "service": "服务",
       "group": "组",
       "environment": "环境",
-      "region": "地区",
+      "cloudProvider": "云服务商",
+      "cloudRegion": "云区域",
+      "cloudZone": "云可用区",
       "labels": "标签",
       "hostname": "主机名",
       "externalAddress": "外部IP",
@@ -4401,7 +4410,9 @@
       "service": "服务",
       "group": "组",
       "environment": "环境",
-      "region": "地区"
+      "cloudProvider": "云服务商",
+      "cloudRegion": "云区域",
+      "cloudZone": "云可用区"
     },
     "stats": {
       "initializing": "初始化中",

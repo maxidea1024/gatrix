@@ -5,7 +5,10 @@
   "schemaVersion": 39,
   "version": 1,
   "refresh": "10s",
-  "tags": ["gatrix", "sdk"],
+  "tags": [
+    "gatrix",
+    "sdk"
+  ],
   "templating": {
     "list": [
       {
@@ -23,6 +26,39 @@
         "type": "query",
         "datasource": "Prometheus",
         "query": "label_values(sdk_http_requests_total, service)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "cloudProvider",
+        "type": "query",
+        "label": "Cloud Provider",
+        "datasource": "Prometheus",
+        "query": "label_values(sdk_http_requests_total, cloudProvider)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "cloudRegion",
+        "type": "query",
+        "label": "Cloud Region",
+        "datasource": "Prometheus",
+        "query": "label_values(sdk_http_requests_total, cloudRegion)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
+        "name": "cloudZone",
+        "type": "query",
+        "label": "Cloud Zone",
+        "datasource": "Prometheus",
+        "query": "label_values(sdk_http_requests_total, cloudZone)",
         "includeAll": true,
         "allValue": ".*",
         "multi": true,
@@ -69,15 +105,32 @@
         "refresh": 1
       },
       {
+        "name": "version",
+        "type": "query",
+        "label": "Version",
+        "datasource": "Prometheus",
+        "query": "label_values(sdk_http_requests_total, version)",
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1
+      },
+      {
         "name": "window",
         "type": "interval",
         "label": "Window",
         "query": "5m,10m,30m,1h",
-        "current": {"text": "5m", "value": "5m"}
+        "current": {
+          "text": "5m",
+          "value": "5m"
+        }
       }
     ]
   },
-  "time": {"from": "now-1h", "to": "now"},
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "panels": [
     {
       "id": 1,
@@ -86,12 +139,17 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum by (route, status) (rate(sdk_http_requests_total{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"}[$window]))",
+          "expr": "sum by (route, status) (rate(sdk_http_requests_total{application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"}[$window]))",
           "legendFormat": "{{route}} [{{status}}]",
           "refId": "A"
         }
       ],
-      "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8}
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      }
     },
     {
       "id": 2,
@@ -100,12 +158,17 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(rate(sdk_http_requests_total{status!=\"200\",application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"}[$window])) / sum(rate(sdk_http_requests_total{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"}[$window]))",
+          "expr": "sum(rate(sdk_http_requests_total{status!=\"200\",application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"}[$window])) / sum(rate(sdk_http_requests_total{application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"}[$window]))",
           "legendFormat": "error rate",
           "refId": "A"
         }
       ],
-      "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8}
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      }
     },
     {
       "id": 3,
@@ -114,12 +177,17 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(sdk_http_request_duration_seconds_bucket{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"}[$window])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(sdk_http_request_duration_seconds_bucket{application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"}[$window])))",
           "legendFormat": "p95 latency",
           "refId": "A"
         }
       ],
-      "gridPos": {"x": 0, "y": 12, "w": 12, "h": 8}
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
     },
     {
       "id": 4,
@@ -128,12 +196,17 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum by (target) (increase(sdk_cache_refresh_total{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"}[$window]))",
+          "expr": "sum by (target) (increase(sdk_cache_refresh_total{application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"}[$window]))",
           "legendFormat": "{{target}}",
           "refId": "A"
         }
       ],
-      "gridPos": {"x": 12, "y": 12, "w": 12, "h": 8}
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
     },
     {
       "id": 5,
@@ -142,11 +215,16 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "max(sdk_redis_connected{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"})",
+          "expr": "max(sdk_redis_connected{application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"})",
           "refId": "A"
         }
       ],
-      "gridPos": {"x": 0, "y": 0, "w": 8, "h": 4}
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 4
+      }
     },
     {
       "id": 6,
@@ -155,11 +233,16 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(increase(sdk_redis_reconnect_total{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"}[$window]))",
+          "expr": "sum(increase(sdk_redis_reconnect_total{application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"}[$window]))",
           "refId": "A"
         }
       ],
-      "gridPos": {"x": 8, "y": 0, "w": 8, "h": 4}
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 4
+      }
     },
     {
       "id": 7,
@@ -168,11 +251,16 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum(increase(sdk_errors_total{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"}[$window]))",
+          "expr": "sum(increase(sdk_errors_total{application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"}[$window]))",
           "refId": "A"
         }
       ],
-      "gridPos": {"x": 16, "y": 0, "w": 8, "h": 4}
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 8,
+        "h": 4
+      }
     },
     {
       "id": 8,
@@ -181,12 +269,17 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{route=\"/metrics\",application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"}[$window])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{route=\"/metrics\",application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"}[$window])))",
           "legendFormat": "p95 /metrics",
           "refId": "A"
         }
       ],
-      "gridPos": {"x": 12, "y": 20, "w": 12, "h": 8}
+      "gridPos": {
+        "x": 12,
+        "y": 20,
+        "w": 12,
+        "h": 8
+      }
     },
     {
       "id": 9,
@@ -195,12 +288,17 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum by (le, target) (rate(sdk_cache_refresh_duration_seconds_bucket{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"}[$window])))",
+          "expr": "histogram_quantile(0.95, sum by (le, target) (rate(sdk_cache_refresh_duration_seconds_bucket{application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"}[$window])))",
           "legendFormat": "{{target}}",
           "refId": "A"
         }
       ],
-      "gridPos": {"x": 0, "y": 20, "w": 12, "h": 8}
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 12,
+        "h": 8
+      }
     },
     {
       "id": 10,
@@ -209,18 +307,22 @@
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum by (type) (rate(sdk_events_received_total{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"}[$window]))",
+          "expr": "sum by (type) (rate(sdk_events_received_total{application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"}[$window]))",
           "legendFormat": "received {{type}}",
           "refId": "A"
         },
         {
-          "expr": "sum by (type) (rate(sdk_events_published_total{application=~\"$application\",service=~\"$service\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\"}[$window]))",
+          "expr": "sum by (type) (rate(sdk_events_published_total{application=~\"$application\",service=~\"$service\",cloudProvider=~\"$cloudProvider\",cloudRegion=~\"$cloudRegion\",cloudZone=~\"$cloudZone\",hostname=~\"$hostname\",ip=~\"$internalIp\",externalIp=~\"$externalIp\",instanceId=~\"$instanceId\",version=~\"$version\"}[$window]))",
           "legendFormat": "published {{type}}",
           "refId": "B"
         }
       ],
-      "gridPos": {"x": 0, "y": 28, "w": 24, "h": 8}
+      "gridPos": {
+        "x": 0,
+        "y": 28,
+        "w": 24,
+        "h": 8
+      }
     }
   ]
 }
-

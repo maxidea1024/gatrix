@@ -107,9 +107,9 @@ import { messageTemplateService, MessageTemplate } from '@/services/messageTempl
 import MultiLanguageMessageInput, { MessageLocale, MultiLanguageMessageInputRef } from '@/components/common/MultiLanguageMessageInput';
 import { useTheme } from '@mui/material/styles';
 import { tagService, Tag } from '../../services/tagService';
-import { 
-  ClientVersion, 
-  ClientVersionFilters, 
+import {
+  ClientVersion,
+  ClientVersionFilters,
   ClientStatus,
   ClientStatusLabels,
   ClientStatusColors,
@@ -349,7 +349,7 @@ const ClientVersionsPage: React.FC = () => {
   // 선택 관리
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
-  
+
   // 다이얼로그
   const [selectedClientVersion, setSelectedClientVersion] = useState<ClientVersion | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -1567,108 +1567,115 @@ const ClientVersionsPage: React.FC = () => {
                   loading={false}
                   message={t('clientVersions.noVersionsFound')}
                   loadingMessage={t('common.loadingClientVersions')}
+                  subtitle={canManage ? t('common.addFirstItem') : undefined}
+                  onAddClick={canManage ? () => {
+                    setEditingClientVersion(null);
+                    setIsCopyMode(false);
+                    setFormDialogOpen(true);
+                  } : undefined}
+                  addButtonLabel={t('clientVersions.addIndividual')}
                 />
               ) : (
                 clientVersions.map((clientVersion) => (
-                <TableRow
-                  key={clientVersion.id}
-                  selected={selectedIds.includes(clientVersion.id)}
-                  hover
-                >
-                  {canManage && (
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedIds.includes(clientVersion.id)}
-                        onChange={(e) => handleSelectOne(clientVersion.id, e.target.checked)}
-                      />
-                    </TableCell>
-                  )}
-                  {columns.filter(col => col.visible).map((column) => (
-                    <TableCell
-                      key={column.id}
-                      align={column.id === 'guestModeAllowed' ? 'center' : 'left'}
-                      width={column.width}
-                    >
-                      {renderCellContent(clientVersion, column.id)}
-                    </TableCell>
-                  ))}
-                  <TableCell>
-                    <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {clientVersion.createdByName || t('dashboard.unknown')}
-                      </Typography>
-                      {clientVersion.createdByEmail && (
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                          {clientVersion.createdByEmail}
+                  <TableRow
+                    key={clientVersion.id}
+                    selected={selectedIds.includes(clientVersion.id)}
+                    hover
+                  >
+                    {canManage && (
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedIds.includes(clientVersion.id)}
+                          onChange={(e) => handleSelectOne(clientVersion.id, e.target.checked)}
+                        />
+                      </TableCell>
+                    )}
+                    {columns.filter(col => col.visible).map((column) => (
+                      <TableCell
+                        key={column.id}
+                        align={column.id === 'guestModeAllowed' ? 'center' : 'left'}
+                        width={column.width}
+                      >
+                        {renderCellContent(clientVersion, column.id)}
+                      </TableCell>
+                    ))}
+                    <TableCell>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {clientVersion.createdByName || t('dashboard.unknown')}
                         </Typography>
-                      )}
-                    </Box>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                      {canManage && (
-                        <>
-                          <Tooltip title={t('clientVersions.copyVersion')} arrow>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleCopyVersion(clientVersion)}
-                              color="primary"
-                              sx={{
-                                '&:hover': {
-                                  backgroundColor: 'primary.light',
-                                  color: 'white',
-                                },
-                              }}
-                            >
-                              <CopyIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t('common.edit')} arrow>
-                            <IconButton
-                              size="small"
-                              onClick={() => {
-                                console.log('Edit button clicked for client version:', {
-                                  id: clientVersion.id,
-                                  clientVersion: clientVersion
-                                });
-                                setEditingClientVersion(clientVersion);
-                                setIsCopyMode(false);
-                                setFormDialogOpen(true);
-                              }}
-                              color="info"
-                              sx={{
-                                '&:hover': {
-                                  backgroundColor: 'info.light',
-                                  color: 'white',
-                                },
-                              }}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t('common.delete')} arrow>
-                            <IconButton
-                              size="small"
-                              onClick={() => {
-                                setSelectedClientVersion(clientVersion);
-                                setDeleteDialogOpen(true);
-                              }}
-                              color="error"
-                              sx={{
-                                '&:hover': {
-                                  backgroundColor: 'error.light',
-                                  color: 'white',
-                                },
-                              }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </>
-                      )}
-                    </Box>
-                  </TableCell>
-                </TableRow>
+                        {clientVersion.createdByEmail && (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                            {clientVersion.createdByEmail}
+                          </Typography>
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                        {canManage && (
+                          <>
+                            <Tooltip title={t('clientVersions.copyVersion')} arrow>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleCopyVersion(clientVersion)}
+                                color="primary"
+                                sx={{
+                                  '&:hover': {
+                                    backgroundColor: 'primary.light',
+                                    color: 'white',
+                                  },
+                                }}
+                              >
+                                <CopyIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('common.edit')} arrow>
+                              <IconButton
+                                size="small"
+                                onClick={() => {
+                                  console.log('Edit button clicked for client version:', {
+                                    id: clientVersion.id,
+                                    clientVersion: clientVersion
+                                  });
+                                  setEditingClientVersion(clientVersion);
+                                  setIsCopyMode(false);
+                                  setFormDialogOpen(true);
+                                }}
+                                color="info"
+                                sx={{
+                                  '&:hover': {
+                                    backgroundColor: 'info.light',
+                                    color: 'white',
+                                  },
+                                }}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('common.delete')} arrow>
+                              <IconButton
+                                size="small"
+                                onClick={() => {
+                                  setSelectedClientVersion(clientVersion);
+                                  setDeleteDialogOpen(true);
+                                }}
+                                color="error"
+                                sx={{
+                                  '&:hover': {
+                                    backgroundColor: 'error.light',
+                                    color: 'white',
+                                  },
+                                }}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </>
+                        )}
+                      </Box>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
             </TableBody>

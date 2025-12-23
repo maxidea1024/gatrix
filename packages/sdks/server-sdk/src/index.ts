@@ -40,6 +40,9 @@ export { createHttpMetricsMiddleware, HttpMetricsOptions } from './utils/httpMet
 // Export environment resolver
 export { EnvironmentResolver } from './utils/EnvironmentResolver';
 
+// Export cloud metadata detection utilities
+export { CloudMetadata, CloudProvider, detectCloudMetadata } from './utils/cloudMetadata';
+
 // Export SDK version
 export { SDK_VERSION } from './version';
 

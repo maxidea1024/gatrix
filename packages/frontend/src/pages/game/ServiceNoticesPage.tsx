@@ -239,7 +239,7 @@ const ServiceNoticesPage: React.FC = () => {
       }
 
       const result = await serviceNoticeService.getServiceNotices(page + 1, rowsPerPage, filters);
-      
+
       // Validate response
       if (result && typeof result === 'object') {
         setNotices(result.notices || []);
@@ -612,6 +612,9 @@ const ServiceNoticesPage: React.FC = () => {
                     colSpan={visibleColumns.length + (canManage ? 2 : 0)}
                     loading={loading}
                     message={t('serviceNotices.noNoticesFound')}
+                    subtitle={canManage ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage ? handleCreate : undefined}
+                    addButtonLabel={t('serviceNotices.createNotice')}
                   />
                 ) : (
                   notices.map((notice) => (
@@ -653,16 +656,16 @@ const ServiceNoticesPage: React.FC = () => {
 
                           const tooltipMessage = isCurrentlyVisible
                             ? t('serviceNotices.currentlyVisibleTooltip', {
-                                time: formatDateTime(now),
-                                start: startText,
-                                end: endText
-                              })
+                              time: formatDateTime(now),
+                              start: startText,
+                              end: endText
+                            })
                             : t('serviceNotices.notVisibleTooltip', {
-                                time: formatDateTime(now),
-                                start: startText,
-                                end: endText,
-                                isActive: notice.isActive
-                              });
+                              time: formatDateTime(now),
+                              start: startText,
+                              end: endText,
+                              isActive: notice.isActive
+                            });
 
                           return (
                             <TableCell key={column.id}>

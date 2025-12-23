@@ -1945,6 +1945,9 @@ const UsersManagementPage: React.FC = () => {
                     loading={false}
                     message={t('users.noUsersFound')}
                     loadingMessage={t('common.loadingUsers')}
+                    subtitle={canManage ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage ? handleAddUser : undefined}
+                    addButtonLabel={t('users.addUser')}
                   />
                 ) : (
                   users.map((user) => (

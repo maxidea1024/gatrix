@@ -1023,243 +1023,250 @@ const DashboardPage: React.FC = () => {
               const canManageEnvs = hasPermission(PERMISSIONS.ENVIRONMENTS_MANAGE);
               const emptyCardsCount = (4 - (count % 4)) % 4 || (count < 4 ? 4 - count : 0);
 
-              return environmentsWithCounts.map((env) => {
-              const isCurrentEnv = env.id === currentEnvironmentId;
-              return (
-              <Grid key={env.id} size={{ xs: 12, sm: smSize, md: mdSize }}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    borderTop: `3px solid ${env.color || theme.palette.primary.main}`,
-                    transition: 'all 0.2s ease-in-out',
-                    ...(isCurrentEnv && {
-                      boxShadow: `0 0 0 2px ${env.color || theme.palette.primary.main}40`,
-                      bgcolor: `${env.color || theme.palette.primary.main}08`,
-                    }),
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: theme.shadows[4],
-                    },
-                  }}
-                >
-                  <CardContent sx={{ p: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                      <Box
-                        sx={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: '50%',
-                          bgcolor: env.color || theme.palette.primary.main,
-                          mr: 1,
-                        }}
-                      />
-                      <Typography variant="subtitle2" fontWeight={600} noWrap sx={{ flex: 1 }}>
-                        {env.displayName || env.environmentName}
-                      </Typography>
-                      {isCurrentEnv ? (
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            ml: 1,
-                            px: 0.75,
-                            py: 0.25,
-                            borderRadius: 1,
-                            bgcolor: `${env.color || theme.palette.primary.main}20`,
-                            color: env.color || theme.palette.primary.main,
-                            fontWeight: 600,
-                            fontSize: '0.65rem',
-                          }}
-                        >
-                          {t('common.current')}
-                        </Typography>
-                      ) : (
-                        <Tooltip title={t('environments.switchTo', { name: env.displayName || env.environmentName })}>
-                          <IconButton
-                            size="small"
-                            onClick={() => switchEnvironment(env.id)}
-                            sx={{
-                              ml: 0.5,
-                              p: 0.5,
-                              color: 'text.secondary',
-                              '&:hover': {
-                                color: env.color || theme.palette.primary.main,
-                                bgcolor: `${env.color || theme.palette.primary.main}15`,
-                              },
-                            }}
-                          >
-                            <ArrowForwardIcon sx={{ fontSize: 16 }} />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </Box>
-                    {env.loading || envCountsLoading ? (
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                        <Skeleton width="80%" height={20} />
-                        <Skeleton width="60%" height={20} />
-                        <Skeleton width="70%" height={20} />
-                      </Box>
-                    ) : env.counts ? (
-                      <Box
-                        sx={{
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(2, 1fr)',
-                          gap: 0.5,
-                        }}
-                      >
-                        {[
-                          { label: 'envTemplates', value: env.counts.templates, path: '/admin/remote-config' },
-                          { label: 'envGameWorlds', value: env.counts.gameWorlds, path: '/admin/game-worlds' },
-                          { label: 'envClientVersions', value: env.counts.clientVersions, path: '/admin/client-versions' },
-                          { label: 'envSegments', value: env.counts.segments, path: '/admin/remote-config' },
-                          { label: 'envVars', value: env.counts.vars, path: '/settings/kv' },
-                          { label: 'envMessageTemplates', value: env.counts.messageTemplates, path: '/admin/maintenance-templates' },
-                          { label: 'envSurveys', value: env.counts.surveys, path: '/game/surveys' },
-                          { label: 'envCoupons', value: env.counts.coupons, path: '/game/coupon-settings' },
-                          { label: 'envNotices', value: env.counts.serviceNotices, path: '/game/service-notices' },
-                          { label: 'envIngamePopups', value: env.counts.ingamePopups, path: '/game/ingame-popup-notices' },
-                          { label: 'envBanners', value: env.counts.banners, path: '/game/banners' },
-                          { label: 'envJobs', value: env.counts.jobs, path: '/admin/jobs' },
-                          { label: 'envStoreProducts', value: env.counts.storeProducts, path: '/game/store-products' },
-                        ].map((item) => (
-                          <Box
-                            key={item.label}
-                            onClick={() => {
-                              if (env.id !== currentEnvironmentId) {
-                                switchEnvironment(env.id);
-                              }
-                              navigate(item.path);
-                            }}
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'stretch',
-                              height: 24,
-                              borderRadius: 0.5,
-                              border: 1,
-                              borderColor: 'divider',
-                              overflow: 'hidden',
-                              cursor: 'pointer',
-                              '&:hover': {
-                                borderColor: 'primary.main',
-                                '& .env-count-label': {
-                                  bgcolor: 'action.hover',
-                                },
-                                '& .env-count-value': {
-                                  bgcolor: 'primary.dark',
-                                },
-                              },
-                            }}
-                          >
-                            <Box
-                              className="env-count-label"
-                              sx={{
-                                flex: 1,
-                                display: 'flex',
-                                alignItems: 'center',
-                                px: 1,
-                                fontSize: '0.7rem',
-                                color: 'text.secondary',
-                                bgcolor: 'background.paper',
-                                transition: 'background-color 0.15s',
-                              }}
-                            >
-                              {t(`dashboard.${item.label}`)}
-                            </Box>
-                            <Box
-                              className="env-count-value"
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                minWidth: 28,
-                                px: 0.5,
-                                fontSize: '0.7rem',
-                                fontWeight: 700,
-                                color: 'primary.contrastText',
-                                bgcolor: item.value > 0 ? 'primary.main' : 'action.disabledBackground',
-                                transition: 'background-color 0.15s',
-                              }}
-                            >
-                              {item.value}
-                            </Box>
-                          </Box>
-                        ))}
-                      </Box>
-                    ) : (
-                      <Typography variant="caption" color="text.secondary">
-                        {t('dashboard.envNoData')}
-                      </Typography>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-              );
-            }).concat(
-              // Add empty placeholder cards to fill the row
-              Array.from({ length: emptyCardsCount }).map((_, idx) => (
-                <Grid key={`empty-${idx}`} size={{ xs: 12, sm: smSize, md: mdSize }}>
-                  <Card
-                    onClick={canManageEnvs ? () => navigate('/settings/environments') : undefined}
-                    sx={{
-                      height: '100%',
-                      border: '1px dashed',
-                      borderColor: 'divider',
-                      boxShadow: 'none',
-                      bgcolor: 'transparent',
-                      cursor: canManageEnvs ? 'pointer' : 'default',
-                      transition: 'all 0.2s ease-in-out',
-                      ...(canManageEnvs && {
-                        '&:hover': {
-                          borderColor: 'primary.main',
-                          bgcolor: 'action.hover',
-                          transform: 'translateY(-2px)',
-                          '& .add-icon': {
-                            color: 'primary.main',
-                            transform: 'scale(1.1)',
-                          },
-                          '& .add-text': {
-                            color: 'text.primary',
-                          },
-                        },
-                      }),
-                    }}
-                  >
-                    <CardContent
+              // Sort environments to put current environment first
+              const sortedEnvs = [...environmentsWithCounts].sort((a, b) => {
+                if (a.id === currentEnvironmentId) return -1;
+                if (b.id === currentEnvironmentId) return 1;
+                return 0;
+              });
+
+              return sortedEnvs.map((env) => {
+                const isCurrentEnv = env.id === currentEnvironmentId;
+                return (
+                  <Grid key={env.id} size={{ xs: 12, sm: smSize, md: mdSize }}>
+                    <Card
                       sx={{
-                        p: 2,
                         height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        minHeight: 200,
+                        borderTop: `3px solid ${env.color || theme.palette.primary.main}`,
+                        transition: 'all 0.2s ease-in-out',
+                        ...(isCurrentEnv && {
+                          boxShadow: `0 0 0 2px ${env.color || theme.palette.primary.main}40`,
+                          bgcolor: `${env.color || theme.palette.primary.main}08`,
+                        }),
+                        '&:hover': {
+                          transform: 'translateY(-2px)',
+                          boxShadow: theme.shadows[4],
+                        },
                       }}
                     >
-                      {canManageEnvs && (
-                        <>
-                          <SettingsIcon
-                            className="add-icon"
+                      <CardContent sx={{ p: 2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                          <Box
                             sx={{
-                              fontSize: 32,
-                              color: 'text.disabled',
-                              mb: 1,
-                              transition: 'all 0.2s ease-in-out',
+                              width: 8,
+                              height: 8,
+                              borderRadius: '50%',
+                              bgcolor: env.color || theme.palette.primary.main,
+                              mr: 1,
                             }}
                           />
-                          <Typography
-                            className="add-text"
-                            variant="caption"
-                            color="text.disabled"
-                            sx={{ transition: 'color 0.2s ease-in-out' }}
-                          >
-                            {t('sidebar.environments')}
+                          <Typography variant="subtitle2" fontWeight={600} noWrap sx={{ flex: 1 }}>
+                            {env.displayName || env.environmentName}
                           </Typography>
-                        </>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))
-            );
+                          {isCurrentEnv ? (
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                ml: 1,
+                                px: 0.75,
+                                py: 0.25,
+                                borderRadius: 1,
+                                bgcolor: `${env.color || theme.palette.primary.main}20`,
+                                color: env.color || theme.palette.primary.main,
+                                fontWeight: 600,
+                                fontSize: '0.65rem',
+                              }}
+                            >
+                              {t('common.current')}
+                            </Typography>
+                          ) : (
+                            <Tooltip title={t('environments.switchTo', { name: env.displayName || env.environmentName })}>
+                              <IconButton
+                                size="small"
+                                onClick={() => switchEnvironment(env.id)}
+                                sx={{
+                                  ml: 0.5,
+                                  p: 0.5,
+                                  color: 'text.secondary',
+                                  '&:hover': {
+                                    color: env.color || theme.palette.primary.main,
+                                    bgcolor: `${env.color || theme.palette.primary.main}15`,
+                                  },
+                                }}
+                              >
+                                <ArrowForwardIcon sx={{ fontSize: 16 }} />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </Box>
+                        {env.loading || envCountsLoading ? (
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                            <Skeleton width="80%" height={20} />
+                            <Skeleton width="60%" height={20} />
+                            <Skeleton width="70%" height={20} />
+                          </Box>
+                        ) : env.counts ? (
+                          <Box
+                            sx={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(2, 1fr)',
+                              gap: 0.5,
+                            }}
+                          >
+                            {[
+                              { label: 'envTemplates', value: env.counts.templates, path: '/admin/remote-config' },
+                              { label: 'envGameWorlds', value: env.counts.gameWorlds, path: '/admin/game-worlds' },
+                              { label: 'envClientVersions', value: env.counts.clientVersions, path: '/admin/client-versions' },
+                              { label: 'envSegments', value: env.counts.segments, path: '/admin/remote-config' },
+                              { label: 'envVars', value: env.counts.vars, path: '/settings/kv' },
+                              { label: 'envMessageTemplates', value: env.counts.messageTemplates, path: '/admin/maintenance-templates' },
+                              { label: 'envSurveys', value: env.counts.surveys, path: '/game/surveys' },
+                              { label: 'envCoupons', value: env.counts.coupons, path: '/game/coupon-settings' },
+                              { label: 'envNotices', value: env.counts.serviceNotices, path: '/game/service-notices' },
+                              { label: 'envIngamePopups', value: env.counts.ingamePopups, path: '/game/ingame-popup-notices' },
+                              { label: 'envBanners', value: env.counts.banners, path: '/game/banners' },
+                              { label: 'envJobs', value: env.counts.jobs, path: '/admin/jobs' },
+                              { label: 'envStoreProducts', value: env.counts.storeProducts, path: '/game/store-products' },
+                            ].map((item) => (
+                              <Box
+                                key={item.label}
+                                onClick={() => {
+                                  if (env.id !== currentEnvironmentId) {
+                                    switchEnvironment(env.id);
+                                  }
+                                  navigate(item.path);
+                                }}
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'stretch',
+                                  height: 24,
+                                  borderRadius: 0.5,
+                                  border: 1,
+                                  borderColor: 'divider',
+                                  overflow: 'hidden',
+                                  cursor: 'pointer',
+                                  '&:hover': {
+                                    borderColor: 'primary.main',
+                                    '& .env-count-label': {
+                                      bgcolor: 'action.hover',
+                                    },
+                                    '& .env-count-value': {
+                                      bgcolor: 'primary.dark',
+                                    },
+                                  },
+                                }}
+                              >
+                                <Box
+                                  className="env-count-label"
+                                  sx={{
+                                    flex: 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    px: 1,
+                                    fontSize: '0.7rem',
+                                    color: 'text.secondary',
+                                    bgcolor: 'background.paper',
+                                    transition: 'background-color 0.15s',
+                                  }}
+                                >
+                                  {t(`dashboard.${item.label}`)}
+                                </Box>
+                                <Box
+                                  className="env-count-value"
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    minWidth: 28,
+                                    px: 0.5,
+                                    fontSize: '0.7rem',
+                                    fontWeight: 700,
+                                    color: 'primary.contrastText',
+                                    bgcolor: item.value > 0 ? 'primary.main' : 'action.disabledBackground',
+                                    transition: 'background-color 0.15s',
+                                  }}
+                                >
+                                  {item.value}
+                                </Box>
+                              </Box>
+                            ))}
+                          </Box>
+                        ) : (
+                          <Typography variant="caption" color="text.secondary">
+                            {t('dashboard.envNoData')}
+                          </Typography>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              }).concat(
+                // Add empty placeholder cards to fill the row
+                Array.from({ length: emptyCardsCount }).map((_, idx) => (
+                  <Grid key={`empty-${idx}`} size={{ xs: 12, sm: smSize, md: mdSize }}>
+                    <Card
+                      onClick={canManageEnvs ? () => navigate('/settings/environments') : undefined}
+                      sx={{
+                        height: '100%',
+                        border: '1px dashed',
+                        borderColor: 'divider',
+                        boxShadow: 'none',
+                        bgcolor: 'transparent',
+                        cursor: canManageEnvs ? 'pointer' : 'default',
+                        transition: 'all 0.2s ease-in-out',
+                        ...(canManageEnvs && {
+                          '&:hover': {
+                            borderColor: 'primary.main',
+                            bgcolor: 'action.hover',
+                            transform: 'translateY(-2px)',
+                            '& .add-icon': {
+                              color: 'primary.main',
+                              transform: 'scale(1.1)',
+                            },
+                            '& .add-text': {
+                              color: 'text.primary',
+                            },
+                          },
+                        }),
+                      }}
+                    >
+                      <CardContent
+                        sx={{
+                          p: 2,
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minHeight: 200,
+                        }}
+                      >
+                        {canManageEnvs && (
+                          <>
+                            <SettingsIcon
+                              className="add-icon"
+                              sx={{
+                                fontSize: 32,
+                                color: 'text.disabled',
+                                mb: 1,
+                                transition: 'all 0.2s ease-in-out',
+                              }}
+                            />
+                            <Typography
+                              className="add-text"
+                              variant="caption"
+                              color="text.disabled"
+                              sx={{ transition: 'color 0.2s ease-in-out' }}
+                            >
+                              {t('sidebar.environments')}
+                            </Typography>
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))
+              );
             })()}
           </Grid>
         </Box>

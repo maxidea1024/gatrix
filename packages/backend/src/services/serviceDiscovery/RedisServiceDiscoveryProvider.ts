@@ -313,7 +313,9 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
           logger.info(`Service auto-registered: ${serviceType}:${input.instanceId}`, { labels: input.labels });
           return;
         } else {
-          throw new Error(`Service ${serviceType}:${input.instanceId} not found`);
+          const error: any = new Error(`Service ${serviceType}:${input.instanceId} not found`);
+          error.status = 404;
+          throw error;
         }
       }
 

@@ -21,6 +21,7 @@ const TagsPage: React.FC = () => {
   // Data/state
   const [tags, setTags] = useState<Tag[]>([]);
   const [query, setQuery] = useState('');
+  const nameInputRef = React.useRef<HTMLInputElement>(null);
 
   // Delete confirm dialog
   const [deleteTarget, setDeleteTarget] = useState<Tag | null>(null);
@@ -155,6 +156,7 @@ const TagsPage: React.FC = () => {
                 <Chip label={newName || 'label'} sx={{ bgcolor: newColor, color: '#fff', height: 28, cursor: 'help' }} />
               </Tooltip>
               <TextField
+                inputRef={nameInputRef}
                 label={t('tags.name')}
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
@@ -217,6 +219,9 @@ const TagsPage: React.FC = () => {
                     loading={loading}
                     message={tags.length === 0 ? t('tags.noTagsFound') : t('tags.noMatchingTags')}
                     loadingMessage={t('common.loadingData')}
+                    subtitle={canManage && tags.length === 0 ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage && tags.length === 0 ? () => nameInputRef.current?.focus() : undefined}
+                    addButtonLabel={t('tags.addTag')}
                   />
                 ) : (
                   filtered.map(tag => (

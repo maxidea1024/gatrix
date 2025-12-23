@@ -426,7 +426,15 @@ const BannerManagementPage: React.FC = () => {
                 {loading && isInitialLoad ? (
                   <EmptyTableRow colSpan={visibleColumns.length} loading={true} message="" loadingMessage={t('common.loadingData')} />
                 ) : banners.length === 0 ? (
-                  <EmptyTableRow colSpan={visibleColumns.length} loading={false} message={t('banners.noBannersFound')} loadingMessage="" />
+                  <EmptyTableRow
+                    colSpan={visibleColumns.length}
+                    loading={false}
+                    message={t('banners.noBannersFound')}
+                    loadingMessage=""
+                    subtitle={canManage ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage ? handleCreate : undefined}
+                    addButtonLabel={t('banners.createBanner')}
+                  />
                 ) : (
                   banners.map((banner) => (
                     <TableRow key={banner.bannerId} hover selected={selectedIds.includes(banner.bannerId)}>

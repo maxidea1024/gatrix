@@ -903,202 +903,205 @@ const ApiTokensPage: React.FC = () => {
 
 
 
-      {/* Bulk Actions */}
-      {canManage && selectedTokenIds.length > 0 && (
-        <Box sx={{
-          mb: 2,
-          p: 2,
-          bgcolor: 'action.hover',
-          borderRadius: 1,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <Typography variant="body2" color="text.secondary">
-            {t('common.selectedItems', { count: selectedTokenIds.length })}
-          </Typography>
-          <Button
-            variant="outlined"
-            color="error"
-            size="small"
-            startIcon={<DeleteIcon />}
-            onClick={handleBulkDelete}
-          >
-            {t('apiTokens.bulkDelete')}
-          </Button>
-        </Box>
-      )}
-
-      {/* Filter and Column Settings */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-            {/* Search */}
-            <TextField
-              placeholder={t('apiTokens.searchPlaceholder')}
+        {/* Bulk Actions */}
+        {canManage && selectedTokenIds.length > 0 && (
+          <Box sx={{
+            mb: 2,
+            p: 2,
+            bgcolor: 'action.hover',
+            borderRadius: 1,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <Typography variant="body2" color="text.secondary">
+              {t('common.selectedItems', { count: selectedTokenIds.length })}
+            </Typography>
+            <Button
+              variant="outlined"
+              color="error"
               size="small"
-              sx={{
-                minWidth: 450,
-                flexGrow: 1,
-                maxWidth: 450,
-                '& .MuiOutlinedInput-root': {
-                  height: '40px',
-                  borderRadius: '20px',
-                  bgcolor: 'background.paper',
-                  transition: 'all 0.2s ease-in-out',
-                  '& fieldset': {
-                    borderColor: 'divider',
-                  },
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                    '& fieldset': {
-                      borderColor: 'primary.light',
-                    }
-                  },
-                  '&.Mui-focused': {
-                    bgcolor: 'background.paper',
-                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                    '& fieldset': {
-                      borderColor: 'primary.main',
-                      borderWidth: '1px',
-                    }
-                  }
-                },
-                '& .MuiInputBase-input': {
-                  fontSize: '0.875rem',
-                }
-              }}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            {/* Column Settings Button */}
-            <Tooltip title={t('common.columnSettings')}>
-              <IconButton
-                onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                sx={{
-                  ml: 1,
-                  bgcolor: 'background.paper',
-                  border: 1,
-                  borderColor: 'divider',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  },
-                }}
-              >
-                <ViewColumnIcon />
-              </IconButton>
-            </Tooltip>
+              startIcon={<DeleteIcon />}
+              onClick={handleBulkDelete}
+            >
+              {t('apiTokens.bulkDelete')}
+            </Button>
           </Box>
-        </CardContent>
-      </Card>
-
-      {/* Tokens Table */}
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer>
-          <Table stickyHeader sx={{ tableLayout: 'auto' }}>
-            <TableHead>
-              <TableRow>
-                {canManage && (
-                  <TableCell padding="checkbox" sx={{ width: 50 }}>
-                    <Checkbox
-                      checked={selectAll}
-                      indeterminate={selectedTokenIds.length > 0 && selectedTokenIds.length < filteredTokens.length}
-                      onChange={(e) => handleSelectAll(e.target.checked)}
-                      disabled={filteredTokens.length === 0}
-                    />
-                  </TableCell>
-                )}
-                {columns.filter(col => col.visible).map((column) => (
-                  <TableCell key={column.id}>
-                    {t(column.labelKey)}
-                  </TableCell>
-                ))}
-                <TableCell align="center" sx={{ width: 150 }}>{t('common.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {!filteredTokens || filteredTokens.length === 0 ? (
-                <EmptyTableRow
-                  colSpan={columns.filter(col => col.visible).length + (canManage ? 2 : 1)}
-                  loading={loading}
-                  message={searchTerm ? t('common.noSearchResults') : t('apiTokens.noTokens')}
-                  loadingMessage={t('common.loadingData')}
-                />
-              ) : (
-                filteredTokens.map((token) => (
-                  <TableRow key={token.id} hover selected={selectedTokenIds.includes(token.id)}>
-                    {canManage && (
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={selectedTokenIds.includes(token.id)}
-                          onChange={(e) => handleSelectToken(token.id, e.target.checked)}
-                        />
-                      </TableCell>
-                    )}
-                    {columns.filter(col => col.visible).map((column) => (
-                      <TableCell key={column.id}>
-                        {renderCellContent(token, column.id)}
-                      </TableCell>
-                    ))}
-                    <TableCell align="center">
-                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                        <Tooltip title={t('apiTokens.copyToken')}>
-                          <IconButton size="small" onClick={async () => await copyTokenValue(token)}>
-                            <CopyIcon />
-                          </IconButton>
-                        </Tooltip>
-                        {canManage && (
-                          <>
-                            <Tooltip title={t('common.edit')}>
-                              <IconButton size="small" onClick={() => openEditDialog(token)}>
-                                <EditIcon />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('apiTokens.regenerateToken')}>
-                              <IconButton size="small" onClick={() => openRegenerateDialog(token)}>
-                                <RefreshIcon />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('common.delete')}>
-                              <IconButton size="small" onClick={() => openDeleteDialog(token)}>
-                                <DeleteIcon />
-                              </IconButton>
-                            </Tooltip>
-                          </>
-                        )}
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        {/* Pagination */}
-        {!loading && tokens.length > 0 && (
-          <SimplePagination
-            count={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(_, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
-            rowsPerPageOptions={[5, 10, 25, 50]}
-          />
         )}
-      </Paper>
-    </Box>
+
+        {/* Filter and Column Settings */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+              {/* Search */}
+              <TextField
+                placeholder={t('apiTokens.searchPlaceholder')}
+                size="small"
+                sx={{
+                  minWidth: 450,
+                  flexGrow: 1,
+                  maxWidth: 450,
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
+                    },
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
+                      }
+                    },
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
+                      }
+                    }
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
+                  }
+                }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('common.columnSettings')}>
+                <IconButton
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    ml: 1,
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* Tokens Table */}
+        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+          <TableContainer>
+            <Table stickyHeader sx={{ tableLayout: 'auto' }}>
+              <TableHead>
+                <TableRow>
+                  {canManage && (
+                    <TableCell padding="checkbox" sx={{ width: 50 }}>
+                      <Checkbox
+                        checked={selectAll}
+                        indeterminate={selectedTokenIds.length > 0 && selectedTokenIds.length < filteredTokens.length}
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        disabled={filteredTokens.length === 0}
+                      />
+                    </TableCell>
+                  )}
+                  {columns.filter(col => col.visible).map((column) => (
+                    <TableCell key={column.id}>
+                      {t(column.labelKey)}
+                    </TableCell>
+                  ))}
+                  <TableCell align="center" sx={{ width: 150 }}>{t('common.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {!filteredTokens || filteredTokens.length === 0 ? (
+                  <EmptyTableRow
+                    colSpan={columns.filter(col => col.visible).length + (canManage ? 2 : 1)}
+                    loading={loading}
+                    message={searchTerm ? t('common.noSearchResults') : t('apiTokens.noTokens')}
+                    loadingMessage={t('common.loadingData')}
+                    subtitle={canManage && !searchTerm ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage && !searchTerm ? openCreateDialog : undefined}
+                    addButtonLabel={t('apiTokens.createToken')}
+                  />
+                ) : (
+                  filteredTokens.map((token) => (
+                    <TableRow key={token.id} hover selected={selectedTokenIds.includes(token.id)}>
+                      {canManage && (
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedTokenIds.includes(token.id)}
+                            onChange={(e) => handleSelectToken(token.id, e.target.checked)}
+                          />
+                        </TableCell>
+                      )}
+                      {columns.filter(col => col.visible).map((column) => (
+                        <TableCell key={column.id}>
+                          {renderCellContent(token, column.id)}
+                        </TableCell>
+                      ))}
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                          <Tooltip title={t('apiTokens.copyToken')}>
+                            <IconButton size="small" onClick={async () => await copyTokenValue(token)}>
+                              <CopyIcon />
+                            </IconButton>
+                          </Tooltip>
+                          {canManage && (
+                            <>
+                              <Tooltip title={t('common.edit')}>
+                                <IconButton size="small" onClick={() => openEditDialog(token)}>
+                                  <EditIcon />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={t('apiTokens.regenerateToken')}>
+                                <IconButton size="small" onClick={() => openRegenerateDialog(token)}>
+                                  <RefreshIcon />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={t('common.delete')}>
+                                <IconButton size="small" onClick={() => openDeleteDialog(token)}>
+                                  <DeleteIcon />
+                                </IconButton>
+                              </Tooltip>
+                            </>
+                          )}
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {/* Pagination */}
+          {!loading && tokens.length > 0 && (
+            <SimplePagination
+              count={total}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={(_, newPage) => setPage(newPage)}
+              onRowsPerPageChange={(e) => {
+                setRowsPerPage(parseInt(e.target.value, 10));
+                setPage(0);
+              }}
+              rowsPerPageOptions={[5, 10, 25, 50]}
+            />
+          )}
+        </Paper>
+      </Box>
 
       {/* Create Token Side Panel */}
       <ResizableDrawer
@@ -2056,182 +2059,182 @@ const ApiTokensPage: React.FC = () => {
           }
         }}
       >
-          <DialogTitle sx={{ pb: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <CheckCircleIcon color="success" sx={{ fontSize: 32 }} />
-              <Box>
-                <Typography variant="h5" component="div" sx={{ fontWeight: 600 }}>
-                  {newTokenInfo?.isNew
-                    ? t('apiTokens.tokenCreated')
-                    : t('apiTokens.tokenRegenerated')
-                  }
-                </Typography>
-              </Box>
+        <DialogTitle sx={{ pb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <CheckCircleIcon color="success" sx={{ fontSize: 32 }} />
+            <Box>
+              <Typography variant="h5" component="div" sx={{ fontWeight: 600 }}>
+                {newTokenInfo?.isNew
+                  ? t('apiTokens.tokenCreated')
+                  : t('apiTokens.tokenRegenerated')
+                }
+              </Typography>
             </Box>
-          </DialogTitle>
-          <DialogContent sx={{ pt: 2 }}>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
 
-            {/* Token Summary */}
-            {newTokenInfo && (
-              <Box sx={{
-                mb: 3,
-                p: 3,
-                bgcolor: 'background.paper',
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-              }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
-                  {t('apiTokens.tokenSummary')}
-                </Typography>
-                <Box sx={{ display: 'grid', gap: 2 }}>
+          {/* Token Summary */}
+          {newTokenInfo && (
+            <Box sx={{
+              mb: 3,
+              p: 3,
+              bgcolor: 'background.paper',
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: 'divider',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+                {t('apiTokens.tokenSummary')}
+              </Typography>
+              <Box sx={{ display: 'grid', gap: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    {t('apiTokens.tokenName')}
+                  </Typography>
+                  <Chip label={newTokenInfo.tokenName} variant="outlined" size="small" />
+                </Box>
+                {newTokenInfo.description && (
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                      {t('apiTokens.tokenName')}
+                      {t('apiTokens.description')}
                     </Typography>
-                    <Chip label={newTokenInfo.tokenName} variant="outlined" size="small" />
+                    <Typography variant="body2" fontWeight={500} sx={{ maxWidth: '60%', textAlign: 'right' }}>
+                      {newTokenInfo.description}
+                    </Typography>
                   </Box>
-                  {newTokenInfo.description && (
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                        {t('apiTokens.description')}
+                )}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    {t('apiTokens.tokenType')}
+                  </Typography>
+                  <Chip
+                    label={t(`apiTokens.types.${newTokenInfo.tokenType}`, newTokenInfo.tokenType)}
+                    color="primary"
+                    size="small"
+                  />
+                </Box>
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    {t('apiTokens.expiresAt')}
+                  </Typography>
+                  <Typography variant="body2" fontWeight={500}>
+                    {newTokenInfo.expiresAt
+                      ? formatRelativeTime(newTokenInfo.expiresAt)
+                      : t('apiTokens.noExpiration')
+                    }
+                  </Typography>
+                </Box>
+
+                {/* Environment Access */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    {t('apiTokens.environments')}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'flex-end', maxWidth: '60%' }}>
+                    {newTokenInfo.allowAllEnvironments ? (
+                      <Chip
+                        label={t('apiTokens.allEnvironments')}
+                        size="small"
+                        color="success"
+                      />
+                    ) : newTokenInfo.environmentIds && newTokenInfo.environmentIds.length > 0 ? (
+                      newTokenInfo.environmentIds.map((envId: number) => {
+                        const env = environments.find(e => e.id === envId);
+                        return env ? (
+                          <Chip
+                            key={envId}
+                            label={env.environmentName}
+                            size="small"
+                            variant="outlined"
+                          />
+                        ) : null;
+                      })
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        {t('apiTokens.noEnvironmentSelected')}
                       </Typography>
-                      <Typography variant="body2" fontWeight={500} sx={{ maxWidth: '60%', textAlign: 'right' }}>
-                        {newTokenInfo.description}
-                      </Typography>
-                    </Box>
-                  )}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                      {t('apiTokens.tokenType')}
-                    </Typography>
-                    <Chip
-                      label={t(`apiTokens.types.${newTokenInfo.tokenType}`, newTokenInfo.tokenType)}
-                      color="primary"
-                      size="small"
-                    />
-                  </Box>
-
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                      {t('apiTokens.expiresAt')}
-                    </Typography>
-                    <Typography variant="body2" fontWeight={500}>
-                      {newTokenInfo.expiresAt
-                        ? formatRelativeTime(newTokenInfo.expiresAt)
-                        : t('apiTokens.noExpiration')
-                      }
-                    </Typography>
-                  </Box>
-
-                  {/* Environment Access */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                      {t('apiTokens.environments')}
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'flex-end', maxWidth: '60%' }}>
-                      {newTokenInfo.allowAllEnvironments ? (
-                        <Chip
-                          label={t('apiTokens.allEnvironments')}
-                          size="small"
-                          color="success"
-                        />
-                      ) : newTokenInfo.environmentIds && newTokenInfo.environmentIds.length > 0 ? (
-                        newTokenInfo.environmentIds.map((envId: number) => {
-                          const env = environments.find(e => e.id === envId);
-                          return env ? (
-                            <Chip
-                              key={envId}
-                              label={env.environmentName}
-                              size="small"
-                              variant="outlined"
-                            />
-                          ) : null;
-                        })
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          {t('apiTokens.noEnvironmentSelected')}
-                        </Typography>
-                      )}
-                    </Box>
+                    )}
                   </Box>
                 </Box>
               </Box>
-            )}
+            </Box>
+          )}
 
-            {/* Token Value */}
-            {newTokenValue ? (
+          {/* Token Value */}
+          {newTokenValue ? (
+            <Box sx={{
+              p: 2,
+              bgcolor: 'action.hover',
+              borderRadius: 1,
+              border: '1px solid',
+              borderColor: 'divider'
+            }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                {t('apiTokens.tokenValue')}
+              </Typography>
+
+              {/* Token Display with Copy Button */}
               <Box sx={{
-                p: 2,
-                bgcolor: 'action.hover',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                p: 1.5,
+                bgcolor: 'background.default',
                 borderRadius: 1,
                 border: '1px solid',
                 borderColor: 'divider'
               }}>
-                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                  {t('apiTokens.tokenValue')}
+                <Typography
+                  variant="body2"
+                  fontFamily="monospace"
+                  sx={{
+                    flex: 1,
+                    fontSize: '0.875rem',
+                    letterSpacing: '0.5px',
+                    color: 'text.primary'
+                  }}
+                >
+                  {maskToken(newTokenValue)}
                 </Typography>
-
-                {/* Token Display with Copy Button */}
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  p: 1.5,
-                  bgcolor: 'background.default',
-                  borderRadius: 1,
-                  border: '1px solid',
-                  borderColor: 'divider'
-                }}>
-                  <Typography
-                    variant="body2"
-                    fontFamily="monospace"
-                    sx={{
-                      flex: 1,
-                      fontSize: '0.875rem',
-                      letterSpacing: '0.5px',
-                      color: 'text.primary'
-                    }}
+                <Tooltip title={t('apiTokens.copyTokenValue')}>
+                  <IconButton
+                    onClick={async () => await copyToClipboard(newTokenValue)}
+                    size="small"
+                    color="primary"
                   >
-                    {maskToken(newTokenValue)}
-                  </Typography>
-                  <Tooltip title={t('apiTokens.copyTokenValue')}>
-                    <IconButton
-                      onClick={async () => await copyToClipboard(newTokenValue)}
-                      size="small"
-                      color="primary"
-                    >
-                      <CopyIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
+                    <CopyIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </Box>
-            ) : (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                <Typography variant="body2">
-                  {t('apiTokens.tokenValueError')}
-                </Typography>
-              </Alert>
-            )}
-          </DialogContent>
-          <DialogActions sx={{ p: 3, pt: 2 }}>
-            <Button
-              onClick={() => { setNewTokenValue(''); setNewTokenInfo(null); setNewTokenDialogOpen(false); }}
-              variant="contained"
-              startIcon={<CheckCircleIcon />}
-              size="medium"
-              sx={{
-                px: 3,
-                py: 1,
-                fontWeight: 600,
-                textTransform: 'none'
-              }}
-            >
-              {t('common.confirm')}
-            </Button>
-          </DialogActions>
-        </Dialog>
+            </Box>
+          ) : (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              <Typography variant="body2">
+                {t('apiTokens.tokenValueError')}
+              </Typography>
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button
+            onClick={() => { setNewTokenValue(''); setNewTokenInfo(null); setNewTokenDialogOpen(false); }}
+            variant="contained"
+            startIcon={<CheckCircleIcon />}
+            size="medium"
+            sx={{
+              px: 3,
+              py: 1,
+              fontWeight: 600,
+              textTransform: 'none'
+            }}
+          >
+            {t('common.confirm')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Column Settings Popover */}
       <Popover

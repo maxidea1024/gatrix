@@ -459,7 +459,7 @@ const GameWorldsPage: React.FC = () => {
     open: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   // Delete confirmation state
@@ -484,7 +484,7 @@ const GameWorldsPage: React.FC = () => {
   // Load registry tags for form use
   const [allRegistryTags, setAllRegistryTags] = useState<Tag[]>([]);
   useEffect(() => {
-    tagService.list().then(setAllRegistryTags).catch(() => {});
+    tagService.list().then(setAllRegistryTags).catch(() => { });
   }, []);
 
   // Load message templates
@@ -1370,7 +1370,7 @@ const GameWorldsPage: React.FC = () => {
               {t('gameWorlds.title')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {t('gameWorlds.subtitle') }
+              {t('gameWorlds.subtitle')}
             </Typography>
           </Box>
         </Box>
@@ -1512,6 +1512,9 @@ const GameWorldsPage: React.FC = () => {
                       loading={loading}
                       message={t('gameWorlds.noWorldsFound')}
                       loadingMessage={t('common.loadingData')}
+                      subtitle={canManage ? t('common.addFirstItem') : undefined}
+                      onAddClick={canManage ? handleAddWorld : undefined}
+                      addButtonLabel={t('gameWorlds.addGameWorld')}
                     />
                   ) : (
                     <SortableContext
@@ -1543,7 +1546,7 @@ const GameWorldsPage: React.FC = () => {
             </TableContainer>
           </DndContext>
 
-        {/* Pagination removed (no server/client paging) */}
+          {/* Pagination removed (no server/client paging) */}
 
         </CardContent>
       </Card>

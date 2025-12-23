@@ -91,7 +91,7 @@ export function createMetricsServer(config: MetricsServerConfig = {}): MetricsSe
       // getSingleMetric returns the metric if found, undefined otherwise
       return !!reg.getSingleMetric(PROXY_METRIC);
     });
-  } catch (e) {
+  } catch (_e) {
     // Ignore errors during check
   }
 

@@ -533,7 +533,10 @@ const IngamePopupNoticesPage: React.FC = () => {
                   <EmptyTableRow
                     colSpan={visibleColumns.length + (canManage ? 2 : 0)}
                     loading={loading}
-                    message={t('serviceNotices.noNoticesFound')}
+                    message={t('ingamePopupNotices.noNoticesFound')}
+                    subtitle={canManage ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage ? handleCreate : undefined}
+                    addButtonLabel={t('ingamePopupNotices.createNotice')}
                   />
                 ) : (
                   notices.map((notice) => (

@@ -258,7 +258,14 @@ const KeyValuePage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {items.length === 0 ? (
-                  <EmptyTableRow colSpan={canManage ? 6 : 5} message={t('settings.kv.noItems')} />
+                  <EmptyTableRow
+                    colSpan={canManage ? 6 : 5}
+                    message={t('settings.kv.noItems')}
+                    loading={loading}
+                    subtitle={canManage ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage ? handleCreate : undefined}
+                    addButtonLabel={t('settings.kv.create')}
+                  />
                 ) : (
                   items.map((item) => (
                     <TableRow key={item.varKey} hover>

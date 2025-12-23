@@ -131,7 +131,7 @@ interface ClusterLink extends SimulationLinkDatum<ClusterNode> {
 }
 
 // Grouping option type
-type GroupingOption = 'none' | 'service' | 'group' | 'environment' | 'region';
+type GroupingOption = 'none' | 'service' | 'group' | 'environment' | 'cloudProvider' | 'cloudRegion' | 'cloudZone';
 
 // ClusterView component with D3 force simulation
 interface ClusterViewProps {
@@ -477,8 +477,12 @@ const ClusterView: React.FC<ClusterViewProps> = ({ services, heartbeatIds, t, gr
         return service.labels.group || 'unknown';
       case 'environment':
         return service.labels.environment || 'unknown';
-      case 'region':
-        return service.labels.region || 'unknown';
+      case 'cloudProvider':
+        return service.labels.cloudProvider || 'unknown';
+      case 'cloudRegion':
+        return service.labels.cloudRegion || 'unknown';
+      case 'cloudZone':
+        return service.labels.cloudZone || 'unknown';
       default:
         return 'center';
     }
@@ -1456,11 +1460,28 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
                   pb: 0,
                   // Heartbeat glow animation
                   ...(hasHeartbeat && {
-                    animation: 'heartbeatPulse 0.8s ease-out',
-                    '@keyframes heartbeatPulse': {
-                      '0%': { boxShadow: 'inset 0 0 0 2px rgba(244, 67, 54, 0.8), 0 0 12px rgba(244, 67, 54, 0.5)' },
-                      '50%': { boxShadow: 'inset 0 0 0 4px rgba(244, 67, 54, 0.4), 0 0 16px rgba(244, 67, 54, 0.3)' },
-                      '100%': { boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.15)' },
+                    animation: 'heartbeatGlowPulse 1s ease-out',
+                    '@keyframes heartbeatGlowPulse': {
+                      '0%': {
+                        boxShadow: '0 0 0 0 rgba(76, 175, 80, 0.7), 0 0 20px rgba(76, 175, 80, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.3)',
+                        transform: 'scale(1.08)',
+                        filter: 'brightness(1.3)',
+                      },
+                      '30%': {
+                        boxShadow: '0 0 0 8px rgba(76, 175, 80, 0.4), 0 0 30px rgba(76, 175, 80, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.2)',
+                        transform: 'scale(1.04)',
+                        filter: 'brightness(1.15)',
+                      },
+                      '60%': {
+                        boxShadow: '0 0 0 12px rgba(76, 175, 80, 0.1), 0 0 15px rgba(76, 175, 80, 0.3), inset 0 0 5px rgba(255, 255, 255, 0.1)',
+                        transform: 'scale(1.02)',
+                        filter: 'brightness(1.05)',
+                      },
+                      '100%': {
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.15)',
+                        transform: 'scale(1)',
+                        filter: 'brightness(1)',
+                      },
                     },
                   }),
                   '&::after': {
@@ -1525,14 +1546,16 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
                   {service.status === 'ready' ? (
                     <CheckCircleIcon sx={{ fontSize: 21, color: 'white' }} />
                   ) : service.status === 'initializing' ? (
-                    <HourglassEmptyIcon sx={{
-                      fontSize: 18,
+                    <SearchIcon sx={{
+                      fontSize: 20,
                       color: 'white',
-                      animation: 'hourglassFlip 1.5s ease-in-out infinite',
-                      '@keyframes hourglassFlip': {
-                        '0%': { transform: 'rotate(0deg)' },
-                        '50%': { transform: 'rotate(180deg)' },
-                        '100%': { transform: 'rotate(360deg)' },
+                      animation: 'searchingAnim 2s ease-in-out infinite',
+                      '@keyframes searchingAnim': {
+                        '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                        '25%': { transform: 'translate(2px, -2px) rotate(15deg)' },
+                        '50%': { transform: 'translate(-2px, 2px) rotate(-15deg)' },
+                        '75%': { transform: 'translate(2px, 2px) rotate(15deg)' },
+                        '100%': { transform: 'translate(0, 0) rotate(0deg)' },
                       },
                     }} />
                   ) : service.status === 'shutting_down' ? (
@@ -1606,10 +1629,16 @@ const CheckerboardView: React.FC<CheckerboardViewProps> = React.memo(({
           groupKey = service.labels.group || 'Default';
           break;
         case 'environment':
-          groupKey = service.labels.environment || 'Unknown'; // Fixed: env to environment based on ServiceInstance typings usage in previous context 
+          groupKey = service.labels.environment || 'Unknown';
           break;
-        case 'region':
-          groupKey = service.labels.region || 'Unknown';
+        case 'cloudProvider':
+          groupKey = service.labels.cloudProvider || 'Unknown';
+          break;
+        case 'cloudRegion':
+          groupKey = service.labels.cloudRegion || 'Unknown';
+          break;
+        case 'cloudZone':
+          groupKey = service.labels.cloudZone || 'Unknown';
           break;
       }
       if (!groups.has(groupKey)) {
@@ -1924,15 +1953,17 @@ const ServerListPage: React.FC = () => {
     { id: 'service', labelKey: 'serverList.table.service', visible: true },
     { id: 'group', labelKey: 'serverList.table.group', visible: true },
     { id: 'environment', labelKey: 'serverList.table.environment', visible: true },
-    { id: 'region', labelKey: 'serverList.table.region', visible: true },
+    { id: 'cloudProvider', labelKey: 'serverList.table.cloudProvider', visible: false },
+    { id: 'cloudRegion', labelKey: 'serverList.table.cloudRegion', visible: true },
+    { id: 'cloudZone', labelKey: 'serverList.table.cloudZone', visible: false },
     { id: 'labels', labelKey: 'serverList.table.labels', visible: true },
     { id: 'instanceId', labelKey: 'serverList.table.instanceId', visible: true },
     { id: 'hostname', labelKey: 'serverList.table.hostname', visible: true },
-    { id: 'externalAddress', labelKey: 'serverList.table.externalAddress', visible: true },
+    { id: 'externalAddress', labelKey: 'serverList.table.externalAddress', visible: false },
     { id: 'internalAddress', labelKey: 'serverList.table.internalAddress', visible: true },
     { id: 'ports', labelKey: 'serverList.table.ports', visible: true },
-    { id: 'stats', labelKey: 'serverList.table.stats', visible: true },
-    { id: 'meta', labelKey: 'serverList.table.meta', visible: true },
+    { id: 'stats', labelKey: 'serverList.table.stats', visible: false },
+    { id: 'meta', labelKey: 'serverList.table.meta', visible: false },
     { id: 'createdAt', labelKey: 'serverList.table.createdAt', visible: true },
     { id: 'updatedAt', labelKey: 'serverList.table.updatedAt', visible: true },
     { id: 'actions', labelKey: 'serverList.table.actions', visible: true },
@@ -2576,8 +2607,16 @@ const ServerListPage: React.FC = () => {
     [...new Set(services.map(s => s.labels.group).filter(Boolean))].sort() as string[],
     [services]
   );
-  const uniqueRegions = useMemo(() =>
-    [...new Set(services.map(s => s.labels.region).filter(Boolean))].sort() as string[],
+  const uniqueCloudProviders = useMemo(() =>
+    [...new Set(services.map(s => s.labels.cloudProvider).filter(Boolean))].sort() as string[],
+    [services]
+  );
+  const uniqueCloudRegions = useMemo(() =>
+    [...new Set(services.map(s => s.labels.cloudRegion).filter(Boolean))].sort() as string[],
+    [services]
+  );
+  const uniqueCloudZones = useMemo(() =>
+    [...new Set(services.map(s => s.labels.cloudZone).filter(Boolean))].sort() as string[],
     [services]
   );
   const uniqueEnvs = useMemo(() =>
@@ -2641,10 +2680,22 @@ const ServerListPage: React.FC = () => {
       options: uniqueGroups.map((g) => ({ value: g, label: g })),
     },
     {
-      key: 'region',
-      label: t('serverList.filters.region'),
+      key: 'cloudProvider',
+      label: t('serverList.filters.cloudProvider'),
       type: 'select',
-      options: uniqueRegions.map((r) => ({ value: r, label: r })),
+      options: uniqueCloudProviders.map((p) => ({ value: p, label: p })),
+    },
+    {
+      key: 'cloudRegion',
+      label: t('serverList.filters.cloudRegion'),
+      type: 'select',
+      options: uniqueCloudRegions.map((r) => ({ value: r, label: r })),
+    },
+    {
+      key: 'cloudZone',
+      label: t('serverList.filters.cloudZone'),
+      type: 'select',
+      options: uniqueCloudZones.map((z) => ({ value: z, label: z })),
     },
     {
       key: 'env',
@@ -2860,7 +2911,22 @@ const ServerListPage: React.FC = () => {
     const statusConfig = {
       ready: { color: 'success' as const, icon: <CheckCircleIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.ready'), tooltipKey: 'ready' },
       error: { color: 'error' as const, icon: <ErrorIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.error'), tooltipKey: 'error' },
-      initializing: { color: 'warning' as const, icon: <HourglassEmptyIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.initializing'), tooltipKey: 'initializing' },
+      initializing: {
+        color: 'warning' as const,
+        icon: <SearchIcon sx={{
+          fontSize: 16,
+          animation: 'searchingAnimSmall 2s ease-in-out infinite',
+          '@keyframes searchingAnimSmall': {
+            '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+            '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
+            '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
+            '75%': { transform: 'translate(1px, 1px) rotate(10deg)' },
+            '100%': { transform: 'translate(0, 0) rotate(0deg)' },
+          },
+        }} />,
+        label: t('serverList.status.initializing'),
+        tooltipKey: 'initializing'
+      },
       shutting_down: { color: 'info' as const, icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.shuttingDown'), tooltipKey: 'shuttingDown' },
       terminated: { color: 'default' as const, icon: <PowerSettingsNewIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.terminated'), tooltipKey: 'terminated' },
       'no-response': { color: 'warning' as const, icon: <WarningIcon sx={{ fontSize: 16 }} />, label: t('serverList.status.noResponse'), tooltipKey: 'noResponse' },
@@ -3231,10 +3297,22 @@ const ServerListPage: React.FC = () => {
                     {t('serverList.grouping.environment')}
                   </MenuItem>
                   <MenuItem
-                    selected={groupingBy === 'region'}
-                    onClick={() => handleGroupingChange('region')}
+                    selected={groupingBy === 'cloudProvider'}
+                    onClick={() => handleGroupingChange('cloudProvider')}
                   >
-                    {t('serverList.grouping.region')}
+                    {t('serverList.grouping.cloudProvider')}
+                  </MenuItem>
+                  <MenuItem
+                    selected={groupingBy === 'cloudRegion'}
+                    onClick={() => handleGroupingChange('cloudRegion')}
+                  >
+                    {t('serverList.grouping.cloudRegion')}
+                  </MenuItem>
+                  <MenuItem
+                    selected={groupingBy === 'cloudZone'}
+                    onClick={() => handleGroupingChange('cloudZone')}
+                  >
+                    {t('serverList.grouping.cloudZone')}
                   </MenuItem>
                 </Menu>
                 {/* Divider */}
@@ -3485,12 +3563,44 @@ const ServerListPage: React.FC = () => {
                                   )}
                                 </TableCell>
                               );
-                            case 'region':
+                            case 'cloudProvider':
                               return (
                                 <TableCell key={column.id}>
-                                  {service.labels.region ? (
+                                  {service.labels.cloudProvider ? (
                                     <Chip
-                                      label={service.labels.region}
+                                      label={service.labels.cloudProvider}
+                                      size="small"
+                                      variant="outlined"
+                                      color="info"
+                                      sx={{ fontWeight: 600, borderRadius: 1 }}
+                                    />
+                                  ) : (
+                                    <Typography variant="caption" color="text.disabled">-</Typography>
+                                  )}
+                                </TableCell>
+                              );
+                            case 'cloudRegion':
+                              return (
+                                <TableCell key={column.id}>
+                                  {service.labels.cloudRegion ? (
+                                    <Chip
+                                      label={service.labels.cloudRegion}
+                                      size="small"
+                                      variant="outlined"
+                                      color="info"
+                                      sx={{ fontWeight: 600, borderRadius: 1 }}
+                                    />
+                                  ) : (
+                                    <Typography variant="caption" color="text.disabled">-</Typography>
+                                  )}
+                                </TableCell>
+                              );
+                            case 'cloudZone':
+                              return (
+                                <TableCell key={column.id}>
+                                  {service.labels.cloudZone ? (
+                                    <Chip
+                                      label={service.labels.cloudZone}
                                       size="small"
                                       variant="outlined"
                                       color="info"
@@ -3506,7 +3616,7 @@ const ServerListPage: React.FC = () => {
                                 <TableCell key={column.id}>
                                   <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
                                     {Object.entries(service.labels)
-                                      .filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'region')
+                                      .filter(([key]) => key !== 'service' && key !== 'group' && key !== 'environment' && key !== 'cloudProvider' && key !== 'cloudRegion' && key !== 'cloudZone')
                                       .map(([key, value]) => (
                                         <Chip
                                           key={`${service.instanceId}-${key}`}
@@ -3983,7 +4093,20 @@ const ServerListPage: React.FC = () => {
                                           '&:hover': { bgcolor: 'action.hover' },
                                         }}
                                       >
-                                        {gridHealthStatus?.loading ? <CircularProgress size={12} /> : <TouchAppIcon sx={{ fontSize: 14 }} />}
+                                        {gridHealthStatus?.loading ? (
+                                          <SearchIcon sx={{
+                                            fontSize: 14,
+                                            animation: 'searchingAnimXSmall 2s ease-in-out infinite',
+                                            '@keyframes searchingAnimXSmall': {
+                                              '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                                              '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
+                                              '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
+                                              '100%': { transform: 'translate(0, 0) rotate(0deg)' },
+                                            },
+                                          }} />
+                                        ) : (
+                                          <TouchAppIcon sx={{ fontSize: 14 }} />
+                                        )}
                                       </IconButton>
                                     </Tooltip>
                                   );
@@ -4248,7 +4371,20 @@ const ServerListPage: React.FC = () => {
                                           '&:hover': { bgcolor: 'action.hover' },
                                         }}
                                       >
-                                        {cardHealthStatus?.loading ? <CircularProgress size={14} /> : <TouchAppIcon sx={{ fontSize: 16 }} />}
+                                        {cardHealthStatus?.loading ? (
+                                          <SearchIcon sx={{
+                                            fontSize: 16,
+                                            animation: 'searchingAnimXSmall 2s ease-in-out infinite',
+                                            '@keyframes searchingAnimXSmall': {
+                                              '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                                              '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
+                                              '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
+                                              '100%': { transform: 'translate(0, 0) rotate(0deg)' },
+                                            },
+                                          }} />
+                                        ) : (
+                                          <TouchAppIcon sx={{ fontSize: 16 }} />
+                                        )}
                                       </IconButton>
                                     </Tooltip>
                                   );
@@ -4617,7 +4753,17 @@ const ServerListPage: React.FC = () => {
                         <HourglassEmptyIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
                       )}
                       {item.status === 'checking' && (
-                        <CircularProgress size={18} />
+                        <SearchIcon sx={{
+                          fontSize: 18,
+                          animation: 'searchingAnimSmall 2s ease-in-out infinite',
+                          '@keyframes searchingAnimSmall': {
+                            '0%': { transform: 'translate(0, 0) rotate(0deg)' },
+                            '25%': { transform: 'translate(1px, -1px) rotate(10deg)' },
+                            '50%': { transform: 'translate(-1px, 1px) rotate(-10deg)' },
+                            '75%': { transform: 'translate(1px, 1px) rotate(10deg)' },
+                            '100%': { transform: 'translate(0, 0) rotate(0deg)' },
+                          },
+                        }} />
                       )}
                       {item.status === 'success' && (
                         <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />

@@ -905,6 +905,9 @@ const StoreProductsPage: React.FC = () => {
                     loading={false}
                     message={t('storeProducts.noProductsFound')}
                     loadingMessage=""
+                    subtitle={canManage ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage ? handleSyncPreview : undefined}
+                    addButtonLabel={t('storeProducts.syncWithPlanningData')}
                   />
                 ) : (
                   products.map((product) => (

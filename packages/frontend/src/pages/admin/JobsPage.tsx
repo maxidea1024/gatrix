@@ -234,8 +234,8 @@ const JobsPage: React.FC = () => {
   const handleExecuteJob = async (job: Job) => {
     try {
       const result = await jobService.executeJob(job.id);
-      enqueueSnackbar(t('jobs.executeStarted', { name: job.name, executionId: result.executionId }), { 
-        variant: 'success' 
+      enqueueSnackbar(t('jobs.executeStarted', { name: job.name, executionId: result.executionId }), {
+        variant: 'success'
       });
     } catch (error) {
       console.error('Failed to execute job:', error);
@@ -595,6 +595,9 @@ const JobsPage: React.FC = () => {
                 loading={loading}
                 message={t('jobs.noJobsFound')}
                 loadingMessage={t('common.loadingJobs')}
+                subtitle={canManage ? t('common.addFirstItem') : undefined}
+                onAddClick={canManage ? handleAddJob : undefined}
+                addButtonLabel={t('jobs.addJob')}
               />
             ) : (
               jobs.map((job, index) => (
@@ -641,7 +644,7 @@ const JobsPage: React.FC = () => {
                       </Tooltip>
                     </TableCell>
                   )}
-              </TableRow>
+                </TableRow>
               ))
             )}
           </TableBody>

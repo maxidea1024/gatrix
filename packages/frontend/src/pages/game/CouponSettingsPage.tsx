@@ -1055,7 +1055,14 @@ const CouponSettingsPage: React.FC = () => {
                 {loading ? (
                   <EmptyTableRow colSpan={colCount} loading={true} message={t('common.loading') as string} />
                 ) : items.length === 0 ? (
-                  <EmptyTableRow colSpan={colCount} loading={false} message={t('common.noData') as string} />
+                  <EmptyTableRow
+                    colSpan={colCount}
+                    loading={false}
+                    message={t('common.noData') as string}
+                    subtitle={canManage ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage ? () => { resetForm(); setOpenForm(true); } : undefined}
+                    addButtonLabel={t('coupons.couponSettings.addCoupon')}
+                  />
                 ) : (
                   sortedItems.map((it) => (
                     <TableRow key={it.id} hover sx={{ height: 48 }}>

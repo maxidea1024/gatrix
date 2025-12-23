@@ -207,60 +207,29 @@ export class ServiceDiscoveryService {
       payload.internalAddress = input.internalAddress;
       payload.ports = input.ports;
       payload.meta = input.meta;
+      payload.autoRegisterIfMissing = true;
     }
 
-    const response = await this.apiClient.post('/api/v1/server/services/status', payload);
+    let response;
+    try {
+      response = await this.apiClient.post('/api/v1/server/services/status', payload);
+    } catch (error: any) {
+      // Handle thrown errors from ApiClient (e.g. 404, 500)
+      const errorMessage = error.message || String(error);
+
+      if (errorMessage.includes('not found')) {
+        return await this.handleServiceNotFound(input);
+      }
+
+      throw error;
+    }
 
     if (!response.success) {
       const errorMessage = response.error?.message || 'Failed to update service status';
 
       // Check if error is "Service not found" and we have backup data
       if (errorMessage.includes('not found')) {
-        if (this.registrationBackup) {
-          this.logger.warn('Service not found in registry, attempting auto-registration', {
-            instanceId: this.instanceId,
-            service: this.labels?.service,
-          });
-
-          try {
-            // Re-register using backup data
-            await this.register({
-              instanceId: this.instanceId,
-              labels: this.labels!,
-              hostname: this.registrationBackup.hostname,
-              internalAddress: this.registrationBackup.internalAddress,
-              ports: this.registrationBackup.ports,
-              meta: this.registrationBackup.meta,
-              status: (input.status || this.registrationBackup.status || 'ready') as any,
-              stats: input.stats,
-            });
-
-            this.logger.info('Service auto-registered successfully', {
-              instanceId: this.instanceId,
-              service: this.labels?.service,
-            });
-
-            // Successfully re-registered, return without error
-            return;
-          } catch (reregisterError: any) {
-            this.logger.error('Failed to auto-register service', {
-              instanceId: this.instanceId,
-              error: reregisterError.message || String(reregisterError),
-            });
-            // Fall through to throw original error
-          }
-        } else {
-          // No backup data - this happens when server was restarted but register() was not called first
-          // Clear the stale instanceId and labels to force a fresh register()
-          this.logger.error('Service not found and no backup data available. Did you call register() first?', {
-            instanceId: this.instanceId,
-            service: this.labels?.service,
-          });
-          this.stopHeartbeat();
-          this.instanceId = undefined;
-          this.labels = undefined;
-          throw new Error('Service not found. Please call register() to re-register the service.');
-        }
+        return await this.handleServiceNotFound(input);
       }
 
       throw new Error(errorMessage);
@@ -271,6 +240,57 @@ export class ServiceDiscoveryService {
       labels: this.labels,
       status: input.status,
     });
+  }
+
+  /**
+   * Handle 'Service not found' error by attempting auto-registration
+   */
+  private async handleServiceNotFound(input: UpdateServiceStatusInput): Promise<void> {
+    if (this.registrationBackup) {
+      this.logger.warn('Service not found in registry, attempting auto-registration', {
+        instanceId: this.instanceId,
+        service: this.labels?.service,
+      });
+
+      try {
+        // Re-register using backup data
+        await this.register({
+          instanceId: this.instanceId,
+          labels: this.labels!,
+          hostname: this.registrationBackup.hostname,
+          internalAddress: this.registrationBackup.internalAddress,
+          ports: this.registrationBackup.ports,
+          meta: this.registrationBackup.meta,
+          status: (input.status || this.registrationBackup.status || 'ready') as any,
+          stats: input.stats,
+        });
+
+        this.logger.info('Service auto-registered successfully', {
+          instanceId: this.instanceId,
+          service: this.labels?.service,
+        });
+
+        // Successfully re-registered
+        return;
+      } catch (reregisterError: any) {
+        this.logger.error('Failed to auto-register service', {
+          instanceId: this.instanceId,
+          error: reregisterError.message || String(reregisterError),
+        });
+        throw reregisterError;
+      }
+    } else {
+      // No backup data - this happens when server was restarted but register() was not called first
+      // Clear the stale instanceId and labels to force a fresh register()
+      this.logger.error('Service not found and no backup data available. Did you call register() first?', {
+        instanceId: this.instanceId,
+        service: this.labels?.service,
+      });
+      this.stopHeartbeat();
+      this.instanceId = undefined;
+      this.labels = undefined;
+      throw new Error('Service not found. Please call register() to re-register the service.');
+    }
   }
 
   /**
@@ -359,7 +379,6 @@ export class ServiceDiscoveryService {
     return response.data;
   }
 
-
   /**
    * Start automatic heartbeat to keep service alive in Redis
    * Sends heartbeat every 15 seconds (half of default 30s TTL)
@@ -430,4 +449,3 @@ export class ServiceDiscoveryService {
     }
   }
 }
-

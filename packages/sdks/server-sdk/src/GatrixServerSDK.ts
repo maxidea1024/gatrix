@@ -41,6 +41,7 @@ import {
   Banner,
   StoreProduct,
 } from './types/api';
+import { detectCloudMetadata, CloudMetadata, CloudProvider } from './utils/cloudMetadata';
 
 /**
  * GatrixServerSDK
@@ -66,6 +67,9 @@ export class GatrixServerSDK {
 
   // Maintenance event listeners (separate from standard event listeners)
   private maintenanceEventListeners: Map<string, EventCallback[]> = new Map();
+
+  // Cloud metadata (auto-detected on initialization)
+  private cloudMetadata: CloudMetadata = { provider: 'unknown' };
 
   /**
    * Create SDK instance with optional overrides
@@ -120,11 +124,13 @@ export class GatrixServerSDK {
     if (overrides.service !== undefined) merged.service = overrides.service;
     if (overrides.group !== undefined) merged.group = overrides.group;
     if (overrides.environment !== undefined) merged.environment = overrides.environment;
-    if (overrides.region !== undefined) merged.region = overrides.region;
     if (overrides.gatrixUrl !== undefined) merged.gatrixUrl = overrides.gatrixUrl;
     if (overrides.apiToken !== undefined) merged.apiToken = overrides.apiToken;
     if (overrides.applicationName !== undefined) merged.applicationName = overrides.applicationName;
     if (overrides.worldId !== undefined) merged.worldId = overrides.worldId;
+    if (overrides.version !== undefined) merged.version = overrides.version;
+    if (overrides.commitHash !== undefined) merged.commitHash = overrides.commitHash;
+    if (overrides.gitBranch !== undefined) merged.gitBranch = overrides.gitBranch;
     if (overrides.environments !== undefined) merged.environments = overrides.environments;
 
     // Deep merge nested objects
@@ -145,6 +151,9 @@ export class GatrixServerSDK {
     }
     if (overrides.features) {
       merged.features = { ...baseConfig.features, ...overrides.features };
+    }
+    if (overrides.cloud) {
+      merged.cloud = { ...baseConfig.cloud, ...overrides.cloud };
     }
 
     return merged;
@@ -391,6 +400,21 @@ export class GatrixServerSDK {
     });
 
     try {
+      // Auto-detect cloud provider and metadata (region, zone, instance ID, etc.)
+      // This runs in the background and doesn't block initialization
+      const cloudProvider = this.config.cloud?.provider as CloudProvider | undefined;
+      this.cloudMetadata = await detectCloudMetadata(cloudProvider);
+      if (this.cloudMetadata.provider !== 'unknown') {
+        this.logger.info('Cloud metadata detected', {
+          provider: this.cloudMetadata.provider,
+          region: this.cloudMetadata.region,
+          zone: this.cloudMetadata.zone,
+          instanceId: this.cloudMetadata.instanceId,
+        });
+      } else {
+        this.logger.debug('No cloud metadata detected (not running in a cloud environment)');
+      }
+
       // Initialize cache manager
       // CacheManager creates all services internally based on feature flags
       const cacheConfig = this.config.cache || {};
@@ -465,6 +489,23 @@ export class GatrixServerSDK {
    */
   getConfig(): GatrixSDKConfig {
     return this.config;
+  }
+
+  /**
+   * Get detected cloud metadata
+   * Returns information about the cloud provider, region, zone, instance ID, etc.
+   * This is auto-detected during SDK initialization.
+   */
+  getCloudMetadata(): CloudMetadata {
+    return this.cloudMetadata;
+  }
+
+  /**
+   * Get detected region from cloud metadata
+   * Returns undefined if not running in a cloud environment or region detection failed
+   */
+  getRegion(): string | undefined {
+    return this.cloudMetadata.region;
   }
 
   /**
@@ -1249,6 +1290,7 @@ export class GatrixServerSDK {
    * Register this service instance via Backend API
    * Note: metricsApi port is automatically added from SDK config (default: 9337) if not provided in input.ports
    * Note: environment and region labels are automatically added from SDK config if not provided
+   * Note: version, commitHash, gitBranch are automatically added to meta from SDK config if provided
    */
   async registerService(input: RegisterServiceInput): Promise<{ instanceId: string; hostname: string; internalAddress: string; externalAddress: string }> {
     // Auto-add environment and region labels from SDK config if not already provided
@@ -1261,9 +1303,19 @@ export class GatrixServerSDK {
       enhancedLabels.environment = this.config.environment;
     }
 
-    // Add region from SDK config if not provided in labels
-    if (this.config.region && !input.labels.region) {
-      enhancedLabels.region = this.config.region;
+    // Add cloud metadata labels (auto-detected, always override any input)
+    // Use 'cloud' prefix to avoid conflicts with other fields (e.g., instanceId from service registration)
+    if (this.cloudMetadata.provider !== 'unknown') {
+      enhancedLabels.cloudProvider = this.cloudMetadata.provider;
+    }
+    if (this.cloudMetadata.region) {
+      enhancedLabels.cloudRegion = this.cloudMetadata.region;
+    }
+    if (this.cloudMetadata.zone) {
+      enhancedLabels.cloudZone = this.cloudMetadata.zone;
+    }
+    if (this.cloudMetadata.instanceId) {
+      enhancedLabels.cloudInstanceId = this.cloudMetadata.instanceId;
     }
 
     // Always add SDK version to labels
@@ -1276,10 +1328,23 @@ export class GatrixServerSDK {
       enhancedPorts.metricsApi = metricsPort;
     }
 
+    // Build meta with version info from SDK config (merged with input.meta)
+    const enhancedMeta: Record<string, any> = { ...input.meta };
+    if (this.config.version) {
+      enhancedMeta.version = this.config.version;
+    }
+    if (this.config.commitHash) {
+      enhancedMeta.commitHash = this.config.commitHash;
+    }
+    if (this.config.gitBranch) {
+      enhancedMeta.gitBranch = this.config.gitBranch;
+    }
+
     const inputWithEnhancements = {
       ...input,
       labels: enhancedLabels,
       ports: enhancedPorts,
+      meta: Object.keys(enhancedMeta).length > 0 ? enhancedMeta : input.meta,
     };
     const result = await this.serviceDiscovery.register(inputWithEnhancements);
     return result;

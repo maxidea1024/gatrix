@@ -904,6 +904,9 @@ const MessageTemplatesPage: React.FC = () => {
                     loading={loading}
                     message={t('messageTemplates.noTemplatesFound')}
                     loadingMessage={t('common.loadingData')}
+                    subtitle={canManage ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage ? handleAdd : undefined}
+                    addButtonLabel={t('messageTemplates.addTemplate')}
                   />
                 ) : (
                   items.map(row => (

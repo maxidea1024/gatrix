@@ -265,7 +265,9 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
 
           return;
         } else {
-          throw new Error(`Service ${serviceType}:${input.instanceId} not found`);
+          const error: any = new Error(`Service ${serviceType}:${input.instanceId} not found`);
+          error.status = 404;
+          throw error;
         }
       }
 

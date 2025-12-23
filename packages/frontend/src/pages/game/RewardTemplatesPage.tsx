@@ -241,21 +241,21 @@ const RewardTemplatesPage: React.FC = () => {
           // Deep copy tags array
           const tagsCopy = t.tags && Array.isArray(t.tags)
             ? t.tags.map(tag => {
-                if (typeof tag === 'object' && tag !== null) {
-                  return { ...tag };
-                }
-                return tag;
-              })
+              if (typeof tag === 'object' && tag !== null) {
+                return { ...tag };
+              }
+              return tag;
+            })
             : [];
 
           // Deep copy rewardItems array
           const rewardItemsCopy = t.rewardItems && Array.isArray(t.rewardItems)
             ? t.rewardItems.map(item => {
-                if (typeof item === 'object' && item !== null) {
-                  return { ...item };
-                }
-                return item;
-              })
+              if (typeof item === 'object' && item !== null) {
+                return { ...item };
+              }
+              return item;
+            })
             : [];
 
           return {
@@ -697,6 +697,9 @@ const RewardTemplatesPage: React.FC = () => {
                     loading={false}
                     message={t('rewardTemplates.noTemplatesFound')}
                     loadingMessage=""
+                    subtitle={canManage ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage ? handleCreate : undefined}
+                    addButtonLabel={t('rewardTemplates.createTemplate')}
                   />
                 ) : (
                   templates.map((template) => (

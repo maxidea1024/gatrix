@@ -495,6 +495,9 @@ const SurveysPage: React.FC = () => {
                     loading={false}
                     message={t('surveys.noSurveysFound')}
                     loadingMessage=""
+                    subtitle={canManage ? t('common.addFirstItem') : undefined}
+                    onAddClick={canManage ? handleCreate : undefined}
+                    addButtonLabel={t('surveys.createSurvey')}
                   />
                 ) : (
                   surveys.map((survey) => (

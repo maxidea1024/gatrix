@@ -384,105 +384,112 @@ const EnvironmentsPage: React.FC = () => {
                 <TableCell>{t('environments.description')}</TableCell>
                 <TableCell align="center">{t('environments.isDefault')}</TableCell>
                 <TableCell align="center">{t('environments.isSystemDefined')}</TableCell>
+                {canManage && <TableCell align="center">{t('common.visible')}</TableCell>}
                 {canManage && <TableCell align="center">{t('common.actions')}</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
-              {environments.map((env) => (
-                <TableRow key={env.id}>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                        {env.environmentName}
-                      </Typography>
-                      <Tooltip title={t('common.copy')}>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            navigator.clipboard.writeText(env.environmentName);
-                            enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
-                          }}
-                          sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
-                        >
-                          <CopyIcon fontSize="small" sx={{ fontSize: 14 }} />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {env.color && (
-                        <Box
-                          sx={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: '50%',
-                            backgroundColor: env.color
-                          }}
-                        />
-                      )}
-                      {env.displayName}
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={t(`environments.types.${env.environmentType}`)}
-                      color={getEnvironmentTypeColor(env.environmentType)}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>{env.description || '-'}</TableCell>
-                  <TableCell align="center">
-                    {(env as any).isDefault ? <Chip label="✓" color="primary" size="small" /> : '-'}
-                  </TableCell>
-                  <TableCell align="center">
-                    {env.isSystemDefined ? <Chip label="✓" color="default" size="small" /> : '-'}
-                  </TableCell>
-                  {canManage && (
+              {environments
+                .filter((env) => env.environmentName !== 'gatrix-env')
+                .map((env) => (
+                  <TableRow key={env.id}>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                          {env.environmentName}
+                        </Typography>
+                        <Tooltip title={t('common.copy')}>
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              navigator.clipboard.writeText(env.environmentName);
+                              enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                            }}
+                            sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                          >
+                            <CopyIcon fontSize="small" sx={{ fontSize: 14 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {env.color && (
+                          <Box
+                            sx={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: '50%',
+                              backgroundColor: env.color
+                            }}
+                          />
+                        )}
+                        {env.displayName}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={t(`environments.types.${env.environmentType}`)}
+                        color={getEnvironmentTypeColor(env.environmentType)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>{env.description || '-'}</TableCell>
                     <TableCell align="center">
-                      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
+                      {(env as any).isDefault ? <Chip label="✓" color="primary" size="small" /> : '-'}
+                    </TableCell>
+                    <TableCell align="center">
+                      {env.isSystemDefined ? <Chip label="✓" color="default" size="small" /> : '-'}
+                    </TableCell>
+                    {canManage && (
+                      <TableCell align="center">
                         <Tooltip title={env.isHidden ? t('environments.show') : t('environments.hide')}>
                           <IconButton
                             size="small"
                             onClick={() => handleToggleVisibility(env)}
-                            sx={{ color: env.isHidden ? 'text.disabled' : 'text.secondary' }}
+                            sx={{ color: env.isHidden ? 'text.disabled' : 'success.main' }}
                           >
                             {env.isHidden ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title={t('common.edit')}>
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={() => handleOpenEditDialog(env)}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        {Boolean(env.isSystemDefined) ? (
-                          <Tooltip title={t('environments.cannotDeleteSystem')}>
-                            <span>
-                              <IconButton size="small" color="error" disabled>
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </span>
-                          </Tooltip>
-                        ) : (
-                          <Tooltip title={t('common.delete')}>
+                      </TableCell>
+                    )}
+                    {canManage && (
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
+                          <Tooltip title={t('common.edit')}>
                             <IconButton
                               size="small"
-                              color="error"
-                              onClick={() => handleOpenDeleteDialog(env)}
+                              color="primary"
+                              onClick={() => handleOpenEditDialog(env)}
                             >
-                              <DeleteIcon fontSize="small" />
+                              <EditIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
-                        )}
-                      </Box>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
+                          {Boolean(env.isSystemDefined) ? (
+                            <Tooltip title={t('environments.cannotDeleteSystem')}>
+                              <span>
+                                <IconButton size="small" color="error" disabled>
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          ) : (
+                            <Tooltip title={t('common.delete')}>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => handleOpenDeleteDialog(env)}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </Box>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
