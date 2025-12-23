@@ -390,6 +390,7 @@ router.get('/:environment/game-worlds', async (req: Request, res: Response) => {
         name: world.name,
         description: (world as unknown as { description?: string }).description || '',
         displayOrder: world.displayOrder,
+        meta: world.customPayload || {},
         createdAt: world.createdAt,
         updatedAt: (world as unknown as { updatedAt?: string }).updatedAt || world.createdAt,
       })),
