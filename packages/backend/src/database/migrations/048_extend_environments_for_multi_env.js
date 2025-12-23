@@ -52,7 +52,7 @@ function generateEnvironmentId(environmentName) {
   return `${environmentName}.${generateUlid()}`;
 }
 
-exports.up = async function(connection) {
+exports.up = async function (connection) {
   console.log('Starting multi-environment support migration...');
 
   // 1. Create projects table
@@ -89,7 +89,27 @@ exports.up = async function(connection) {
   console.log('✓ g_projects table created');
 
   // 2. Add new columns to g_environments (already has VARCHAR(127) id from 005)
-  console.log('Adding new columns to g_environments...');
+  console.log('Ensuring g_environments table exists and adding new columns...');
+
+  // Ensure g_environments exists (it should have been created in 005, but safety first for some environments)
+  await connection.execute(`
+    CREATE TABLE IF NOT EXISTS g_environments (
+      id VARCHAR(127) NOT NULL PRIMARY KEY COMMENT 'Format: {environmentName}.{ulid}',
+      environmentName VARCHAR(100) NOT NULL UNIQUE,
+      displayName VARCHAR(200) NOT NULL,
+      description TEXT NULL,
+      isDefault BOOLEAN NOT NULL DEFAULT FALSE,
+      requiresApproval BOOLEAN NOT NULL DEFAULT FALSE,
+      requiredApprovers INT NOT NULL DEFAULT 1,
+      createdBy INT NOT NULL,
+      updatedBy INT NULL,
+      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+      INDEX idx_environment_name (environmentName),
+      INDEX idx_is_default (isDefault)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
 
   // Check and add environmentType column
   if (!await columnExists(connection, 'g_environments', 'environmentType')) {
@@ -184,7 +204,7 @@ exports.up = async function(connection) {
   console.log('Multi-environment support migration completed successfully');
 };
 
-exports.down = async function(connection) {
+exports.down = async function (connection) {
   console.log('Rolling back multi-environment support migration...');
 
   // Remove foreign key constraint first

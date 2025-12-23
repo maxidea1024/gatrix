@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import VarsModel from '../models/Vars';
 import { pubSubService } from '../services/PubSubService';
+import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
 
 export class VarsController {
   static async getVar(req: Request, res: Response, next: NextFunction) {
@@ -130,6 +131,8 @@ export class VarsController {
       if (fullKey === '$clientVersionPassiveData' || fullKey === 'kv:clientVersionPassiveData') {
         // Invalidate all client version caches since meta field includes clientVersionPassiveData
         await pubSubService.invalidateByPattern('client_version:*');
+        // Also invalidate Server SDK ETag cache (Edge)
+        await pubSubService.invalidateByPattern(`${SERVER_SDK_ETAG.CLIENT_VERSIONS}:*`);
       }
 
       // Invalidate platform/channel caches when they are updated
