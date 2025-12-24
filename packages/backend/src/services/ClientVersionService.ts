@@ -4,6 +4,7 @@ import { Environment } from '../models/Environment';
 import logger from '../config/logger';
 import { applyMaintenanceStatusCalculationToArray, applyMaintenanceStatusCalculation } from '../utils/maintenanceUtils';
 import { SERVER_SDK_ETAG } from '../constants/cacheKeys';
+import VarsModel from '../models/Vars';
 
 /**
  * Parse semver string to numeric array [major, minor, patch]
@@ -75,6 +76,74 @@ export interface BulkStatusUpdateRequest {
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: Array<{ lang: 'ko' | 'en' | 'zh', message: string }>;
   messageTemplateId?: number;
+}
+
+/**
+ * Prepare client version data for SDK events
+ * Parses customPayload and merges with passiveData to ensure meta is an object
+ */
+async function prepareClientVersionForSDK(
+  version: ClientVersionAttributes,
+  environmentId?: string
+): Promise<any> {
+  // Get clientVersionPassiveData from KV settings
+  let passiveData: Record<string, any> = {};
+  try {
+    const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environmentId);
+    if (passiveDataStr) {
+      let parsed = JSON.parse(passiveDataStr);
+      // Handle double-encoded JSON string
+      if (typeof parsed === 'string') {
+        try {
+          parsed = JSON.parse(parsed);
+        } catch (e) {
+          // ignore
+        }
+      }
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        passiveData = parsed;
+      }
+    }
+  } catch (error) {
+    logger.warn('Failed to parse clientVersionPassiveData for SDK event:', error);
+  }
+
+  // Parse customPayload
+  let customPayload: Record<string, any> = {};
+  try {
+    if (version.customPayload) {
+      let parsed = typeof version.customPayload === 'string'
+        ? JSON.parse(version.customPayload)
+        : version.customPayload;
+
+      // Handle double-encoded JSON string
+      if (typeof parsed === 'string') {
+        try {
+          parsed = JSON.parse(parsed);
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        customPayload = parsed;
+      }
+    }
+  } catch (error) {
+    logger.warn(`Failed to parse customPayload for SDK event (version ${version.id}):`, error);
+  }
+
+  // Merge: passiveData first, then customPayload (customPayload overwrites)
+  const mergedMeta = { ...passiveData, ...customPayload };
+
+  // Remove internal fields from response
+  const { environmentId: _envId, ...versionWithoutEnvId } = version as any;
+  void _envId;
+
+  return {
+    ...versionWithoutEnvId,
+    customPayload: mergedMeta, // Return as object, not string
+  };
 }
 
 export class ClientVersionService {
@@ -310,13 +379,18 @@ export class ClientVersionService {
       // Get full client version with tags for SDK cache
       const fullClientVersion = await this.getClientVersionById(result.id);
 
+      // Prepare data for SDK (parse customPayload and merge with passiveData)
+      const sdkReadyClientVersion = fullClientVersion
+        ? await prepareClientVersionForSDK(fullClientVersion, result.environmentId)
+        : null;
+
       await pubSubService.publishSDKEvent({
         type: 'client_version.created',
         data: {
           id: result.id,
           environment,
           timestamp: Date.now(),
-          clientVersion: fullClientVersion
+          clientVersion: sdkReadyClientVersion
         }
       });
     } catch (err) {
@@ -446,13 +520,19 @@ export class ClientVersionService {
           environment = env?.environmentName;
         }
 
+        // Prepare data for SDK (parse customPayload and merge with passiveData)
+        const sdkReadyClientVersion = await prepareClientVersionForSDK(
+          updatedClientVersion,
+          updatedClientVersion.environmentId
+        );
+
         await pubSubService.publishSDKEvent({
           type: 'client_version.updated',
           data: {
             id: updatedClientVersion.id,
             environment,
             timestamp: Date.now(),
-            clientVersion: updatedClientVersion
+            clientVersion: sdkReadyClientVersion
           }
         });
       } catch (err) {

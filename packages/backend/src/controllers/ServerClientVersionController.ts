@@ -40,7 +40,18 @@ export class ServerClientVersionController {
           try {
             const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', environment.id);
             if (passiveDataStr) {
-              passiveData = JSON.parse(passiveDataStr);
+              let parsed = JSON.parse(passiveDataStr);
+              // Handle double-encoded JSON string
+              if (typeof parsed === 'string') {
+                try {
+                  parsed = JSON.parse(parsed);
+                } catch (e) {
+                  // ignore
+                }
+              }
+              if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                passiveData = parsed;
+              }
             }
           } catch (error) {
             logger.warn('Failed to parse clientVersionPassiveData for Server SDK:', error);
@@ -55,9 +66,22 @@ export class ServerClientVersionController {
               let customPayload = {};
               try {
                 if (version.customPayload) {
-                  customPayload = typeof version.customPayload === 'string'
+                  let parsed = typeof version.customPayload === 'string'
                     ? JSON.parse(version.customPayload)
                     : version.customPayload;
+
+                  // Handle double-encoded JSON string
+                  if (typeof parsed === 'string') {
+                    try {
+                      parsed = JSON.parse(parsed);
+                    } catch (e) {
+                      // ignore
+                    }
+                  }
+
+                  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                    customPayload = parsed;
+                  }
                 }
               } catch (error) {
                 logger.warn(`Failed to parse customPayload for client version ${version.id}:`, error);
@@ -141,7 +165,18 @@ export class ServerClientVersionController {
       try {
         const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', req.environment!.id);
         if (passiveDataStr) {
-          passiveData = JSON.parse(passiveDataStr);
+          let parsed = JSON.parse(passiveDataStr);
+          // Handle double-encoded JSON string
+          if (typeof parsed === 'string') {
+            try {
+              parsed = JSON.parse(parsed);
+            } catch (e) {
+              // ignore
+            }
+          }
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            passiveData = parsed;
+          }
         }
       } catch (error) {
         logger.warn('Failed to parse clientVersionPassiveData for Server SDK (Single):', error);
@@ -151,9 +186,22 @@ export class ServerClientVersionController {
       let customPayload = {};
       try {
         if (version.customPayload) {
-          customPayload = typeof version.customPayload === 'string'
+          let parsed = typeof version.customPayload === 'string'
             ? JSON.parse(version.customPayload)
             : version.customPayload;
+
+          // Handle double-encoded JSON string
+          if (typeof parsed === 'string') {
+            try {
+              parsed = JSON.parse(parsed);
+            } catch (e) {
+              // ignore
+            }
+          }
+
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            customPayload = parsed;
+          }
         }
       } catch (error) {
         logger.warn(`Failed to parse customPayload for client version ${version.id}:`, error);

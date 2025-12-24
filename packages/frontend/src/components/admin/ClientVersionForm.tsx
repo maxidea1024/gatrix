@@ -563,16 +563,29 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       console.error('Error saving client version:', error);
 
       // Handle version validation error
-      let errorMessage = error.message || t('clientVersions.saveError');
+      let rawMessage = error.message;
 
-      if (error.message?.startsWith('VERSION_TOO_OLD:')) {
-        const latestVersion = error.message.split(':')[1];
+      // apiService가 throw한 에러 객체 처리 ({ error: { message: ... } } 또는 { message: ... })
+      if (!rawMessage && error.error?.message) {
+        rawMessage = error.error.message;
+      } else if (!rawMessage && error.response?.data?.error?.message) {
+        rawMessage = error.response.data.error.message;
+      } else if (!rawMessage && error.response?.data?.message) {
+        rawMessage = error.response.data.message;
+      } else if (!rawMessage && typeof error === 'string') {
+        rawMessage = error;
+      }
+
+      let errorMessage = rawMessage || t('clientVersions.saveError');
+
+      if (rawMessage?.startsWith('VERSION_TOO_OLD:')) {
+        const latestVersion = rawMessage.split(':')[1];
         errorMessage = t('clientVersions.versionTooOld', {
           newVersion: data.clientVersion,
           latestVersion
         });
-      } else if (error.message?.startsWith('DUPLICATE_CLIENT_VERSIONS:')) {
-        const duplicates = error.message.split(':')[1];
+      } else if (rawMessage?.startsWith('DUPLICATE_CLIENT_VERSIONS:')) {
+        const duplicates = rawMessage.split(':')[1];
         errorMessage = t('clientVersions.duplicateClientVersions', {
           duplicates
         });

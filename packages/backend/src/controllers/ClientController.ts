@@ -120,7 +120,18 @@ export class ClientController {
     try {
       const passiveDataStr = await VarsModel.get('$clientVersionPassiveData', envId);
       if (passiveDataStr) {
-        passiveData = JSON.parse(passiveDataStr);
+        let parsed = JSON.parse(passiveDataStr);
+        // Handle double-encoded JSON string
+        if (typeof parsed === 'string') {
+          try {
+            parsed = JSON.parse(parsed);
+          } catch (e) {
+            // ignore
+          }
+        }
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          passiveData = parsed;
+        }
       }
     } catch (error) {
       logger.warn(`Failed to parse clientVersionPassiveData for environment ${envId || 'default'}:`, error);
@@ -130,9 +141,22 @@ export class ClientController {
     let customPayload = {};
     try {
       if (record.customPayload) {
-        customPayload = typeof record.customPayload === 'string'
+        let parsed = typeof record.customPayload === 'string'
           ? JSON.parse(record.customPayload)
           : record.customPayload;
+
+        // Handle double-encoded JSON string
+        if (typeof parsed === 'string') {
+          try {
+            parsed = JSON.parse(parsed);
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          customPayload = parsed;
+        }
       }
     } catch (error) {
       logger.warn('Failed to parse customPayload:', error);
